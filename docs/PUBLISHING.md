@@ -1,19 +1,23 @@
-# Publishing CFA
+# Publishing iOS App Development with CFA
 
 ## Identity
 
-- Name: **Cooperative Feature Architecture (CFA)**
-- Repository slug: `cooperative-feature-architecture`
-- Subtitle: **An AI-assisted iOS architecture toolkit for SwiftUI and Swift Concurrency.**
+- Repository and plugin name: **iOS App Development with CFA**
+- Underlying architecture: **Cooperative Feature Architecture (CFA)**
+- Plugin identifier: `ios-app-development-cfa`
+- Plugin display name: **iOS App Development with CFA**
+- Repository slug: `iOS-App-Development-CFA-AI-Toolkit`
+- Subtitle: **AI skills and tools to build, modernise and maintain SwiftUI apps with Swift Concurrency.**
 - Suggested repository topics: `swift`, `swiftui`, `ios`, `swift-concurrency`, `architecture`, `ai-assisted-development`, `mvvm`, `gcd`, `migration`, `agent-skills`.
 
-Keep the architecture name stable. Use AI, SwiftUI and Swift Concurrency naturally in
-page titles, descriptions and examples. This is descriptive positioning, not a
-promise of search ranking. CFA is an architectural method, not an AI runtime.
+Keep the architecture name stable, but lead with the work the toolkit helps
+developers do. Use AI, SwiftUI and Swift Concurrency naturally in page titles,
+descriptions and examples. This is descriptive positioning, not a promise of
+search ranking. CFA is an architectural method, not an AI runtime.
 
 ## What is ready locally
 
-The source, plugin manifest, five self-contained skills, scanner, tests, installer,
+The source, plugin manifest, eight self-contained skills, scanner, tests, installer,
 MIT licence and reproducible ZIP builder live together in this repository. The
 scanner has no npm dependencies. The skills include their own references and tools.
 No Trend checkout is required. Download users need Node.js 20+; maintainers also

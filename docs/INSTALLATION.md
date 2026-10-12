@@ -1,4 +1,4 @@
-# Install CFA
+# Install iOS App Development with CFA
 
 ## Requirements
 
@@ -41,7 +41,7 @@ template from another source.
 
 ## Recommended: Codex plugin
 
-1. Download the `cooperative-feature-architecture-<version>-plugin.zip` release.
+1. Download the `ios-app-development-cfa-<version>-plugin.zip` release.
 2. Extract it. Keep the extracted folder intact.
 3. Open a terminal in that folder and run:
 
@@ -56,7 +56,7 @@ If macOS asks you to approve opening a downloaded script, inspect the script and
 the terminal command above. The package is not an Apple-signed or notarised installer.
 
 The installer verifies the package checksum inventory, copies the complete plugin to
-`~/plugins/cooperative-feature-architecture`, preserves/extends your personal
+`~/plugins/ios-app-development-cfa`, preserves/extends your personal
 `~/.agents/plugins/marketplace.json`, and runs `codex plugin add` using the actual
 marketplace name. No custom marketplace registration is required for this default
 personal location. It also adds a `cfa` Terminal command in `~/.local/bin`. No
@@ -110,7 +110,7 @@ Open a **new conversation** after installation and ask the agent:
 
 ```text
 I have just installed the CFA Toolkit for iOS from
-https://github.com/3DaysOfSwift/cooperative-feature-architecture.
+https://github.com/3DaysOfSwift/iOS-App-Development-CFA-AI-Toolkit.
 Did it work? Do you have access to create and maintain iOS projects with CFA?
 ```
 
@@ -167,10 +167,13 @@ never silently deletes an old skill or guesses whether local edits are disposabl
 
 ## Uninstall
 
-For a plugin, use `codex plugin remove cooperative-feature-architecture@personal`,
+For a plugin, use `codex plugin remove ios-app-development-cfa@personal`,
 substituting the marketplace name printed by the installer if it was not `personal`.
 This removes native activation; the staged source and marketplace listing can remain
 for reinstall. Remove those deliberately only when you no longer need them.
+Existing installations under `cooperative-feature-architecture` are a separate
+plugin identity. Installing this renamed plugin does not remove the old one;
+review any local changes before deactivating the previous installation.
 
 For standalone skills, remove only the eight installed folders printed by the installer:
 `cfa-app-creation`, `cfa-feature-work`, `cfa-architecture-adoption`,

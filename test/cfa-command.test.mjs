@@ -15,7 +15,7 @@ function sandbox(t) {
 
 function installedCommand(t) {
   const directory = sandbox(t);
-  const source = stageRelease(path.join(directory, 'cooperative-feature-architecture'));
+  const source = stageRelease(path.join(directory, 'ios-app-development-cfa'));
   const result = install({ source, destination: path.join(directory, 'customer'), mode: 'skills' });
   return { directory, command: result.command };
 }

@@ -1,16 +1,23 @@
 <p align="left">
-  <a href="https://github.com/3DaysOfSwift/cooperative-feature-architecture">
+  <a href="https://github.com/3DaysOfSwift/iOS-App-Development-CFA-AI-Toolkit">
     <img src="readme-images/CFA-Toolkit-AppIcon.png" width="320" alt="CFA Toolkit icon">
   </a>
 </p>
 
-# Cooperative Feature Architecture (CFA)
+# iOS App Development with CFA
 
-**CFA is a modern iOS app architecture for commercial Xcode projects.** It was
-created by iOS developers with 17 years of experience building, publishing
-and maintaining iOS applications. CFA gives SwiftUI, ViewModels, Feature
-Managers, repositories and Swift Concurrency clear responsibilities, so a team
-can build faster and maintain the result with confidence.
+**Build, modernise, test and maintain iOS apps with AI, SwiftUI and Swift
+Concurrency.** This repository contains the CFA Toolkit: eight AI skills, a
+native Xcode project template, an architecture inspector and practical
+guidance for working on new and existing apps. It is published by
+[3 Days of Swift Concurrency](https://www.3daysofswiftconcurrency.com/).
+
+Cooperative Feature Architecture (CFA) is the method underneath the toolkit.
+Created by iOS developers with 17 years of experience building, publishing
+and maintaining iOS applications, it gives SwiftUI, ViewModels, Feature
+Managers, repositories and Swift Concurrency clear responsibilities. You can
+use the toolkit to build with CFA without first studying an architecture
+manual: the structure is visible in Xcode and the skills explain it as you go.
 
 Its structure is visible in Xcode from the first day. This shortened map uses
 [Trend](https://github.com/3DaysOfSwift/Trend-iOS-App-Swift-Concurrency-CFA) as
@@ -51,7 +58,7 @@ provides guidance for AI-written code, has fewer moving parts, and gives a
 developer a visible path from SwiftUI to each implemented feature and the shared
 state it owns.
 
-# Toolkit - 7 CFA Skills + Swift Quality + 1 Dashboard
+# CFA Toolkit - 8 AI Skills + Inspector
 
 **The CFA Toolkit is a free, open-source collection of eight AI skills and one
 tool.** It teaches an AI coding tool how to create, change, tidy, test, migrate
@@ -59,8 +66,13 @@ and review an iOS project using the CFA architecture. The skills give the AI a
 clear blueprint to follow, which makes AI-driven development more consistent
 and produces a more professional Xcode project from the first feature onward.
 
+The plugin is listed as **iOS App Development with CFA** (`ios-app-development-cfa`)
+so its purpose is clear in an installed plugin list. The GitHub repository is
+**[iOS-App-Development-CFA-AI-Toolkit](https://github.com/3DaysOfSwift/iOS-App-Development-CFA-AI-Toolkit)**;
+Cooperative Feature Architecture remains the name of the architecture.
+
 <p align="left">
-  <a href="https://github.com/3DaysOfSwift/cooperative-feature-architecture">
+  <a href="https://github.com/3DaysOfSwift/iOS-App-Development-CFA-AI-Toolkit">
     <img src="readme-images/3DaysOfSwiftConcurrency-h512.png" width="320" alt="3DaysOfSwiftConcurrency.com logo">
   </a>
 </p>
@@ -123,7 +135,7 @@ conversation and paste this message:
 
 ```text
 I have installed the CFA Toolkit for iOS from
-https://github.com/3DaysOfSwift/cooperative-feature-architecture.
+https://github.com/3DaysOfSwift/iOS-App-Development-CFA-AI-Toolkit.
 Do you have access to create and maintain iOS projects with CFA?
 ```
 
@@ -402,7 +414,7 @@ the [validation record](docs/VALIDATION.md) and [Privacy](docs/PRIVACY.md).
 ## Copyright and permission
 
 <p align="left">
-  <a href="https://github.com/3DaysOfSwift/cooperative-feature-architecture">
+  <a href="https://github.com/3DaysOfSwift/iOS-App-Development-CFA-AI-Toolkit">
     <img src="readme-images/3DaysOfSwiftConcurrency-h512.png" width="320" alt="3DaysOfSwiftConcurrency.com logo">
   </a>
 </p>

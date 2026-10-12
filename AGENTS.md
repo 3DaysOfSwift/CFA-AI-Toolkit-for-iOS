@@ -1,13 +1,15 @@
-# Cooperative Feature Architecture toolkit
+# iOS App Development with CFA toolkit
 
 This is the independent CFA toolkit, not the Trend app. Maintain `architecture/cfa-specification.md`
 as the canonical architecture and `tools/architecture-dashboard` as the canonical executable.
 Run `node scripts/sync.mjs` to refresh generated skill dependencies. Never copy reports,
 private source, absolute workstation paths or credentials into releases.
 
-The public project identity is Cooperative Feature Architecture (CFA). Use the subtitle
-“An AI-assisted iOS architecture toolkit for SwiftUI and Swift Concurrency.” AppModel is
-the composition-root type, not the public product name. Respect a customer's bundle prefix.
+The public repository and plugin identity is iOS App Development with CFA.
+Cooperative Feature Architecture (CFA) remains the architecture name. Use the
+subtitle “AI skills and tools to build, modernise and maintain SwiftUI apps with
+Swift Concurrency.” AppModel is the composition-root type, not the public product
+name. Respect a customer's bundle prefix.
 
 Keep seven independent workflows: app creation, CFA feature work, architecture
 adoption, Legacy GCD migration, read-only architecture review, iterative CFA

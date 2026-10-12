@@ -6,7 +6,7 @@ import { files, hash, json } from './files.mjs';
 import { verifyXcodeTemplateStructure } from './verify-xcode-template-structure.mjs';
 export function validate(base=root,{source=true}={}) {
   const manifest=json(path.join(base,'.codex-plugin/plugin.json'));
-  if(manifest.name!=='cooperative-feature-architecture') throw Error('Unexpected plugin identifier.');
+  if(manifest.name!=='ios-app-development-cfa') throw Error('Unexpected plugin identifier.');
   if(!/^\d+\.\d+\.\d+(?:-[a-z0-9.-]+)?$/.test(manifest.version)) throw Error('Invalid release version.');
   if(manifest.license!=='MIT' || manifest.skills!=='./skills/') throw Error('Missing licence or skills path.');
   for (const field of ['logo', 'composerIcon']) {

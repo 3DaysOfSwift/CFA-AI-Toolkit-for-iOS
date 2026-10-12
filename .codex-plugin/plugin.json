@@ -1,15 +1,15 @@
 {
-  "name": "cooperative-feature-architecture",
+  "name": "ios-app-development-cfa",
   "version": "0.2.0-beta.2",
-  "description": "AI-assisted iOS architecture toolkit for SwiftUI and Swift Concurrency: build with CFA, migrate legacy apps, and review source evidence.",
+  "description": "AI skills and tools to build, modernise, test and maintain SwiftUI apps with Swift Concurrency and CFA.",
   "author": {
     "name": "3 Days of Swift Concurrency"
   },
   "skills": "./skills/",
   "interface": {
-    "displayName": "Cooperative Feature Architecture",
-    "shortDescription": "AI-assisted SwiftUI architecture and migration",
-    "longDescription": "Eight skills for CFA app creation, feature work, architecture adoption, Legacy GCD migration, read-only architecture review, codebase tidying, unit tests and Swift code quality. Includes a local evidence dashboard. Created by 3DaysOfSwiftConcurrency.com.",
+    "displayName": "iOS App Development with CFA",
+    "shortDescription": "Build and modernise iOS apps with Swift Concurrency",
+    "longDescription": "Eight skills for iOS app creation, feature work, CFA adoption, Legacy GCD migration, architecture review, codebase tidying, unit tests and Swift code quality. Includes a local evidence dashboard. Created by 3DaysOfSwiftConcurrency.com.",
     "developerName": "3 Days of Swift Concurrency",
     "category": "Productivity",
     "logo": "./readme-images/CFA-Toolkit-AppIcon.png",

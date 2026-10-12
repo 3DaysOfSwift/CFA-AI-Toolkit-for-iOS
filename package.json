@@ -1,10 +1,10 @@
 {
-  "name": "cooperative-feature-architecture",
+  "name": "ios-app-development-cfa",
   "version": "0.2.0-beta.2",
   "private": true,
   "type": "module",
   "license": "MIT",
-  "description": "AI-assisted iOS architecture toolkit for SwiftUI and Swift Concurrency: build with CFA, migrate legacy apps, and review source evidence.",
+  "description": "AI skills and tools to build, modernise, test and maintain SwiftUI apps with Swift Concurrency and CFA.",
   "engines": {
     "node": ">=20"
   },

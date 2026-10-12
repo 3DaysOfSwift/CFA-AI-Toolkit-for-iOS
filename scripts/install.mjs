@@ -8,7 +8,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { inventory, verify, json, writeJSON, files } from './files.mjs';
 import { skills } from './sync.mjs';
 
-const NAME='cooperative-feature-architecture';
+const NAME='ios-app-development-cfa';
 const RECEIPT='.cfa-receipt.json';
 const COMMAND_MARKER='# CFA Toolkit command launcher';
 function runCodex(executable,args) {

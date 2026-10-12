@@ -10,7 +10,7 @@ import { install } from '../scripts/install.mjs';
 import { json, hash, inventory } from '../scripts/files.mjs';
 
 function sandbox(t) { const dir=fs.mkdtempSync(path.join(os.tmpdir(),'cfa-test-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));return dir; }
-function release(t) {const dir=sandbox(t);return {dir,source:stageRelease(path.join(dir,'cooperative-feature-architecture'))};}
+function release(t) {const dir=sandbox(t);return {dir,source:stageRelease(path.join(dir,'ios-app-development-cfa'))};}
 
 test('standalone release carries scanner dependencies and scans outside the source checkout',t=>{
  const {dir,source}=release(t); const destination=path.join(dir,'customer');
@@ -57,9 +57,9 @@ test('plugin staging preserves unrelated marketplace configuration and names',t=
  assert.equal(result.status,'staged');assert.equal(result.marketplace,'my-personal');
  assert.deepEqual(json(market).plugins[0],existing.plugins[0]);
  assert.deepEqual(json(market).interface,existing.interface);
- assert.equal(json(market).plugins[1].source.path,'./plugins/cooperative-feature-architecture');
- assert.ok(fs.existsSync(path.join(destination,'plugins/cooperative-feature-architecture/skills/cfa-app-creation/references/cfa-specification.md')));
- const stagedPlugin=path.join(destination,'plugins/cooperative-feature-architecture');
+ assert.equal(json(market).plugins[1].source.path,'./plugins/ios-app-development-cfa');
+ assert.ok(fs.existsSync(path.join(destination,'plugins/ios-app-development-cfa/skills/cfa-app-creation/references/cfa-specification.md')));
+ const stagedPlugin=path.join(destination,'plugins/ios-app-development-cfa');
  const iconPath='./readme-images/CFA-Toolkit-AppIcon.png';
  const brandedManifest=json(path.join(stagedPlugin,'.codex-plugin/plugin.json'));
  assert.equal(brandedManifest.interface.logo,iconPath);

@@ -1,5 +1,11 @@
 # Unreleased
 
+- Update repository references to `iOS-App-Development-CFA-AI-Toolkit` after the GitHub rename. The installed plugin identifier is unchanged.
+- Rename the plugin identifier to `ios-app-development-cfa` and its display name
+  to **iOS App Development with CFA**. Update repository links to the renamed
+  `iOS-App-Development-CFA` repository; Cooperative Feature Architecture remains
+  the architecture name. Existing installations under the old plugin identifier
+  remain separate.
 - Added CFA Codebase Tidy as the fifth independently installable workflow, with bundled architecture and behaviour references, iterative cleanup, and ViewModel/feature-manager unit-test audits.
 
 # Changelog

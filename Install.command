@@ -16,7 +16,7 @@ if [ -z "$NODE_EXECUTABLE" ]; then
   exit 1
 fi
 INSTALL_ARGUMENTS=""
-if [ -d "$HOME/plugins/cooperative-feature-architecture" ]; then
+if [ -d "$HOME/plugins/ios-app-development-cfa" ]; then
   INSTALL_ARGUMENTS="--replace"
 fi
 
