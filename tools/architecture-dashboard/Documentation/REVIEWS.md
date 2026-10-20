@@ -18,7 +18,7 @@ described in [OBSERVATIONS.md](OBSERVATIONS.md).
     "status": "Ordering risk — source review",
     "description": "Explain the actual implementation and consequences.",
     "check": "Describe a focused regression scenario; not an executed test.",
-    "evidence": [{"file": "App/SaveManager.swift", "line": 10, "endLine": 20}]
+    "evidence": [{"file": "App/SaveFeature.swift", "line": 10, "endLine": 20}]
   }],
   "testQuality": {
     "scope": "Named scenario groups reviewed, with exclusions",
@@ -72,7 +72,7 @@ actual code; the lexical scanner does not generate a semantic call graph.
 
 Check `.task` navigation cancellation, `.task(id:)` cancellation/restart on ID
 changes, and repeated Button invocations (no automatic cancellation). Inspect
-manager guards before suspension, independent workers, state ordering, partial
+feature guards before suspension, independent workers, state ordering, partial
 writes and remote commit/idempotency boundaries. A load can also mutate storage.
 Cancellation does not roll back server work. Correctly managed roots and shared
 workers are valid outcomes, not automatic warnings.
@@ -129,7 +129,7 @@ coverage is omitted, never substituted with a pass percentage.
 ## Supported scope
 
 This dashboard is for modern iOS applications using Swift Concurrency, including
-SwiftUI MVVM with feature managers and a central composition root. Names and
+SwiftUI MVVM with features and a central composition root. Names and
 folder labels are not mandatory. The CLI rejects a scope with no Swift Concurrency
 syntax; the reviewer must still resolve target membership and custom-name false
 matches. It is a lexical scanner plus authored review, not a Swift compiler.

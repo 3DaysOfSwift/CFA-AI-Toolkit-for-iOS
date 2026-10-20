@@ -1,4 +1,4 @@
-# Install iOS App Development with CFA
+# Install CFA AI Toolkit for iOS
 
 ## Requirements
 
@@ -12,11 +12,11 @@ all eight skills, references and dashboard executable source, with no Trend depe
 
 ## Xcode project template
 
-The Toolkit includes **CFA App**, a native Xcode project template. It is
+The CFA AI Toolkit for iOS includes **CFA App**, a native Xcode project template. It is
 separate from the AI-skill installation: install it when you want a new CFA
 project to appear in Xcode's project chooser.
 
-From the root of the extracted Toolkit release, double-click
+From the root of the extracted CFA AI Toolkit for iOS release, double-click
 `Install Xcode Template.command`. It copies the template without requiring
 Node.js.
 
@@ -109,7 +109,7 @@ node scripts/install.mjs --codex /path/to/codex
 Open a **new conversation** after installation and ask the agent:
 
 ```text
-I have just installed the CFA Toolkit for iOS from
+I have just installed CFA AI Toolkit for iOS from
 https://github.com/3DaysOfSwift/iOS-App-Development-CFA-AI-Toolkit.
 Did it work? Do you have access to create and maintain iOS projects with CFA?
 ```

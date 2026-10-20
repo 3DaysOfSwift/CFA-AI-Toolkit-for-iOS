@@ -27,7 +27,7 @@ test('framework modifiers, detached work and group scopes have distinct kinds',(
 test('architecture warnings depend on source location, not every conditional',()=>{
   const source='if visible { show() }; let day = calendar.startOfDay(for: date)';
   assert.equal(scanSource(source,'CoffeeViewModel.swift').sites.filter(s=>s.kind==='ui-rule').length,1);
-  assert.equal(scanSource(source,'CoffeeManager.swift').sites.length,0);
+  assert.equal(scanSource(source,'CoffeeFeature.swift').sites.length,0);
 });
 test('scan excludes test folders and symlinks and does not change input',async()=>{
   const root=await fs.mkdtemp(path.join(os.tmpdir(),'swift-explorer-test-'));

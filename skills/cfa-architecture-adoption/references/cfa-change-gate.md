@@ -21,19 +21,22 @@ the architecture:
    View with `@State`.
 2. Each ViewModel defaults its narrow live feature dependency from
    `AppModel.shared`, while tests can provide an isolated replacement.
-3. Screen View initializers do not receive AppModel, feature managers,
+3. Screen View initializers do not receive AppModel, features,
    repositories or ViewModels.
 4. `ThemeManager` is an app-wide presentation dependency supplied through the
-   SwiftUI environment. AppModel and feature managers are not environment
+   SwiftUI environment. AppModel and features are not environment
    values.
-5. Feature managers own feature state and behaviour; ViewModels own screen
+5. Features own feature state and behaviour; ViewModels own screen
    presentation state and route user intent to their feature.
 6. RootTabView is structural only. It presents tabs and navigation; it does not
    refresh features, interpret feature failures, or own feature loading state.
-7. Every AppModel property, ViewModel dependency, initializer label, and local
-   reference that represents a CFA feature ends in `Feature`. Reserve `Manager`
-   for concrete implementation type names such as `SettingsManager`.
-8. API operations return domain data or throw. Feature managers keep domain
+7. Every concrete feature type ends in `Feature`, such as `SettingsFeature`.
+   Its AppModel property, ViewModel dependency, initializer label, and local
+   reference use the matching lower-camel-case name, such as
+   `settingsFeature`. A narrow protocol, when useful, may be named
+   `SettingsFeatureAPI`. Reserve infrastructure names for lower-level services;
+   do not call a feature owner a `Manager`.
+8. API operations return domain data or throw. Features keep domain
    data, operation state and retained errors as separate values; no result-like
    `LoadState` enum may carry all three.
 9. Application launch begins at the application lifecycle boundary. AppModel's
@@ -42,11 +45,11 @@ the architecture:
    intentionally screen-lifetime-bound work.
 10. A non-trivial SwiftData repository is a `@ModelActor`. Its `ModelContext`
     and SwiftData records stay inside that actor; it returns `Sendable` domain
-    values to the main-actor concrete feature-manager type.
+    values to the main-actor concrete feature type.
 11. Views remain declarative. Bundle/system reads and presentation formatting
     belong to the adjacent ViewModel; business, persistence, and shared state
-    belong to the owning FeatureManager.
-12. A ViewModel initializer accepts only its narrow FeatureManager, defaulted
+    belong to the owning Feature.
+12. A ViewModel initializer accepts only its narrow feature dependency, defaulted
     from `AppModel.shared`. UI data is exposed by that feature and read through
     the ViewModel; do not add convenience initializer parameters.
 13. Each local data responsibility uses the simplest single persistence route.
@@ -67,7 +70,8 @@ Review the changed source as one feature slice, not as isolated files.
 - Confirm that launch refresh logic is absent from RootTabView and feature
   screens do not use `.task` as a substitute for application launch.
 - Confirm that cached domain data remains representable while a refresh runs or
-  fails, and that AppModel feature properties retain the `Feature` suffix.
+  fails, and that concrete feature types and their AppModel properties retain
+  the `Feature` suffix.
 - Confirm that storage work does not leak SwiftData `@Model` objects across an
   actor boundary, and that a `@ModelActor` is used where database work is not
   deliberately small and UI-owned.

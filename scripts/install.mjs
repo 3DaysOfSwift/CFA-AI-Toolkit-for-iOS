@@ -140,7 +140,7 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1]
       }
       const result=install(options);console.log(JSON.stringify(result,null,2));
       if(result.status==='installed') {
-        console.log('Installation complete. Open a new conversation, then ask: I have installed the CFA Toolkit for iOS. Do you have access to create and maintain iOS projects with CFA?');
+        console.log('Installation complete. Open a new conversation, then ask: I have installed CFA AI Toolkit for iOS. Do you have access to create and maintain iOS projects with CFA?');
         if(result.command) console.log(`Terminal command installed: ${result.command}\nRun: cfa dashboard`);
       } else console.log('Package staged; Codex activation was not attempted.');
     }

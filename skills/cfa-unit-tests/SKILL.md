@@ -7,8 +7,8 @@ description: Write, organise and audit meaningful unit tests for CFA SwiftUI app
 
 Read the [CFA specification](references/cfa-specification.md), [CFA change gate](references/cfa-change-gate.md), [product
 behaviour contract](references/product-behaviour-contract.md) and [Swift coding
-guide](references/swift-coding-guide.md). Keep production decisions in Feature
-Managers and presentation state in ViewModels; never move a business rule into
+guide](references/swift-coding-guide.md). Keep production decisions in Features
+and presentation state in ViewModels; never move a business rule into
 a ViewModel merely to make it easier to test.
 
 For a review-only request, inventory and report without editing. For a writing

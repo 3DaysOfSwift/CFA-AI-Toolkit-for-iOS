@@ -3,7 +3,7 @@ import Observation
 
 @MainActor
 @Observable
-final class SettingsManager {
+final class SettingsFeature {
     private let defaults: UserDefaults
     private let selectedColourThemeStorageKey = "selectedColourTheme"
     private let developerWebsiteAddress = "https://3daysofswiftconcurrency.com"

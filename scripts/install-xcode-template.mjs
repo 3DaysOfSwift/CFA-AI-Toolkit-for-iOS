@@ -25,7 +25,7 @@ function isCFATemplate(directory) {
 
 function install({ destination = path.join(os.homedir(), 'Library', 'Developer', 'Xcode', 'Templates'), replace = false } = {}) {
   if (!fs.existsSync(path.join(templateSource, 'TemplateInfo.plist'))) {
-    throw Error('CFA App template is missing from this Toolkit copy. Download a complete release and retry.');
+    throw Error('CFA App template is missing from this CFA AI Toolkit for iOS copy. Download a complete release and retry.');
   }
 
   const target = path.join(path.resolve(destination), relativeTemplate);

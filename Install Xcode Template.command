@@ -5,7 +5,7 @@ template_destination="$HOME/Library/Developer/Xcode/Templates/Project Templates/
 legacy_template_destination="$HOME/Library/Developer/Xcode/Templates/Project Templates/iOS/Application/CFA iOS App.xctemplate"
 
 if [[ ! -f "$template_source/TemplateInfo.plist" ]]; then
-  echo "CFA App template files are missing from this Toolkit folder."
+  echo "CFA App template files are missing from this CFA AI Toolkit for iOS folder."
   result_code=1
 elif [[ -e "$legacy_template_destination" ]]; then
   marker="$legacy_template_destination/CFA-TEMPLATE.json"

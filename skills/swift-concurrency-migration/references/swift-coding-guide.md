@@ -1,6 +1,6 @@
 # Swift coding guide
 
-Our working principles for readable, dependable Swift. This is a living guide: add rules when they solve a demonstrated problem, explain their purpose, and keep examples small. It applies to first-party source and tests across the CFA toolkit. It is an engineering standard, not a claim that Swift itself forbids these constructs.
+Our working principles for readable, dependable Swift. This is a living guide: add rules when they solve a demonstrated problem, explain their purpose, and keep examples small. It applies to first-party source and tests across CFA AI Toolkit for iOS. It is an engineering standard, not a claim that Swift itself forbids these constructs.
 
 Creation follows these rules from the start. Adoption, Legacy GCD migration and tidying apply them within the requested scope. Read-only reviews report violations and suggested corrections without editing code. Legacy GCD migration adopts CFA while preserving product behaviour; it does not mechanically replace GCD syntax or preserve an unclear ownership model.
 
@@ -34,7 +34,7 @@ Use nonoptional APIs where possible. Iterate dictionary entries rather than forc
 
 **Rule:** Keep decisions needed by all targets—including future targets—in the model, not Views or ViewModels.
 
-“Model” means the domain layer: feature managers, policies and domain values. It does not mean putting every function in a single model object. Repositories own storage and transport implementation details.
+“Model” means the domain layer: features, policies and domain values. It does not mean putting every function in a single model object. Repositories own storage and transport implementation details.
 
 A purchase entitlement, publishing allowance, validation rule, recommendation policy or completion reward must behave identically from an iPhone screen, a future Mac app or another entry point. The feature must enforce it even if the UI also disables a button.
 
@@ -66,15 +66,15 @@ Move view-related work—formatting externally supplied values, reading bundle o
 system metadata, constructing presentation strings, coordinating actions, and
 handling UI outcomes—to that View's ViewModel so it can be tested without
 rendering the View. Move business decisions, persistence, network work, and
-shared feature state to the owning FeatureManager. Bindings, simple conditional
+shared feature state to the owning Feature. Bindings, simple conditional
 rendering, and short layout-local values that directly describe the rendered
 interface remain declarative View code.
 
 In CFA, a screen ViewModel has one narrow initializer input only: its owning
-FeatureManager, defaulted from `AppModel.shared`. Do not add convenience inputs
+Feature, defaulted from `AppModel.shared`. Do not add convenience inputs
 for bundle values, URLs, strings, dates, defaults, services, or other UI data.
-That information belongs to the owning FeatureManager and flows to the View
-through the ViewModel. Tests may pass an isolated FeatureManager through that
+That information belongs to the owning Feature and flows to the View
+through the ViewModel. Tests may pass an isolated Feature through that
 same single parameter; production screens instantiate their ViewModel with no
 arguments.
 
@@ -101,9 +101,9 @@ The example assumes a ViewModel-owned task property and explicit feature depende
 
 Bindings, conditional content, `ForEach` and direct dismissal are declarative UI work. A View `.task` is lifecycle-bound work, not a general loading mechanism: use it only when cancellation on that screen's disappearance is the intended product behaviour. Do not use it for app-launch refreshes, persistent saves or shared feature work that must outlive a screen. UIKit delegate and layout code belongs in a named presentation adapter when needed. Do not create extra layers just to move a trivial assignment.
 
-The SwiftUI environment is for app-wide presentation dependencies such as `ThemeManager`, locale-aware formatting or accessibility configuration. Do not place `AppModel` or a feature manager in the environment. Use the active architecture's declared composition route for feature dependencies. In CFA, a View owns its ViewModel and that ViewModel defaults its narrow live feature dependency from `AppModel.shared`; do not replace that route with screen-initializer plumbing.
+The SwiftUI environment is for app-wide presentation dependencies such as `ThemeManager`, locale-aware formatting or accessibility configuration. Do not place `AppModel` or a feature in the environment. Use the active architecture's declared composition route for feature dependencies. In CFA, a View owns its ViewModel and that ViewModel defaults its narrow live feature dependency from `AppModel.shared`; do not replace that route with screen-initializer plumbing.
 
-**Review:** A reader should see what the screen displays and which intents it forwards without tracing storage calls, bundle/system reads, formatting work, business rules, or multi-step tasks in its body. Does the ViewModel have only its defaulted FeatureManager input?
+**Review:** A reader should see what the screen displays and which intents it forwards without tracing storage calls, bundle/system reads, formatting work, business rules, or multi-step tasks in its body. Does the ViewModel have only its defaulted Feature input?
 
 ## 4. Prefer a straightforward solution
 
@@ -141,7 +141,7 @@ used in its declarations?
 
 ### Keep operation state separate from domain data
 
-**Rule:** An API function returns its domain value or throws. A feature manager
+**Rule:** An API function returns its domain value or throws. A feature
 owns current domain data, operation state, and any retained error as separate
 properties. Do not make a `LoadState` enum carry all three.
 
@@ -155,33 +155,34 @@ not, separate the domain data from the operation state.
 
 ### Name shared feature capabilities as features
 
-**Rule:** Refer to an app capability as a **feature**, even when its concrete
-implementation type is a manager. Use `gitReposFeature`, `settingsFeature`, or
-`purchaseFeature` for AppModel properties, stored dependencies, initializer
-labels, and local values. This makes it clear that the value represents a CFA
-feature, not a generic object whose implementation detail happens to be a
-manager.
+**Rule:** Name each concrete CFA feature owner for its capability with a
+`Feature` suffix, such as `SettingsFeature` or `GitReposFeature`. Use the
+matching lower-camel-case name—`settingsFeature` or `gitReposFeature`—for its
+AppModel property, ViewModel dependency, initializer label, and local values.
+When a narrow protocol is useful, distinguish it with an `API` suffix, such as
+`SettingsFeatureAPI`. Do not require a protocol solely to satisfy the diagram.
 
-Reserve the `Manager` suffix for a concrete type that manages something:
-`GitReposManager`, `SettingsManager`, or `ThemeManager`. Infrastructure is not
-a feature merely because it has a manager-like responsibility: name it for the
-thing it manages, such as `RepoFileCache` or `LocalDatabase`.
+Do not call the feature owner a `Manager`. A lower-level collaborator should
+describe its job, such as `SettingsStore`, `LocationClient`, or
+`PurchaseService`; `Manager` remains acceptable for a genuine infrastructure
+or presentation manager such as `ThemeManager`. Do not rename an existing app
+merely because a review discovered an older convention.
 
-**Review:** Do references describe the feature (`settingsFeature`) while the
-concrete type describes its responsibility (`SettingsManager`)?
+**Review:** Does `let settingsFeature: SettingsFeature = appModel.settingsFeature`
+name the same capability consistently across the route?
 
 ### Every type must earn its existence
 
 **Rule:** Do not create a type merely because an architecture diagram has a box with that name. Every new type must own a real responsibility that cannot be expressed more clearly by an existing type.
 
-- A **feature manager** is the concrete implementation of a feature. It owns durable feature state, a business policy, or a cohesive operation that coordinates its provider and storage dependencies.
+- A **feature** is the concrete owner of a capability. It owns durable feature state, a business policy, or a cohesive operation that coordinates its provider and storage dependencies.
 - A **ViewModel** owns presentation state, an asynchronous UI workflow, or a translation from feature outcomes into user-facing state. Do not create one just to forward `selectTheme()` to another object.
 - A **protocol** represents a genuine substitution boundary: a second production implementation, an external capability that must be replaced in deterministic tests, or a library-facing contract. Do not create a protocol “just in case.”
 - An **actor** owns mutable state that must be isolated away from its caller. Do not add one to hide an isolation error or make ordinary code appear concurrent.
 
-A thin starter project must still be honest. A Settings feature may have a manager because it owns persisted user preferences. In CFA, its screen still has a dedicated ViewModel: the ViewModel owns the declarative screen boundary and presentation formatting, while the feature owns the preference state and mutation.
+A thin starter project must still be honest. `SettingsFeature` owns persisted user preferences. In CFA, its screen still has a dedicated ViewModel: the ViewModel owns the declarative screen boundary and presentation formatting, while the feature owns the preference state and mutation.
 
-When an active architecture explicitly requires a named boundary, its contract takes precedence over this generic rule. In CFA, every screen-level View has its own ViewModel and reaches its feature through that ViewModel; do not remove the ViewModel or add feature-manager parameters to a screen initializer in the name of generic minimalism.
+When an active architecture explicitly requires a named boundary, its contract takes precedence over this generic rule. In CFA, every screen-level View has its own ViewModel and reaches its feature through that ViewModel; do not remove the ViewModel or add feature parameters to a screen initializer in the name of generic minimalism.
 
 **Review:** For every added type, write one sentence beginning “This type owns…” If that sentence is vague, duplicates an existing owner, or only describes forwarding, remove the type or merge the responsibility into its existing owner.
 
@@ -271,7 +272,7 @@ boundary. This is our architecture convention, not a limitation of SwiftData.
 - For a production feature that performs meaningful database work, make its
   persistence implementation a `@ModelActor`. The model actor owns its
   `ModelContext` and serializes fetch, insert, delete, and save work away from
-  the Main Actor. Feature managers remain `@MainActor` because they publish
+  the Main Actor. Features remain `@MainActor` because they publish
   observable state to SwiftUI; they await the model actor and publish immutable
   domain values, never SwiftData `@Model` instances.
 - A small UI-owned context may remain on `@MainActor` only when its work is

@@ -19,16 +19,16 @@ Identify, in plain language:
 4. Whether an existing type already owns the responsibility.
 5. Whether two types have the same properties and functions. If they represent the same information and behaviour without a meaningful enforced distinction, keep one type.
 
-For every new Manager, ViewModel, protocol, actor or persistence type, state one concrete ownership sentence: “This type owns …”. Do not create it if that sentence only says it forwards a call, groups files, or might be useful later.
+For every new Feature, ViewModel, protocol, actor or persistence type, state one concrete ownership sentence: “This type owns …”. Do not create it if that sentence only says it forwards a call, groups files, or might be useful later.
 
 ## Architecture and dependency rules
 
-- A feature manager owns feature behaviour and durable state. It does not exist merely to complete a CFA-shaped folder.
+- A feature owns feature behaviour and durable state. It does not exist merely to complete a CFA-shaped folder.
 - A ViewModel earns its existence by owning presentation state or an asynchronous/multi-step UI workflow. A pass-through ViewModel is a defect, not a pattern—unless the active architecture explicitly requires one dedicated ViewModel for every screen.
 - A protocol earns its existence only at a real substitution boundary—usually deterministic tests, multiple production implementations, or a public library contract.
 - An actor earns its existence by isolating mutable state; it is not a generic “background work” marker.
-- SwiftUI environment values are presentation dependencies. Put `ThemeManager` there when it is app-wide. Do not put `AppModel` or feature managers in the environment; use the active architecture's declared composition route for feature dependencies.
-- Keep dependency direction visible: View → optional ViewModel → feature manager → provider/storage. A View may call a manager directly for a trivial intent only when the active architecture permits it. CFA requires View → ViewModel → feature manager for every screen.
+- SwiftUI environment values are presentation dependencies. Put `ThemeManager` there when it is app-wide. Do not put `AppModel` or features in the environment; use the active architecture's declared composition route for feature dependencies.
+- Keep dependency direction visible: View → optional ViewModel → feature → provider/storage. A View may call its feature directly for a trivial intent only when the active architecture permits it. CFA requires View → ViewModel → feature for every screen.
 
 ## Delivery gate
 

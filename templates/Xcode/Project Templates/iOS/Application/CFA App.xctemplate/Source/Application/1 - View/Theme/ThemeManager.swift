@@ -5,9 +5,9 @@ import Observation
 final class ThemeManager {
     static let shared = ThemeManager(settingsFeature: AppModel.shared.settingsFeature)
 
-    private let settingsFeature: SettingsManager
+    private let settingsFeature: SettingsFeature
 
-    init(settingsFeature: SettingsManager) {
+    init(settingsFeature: SettingsFeature) {
         self.settingsFeature = settingsFeature
     }
 

@@ -2,7 +2,7 @@
 
 ## Purpose of this Document
 
-This document defines the AppModel, Feature Manager, MVVM layered architecture
+This document defines the AppModel, Feature, MVVM layered architecture
 used by Trend and intended for future 3 Days of Swift Concurrency reference
 applications. It is a free template for iOS developers and AI coding agents
 creating, changing, or reviewing maintainable production SwiftUI applications
@@ -47,7 +47,7 @@ CFA groups coherent feature state and behaviour behind narrow APIs and explicit
 owners. “Cooperative” describes how features collaborate. Swift’s cooperative
 runtime is a separate concept: Swift Concurrency does not mandate feature-based
 architecture. CFA does not require one actor per feature or all feature code in
-one class. Keep the documented ViewModel, manager, worker and repository boundaries.
+one class. Keep the documented ViewModel, feature, worker and repository boundaries.
 
 This is an application architecture, not a runtime framework dependency. Its
 skills assist construction, migration and review; they do not prove correctness.
@@ -66,7 +66,7 @@ Two principles govern every rule in this document:
 
 ## Coordinated Application Flow
 
-The coordination between SwiftUI, ViewModels, feature managers, repositories,
+The coordination between SwiftUI, ViewModels, features, repositories,
 and lower-level device APIs separates the application's execution paths and
 behavioural responsibilities into one understandable flow through a layered
 system. Together, these parts exist to make a real-world commercial application
@@ -75,7 +75,7 @@ simpler.
 ## Maintenance over Complexity
 
 When an architectural choice adds code without making ownership, behaviour,
-testing, or maintenance clearer, reject it. If a feature manager is divided
+testing, or maintenance clearer, reject it. If a feature is divided
 across several additional managers or layers, question what the increased
 complexity genuinely provides. Continue only when its benefits outweigh its
 maintenance cost.
@@ -96,7 +96,7 @@ ViewModel
   ↓
 Feature API
   ↓
-Feature Manager
+Feature
   ↓
 Repository
   ↓
@@ -105,7 +105,7 @@ External System
 
 User intent moves down through the layers and state or results flow back up. A
 View reports intent to its ViewModel, the ViewModel requests a capability from
-the Feature API, the Feature Manager applies the application's rules, and the
+the Feature API, the concrete Feature applies the application's rules, and the
 Repository interacts with storage, a server, or a device API.
 
 Keep this route short, but never bypass an established owner for convenience.
@@ -136,8 +136,8 @@ Application
 │   ├── AppModel.swift
 │   ├── Features
 │   │   └── Feature Name
-│   │       ├── FeatureAPI.swift
-│   │       ├── FeatureManager.swift
+│   │       ├── FeatureNameFeatureAPI.swift (when a protocol boundary is useful)
+│   │       ├── FeatureNameFeature.swift
 │   │       └── Feature-owned domain types
 │   └── User Data Storage
 │       ├── Protocols
@@ -274,7 +274,7 @@ Use this extraction test:
 >
 > If the Apple Watch prototype requires a business decision to be copied from
 > an iPhone View or ViewModel, business logic has leaked into the UI. Extract
-> that decision into the Model layer and place it in the Feature Manager that
+> that decision into the Model layer and place it in the Feature that
 > owns the feature.
 
 There is zero tolerance for business logic in the UI layer. Do not excuse it
@@ -297,7 +297,7 @@ Coffee
 
 Never share one ViewModel class between different screen Views. Similar screens
 still have different presentation behaviour, lifetimes, state, and future
-requirements. Reuse belongs below the ViewModel boundary in a feature manager,
+requirements. Reuse belongs below the ViewModel boundary in a feature,
 or in a stateless presentational View.
 
 A small reusable View that only renders plain display data may remain stateless
@@ -365,7 +365,7 @@ A ViewModel:
 - is named after exactly one View;
 - uses `@MainActor` and `@Observable` when it exposes UI-observed state;
 - is created and owned by its View using `@State`;
-- accepts only its narrow owning FeatureManager in its initializer, defaulted
+- accepts only its narrow owning Feature in its initializer, defaulted
   from `AppModel.shared`; it does not accept bundle metadata, URLs, defaults,
   services, or other convenience presentation inputs;
 - lives only as long as that View lives;
@@ -382,8 +382,8 @@ The ViewModel initializer provides the live feature as its default while
 remaining replaceable by tests:
 
 ```swift
-init(habits: any HabitsFeature = AppModel.shared.habitsFeature) {
-    self.habits = habits
+init(habitsFeature: any HabitsFeatureAPI = AppModel.shared.habitsFeature) {
+    self.habitsFeature = habitsFeature
 }
 ```
 
@@ -396,7 +396,7 @@ This is mandatory for CFA application screens. Before delivery, verify all three
 
 1. Every screen-level View owns one dedicated `@State` ViewModel created at its property declaration.
 2. Each ViewModel initializer defaults its narrow live feature dependency from `AppModel.shared` while allowing tests to supply an isolated replacement.
-3. A screen View initializer does not receive `AppModel`, a feature manager, repository or ViewModel from its caller.
+3. A screen View initializer does not receive `AppModel`, a feature, repository or ViewModel from its caller.
 
 Do not remove a screen ViewModel, or pass feature dependencies through a screen initializer, merely because a generic architecture guideline would use fewer types. CFA makes the ViewModel boundary explicit so every screen has one clear, testable route into the shared application graph.
 
@@ -412,7 +412,7 @@ A screen View must not receive:
 
 - a ViewModel;
 - AppModel;
-- a feature manager;
+- a feature;
 - a repository;
 - a closure taken from another ViewModel;
 - navigation commands owned by an ancestor ViewModel.
@@ -446,11 +446,11 @@ architectural decision, not an accidental global variable.
 
 AppModel:
 
-- constructs and retains one instance of each app-scoped feature manager;
+- constructs and retains one instance of each app-scoped feature;
 - exposes narrow feature APIs to ViewModels;
 - guarantees that all scenes observe the same underlying application state;
 - prevents SwiftUI environment placement from accidentally creating multiple
-  Models or conflicting feature-manager instances;
+  Models or conflicting feature instances;
 - wires dependencies in one visible `live()` factory;
 - requires every dependency in its initializer;
 - permits isolated AppModel graphs to be assembled in tests;
@@ -471,30 +471,41 @@ need controlled state. Multiple production scenes use the shared graph so they
 cannot accidentally disagree about persisted application state.
 
 Do not give AppModel every function in the application. It is a facade over
-coherent feature managers, not a god object. A command concerning one feature
-belongs on that feature's API and manager.
+coherent features, not a god object. A command concerning one feature
+belongs on that feature's API and concrete implementation.
 
 Do not hide production dependency construction in default initializer values.
 `AppModel.init` is fully explicit. `AppModel.live()` is the only place that
 chooses live repositories, clients, clocks, and feature implementations.
 
-## Organize Behaviour into Cohesive Feature Managers
+## Organize Behaviour into Cohesive Features
 
-A feature manager owns one coherent application capability. Name it directly:
-`SettingsManager`, `PurchaseManager`, `HabitsManager`, not
-`SettingsFeatureManager`.
+A concrete feature owns one coherent application capability. Name its type
+after that capability with the `Feature` suffix: `SettingsFeature`,
+`PurchasesFeature`, `HabitsFeature`. Do not name feature owners `Manager` or
+`FeatureManager`.
 
-Every AppModel property that exposes a feature uses the explicit suffix
-`Feature`: `settingsFeature`, `gitReposFeature`, `purchaseFeature`. Use the
-same vocabulary for ViewModel dependencies, initializer labels, and local
-references. Never shorten one to a plural domain noun such as `repos` or
-`settings`; that makes a shared feature capability look like a collection or
-value. Reserve the `Manager` suffix for concrete implementation type names,
-such as `SettingsManager` and `GitReposManager`.
+Every AppModel property that exposes a feature uses the same domain name and
+the lower-camel-case `Feature` suffix: `settingsFeature`, `gitReposFeature`,
+`purchasesFeature`. Use that exact property name for ViewModel dependencies,
+initializer labels, and local references, including a reference copied from
+`appModel.settingsFeature`. Never shorten one to a plural domain noun such as
+`repos` or `settings`; that makes a shared capability look like a collection.
+When a narrow protocol is useful, distinguish it from the concrete type with
+an `API` suffix, such as `SettingsFeatureAPI`; do not require a protocol for
+every feature.
 
-A feature manager:
+Reserve infrastructure names for the service's actual job: `SettingsStore`,
+`LocationClient`, `PurchaseService`, or a justified `LocationManager`. These
+lower-level collaborators are not features merely because several features
+use them. A shared collaborator may remain in its original owning feature
+while that ownership stays clear; move it to a shared location only when the
+first feature no longer naturally owns it. Do not rename existing apps solely
+to satisfy this convention unless the requested work includes migration.
 
-- exposes a narrow protocol written in domain language;
+A concrete feature:
+
+- exposes a narrow domain API, using a protocol when substitution is useful;
 - owns business rules, validation, calculations, and classifications;
 - coordinates repositories and lower-level collaborators for its workflow;
 - publishes shared feature state after successful persistence;
@@ -535,7 +546,7 @@ caller actually needs through a clear feature API.
 
 ## Keep Persistence Behind Repository Contracts
 
-Feature managers speak to repository protocols in domain language. They do not
+Features speak to repository protocols in domain language. They do not
 know file paths, CloudKit record fields, HTTP routes, database tables, or cache
 formats.
 
@@ -549,9 +560,9 @@ Repository implementations:
 
 For production SwiftData repositories with non-trivial reads, writes, imports,
 or data sets, use a dedicated `@ModelActor`. It owns its `ModelContext`; feature
-managers remain `@MainActor` and publish only immutable `Sendable` domain
+features remain `@MainActor` and publish only immutable `Sendable` domain
 values after awaiting the repository. SwiftData `@Model` records never cross
-from the model actor into a feature manager, ViewModel, or View. A small,
+from the model actor into a feature, ViewModel, or View. A small,
 deliberately UI-owned context may be main-actor isolated when its work is proven
 short, but that is an exception—not the default commercial persistence design.
 
@@ -596,7 +607,7 @@ The moment the application must track progress, prevent duplication, replace
 older work, or cancel that Task, move Task ownership into the View's tightly
 coupled ViewModel. Task tracking and cancellation are screen behaviour and must
 not accumulate in the View. The ViewModel still exposes clear intent methods,
-and the feature manager owns the underlying business workflow. Do not wrap every
+and the feature owns the underlying business workflow. Do not wrap every
 async method in a ViewModel-owned Task merely to remove `Task` syntax from
 SwiftUI.
 
@@ -667,7 +678,7 @@ func applicationDidFinishLaunching() async
 
 AppModel keeps one simple Boolean to ensure the method runs once. It does not
 store a Task handle. The app delegate creates the launch Task and awaits this
-method; AppModel then awaits the required feature-manager refreshes.
+method; AppModel then awaits the required feature refreshes.
 AppModel does not interpret success, combine failures, show errors, or decide
 whether the user may enter a feature.
 
@@ -675,7 +686,7 @@ RootTabView is structural only: it presents tabs and navigation. It never starts
 a feature refresh, interprets loading, or presents a feature failure. Each
 feature screen owns that presentation through its own ViewModel.
 
-A feature manager owns the current domain data and minimal operation state as
+A feature owns the current domain data and minimal operation state as
 separate values. A network API returns domain data or throws an error. Do not
 create a `LoadState` enum that carries repositories, error text, and operation
 status together: it is a disguised result type that makes cached data and retry
@@ -687,7 +698,7 @@ private(set) var isRefreshing = false
 private(set) var refreshError: (any Error)?
 ```
 
-`refresh()` is an explicit feature-manager command. It may first publish saved
+`refresh()` is an explicit feature command. It may first publish saved
 data from SwiftData, then request newer data, update storage, and publish the
 confirmed current data. Reading a property must not secretly begin asynchronous
 work. A ViewModel exposes these values as presentation-ready properties; its View
@@ -698,19 +709,19 @@ Use a View `.task` only for work whose lifetime is intentionally tied to that
 specific screen and whose cancellation when the screen disappears is correct.
 Airplane Mode, a temporary API failure, unavailable iCloud, and lost
 connectivity are legitimate user flows, not exceptional states to conceal.
-Retrying asks the same feature manager to refresh again; the View does not
+Retrying asks the same feature to refresh again; the View does not
 reproduce feature rules.
 
 One feature failing must not prevent unrelated features from becoming usable.
 If several scenes report application launch, AppModel's Boolean prevents
 duplicate launch refreshes.
 
-Individual feature managers have no concept of an application launch unless
-launch is genuinely part of that feature's domain. `DailyTipManager.refresh()`
+Individual features have no concept of an application launch unless
+launch is genuinely part of that feature's domain. `DailyTipFeature.refresh()`
 refreshes tips; it does not `beginLaunch()`.
 
 Tests directly test that the launch opportunity triggers the intended features
-once without making AppModel responsible for their results. Each feature manager
+once without making AppModel responsible for their results. Each feature
 has its own tests for successful refresh, failed refresh, retained cached data,
 and retry.
 
@@ -745,7 +756,7 @@ each ViewModel to obtain the date and reconstruct what “today” means.
 For supported modern deployment targets, use `@Observable` rather than Combine
 publisher plumbing for UI-readable reference state.
 
-- Put `@Observable` on ViewModels and UI-observed feature managers.
+- Put `@Observable` on ViewModels and UI-observed features.
 - Put those types on `@MainActor` when their state is read by SwiftUI.
 - Own a ViewModel with `@State` in its View.
 - Create an `@Bindable` projection only when a SwiftUI control requires a
@@ -762,35 +773,34 @@ when it represents completed asynchronous work.
 ## Preserve One Authoritative Owner for Shared State
 
 Every piece of persisted or shared feature state has one authoritative owner:
-its feature manager. ViewModels expose, format, and temporarily edit that state;
+its feature. ViewModels expose, format, and temporarily edit that state;
 they do not maintain competing copies that require manual synchronization.
 
 ViewModel-owned drafts, selections, focus, loading presentation, and transient
 errors are permitted because they belong to one screen. Persisted collections,
-entitlements, synchronization status, and domain results belong to their feature
-manager.
+entitlements, synchronization status, and domain results belong to their feature.
 
 Feature APIs expose state as read-only and provide named commands for mutation.
 Views and ViewModels never mutate a feature collection directly. Every domain
-mutation passes through the manager that owns its rules and persistence.
+mutation passes through the feature that owns its rules and persistence.
 
 ## Separate Domain Decisions from Display Decisions
 
-Feature managers return semantic results and plain data snapshots. ViewModels
+Features return semantic results and plain data snapshots. ViewModels
 translate those results into the exact information their View needs. Views
 render them.
 
 For example:
 
 ```text
-DailyTrendManager: classifies the weight direction
+DailyTrendFeature: classifies the weight direction
 TodayViewModel: exposes the classification and formatted screen values
 TodayView: chooses the icon size and transition for that classification
 ```
 
 A ViewModel may choose display wording or expose a presentation flag. It must
 not recreate the classification rule. If another interface would need the same
-answer, move the answer into the feature manager.
+answer, move the answer into the feature.
 
 Charts receive prepared chart data. SwiftUI draws the chart, but the Model owns
 filtering, ranges, projection, interpolation inputs, trend calculations, and
@@ -811,7 +821,7 @@ Rules for tests:
 - every ViewModel has its own test file and suite;
 - never create one shared test suite for several screen ViewModels;
 - ViewModel tests inject an isolated feature capability;
-- feature-manager tests exercise business rules and workflow coordination;
+- feature tests exercise business rules and workflow coordination;
 - repository tests exercise persistence, synchronization, and failure behaviour;
 - AppModel tests verify construction and application-wide coordination;
 - async functions are awaited directly in unit tests;
@@ -857,10 +867,10 @@ Reject or refactor the following during review:
 - reusable business rules in a ViewModel;
 - one ViewModel shared by multiple unique screens;
 - ViewModels stored by AppModel, a root ViewModel, or another ViewModel;
-- Views receiving ViewModels, feature managers, AppModel, or service closures;
+- Views receiving ViewModels, features, AppModel, or service closures;
 - ViewModels depending on the whole AppModel instead of the smallest coherent
   set of narrow feature APIs;
-- feature managers containing navigation, sheets, dialogs, or screen names;
+- features containing navigation, sheets, dialogs, or screen names;
 - repositories imported directly by Views or ViewModels;
 - deep chains through the AppModel object graph;
 - default live dependencies hidden in `AppModel.init`;
@@ -890,7 +900,7 @@ Before accepting a change, answer every question:
    its View?
 4. Can every View be created without receiving a ViewModel, AppModel, feature,
    repository, or behavioural closure?
-5. Does every business decision live in a feature manager or lower Model layer?
+5. Does every business decision live in a feature or lower Model layer?
 6. Would an Apple Watch app be able to reuse the decision without copying UI
    code?
 7. Does each ViewModel depend on the smallest coherent set of narrow,

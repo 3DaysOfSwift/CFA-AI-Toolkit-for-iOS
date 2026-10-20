@@ -24,7 +24,7 @@ Use deliberate passes:
    delivery, cancellation and callback-execution requirements. Create a product
    behaviour contract from tests, source and manual journeys.
 2. Move one complete feature at a time into CFA. Give each SwiftUI View a
-   bespoke ViewModel, move testable feature decisions into its Feature Manager,
+   bespoke ViewModel, move testable feature decisions into its Feature,
    place shared dependency construction in AppModel and keep persistence behind
    repositories. Do not move GCD syntax mechanically during this pass.
 3. Convert that feature’s asynchronous model work into directly awaitable

@@ -15,14 +15,14 @@ success/failure states and existing behaviour that must remain intact.
 
 If the project is already CFA, make the smallest complete vertical change:
 
-1. Add or change the feature-owned domain behaviour in its Feature Manager and
+1. Add or change the feature-owned domain behaviour in its Feature and
    repository boundary.
 2. Give every new SwiftUI View its own adjacent, bespoke ViewModel. Views remain
    declarative and forward intent; business decisions stay in the feature model.
 3. Wire dependencies through AppModel. Do not create global singletons or add
    generic manager layers.
 4. For a removal, delete the route, View, ViewModel, feature API surface,
-   manager behaviour, storage only when its data-retention requirement permits,
+   feature behaviour, storage only when its data-retention requirement permits,
    tests and Xcode membership together. Search all callers before deleting.
 5. Add or revise meaningful feature and ViewModel tests, build the target and
    run the affected test suite.

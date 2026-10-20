@@ -64,8 +64,8 @@ export function verifyXcodeTemplateStructure(templateDirectory = defaultTemplate
       group: undefined
     },
     {
-      id: '2 - AppModel/Features/Git Repos/GitReposManager.swift',
-      sourcePath: 'Source/Application/2 - AppModel/Features/Git Repos/GitReposManager.swift',
+      id: '2 - AppModel/Features/Git Repos/GitReposFeature.swift',
+      sourcePath: 'Source/Application/2 - AppModel/Features/Git Repos/GitReposFeature.swift',
       group: undefined
     },
     {
@@ -74,8 +74,8 @@ export function verifyXcodeTemplateStructure(templateDirectory = defaultTemplate
       group: undefined
     },
     {
-      id: '2 - AppModel/Features/Settings/SettingsManager.swift',
-      sourcePath: 'Source/Application/2 - AppModel/Features/Settings/SettingsManager.swift',
+      id: '2 - AppModel/Features/Settings/SettingsFeature.swift',
+      sourcePath: 'Source/Application/2 - AppModel/Features/Settings/SettingsFeature.swift',
       group: undefined
     },
     {

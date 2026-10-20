@@ -20,7 +20,7 @@ test('inventory counts creation separately from awaits and group scopes',()=>{
 test('explicit isolation annotations are classified, not inferred',()=>{
   const d=dashboard([
     scanSource('@MainActor class CoffeeViewModel {}','CoffeeViewModel.swift'),
-    scanSource('@MainActor class CoffeeManager {}','Features/CoffeeManager.swift'),
+    scanSource('@MainActor class CoffeeFeature {}','Features/CoffeeFeature.swift'),
     scanSource('// @MainActor\nclass Other {}','Other.swift')
   ]);
   assert.equal(d.metrics.find(m=>m.id==='ui-main').value,1);

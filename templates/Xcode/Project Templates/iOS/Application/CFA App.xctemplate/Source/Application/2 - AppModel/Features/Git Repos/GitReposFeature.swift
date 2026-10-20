@@ -2,7 +2,7 @@ import Observation
 
 @MainActor
 @Observable
-final class GitReposManager {
+final class GitReposFeature {
     private let provider: any GitReposProvider
     private let cache: any RepoCache
 

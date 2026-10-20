@@ -5,7 +5,7 @@ Adopt CFA while preserving product behaviour. Begin at an operation boundary wit
 ## Preserve concurrency guarantees
 
 First establish the CFA boundary for one complete feature: a bespoke ViewModel
-for each View, a feature manager for business decisions and AppModel for
+for each View, a concrete Feature for business decisions and AppModel for
 composition. Then migrate asynchronous model work below the View layer. Keep
 SwiftUI declarative until the Model exposes useful, directly testable async
 functions.

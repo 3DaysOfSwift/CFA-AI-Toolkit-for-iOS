@@ -1,14 +1,20 @@
-# Unreleased
-
-- Update repository references to `iOS-App-Development-CFA-AI-Toolkit` after the GitHub rename. The installed plugin identifier is unchanged.
-- Rename the plugin identifier to `ios-app-development-cfa` and its display name
-  to **iOS App Development with CFA**. Update repository links to the renamed
-  `iOS-App-Development-CFA` repository; Cooperative Feature Architecture remains
-  the architecture name. Existing installations under the old plugin identifier
-  remain separate.
-- Added CFA Codebase Tidy as the fifth independently installable workflow, with bundled architecture and behaviour references, iterative cleanup, and ViewModel/feature-manager unit-test audits.
-
 # Changelog
+
+## 0.3.0 — 2026-10-20
+
+- Deliver eight independent AI skills, the `cfa` command with inspector,
+  dashboard, doctor, and project-guidance commands, and the native CFA App
+  Xcode project template in both release archives.
+- Adopt **CFA AI Toolkit for iOS** as the public display brand while keeping
+  the installed plugin identifier and repository URL stable.
+- Name concrete feature owners `*Feature` and match their AppModel properties,
+  ViewModel dependencies, and local references. Align the Xcode template,
+  bundled skills, project guidance, and inspector vocabulary; existing apps
+  are not automatically renamed.
+- Add CFA Codebase Tidy, CFA Feature Work, CFA Unit Tests, and Swift Code
+  Quality workflows. Expand the installer and local architecture review tools.
+- Add practical installation guidance and links to related Swift Concurrency
+  articles in the README.
 
 ## 0.2.0-beta.2
 

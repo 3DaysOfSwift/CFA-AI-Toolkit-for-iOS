@@ -4,10 +4,10 @@ import Observation
 @MainActor
 @Observable
 final class GitReposViewModel {
-    private let gitReposFeature: GitReposManager
+    private let gitReposFeature: GitReposFeature
 
-    init(feature: GitReposManager = AppModel.shared.gitReposFeature) {
-        self.gitReposFeature = feature
+    init(gitReposFeature: GitReposFeature = AppModel.shared.gitReposFeature) {
+        self.gitReposFeature = gitReposFeature
     }
 
     var repos: [Repo] {

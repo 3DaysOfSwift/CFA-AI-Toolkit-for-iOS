@@ -19,6 +19,7 @@ const cfaSkillNames = [
   'swift-code-quality'
 ];
 const guidanceMarker = '<!-- CFA Toolkit project guidance -->';
+const outdatedFeatureGuidance = 'managers use the Manager suffix';
 const projectGuidance = `${guidanceMarker}
 # CFA project guidance
 
@@ -26,8 +27,11 @@ This iOS project uses Cooperative Feature Architecture (CFA). Match each
 request to the relevant installed CFA skill before changing the project.
 
 - Preserve the CFA call path: View → ViewModel → feature → provider or cache.
-- Every screen has a dedicated ViewModel. AppModel properties exposing feature
-  managers use the Manager suffix; ViewModels depend on narrow feature APIs.
+- Every screen has a dedicated ViewModel. A concrete feature owner uses the
+  Feature suffix; its AppModel property, ViewModel dependency and initializer
+  label use the matching lower-camel-case Feature name. Narrow protocols, when
+  useful, may use the FeatureAPI suffix. Lower-level services keep names that
+  describe their actual jobs.
 - Keep Views declarative. Feature state and business decisions belong outside
   the View layer.
 - Do not call an app CFA merely because it has numbered folders. Trace real
@@ -98,6 +102,11 @@ function doctor(projectArgument) {
   const guidance = guidanceFiles(project);
   if (guidance.length > 0) {
     console.log(`PASS CFA project guidance: ${guidance.join(', ')}`);
+    for (const file of guidance) {
+      if (fs.readFileSync(file, 'utf8').includes(outdatedFeatureGuidance)) {
+        console.log(`WARN outdated feature naming guidance in ${file}; update the CFA guidance block to use concrete *Feature types and matching *Feature properties.`);
+      }
+    }
   } else {
     console.log(`INFO no optional CFA project guidance in ${project}`);
     console.log(`Run: cfa enable-project ${JSON.stringify(project)}`);
@@ -137,6 +146,9 @@ function enableProject(values) {
 
   if (fs.existsSync(guidanceFile) && fs.readFileSync(guidanceFile, 'utf8').includes(guidanceMarker)) {
     console.log(`CFA project guidance is already enabled: ${guidanceFile}`);
+    if (fs.readFileSync(guidanceFile, 'utf8').includes(outdatedFeatureGuidance)) {
+      console.log('The existing guidance still uses the old Manager rule. Edit only the CFA guidance block; the command will not overwrite project instructions.');
+    }
     return;
   }
 

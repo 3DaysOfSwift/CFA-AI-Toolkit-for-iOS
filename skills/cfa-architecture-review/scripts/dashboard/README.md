@@ -24,9 +24,10 @@ node src/cfa.mjs inspect /path/to/your-ios-repository
 node src/cfa.mjs inspect /path/to/your-ios-repository --json
 ```
 
-It identifies screen/ViewModel pairs, visible `AppModel.shared` manager routes,
-manager collaborators, and named ViewModel tests. Findings are lexical leads to
-check in source; zero findings is not a conformance verdict. This command does
+It identifies screen/ViewModel pairs, visible `AppModel.shared` feature routes,
+feature collaborators, and named ViewModel tests. The JSON inspection schema is
+version 2 and names route fields `featureType` and `featureFile`. Findings are
+lexical leads to check in source; zero findings is not a conformance verdict. This command does
 not write a report or alter the inspected project.
 
 ```sh
@@ -88,7 +89,7 @@ defect verdicts. Synchronous work can run inside a Task.
 
 The CLI requires Swift Concurrency syntax in the selected source scope. Verify
 the actual iOS target and live wiring during review; lexical detection alone is
-not compiler confirmation. SwiftUI MVVM, feature managers and a central composition
+not compiler confirmation. SwiftUI MVVM, features and a central composition
 root are supported without requiring an AppModel symbol or Trend's folder names.
 
 Read [Review inputs](Documentation/REVIEWS.md) for findings, test scenarios and
@@ -117,7 +118,7 @@ Never reuse another app’s source classifications.
    confusing an illustrative schedule with an observed execution.
 
 Keep factual Swift Concurrency analysis separate from a team's chosen MVC/MVVM
-or feature-manager conventions. Review evidence before proposing refactoring.
+or feature conventions. Review evidence before proposing refactoring.
 
 ## Development
 

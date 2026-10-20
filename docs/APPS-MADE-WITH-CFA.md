@@ -17,8 +17,10 @@ how the same ownership rules appear in working application code.
 
 - **Starting a new app:** use CFA App Creation, then compare a small complete
   feature with the same boundaries in one of the reference projects.
-- **Adding a feature:** follow the existing app's Feature Manager, repository,
+- **Adding a feature:** follow the existing app's feature owner, repository,
   ViewModel and AppModel wiring rather than placing business rules in a View.
+  The toolkit names new concrete owners `*Feature`; these older projects may
+  retain their existing `*Manager` names until a deliberate migration.
 - **Migrating legacy code:** use Metro Mate as evidence that the Legacy GCD
   migration workflow changes architecture and concurrency in deliberate passes,
   while preserving the application's behaviour.

@@ -1,6 +1,6 @@
 import Foundation
 
-/// The small provider boundary lets GitReposManager be tested without making a real GitHub request.
+/// The small provider boundary lets GitReposFeature be tested without making a real GitHub request.
 protocol GitReposProvider: Sendable {
     func fetchRepos() async throws -> [GitHubRepoResponse]
 }

@@ -54,12 +54,12 @@
         <dict><key>Path</key><string>Source/Application/2 - AppModel/AppModel.swift</string></dict>
         <key>2 - AppModel/Features/Git Repos/Repo.swift</key>
         <dict><key>Path</key><string>Source/Application/2 - AppModel/Features/Git Repos/Repo.swift</string></dict>
-        <key>2 - AppModel/Features/Git Repos/GitReposManager.swift</key>
-        <dict><key>Path</key><string>Source/Application/2 - AppModel/Features/Git Repos/GitReposManager.swift</string></dict>
+        <key>2 - AppModel/Features/Git Repos/GitReposFeature.swift</key>
+        <dict><key>Path</key><string>Source/Application/2 - AppModel/Features/Git Repos/GitReposFeature.swift</string></dict>
         <key>2 - AppModel/Features/Settings/AppColourTheme.swift</key>
         <dict><key>Path</key><string>Source/Application/2 - AppModel/Features/Settings/AppColourTheme.swift</string></dict>
-        <key>2 - AppModel/Features/Settings/SettingsManager.swift</key>
-        <dict><key>Path</key><string>Source/Application/2 - AppModel/Features/Settings/SettingsManager.swift</string></dict>
+        <key>2 - AppModel/Features/Settings/SettingsFeature.swift</key>
+        <dict><key>Path</key><string>Source/Application/2 - AppModel/Features/Settings/SettingsFeature.swift</string></dict>
         <key>2 - AppModel/Networking &amp; Data Storage/File Cache/RepoFileCache.swift</key>
         <dict><key>Path</key><string>Source/Application/2 - AppModel/Networking &amp; Data Storage/File Cache/RepoFileCache.swift</string></dict>
         <key>2 - AppModel/Networking &amp; Data Storage/Networking/GitHubAPI.swift</key>
@@ -84,9 +84,9 @@
         <string>1 - View/Views/Settings/SettingsViewModel.swift</string>
         <string>2 - AppModel/AppModel.swift</string>
         <string>2 - AppModel/Features/Git Repos/Repo.swift</string>
-        <string>2 - AppModel/Features/Git Repos/GitReposManager.swift</string>
+        <string>2 - AppModel/Features/Git Repos/GitReposFeature.swift</string>
         <string>2 - AppModel/Features/Settings/AppColourTheme.swift</string>
-        <string>2 - AppModel/Features/Settings/SettingsManager.swift</string>
+        <string>2 - AppModel/Features/Settings/SettingsFeature.swift</string>
         <string>2 - AppModel/Networking &amp; Data Storage/File Cache/RepoFileCache.swift</string>
         <string>2 - AppModel/Networking &amp; Data Storage/Networking/GitHubAPI.swift</string>
         <string>2 - AppModel/Networking &amp; Data Storage/Protocols/GitReposProvider.swift</string>

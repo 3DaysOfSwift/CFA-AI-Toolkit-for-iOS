@@ -1,10 +1,10 @@
 {
   "name": "ios-app-development-cfa",
-  "version": "0.2.0-beta.2",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "license": "MIT",
-  "description": "AI skills and tools to build, modernise, test and maintain SwiftUI apps with Swift Concurrency and CFA.",
+  "description": "CFA AI Toolkit for iOS: AI skills and tools to build, modernise, test and maintain SwiftUI apps with Swift Concurrency.",
   "engines": {
     "node": ">=20"
   },

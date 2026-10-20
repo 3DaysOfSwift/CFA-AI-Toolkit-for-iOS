@@ -4,10 +4,10 @@ import Observation
 @MainActor
 @Observable
 final class SettingsViewModel {
-    private let settingsFeature: SettingsManager
+    private let settingsFeature: SettingsFeature
 
-    init(feature: SettingsManager = AppModel.shared.settingsFeature) {
-        self.settingsFeature = feature
+    init(settingsFeature: SettingsFeature = AppModel.shared.settingsFeature) {
+        self.settingsFeature = settingsFeature
     }
 
     func selectTheme(_ theme: AppColourTheme) {

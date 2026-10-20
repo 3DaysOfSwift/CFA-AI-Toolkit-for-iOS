@@ -23,7 +23,7 @@ reviewed separation and test-quality ratings; see [Review inputs](REVIEWS.md).
       "action": "Create and retain the load task",
       "task": "Load task",
       "context": "MainActor, explicit class annotation",
-      "evidence": [{"file": "App/Manager.swift", "line": 10, "endLine": 18}]
+      "evidence": [{"file": "App/Feature.swift", "line": 10, "endLine": 18}]
     }],
     "unknowns": ["Storage implementation has not been inspected."]
   }]

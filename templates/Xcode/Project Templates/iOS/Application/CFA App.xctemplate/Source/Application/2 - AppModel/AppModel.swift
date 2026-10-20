@@ -4,11 +4,11 @@ import Foundation
 final class AppModel {
     static let shared = AppModel.live()
 
-    let gitReposFeature: GitReposManager
-    let settingsFeature: SettingsManager
+    let gitReposFeature: GitReposFeature
+    let settingsFeature: SettingsFeature
     private var hasFinishedLaunching = false
 
-    init(gitReposFeature: GitReposManager, settingsFeature: SettingsManager) {
+    init(gitReposFeature: GitReposFeature, settingsFeature: SettingsFeature) {
         self.gitReposFeature = gitReposFeature
         self.settingsFeature = settingsFeature
     }
@@ -30,11 +30,11 @@ final class AppModel {
             )
 
             return AppModel(
-                gitReposFeature: GitReposManager(
+                gitReposFeature: GitReposFeature(
                     provider: GitHubAPI(),
                     cache: RepoFileCache(cacheDirectoryURL: cachesDirectoryURL)
                 ),
-                settingsFeature: SettingsManager()
+                settingsFeature: SettingsFeature()
             )
         } catch {
             preconditionFailure("Unable to open the Git Repositories cache directory: \(error.localizedDescription)")
