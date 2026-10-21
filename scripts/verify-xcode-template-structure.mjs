@@ -47,6 +47,13 @@ export function verifyXcodeTemplateStructure(templateDirectory = defaultTemplate
     sourcePath: 'Source/Application/3 - App Resources/PrivacyInfo.xcprivacy',
     group: '3 - App Resources'
   });
+  for (const [id, sourcePath] of [
+    ['1 - View/Views/Settings/SettingsView.swift', 'Source/Application/1 - View/Views/Settings/SettingsView.swift'],
+    ['1 - View/Views/Settings/SettingsViewModel.swift', 'Source/Application/1 - View/Views/Settings/SettingsViewModel.swift'],
+    ['2 - AppModel/Features/Settings/SettingsFeature.swift', 'Source/Application/2 - AppModel/Features/Settings/SettingsFeature.swift']
+  ]) checkEntry(info, templateDirectory, { id, sourcePath, group: undefined });
+  const appModelSource = fs.readFileSync(path.join(templateDirectory, 'Source/Application/2 - AppModel/AppModel.swift'), 'utf8');
+  if (!/\bsettingsFeature\s*:\s*SettingsFeature\b/.test(appModelSource)) fail('AppModel must expose SettingsFeature as settingsFeature.');
   for (const entry of [
     {
       id: '1 - View/Views/Git Repos/GitReposView.swift',

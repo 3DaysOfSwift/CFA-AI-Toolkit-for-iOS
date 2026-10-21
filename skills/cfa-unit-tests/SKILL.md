@@ -22,7 +22,7 @@ Organise a test tree that exposes the application design:
 <App>Tests/
 ├── AppModelTests/
 ├── ViewModelTests/       # one named file for each production ViewModel
-├── FeatureTests/<Feature>/
+├── FeatureTests/<Feature>/ # one <Feature>Tests.swift home per concrete Feature
 ├── ConcurrencyTests/<Feature>/
 ├── PersistenceTests/
 ├── IntegrationTests/
@@ -40,6 +40,11 @@ Build AppModel tests from an isolated dependency graph. Do not call production
 `AppModel.shared` from a unit test. Give each production ViewModel a matching
 test file and test what its View can observe: loading/ready/error states,
 actions, drafts, selection and asynchronous results.
+Give each concrete Feature a matching API test file under `FeatureTests`,
+including `SettingsFeatureTests.swift` in a new app. Name feature owners and
+their test files with `Feature`, never the obsolete `Manager` suffix. A real
+infrastructure or presentation manager such as `ThemeManager` may retain its
+name and have its own tests.
 
 When auditing quality, report separately:
 

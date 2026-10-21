@@ -53,6 +53,12 @@ export async function inspect(project) {
     if (name !== expected) {
       findings.push(finding('feature-property-name', 'warning', `${name} should use the same domain name as ${property.type}, ending in Feature${featureTypeSuffix.test(property.type) ? ` (${expected})` : ''}.`, appModelFile, property.line));
     }
+    if (featureTypeSuffix.test(property.type) && !property.type.endsWith('API')) {
+      const testName = `${property.type}Tests.swift`;
+      if (![...paths].some(file => file.includes('/FeatureTests/') && file.endsWith(`/${testName}`))) {
+        findings.push(finding('feature-tests-missing', 'warning', `No ${testName} was found under FeatureTests.`, appModelFile, property.line));
+      }
+    }
   }
 
   const screens = [];

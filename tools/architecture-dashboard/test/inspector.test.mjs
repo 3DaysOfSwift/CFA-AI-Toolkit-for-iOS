@@ -22,7 +22,8 @@ test('maps a complete screen to AppModel, feature, collaborator and named tests'
     'Application/1 - View/Views/Chat/ChatViewModel.swift': '@MainActor final class ChatViewModel { private let chatsFeature: ChatsFeature; init(chatsFeature: ChatsFeature = AppModel.shared.chatsFeature) { self.chatsFeature = chatsFeature } }',
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static let shared = AppModel(); let chatsFeature: ChatsFeature }',
     'Application/2 - AppModel/Features/Chats/ChatsFeature.swift': 'final class ChatsFeature { private let repository: any ChatsRepository }',
-    'ApplicationTests/ViewModelTests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}'
+    'ApplicationTests/ViewModelTests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}',
+    'ApplicationTests/FeatureTests/Chats/ChatsFeatureTests.swift': 'struct ChatsFeatureTests {}'
   });
   const report = await inspect(root);
   assert.equal(report.screens.length, 1);
@@ -31,6 +32,16 @@ test('maps a complete screen to AppModel, feature, collaborator and named tests'
   assert.equal(report.screens[0].dependencies[0].featureType, 'ChatsFeature');
   assert.deepEqual(report.screens[0].dependencies[0].collaborators, ['ChatsRepository']);
   assert.match(renderInspection(report), /ChatViewModel → chatsFeature/);
+});
+
+test('reports a missing named feature test file', async t => {
+  const root = await fixture(t, {
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { let settingsFeature: SettingsFeature }',
+    'Application/2 - AppModel/Features/Settings/SettingsFeature.swift': 'final class SettingsFeature {}'
+  });
+  const report = await inspect(root);
+  assert.deepEqual(report.findings.map(item => item.code), ['feature-tests-missing']);
+  assert.match(report.findings[0].message, /SettingsFeatureTests.swift/);
 });
 
 test('reports missing ownership and tests without pretending to verify semantics', async t => {

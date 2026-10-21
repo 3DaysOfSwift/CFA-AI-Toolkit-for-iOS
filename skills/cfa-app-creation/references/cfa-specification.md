@@ -159,6 +159,12 @@ Application
 The Xcode navigator must communicate the design without requiring a developer
 to inspect source files.
 
+Every new CFA app includes a Settings screen, its adjacent
+`SettingsViewModel.swift`, and `SettingsFeature.swift` exposed through
+`AppModel.shared.settingsFeature`. Settings is a screen even when its first
+version only selects a colour theme; do not collapse it into a data-only
+component or call its feature a manager.
+
 ### Xcode Template Layout Is a Contract
 
 For a CFA Xcode template, the on-disk path and the Xcode navigator group are
@@ -819,6 +825,8 @@ AppModel tests
 Rules for tests:
 
 - every ViewModel has its own test file and suite;
+- every concrete Feature has a named API test file under `FeatureTests`,
+  including `SettingsFeatureTests.swift` in a new app;
 - never create one shared test suite for several screen ViewModels;
 - ViewModel tests inject an isolated feature capability;
 - feature tests exercise business rules and workflow coordination;
