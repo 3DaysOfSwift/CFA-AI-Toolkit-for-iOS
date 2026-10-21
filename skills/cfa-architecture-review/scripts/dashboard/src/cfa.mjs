@@ -29,11 +29,25 @@ request to the relevant installed CFA skill before changing the project.
 - Preserve the CFA call path: View → ViewModel → feature → provider or cache.
 - Every screen has a dedicated ViewModel. A concrete feature owner uses the
   Feature suffix; its AppModel property, ViewModel dependency and initializer
-  label use the matching lower-camel-case Feature name. Narrow protocols, when
-  useful, may use the FeatureAPI suffix. Lower-level services keep names that
+  label use the matching lower-camel-case Feature name. Use concrete features
+  directly; do not add matching FeatureAPI protocols. Lower-level services keep names that
   describe their actual jobs.
 - Keep Views declarative. Feature state and business decisions belong outside
   the View layer.
+- AppModel stores only shared, concrete Features, and one private launch guard.
+  Its explicit initializer assigns injected Features; one static live() factory
+  constructs production dependencies. Never store a service or UI error there.
+- SwiftData uses SwiftDataManager; URLSession calls use NetworkingManager.
+  Features own those collaborators. Signal app launch from an application
+  lifecycle callback, never a View .task.
+- App.body installs a stable root View and presentation modifiers only. Keep
+  startup conditionals, database loading and feature error UI out of App and
+  out of the root navigation View; feature screens present their own state.
+- Database availability must never gate the interface, including root wrappers
+  or blocking overlays. Open storage lazily within a Feature's data request;
+  opening failures follow that request through Feature, ViewModel and screen,
+  never an app-level launch error. Retry the request without discarding data.
+  Verify initial open failure leaves the root and independent navigation usable.
 - Do not call an app CFA merely because it has numbered folders. Trace real
   ownership, AppModel composition, and the focused tests for the changed work.
 

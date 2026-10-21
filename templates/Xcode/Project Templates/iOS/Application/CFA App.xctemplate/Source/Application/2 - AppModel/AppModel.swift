@@ -6,11 +6,12 @@ final class AppModel {
 
     let gitReposFeature: GitReposFeature
     let settingsFeature: SettingsFeature
-    private var hasFinishedLaunching = false
+    private var hasFinishedLaunching: Bool
 
     init(gitReposFeature: GitReposFeature, settingsFeature: SettingsFeature) {
         self.gitReposFeature = gitReposFeature
         self.settingsFeature = settingsFeature
+        hasFinishedLaunching = false
     }
 
     func applicationDidFinishLaunching() async {
@@ -22,6 +23,7 @@ final class AppModel {
 
     static func live() -> AppModel {
         do {
+            let networkingManager = NetworkingManager()
             let cachesDirectoryURL = try FileManager.default.url(
                 for: .cachesDirectory,
                 in: .userDomainMask,
@@ -31,7 +33,7 @@ final class AppModel {
 
             return AppModel(
                 gitReposFeature: GitReposFeature(
-                    provider: GitHubAPI(),
+                    provider: GitHubAPI(networkingManager: networkingManager),
                     cache: RepoFileCache(cacheDirectoryURL: cachesDirectoryURL)
                 ),
                 settingsFeature: SettingsFeature()

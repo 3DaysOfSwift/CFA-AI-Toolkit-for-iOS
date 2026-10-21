@@ -136,7 +136,6 @@ Application
 │   ├── AppModel.swift
 │   ├── Features
 │   │   └── Feature Name
-│   │       ├── FeatureNameFeatureAPI.swift (when a protocol boundary is useful)
 │   │       ├── FeatureNameFeature.swift
 │   │       └── Feature-owned domain types
 │   └── User Data Storage
@@ -388,7 +387,7 @@ The ViewModel initializer provides the live feature as its default while
 remaining replaceable by tests:
 
 ```swift
-init(habitsFeature: any HabitsFeatureAPI = AppModel.shared.habitsFeature) {
+init(habitsFeature: HabitsFeature = AppModel.shared.habitsFeature) {
     self.habitsFeature = habitsFeature
 }
 ```
@@ -465,11 +464,13 @@ AppModel:
 - contains no SwiftUI, navigation state, screen identity, or feature-specific
   business rules.
 
-AppModel contains application-scoped state only. Scene-specific navigation,
-selection, drafts, focus, and presentation state remain owned by each scene's
-Views and ViewModels. The singleton guarantees shared access to the application
-graph; it does not create thread safety. Actor isolation and immutable values do
-that.
+AppModel's stored properties are exactly one `static let shared = AppModel.live()`,
+the concrete Feature references, and one private Boolean guarding launch. No
+other stored state belongs here: no service, repository, `ModelContainer`,
+startup error, loading flag, navigation state, or presentation text. A failed
+feature load is retained and presented by that Feature and its screen ViewModel.
+The singleton guarantees shared access to the application graph; it does not
+create thread safety. Actor isolation and immutable values do that.
 
 Tests construct isolated application graphs and never mutate
 `AppModel.shared`. Previews inject isolated feature implementations when they
@@ -481,8 +482,14 @@ coherent features, not a god object. A command concerning one feature
 belongs on that feature's API and concrete implementation.
 
 Do not hide production dependency construction in default initializer values.
-`AppModel.init` is fully explicit. `AppModel.live()` is the only place that
-chooses live repositories, clients, clocks, and feature implementations.
+`AppModel.init` is fully explicit and only assigns its supplied Features and
+initialises the private launch guard to `false`; it does not construct or
+resolve dependencies. No AppModel stored property has a default value except
+`shared`. Exactly one `static func live() -> AppModel` constructs the live
+services, repositories, and Features and passes only Features to `init`.
+Tests construct isolated graphs by passing test Features to that same explicit
+initializer. `live()` may use local lower-level values, but never retains or
+exposes them as AppModel properties.
 
 ## Organize Behaviour into Cohesive Features
 
@@ -497,11 +504,23 @@ the lower-camel-case `Feature` suffix: `settingsFeature`, `gitReposFeature`,
 initializer labels, and local references, including a reference copied from
 `appModel.settingsFeature`. Never shorten one to a plural domain noun such as
 `repos` or `settings`; that makes a shared capability look like a collection.
-When a narrow protocol is useful, distinguish it from the concrete type with
-an `API` suffix, such as `SettingsFeatureAPI`; do not require a protocol for
-every feature.
+**Feature protocols are a waste of time.** In CFA, ViewModels depend directly
+on concrete features. Do not create matching `FeatureAPI` protocols. Test a
+ViewModel with a concrete feature whose repository or provider is replaced
+by a test double.
 
-Reserve infrastructure names for the service's actual job: `SettingsStore`,
+Use a `SwiftDataManager` whenever the app uses SwiftData. It owns container and
+context creation/opening and hands a narrow storage capability to the owning
+Feature. A Feature may ask it to load or save; neither AppModel nor any View or
+ViewModel opens a database or handles a `ModelContainer`. Keep SwiftData
+records and contexts inside the persistence boundary; preserve actor isolation.
+
+Use a `NetworkingManager` whenever the app makes network requests. It owns
+`URLSession` and wraps every session call; feature-specific API adapters decode
+responses and provide domain-oriented operations. AppModel may construct this
+manager as a local inside `live()`, but stores and exposes only Features.
+
+Reserve other infrastructure names for the service's actual job: `SettingsStore`,
 `LocationClient`, `PurchaseService`, or a justified `LocationManager`. These
 lower-level collaborators are not features merely because several features
 use them. A shared collaborator may remain in its original owning feature
@@ -511,7 +530,7 @@ to satisfy this convention unless the requested work includes migration.
 
 A concrete feature:
 
-- exposes a narrow domain API, using a protocol when substitution is useful;
+- exposes its domain methods and properties directly, without a feature protocol;
 - owns business rules, validation, calculations, and classifications;
 - coordinates repositories and lower-level collaborators for its workflow;
 - publishes shared feature state after successful persistence;
@@ -519,12 +538,9 @@ A concrete feature:
 - hides its internal collaborators from callers;
 - has methods named after their real action or result.
 
-A feature API protocol is an intentional boundary between ViewModels and the
-Model. Do not automatically add protocols to internal helpers or value types.
-Create a protocol when it defines a real capability boundary, enables a
-required substitute, isolates an external system, or materially clarifies
-ownership. Repository protocols normally earn this boundary because production
-and test storage genuinely differ.
+Repository and provider protocols may support actual production and test
+implementations. Keep those substitution boundaries below the concrete feature;
+they do not justify a second protocol around the feature itself.
 
 Prefer:
 
@@ -672,6 +688,78 @@ intermediate state is intentional and representable.
 
 ## Use Application Launch as an Opportunity to Refresh Features
 
+### Mandatory: database availability must never gate the interface
+
+**Opening a database is never a prerequisite for presenting the application's
+interface.** Install the stable root navigation immediately, independently of
+whether storage is unopened, opening, available, or failing. This is a CFA
+architecture requirement, not a limitation of SwiftUI or SwiftData.
+
+- Never gate `WindowGroup`, `ContentView`, a root tab/navigation View, or an
+  app-wide blocking overlay on a container, database-ready flag, loading state,
+  or storage error. Moving the condition into another root wrapper is still a
+  violation. Initializers and `AppModel.live()` assemble dependencies; they must
+  not open storage as a side effect before the root can be constructed.
+- A Feature requests domain data through its storage capability.
+  `SwiftDataManager` opens the shared store lazily within that request and
+  reuses it after successful opening. Container/context details never escape
+  the persistence boundary. A failed opening throws through the request just
+  like a failed fetch; it is not an application launch failure.
+- The Feature owns the request outcome. Its dedicated screen ViewModel maps
+  that outcome into presentation, and the feature screen shows loading, error,
+  and retry UI. Preserve previously loaded data when a refresh fails; never
+  report an unsuccessful initial fetch as a successful empty result.
+- Retry repeats the domain request through the same Feature. The View does
+  not reopen a database. If opening never succeeded, the storage owner can
+  attempt it again; an ordinary failed fetch is not permission to discard a
+  working container, delete user data, or substitute an empty in-memory store.
+- Keep independent navigation and capabilities usable. Operations that really
+  require unavailable data must still fail honestly; do not pretend they work.
+  A necessary migration may delay affected data operations, never the whole
+  application shell. There is no app-level `launchError`, `startupError`, or
+  database-loading gate in AppModel, App, the delegate, or root navigation.
+
+The failure route is:
+
+```text
+SwiftDataManager / repository throws from a data request
+  → owning Feature records the request failure
+  → screen ViewModel prepares user-facing information
+  → feature screen renders the error and offers retry
+```
+
+**Acceptance check:** deliberately fail the first store-opening request and
+verify that root navigation remains visible, the affected screen explains its
+failed request, and an independent screen such as Settings remains reachable.
+Then retry successfully and verify that the feature recovers without replacing
+the root interface or losing previously saved data. Test failed refresh with
+existing data separately. Compilation or a fake fetch alone does not verify
+the real storage-opening and UI behaviour; report unexecuted checks explicitly.
+
+### Keep the SwiftUI App entry point structural
+
+The `App` type declares scenes, installs app-wide presentation dependencies,
+and names one stable root View in each `WindowGroup`. Its `body` does not
+branch on feature state, storage availability, launch progress, or errors. It
+does not contain `if`/`switch` startup decisions, `ProgressView` or
+`ContentUnavailableView` for database opening, a `ModelContainer` reference,
+or a launch `.task`. Do not store `AppModel.shared` as an `@State` or other
+property in the App. Keep the root screen identity stable while features load.
+
+The root View (for example, `ContentView` or `RootTabView`) owns only the
+application's navigation or tab structure. A feature screen below it owns
+loading, empty, and error presentation through its dedicated ViewModel; the
+Feature owns those outcomes and asks its `SwiftDataManager` to open storage.
+Moving the same database-opening conditional from `App.body` into the root
+navigation View is not a fix. The root is not a persistence coordinator.
+
+```swift
+WindowGroup {
+    RootTabView()
+        .environment(themeManager)
+}
+```
+
 Construction must not silently trigger asynchronous side effects. Initializers
 assemble valid objects; clearly named methods perform work.
 
@@ -684,7 +772,14 @@ func applicationDidFinishLaunching() async
 
 AppModel keeps one simple Boolean to ensure the method runs once. It does not
 store a Task handle. The app delegate creates the launch Task and awaits this
-method; AppModel then awaits the required feature refreshes.
+method; AppModel then awaits the required feature refreshes. Call it from the
+earliest applicable application lifecycle callback, such as
+`UIApplicationDelegate.application(_:didFinishLaunchingWithOptions:)`, not a
+SwiftUI View or scene `.task`. A synchronous delegate callback may create one
+Task to enter the async method; the callback itself is the launch signal.
+Do not store `AppModel.shared` in the App, delegate, View, or another object's
+property. A local reference for a single call is fine. A ViewModel's defaulted
+Feature dependency may read `AppModel.shared.<feature>` once at construction.
 AppModel does not interpret success, combine failures, show errors, or decide
 whether the user may enter a feature.
 
@@ -710,7 +805,9 @@ confirmed current data. Reading a property must not secretly begin asynchronous
 work. A ViewModel exposes these values as presentation-ready properties; its View
 shows loading, failure, cached data, and retry for that feature.
 
-Do not use `.task { await viewModel.load() }` as the default for launch refresh.
+Never use `.task { await AppModel.shared.applicationDidFinishLaunching() }`
+or an equivalent View-tied call to signal application launch. Do not use
+`.task { await viewModel.load() }` as the default for launch refresh.
 Use a View `.task` only for work whose lifetime is intentionally tied to that
 specific screen and whose cancellation when the screen disappears is correct.
 Airplane Mode, a temporary API failure, unavailable iCloud, and lost

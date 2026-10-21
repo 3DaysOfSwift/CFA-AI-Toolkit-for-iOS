@@ -1,7 +1,7 @@
 # Reference feature: recording a note
 
 `NotesView` owns `@State private var viewModel = NotesViewModel()`.
-`NotesViewModel` retains `any NotesFeatureAPI`, defaulting to `AppModel.shared.notesFeature`.
+`NotesViewModel` retains `NotesFeature`, defaulting to `AppModel.shared.notesFeature`.
 It owns the editable draft and display error. `NotesFeature` validates the text,
 uses an injected repository to save it, and publishes the committed note. A failed
 save retains the draft and leaves the feature’s collection unchanged.
@@ -11,7 +11,9 @@ requires those dependencies explicitly. Tests assemble a separate graph and neve
 mutate the production singleton. `Note` is a feature-owned immutable domain value;
 SwiftData representations live inside the repository implementation.
 
-The feature API offers domain commands, not mutable storage objects. An actor
+The concrete feature offers domain commands, not mutable storage objects. Tests
+construct it with a fake `NotesRepository`; no matching feature protocol is
+needed. An actor
 can isolate the repository or a substantial worker. Use MainActor for observable
 publication; do not move expensive file/CPU work onto it merely for convenience.
 
@@ -21,7 +23,6 @@ Folder map:
 1 - View/Views/Notes/NotesView.swift
 1 - View/Views/Notes/NotesViewModel.swift
 2 - AppModel/AppModel.swift
-2 - AppModel/Features/Notes/NotesFeatureAPI.swift
 2 - AppModel/Features/Notes/NotesFeature.swift
 2 - AppModel/Features/Notes/Note.swift
 2 - AppModel/User Data Storage/Protocols/NotesRepository.swift

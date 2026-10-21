@@ -33,8 +33,10 @@ the architecture:
 7. Every concrete feature type ends in `Feature`, such as `SettingsFeature`.
    Its AppModel property, ViewModel dependency, initializer label, and local
    reference use the matching lower-camel-case name, such as
-   `settingsFeature`. A narrow protocol, when useful, may be named
-   `SettingsFeatureAPI`. Reserve infrastructure names for lower-level services;
+   `settingsFeature`. The ViewModel depends on that concrete feature;
+   do not add a matching `FeatureAPI` protocol. Inject a fake
+   repository or provider into the concrete feature instead. Reserve
+   infrastructure names for lower-level services;
    do not call a feature owner a `Manager`.
 8. API operations return domain data or throw. Features keep domain
    data, operation state and retained errors as separate values; no result-like
@@ -56,6 +58,27 @@ the architecture:
     A replaceable remote snapshot uses one JSON cache; SwiftData is reserved
     for genuinely structured, queryable, growing, or relational local data.
     Do not persist the same snapshot through both a database and a file cache.
+14. AppModel stores only `shared`, concrete Features, and one private launch
+    Boolean. Its explicit initializer assigns injected Features and the guard;
+    its single `static live()` constructs all production dependencies. No
+    service, container, loading/error presentation state, or defaulted Feature
+    property belongs in AppModel.
+15. SwiftData access goes through `SwiftDataManager`; every `URLSession` call
+    goes through `NetworkingManager`. Features own those lower-level
+    collaborators. Views/ViewModels never open storage or make transport calls.
+16. The app delegate's launch callback signals `applicationDidFinishLaunching`.
+    No View `.task` performs app launch, and no App, delegate, or View stores an
+    AppModel reference. ViewModels retain only their narrow Feature.
+17. The SwiftUI `App.body` declares a stable root View and app-wide presentation
+    modifiers only. No startup `if`/`switch`, storage gating, database loading,
+    feature error display, or AppModel property belongs there. The root View
+    manages navigation only; feature screens present their own state.
+18. Database availability never gates the interface, including root wrappers
+    and app-wide blocking overlays. Construct the root independently of storage;
+    open storage lazily inside a Feature's data request. Opening failures follow
+    the request's error path through Feature → ViewModel → feature screen,
+    never a launch/startup error. Retry the domain request, preserve saved data,
+    and keep independent navigation usable.
 
 ## Before delivery
 
@@ -69,9 +92,18 @@ Review the changed source as one feature slice, not as isolated files.
   test file under View Model Tests and Feature Tests.
 - Confirm that launch refresh logic is absent from RootTabView and feature
   screens do not use `.task` as a substitute for application launch.
+- Read the App `body`: it must install a stable root without branching on
+  storage, loading, or errors. Do not merely move that branch into RootTabView.
+- For persistence changes, fail the initial store open and verify the root stays
+  visible, the affected feature shows its request error, and Settings or another
+  independent screen remains reachable. Verify successful retry and retained
+  data after failed refresh. Report any storage/UI checks that did not run.
 - Confirm that cached domain data remains representable while a refresh runs or
   fails, and that concrete feature types and their AppModel properties retain
   the `Feature` suffix.
+- Inspect AppModel's stored properties, initializer, and `live()`; then search
+  for `AppModel.shared` stored elsewhere, View-tied launch calls,
+  `ModelContainer` outside the storage boundary, and direct `URLSession` calls.
 - Confirm that storage work does not leak SwiftData `@Model` objects across an
   actor boundary, and that a `@ModelActor` is used where database work is not
   deliberately small and UI-owned.

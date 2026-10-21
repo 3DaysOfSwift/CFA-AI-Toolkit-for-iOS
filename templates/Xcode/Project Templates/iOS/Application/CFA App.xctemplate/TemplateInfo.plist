@@ -64,6 +64,8 @@
         <dict><key>Path</key><string>Source/Application/2 - AppModel/Networking &amp; Data Storage/File Cache/RepoFileCache.swift</string></dict>
         <key>2 - AppModel/Networking &amp; Data Storage/Networking/GitHubAPI.swift</key>
         <dict><key>Path</key><string>Source/Application/2 - AppModel/Networking &amp; Data Storage/Networking/GitHubAPI.swift</string></dict>
+        <key>2 - AppModel/Networking &amp; Data Storage/Networking/NetworkingManager.swift</key>
+        <dict><key>Path</key><string>Source/Application/2 - AppModel/Networking &amp; Data Storage/Networking/NetworkingManager.swift</string></dict>
         <key>2 - AppModel/Networking &amp; Data Storage/Protocols/GitReposProvider.swift</key>
         <dict><key>Path</key><string>Source/Application/2 - AppModel/Networking &amp; Data Storage/Protocols/GitReposProvider.swift</string></dict>
         <key>3 - App Resources/PrivacyInfo.xcprivacy</key>
@@ -89,6 +91,7 @@
         <string>2 - AppModel/Features/Settings/SettingsFeature.swift</string>
         <string>2 - AppModel/Networking &amp; Data Storage/File Cache/RepoFileCache.swift</string>
         <string>2 - AppModel/Networking &amp; Data Storage/Networking/GitHubAPI.swift</string>
+        <string>2 - AppModel/Networking &amp; Data Storage/Networking/NetworkingManager.swift</string>
         <string>2 - AppModel/Networking &amp; Data Storage/Protocols/GitReposProvider.swift</string>
         <string>3 - App Resources/PrivacyInfo.xcprivacy</string>
         <string>4 - Swift Extensions/Date+Display.swift</string>

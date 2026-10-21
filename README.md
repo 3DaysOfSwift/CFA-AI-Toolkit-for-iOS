@@ -1,5 +1,5 @@
 <p align="left">
-  <a href="https://github.com/3DaysOfSwift/iOS-App-Development-CFA-AI-Toolkit">
+  <a href="https://github.com/3DaysOfSwift/CFA-AI-Toolkit-for-iOS">
     <img src="readme-images/CFA-Toolkit-AppIcon.png" width="320" alt="CFA AI Toolkit for iOS icon">
   </a>
 </p>
@@ -67,11 +67,11 @@ and produces a more professional Xcode project from the first feature onward.
 
 The plugin is listed as **CFA AI Toolkit for iOS** (`ios-app-development-cfa`)
 so its purpose is clear in an installed plugin list. The GitHub repository is
-**[iOS-App-Development-CFA-AI-Toolkit](https://github.com/3DaysOfSwift/iOS-App-Development-CFA-AI-Toolkit)**;
+**[CFA AI Toolkit for iOS](https://github.com/3DaysOfSwift/CFA-AI-Toolkit-for-iOS)**;
 Cooperative Feature Architecture remains the name of the architecture.
 
 <p align="left">
-  <a href="https://github.com/3DaysOfSwift/iOS-App-Development-CFA-AI-Toolkit">
+  <a href="https://github.com/3DaysOfSwift/CFA-AI-Toolkit-for-iOS">
     <img src="readme-images/3DaysOfSwiftConcurrency-h512.png" width="320" alt="3DaysOfSwiftConcurrency.com logo">
   </a>
 </p>
@@ -88,9 +88,9 @@ iOS app, it can read the CFA architecture instructions and use CFA.
 The installation does not change Xcode or your existing apps. It only makes the
 CFA AI Toolkit for iOS instructions available to your AI coding tool.
 
-## Install the CFA App template in Xcode
+## Install the Xcode project templates
 
-The CFA AI Toolkit for iOS also includes a native Xcode project template. It creates a
+The CFA AI Toolkit for iOS includes **CFA App** and **Habit Tracker** Xcode templates. Each creates a
 new, runnable CFA app directly from **File → New → Project**. It does not
 modify an existing Xcode project.
 
@@ -107,12 +107,18 @@ The installer prints the exact folder it created. If it does not print
 **“CFA App is installed in Xcode”**, the installation did not finish—read
 the message in the Terminal window before closing it.
 
-Quit and reopen Xcode. Choose **File → New → Project → iOS → CFA App**.
+Quit and reopen Xcode. Choose **File → New → Project → iOS → CFA App** or **Habit Tracker**.
 Xcode asks for your product name and organisation identifier, then creates a
 new project with the CFA folders, feature, network refresh, JSON file
 cache, retry state and colour-theme settings already in place.
 
-Running the installer again safely updates an existing CFA-installed template.
+**Habit Tracker** provides Today, Habits and Settings tabs, completion/count habits,
+daily streaks, lazy SwiftData storage, colour themes and focused unit tests.
+Its editable, ready-to-open project is in
+[`templates/Xcode/Habit Tracker iOS`](templates/Xcode/Habit%20Tracker%20iOS/README.md).
+The native template is generated from that project so its code stays in sync.
+
+Running the installer again updates CFA-installed templates and preserves backup copies.
 It refuses to replace a same-named template from another source.
 
 ### Codex
@@ -134,7 +140,7 @@ conversation and paste this message:
 
 ```text
 I have installed CFA AI Toolkit for iOS from
-https://github.com/3DaysOfSwift/iOS-App-Development-CFA-AI-Toolkit.
+https://github.com/3DaysOfSwift/CFA-AI-Toolkit-for-iOS.
 Do you have access to create and maintain iOS projects with CFA?
 ```
 
@@ -425,7 +431,7 @@ understand the structure the AI skills create and maintain. These articles from
 ## Copyright and permission
 
 <p align="left">
-  <a href="https://github.com/3DaysOfSwift/iOS-App-Development-CFA-AI-Toolkit">
+  <a href="https://github.com/3DaysOfSwift/CFA-AI-Toolkit-for-iOS">
     <img src="readme-images/3DaysOfSwiftConcurrency-h512.png" width="320" alt="3DaysOfSwiftConcurrency.com logo">
   </a>
 </p>

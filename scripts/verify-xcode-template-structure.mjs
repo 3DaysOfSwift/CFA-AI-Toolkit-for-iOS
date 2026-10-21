@@ -54,6 +54,24 @@ export function verifyXcodeTemplateStructure(templateDirectory = defaultTemplate
   ]) checkEntry(info, templateDirectory, { id, sourcePath, group: undefined });
   const appModelSource = fs.readFileSync(path.join(templateDirectory, 'Source/Application/2 - AppModel/AppModel.swift'), 'utf8');
   if (!/\bsettingsFeature\s*:\s*SettingsFeature\b/.test(appModelSource)) fail('AppModel must expose SettingsFeature as settingsFeature.');
+  if ((appModelSource.match(/\bstatic\s+func\s+live\s*\(/g) ?? []).length !== 1 ||
+      /\b(?:ModelContainer|URLSession|startupError)\b/.test(appModelSource) ||
+      /\bhasFinishedLaunching\s*:\s*Bool\s*=/.test(appModelSource)) {
+    fail('AppModel must use one live() factory, retain only Features and an explicitly initialised launch guard, and hide infrastructure.');
+  }
+  const appSource = fs.readFileSync(path.join(templateDirectory, 'Source/Application/1 - View/___PACKAGENAME:identifier___App.swift'), 'utf8');
+  if (!/didFinishLaunchingWithOptions/.test(appSource) || /\.task\s*\{[^}]*applicationDidFinishLaunching/s.test(appSource)) {
+    fail('Application launch must be signalled from the app delegate, not a View .task.');
+  }
+  const sceneBody = /\bvar\s+body\s*:\s*some\s+Scene\s*\{([\s\S]*)/.exec(appSource)?.[1] ?? '';
+  if (!/WindowGroup\s*\{\s*RootTabView\s*\(\s*\)/.test(sceneBody) ||
+      /\b(?:if|switch|ModelContainer|ProgressView|ContentUnavailableView)\b/.test(sceneBody)) {
+    fail('App.body must present one stable structural root without startup branching or database presentation.');
+  }
+  const apiSource = fs.readFileSync(path.join(templateDirectory, 'Source/Application/2 - AppModel/Networking & Data Storage/Networking/GitHubAPI.swift'), 'utf8');
+  if (/\bURLSession\b/.test(apiSource) || !/networkingManager\.data\(/.test(apiSource)) {
+    fail('The template API must use NetworkingManager rather than URLSession directly.');
+  }
   for (const entry of [
     {
       id: '1 - View/Views/Git Repos/GitReposView.swift',
@@ -93,6 +111,11 @@ export function verifyXcodeTemplateStructure(templateDirectory = defaultTemplate
     {
       id: '2 - AppModel/Networking & Data Storage/Networking/GitHubAPI.swift',
       sourcePath: 'Source/Application/2 - AppModel/Networking & Data Storage/Networking/GitHubAPI.swift',
+      group: undefined
+    },
+    {
+      id: '2 - AppModel/Networking & Data Storage/Networking/NetworkingManager.swift',
+      sourcePath: 'Source/Application/2 - AppModel/Networking & Data Storage/Networking/NetworkingManager.swift',
       group: undefined
     },
     {

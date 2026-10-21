@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Kind</key>
+	<string>Xcode.Xcode3.ProjectTemplateUnitKind</string>
+	<key>Identifier</key>
+	<string>com.3daysofswift.cfa.habitTracker</string>
+	<key>Ancestors</key>
+	<array>
+		<string>com.apple.dt.unit.cocoaTouchApplicationBase</string>
+	</array>
+	<key>Concrete</key>
+	<true/>
+	<key>Description</key>
+	<string>CFA Habit Tracker: Today, Habits, Settings, lazy SwiftData persistence, themes and focused Swift Testing suites.</string>
+	<key>Platforms</key>
+	<array>
+		<string>com.apple.platform.iphoneos</string>
+	</array>
+	<key>NameOfInitialFileForEditor</key>
+	<string>___PACKAGENAMEASIDENTIFIER___App.swift</string>
+	<key>Definitions</key>
+	<dict>
+		<key>1 - View/___PACKAGENAMEASIDENTIFIER___App.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/___PACKAGENAMEASIDENTIFIER___App.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+			<key>Group</key>
+			<string>1 - View</string>
+		</dict>
+		<key>1 - View/Theme/AppColourTheme.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Theme/AppColourTheme.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Theme/ThemeManager.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Theme/ThemeManager.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/AddHabit/AddHabitView.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/AddHabit/AddHabitView.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/AddHabit/AddHabitViewModel.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/AddHabit/AddHabitViewModel.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/ContentView.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/ContentView.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/Habits/HabitsView.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/Habits/HabitsView.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/Habits/HabitsViewModel.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/Habits/HabitsViewModel.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/Settings/SettingsView.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/Settings/SettingsView.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/Settings/SettingsViewModel.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/Settings/SettingsViewModel.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/Today/TodayView.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/Today/TodayView.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/Today/TodayViewModel.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/Today/TodayViewModel.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>2 - AppModel/AppModel.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/2 - AppModel/AppModel.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>2 - AppModel/Features/Habits/Habit.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/2 - AppModel/Features/Habits/Habit.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>2 - AppModel/Features/Habits/HabitsFeature.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/2 - AppModel/Features/Habits/HabitsFeature.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>2 - AppModel/Features/Settings/SettingsFeature.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/2 - AppModel/Features/Settings/SettingsFeature.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>2 - AppModel/User Data Storage/Local/HabitRepository.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/2 - AppModel/User Data Storage/Local/HabitRepository.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>2 - AppModel/User Data Storage/Local/StoredHabit.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/2 - AppModel/User Data Storage/Local/StoredHabit.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>2 - AppModel/User Data Storage/Local/SwiftDataManager.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/2 - AppModel/User Data Storage/Local/SwiftDataManager.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>2 - AppModel/User Data Storage/Protocols/HabitsRepository.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/2 - AppModel/User Data Storage/Protocols/HabitsRepository.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>3 - App Resources/PrivacyInfo.xcprivacy</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/3 - App Resources/PrivacyInfo.xcprivacy</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+			<key>Group</key>
+			<string>3 - App Resources</string>
+		</dict>
+		<key>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/HabitStreakTests.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Tests/FeatureTests/HabitStreakTests.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.3daysofswift.cfa.habitTrackerTests</string>
+			</array>
+		</dict>
+		<key>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/HabitsFeatureTests.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Tests/FeatureTests/HabitsFeatureTests.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.3daysofswift.cfa.habitTrackerTests</string>
+			</array>
+		</dict>
+		<key>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/SettingsFeatureTests.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Tests/FeatureTests/SettingsFeatureTests.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.3daysofswift.cfa.habitTrackerTests</string>
+			</array>
+		</dict>
+		<key>___PACKAGENAMEASIDENTIFIER___Tests/Support/InMemoryHabitsRepository.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Tests/Support/InMemoryHabitsRepository.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.3daysofswift.cfa.habitTrackerTests</string>
+			</array>
+		</dict>
+		<key>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/AddHabitViewModelTests.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Tests/ViewModelTests/AddHabitViewModelTests.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.3daysofswift.cfa.habitTrackerTests</string>
+			</array>
+		</dict>
+		<key>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/HabitsViewModelTests.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Tests/ViewModelTests/HabitsViewModelTests.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.3daysofswift.cfa.habitTrackerTests</string>
+			</array>
+		</dict>
+		<key>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/SettingsViewModelTests.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Tests/ViewModelTests/SettingsViewModelTests.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.3daysofswift.cfa.habitTrackerTests</string>
+			</array>
+		</dict>
+		<key>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/TodayViewModelTests.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Tests/ViewModelTests/TodayViewModelTests.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.3daysofswift.cfa.habitTrackerTests</string>
+			</array>
+		</dict>
+		<key>Assets.xcassets</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Assets.xcassets</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+	</dict>
+	<key>Nodes</key>
+	<array>
+		<string>1 - View/___PACKAGENAMEASIDENTIFIER___App.swift</string>
+		<string>1 - View/Theme/AppColourTheme.swift</string>
+		<string>1 - View/Theme/ThemeManager.swift</string>
+		<string>1 - View/Views/AddHabit/AddHabitView.swift</string>
+		<string>1 - View/Views/AddHabit/AddHabitViewModel.swift</string>
+		<string>1 - View/Views/ContentView.swift</string>
+		<string>1 - View/Views/Habits/HabitsView.swift</string>
+		<string>1 - View/Views/Habits/HabitsViewModel.swift</string>
+		<string>1 - View/Views/Settings/SettingsView.swift</string>
+		<string>1 - View/Views/Settings/SettingsViewModel.swift</string>
+		<string>1 - View/Views/Today/TodayView.swift</string>
+		<string>1 - View/Views/Today/TodayViewModel.swift</string>
+		<string>2 - AppModel/AppModel.swift</string>
+		<string>2 - AppModel/Features/Habits/Habit.swift</string>
+		<string>2 - AppModel/Features/Habits/HabitsFeature.swift</string>
+		<string>2 - AppModel/Features/Settings/SettingsFeature.swift</string>
+		<string>2 - AppModel/User Data Storage/Local/HabitRepository.swift</string>
+		<string>2 - AppModel/User Data Storage/Local/StoredHabit.swift</string>
+		<string>2 - AppModel/User Data Storage/Local/SwiftDataManager.swift</string>
+		<string>2 - AppModel/User Data Storage/Protocols/HabitsRepository.swift</string>
+		<string>3 - App Resources/PrivacyInfo.xcprivacy</string>
+		<string>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/HabitStreakTests.swift</string>
+		<string>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/HabitsFeatureTests.swift</string>
+		<string>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/SettingsFeatureTests.swift</string>
+		<string>___PACKAGENAMEASIDENTIFIER___Tests/Support/InMemoryHabitsRepository.swift</string>
+		<string>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/AddHabitViewModelTests.swift</string>
+		<string>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/HabitsViewModelTests.swift</string>
+		<string>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/SettingsViewModelTests.swift</string>
+		<string>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/TodayViewModelTests.swift</string>
+		<string>Assets.xcassets</string>
+	</array>
+	<key>Options</key>
+	<array>
+		<dict>
+			<key>Identifier</key>
+			<string>appLifecycle</string>
+			<key>Default</key>
+			<string>SwiftUI</string>
+			<key>Type</key>
+			<string>popup</string>
+			<key>Values</key>
+			<array>
+				<string>SwiftUI</string>
+			</array>
+			<key>RequiredOptionsForValues</key>
+			<dict>
+				<key>SwiftUI</key>
+				<dict>
+					<key>userInterface</key>
+					<string>SwiftUI</string>
+				</dict>
+			</dict>
+		</dict>
+		<dict>
+			<key>Identifier</key>
+			<string>languageChoice</string>
+			<key>Default</key>
+			<string>Swift</string>
+			<key>Type</key>
+			<string>popup</string>
+			<key>Values</key>
+			<array>
+				<string>Swift</string>
+			</array>
+		</dict>
+	</array>
+	<key>Targets</key>
+	<array>
+		<dict>
+			<key>TargetIdentifier</key>
+			<string>com.apple.dt.applicationTarget</string>
+			<key>SharedSettings</key>
+			<dict>
+				<key>SWIFT_VERSION</key>
+				<string>6.0</string>
+				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
+				<string>18.0</string>
+				<key>GENERATE_INFOPLIST_FILE</key>
+				<string>YES</string>
+				<key>SWIFT_STRICT_CONCURRENCY</key>
+				<string>complete</string>
+				<key>ENABLE_TESTABILITY</key>
+				<string>YES</string>
+				<key>INFOPLIST_KEY_UIApplicationSceneManifest_Generation</key>
+				<string>YES</string>
+				<key>INFOPLIST_KEY_UILaunchScreen_Generation</key>
+				<string>YES</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>TargetIdentifier</key>
+			<string>com.3daysofswift.cfa.habitTrackerTests</string>
+			<key>TargetIdentifierToBeTested</key>
+			<string>com.apple.dt.applicationTarget</string>
+			<key>Name</key>
+			<string>___PACKAGENAMEASIDENTIFIER___Tests</string>
+			<key>ProductType</key>
+			<string>com.apple.product-type.bundle.unit-test</string>
+			<key>SharedSettings</key>
+			<dict>
+				<key>SWIFT_VERSION</key>
+				<string>6.0</string>
+				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
+				<string>18.0</string>
+				<key>GENERATE_INFOPLIST_FILE</key>
+				<string>YES</string>
+				<key>SWIFT_STRICT_CONCURRENCY</key>
+				<string>complete</string>
+				<key>PRODUCT_NAME</key>
+				<string>$(TARGET_NAME)</string>
+				<key>PRODUCT_BUNDLE_IDENTIFIER</key>
+				<string>___ORGANIZATIONIDENTIFIER___.___PACKAGENAMEASIDENTIFIER___.___PACKAGENAMEASIDENTIFIER___Tests</string>
+				<key>BUNDLE_LOADER</key>
+				<string>$(TEST_HOST)</string>
+				<key>TEST_HOST</key>
+				<string>$(BUILT_PRODUCTS_DIR)/___PACKAGENAMEASIDENTIFIER___.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/___PACKAGENAMEASIDENTIFIER___</string>
+			</dict>
+			<key>Configurations</key>
+			<dict>
+				<key>Debug</key>
+				<dict/>
+				<key>Release</key>
+				<dict/>
+			</dict>
+			<key>BuildPhases</key>
+			<array>
+				<dict>
+					<key>Class</key>
+					<string>Sources</string>
+				</dict>
+				<dict>
+					<key>Class</key>
+					<string>Frameworks</string>
+				</dict>
+				<dict>
+					<key>Class</key>
+					<string>Resources</string>
+				</dict>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

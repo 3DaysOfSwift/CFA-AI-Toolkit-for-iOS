@@ -1,14 +1,18 @@
 import Foundation
 
 actor GitHubAPI: GitReposProvider {
-    private let url = URL(string: "https://api.github.com/orgs/3DaysOfSwift/repos?per_page=100&sort=updated")!
+    private let networkingManager: NetworkingManager
+
+    init(networkingManager: NetworkingManager) {
+        self.networkingManager = networkingManager
+    }
 
     func fetchRepos() async throws -> [GitHubRepoResponse] {
         try Task.checkCancellation()
-        let (data, response) = try await URLSession.shared.data(from: url)
-        guard let response = response as? HTTPURLResponse, 200..<300 ~= response.statusCode else {
-            throw URLError(.badServerResponse)
+        guard let url = URL(string: "https://api.github.com/orgs/3DaysOfSwift/repos?per_page=100&sort=updated") else {
+            throw URLError(.badURL)
         }
+        let data = try await networkingManager.data(from: url)
 
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601

@@ -159,8 +159,11 @@ not, separate the domain data from the operation state.
 `Feature` suffix, such as `SettingsFeature` or `GitReposFeature`. Use the
 matching lower-camel-case name—`settingsFeature` or `gitReposFeature`—for its
 AppModel property, ViewModel dependency, initializer label, and local values.
-When a narrow protocol is useful, distinguish it with an `API` suffix, such as
-`SettingsFeatureAPI`. Do not require a protocol solely to satisfy the diagram.
+**Feature protocols are a waste of time.** CFA ViewModels depend on concrete
+features. Do not add matching `FeatureAPI` protocols. Inject a fake storage or
+provider dependency into the feature and use that concrete feature in
+ViewModel tests. Protocols below the feature may remain where actual production
+and test implementations require substitution.
 
 Do not call the feature owner a `Manager`. A lower-level collaborator should
 describe its job, such as `SettingsStore`, `LocationClient`, or
@@ -169,7 +172,8 @@ or presentation manager such as `ThemeManager`. Do not rename an existing app
 merely because a review discovered an older convention.
 
 **Review:** Does `let settingsFeature: SettingsFeature = appModel.settingsFeature`
-name the same capability consistently across the route?
+name the same capability consistently across the route, without a redundant
+feature protocol?
 
 ### Every type must earn its existence
 
@@ -254,16 +258,23 @@ snapshot are duplication.
 local collection? Can one storage implementation meet the requirement without
 duplicating encoding, persistence, invalidation, or recovery policy?
 
-Use **one shared ModelContainer backed by one persistent SwiftData store per iOS app**, owned by the production
-AppModel composition root. Features keep their records in separate model types
+Use **one shared ModelContainer backed by one persistent SwiftData store per iOS app**,
+owned by a shared `SwiftDataManager` in the persistence layer. The production
+AppModel composition root constructs and injects this owner without opening
+storage or retaining/exposing its container. Features keep their records in separate model types
 or logical collections inside that store. A feature boundary is not a database
 boundary. This is our architecture convention, not a limitation of SwiftData.
 
-- Create the store once and inject it into every persistent repository. Make
+- Open the store lazily within a data request and share it across persistent repositories. Make
   that dependency mandatory: no optional store arguments, hidden fallback
   containers, silent in-memory fallbacks, or per-feature database files. A
-  production store-opening failure must take an explicit, user-safe startup
-  path; it must never make a persistent app silently appear empty.
+  production store-opening failure throws through the affected data request,
+  just like a fetch failure. The Feature and its screen ViewModel expose that
+  failure for the feature screen to present. Database availability must never
+  gate the app's root interface, even through a root wrapper or blocking overlay.
+  Do not create launch-error state or silently present failed loading as empty
+  data. Retry the domain request and keep independent navigation usable. Apply
+  the CFA specification's mandatory database-availability rule and failure checks.
 - Keep schema, configuration, database location and lifetime in the model's
   persistence layer. Views and ViewModels do not create or choose stores.
 - Multiple actor-owned contexts may use the same container. Keep each context
@@ -308,8 +319,9 @@ alone is not proof of a crash. **Overlapping initialization was the reproduced
 trigger.** A SIGSEGV cannot be recovered with Swift `do`/`catch`.
 
 **Primary prevention: do not create multiple containers in the live app graph.**
-Create one at the composition root and inject the same owner into every
-repository. A single database filename is not enough if each repository still
+Construct one shared storage owner at the composition root, then let it open
+the container lazily inside the persistence boundary. Share the container with
+the persistent repositories. A single database filename is not enough if each repository still
 constructs its own container. Separate models, collections and actor-owned
 contexts can share that one container.
 
@@ -333,7 +345,7 @@ recurrence with the OS version, stack and opening pattern. Validate on the
 supported iOS runtime before release.
 
 During review, locate every container/store constructor and verify that only
-composition roots and the persistence factory create them. Test concurrent
+the persistence boundary creates them, not AppModel or UI construction. Test concurrent
 opening, failure recovery, collection isolation and persistence after reopening.
 Any exception to the one-store rule needs an explicit architectural reason and
 user agreement; adding a feature is not sufficient justification.

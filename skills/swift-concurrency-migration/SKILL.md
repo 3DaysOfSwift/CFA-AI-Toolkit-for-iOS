@@ -26,7 +26,11 @@ Use deliberate passes:
 2. Move one complete feature at a time into CFA. Give each SwiftUI View a
    bespoke ViewModel, move testable feature decisions into its Feature,
    place shared dependency construction in AppModel and keep persistence behind
-   repositories. Do not move GCD syntax mechanically during this pass.
+   repositories. AppModel's single `static live()` constructs dependencies,
+   while its stored properties are only Features and the launch guard. Use
+   `SwiftDataManager` for SwiftData and `NetworkingManager` for `URLSession`;
+   signal launch from the app lifecycle, not a View `.task`. Do not move GCD
+   syntax mechanically during this pass.
 3. Convert that feature’s asynchronous model work into directly awaitable
    Swift Concurrency. Choose a deliberate policy for serial durable saves,
    reject-while-busy operations, latest-request-wins work and independent work.

@@ -6,7 +6,7 @@
 - Underlying architecture: **Cooperative Feature Architecture (CFA)**
 - Plugin identifier: `ios-app-development-cfa`
 - Plugin display name: **CFA AI Toolkit for iOS**
-- Repository slug: `iOS-App-Development-CFA-AI-Toolkit`
+- Repository slug: `CFA-AI-Toolkit-for-iOS`
 - Subtitle: **AI skills and tools to build, modernise and maintain SwiftUI apps with Swift Concurrency.**
 - Suggested repository topics: `swift`, `swiftui`, `ios`, `swift-concurrency`, `architecture`, `ai-assisted-development`, `mvvm`, `gcd`, `migration`, `agent-skills`.
 

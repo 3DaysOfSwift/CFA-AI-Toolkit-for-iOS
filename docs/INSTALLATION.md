@@ -12,12 +12,12 @@ all eight skills, references and dashboard executable source, with no Trend depe
 
 ## Xcode project template
 
-The CFA AI Toolkit for iOS includes **CFA App**, a native Xcode project template. It is
+The CFA AI Toolkit for iOS includes **CFA App** and **Habit Tracker**, native Xcode project templates. Their installation is
 separate from the AI-skill installation: install it when you want a new CFA
 project to appear in Xcode's project chooser.
 
 From the root of the extracted CFA AI Toolkit for iOS release, double-click
-`Install Xcode Template.command`. It copies the template without requiring
+`Install Xcode Template.command`. It copies both templates without requiring
 Node.js.
 
 You can instead run it from Terminal:
@@ -30,14 +30,19 @@ Wait for the installer to say **“CFA App is installed in Xcode”** and show
 the installed folder. If it does not, the template has not been installed;
 read the Terminal message before closing that window.
 
-Then quit and reopen Xcode. Choose **File → New → Project → iOS → CFA App**.
+Then quit and reopen Xcode. Choose **File → New → Project → iOS → CFA App**
+or **Habit Tracker**. The latter includes habit tracking, SwiftData, Settings and tests.
 Xcode will ask for the product name and organisation identifier and generate a
 new project. The template installer copies only into your personal Xcode
 Templates folder; it never changes an existing app.
 
-Run the installer again to update a previous CFA copy. It replaces only a
+Run the installer again to update previous CFA copies, preserving backups. It replaces only a
 template containing CFA's own marker and refuses to change a same-named
 template from another source.
+
+You can also open `templates/Xcode/Habit Tracker iOS/HabitTrackerTemplate.xcodeproj`
+directly without installing anything. This project is the editable source of the
+Habit Tracker template; see its README for regeneration and verification commands.
 
 ## Recommended: Codex plugin
 
@@ -117,7 +122,7 @@ Open a **new conversation** after installation and ask the agent:
 
 ```text
 I have just installed CFA AI Toolkit for iOS from
-https://github.com/3DaysOfSwift/iOS-App-Development-CFA-AI-Toolkit.
+https://github.com/3DaysOfSwift/CFA-AI-Toolkit-for-iOS.
 Did it work? Do you have access to create and maintain iOS projects with CFA?
 ```
 

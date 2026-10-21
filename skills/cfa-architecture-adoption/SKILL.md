@@ -15,7 +15,7 @@ Read [CFA specification](references/cfa-specification.md), [CFA change gate](ref
 
 1. Identify the live target, dependency wiring and baseline build/tests. Map current screens, business decisions, state owners and persistence. Record existing failures separately.
 2. Define a bounded feature and its behaviour contract. Map each responsibility to its CFA destination before moving code. Preserve public interfaces with temporary adapters where needed.
-3. Separate screen presentation from feature rules. Introduce or align AppModel.shared as the composition root; do not use it as a dumping ground for migrated state. Move each authoritative value and its mutations to a named feature owner.
+3. Separate screen presentation from feature rules. Introduce or align AppModel.shared as the composition root with only Feature properties and its launch guard; its explicit initializer receives Features, and its single `static live()` builds production dependencies. Move each authoritative value and its mutations to a named Feature. Route SwiftData through `SwiftDataManager`, networking through `NetworkingManager`, and app launch through the lifecycle callback rather than a View `.task`.
 4. Migrate one end-to-end feature at a time, checking callers and live wiring. Keep data formats, navigation, errors, ordering and operation lifetimes stable. Remove superseded wiring only once all callers have moved.
 5. Build and run relevant regression checks at each meaningful boundary. Compare final ownership against the specification’s review checklist and explain any remaining transitional components.
 

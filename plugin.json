@@ -7,8 +7,8 @@
     "name": "3 Days of Swift Concurrency",
     "url": "https://www.3daysofswiftconcurrency.com/"
   },
-  "homepage": "https://github.com/3DaysOfSwift/iOS-App-Development-CFA-AI-Toolkit",
-  "repository": "https://github.com/3DaysOfSwift/iOS-App-Development-CFA-AI-Toolkit",
+  "homepage": "https://github.com/3DaysOfSwift/CFA-AI-Toolkit-for-iOS",
+  "repository": "https://github.com/3DaysOfSwift/CFA-AI-Toolkit-for-iOS",
   "license": "MIT",
   "keywords": ["swift", "swiftui", "ios", "swift-concurrency", "architecture", "cfa"]
 }

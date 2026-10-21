@@ -6,10 +6,8 @@ final class CFAAppDelegate: NSObject, UIApplicationDelegate {
         _: UIApplication,
         didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
-        let appModel = AppModel.shared
-
         Task { @MainActor in
-            await appModel.applicationDidFinishLaunching()
+            await AppModel.shared.applicationDidFinishLaunching()
         }
 
         return true

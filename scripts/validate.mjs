@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { execFileSync } from 'node:child_process';
 import { root, skills, cfaSkills } from './sync.mjs';
 import { files, hash, json } from './files.mjs';
 import { verifyXcodeTemplateStructure } from './verify-xcode-template-structure.mjs';
@@ -55,6 +56,7 @@ export function validate(base=root,{source=true}={}) {
       if(hash(path.join(base,'tools/architecture-dashboard',dir,file))!==hash(path.join(base,'skills/cfa-architecture-review/scripts/dashboard',dir,file))) throw Error(`Stale bundled tool: ${file}`);
     }
     if (process.platform === 'darwin') verifyXcodeTemplateStructure(path.join(base, 'templates/Xcode/Project Templates/iOS/Application/CFA App.xctemplate'));
+    execFileSync('python3', [path.join(base, 'scripts/sync-habit-template.py'), '--check'], { stdio: 'pipe' });
   }
   return manifest;
 }
