@@ -34,14 +34,14 @@ struct DayStreakView: View {
                                     Text("\(summary.currentStreak)").font(.system(.largeTitle, design: .rounded).bold())
                                     Text("day streak").foregroundStyle(theme.secondaryText)
                                 }
-                                .foregroundStyle(theme.accent)
+                                .foregroundStyle(theme.tint)
                                 HStack {
                                     ForEach(summary.recentDays) { day in
                                         VStack(spacing: 8) {
                                             Text(viewModel.weekday(for: day)).font(.caption)
                                             Image(systemName: day.isComplete ? "checkmark.circle.fill" : "circle")
                                                 .font(.title3)
-                                                .foregroundStyle(day.isComplete ? theme.accent : theme.secondaryText)
+                                                .foregroundStyle(day.isComplete ? theme.tint : theme.secondaryText)
                                         }
                                         .frame(maxWidth: .infinity)
                                         .accessibilityElement(children: .ignore)
@@ -62,6 +62,6 @@ struct DayStreakView: View {
             .background(theme.background)
             .navigationTitle("Day Streak")
         }
-        .tint(theme.accent)
+        .tint(theme.tint)
     }
 }

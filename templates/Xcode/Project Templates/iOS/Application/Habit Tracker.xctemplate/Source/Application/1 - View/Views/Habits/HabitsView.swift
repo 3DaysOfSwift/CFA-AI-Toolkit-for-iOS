@@ -53,7 +53,7 @@ struct HabitsView: View {
             }
             .sheet(isPresented: $isShowingAddHabit) { AddHabitView() }
         }
-        .tint(theme.accent)
+        .tint(theme.tint)
     }
 
     private func description(for habit: Habit) -> String {

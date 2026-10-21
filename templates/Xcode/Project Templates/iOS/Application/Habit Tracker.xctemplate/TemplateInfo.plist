@@ -296,6 +296,15 @@
 				<string>com.3daysofswift.cfa.habitTrackerTests</string>
 			</array>
 		</dict>
+		<key>___PACKAGENAMEASIDENTIFIER___Tests/PresentationTests/ThemeManagerTests.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Tests/PresentationTests/ThemeManagerTests.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.3daysofswift.cfa.habitTrackerTests</string>
+			</array>
+		</dict>
 		<key>___PACKAGENAMEASIDENTIFIER___Tests/Support/InMemoryHabitsRepository.swift</key>
 		<dict>
 			<key>Path</key>
@@ -392,6 +401,7 @@
 		<string>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/HabitsFeatureTests.swift</string>
 		<string>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/SettingsFeatureTests.swift</string>
 		<string>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/TodayFeatureTests.swift</string>
+		<string>___PACKAGENAMEASIDENTIFIER___Tests/PresentationTests/ThemeManagerTests.swift</string>
 		<string>___PACKAGENAMEASIDENTIFIER___Tests/Support/InMemoryHabitsRepository.swift</string>
 		<string>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/AddHabitViewModelTests.swift</string>
 		<string>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/DayStreakViewModelTests.swift</string>

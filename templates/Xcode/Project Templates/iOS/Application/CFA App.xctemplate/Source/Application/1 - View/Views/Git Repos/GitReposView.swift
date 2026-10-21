@@ -13,7 +13,7 @@ struct GitReposView: View {
             Group {
                 if viewModel.repos.isEmpty, viewModel.isRefreshing {
                     ProgressView("Downloading GitHub repositories…")
-                        .tint(palette.accent)
+                        .tint(palette.tint)
                 } else if viewModel.repos.isEmpty, let message = viewModel.refreshFailureMessage {
                     failureCard(message, palette: palette)
                 } else if viewModel.repos.isEmpty {
@@ -26,7 +26,7 @@ struct GitReposView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(palette.background)
             .navigationTitle("Git Repos")
-            .toolbarColorScheme(resolvedTheme.preferredColorScheme, for: .navigationBar)
+            .toolbarColorScheme(resolvedTheme.colorScheme, for: .navigationBar)
         }
     }
 
@@ -41,7 +41,7 @@ struct GitReposView: View {
                     .foregroundStyle(palette.secondaryText)
                 Label("\(repo.stars) GitHub stars", systemImage: "star.fill")
                     .font(.footnote)
-                    .foregroundStyle(palette.accent)
+                    .foregroundStyle(palette.tint)
             }
             .padding(.vertical, 6)
             .listRowBackground(palette.surface)
@@ -59,7 +59,7 @@ struct GitReposView: View {
                 Task { await viewModel.refresh() }
             }
             .buttonStyle(.borderedProminent)
-            .tint(palette.accent)
+            .tint(palette.tint)
         }
         .foregroundStyle(palette.primaryText)
         .padding()

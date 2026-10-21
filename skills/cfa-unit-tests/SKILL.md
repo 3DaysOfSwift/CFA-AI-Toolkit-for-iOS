@@ -36,6 +36,13 @@ state transitions and side effects rather than private implementation details.
 Use injected repositories, clocks, clients and controllable continuations; do
 not use live services, arbitrary sleeps or scheduler luck.
 
+For retained ViewModel tasks, prove repeated equivalent actions share one
+execution and await completion, including failure and retry. Independently test
+each Feature's sharing or sequential-queue policy with multiple callers:
+equivalent requests receive the shared outcome; distinct queued inputs execute
+in admission order and receive their own outcomes. Cover cancellation, cleanup
+and later work after failure without losing or indefinitely suspending waiters.
+
 Build AppModel tests from an isolated dependency graph. Do not call production
 `AppModel.shared` from a unit test. Give each production ViewModel a matching
 test file and test what its View can observe: loading/ready/error states,

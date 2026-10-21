@@ -23,6 +23,7 @@ struct SettingsView: View {
                         }
                     }
                     .pickerStyle(.menu)
+                    .frame(minHeight: 48)
                     .listRowBackground(palette.surface)
                 }
 
@@ -49,7 +50,7 @@ struct SettingsView: View {
                     .padding(.top, 20)
                 }
             }
-            .tint(palette.accent)
+            .tint(palette.tint)
             .scrollContentBackground(.hidden)
             .background(palette.background)
             .navigationTitle("Settings")

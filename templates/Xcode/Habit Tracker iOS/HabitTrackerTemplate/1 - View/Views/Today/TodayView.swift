@@ -65,7 +65,7 @@ struct TodayView: View {
                             .frame(minWidth: 48, minHeight: 48)
                     }
                     .accessibilityLabel("Add habit")
-                    .tint(theme.accent)
+                    .tint(theme.tint)
                 }
             }
             .sheet(isPresented: $isShowingAddHabit) { AddHabitView() }
@@ -77,7 +77,7 @@ struct TodayView: View {
                 Button("Not now", role: .cancel) { viewModel.errorMessage = nil }
             } message: { Text(viewModel.errorMessage ?? "Please try again.") }
         }
-        .tint(theme.accent)
+        .tint(theme.tint)
     }
 
     private var header: some View {
@@ -92,7 +92,7 @@ struct TodayView: View {
 
     private var progressCard: some View {
         HStack(spacing: 16) {
-            Image(systemName: "flame.fill").font(.title2).foregroundStyle(theme.accent)
+            Image(systemName: "flame.fill").font(.title2).foregroundStyle(theme.tint)
             VStack(alignment: .leading, spacing: 4) {
                 Text("\(viewModel.completedCount) of \(viewModel.habits.count) done")
                     .font(.headline).foregroundStyle(theme.primaryText)
@@ -123,7 +123,7 @@ private struct HabitTodayRow: View {
                 Button(action: onToggle) {
                     Image(systemName: habit.isCompleteToday ? "checkmark.circle.fill" : "circle")
                         .font(.system(size: 28))
-                        .foregroundStyle(habit.isCompleteToday ? theme.accent : theme.secondaryText)
+                        .foregroundStyle(habit.isCompleteToday ? theme.tint : theme.secondaryText)
                         .frame(width: 48, height: 48)
                         .contentShape(Rectangle())
                 }
@@ -158,7 +158,7 @@ private struct HabitTodayRow: View {
                             .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(theme.accent)
+                    .foregroundStyle(theme.tint)
                     .disabled(!canIncrement)
                     .accessibilityLabel("Add one to \(habit.name)")
                 }

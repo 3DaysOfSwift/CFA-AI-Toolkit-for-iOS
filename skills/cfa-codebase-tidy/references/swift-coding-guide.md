@@ -61,6 +61,13 @@ ViewModels own presentation state: drafts, focus, selection, navigation, loading
 
 **Rule:** Keep Views declarative and free of imperative workflows in almost all cases. Move multi-step event handling into the ViewModel belonging to that View.
 
+**ViewModel intent naming:** Name a ViewModel method for the work it performs,
+not the gesture or lifecycle signal that reached it. Use `refresh()`, `save()`,
+`retry()` or `selectTheme(_:)`; do not use `refreshTapped()`, `savePressed()`,
+`retryClicked()` or `screenAppeared()`. The View is the layer that knows a
+button was tapped or a screen appeared. The ViewModel owns the screen workflow,
+so its API describes the meaningful intent that workflow performs.
+
 Each SwiftUI View describes the interface; it does not perform imperative work.
 Move view-related work—formatting externally supplied values, reading bundle or
 system metadata, constructing presentation strings, coordinating actions, and
@@ -80,30 +87,50 @@ arguments.
 
 ```swift
 // Dedicated editor: describe the Save control and forward intent.
-Button("Save", action: viewModel.save)
+Button("Save") { _ = viewModel.save() }
 
 // ViewModel: own the event task and presentation transitions.
-func save() {
-    guard saveTask == nil else { return }
-    saveTask = Task {
+func save() -> Task<Void, Never> {
+    if let saveTask { return saveTask }
+    let draftToSave = draft
+    let task = Task {
         defer { saveTask = nil }
         do {
-            try await feature.save(draft)
+            try await feature.save(draftToSave)
             message = "Saved."
         } catch {
             self.error = error.localizedDescription
         }
     }
+    saveTask = task
+    return task
 }
 ```
 
-The example assumes a ViewModel-owned task property and explicit feature dependency. Choose cancellation and lifetime for the actual operation; a persistent save need not be cancelled just because the screen disappears. Business rules within `feature.save` remain in the model.
+The example assumes a main-actor ViewModel, a stored `Task<Void, Never>?` named
+`saveTask`, an explicit feature dependency and an unchanged editor draft while
+saving. Repeated taps reuse the handle; async callers and tests use
+`await viewModel.save().value`. If input changes during saving, queue that
+distinct edit rather than silently treating it as a duplicate. A persistent
+save need not be cancelled on navigation. Business rules remain in the Feature.
 
-Bindings, conditional content, `ForEach` and direct dismissal are declarative UI work. A View `.task` is lifecycle-bound work, not a general loading mechanism: use it only when cancellation on that screen's disappearance is the intended product behaviour. Do not use it for app-launch refreshes, persistent saves or shared feature work that must outlive a screen. UIKit delegate and layout code belongs in a named presentation adapter when needed. Do not create extra layers just to move a trivial assignment.
+Bindings, conditional content, `ForEach` and direct dismissal are declarative UI work. A View `.task` is lifecycle-bound work: SwiftUI starts it before the View appears and may cancel it after the View disappears. Use it confidently for a screen's initial refresh or other work that belongs to that screen's lifetime. It is not a completion barrier: render a useful observed loading, cached, empty, or error state while the asynchronous operation continues.
+
+Use the application lifecycle for an app-wide system refresh that should begin at launch. The UIKit delegate callback starts that shared work before scene display preparation; it does not wait for a network or storage operation to finish. This gives shared work an early opportunity to overlap with UI construction. Do not use a screen `.task` as the sole trigger for app-wide work, persistent saves or work that must outlive a screen.
+
+When launch and a screen `.task` can request the same refresh, the Feature owns one in-flight `Task<Void, Never>`. The first caller creates it; subsequent callers await its `value` rather than starting duplicate work or returning early. Derive `isRefreshing` from the stored handle and clear the handle in the task's `defer` after publishing its outcome. This is a Feature-owned task, not a structured child of a screen task, because the work may outlive that screen. Use another documented policy only when the product contract genuinely differs. UIKit delegate and layout code belongs in a named presentation adapter when needed. Do not create extra layers just to move a trivial assignment.
+
+For a synchronous Button action that begins a refresh, the ViewModel also owns
+one screen interaction task. Its `refresh()` method returns the stored
+`Task<Void, Never>` (creating it only if absent), so the Button does not create
+a new unstructured task for every tap and an async caller can await `.value`.
+The ViewModel task awaits the Feature command; the Feature task coalesces the
+shared operation across launch and screens. Clear each handle at its own owner
+when its work completes.
 
 The SwiftUI environment is for app-wide presentation dependencies such as `ThemeManager`, locale-aware formatting or accessibility configuration. Do not place `AppModel` or a feature in the environment. Use the active architecture's declared composition route for feature dependencies. In CFA, a View owns its ViewModel and that ViewModel defaults its narrow live feature dependency from `AppModel.shared`; do not replace that route with screen-initializer plumbing.
 
-**Review:** A reader should see what the screen displays and which intents it forwards without tracing storage calls, bundle/system reads, formatting work, business rules, or multi-step tasks in its body. Does the ViewModel have only its defaulted Feature input?
+**Review:** Does each screen start its own initial work in `.task` before it appears, when that work belongs to the screen? Does the app lifecycle begin shared system refresh early without blocking the root UI? A reader should see what the screen displays and which intents it forwards without tracing storage calls, bundle/system reads, formatting work, business rules, or multi-step tasks in its body. Does the ViewModel have only its defaulted Feature input?
 
 ### Inline editing saves directly; dedicated editors may have Save and Cancel
 
@@ -146,6 +173,45 @@ Keep one authoritative source of each piece of state. Derive values instead of s
 For example, a key used only to persist the selected colour theme is `selectedColourThemeStorageKey`, not `storageKey`. The longer name is valuable because it makes the stored information clear at every read and write site. Use concise names when the scope makes the information genuinely obvious; do not shorten away the domain meaning.
 
 **Review:** Read each declaration without its implementation. Can a reader identify the information it stores, not merely the API or container it uses?
+
+### Variable-name scan during every tidy-up
+
+**Rule:** Every CFA tidy-up includes a contextual variable-name scan of the
+agreed first-party source and test scope. Review stored and computed properties,
+local values, parameters, bindings and closure captures alongside their callers.
+Search helps locate candidates; a short or generic name alone is not a defect.
+
+- Describe the domain information and distinguish representations: a count from
+  a collection, editable text from a parsed amount, a selected value from a
+  resolved value, and a pending write from confirmed data. For example,
+  `completedHabitCount` describes a number of habits; `completedDayCount`
+  describes a number of days. Do not give different concepts the same name
+  merely because they share a type.
+- Follow established framework terminology when the meaning really matches.
+  Theme roles use `tint`, `onTint` and `colorScheme`; `theme` names the complete
+  palette. Keep required framework names such as `Identifiable.id` and useful
+  short locals whose meaning is obvious in their immediate scope. Do not
+  mechanically expand every `value`, `data`, `error` or `id`.
+- Use the same domain term across equivalent Feature properties, ViewModel
+  dependencies, initializer labels and call sites. Keep concrete Feature
+  references named for their type, such as `habitsFeature: HabitsFeature`.
+  Boolean names should read as predicates; ambiguous quantities should expose
+  their unit or meaning when the owner and type do not already make it clear.
+- Explain each proposed rename with its declaration, callers and the ambiguity
+  it removes. Apply safe source-only renames consistently, including tests,
+  key paths and maintained examples. Avoid adding aliases or abstractions just
+  to change spelling.
+- Preserve compatibility. A source rename must not silently change UserDefaults
+  key strings, Codable wire keys, raw values, SwiftData/Core Data schema fields,
+  store locations, product identifiers, accessibility identifiers or external
+  APIs. Inspect synthesized encoding and persistence mappings too. When a
+  rename affects such a contract, report the finding and obtain agreement on
+  a compatible mapping or migration instead of treating it as cosmetic cleanup.
+
+**Review:** Record representative before/after names and reasons, intentional
+exceptions and compatibility-sensitive findings. Re-scan references, build the
+affected targets and run relevant tests after renaming. Report unverified checks;
+successful text replacement does not establish behavioural compatibility.
 
 ### Every Swift file declares the imports it needs
 
@@ -230,9 +296,26 @@ For persistence, prepare the proposed state, commit it, then expose confirmed su
 
 Use structured child tasks for independent work whose lifetime belongs to the current operation. Give longer-lived tasks an owner and cancellation policy. A `Task` does not automatically move expensive work off the main actor; use suitable actor workers for parsing, persistence and generation. Do not add detached tasks merely to silence isolation errors.
 
-Store a Task handle only when later code must cancel it, await it, inspect it, or enforce an overlapping-operation policy. A one-time lifecycle action can instead use an explicit Boolean guard. When a Task needs one dependency, capture that dependency directly rather than weakly capturing `self` only to reach it.
+In CFA, ViewModels retain a named handle for each unstructured Task they create
+by default. Repeated equivalent actions reuse that handle and await its outcome,
+not a second execution or a silent busy return. Synchronous UI methods may
+return the shared handle for async callers to await; avoid new waiter Tasks for
+each tap. Install ownership before suspension and clear it after publishing the
+outcome on success, failure and cancellation. Framework-owned `.task` and
+structured child tasks retain their existing owners. AppModel's one-time
+lifecycle notification keeps its specified Boolean guard, not screen task state.
+When a Task needs one dependency, capture it directly rather than weakly
+capturing `self` only to reach it.
 
-Actors protect isolated state, but an `await` permits reentrancy. Decide whether overlapping operations are rejected, coalesced, serialized or allowed independently. Recheck relevant access and request identity after suspension before publishing results. Avoid blocking waits and replacing GCD mechanically without preserving its ordering guarantees.
+Each CFA Feature operation independently handles overlapping calls: share one
+in-flight execution for equivalent requests, or queue distinct commands for
+whole-operation sequential execution. ViewModel suppression cannot protect
+against other callers. Define request identity, each caller's outcome, cleanup
+and cancellation policy; a cancelled waiter must not accidentally cancel work
+needed by others. Do not discard changed inputs as duplicates. Other policies
+need an explicit product reason. Actors protect isolated state, but an `await`
+permits reentrancy. Recheck relevant access and request identity after suspension
+before publishing results. Avoid blocking waits and self-awaiting queue cycles.
 
 **Review:** For every Task, identify its creator, why its handle is or is not stored, its cancellation policy, and the exact state it may publish. Test cancellation, overlap, stale completion and retry with controlled dependencies rather than sleeps or scheduler assumptions.
 

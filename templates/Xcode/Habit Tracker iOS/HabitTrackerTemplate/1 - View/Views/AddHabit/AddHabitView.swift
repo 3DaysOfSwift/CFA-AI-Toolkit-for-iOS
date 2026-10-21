@@ -49,7 +49,7 @@ struct AddHabitView: View {
                 if didSave { dismiss() }
             }
         }
-        .tint(theme.accent)
-        .preferredColorScheme(theme.scheme)
+        .tint(theme.tint)
+        .preferredColorScheme(theme.colorScheme)
     }
 }

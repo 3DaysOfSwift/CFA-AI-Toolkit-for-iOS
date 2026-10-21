@@ -12,15 +12,17 @@ struct SettingsView: View {
                     Picker("Colour theme", selection: Binding(
                         get: { themeManager.current.id },
                         set: { id in
-                            if let selected = AppColourTheme.all.first(where: { $0.id == id }) {
+                            if let selected = AppColourTheme.selections.first(where: { $0.id == id }) {
                                 themeManager.select(selected)
                             }
                         }
                     )) {
-                        ForEach(AppColourTheme.all, id: \.id) { option in
+                        ForEach(AppColourTheme.selections, id: \.id) { option in
                             Text(option.name).tag(option.id)
                         }
                     }
+                    .pickerStyle(.menu)
+                    .frame(minHeight: 48)
                 }
                 Section("Calendar") {
                     Picker("Week starts", selection: Binding(
@@ -42,7 +44,7 @@ struct SettingsView: View {
             .background(theme.background)
             .navigationTitle("Settings")
         }
-        .tint(theme.accent)
-        .preferredColorScheme(theme.scheme)
+        .tint(theme.tint)
+        .preferredColorScheme(theme.colorScheme)
     }
 }

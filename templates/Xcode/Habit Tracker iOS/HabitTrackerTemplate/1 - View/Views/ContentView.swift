@@ -11,7 +11,7 @@ struct ContentView: View {
             Tab("Day Streak", systemImage: "flame") { DayStreakView() }
             Tab("Settings", systemImage: "gearshape") { SettingsView() }
         }
-        .tint(theme.accent)
-        .preferredColorScheme(theme.scheme)
+        .tint(theme.tint)
+        .preferredColorScheme(theme.colorScheme)
     }
 }

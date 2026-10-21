@@ -27,6 +27,11 @@ Use deliberate passes:
    property, dedicated screen ViewModel and named Feature tests. Correct missing
    tab owners during their migration checkpoint, preserving one authoritative
    owner for data shared by several tabs; do not duplicate stores or collections.
+   Inventory appearance against the specification's Colour Theme policy: seven
+   palettes plus Automatic and a native popup selector, not horizontal theme
+   tabs. Preserve recognised saved choices. Apply and test this policy when
+   appearance is in scope; otherwise report the gap without silently expanding
+   a bounded concurrency migration.
 2. Move one complete feature at a time into CFA. Give each SwiftUI View a
    bespoke ViewModel, move testable feature decisions into its Feature,
    place shared dependency construction in AppModel and keep persistence behind
@@ -36,9 +41,12 @@ Use deliberate passes:
    signal launch from the app lifecycle, not a View `.task`. Do not move GCD
    syntax mechanically during this pass.
 3. Convert that feature’s asynchronous model work into directly awaitable
-   Swift Concurrency. Choose a deliberate policy for serial durable saves,
-   reject-while-busy operations, latest-request-wins work and independent work.
-   Give independent root Tasks an explicit owner and cancellation policy.
+   Swift Concurrency. ViewModels retain created task handles by default and
+   equivalent repeated actions await the shared execution. Each Feature
+   independently shares equivalent in-flight requests or queues distinct
+   commands sequentially across awaits. Preserve required product semantics;
+   document exceptions such as latest-request-wins or independent work rather
+   than silently dropping inputs. Give root Tasks explicit cancellation owners.
 4. Re-run the relevant behaviour and concurrency tests. Record the remaining
    legacy primitives, completed feature milestones and verification gaps.
 

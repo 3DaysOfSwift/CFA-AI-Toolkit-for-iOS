@@ -10,7 +10,7 @@ final class ThemeManager {
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         let savedID = defaults.string(forKey: "selectedTheme")
-        current = AppColourTheme.all.first(where: { $0.id == savedID }) ?? .light
+        current = AppColourTheme.selections.first(where: { $0.id == savedID }) ?? .automatic
     }
 
     func select(_ theme: AppColourTheme) {

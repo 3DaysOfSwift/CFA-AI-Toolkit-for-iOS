@@ -23,7 +23,7 @@ struct ___PACKAGENAME:identifier___App: App {
         WindowGroup {
             RootTabView()
                 .environment(themeManager)
-                .preferredColorScheme(themeManager.selectedTheme.preferredColorScheme)
+                .preferredColorScheme(themeManager.selectedTheme.colorScheme)
         }
     }
 }

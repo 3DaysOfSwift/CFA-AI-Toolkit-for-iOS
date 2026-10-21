@@ -29,6 +29,7 @@ For every new Feature, ViewModel, protocol, actor or persistence type, state one
 - An actor earns its existence by isolating mutable state; it is not a generic “background work” marker.
 - SwiftUI environment values are presentation dependencies. Put `ThemeManager` there when it is app-wide. Do not put `AppModel` or features in the environment; use the active architecture's declared composition route for feature dependencies.
 - Keep dependency direction visible: View → optional ViewModel → feature → provider/storage. A View may call its feature directly for a trivial intent only when the active architecture permits it. CFA requires View → ViewModel → feature for every screen.
+- Name ViewModel methods for the work they perform, not for a UI gesture or lifecycle signal. Prefer `refresh()`, `save()` and `retry()` over `refreshTapped()`, `savePressed()` and `screenAppeared()`.
 
 ## Delivery gate
 

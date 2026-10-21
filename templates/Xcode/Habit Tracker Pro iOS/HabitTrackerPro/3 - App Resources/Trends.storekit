@@ -1,0 +1,20 @@
+{
+  "identifier": "A4EBA9A9-71AF-46B8-A51D-976F43CE2D80",
+  "nonRenewingSubscriptions": [],
+  "products": [{
+    "displayPrice": "4.99",
+    "familyShareable": false,
+    "internalID": "6902D3A0-1948-4518-8A2E-B5962617598A",
+    "localizations": [{
+      "description": "Unlock daily activity charts and weekly consistency for every habit. One-time purchase.",
+      "displayName": "Unlock Trends",
+      "locale": "en_US"
+    }],
+    "productID": "com.3DaysOfSwiftConcurrency.HabitTrackerPro.trends",
+    "referenceName": "Trends",
+    "type": "NonConsumable"
+  }],
+  "settings": { "_failTransactionsEnabled": false, "_locale": "en_US", "_storefront": "USA" },
+  "subscriptionGroups": [],
+  "version": { "major": 4, "minor": 0 }
+}

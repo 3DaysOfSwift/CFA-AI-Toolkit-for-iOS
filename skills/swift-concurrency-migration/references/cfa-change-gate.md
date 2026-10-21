@@ -43,8 +43,15 @@ the architecture:
    `LoadState` enum may carry all three.
 9. Application launch begins at the application lifecycle boundary. AppModel's
    `applicationDidFinishLaunching()` uses a Boolean guard and awaits feature
-   refreshes without storing a Task handle. A screen `.task` is only for
-   intentionally screen-lifetime-bound work.
+   refreshes without storing a Task handle. The app delegate starts an app-wide
+   refresh at the earliest launch callback, without blocking UI preparation.
+   A screen `.task` starts screen-owned initial asynchronous work before that
+   View appears; it is not a substitute for launch. When both paths request the
+   same refresh, a shared Feature retains one in-flight `Task<Void, Never>` and
+   every caller awaits its value; it clears the task in `defer` after publishing
+   the outcome. A ViewModel retains one Button-triggered interaction task and
+   returns it from `refresh()`; repeated Button presses reuse it and async
+   callers await its value.
 10. A non-trivial SwiftData repository is a `@ModelActor`. Its `ModelContext`
     and SwiftData records stay inside that actor; it returns `Sendable` domain
     values to the main-actor concrete feature type.
@@ -79,27 +86,56 @@ the architecture:
     the request's error path through Feature → ViewModel → feature screen,
     never a launch/startup error. Retry the domain request, preserve saved data,
     and keep independent navigation usable.
+19. ViewModel methods name the work they perform, not the UI gesture or
+    lifecycle signal that triggered it. Use `refresh()`, `save()` or `retry()`;
+    never `refreshTapped()`, `savePressed()` or `screenAppeared()`.
 
-19. Every top-level app tab has its own concrete Feature exposed by AppModel
+20. Every top-level app tab has its own concrete Feature exposed by AppModel
     and used by the tab's dedicated ViewModel. Give it a real responsibility
     and named tests. Cooperating tab Features share one authoritative data
     owner, never competing collections or independent copies of the store.
+21. New apps provide seven complete palettes plus Automatic with named default
+    light/dark palettes. Settings opens a native popup theme menu, never
+    horizontal theme tabs or a segmented control. Follow the specification's
+    Colour Theme policy and preserve recognised saved choices during migration.
+22. ViewModels retain handles for their created Tasks by default. Equivalent
+    repeated actions reuse and await the existing execution, not a duplicate
+    task or silent busy return. Each Feature operation independently shares
+    equivalent in-flight work or queues distinct calls sequentially across
+    suspension points. Record input identity, cleanup, cancellation and any
+    product-required exception. Never lose a distinct edit as a duplicate.
 
 ## Before delivery
 
 Review the changed source as one feature slice, not as isolated files.
+
+- Verify repeated ViewModel actions and equivalent Feature calls share one
+  execution and completion. Verify queued commands execute in admission order
+  and return their own outcomes. Test failure/cancellation cleanup and a later
+  retry using controlled dependencies, not sleeps; record exceptions explicitly.
 
 - Trace every affected screen to its ViewModel and default AppModel feature.
 - For a tab-based app, map every top-level app tab to a distinct concrete Feature
   exposed by AppModel and requested by that tab's ViewModel. Require its named
   Feature tests; test shared data across tabs without duplicating state owners.
 - Confirm that no screen initializer gained dependency plumbing.
+- For creation or appearance changes, verify seven palettes plus Automatic,
+  popup selection, persistence, live system changes, manual overrides and
+  returning to Automatic. Check sheets, contrast and accessible touch targets.
 - Inspect every newly created or moved Swift file for the imports required by
   its own declarations; imports in another source file do not satisfy this.
 - Confirm that every new screen and feature has the appropriate named
   test file under View Model Tests and Feature Tests.
 - Confirm that launch refresh logic is absent from RootTabView and feature
-  screens do not use `.task` as a substitute for application launch.
+  screens use `.task` for their own initial work—not as a substitute for
+  application launch. Confirm the app delegate starts each shared system
+  refresh at launch without gating or delaying the root UI.
+- When launch and screen refresh can overlap, confirm callers await the one
+  Feature-owned in-flight task rather than duplicate the request or silently
+  return; test its success, failure and reset after completion.
+- Confirm a repeated synchronous Button action reuses its ViewModel-owned task
+  rather than creating a new `Task` per press; its async callers await the
+  returned task's value.
 - Read the App `body`: it must install a stable root without branching on
   storage, loading, or errors. Do not merely move that branch into RootTabView.
 - For persistence changes, fail the initial store open and verify the root stays

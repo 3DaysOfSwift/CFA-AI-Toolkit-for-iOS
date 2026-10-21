@@ -210,23 +210,59 @@ supplies that same instance to every screen, scene, and presentation. Do not
 construct separate managers in individual screens or place this presentation
 state in AppModel.
 
-Provide at least two distinct, complete colour themes. ThemeManager owns the
-current selection and exposes its palette. Every screen and shared component
+Every new CFA app ships seven distinct, complete colour palettes, including at
+least one light and one dark palette, plus an **Automatic** selection. Automatic
+is a mode, not an eighth palette: it follows the system appearance using one
+named default light palette and one named default dark palette. It is the
+default for a fresh installation or an unknown saved identifier. A manual
+choice stays selected when system appearance changes; returning to Automatic
+follows the system again. Persist the mode, not its last resolved palette.
+
+ThemeManager owns the current selection and exposes its palette. Every screen and shared component
 uses that current palette for semantic colours: backgrounds, surfaces, text,
 secondary text, accents, button foregrounds, and feedback. Keep palette literals
 centralized. Deliberately fixed artwork colours can remain stable, but must not
 be used as a substitute for themed interface colours.
 
-Add a colour-theme selector to Settings. Changing it must update visible and
-subsequently presented screens immediately. Persist a stable theme identifier
+Use `tint` for the interactive accent colour and `colorScheme: ColorScheme?`
+for the light/dark appearance preference (`nil` for Automatic). Name the
+contrasting foreground drawn over the tint `onTint`. Keep `theme` for the
+complete palette, not just its appearance preference. The call sites read
+`.tint(theme.tint)` and `.preferredColorScheme(theme.colorScheme)`, matching
+SwiftUI terminology without renaming the framework modifiers.
+
+Add a colour-theme selector to Settings using a native popup menu. A labelled
+row shows the current choice and opens the choices when tapped. Use SwiftUI
+`Picker` with explicit `.pickerStyle(.menu)`, or a native `Menu` containing a
+selection-aware Picker. Show names and a selected-state checkmark; swatches
+alone are insufficient. Never use a horizontal tab bar, segmented control, or
+horizontally scrolling swatch strip to select themes. This restriction does
+not prohibit the app's navigation `TabView`. Support VoiceOver, Dynamic Type
+and comfortable touch targets. Selection applies immediately without Save.
+
+Changing it must update visible and subsequently presented screens immediately.
+Persist a stable theme identifier
 across launches, with a default fallback for a missing or obsolete identifier.
 Make system appearance, navigation, lists, text inputs, and sheets agree with
 the selected palette; do not force light mode for a dark theme. Declare any
 required privacy-manifest reason for the chosen preferences API.
 
-Verify both themes on the main user journey and in Settings, including contrast,
-selection persistence, and newly opened sheets. Keep the themes and manager in
+In Automatic, leave the preferred colour scheme unset and respond to actual
+system appearance changes while the app is open. Apply manual overrides to
+native controls and sheets consistently; do not mistake a forced scheme for
+the system preference.
+
+Verify all seven palettes on the main user journey and in Settings, including
+contrast, selection persistence, and newly opened sheets. Test Automatic in
+both appearances, live system changes, manual overrides, returning to Automatic,
+and missing/obsolete saved identifiers. Keep the themes and manager in
 `1 - View`, because they own presentation rather than application behaviour.
+
+Creation follows this policy from the start. Adoption and migration inventory
+palette identifiers, saved choices, default mappings and selector behaviour.
+Apply the policy when appearance is in scope; preserve recognised saved choices
+and record intended UI changes in the behaviour contract. A narrowly scoped
+unrelated migration reports the gap rather than silently redesigning the UI.
 
 ### Swift Extensions
 
@@ -380,6 +416,9 @@ A ViewModel:
   screen rather than the complete AppModel;
 - converts feature state into presentation-ready values;
 - accepts user intent and calls its feature API;
+- names methods for the work it performs, not the UI gesture or lifecycle
+  signal that reached it: use `refresh()`, `save()` and `retry()`, never
+  `refreshTapped()`, `savePressed()` or `screenAppeared()`;
 - owns screen-specific error text, loading state, drafts, and presentation state;
 - contains no reusable business rule.
 
@@ -645,43 +684,79 @@ and bounded.
 An `async` feature method is a testable unit of work. It is not itself a `Task`.
 A `Task` represents the initiated lifetime of asynchronous work.
 
-A SwiftUI event may create a `Task` to bridge a synchronous callback into an
-async workflow:
+### Default: retained ViewModel tasks and shared completion
+
+Each ViewModel retains a named handle for every unstructured `Task` it creates
+by default. Use one handle per independently managed operation, or keyed handles
+when independent records need independent work. Equivalent repeated button
+actions reuse the existing execution rather than create another task. A
+synchronous button-facing method returns the existing/new handle; asynchronous
+callers and tests await that same handle's `value`. Do not create a new wrapper
+task for every tap just to wait, or silently return from an async operation
+while its requested work is still unfinished.
+
+Install the handle before the first suspension. The following main-actor
+ViewModel example returns the same handle for repeated refresh requests:
 
 ```swift
-Button("Save") {
-    Task {
-        await viewModel.save()
+@discardableResult
+func refresh() -> Task<Void, Never> {
+    if let refreshTask { return refreshTask }
+
+    let refreshTask = Task { [weak self, itemsFeature] in
+        defer { self?.refreshTask = nil }
+        await itemsFeature.refresh()
     }
+    self.refreshTask = refreshTask
+    return refreshTask
 }
 ```
 
-It is completely acceptable for a View to create an unretained Task for a
-direct user event. This is the simplest starting point. An unretained Task is
-not trackable or explicitly cancellable, which may be exactly what a durable
-command such as saving requires: the save can continue after the View
-disappears.
-
-The moment the application must track progress, prevent duplication, replace
-older work, or cancel that Task, move Task ownership into the View's tightly
-coupled ViewModel. Task tracking and cancellation are screen behaviour and must
-not accumulate in the View. The ViewModel still exposes clear intent methods,
-and the feature owns the underlying business workflow. Do not wrap every
-async method in a ViewModel-owned Task merely to remove `Task` syntax from
-SwiftUI.
+Clear the stored task after publishing its outcome, on success, failure and
+cancellation, so a later request can start again. Cleanup from an obsolete
+execution must not clear a newer handle. Task tracking and cancellation are
+screen behaviour and must not accumulate in the View. The ViewModel still
+exposes clear intent methods, and the Feature owns the underlying business
+workflow and shared request policy. Framework-owned View `.task` and structured
+child tasks retain their existing owners; do not manufacture stored wrapper
+tasks for them. Document departures from the retained-task default with a
+concrete lifetime requirement. Retaining a handle does not require cancelling
+a durable save when its screen disappears.
 
 A SwiftUI View must never store a `Task` handle in a stored property or in
-`@State` so it can inspect or cancel that work later. Requiring a persistent
-reference to the Task is the precise point at which the screen has gained
-enough asynchronous behaviour for its custom ViewModel to own that lifetime.
+`@State` so it can inspect or cancel that work later. Its custom ViewModel owns
+the screen's explicitly created task lifetimes from the start.
 The View continues to render the ViewModel's observable state and report user
 intent; the ViewModel stores, replaces, or cancels the Task.
 
-Store a Task when its lifetime must be managed. Examples include:
+Other retained task lifetimes include:
 
 - cancelling an obsolete progress calculation when a new range is selected;
 - retaining a long-lived StoreKit transaction observer;
 - ensuring several scenes await the same launch workflow.
+
+### Each Feature owns its overlapping-call policy
+
+ViewModel protection is not enough: another screen, lifecycle callback or
+Feature may call the same API. Each asynchronous Feature operation must define
+its policy at the Feature boundary:
+
+- **Share execution:** equivalent calls await one retained in-flight task and
+  receive its outcome. Define equivalence by operation and relevant inputs.
+- **Queue execution:** when every command must execute, admit calls to an
+  explicit asynchronous sequential queue. Finish the whole operation, including
+  suspension points, before starting the next admitted command. Each caller
+  awaits its own outcome. Define cancellation, failure and cleanup so no waiter
+  is lost and a failed command does not accidentally strand later commands.
+
+These are the default policies. Reject-while-busy, latest-request-wins or
+independent execution needs a documented product reason. Never discard a new
+edit or return another record's result as duplicate suppression. Preserve
+independent work instead of serializing the entire app. Actors and `@MainActor`
+do not serialize whole operations across `await`; coordinate without blocking
+threads. Keep queue admission separate from admitted internal work to avoid
+an operation awaiting itself. A cancelled waiter must not accidentally cancel
+shared work still needed by other callers.
 
 Choose the lifetime deliberately:
 
@@ -843,10 +918,27 @@ work. A ViewModel exposes these values as presentation-ready properties; its Vie
 shows loading, failure, cached data, and retry for that feature.
 
 Never use `.task { await AppModel.shared.applicationDidFinishLaunching() }`
-or an equivalent View-tied call to signal application launch. Do not use
-`.task { await viewModel.load() }` as the default for launch refresh.
-Use a View `.task` only for work whose lifetime is intentionally tied to that
-specific screen and whose cancellation when the screen disappears is correct.
+or an equivalent View-tied call to signal application launch. The app delegate
+signals launch at the earliest applicable application lifecycle callback and
+starts the shared system refresh concurrently with UI preparation.
+
+A screen's `.task { await viewModel.refresh() }` is the normal, approved
+choice for that screen's own initial asynchronous work: SwiftUI starts it
+before the View appears. It does not guarantee that storage or network work
+finishes before the first frame, so the screen must render an observed loading,
+cached, empty, or error state while the work continues. Use the app lifecycle,
+not a screen `.task`, for a shared refresh that must begin with launch or outlive
+one screen.
+
+When the launch lifecycle and one or more screen `.task` modifiers can request
+the same Feature refresh, the Feature stores one in-flight `Task<Void, Never>`.
+The first caller creates it; every later caller awaits that task's `value`.
+They therefore receive the result of the same refresh rather than starting a
+second request or returning before the first finishes. Derive `isRefreshing`
+from the stored task and clear it with `defer` inside the task after publishing
+its outcome. This task belongs to the Feature—not to the View task that first
+requested it—because the shared refresh may outlive any one screen. A different
+policy needs a documented product reason and dedicated tests.
 Airplane Mode, a temporary API failure, unavailable iCloud, and lost
 connectivity are legitimate user flows, not exceptional states to conceal.
 Retrying asks the same feature to refresh again; the View does not
@@ -858,7 +950,8 @@ duplicate launch refreshes.
 
 Individual features have no concept of an application launch unless
 launch is genuinely part of that feature's domain. `DailyTipFeature.refresh()`
-refreshes tips; it does not `beginLaunch()`.
+refreshes tips; it does not `beginLaunch()`. The lifecycle initiator names the
+occasion; the Feature command names the work.
 
 Tests directly test that the launch opportunity triggers the intended features
 once without making AppModel responsible for their results. Each feature
@@ -968,6 +1061,9 @@ Rules for tests:
 - AppModel tests verify construction and application-wide coordination;
 - async functions are awaited directly in unit tests;
 - task cancellation and race-prevention behaviour receive dedicated tests;
+- repeated equivalent ViewModel actions and Feature calls share one execution
+  and completion; queued commands run in admission order with individual
+  outcomes, including failure/cancellation cleanup and successful later retry;
 - clocks, repositories, and external clients use deterministic test doubles;
 - tests describe observable behaviour, not private implementation details.
 - tests that need AppModel assemble an isolated graph and never alter the shared

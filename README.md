@@ -112,11 +112,17 @@ Xcode asks for your product name and organisation identifier, then creates a
 new project with the CFA folders, feature, network refresh, JSON file
 cache, retry state and colour-theme settings already in place.
 
-**Habit Tracker** provides Today, Habits and Settings tabs, completion/count habits,
+**Habit Tracker** provides Today, Habits, Day Streak and Settings tabs, completion/count habits,
 daily streaks, lazy SwiftData storage, colour themes and focused unit tests.
 Its editable, ready-to-open project is in
 [`templates/Xcode/Habit Tracker iOS`](templates/Xcode/Habit%20Tracker%20iOS/README.md).
 The native template is generated from that project so its code stays in sync.
+
+For a separate paid-feature example, open
+[Habit Tracker Pro](templates/Xcode/Habit%20Tracker%20Pro%20iOS/README.md).
+It adds a Trends tab with Swift Charts, a one-time StoreKit unlock and local
+purchase tests. The free template remains unchanged; Pro is currently a
+ready-to-open project, not an additional installer template.
 
 Running the installer again updates CFA-installed templates and preserves backup copies.
 It refuses to replace a same-named template from another source.
@@ -212,6 +218,20 @@ The installable **CFA App** Xcode template is a deliberately small, complete
 project for learning the structure before building a product. It has a tab bar,
 a launch refresh, a real public-network request, a JSON file cache, retry and
 failure states, persistent colour themes and focused tests.
+
+### Start shared work early, and screen work early too
+
+CFA makes a deliberate distinction between two valid refresh paths. The app
+delegate starts an app-wide system refresh at the earliest launch callback, so
+shared work can run while the UI is prepared. Each screen uses SwiftUI
+`.task` for its own initial asynchronous work; SwiftUI starts that work before
+the View appears. Neither path blocks the first frame or promises that a remote
+request has already finished. The owning Feature coordinates duplicate requests
+and publishes observed loading, cached, empty, success or error state.
+
+This avoids a common false choice: using a View task as the whole app's launch
+mechanism, or postponing all loading until a screen is visibly on screen. CFA
+uses both routes, each with a clear owner.
 
 ## The CFA architecture
 

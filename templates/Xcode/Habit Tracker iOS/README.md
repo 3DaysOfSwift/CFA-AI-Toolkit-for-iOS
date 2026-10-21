@@ -7,7 +7,7 @@ physical device. No personal signing team is included.
 
 This is the editable source for the toolkit's **Habit Tracker** Xcode template.
 It includes Today, Habits, Day Streak and rightmost Settings tabs; completion/count habits;
-daily streaks; light/dark themes; SwiftData persistence; and focused Swift Testing
+daily streaks; seven colour themes plus Automatic; SwiftData persistence; and focused Swift Testing
 suites for every screen ViewModel and Feature.
 
 Each tab has its own concrete Feature:
