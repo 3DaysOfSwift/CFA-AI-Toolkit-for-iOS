@@ -168,9 +168,25 @@ Keep one authoritative source of each piece of state. Derive values instead of s
 
 ### Names describe information, not only mechanics
 
+**Philosophy:** Naming gives the reader more information about what is going
+on. It is an opportunity to explain meaning, responsibility and intent at the
+point of use. Readability and ease of maintenance take priority over writing
+shorter code or chaining many objects and calls into one expression.
+
+When a chain makes the reader reconstruct several steps mentally, introduce
+meaningfully named intermediate values or straightforward statements. Keep a
+short chain when its meaning is already obvious. The goal is understanding,
+not a minimum line count, a maximum name length, or an arbitrary ban on chains.
+
 **Rule:** Name a value for the specific information it contains or identifies. A name such as `storageKey`, `value`, `data`, `result` or `manager` usually describes a mechanism or a vague role, not the information a reader needs to understand.
 
 For example, a key used only to persist the selected colour theme is `selectedColourThemeStorageKey`, not `storageKey`. The longer name is valuable because it makes the stored information clear at every read and write site. Use concise names when the scope makes the information genuinely obvious; do not shorten away the domain meaning.
+
+Do not name an operation-state Boolean `isBusy`. Name the actual work or
+condition, such as `isSaving`, `isRefreshing`, `isPurchasePending` or
+`isPurchasingOrRestoring`. A flag shared by purchase and restore operations
+must not be called `isPurchasing`, because that hides half its meaning. Keep
+names accurate without inventing extra state solely for naming purposes.
 
 **Review:** Read each declaration without its implementation. Can a reader identify the information it stores, not merely the API or container it uses?
 

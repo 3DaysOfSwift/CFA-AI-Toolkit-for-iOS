@@ -13,7 +13,7 @@ struct TrendsView: View {
                         Text("See the bigger picture.")
                             .font(.largeTitle.bold())
                         Text("Your last 30 days, one habit at a time.")
-                            .foregroundStyle(themeManager.current.secondaryText)
+                            .foregroundStyle(themeManager.selectedTheme.secondaryText)
                         if let error = viewModel.loadError {
                             Text(error)
                             Button("Try again") { Task { await viewModel.retry() } }
@@ -30,7 +30,7 @@ struct TrendsView: View {
                             }
                             .pickerStyle(.menu)
                             .frame(minHeight: 48)
-                            HabitTrendCharts(trend: trend, theme: themeManager.current)
+                            HabitTrendCharts(trend: trend, theme: themeManager.selectedTheme)
                         } else if !viewModel.isLoading && viewModel.loadError == nil {
                             ContentUnavailableView("Your story starts with a habit",
                                 systemImage: "chart.bar", description: Text("Add a habit in Today. Your recorded activity will appear here."))
@@ -41,8 +41,8 @@ struct TrendsView: View {
                 }
                 .padding(20)
             }
-            .foregroundStyle(themeManager.current.primaryText)
-            .background(themeManager.current.background)
+            .foregroundStyle(themeManager.selectedTheme.primaryText)
+            .background(themeManager.selectedTheme.background)
             .navigationTitle("Trends")
         }
     }
@@ -55,7 +55,7 @@ private struct HabitTrendCharts: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
             VStack(alignment: .leading, spacing: 8) {
-                Text("\(trend.completedDays)").font(.system(size: 56, weight: .bold, design: .rounded))
+                Text("\(trend.completedDayCount)").font(.system(size: 56, weight: .bold, design: .rounded))
                     .foregroundStyle(theme.tint)
                 Text("completed days out of the last 30").foregroundStyle(theme.secondaryText)
             }
@@ -70,7 +70,7 @@ private struct HabitTrendCharts: View {
                             .accessibilityLabel(day.date.formatted(date: .abbreviated, time: .omitted))
                             .accessibilityValue("\(day.value)")
                     }
-                    if let target = trend.target {
+                    if let target = trend.dailyTarget {
                         RuleMark(y: .value("Daily target", target))
                             .lineStyle(StrokeStyle(lineWidth: 1, dash: [4]))
                             .foregroundStyle(theme.secondaryText)
@@ -87,11 +87,11 @@ private struct HabitTrendCharts: View {
                     .font(.subheadline).foregroundStyle(theme.secondaryText)
                 Chart(trend.weeks) { week in
                     BarMark(x: .value("Week starting", week.start, unit: .day),
-                            y: .value("Completed days", week.completedDays))
+                            y: .value("Completed days", week.completedDayCount))
                         .foregroundStyle(theme.tint)
                         .cornerRadius(5)
                         .accessibilityLabel("Seven days from \(week.start.formatted(date: .abbreviated, time: .omitted))")
-                        .accessibilityValue("\(week.completedDays) completed days")
+                        .accessibilityValue("\(week.completedDayCount) completed days")
                 }
                 .chartYScale(domain: 0...7)
                 .chartXAxis { AxisMarks(values: trend.weeks.map(\.start)) }

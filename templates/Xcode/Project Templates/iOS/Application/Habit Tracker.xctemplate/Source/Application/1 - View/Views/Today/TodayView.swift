@@ -5,7 +5,7 @@ struct TodayView: View {
     @Environment(ThemeManager.self) private var themeManager
     @State private var isShowingAddHabit = false
 
-    private var theme: AppColourTheme { themeManager.current }
+    private var theme: AppColourTheme { themeManager.selectedTheme }
 
     var body: some View {
         NavigationStack {
@@ -94,7 +94,7 @@ struct TodayView: View {
         HStack(spacing: 16) {
             Image(systemName: "flame.fill").font(.title2).foregroundStyle(theme.tint)
             VStack(alignment: .leading, spacing: 4) {
-                Text("\(viewModel.completedCount) of \(viewModel.habits.count) done")
+                Text("\(viewModel.completedHabitCount) of \(viewModel.habits.count) done")
                     .font(.headline).foregroundStyle(theme.primaryText)
                 Text(viewModel.habits.isEmpty ? "Start with one small habit" : "Keep your promises to yourself")
                     .font(.subheadline).foregroundStyle(theme.secondaryText)

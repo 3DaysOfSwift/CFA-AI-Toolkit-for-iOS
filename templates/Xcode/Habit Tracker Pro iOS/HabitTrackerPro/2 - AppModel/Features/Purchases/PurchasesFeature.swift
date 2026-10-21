@@ -10,8 +10,8 @@ final class PurchasesFeature {
     private(set) var hasTrendsAccess = false
     private(set) var offer: PurchaseOffer?
     private(set) var isLoadingOffer = false
-    private(set) var isBusy = false
-    private(set) var isPending = false
+    private(set) var isPurchasingOrRestoring = false
+    private(set) var isPurchasePending = false
     private(set) var errorMessage: String?
     private(set) var notice: String?
 
@@ -49,11 +49,11 @@ final class PurchasesFeature {
         entitlementRevision += 1
         let revision = entitlementRevision
         do {
-            let hasAccess = try await store.currentEntitlement()
+            let hasAccess = try await store.hasTrendsAccess()
             guard revision == entitlementRevision else { return }
             hasTrendsAccess = hasAccess
             if hasAccess {
-                isPending = false
+                isPurchasePending = false
                 notice = nil
                 errorMessage = nil
             }
@@ -67,18 +67,18 @@ final class PurchasesFeature {
     }
 
     func purchaseTrends() async {
-        guard !isBusy, !hasTrendsAccess, !isPending else { return }
-        isBusy = true
+        guard !isPurchasingOrRestoring, !hasTrendsAccess, !isPurchasePending else { return }
+        isPurchasingOrRestoring = true
         errorMessage = nil
         notice = nil
-        defer { isBusy = false }
+        defer { isPurchasingOrRestoring = false }
         do {
             switch try await store.purchase() {
             case .purchased:
                 await refreshEntitlement()
                 if !hasTrendsAccess { errorMessage = PurchaseError.unverified.localizedDescription }
             case .pending:
-                isPending = true
+                isPurchasePending = true
                 notice = "Your purchase is awaiting approval. Trends will unlock after it is approved."
             case .cancelled:
                 break
@@ -89,11 +89,11 @@ final class PurchasesFeature {
     }
 
     func restorePurchases() async {
-        guard !isBusy else { return }
-        isBusy = true
+        guard !isPurchasingOrRestoring else { return }
+        isPurchasingOrRestoring = true
         errorMessage = nil
         notice = nil
-        defer { isBusy = false }
+        defer { isPurchasingOrRestoring = false }
         do {
             try await store.restore()
             await refreshEntitlement()

@@ -29,7 +29,7 @@ struct PurchasesFeatureTests {
         await feature.purchaseTrends()
         #expect(feature.hasTrendsAccess)
         #expect(store.purchaseCount == 1)
-        #expect(!feature.isBusy)
+        #expect(!feature.isPurchasingOrRestoring)
     }
 
     @Test func cancelledAndPendingDoNotUnlock() async {
@@ -42,12 +42,12 @@ struct PurchasesFeatureTests {
         store.outcome = .pending
         await feature.purchaseTrends()
         #expect(!feature.hasTrendsAccess)
-        #expect(feature.isPending)
+        #expect(feature.isPurchasePending)
         #expect(feature.notice != nil)
         store.entitled = true
         await feature.refreshEntitlement()
         #expect(feature.hasTrendsAccess)
-        #expect(!feature.isPending)
+        #expect(!feature.isPurchasePending)
     }
 
     @Test func restoresAndRevokes() async {

@@ -26,10 +26,10 @@ struct TrendsFeatureTests {
         let chart = try #require(trends.trends.first)
         #expect(chart.days.count == 30)
         #expect(chart.days.suffix(2).map(\.value) == [5, 10])
-        #expect(chart.completedDays == 1)
+        #expect(chart.completedDayCount == 1)
         #expect(chart.weeks.count == 4)
-        #expect(chart.weeks.last?.completedDays == 1)
-        #expect(chart.target == 10)
+        #expect(chart.weeks.last?.completedDayCount == 1)
+        #expect(chart.dailyTarget == 10)
         store.entitled = false
         await purchases.refreshEntitlement()
         #expect(trends.trends.isEmpty)

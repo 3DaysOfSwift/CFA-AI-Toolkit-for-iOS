@@ -102,7 +102,7 @@ struct AppColourTheme: Equatable {
         separator: adaptive(defaultLight.separator, defaultDark.separator)
     )
 
-    static let selections = [automatic] + all
+    static let availableThemes = [automatic] + all
 
     private static func adaptive(_ light: Color, _ dark: Color) -> Color {
         let lightColour = UIColor(light)

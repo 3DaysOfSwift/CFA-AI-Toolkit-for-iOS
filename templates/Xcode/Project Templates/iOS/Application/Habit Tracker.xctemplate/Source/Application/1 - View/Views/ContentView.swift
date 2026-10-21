@@ -4,7 +4,7 @@ struct ContentView: View {
     @Environment(ThemeManager.self) private var themeManager
 
     var body: some View {
-        let theme = themeManager.current
+        let theme = themeManager.selectedTheme
         TabView {
             Tab("Today", systemImage: "checkmark.circle") { TodayView() }
             Tab("Habits", systemImage: "list.bullet") { HabitsView() }

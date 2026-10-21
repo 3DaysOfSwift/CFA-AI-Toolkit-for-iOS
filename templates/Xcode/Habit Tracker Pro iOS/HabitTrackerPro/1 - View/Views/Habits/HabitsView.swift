@@ -6,7 +6,7 @@ struct HabitsView: View {
     @State private var isShowingAddHabit = false
 
     var body: some View {
-        let theme = themeManager.current
+        let theme = themeManager.selectedTheme
         NavigationStack {
             List {
                 Section {

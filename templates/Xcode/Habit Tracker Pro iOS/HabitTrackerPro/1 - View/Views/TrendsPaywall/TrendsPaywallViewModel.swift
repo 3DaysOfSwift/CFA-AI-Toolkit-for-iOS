@@ -16,9 +16,9 @@ final class TrendsPaywallViewModel {
         return "Unlock Trends · \(offer.displayPrice)"
     }
     var canPurchase: Bool {
-        purchasesFeature.offer != nil && !isBusy && !purchasesFeature.isPending && !purchasesFeature.hasTrendsAccess
+        purchasesFeature.offer != nil && !isPurchasingOrRestoring && !purchasesFeature.isPurchasePending && !purchasesFeature.hasTrendsAccess
     }
-    var isBusy: Bool { purchasesFeature.isBusy }
+    var isPurchasingOrRestoring: Bool { purchasesFeature.isPurchasingOrRestoring }
     var isLoadingOffer: Bool { purchasesFeature.isLoadingOffer }
     var errorMessage: String? { purchasesFeature.errorMessage }
     var notice: String? { purchasesFeature.notice }

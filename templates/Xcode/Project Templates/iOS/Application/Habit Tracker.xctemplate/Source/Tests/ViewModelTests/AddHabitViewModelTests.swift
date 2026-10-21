@@ -14,7 +14,7 @@ struct AddHabitViewModelTests {
         viewModel.name = "Pull ups"
         viewModel.tracking = .count
         viewModel.unit = "reps"
-        viewModel.target = "10"
+        viewModel.dailyTargetText = "10"
 
         viewModel.save()
         let savedHabit = await repository.waitForInsert()

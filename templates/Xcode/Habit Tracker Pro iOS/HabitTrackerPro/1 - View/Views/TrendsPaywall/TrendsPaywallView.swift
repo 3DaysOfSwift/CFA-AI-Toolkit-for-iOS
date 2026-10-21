@@ -5,7 +5,7 @@ struct TrendsPaywallView: View {
     @State private var viewModel = TrendsPaywallViewModel()
     @Environment(ThemeManager.self) private var themeManager
 
-    private var theme: AppColourTheme { themeManager.current }
+    private var theme: AppColourTheme { themeManager.selectedTheme }
     // Illustrative artwork only. Never substitutes for a user's paid data.
     private let preview = [2, 4, 3, 5, 4, 6, 7]
 
@@ -45,15 +45,15 @@ struct TrendsPaywallView: View {
             .disabled(!viewModel.canPurchase)
             Text("One-time purchase. No subscription. Your habits and day streaks remain free.")
                 .font(.footnote).foregroundStyle(theme.secondaryText)
-            if viewModel.isBusy || viewModel.isLoadingOffer { ProgressView() }
+            if viewModel.isPurchasingOrRestoring || viewModel.isLoadingOffer { ProgressView() }
             if let notice = viewModel.notice { Text(notice).font(.callout) }
             if let error = viewModel.errorMessage {
                 Text(error).font(.callout)
                 Button("Try again") { Task { await viewModel.retry() } }
-                    .frame(minHeight: 48).disabled(viewModel.isBusy || viewModel.isLoadingOffer)
+                    .frame(minHeight: 48).disabled(viewModel.isPurchasingOrRestoring || viewModel.isLoadingOffer)
             }
             Button("Restore Purchases") { Task { await viewModel.restore() } }
-                .frame(maxWidth: .infinity, minHeight: 48).disabled(viewModel.isBusy)
+                .frame(maxWidth: .infinity, minHeight: 48).disabled(viewModel.isPurchasingOrRestoring)
         }
         .foregroundStyle(theme.primaryText)
     }

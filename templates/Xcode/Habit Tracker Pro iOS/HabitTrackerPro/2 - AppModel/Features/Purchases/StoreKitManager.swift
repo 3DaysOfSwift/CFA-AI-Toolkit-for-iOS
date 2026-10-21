@@ -31,7 +31,7 @@ final class StoreKitManager: PurchaseStore {
         }
     }
 
-    func currentEntitlement() async throws -> Bool {
+    func hasTrendsAccess() async throws -> Bool {
         for await verification in Transaction.currentEntitlements {
             switch verification {
             case .verified(let transaction):

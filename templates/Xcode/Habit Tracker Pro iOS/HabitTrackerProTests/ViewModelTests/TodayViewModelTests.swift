@@ -17,7 +17,7 @@ struct TodayViewModelTests {
         await feature.reload()
         let viewModel = TodayViewModel(todayFeature: TodayFeature(habitsFeature: feature))
 
-        #expect(viewModel.completedCount == 1)
+        #expect(viewModel.completedHabitCount == 1)
     }
 
     @Test("Completing a habit records today's value through the feature")
@@ -68,7 +68,7 @@ struct TodayViewModelTests {
         // completion while the user's inline controls remain available.
         #expect(viewModel.statusText(for: habit) == nil)
         #expect(!viewModel.isLoading)
-        #expect(viewModel.completedCount == 0)
+        #expect(viewModel.completedHabitCount == 0)
         #expect(viewModel.canIncrement(habit))
         #expect(viewModel.errorMessage == nil)
         #expect(!viewModel.needsRetry(habit))

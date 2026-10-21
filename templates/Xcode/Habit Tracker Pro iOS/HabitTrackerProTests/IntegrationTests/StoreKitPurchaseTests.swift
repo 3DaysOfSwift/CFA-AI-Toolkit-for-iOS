@@ -22,7 +22,7 @@ struct StoreKitPurchaseTests {
         let store = StoreKitManager()
         let offer = try await store.offer()
         #expect(!offer.displayPrice.isEmpty)
-        #expect(try await store.currentEntitlement() == false)
+        #expect(try await store.hasTrendsAccess() == false)
         let feature = PurchasesFeature(store: store)
         await feature.purchaseTrends()
         #expect(feature.hasTrendsAccess)

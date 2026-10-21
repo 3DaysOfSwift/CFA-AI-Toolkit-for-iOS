@@ -5,19 +5,19 @@ struct SettingsView: View {
     @Environment(ThemeManager.self) private var themeManager
 
     var body: some View {
-        let theme = themeManager.current
+        let theme = themeManager.selectedTheme
         NavigationStack {
             Form {
                 Section("Appearance") {
                     Picker("Colour theme", selection: Binding(
-                        get: { themeManager.current.id },
+                        get: { themeManager.selectedTheme.id },
                         set: { id in
-                            if let selected = AppColourTheme.selections.first(where: { $0.id == id }) {
+                            if let selected = AppColourTheme.availableThemes.first(where: { $0.id == id }) {
                                 themeManager.select(selected)
                             }
                         }
                     )) {
-                        ForEach(AppColourTheme.selections, id: \.id) { option in
+                        ForEach(AppColourTheme.availableThemes, id: \.id) { option in
                             Text(option.name).tag(option.id)
                         }
                     }

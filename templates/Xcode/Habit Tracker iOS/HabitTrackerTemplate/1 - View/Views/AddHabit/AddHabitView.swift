@@ -6,7 +6,7 @@ struct AddHabitView: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        let theme = themeManager.current
+        let theme = themeManager.selectedTheme
         NavigationStack {
             Form {
                 Section("Habit") {
@@ -17,7 +17,7 @@ struct AddHabitView: View {
                     }
                     if viewModel.tracking == .count {
                         TextField("Unit, for example pull-ups", text: $viewModel.unit)
-                        TextField("Daily target (optional)", text: $viewModel.target)
+                        TextField("Daily target (optional)", text: $viewModel.dailyTargetText)
                             .keyboardType(.numberPad)
                     }
                 }

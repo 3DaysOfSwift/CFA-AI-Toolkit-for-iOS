@@ -16,7 +16,7 @@ enum PurchaseOutcome: Sendable {
 protocol PurchaseStore: AnyObject {
     func offer() async throws -> PurchaseOffer
     func purchase() async throws -> PurchaseOutcome
-    func currentEntitlement() async throws -> Bool
+    func hasTrendsAccess() async throws -> Bool
     func restore() async throws
     func updates() -> AsyncStream<Void>
     func finishTransactions() async

@@ -10,7 +10,7 @@ struct TrendDay: Identifiable, Sendable {
 
 struct TrendWeek: Identifiable, Sendable {
     let start: Date
-    let completedDays: Int
+    let completedDayCount: Int
     var id: Date { start }
 }
 
@@ -18,10 +18,10 @@ struct HabitTrend: Identifiable, Sendable {
     let id: UUID
     let name: String
     let unit: String
-    let target: Int?
+    let dailyTarget: Int?
     let days: [TrendDay]
     let weeks: [TrendWeek]
-    let completedDays: Int
+    let completedDayCount: Int
 }
 
 @MainActor
@@ -68,12 +68,12 @@ final class TrendsFeature {
             let weeks = stride(from: 2, to: 30, by: 7).map { start in
                 let window = Array(days.dropFirst(start).prefix(7))
                 return TrendWeek(start: window.first?.date ?? today,
-                                 completedDays: window.filter(\.isComplete).count)
+                                 completedDayCount: window.filter(\.isComplete).count)
             }
             return HabitTrend(id: habit.id, name: habit.name,
                               unit: habit.tracking == .completion ? "Completion" : habit.unit,
-                              target: habit.dailyTarget, days: days, weeks: weeks,
-                              completedDays: days.filter(\.isComplete).count)
+                              dailyTarget: habit.dailyTarget, days: days, weeks: weeks,
+                              completedDayCount: days.filter(\.isComplete).count)
         }
     }
 }

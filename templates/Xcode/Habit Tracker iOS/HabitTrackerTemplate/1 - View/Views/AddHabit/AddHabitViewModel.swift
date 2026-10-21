@@ -8,7 +8,7 @@ final class AddHabitViewModel {
     var name = ""
     var tracking: HabitTracking = .completion
     var unit = ""
-    var target = ""
+    var dailyTargetText = ""
     var errorMessage: String?
     var isSaving = false
     var didSave = false
@@ -28,8 +28,8 @@ final class AddHabitViewModel {
                 saveTask = nil
             }
             do {
-                let parsedTarget = target.isEmpty ? nil : Int(target)
-                if !target.isEmpty, parsedTarget == nil {
+                let parsedTarget = dailyTargetText.isEmpty ? nil : Int(dailyTargetText)
+                if !dailyTargetText.isEmpty, parsedTarget == nil {
                     throw HabitError.invalidTarget
                 }
                 try await habitsFeature.addHabit(name: name, tracking: tracking,

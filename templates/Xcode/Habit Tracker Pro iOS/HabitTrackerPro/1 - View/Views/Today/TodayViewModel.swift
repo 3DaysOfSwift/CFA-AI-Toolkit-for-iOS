@@ -20,7 +20,7 @@ final class TodayViewModel {
     var isLoading: Bool { todayFeature.isLoading }
     var loadError: String? { todayFeature.loadError }
     func retryLoading() async { await todayFeature.reload() }
-    var completedCount: Int { todayFeature.completedCount }
+    var completedHabitCount: Int { todayFeature.completedHabitCount }
     var todayHeading: String { Date.now.formatted(.dateTime.weekday(.wide).month(.wide).day()) }
     var isRecording: Bool { recordTask != nil }
 

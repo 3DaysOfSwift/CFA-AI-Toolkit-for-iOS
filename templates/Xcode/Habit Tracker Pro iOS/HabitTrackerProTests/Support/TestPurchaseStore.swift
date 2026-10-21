@@ -29,7 +29,7 @@ final class TestPurchaseStore: PurchaseStore {
         if case .purchased = outcome { entitled = true }
         return outcome
     }
-    func currentEntitlement() async throws -> Bool {
+    func hasTrendsAccess() async throws -> Bool {
         if failsVerification { throw PurchaseError.unverified }
         if holdsNextEntitlement {
             holdsNextEntitlement = false

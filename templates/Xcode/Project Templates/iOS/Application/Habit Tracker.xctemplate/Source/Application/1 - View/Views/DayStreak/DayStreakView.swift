@@ -5,7 +5,7 @@ struct DayStreakView: View {
     @Environment(ThemeManager.self) private var themeManager
 
     var body: some View {
-        let theme = themeManager.current
+        let theme = themeManager.selectedTheme
         NavigationStack {
             // Re-evaluate date-based presentation across midnight without a fetch.
             TimelineView(.periodic(from: .now, by: 60)) { _ in

@@ -20,7 +20,7 @@ struct TrendsViewModelTests {
         #expect(viewModel.selectedTrend?.id == first.id)
         viewModel.selectedID = second.id
         try await habits.recordToday(habitID: second.id, value: 5)
-        #expect(viewModel.selectedTrend?.completedDays == 1)
+        #expect(viewModel.selectedTrend?.completedDayCount == 1)
         store.entitled = false
         await purchases.refreshEntitlement()
         #expect(viewModel.selectedTrend == nil)

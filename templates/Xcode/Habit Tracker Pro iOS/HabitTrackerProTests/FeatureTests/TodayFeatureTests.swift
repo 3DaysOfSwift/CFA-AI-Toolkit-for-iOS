@@ -14,18 +14,18 @@ struct TodayFeatureTests {
         #expect(todayFeature.habits.isEmpty)
         try await habitsFeature.addHabit(name: "Pull ups", tracking: .count, unit: "reps", dailyTarget: 10)
         let habit = try #require(todayFeature.habits.first)
-        #expect(todayFeature.completedCount == 0)
+        #expect(todayFeature.completedHabitCount == 0)
         #expect(todayFeature.valueForTogglingCompletion(habitID: habit.id) == 10)
 
         try await todayFeature.recordToday(habitID: habit.id, value: 9)
-        #expect(todayFeature.completedCount == 0)
+        #expect(todayFeature.completedHabitCount == 0)
         try await todayFeature.recordToday(habitID: habit.id, value: 10)
-        #expect(todayFeature.completedCount == 1)
+        #expect(todayFeature.completedHabitCount == 1)
         #expect(habitsFeature.habits.first?.todayValue == 10)
         #expect(todayFeature.valueForTogglingCompletion(habitID: habit.id) == 0)
 
         try await todayFeature.recordToday(habitID: habit.id, value: 0)
-        #expect(todayFeature.completedCount == 0)
+        #expect(todayFeature.completedHabitCount == 0)
         #expect(habitsFeature.habits.first?.todayValue == 0)
     }
 
@@ -40,7 +40,7 @@ struct TodayFeatureTests {
         await #expect(throws: HabitError.invalidEntry) {
             try await todayFeature.recordToday(habitID: habit.id, value: -1)
         }
-        #expect(todayFeature.completedCount == 0)
+        #expect(todayFeature.completedHabitCount == 0)
     }
 
     @Test("Today exposes a failed data request and recovers through the same shared owner")

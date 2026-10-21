@@ -13,7 +13,7 @@ final class TodayFeature {
     }
 
     var habits: [Habit] { habitsFeature.habits }
-    var completedCount: Int { habits.filter(\.isCompleteToday).count }
+    var completedHabitCount: Int { habits.filter(\.isCompleteToday).count }
     var isLoading: Bool { habitsFeature.isLoading }
     var loadError: String? { habitsFeature.loadError }
 

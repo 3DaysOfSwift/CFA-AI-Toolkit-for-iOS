@@ -26,7 +26,7 @@ struct AppModelTests {
         let habit = try #require(appModel.todayFeature.habits.first)
         try await appModel.todayFeature.recordToday(habitID: habit.id, value: 1)
         #expect(appModel.habitsFeature.habits.first?.todayValue == 1)
-        #expect(appModel.todayFeature.completedCount == 1)
+        #expect(appModel.todayFeature.completedHabitCount == 1)
         #expect(appModel.dayStreakFeature.summaries.first?.currentStreak == 1)
     }
 }

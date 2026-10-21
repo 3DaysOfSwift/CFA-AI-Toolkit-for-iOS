@@ -11,7 +11,7 @@ struct ThemeManagerTests {
         #expect(Set(AppColourTheme.all.map(\.id)).count == 7)
         #expect(AppColourTheme.all.contains { $0.colorScheme == .light })
         #expect(AppColourTheme.all.contains { $0.colorScheme == .dark })
-        #expect(AppColourTheme.selections.count == 8)
+        #expect(AppColourTheme.availableThemes.count == 8)
         #expect(AppColourTheme.automatic.colorScheme == nil)
     }
 
@@ -20,20 +20,20 @@ struct ThemeManagerTests {
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
         let manager = ThemeManager(defaults: defaults)
-        #expect(manager.current.id == "automatic")
-        for palette in AppColourTheme.selections {
+        #expect(manager.selectedTheme.id == "automatic")
+        for palette in AppColourTheme.availableThemes {
             manager.select(palette)
-            #expect(manager.current.id == palette.id)
-            #expect(ThemeManager(defaults: defaults).current.id == palette.id)
+            #expect(manager.selectedTheme.id == palette.id)
+            #expect(ThemeManager(defaults: defaults).selectedTheme.id == palette.id)
         }
         manager.select(.automatic)
-        #expect(ThemeManager(defaults: defaults).current.colorScheme == nil)
+        #expect(ThemeManager(defaults: defaults).selectedTheme.colorScheme == nil)
         defaults.set("obsolete-theme", forKey: "selectedTheme")
-        #expect(ThemeManager(defaults: defaults).current.id == "automatic")
+        #expect(ThemeManager(defaults: defaults).selectedTheme.id == "automatic")
         // Existing installations keep their recognised choices.
         for legacyID in ["light", "dark"] {
             defaults.set(legacyID, forKey: "selectedTheme")
-            #expect(ThemeManager(defaults: defaults).current.id == legacyID)
+            #expect(ThemeManager(defaults: defaults).selectedTheme.id == legacyID)
         }
     }
 
