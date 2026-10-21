@@ -31,7 +31,7 @@ struct TodayView: View {
                         ContentUnavailableView {
                             Label("No habits yet", systemImage: "circle.dashed")
                         } description: {
-                            Text("Add a habit to start building your daily streak.")
+                            Text("Add a habit to start tracking your daily progress.")
                         } actions: {
                             Button("Add Habit") { isShowingAddHabit = true }
                                 .buttonStyle(.borderedProminent)
@@ -43,7 +43,6 @@ struct TodayView: View {
                                 HabitTodayRow(habit: habit, theme: theme,
                                               amount: Binding(get: { viewModel.amountText(for: habit) },
                                                               set: { viewModel.editAmount($0, for: habit) }),
-                                              isSaving: viewModel.isSaving(habit),
                                               canIncrement: viewModel.canIncrement(habit),
                                               statusText: viewModel.statusText(for: habit),
                                               needsRetry: viewModel.needsRetry(habit),
@@ -111,7 +110,6 @@ private struct HabitTodayRow: View {
     let habit: Habit
     let theme: AppColourTheme
     @Binding var amount: String
-    let isSaving: Bool
     let canIncrement: Bool
     let statusText: String?
     let needsRetry: Bool
@@ -130,13 +128,10 @@ private struct HabitTodayRow: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .disabled(isSaving)
                 .accessibilityLabel(habit.isCompleteToday ? "Mark \(habit.name) incomplete" : "Complete \(habit.name)")
 
                 VStack(alignment: .leading, spacing: 5) {
                     Text(habit.name).font(.headline).foregroundStyle(theme.primaryText)
-                    Text("\(habit.currentStreak()) day streak")
-                        .font(.caption).foregroundStyle(theme.secondaryText)
                 }
                 Spacer(minLength: 0)
             }

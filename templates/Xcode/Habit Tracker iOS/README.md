@@ -6,7 +6,7 @@ iOS 18; the project uses only Apple frameworks. Choose your signing team for a
 physical device. No personal signing team is included.
 
 This is the editable source for the toolkit's **Habit Tracker** Xcode template.
-It includes Today, Habits and rightmost Settings tabs; completion/count habits;
+It includes Today, Habits, Day Streak and rightmost Settings tabs; completion/count habits;
 daily streaks; light/dark themes; SwiftData persistence; and focused Swift Testing
 suites for every screen ViewModel and Feature.
 
@@ -16,11 +16,21 @@ Each tab has its own concrete Feature:
 | --- | --- | --- | --- |
 | Today | TodayViewModel | todayFeature | Daily progress and completion behaviour |
 | Habits | HabitsViewModel | habitsFeature | Authoritative habit collection and persisted mutations |
+| Day Streak | DayStreakViewModel | dayStreakFeature | Current/longest streaks, completed-day totals and recent activity |
 | Settings | SettingsViewModel | settingsFeature | Settings preferences |
 
 `TodayFeature` receives the same `HabitsFeature` instance exposed by AppModel.
 It derives daily progress from that owner instead of keeping a second habit
 collection. `TodayFeatureTests` and `AppModelTests` exercise cross-tab consistency.
+
+`DayStreakFeature` also reads that same HabitsFeature. Habits and their storage
+do not depend on streaks. Streak summaries use all recorded history, while the
+screen shows the last seven calendar days for each habit. A day qualifies when
+the habit target is met (or a positive value is recorded for an untargeted
+habit). A streak ending yesterday remains current until today ends; future
+entries never count. Tests cover gaps, targets, duplicate dates, multi-year
+history, daylight saving and recoverable loading failures. No storage schema
+or existing habit records are changed by this separation.
 
 Count rows save valid edits automatically, without an inline Save button. Custom
 row controls have 48-point touch targets and their own line below the habit

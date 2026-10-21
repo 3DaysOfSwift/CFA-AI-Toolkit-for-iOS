@@ -24,24 +24,6 @@ struct Habit: Identifiable, Equatable, Sendable {
         return todayValue >= dailyTarget
     }
 
-    func currentStreak(calendar: Calendar = .current, today: Date = .now) -> Int {
-        let completedDays = Set(entries.filter { entry in
-            guard entry.value > 0 else { return false }
-            return dailyTarget.map { entry.value >= $0 } ?? true
-        }.map { calendar.startOfDay(for: $0.date) })
-        var day = calendar.startOfDay(for: today)
-        if !completedDays.contains(day), let yesterday = calendar.date(byAdding: .day, value: -1, to: day) {
-            day = yesterday
-        }
-
-        var streak = 0
-        while completedDays.contains(day) {
-            streak += 1
-            guard let previousDay = calendar.date(byAdding: .day, value: -1, to: day) else { break }
-            day = previousDay
-        }
-        return streak
-    }
 }
 
 struct HabitEntry: Identifiable, Equatable, Sendable {

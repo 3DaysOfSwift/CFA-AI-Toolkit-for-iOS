@@ -59,7 +59,6 @@ final class TodayViewModel {
         if let draft = amountDrafts[habit.id], Int(draft).map({ $0 >= 0 }) != true {
             return "Enter a whole number of zero or more."
         }
-        if isSaving(habit) { return "Saving…" }
         if failedValues[habit.id] != nil { return "Not saved. Tap Retry to try again." }
         return nil
     }

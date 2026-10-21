@@ -78,6 +78,24 @@
 				<string>com.apple.dt.applicationTarget</string>
 			</array>
 		</dict>
+		<key>1 - View/Views/DayStreak/DayStreakView.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/DayStreak/DayStreakView.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/DayStreak/DayStreakViewModel.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/DayStreak/DayStreakViewModel.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
 		<key>1 - View/Views/Habits/HabitsView.swift</key>
 		<dict>
 			<key>Path</key>
@@ -136,6 +154,15 @@
 		<dict>
 			<key>Path</key>
 			<string>Source/Application/2 - AppModel/AppModel.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>2 - AppModel/Features/DayStreak/DayStreakFeature.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/2 - AppModel/Features/DayStreak/DayStreakFeature.swift</string>
 			<key>TargetIdentifiers</key>
 			<array>
 				<string>com.apple.dt.applicationTarget</string>
@@ -233,10 +260,10 @@
 				<string>com.3daysofswift.cfa.habitTrackerTests</string>
 			</array>
 		</dict>
-		<key>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/HabitStreakTests.swift</key>
+		<key>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/DayStreakFeatureTests.swift</key>
 		<dict>
 			<key>Path</key>
-			<string>Source/Tests/FeatureTests/HabitStreakTests.swift</string>
+			<string>Source/Tests/FeatureTests/DayStreakFeatureTests.swift</string>
 			<key>TargetIdentifiers</key>
 			<array>
 				<string>com.3daysofswift.cfa.habitTrackerTests</string>
@@ -287,6 +314,15 @@
 				<string>com.3daysofswift.cfa.habitTrackerTests</string>
 			</array>
 		</dict>
+		<key>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/DayStreakViewModelTests.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Tests/ViewModelTests/DayStreakViewModelTests.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.3daysofswift.cfa.habitTrackerTests</string>
+			</array>
+		</dict>
 		<key>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/HabitsViewModelTests.swift</key>
 		<dict>
 			<key>Path</key>
@@ -332,6 +368,8 @@
 		<string>1 - View/Views/AddHabit/AddHabitView.swift</string>
 		<string>1 - View/Views/AddHabit/AddHabitViewModel.swift</string>
 		<string>1 - View/Views/ContentView.swift</string>
+		<string>1 - View/Views/DayStreak/DayStreakView.swift</string>
+		<string>1 - View/Views/DayStreak/DayStreakViewModel.swift</string>
 		<string>1 - View/Views/Habits/HabitsView.swift</string>
 		<string>1 - View/Views/Habits/HabitsViewModel.swift</string>
 		<string>1 - View/Views/Settings/SettingsView.swift</string>
@@ -339,6 +377,7 @@
 		<string>1 - View/Views/Today/TodayView.swift</string>
 		<string>1 - View/Views/Today/TodayViewModel.swift</string>
 		<string>2 - AppModel/AppModel.swift</string>
+		<string>2 - AppModel/Features/DayStreak/DayStreakFeature.swift</string>
 		<string>2 - AppModel/Features/Habits/Habit.swift</string>
 		<string>2 - AppModel/Features/Habits/HabitsFeature.swift</string>
 		<string>2 - AppModel/Features/Settings/SettingsFeature.swift</string>
@@ -349,12 +388,13 @@
 		<string>2 - AppModel/User Data Storage/Protocols/HabitsRepository.swift</string>
 		<string>3 - App Resources/PrivacyInfo.xcprivacy</string>
 		<string>___PACKAGENAMEASIDENTIFIER___Tests/AppModelTests/AppModelTests.swift</string>
-		<string>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/HabitStreakTests.swift</string>
+		<string>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/DayStreakFeatureTests.swift</string>
 		<string>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/HabitsFeatureTests.swift</string>
 		<string>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/SettingsFeatureTests.swift</string>
 		<string>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/TodayFeatureTests.swift</string>
 		<string>___PACKAGENAMEASIDENTIFIER___Tests/Support/InMemoryHabitsRepository.swift</string>
 		<string>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/AddHabitViewModelTests.swift</string>
+		<string>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/DayStreakViewModelTests.swift</string>
 		<string>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/HabitsViewModelTests.swift</string>
 		<string>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/SettingsViewModelTests.swift</string>
 		<string>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/TodayViewModelTests.swift</string>

@@ -473,6 +473,14 @@ named test file per tab Feature. Test cross-tab consistency when tabs share
 data. Nested screens may reuse their owning tab's Feature while retaining
 their own ViewModels; do not invent one Feature per reusable View.
 
+Tabs are a useful ownership map, not the only reason to create a Feature.
+Separate capabilities with different responsibilities even when they share
+data: habits can exist without streaks. `HabitsFeature` owns habits and recorded
+activity; `DayStreakFeature` depends on it to interpret that history as current
+and longest streaks. The dependency must not point back from Habits to Day
+Streak, and streak calculations do not belong on the base Habit model. Such a
+Feature can later gain its own tab without moving its rules into the UI.
+
 ## Use AppModel as the Composition Root and Feature Facade
 
 `AppModel.shared` is the one production application graph. This is an explicit

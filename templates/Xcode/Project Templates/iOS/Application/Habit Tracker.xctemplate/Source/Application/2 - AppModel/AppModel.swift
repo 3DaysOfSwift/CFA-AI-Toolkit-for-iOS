@@ -8,12 +8,14 @@ final class AppModel {
 
     let todayFeature: TodayFeature
     let habitsFeature: HabitsFeature
+    let dayStreakFeature: DayStreakFeature
     let settingsFeature: SettingsFeature
     private var didFinishLaunching: Bool
 
-    init(todayFeature: TodayFeature, habitsFeature: HabitsFeature, settingsFeature: SettingsFeature) {
+    init(todayFeature: TodayFeature, habitsFeature: HabitsFeature, dayStreakFeature: DayStreakFeature, settingsFeature: SettingsFeature) {
         self.todayFeature = todayFeature
         self.habitsFeature = habitsFeature
+        self.dayStreakFeature = dayStreakFeature
         self.settingsFeature = settingsFeature
         didFinishLaunching = false
     }
@@ -24,6 +26,7 @@ final class AppModel {
         return AppModel(
             todayFeature: TodayFeature(habitsFeature: habitsFeature),
             habitsFeature: habitsFeature,
+            dayStreakFeature: DayStreakFeature(habitsFeature: habitsFeature),
             settingsFeature: SettingsFeature(defaults: .standard)
         )
     }

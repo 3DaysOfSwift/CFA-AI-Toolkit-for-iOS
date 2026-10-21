@@ -22,8 +22,6 @@ struct HabitsView: View {
                             Text(description(for: habit)).font(.subheadline).foregroundStyle(theme.secondaryText)
                         }
                         Spacer()
-                        Label("\(habit.currentStreak())", systemImage: "flame.fill")
-                            .font(.subheadline.weight(.semibold)).foregroundStyle(theme.accent)
                     }
                     .listRowBackground(theme.surface)
                 }

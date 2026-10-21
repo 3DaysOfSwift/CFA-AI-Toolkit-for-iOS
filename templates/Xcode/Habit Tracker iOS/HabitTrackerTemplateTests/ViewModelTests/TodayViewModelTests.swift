@@ -64,11 +64,20 @@ struct TodayViewModelTests {
 
         viewModel.editAmount("1", for: habit)
         await repository.waitForFirstWrite()
+        // Autosave must not introduce a status row, loading state or premature
+        // completion while the user's inline controls remain available.
+        #expect(viewModel.statusText(for: habit) == nil)
+        #expect(!viewModel.isLoading)
+        #expect(viewModel.completedCount == 0)
+        #expect(viewModel.canIncrement(habit))
+        #expect(viewModel.errorMessage == nil)
+        #expect(!viewModel.needsRetry(habit))
         viewModel.editAmount("14", for: habit)
         viewModel.increment(habit)
         viewModel.increment(habit)
         #expect(viewModel.amountText(for: habit) == "16")
         #expect(viewModel.isSaving(habit))
+        #expect(viewModel.statusText(for: habit) == nil)
         await repository.releaseFirstWrite()
         await viewModel.waitForPendingSaves()
 
