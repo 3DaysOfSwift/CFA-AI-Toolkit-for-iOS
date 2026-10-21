@@ -80,11 +80,19 @@ the architecture:
     never a launch/startup error. Retry the domain request, preserve saved data,
     and keep independent navigation usable.
 
+19. Every top-level app tab has its own concrete Feature exposed by AppModel
+    and used by the tab's dedicated ViewModel. Give it a real responsibility
+    and named tests. Cooperating tab Features share one authoritative data
+    owner, never competing collections or independent copies of the store.
+
 ## Before delivery
 
 Review the changed source as one feature slice, not as isolated files.
 
 - Trace every affected screen to its ViewModel and default AppModel feature.
+- For a tab-based app, map every top-level app tab to a distinct concrete Feature
+  exposed by AppModel and requested by that tab's ViewModel. Require its named
+  Feature tests; test shared data across tabs without duplicating state owners.
 - Confirm that no screen initializer gained dependency plumbing.
 - Inspect every newly created or moved Swift file for the imports required by
   its own declarations; imports in another source file do not satisfy this.

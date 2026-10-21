@@ -444,6 +444,35 @@ Each screen owns the sheet, alert, or navigation destination it presents. Do
 not create an application-wide router merely to move local presentation state
 away from the View.
 
+## Give Every App Tab Its Own Feature
+
+In a tab-based CFA app, every top-level app tab has a distinct concrete Feature
+exposed by AppModel. For example, Today, Habits and Settings map to
+`TodayFeature`, `HabitsFeature` and `SettingsFeature`, with matching
+`todayFeature`, `habitsFeature` and `settingsFeature` properties. Each tab's
+screen ViewModel requests its own Feature. This is a CFA project-structure rule,
+not a requirement imposed by SwiftUI.
+
+Inventory the actual tab destinations before creation or migration. Record each
+route as Tab → screen → dedicated ViewModel → AppModel Feature → named Feature
+tests. Correct a missing tab Feature; having three arbitrary Features does not
+satisfy a three-tab app. Additional non-tab Features are allowed. A system More
+overflow item or a toolbar action is not a separate application tab.
+
+Give each tab Feature a real domain responsibility, not an empty marker or a
+copy of another Feature. Today owns daily progress and completion behaviour;
+Habits owns the habit collection and its persisted mutations. They cooperate
+through an explicitly injected dependency constructed in `AppModel.live()`.
+The Today Feature reads the same Habits Feature instance; it does not copy its
+collection or open another database. Keep dependencies directional and avoid
+cycles. No tab-selection state, navigation, ViewModel, or matching FeatureAPI
+protocol belongs inside these Features.
+
+Creation and migration must verify this mapping in source and provide one
+named test file per tab Feature. Test cross-tab consistency when tabs share
+data. Nested screens may reuse their owning tab's Feature while retaining
+their own ViewModels; do not invent one Feature per reusable View.
+
 ## Use AppModel as the Composition Root and Feature Facade
 
 `AppModel.shared` is the one production application graph. This is an explicit

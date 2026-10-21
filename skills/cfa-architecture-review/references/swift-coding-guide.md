@@ -79,7 +79,7 @@ same single parameter; production screens instantiate their ViewModel with no
 arguments.
 
 ```swift
-// View: describe the control and forward intent.
+// Dedicated editor: describe the Save control and forward intent.
 Button("Save", action: viewModel.save)
 
 // ViewModel: own the event task and presentation transitions.
@@ -104,6 +104,30 @@ Bindings, conditional content, `ForEach` and direct dismissal are declarative UI
 The SwiftUI environment is for app-wide presentation dependencies such as `ThemeManager`, locale-aware formatting or accessibility configuration. Do not place `AppModel` or a feature in the environment. Use the active architecture's declared composition route for feature dependencies. In CFA, a View owns its ViewModel and that ViewModel defaults its narrow live feature dependency from `AppModel.shared`; do not replace that route with screen-initializer plumbing.
 
 **Review:** A reader should see what the screen displays and which intents it forwards without tracing storage calls, bundle/system reads, formatting work, business rules, or multi-step tasks in its body. Does the ViewModel have only its defaulted Feature input?
+
+### Inline editing saves directly; dedicated editors may have Save and Cancel
+
+An inline editable row changes the existing value directly. Persist each valid
+edit automatically through its ViewModel and Feature; do not add a separate
+Save button to the row. A dedicated editing screen or sheet may deliberately
+hold a draft and offer navigation-bar Cancel and Save actions.
+
+Keep text entry responsive during persistence. Serialize writes or coalesce
+pending edits so the latest value is not discarded or overwritten by an older
+completion. An empty or invalid intermediate draft must not erase saved data.
+Durable edits continue after navigation. On failure, retain the draft, identify
+the unsaved change and offer Retry; do not claim it was saved. Cover rapid edits,
+failed writes/retry and input boundaries in the screen ViewModel tests.
+
+Give custom interactive controls a minimum 48-by-48-point hit region, with
+visible controls and spacing suitable for fingers. Expand the label's frame
+and hit shape, not just the symbol. Preserve comfortable targets and readable
+content at narrow widths and larger Dynamic Type sizes; move controls onto a
+second line when a single row becomes cramped. Native navigation and alert
+actions may use their platform-provided touch targets.
+
+**Review:** Can the user edit inline without an extra confirmation, recover an
+unsaved change, and comfortably tap every control without hitting its neighbour?
 
 ## 4. Prefer a straightforward solution
 

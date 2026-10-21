@@ -23,6 +23,10 @@ Use deliberate passes:
    operation and callback; record protected state, ordering, lifetime, error
    delivery, cancellation and callback-execution requirements. Create a product
    behaviour contract from tests, source and manual journeys.
+   Map each top-level app tab to its own concrete Feature, matching AppModel
+   property, dedicated screen ViewModel and named Feature tests. Correct missing
+   tab owners during their migration checkpoint, preserving one authoritative
+   owner for data shared by several tabs; do not duplicate stores or collections.
 2. Move one complete feature at a time into CFA. Give each SwiftUI View a
    bespoke ViewModel, move testable feature decisions into its Feature,
    place shared dependency construction in AppModel and keep persistence behind

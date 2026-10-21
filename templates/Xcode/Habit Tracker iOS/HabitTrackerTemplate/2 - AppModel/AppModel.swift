@@ -6,11 +6,13 @@ import Observation
 final class AppModel {
     static let shared = live()
 
+    let todayFeature: TodayFeature
     let habitsFeature: HabitsFeature
     let settingsFeature: SettingsFeature
     private var didFinishLaunching: Bool
 
-    init(habitsFeature: HabitsFeature, settingsFeature: SettingsFeature) {
+    init(todayFeature: TodayFeature, habitsFeature: HabitsFeature, settingsFeature: SettingsFeature) {
+        self.todayFeature = todayFeature
         self.habitsFeature = habitsFeature
         self.settingsFeature = settingsFeature
         didFinishLaunching = false
@@ -18,8 +20,10 @@ final class AppModel {
 
     static func live() -> AppModel {
         let swiftDataManager = SwiftDataManager()
+        let habitsFeature = HabitsFeature(repository: swiftDataManager)
         return AppModel(
-            habitsFeature: HabitsFeature(repository: swiftDataManager),
+            todayFeature: TodayFeature(habitsFeature: habitsFeature),
+            habitsFeature: habitsFeature,
             settingsFeature: SettingsFeature(defaults: .standard)
         )
     }

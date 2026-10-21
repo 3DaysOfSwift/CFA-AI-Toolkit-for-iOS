@@ -10,6 +10,23 @@ It includes Today, Habits and rightmost Settings tabs; completion/count habits;
 daily streaks; light/dark themes; SwiftData persistence; and focused Swift Testing
 suites for every screen ViewModel and Feature.
 
+Each tab has its own concrete Feature:
+
+| Tab | ViewModel | AppModel property | Responsibility |
+| --- | --- | --- | --- |
+| Today | TodayViewModel | todayFeature | Daily progress and completion behaviour |
+| Habits | HabitsViewModel | habitsFeature | Authoritative habit collection and persisted mutations |
+| Settings | SettingsViewModel | settingsFeature | Settings preferences |
+
+`TodayFeature` receives the same `HabitsFeature` instance exposed by AppModel.
+It derives daily progress from that owner instead of keeping a second habit
+collection. `TodayFeatureTests` and `AppModelTests` exercise cross-tab consistency.
+
+Count rows save valid edits automatically, without an inline Save button. Custom
+row controls have 48-point touch targets and their own line below the habit
+title. Pending edits survive navigation; failed writes retain the draft and
+offer Retry. The separate Add Habit editor retains navigation Cancel/Save.
+
 The app delegate signals launch. AppModel constructs Features through `live()`
 without opening storage. The shared SwiftDataManager opens its database lazily
 within a data request. Failures are presented by the affected screen, not by the

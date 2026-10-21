@@ -40,9 +40,16 @@ struct TodayView: View {
                     } else {
                         VStack(spacing: 12) {
                             ForEach(viewModel.habits) { habit in
-                                HabitTodayRow(habit: habit, theme: theme, isRecording: viewModel.isRecording,
+                                HabitTodayRow(habit: habit, theme: theme,
+                                              amount: Binding(get: { viewModel.amountText(for: habit) },
+                                                              set: { viewModel.editAmount($0, for: habit) }),
+                                              isSaving: viewModel.isSaving(habit),
+                                              canIncrement: viewModel.canIncrement(habit),
+                                              statusText: viewModel.statusText(for: habit),
+                                              needsRetry: viewModel.needsRetry(habit),
                                               onToggle: { viewModel.toggle(habit) },
-                                              onRecord: { value in viewModel.record(habit, value: value) })
+                                              onIncrement: { viewModel.increment(habit) },
+                                              onRetry: viewModel.retrySaving)
                             }
                         }
                     }
@@ -56,6 +63,7 @@ struct TodayView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { isShowingAddHabit = true } label: {
                         Image(systemName: "plus").font(.headline)
+                            .frame(minWidth: 48, minHeight: 48)
                     }
                     .accessibilityLabel("Add habit")
                     .tint(theme.accent)
@@ -66,7 +74,8 @@ struct TodayView: View {
                 get: { viewModel.errorMessage != nil },
                 set: { if !$0 { viewModel.errorMessage = nil } }
             )) {
-                Button("OK", role: .cancel) { viewModel.errorMessage = nil }
+                Button("Retry", action: viewModel.retrySaving)
+                Button("Not now", role: .cancel) { viewModel.errorMessage = nil }
             } message: { Text(viewModel.errorMessage ?? "Please try again.") }
         }
         .tint(theme.accent)
@@ -101,58 +110,74 @@ struct TodayView: View {
 private struct HabitTodayRow: View {
     let habit: Habit
     let theme: AppColourTheme
-    let isRecording: Bool
+    @Binding var amount: String
+    let isSaving: Bool
+    let canIncrement: Bool
+    let statusText: String?
+    let needsRetry: Bool
     let onToggle: () -> Void
-    let onRecord: (Int) -> Void
-    @State private var amount = ""
+    let onIncrement: () -> Void
+    let onRetry: () -> Void
 
     var body: some View {
-        HStack(spacing: 14) {
-            Button(action: onToggle) {
-                Image(systemName: habit.isCompleteToday ? "checkmark.circle.fill" : "circle")
-                    .font(.title2).foregroundStyle(habit.isCompleteToday ? theme.accent : theme.secondaryText)
-            }
-            .buttonStyle(.plain)
-            .disabled(isRecording)
-            .accessibilityLabel(habit.isCompleteToday ? "Mark \(habit.name) incomplete" : "Complete \(habit.name)")
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 12) {
+                Button(action: onToggle) {
+                    Image(systemName: habit.isCompleteToday ? "checkmark.circle.fill" : "circle")
+                        .font(.system(size: 28))
+                        .foregroundStyle(habit.isCompleteToday ? theme.accent : theme.secondaryText)
+                        .frame(width: 48, height: 48)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(isSaving)
+                .accessibilityLabel(habit.isCompleteToday ? "Mark \(habit.name) incomplete" : "Complete \(habit.name)")
 
-            VStack(alignment: .leading, spacing: 5) {
-                Text(habit.name).font(.headline).foregroundStyle(theme.primaryText)
-                Text("\(habit.currentStreak()) day streak")
-                    .font(.caption).foregroundStyle(theme.secondaryText)
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(habit.name).font(.headline).foregroundStyle(theme.primaryText)
+                    Text("\(habit.currentStreak()) day streak")
+                        .font(.caption).foregroundStyle(theme.secondaryText)
+                }
+                Spacer(minLength: 0)
             }
-            Spacer(minLength: 8)
             if habit.tracking == .count {
-                HStack(spacing: 6) {
+                HStack(spacing: 12) {
                     TextField("0", text: $amount)
                         .keyboardType(.numberPad)
-                        .multilineTextAlignment(.trailing)
-                        .frame(width: 48)
+                        .multilineTextAlignment(.center)
                         .font(.headline.monospacedDigit())
                         .foregroundStyle(theme.primaryText)
-                        .onSubmit(saveAmount)
-                    if !habit.unit.isEmpty { Text(habit.unit).font(.caption).foregroundStyle(theme.secondaryText) }
-                    Button("Save", action: saveAmount)
-                        .font(.caption.weight(.semibold))
-                    Button {
-                        onRecord(max(0, habit.todayValue) + 1)
-                    } label: {
-                        Image(systemName: "plus").font(.caption.weight(.bold))
-                            .padding(8).background(theme.background, in: Circle())
+                        .frame(minWidth: 64, maxWidth: 110, minHeight: 48)
+                        .background(theme.background, in: RoundedRectangle(cornerRadius: 12))
+                        .accessibilityLabel("Today's count for \(habit.name)")
+                        .accessibilityHint("Changes save automatically")
+                    if !habit.unit.isEmpty {
+                        Text(habit.unit).font(.subheadline).foregroundStyle(theme.secondaryText)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
+                    Spacer(minLength: 0)
+                    Button(action: onIncrement) {
+                        Image(systemName: "plus").font(.title3.weight(.semibold))
+                            .frame(width: 48, height: 48)
+                            .background(theme.background, in: Circle())
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(theme.accent)
+                    .disabled(!canIncrement)
                     .accessibilityLabel("Add one to \(habit.name)")
                 }
+            }
+            if let statusText {
+                Text(statusText).font(.caption).foregroundStyle(theme.secondaryText)
+            }
+            if needsRetry {
+                Button("Retry", action: onRetry)
+                    .frame(minWidth: 48, minHeight: 48)
+                    .buttonStyle(.bordered)
             }
         }
         .padding(16)
         .background(theme.surface, in: RoundedRectangle(cornerRadius: 16))
-        .disabled(isRecording)
-        .onAppear { amount = String(habit.todayValue) }
-        .onChange(of: habit.todayValue) { _, value in amount = String(value) }
-    }
-
-    private func saveAmount() {
-        guard let value = Int(amount), value >= 0 else { return }
-        onRecord(value)
     }
 }

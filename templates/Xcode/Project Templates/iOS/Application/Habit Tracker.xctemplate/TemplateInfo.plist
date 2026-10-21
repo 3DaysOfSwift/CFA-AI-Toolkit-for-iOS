@@ -168,6 +168,15 @@
 				<string>com.apple.dt.applicationTarget</string>
 			</array>
 		</dict>
+		<key>2 - AppModel/Features/Today/TodayFeature.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/2 - AppModel/Features/Today/TodayFeature.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
 		<key>2 - AppModel/User Data Storage/Local/HabitRepository.swift</key>
 		<dict>
 			<key>Path</key>
@@ -215,6 +224,15 @@
 			<key>Group</key>
 			<string>3 - App Resources</string>
 		</dict>
+		<key>___PACKAGENAMEASIDENTIFIER___Tests/AppModelTests/AppModelTests.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Tests/AppModelTests/AppModelTests.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.3daysofswift.cfa.habitTrackerTests</string>
+			</array>
+		</dict>
 		<key>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/HabitStreakTests.swift</key>
 		<dict>
 			<key>Path</key>
@@ -237,6 +255,15 @@
 		<dict>
 			<key>Path</key>
 			<string>Source/Tests/FeatureTests/SettingsFeatureTests.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.3daysofswift.cfa.habitTrackerTests</string>
+			</array>
+		</dict>
+		<key>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/TodayFeatureTests.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Tests/FeatureTests/TodayFeatureTests.swift</string>
 			<key>TargetIdentifiers</key>
 			<array>
 				<string>com.3daysofswift.cfa.habitTrackerTests</string>
@@ -315,14 +342,17 @@
 		<string>2 - AppModel/Features/Habits/Habit.swift</string>
 		<string>2 - AppModel/Features/Habits/HabitsFeature.swift</string>
 		<string>2 - AppModel/Features/Settings/SettingsFeature.swift</string>
+		<string>2 - AppModel/Features/Today/TodayFeature.swift</string>
 		<string>2 - AppModel/User Data Storage/Local/HabitRepository.swift</string>
 		<string>2 - AppModel/User Data Storage/Local/StoredHabit.swift</string>
 		<string>2 - AppModel/User Data Storage/Local/SwiftDataManager.swift</string>
 		<string>2 - AppModel/User Data Storage/Protocols/HabitsRepository.swift</string>
 		<string>3 - App Resources/PrivacyInfo.xcprivacy</string>
+		<string>___PACKAGENAMEASIDENTIFIER___Tests/AppModelTests/AppModelTests.swift</string>
 		<string>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/HabitStreakTests.swift</string>
 		<string>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/HabitsFeatureTests.swift</string>
 		<string>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/SettingsFeatureTests.swift</string>
+		<string>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/TodayFeatureTests.swift</string>
 		<string>___PACKAGENAMEASIDENTIFIER___Tests/Support/InMemoryHabitsRepository.swift</string>
 		<string>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/AddHabitViewModelTests.swift</string>
 		<string>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/HabitsViewModelTests.swift</string>
