@@ -7,6 +7,7 @@ import { verifyXcodeTemplateStructure } from './verify-xcode-template-structure.
 export function validate(base=root,{source=true}={}) {
   const manifest=json(path.join(base,'.codex-plugin/plugin.json'));
   if(manifest.name!=='ios-app-development-cfa') throw Error('Unexpected plugin identifier.');
+  if(manifest.interface?.displayName!=='CFA AI Toolkit for iOS') throw Error('Unexpected plugin display name.');
   if(!/^\d+\.\d+\.\d+(?:-[a-z0-9.-]+)?$/.test(manifest.version)) throw Error('Invalid release version.');
   if(manifest.license!=='MIT' || manifest.skills!=='./skills/') throw Error('Missing licence or skills path.');
   for (const field of ['logo', 'composerIcon']) {

@@ -106,6 +106,13 @@ If `codex` is not on PATH, pass its executable explicitly:
 node scripts/install.mjs --codex /path/to/codex
 ```
 
+The installed plugin should appear as **CFA AI Toolkit for iOS**. If Codex still
+shows **Cooperative Feature Architecture**, that is the older
+`cooperative-feature-architecture` plugin, not this release. Install this
+release and remove the older plugin separately once you have confirmed the new
+one works; changing the source repository alone does not rename an existing
+installation.
+
 Open a **new conversation** after installation and ask the agent:
 
 ```text
