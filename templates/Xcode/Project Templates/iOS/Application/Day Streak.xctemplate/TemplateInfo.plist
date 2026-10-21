@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Kind</key>
+	<string>Xcode.Xcode3.ProjectTemplateUnitKind</string>
+	<key>Identifier</key>
+	<string>com.3daysofswift.cfa.dayStreak</string>
+	<key>Ancestors</key>
+	<array>
+		<string>com.apple.dt.unit.cocoaTouchApplicationBase</string>
+	</array>
+	<key>Concrete</key>
+	<true/>
+	<key>Description</key>
+	<string>CFA Day Streak: multiplication practice, daily limits, a reusable streak feature, seven themes, lazy SwiftData and focused tests.</string>
+	<key>Platforms</key>
+	<array>
+		<string>com.apple.platform.iphoneos</string>
+	</array>
+	<key>NameOfInitialFileForEditor</key>
+	<string>___PACKAGENAMEASIDENTIFIER___App.swift</string>
+	<key>Definitions</key>
+	<dict>
+		<key>1 - View/___PACKAGENAMEASIDENTIFIER___App.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/___PACKAGENAMEASIDENTIFIER___App.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+			<key>Group</key>
+			<string>1 - View</string>
+		</dict>
+		<key>1 - View/Theme/ThemeManager.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Theme/ThemeManager.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/Components/PracticeComponents.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/Components/PracticeComponents.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/ContentView.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/ContentView.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/DayStreak/DayStreakView.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/DayStreak/DayStreakView.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/DayStreak/DayStreakViewModel.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/DayStreak/DayStreakViewModel.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/Practice/PracticeView.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/Practice/PracticeView.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/Practice/PracticeViewModel.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/Practice/PracticeViewModel.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/Settings/SettingsView.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/Settings/SettingsView.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/Settings/SettingsViewModel.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/Settings/SettingsViewModel.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>2 - AppModel/AppModel.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/2 - AppModel/AppModel.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>2 - AppModel/Features/DayStreak/DayStreakFeature.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/2 - AppModel/Features/DayStreak/DayStreakFeature.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>2 - AppModel/Features/Practice/PracticeFeature.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/2 - AppModel/Features/Practice/PracticeFeature.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>2 - AppModel/Features/Practice/PracticeSession.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/2 - AppModel/Features/Practice/PracticeSession.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>2 - AppModel/Features/Settings/SettingsFeature.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/2 - AppModel/Features/Settings/SettingsFeature.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>2 - AppModel/User Data Storage/SessionRepository.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/2 - AppModel/User Data Storage/SessionRepository.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>2 - AppModel/User Data Storage/SwiftDataManager.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/2 - AppModel/User Data Storage/SwiftDataManager.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>3 - App Resources/LaunchScreen.storyboard</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/3 - App Resources/LaunchScreen.storyboard</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+			<key>Group</key>
+			<string>3 - App Resources</string>
+		</dict>
+		<key>3 - App Resources/PrivacyInfo.xcprivacy</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/3 - App Resources/PrivacyInfo.xcprivacy</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+			<key>Group</key>
+			<string>3 - App Resources</string>
+		</dict>
+		<key>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/DayStreakFeatureTests.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Tests/FeatureTests/DayStreakFeatureTests.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.3daysofswift.cfa.dayStreakTests</string>
+			</array>
+		</dict>
+		<key>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/PracticeFeatureTests.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Tests/FeatureTests/PracticeFeatureTests.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.3daysofswift.cfa.dayStreakTests</string>
+			</array>
+		</dict>
+		<key>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/SettingsFeatureTests.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Tests/FeatureTests/SettingsFeatureTests.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.3daysofswift.cfa.dayStreakTests</string>
+			</array>
+		</dict>
+		<key>___PACKAGENAMEASIDENTIFIER___Tests/StorageTests/SwiftDataManagerTests.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Tests/StorageTests/SwiftDataManagerTests.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.3daysofswift.cfa.dayStreakTests</string>
+			</array>
+		</dict>
+		<key>___PACKAGENAMEASIDENTIFIER___Tests/Support/TestSupport.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Tests/Support/TestSupport.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.3daysofswift.cfa.dayStreakTests</string>
+			</array>
+		</dict>
+		<key>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/DayStreakViewModelTests.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Tests/ViewModelTests/DayStreakViewModelTests.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.3daysofswift.cfa.dayStreakTests</string>
+			</array>
+		</dict>
+		<key>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/PracticeViewModelTests.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Tests/ViewModelTests/PracticeViewModelTests.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.3daysofswift.cfa.dayStreakTests</string>
+			</array>
+		</dict>
+		<key>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/SettingsViewModelTests.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Tests/ViewModelTests/SettingsViewModelTests.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.3daysofswift.cfa.dayStreakTests</string>
+			</array>
+		</dict>
+		<key>Assets.xcassets</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Assets.xcassets</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+	</dict>
+	<key>Nodes</key>
+	<array>
+		<string>1 - View/___PACKAGENAMEASIDENTIFIER___App.swift</string>
+		<string>1 - View/Theme/ThemeManager.swift</string>
+		<string>1 - View/Views/Components/PracticeComponents.swift</string>
+		<string>1 - View/Views/ContentView.swift</string>
+		<string>1 - View/Views/DayStreak/DayStreakView.swift</string>
+		<string>1 - View/Views/DayStreak/DayStreakViewModel.swift</string>
+		<string>1 - View/Views/Practice/PracticeView.swift</string>
+		<string>1 - View/Views/Practice/PracticeViewModel.swift</string>
+		<string>1 - View/Views/Settings/SettingsView.swift</string>
+		<string>1 - View/Views/Settings/SettingsViewModel.swift</string>
+		<string>2 - AppModel/AppModel.swift</string>
+		<string>2 - AppModel/Features/DayStreak/DayStreakFeature.swift</string>
+		<string>2 - AppModel/Features/Practice/PracticeFeature.swift</string>
+		<string>2 - AppModel/Features/Practice/PracticeSession.swift</string>
+		<string>2 - AppModel/Features/Settings/SettingsFeature.swift</string>
+		<string>2 - AppModel/User Data Storage/SessionRepository.swift</string>
+		<string>2 - AppModel/User Data Storage/SwiftDataManager.swift</string>
+		<string>3 - App Resources/LaunchScreen.storyboard</string>
+		<string>3 - App Resources/PrivacyInfo.xcprivacy</string>
+		<string>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/DayStreakFeatureTests.swift</string>
+		<string>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/PracticeFeatureTests.swift</string>
+		<string>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/SettingsFeatureTests.swift</string>
+		<string>___PACKAGENAMEASIDENTIFIER___Tests/StorageTests/SwiftDataManagerTests.swift</string>
+		<string>___PACKAGENAMEASIDENTIFIER___Tests/Support/TestSupport.swift</string>
+		<string>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/DayStreakViewModelTests.swift</string>
+		<string>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/PracticeViewModelTests.swift</string>
+		<string>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/SettingsViewModelTests.swift</string>
+		<string>Assets.xcassets</string>
+	</array>
+	<key>Options</key>
+	<array>
+		<dict>
+			<key>Identifier</key>
+			<string>appLifecycle</string>
+			<key>Default</key>
+			<string>SwiftUI</string>
+			<key>Type</key>
+			<string>popup</string>
+			<key>Values</key>
+			<array>
+				<string>SwiftUI</string>
+			</array>
+			<key>RequiredOptionsForValues</key>
+			<dict>
+				<key>SwiftUI</key>
+				<dict>
+					<key>userInterface</key>
+					<string>SwiftUI</string>
+				</dict>
+			</dict>
+		</dict>
+		<dict>
+			<key>Identifier</key>
+			<string>languageChoice</string>
+			<key>Default</key>
+			<string>Swift</string>
+			<key>Type</key>
+			<string>popup</string>
+			<key>Values</key>
+			<array>
+				<string>Swift</string>
+			</array>
+		</dict>
+	</array>
+	<key>Targets</key>
+	<array>
+		<dict>
+			<key>TargetIdentifier</key>
+			<string>com.apple.dt.applicationTarget</string>
+			<key>SharedSettings</key>
+			<dict>
+				<key>SWIFT_VERSION</key>
+				<string>6.0</string>
+				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
+				<string>18.0</string>
+				<key>GENERATE_INFOPLIST_FILE</key>
+				<string>YES</string>
+				<key>SWIFT_STRICT_CONCURRENCY</key>
+				<string>complete</string>
+				<key>PRODUCT_BUNDLE_IDENTIFIER</key>
+				<string>com.3DaysOfSwiftConcurrency.___PACKAGENAMEASIDENTIFIER___</string>
+				<key>ENABLE_TESTABILITY</key>
+				<string>YES</string>
+				<key>ASSETCATALOG_COMPILER_APPICON_NAME</key>
+				<string>AppIcon</string>
+				<key>INFOPLIST_KEY_UIApplicationSceneManifest_Generation</key>
+				<string>YES</string>
+				<key>INFOPLIST_KEY_UILaunchStoryboardName</key>
+				<string>LaunchScreen</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>TargetIdentifier</key>
+			<string>com.3daysofswift.cfa.dayStreakTests</string>
+			<key>TargetIdentifierToBeTested</key>
+			<string>com.apple.dt.applicationTarget</string>
+			<key>Name</key>
+			<string>___PACKAGENAMEASIDENTIFIER___Tests</string>
+			<key>ProductType</key>
+			<string>com.apple.product-type.bundle.unit-test</string>
+			<key>SharedSettings</key>
+			<dict>
+				<key>SWIFT_VERSION</key>
+				<string>6.0</string>
+				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
+				<string>18.0</string>
+				<key>GENERATE_INFOPLIST_FILE</key>
+				<string>YES</string>
+				<key>SWIFT_STRICT_CONCURRENCY</key>
+				<string>complete</string>
+				<key>PRODUCT_NAME</key>
+				<string>$(TARGET_NAME)</string>
+				<key>PRODUCT_BUNDLE_IDENTIFIER</key>
+				<string>com.3DaysOfSwiftConcurrency.___PACKAGENAMEASIDENTIFIER___.___PACKAGENAMEASIDENTIFIER___Tests</string>
+				<key>BUNDLE_LOADER</key>
+				<string>$(TEST_HOST)</string>
+				<key>TEST_HOST</key>
+				<string>$(BUILT_PRODUCTS_DIR)/___PACKAGENAMEASIDENTIFIER___.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/___PACKAGENAMEASIDENTIFIER___</string>
+			</dict>
+			<key>Configurations</key>
+			<dict>
+				<key>Debug</key>
+				<dict/>
+				<key>Release</key>
+				<dict/>
+			</dict>
+			<key>BuildPhases</key>
+			<array>
+				<dict>
+					<key>Class</key>
+					<string>Sources</string>
+				</dict>
+				<dict>
+					<key>Class</key>
+					<string>Frameworks</string>
+				</dict>
+				<dict>
+					<key>Class</key>
+					<string>Resources</string>
+				</dict>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

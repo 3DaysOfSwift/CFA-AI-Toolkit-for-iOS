@@ -3,7 +3,7 @@ set -eu
 cd "$(dirname "$0")"
 destination_root="${CFA_TEMPLATE_DESTINATION:-$HOME/Library/Developer/Xcode/Templates}"
 relative_directory="Project Templates/iOS/Application"
-template_names=("CFA App" "Habit Tracker")
+template_names=("CFA App" "Habit Tracker" "Day Streak")
 
 finish() {
   local result_code=$?
@@ -15,7 +15,7 @@ finish() {
 }
 trap finish EXIT
 
-# Preflight both destinations before replacing either template.
+# Preflight all destinations before replacing any template.
 for template_name in "${template_names[@]}"; do
   template_source="$PWD/templates/Xcode/$relative_directory/$template_name.xctemplate"
   template_destination="$destination_root/$relative_directory/$template_name.xctemplate"
@@ -51,4 +51,4 @@ for template_name in "${template_names[@]}"; do
   /usr/bin/rsync -r --exclude='.DS_Store' --exclude='xcuserdata' "$template_source/" "$template_destination/"
   echo "$template_name is installed in Xcode at: $template_destination"
 done
-echo "Quit and reopen Xcode, then choose File → New → Project → iOS → CFA App or Habit Tracker."
+echo "Quit and reopen Xcode, then choose File → New → Project → iOS → CFA App, Habit Tracker or Day Streak."

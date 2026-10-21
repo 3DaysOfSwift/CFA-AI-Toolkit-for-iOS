@@ -90,7 +90,7 @@ CFA AI Toolkit for iOS instructions available to your AI coding tool.
 
 ## Install the Xcode project templates
 
-The CFA AI Toolkit for iOS includes **CFA App** and **Habit Tracker** Xcode templates. Each creates a
+The CFA AI Toolkit for iOS includes **CFA App**, **Habit Tracker** and **Day Streak** Xcode templates. Each creates a
 new, runnable CFA app directly from **File → New → Project**. It does not
 modify an existing Xcode project.
 
@@ -107,7 +107,7 @@ The installer prints the exact folder it created. If it does not print
 **“CFA App is installed in Xcode”**, the installation did not finish—read
 the message in the Terminal window before closing it.
 
-Quit and reopen Xcode. Choose **File → New → Project → iOS → CFA App** or **Habit Tracker**.
+Quit and reopen Xcode. Choose **File → New → Project → iOS → CFA App**, **Habit Tracker** or **Day Streak**.
 Xcode asks for your product name and organisation identifier, then creates a
 new project with the CFA folders, feature, network refresh, JSON file
 cache, retry state and colour-theme settings already in place.
@@ -117,6 +117,13 @@ daily streaks, lazy SwiftData storage, colour themes and focused unit tests.
 Its editable, ready-to-open project is in
 [`templates/Xcode/Habit Tracker iOS`](templates/Xcode/Habit%20Tracker%20iOS/README.md).
 The native template is generated from that project so its code stays in sync.
+
+**Day Streak** is a daily-activity blueprint demonstrated by **Todays Twenty**: a
+multiplication game with a cloud of answer buttons, 20 correct first attempts per
+session, one optional extra practice and a reusable DayStreakFeature. It carries over
+Trend's visual design, with seven colour palettes, saved progress and isolated tests.
+Open the [Day Streak project](templates/Xcode/Day%20Streak%20iOS/README.md), or generate
+a new project using its native template. The original Trend project is unchanged.
 
 For a separate paid-feature example, open
 [Habit Tracker Pro](templates/Xcode/Habit%20Tracker%20Pro%20iOS/README.md).

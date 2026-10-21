@@ -5,10 +5,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const toolkitRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const templateNames = ['CFA App', 'Habit Tracker'];
+const templateNames = ['CFA App', 'Habit Tracker', 'Day Streak'];
 
 function usage() {
-  console.log(`Install CFA App and Habit Tracker into Xcode\n\nnode scripts/install-xcode-template.mjs [--replace] [--destination directory]\n\nBy default, Xcode templates are installed in:\n~/Library/Developer/Xcode/Templates`);
+  console.log(`Install CFA App, Habit Tracker and Day Streak into Xcode\n\nnode scripts/install-xcode-template.mjs [--replace] [--destination directory]\n\nBy default, Xcode templates are installed in:\n~/Library/Developer/Xcode/Templates`);
 }
 
 function isCFATemplate(directory, name) {
@@ -64,7 +64,7 @@ try {
       else throw Error(`Unknown or incomplete option: ${argument}`);
     }
     const targets = install({ destination, replace });
-    console.log(`CFA App and Habit Tracker are installed in Xcode.\n\nOpen Xcode → File → New → Project → iOS.\n\nInstalled at:\n${targets.join('\n')}`);
+    console.log(`CFA App, Habit Tracker and Day Streak are installed in Xcode.\n\nOpen Xcode → File → New → Project → iOS.\n\nInstalled at:\n${targets.join('\n')}`);
   }
 } catch (error) {
   console.error(error.message);

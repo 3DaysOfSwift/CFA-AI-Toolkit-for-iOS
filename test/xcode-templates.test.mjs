@@ -6,7 +6,7 @@ import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 
 const root = path.resolve(import.meta.dirname, '..');
-const names = ['CFA App', 'Habit Tracker'];
+const names = ['CFA App', 'Habit Tracker', 'Day Streak'];
 
 for (const [name, application, assets, configuration, light, dark] of [
   ['Habit Tracker', 'Habit Tracker iOS/HabitTrackerTemplate', 'Habit Tracker iOS/HabitTrackerTemplate/Assets.xcassets', 'Habit Tracker iOS/HabitTrackerTemplate.xcodeproj/project.pbxproj', [0.96, 0.96, 0.94], [0.08, 0.09, 0.09]],
