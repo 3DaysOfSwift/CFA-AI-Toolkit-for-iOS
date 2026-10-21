@@ -400,6 +400,17 @@ boundary. This is our architecture convention, not a limitation of SwiftData.
   the CFA specification's mandatory database-availability rule and failure checks.
 - Keep schema, configuration, database location and lifetime in the model's
   persistence layer. Views and ViewModels do not create or choose stores.
+- Before opening a file-backed container, the storage owner explicitly creates
+  the parent directory of the actual configured store URL with intermediate
+  directories enabled. Do this lazily inside the data request, before
+  constructing the container—not in App, a View, or dependency initialization.
+  Directory preparation errors propagate through that request. Do not rely on
+  Core Data recovering from a missing directory, suppress the error, remove a
+  blocking file, reset a store, or fall back to memory. Preserve the configured
+  store URL, schema and migration policy; do not guess a replacement filename.
+  Explicit in-memory test configurations do not need a filesystem directory.
+  Verify fresh-directory creation, persistence after reopening, preservation of
+  existing files, overlapping first requests and failure followed by retry.
 - Multiple actor-owned contexts may use the same container. Keep each context
   and its managed objects within its owner; pass Sendable values across actors.
   A separate context does not require a separate persistent store.

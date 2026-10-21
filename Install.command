@@ -11,7 +11,7 @@ if [ -z "$NODE_EXECUTABLE" ] && [ -d "$HOME/.cache/codex-runtimes" ]; then
 fi
 
 if [ -z "$NODE_EXECUTABLE" ]; then
-  echo "CFA needs Node.js 20 or newer to install its AI skills."
+  echo "CFA AI Toolkit for iOS needs Node.js 20 or newer to install its AI skills."
   echo "Install it from https://nodejs.org, then open this file again."
   exit 1
 fi

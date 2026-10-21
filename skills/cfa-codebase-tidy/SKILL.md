@@ -1,11 +1,22 @@
 ---
 name: cfa-codebase-tidy
-description: Iteratively tidy an existing CFA SwiftUI codebase for educational readability, declarative screens, reusable feature logic, explicit task ownership and tested actor reentrancy. Use for requested CFA cleanup; preserve product behaviour and storage compatibility.
+description: Iteratively tidy an existing CFA SwiftUI codebase for educational readability, declarative screens, reusable feature logic, explicit task ownership and tested actor reentrancy. Also handles the explicit request "add CFA footer to Settings View" as a focused opt-in change. Preserve product behaviour and storage compatibility.
 ---
 
 # CFA codebase tidy
 
 Read the project's AGENTS.md, the bundled [CFA specification](references/cfa-specification.md) and [CFA change gate](references/cfa-change-gate.md). Preserve the [product behaviour contract](references/product-behaviour-contract.md). This workflow refines an existing CFA architecture; do not invent a new application framework. Use architecture adoption for adopting CFA and read-only architecture review when changes are not requested.
+
+## Explicit Settings footer request
+
+“Add CFA footer to Settings View” invokes only the specification's Settings
+About Section and CFA Footer change, not a whole-app cleanup. Apply the same
+layout when the user explicitly agrees to add it during a broader tidy-up.
+Preserve and merge existing branding, About content and legal/privacy details.
+Verify capabilities before describing storage or on-device AI. Read the version
+and build from the bundle and place them outside the cells. Never add this
+footer automatically to existing apps, repeatedly offer it, or flag its absence
+as a tidy-up failure. An ordinary tidy-up is not consent to add branding.
 
 ## Iteration contract
 
@@ -63,6 +74,19 @@ Re-scan after editing, run affected tests and the broader suite, and report any 
 ## Completion
 
 Run focused tests at each boundary, then the appropriate build and broader suite. Verify project membership and document environment blockers accurately. Report briefly whether the code meets the requested showcase standard, with specific residual issues. Keep behaviour changes distinct from structural cleanup. Do not commit, publish or install this skill globally without authorization.
+
+## Required app icon
+
+Apply the specification's Mandatory Initial App Icon rule on every invocation
+for the in-scope iOS app targets. Preserve existing custom icons and repair
+broken target wiring first. If no usable app icon exists, use the bundled
+[CFA starter icon set](assets/AppIcon.appiconset/Contents.json) and
+[original CFA App artwork](assets/AppIcon.appiconset/CFA-App-Icon.png).
+Configure the actual icon set in the app target's build configurations; an
+empty asset folder is not enough. Build and check the installed Simulator
+Home Screen icon when available; report checks that could not run. This is
+mandatory independently of optional colour-theme changes. Never erase app
+data, overwrite custom branding or change bundle identifiers for this check.
 
 ## Shared Swift coding standards
 

@@ -5,6 +5,8 @@ import { files } from './files.mjs';
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const cfaSkills = ['cfa-app-creation', 'cfa-feature-work', 'cfa-architecture-adoption', 'swift-concurrency-migration', 'cfa-architecture-review', 'cfa-codebase-tidy', 'cfa-unit-tests'];
 export const skills = [...cfaSkills, 'swift-code-quality'];
+export const iconSkills = ['cfa-app-creation', 'cfa-architecture-adoption', 'swift-concurrency-migration', 'cfa-codebase-tidy'];
+export const starterIcon = 'templates/Xcode/Project Templates/iOS/Application/CFA App.xctemplate/Source/Assets.xcassets/AppIcon.appiconset';
 export function sync(base = root) {
   const copy = (source,destination) => {
     const from=path.join(base,source), to=path.join(base,destination);
@@ -12,6 +14,11 @@ export function sync(base = root) {
     fs.copyFileSync(from,to);
   };
   for (const name of skills) copy('architecture/swift-coding-guide.md',`skills/${name}/references/swift-coding-guide.md`);
+  for (const name of iconSkills) {
+    for (const file of files(path.join(base, starterIcon))) {
+      copy(`${starterIcon}/${file}`, `skills/${name}/assets/AppIcon.appiconset/${file}`);
+    }
+  }
   for (const name of cfaSkills) copy('architecture/cfa-specification.md',`skills/${name}/references/cfa-specification.md`);
   for (const name of cfaSkills) copy('architecture/cfa-change-gate.md',`skills/${name}/references/cfa-change-gate.md`);
   for (const name of ['cfa-app-creation','cfa-feature-work','cfa-architecture-adoption','swift-concurrency-migration']) copy('architecture/reference-feature.md',`skills/${name}/references/reference-feature.md`);

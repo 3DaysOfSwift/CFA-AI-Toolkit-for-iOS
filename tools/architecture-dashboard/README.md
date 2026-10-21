@@ -1,10 +1,13 @@
 # Xcode Project Dashboard tool
 
-Part of Cooperative Feature Architecture, created and published by
+Part of the CFA AI Toolkit for iOS, created and published by
 [3DaysOfSwiftConcurrency.com](https://www.3daysofswiftconcurrency.com/) as a free,
 open-source gift to the iOS development community. The publisher offers Swift
 Concurrency training for iOS developers. Copyright © 2026 3 Days of Swift Concurrency.
 Distributed under the toolkit’s MIT licence.
+
+Cooperative Feature Architecture (CFA) is the architecture supported by the
+toolkit, not the product name.
 
 A local-first starting point for **Modern Architecture Analysis** of Swift and
 Xcode repositories. Locate concurrent work, inspect its source and identify
@@ -131,7 +134,7 @@ so future semantic analysis can improve without coupling it to the webpage.
 
 ## Project status and inspiration
 
-Packaged as part of the CFA 0.1.0 beta toolkit under the root MIT licence.
+Packaged as part of the CFA AI Toolkit for iOS under the root MIT licence.
 The report remains a lexical inventory prototype suitable for supervised reviews.
 The toolkit release bundles this executable with the dashboard skill. Node.js 20+
 is still required; the scanner needs no package download or network access.

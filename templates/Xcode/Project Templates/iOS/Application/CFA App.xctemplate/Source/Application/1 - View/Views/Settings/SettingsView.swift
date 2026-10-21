@@ -28,17 +28,28 @@ struct SettingsView: View {
                 }
 
                 Section {
-                    LabeledContent("Architecture", value: "CFA • Cooperative Feature Architecture")
+                    LabeledContent("App") {
+                        Text(viewModel.appName)
+                            .fontWeight(.bold)
+                            .multilineTextAlignment(.trailing)
+                    }
                         .listRowBackground(palette.surface)
                     LabeledContent("Network", value: "GitHub API")
                         .listRowBackground(palette.surface)
-                    LabeledContent("Storage", value: "JSON file cache")
+                    LabeledContent("Storage", value: "Local JSON cache")
+                        .listRowBackground(palette.surface)
+                    LabeledContent("Architecture", value: "CFA iOS Architecture")
+                        .listRowBackground(palette.surface)
+                    Text("Built with Cooperative Feature Architecture.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                         .listRowBackground(palette.surface)
                 } header: {
-                    Text("Technology Stack")
+                    Text("About")
                 } footer: {
-                    VStack(spacing: 4) {
-                        HStack(spacing: 4) {
+                    VStack(spacing: 20) {
+                        Text("Explore GitHub repositories, with a local cache for previously loaded results.")
+                        VStack(spacing: 4) {
                             Text("Created by")
                             if let websiteURL = viewModel.developerWebsiteURL {
                                 Link("3DaysOfSwiftConcurrency.com", destination: websiteURL)
@@ -46,8 +57,10 @@ struct SettingsView: View {
                         }
                         Text(viewModel.versionDescription)
                     }
+                    .font(.footnote)
+                    .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity)
-                    .padding(.top, 20)
+                    .padding(.vertical, 20)
                 }
             }
             .tint(palette.tint)

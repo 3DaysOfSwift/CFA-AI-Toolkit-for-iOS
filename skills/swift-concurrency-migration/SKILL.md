@@ -59,6 +59,19 @@ evidence that behaviour was preserved. Record remaining legacy mechanisms and
 why they remain. A pure GCD application is a valid starting point; CFA is the
 target architecture.
 
+## Required app icon
+
+Apply the specification's Mandatory Initial App Icon rule on every invocation
+for the in-scope iOS app targets. Preserve existing custom icons and repair
+broken target wiring first. If no usable app icon exists, use the bundled
+[CFA starter icon set](assets/AppIcon.appiconset/Contents.json) and
+[original CFA App artwork](assets/AppIcon.appiconset/CFA-App-Icon.png).
+Configure the actual icon set in the app target's build configurations; an
+empty asset folder is not enough. Build and check the installed Simulator
+Home Screen icon when available; report checks that could not run. This is
+mandatory independently of optional colour-theme changes. Never erase app
+data, overwrite custom branding or change bundle identifiers for this check.
+
 ## Shared Swift coding standards
 
 Read the [Swift coding guide](references/swift-coding-guide.md) before implementing or reviewing Swift. Apply its rules for crash safety, shared model decisions, declarative Views, KISS, errors, concurrency, responsiveness and verification within this workflow's authorized scope. Treat forced operations as explicit crash decisions; never infer permission to retain them merely because they appear safe. Read-only reviews report violations rather than editing code.

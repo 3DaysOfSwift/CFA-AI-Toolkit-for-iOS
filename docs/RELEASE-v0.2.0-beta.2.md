@@ -1,4 +1,8 @@
-# Cooperative Feature Architecture (CFA) — v0.2.0-beta.2
+# CFA AI Toolkit for iOS — v0.2.0-beta.2
+
+Historical release: originally published under the product name
+“Cooperative Feature Architecture”. The current product name is CFA AI Toolkit
+for iOS; Cooperative Feature Architecture (CFA) remains the architecture name.
 
 A free, open-source toolkit from [3DaysOfSwiftConcurrency.com](https://www.3daysofswiftconcurrency.com/) for iOS developers building applications with an AI copilot.
 

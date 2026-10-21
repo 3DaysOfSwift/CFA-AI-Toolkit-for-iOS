@@ -10,6 +10,15 @@
 - Subtitle: **AI skills and tools to build, modernise and maintain SwiftUI apps with Swift Concurrency.**
 - Suggested repository topics: `swift`, `swiftui`, `ios`, `swift-concurrency`, `architecture`, `ai-assisted-development`, `mvvm`, `gcd`, `migration`, `agent-skills`.
 
+Use the exact product name in public-facing toolkit/plugin titles, descriptions,
+documentation and messages. Use CFA or Cooperative Feature Architecture (CFA)
+only when referring to the architecture. Descriptive component names such as
+CFA Inspector and CFA App remain valid.
+
+Keep internal package/plugin identifiers, command names, asset filenames and
+installer ownership markers stable for compatibility; they are not display
+names. Clearly label any historical product names used in upgrade guidance.
+
 Keep the architecture name stable, but lead with the work the toolkit helps
 developers do. Use AI, SwiftUI and Swift Concurrency naturally in page titles,
 descriptions and examples. This is descriptive positioning, not a promise of

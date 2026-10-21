@@ -11,8 +11,10 @@ final class SettingsViewModel {
     }
 
     var firstWeekday: Int { settingsFeature.firstWeekday }
-    var appVersion: String {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+    var appName: String { settingsFeature.appName }
+
+    var versionDescription: String {
+        "Version \(settingsFeature.appVersion) (\(settingsFeature.buildNumber))"
     }
 
     func selectFirstWeekday(_ weekday: Int) {

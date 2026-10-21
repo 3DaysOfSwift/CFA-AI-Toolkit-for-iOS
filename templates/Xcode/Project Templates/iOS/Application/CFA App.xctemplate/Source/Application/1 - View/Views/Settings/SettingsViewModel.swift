@@ -14,6 +14,8 @@ final class SettingsViewModel {
         settingsFeature.selectTheme(theme)
     }
 
+    var appName: String { settingsFeature.appName }
+
     var developerWebsiteURL: URL? {
         settingsFeature.developerWebsiteURL
     }

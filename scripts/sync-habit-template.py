@@ -62,7 +62,7 @@ def generated_files():
             {"Identifier": "languageChoice", "Default": "Swift", "Type": "popup", "Values": ["Swift"]},
         ],
         "Targets": [
-            {"TargetIdentifier": "com.apple.dt.applicationTarget", "SharedSettings": {**shared, "ENABLE_TESTABILITY": "YES", "INFOPLIST_KEY_UIApplicationSceneManifest_Generation": "YES", "INFOPLIST_KEY_UILaunchScreen_Generation": "YES"}},
+            {"TargetIdentifier": "com.apple.dt.applicationTarget", "SharedSettings": {**shared, "ENABLE_TESTABILITY": "YES", "ASSETCATALOG_COMPILER_APPICON_NAME": "AppIcon", "INFOPLIST_KEY_UIApplicationSceneManifest_Generation": "YES", "INFOPLIST_KEY_UILaunchStoryboardName": "LaunchScreen"}},
             {"TargetIdentifier": "com.3daysofswift.cfa.habitTrackerTests", "TargetIdentifierToBeTested": "com.apple.dt.applicationTarget", "Name": TOKEN + "Tests", "ProductType": "com.apple.product-type.bundle.unit-test", "SharedSettings": {**shared, "PRODUCT_NAME": "$(TARGET_NAME)", "PRODUCT_BUNDLE_IDENTIFIER": "___ORGANIZATIONIDENTIFIER___." + TOKEN + "." + TOKEN + "Tests", "BUNDLE_LOADER": "$(TEST_HOST)", "TEST_HOST": "$(BUILT_PRODUCTS_DIR)/" + TOKEN + ".app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/" + TOKEN}, "Configurations": {"Debug": {}, "Release": {}}, "BuildPhases": [{"Class": phase} for phase in ["Sources", "Frameworks", "Resources"]]},
         ],
     }

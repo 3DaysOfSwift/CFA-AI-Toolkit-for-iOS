@@ -36,8 +36,27 @@ struct SettingsView: View {
                     }
                 }
                 Section {
-                    LabeledContent("Data storage", value: "On this device")
-                    LabeledContent("Version", value: viewModel.appVersion)
+                    LabeledContent("App") {
+                        Text(viewModel.appName)
+                            .fontWeight(.bold)
+                            .multilineTextAlignment(.trailing)
+                    }
+                    LabeledContent("Storage", value: "SwiftData · On this device")
+                    LabeledContent("Architecture", value: "CFA iOS Architecture")
+                    Text("Built with Cooperative Feature Architecture.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                } header: {
+                    Text("About")
+                } footer: {
+                    VStack(spacing: 20) {
+                        Text("Build daily habits and celebrate your progress. Habit history is stored on this device.")
+                        Text(viewModel.versionDescription)
+                    }
+                    .font(.footnote)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 20)
                 }
             }
             .scrollContentBackground(.hidden)

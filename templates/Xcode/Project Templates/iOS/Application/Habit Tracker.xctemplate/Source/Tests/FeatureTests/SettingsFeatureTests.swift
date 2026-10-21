@@ -6,6 +6,23 @@ import Testing
 @Suite("Settings feature")
 @MainActor
 struct SettingsFeatureTests {
+    @Test("Blank display names fall back to the bundle name and invalid versions stay unknown")
+    func resolvesBundleMetadata() throws {
+        let suite = "SettingsMetadataTests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let feature = SettingsFeature(defaults: defaults, appInformation: [
+            "CFBundleDisplayName": " ",
+            "CFBundleName": "Habit Tracker",
+            "CFBundleShortVersionString": "",
+            "CFBundleVersion": 42
+        ])
+
+        #expect(feature.appName == "Habit Tracker")
+        #expect(feature.appVersion == "—")
+        #expect(feature.buildNumber == "—")
+    }
+
     @Test("Week start is saved and restored")
     func persistsFirstWeekday() {
         let suite = "SettingsFeatureTests.\(UUID().uuidString)"

@@ -43,6 +43,18 @@ not a requirement of CFA or a default for other developers.
 
 ## Name and Scope
 
+The product is **CFA AI Toolkit for iOS**. Use that exact name for the toolkit
+and plugin in public-facing titles, descriptions, documentation and messages.
+The architecture is **Cooperative Feature Architecture (CFA)**, shortened to
+**CFA**. The toolkit supplies skills, tools and templates that apply CFA; the
+architecture itself is not the toolkit. Keep descriptive component names such
+as CFA Inspector and CFA App distinct from the product name.
+
+Stable package/plugin identifiers, command names, asset filenames and installer
+ownership markers are compatibility contracts, not display branding. Do not
+rename them merely to update wording. Historical names may appear when clearly
+identified as historical or needed to explain an upgrade.
+
 CFA groups coherent feature state and behaviour behind narrow APIs and explicit
 owners. “Cooperative” describes how features collaborate. Swift’s cooperative
 runtime is a separate concept: Swift Concurrency does not mandate feature-based
@@ -172,6 +184,43 @@ Every new CFA app includes a Settings screen, its adjacent
 version only selects a colour theme; do not collapse it into a data-only
 component or call its feature a manager.
 
+### Settings About Section and CFA Footer
+
+For **newly generated apps**, include a branded About section at the bottom of
+Settings by default. Reuse the app's existing wordmark or logo when supplied;
+otherwise display its actual app name with clear typographic emphasis. Do not
+copy another app's branding. Include an Architecture row labelled
+**CFA iOS Architecture** and the supporting sentence
+**Built with Cooperative Feature Architecture.** This identifies the engineering
+approach, not an independent certification or a guarantee of bug-free software.
+
+Describe only capabilities verified in the generated app. Mention SwiftData
+when it is used, distinguish local storage from synchronisation or remote
+services, and describe AI as on-device only when its inference actually runs
+there. Omit the AI row when there is no AI. Never infer a privacy promise from
+the choice of database; account for cloud sync, analytics and external services.
+
+Below the About card, outside all cells, use a table/section footer containing
+a short app-specific description and a separate centred
+`Version <marketing version> (<build number>)` line. Read the actual bundle
+metadata; never hard-code a release number or invent one when missing.
+Use an honest placeholder for unavailable metadata. Keep text readable across
+themes and Dynamic Type, allow long names/values to wrap, and keep the footer
+clear of the tab bar. The existing Settings ViewModel owns presentation
+formatting; this does not justify another Feature or a database request.
+
+For **existing apps**, this is opt-in, not an adoption or tidy-up requirement.
+The explicit request **“add CFA footer to Settings View”** (or equivalent
+consent) enables this focused change. Do not repeatedly ask, add it during
+ordinary cleanup, or treat its absence as a failure. Preserve existing branding,
+legal/privacy information and About content; merge rather than duplicate when
+the user requests it. A focused footer request does not authorize unrelated
+tidy-up passes. Check that the app uses CFA before describing it as CFA.
+
+**Review:** Verify metadata formatting and missing-value handling, truthful
+technology descriptions, branding, footer placement, large text and contrasting
+themes. Record unavailable visual checks separately from source/build checks.
+
 ### Xcode Template Layout Is a Contract
 
 For a CFA Xcode template, the on-disk path and the Xcode navigator group are
@@ -202,6 +251,36 @@ Independent reusable Views belong in their own clearly named files. Do not place
 unrelated components in another View’s file simply because they are small.
 Colocation is appropriate for private implementation details used only by that
 View, not independently reusable components.
+
+### Mandatory Initial App Icon
+
+Every new iOS app project must have a working initial app icon before delivery,
+so its Simulator installation does not display an empty icon. Use supplied
+product artwork when available; otherwise use the existing CFA App template's
+`CFA-App-Icon.png` and its `AppIcon.appiconset/Contents.json`. Reuse that artwork,
+not the toolkit's plugin logo and not a newly generated substitute.
+
+Creation, architecture adoption, concurrency migration and tidy-up must inspect
+each in-scope iOS app target's icon. An empty `AppIcon.appiconset`, a missing
+referenced image or an unconfigured target does not meet this requirement.
+Preserve existing custom artwork, alternate icons and valid appearance variants.
+If artwork exists but its wiring is broken, repair the wiring rather than
+replace the artwork. If no usable icon exists, install the CFA starter icon
+into the existing asset catalog and configure the target to use it.
+
+Set `ASSETCATALOG_COMPILER_APPICON_NAME` to the actual icon set name for the app
+target's build configurations. Verify catalog target membership, referenced
+image files and dimensions, then build and check the installed app icon on the
+Simulator Home Screen when available. Do not erase app data to refresh an icon.
+Report any unverified Simulator check; file presence alone is not visual proof.
+Missing optional dark/tinted variants do not make a valid base icon missing.
+Do not change bundle identifiers, unrelated targets or existing branding.
+
+The canonical starter asset lives in the CFA App Xcode template's
+`Source/Assets.xcassets/AppIcon.appiconset`. The creation, adoption, migration
+and tidy skills bundle the same asset at `assets/AppIcon.appiconset` so this
+rule also works without a toolkit checkout. This check is mandatory independently
+of optional theme work; a read-only review reports gaps without changing files.
 
 ### Strict No File Dumping Policy
 
@@ -271,6 +350,23 @@ palette identifiers, saved choices, default mappings and selector behaviour.
 Apply the policy when appearance is in scope; preserve recognised saved choices
 and record intended UI changes in the behaviour contract. A narrowly scoped
 unrelated migration reports the gap rather than silently redesigning the UI.
+
+### System Launch Appearance
+
+Every new CFA app supplies a minimal system launch screen with a named
+`LaunchBackground` asset containing light (Any Appearance) and dark variants.
+Use the default light and dark palette backgrounds so Automatic transitions
+naturally into the first screen. The system launch screen always follows the
+device appearance, not the saved in-app theme. Do not force `UIUserInterfaceStyle`
+to make it match a manual theme selection. Keep manual in-app themes available.
+
+Configure the native launch screen in the app target; it is not a SwiftUI View
+and cannot consult ThemeManager or saved preferences. Do not add a timed splash,
+database gate, or loading overlay to prolong it. Keep launch resources in
+`3 - App Resources` and colour variants in the app's existing asset catalog.
+Verify the built launch resource and both appearances, including a saved app
+theme that differs from the device. Keep palette changes and launch colours in
+sync. Apply this policy to new templates and appearance-scoped migrations.
 
 ### Swift Extensions
 
@@ -825,6 +921,11 @@ architecture requirement, not a limitation of SwiftUI or SwiftData.
   reuses it after successful opening. Container/context details never escape
   the persistence boundary. A failed opening throws through the request just
   like a failed fetch; it is not an application launch failure.
+- Before constructing a file-backed container, the storage owner explicitly
+  prepares the parent directory at the configured store URL. Preserve existing
+  locations and data; propagate directory failures rather than relying on
+  framework recovery, deleting files or substituting another store. Follow the
+  Swift coding guide's first-use storage preparation and persistence checks.
 - The Feature owns the request outcome. Its dedicated screen ViewModel maps
   that outcome into presentation, and the feature screen shows loading, error,
   and retry UI. Preserve previously loaded data when a refresh fails; never

@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { root, skills, cfaSkills } from './sync.mjs';
+import { root, skills, cfaSkills, iconSkills, starterIcon } from './sync.mjs';
 import { files, hash, json } from './files.mjs';
 import { verifyXcodeTemplateStructure } from './verify-xcode-template-structure.mjs';
 export function validate(base=root,{source=true}={}) {
@@ -29,6 +29,24 @@ export function validate(base=root,{source=true}={}) {
     const text=fs.readFileSync(path.join(skill,'SKILL.md'),'utf8');
     if(!text.startsWith('---\n') || !text.includes(`name: ${name}\n`) || !/^description: .+/m.test(text)) throw Error(`Invalid skill: ${name}`);
     if(text.includes('[TODO:')) throw Error(`Unfinished skill: ${name}`);
+    if (iconSkills.includes(name)) {
+      const iconSet = path.join(skill, 'assets/AppIcon.appiconset');
+      const contents = json(path.join(iconSet, 'Contents.json'));
+      const imageEntry = contents.images?.find(image => image.idiom === 'universal' && image.platform === 'ios' && image.size === '1024x1024');
+      if (imageEntry?.filename !== 'CFA-App-Icon.png') throw Error(`Missing starter app icon mapping: ${name}`);
+      const png = fs.readFileSync(path.join(iconSet, imageEntry.filename));
+      if (png.length < 24 || png.subarray(0, 8).toString('hex') !== '89504e470d0a1a0a' ||
+          png.readUInt32BE(16) !== 1024 || png.readUInt32BE(20) !== 1024) {
+        throw Error(`Invalid 1024px starter app icon: ${name}`);
+      }
+      if (source) {
+        for (const file of ['Contents.json', 'CFA-App-Icon.png']) {
+          if (hash(path.join(iconSet, file)) !== hash(path.join(base, starterIcon, file))) {
+            throw Error(`Stale starter app icon: ${name}. Run npm run sync.`);
+          }
+        }
+      }
+    }
     const guide = path.join(skill,'references/swift-coding-guide.md');
     if (!fs.existsSync(guide) || !text.includes('(references/swift-coding-guide.md)')) throw Error(`Missing Swift coding guide: ${name}`);
     if (source && hash(guide)!==hash(path.join(base,'architecture/swift-coding-guide.md'))) throw Error('Stale coding guide. Run npm run sync.');

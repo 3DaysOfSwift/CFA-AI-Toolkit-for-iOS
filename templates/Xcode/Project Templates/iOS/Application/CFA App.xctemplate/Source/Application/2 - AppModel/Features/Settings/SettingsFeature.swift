@@ -5,13 +5,15 @@ import Observation
 @Observable
 final class SettingsFeature {
     private let defaults: UserDefaults
+    private let appInformation: [String: Any]
     private let selectedColourThemeStorageKey = "selectedColourTheme"
     private let developerWebsiteAddress = "https://3daysofswiftconcurrency.com"
 
     private(set) var selectedTheme: AppColourTheme
 
-    init(defaults: UserDefaults = .standard) {
+    init(defaults: UserDefaults = .standard, appInformation: [String: Any] = Bundle.main.infoDictionary ?? [:]) {
         self.defaults = defaults
+        self.appInformation = appInformation
         selectedTheme = AppColourTheme(rawValue: defaults.string(forKey: selectedColourThemeStorageKey) ?? "") ?? .automatic
     }
 
@@ -24,11 +26,18 @@ final class SettingsFeature {
         URL(string: developerWebsiteAddress)
     }
 
-    var appVersion: String {
-        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
+    var appName: String {
+        information(for: "CFBundleDisplayName") ?? information(for: "CFBundleName") ?? "App"
     }
 
-    var buildNumber: String {
-        Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "—"
+    var appVersion: String { information(for: "CFBundleShortVersionString") ?? "—" }
+    var buildNumber: String { information(for: "CFBundleVersion") ?? "—" }
+
+    private func information(for key: String) -> String? {
+        guard let value = appInformation[key] as? String,
+              !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return nil
+        }
+        return value
     }
 }

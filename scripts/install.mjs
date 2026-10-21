@@ -10,6 +10,7 @@ import { skills } from './sync.mjs';
 
 const NAME='ios-app-development-cfa';
 const RECEIPT='.cfa-receipt.json';
+// Legacy ownership marker: keep stable so existing command launchers can upgrade.
 const COMMAND_MARKER='# CFA Toolkit command launcher';
 function runCodex(executable,args) {
   const result=spawnSync(executable,args,{stdio:'inherit',shell:false});

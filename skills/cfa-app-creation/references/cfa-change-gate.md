@@ -105,6 +105,12 @@ the architecture:
     suspension points. Record input identity, cleanup, cancellation and any
     product-required exception. Never lose a distinct edit as a duplicate.
 
+23. Newly generated apps include the specification's branded Settings About
+    section and CFA footer, with truthful storage/AI details and bundle-derived
+    version/build outside cells. Existing apps receive it only on explicit
+    request, such as “add CFA footer to Settings View”; never repeatedly prompt
+    or fail an ordinary tidy-up because the footer is absent.
+
 ## Before delivery
 
 Review the changed source as one feature slice, not as isolated files.
@@ -119,9 +125,18 @@ Review the changed source as one feature slice, not as isolated files.
   exposed by AppModel and requested by that tab's ViewModel. Require its named
   Feature tests; test shared data across tabs without duplicating state owners.
 - Confirm that no screen initializer gained dependency plumbing.
+- For creation, migration/adoption and tidy-up, verify each in-scope iOS app
+  target has a populated and correctly configured app icon. Preserve custom
+  artwork; repair its wiring when needed. When no usable icon exists, use the
+  bundled CFA App starter icon. Check the installed Simulator Home Screen icon
+  when available and report verification limits. This is not optional theme work.
 - For creation or appearance changes, verify seven palettes plus Automatic,
   popup selection, persistence, live system changes, manual overrides and
   returning to Automatic. Check sheets, contrast and accessible touch targets.
+- Verify the native launch screen uses the default light/dark background assets
+  according to device appearance, independently of a manual in-app theme. Check
+  that its resource is built into the app and no splash delay or storage gate
+  was introduced.
 - Inspect every newly created or moved Swift file for the imports required by
   its own declarations; imports in another source file do not satisfy this.
 - Confirm that every new screen and feature has the appropriate named

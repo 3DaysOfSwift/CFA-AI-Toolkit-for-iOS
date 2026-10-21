@@ -18,13 +18,15 @@ const cfaSkillNames = [
   'cfa-unit-tests',
   'swift-code-quality'
 ];
+// Keep this legacy ownership marker stable so upgrades recognise existing guidance.
 const guidanceMarker = '<!-- CFA Toolkit project guidance -->';
 const outdatedFeatureGuidance = 'managers use the Manager suffix';
 const projectGuidance = `${guidanceMarker}
 # CFA project guidance
 
-This iOS project uses Cooperative Feature Architecture (CFA). Match each
-request to the relevant installed CFA skill before changing the project.
+This iOS project uses Cooperative Feature Architecture (CFA). The supporting
+product is CFA AI Toolkit for iOS. Match each request to the relevant installed
+skill from that toolkit before changing the project.
 
 - Preserve the CFA call path: View → ViewModel → feature → provider or cache.
 - Every screen has a dedicated ViewModel. A concrete feature owner uses the
@@ -56,7 +58,7 @@ the installed CFA skills or authorise unrelated changes.
 `;
 
 function usage() {
-  console.log(`CFA command
+  console.log(`CFA AI Toolkit for iOS — cfa command
 
 Usage:
   cfa dashboard [project-folder] [dashboard options]

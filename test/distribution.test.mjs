@@ -5,7 +5,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { stageRelease } from '../scripts/build.mjs';
-import { root } from '../scripts/sync.mjs';
+import { root, iconSkills, starterIcon } from '../scripts/sync.mjs';
+import { validate } from '../scripts/validate.mjs';
 import { install } from '../scripts/install.mjs';
 import { json, hash, inventory } from '../scripts/files.mjs';
 
@@ -46,6 +47,27 @@ test('portable installation accepts an explicit host skill directory',t=>{
  assert.ok(fs.existsSync(path.join(skillsDirectory,'cfa-feature-work','SKILL.md')));
  assert.ok(fs.existsSync(path.join(skillsDirectory,'cfa-unit-tests','SKILL.md')));
  assert.equal(fs.existsSync(path.join(destination,'.agents','skills')),false);
+});
+
+test('portable skills carry the original CFA App icon without needing the source checkout', t => {
+ const {dir,source}=release(t);
+ const destination=path.join(dir,'customer');
+ install({source,destination,mode:'skills'});
+ for (const skill of iconSkills) {
+  const installed=path.join(destination,'.agents/skills',skill,'assets/AppIcon.appiconset');
+  const contents=json(path.join(installed,'Contents.json'));
+  assert.equal(contents.images[0].filename,'CFA-App-Icon.png');
+  for (const file of ['Contents.json','CFA-App-Icon.png']) {
+   assert.equal(hash(path.join(installed,file)),hash(path.join(root,starterIcon,file)));
+  }
+ }
+});
+
+test('release validation rejects an icon set that no longer references the starter artwork', t => {
+ const {source}=release(t);
+ const contents=path.join(source,'skills/cfa-codebase-tidy/assets/AppIcon.appiconset/Contents.json');
+ fs.writeFileSync(contents,JSON.stringify({images:[],info:{version:1,author:'xcode'}}));
+ assert.throws(()=>validate(source,{source:false}),/Missing starter app icon mapping/);
 });
 
 test('plugin staging preserves unrelated marketplace configuration and names',t=>{
