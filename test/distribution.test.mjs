@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { stageRelease } from '../scripts/build.mjs';
-import { root, iconSkills, starterIcon } from '../scripts/sync.mjs';
+import { root, skills, iconSkills, starterIcon } from '../scripts/sync.mjs';
 import { validate } from '../scripts/validate.mjs';
 import { install } from '../scripts/install.mjs';
 import { json, hash, inventory } from '../scripts/files.mjs';
@@ -47,6 +47,34 @@ test('portable installation accepts an explicit host skill directory',t=>{
  assert.ok(fs.existsSync(path.join(skillsDirectory,'cfa-feature-work','SKILL.md')));
  assert.ok(fs.existsSync(path.join(skillsDirectory,'cfa-unit-tests','SKILL.md')));
  assert.equal(fs.existsSync(path.join(destination,'.agents','skills')),false);
+});
+
+test('every portable skill carries the shared workflow and separate design defaults', t => {
+ const {dir,source}=release(t);
+ const destination=path.join(dir,'customer');
+ install({source,destination,mode:'skills'});
+ for (const name of skills) {
+  const installed=path.join(destination,'.agents/skills',name);
+  const entry=fs.readFileSync(path.join(installed,'SKILL.md'),'utf8');
+  assert.ok(entry.includes('(references/project-workflow.md)'),name);
+  for (const file of ['project-workflow.md','new-app-design-defaults.md']) {
+   assert.equal(hash(path.join(installed,'references',file)),
+    hash(path.join(root,'architecture',file)),name);
+  }
+ }
+});
+
+test('release validation rejects a missing workflow policy and an entry point that bypasses it', t => {
+ const {source}=release(t);
+ const skill=path.join(source,'skills/cfa-feature-work');
+ const policy=path.join(skill,'references/project-workflow.md');
+ const original=fs.readFileSync(policy);
+ fs.unlinkSync(policy);
+ assert.throws(()=>validate(source,{source:false}),/Missing workflow reference/);
+ fs.writeFileSync(policy,original);
+ const entry=path.join(skill,'SKILL.md');
+ fs.writeFileSync(entry,fs.readFileSync(entry,'utf8').replace('(references/project-workflow.md)',''));
+ assert.throws(()=>validate(source,{source:false}),/Missing workflow policy entry point/);
 });
 
 test('portable skills carry the original CFA App icon without needing the source checkout', t => {

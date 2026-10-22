@@ -13,6 +13,11 @@ export function sync(base = root) {
     fs.mkdirSync(path.dirname(to),{recursive:true});
     fs.copyFileSync(from,to);
   };
+  for (const name of skills) {
+    for (const file of ['project-workflow.md', 'new-app-design-defaults.md']) {
+      copy(`architecture/${file}`, `skills/${name}/references/${file}`);
+    }
+  }
   for (const name of skills) copy('architecture/swift-coding-guide.md',`skills/${name}/references/swift-coding-guide.md`);
   for (const name of iconSkills) {
     for (const file of files(path.join(base, starterIcon))) {

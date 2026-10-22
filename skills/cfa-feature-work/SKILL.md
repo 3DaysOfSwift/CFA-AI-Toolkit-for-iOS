@@ -5,6 +5,10 @@ description: Add, change or remove a feature in an existing CFA SwiftUI iOS app.
 
 # CFA feature work
 
+Read [project workflow and design authority](references/project-workflow.md) first.
+Respect the recorded workflow and current request; new-app design defaults do
+not authorize UI changes during maintenance or a narrowly scoped task.
+
 Read the [CFA specification](references/cfa-specification.md), [CFA change
 gate](references/cfa-change-gate.md), [reference feature](references/reference-feature.md) and [product behaviour
 contract](references/product-behaviour-contract.md) before editing.
@@ -12,6 +16,10 @@ contract](references/product-behaviour-contract.md) before editing.
 First identify the live target, AppModel composition, existing feature owner,
 affected Views/ViewModels, storage and tests. Record the intended user journey,
 success/failure states and existing behaviour that must remain intact.
+
+Fit new UI into the existing product design. Do not add themes, footers or
+branding merely because a new Feature is being created. In new-product
+development, App Creation guides product shaping without expanding this task.
 
 If the project is already CFA, make the smallest complete vertical change:
 

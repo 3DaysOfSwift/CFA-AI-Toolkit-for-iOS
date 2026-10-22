@@ -47,6 +47,14 @@ export function validate(base=root,{source=true}={}) {
         }
       }
     }
+    for (const file of ['project-workflow.md', 'new-app-design-defaults.md']) {
+      const reference = path.join(skill, 'references', file);
+      if (!fs.existsSync(reference)) throw Error(`Missing workflow reference: ${name}/${file}`);
+      if (source && hash(reference) !== hash(path.join(base, 'architecture', file))) {
+        throw Error(`Stale workflow reference: ${name}/${file}. Run npm run sync.`);
+      }
+    }
+    if (!text.includes('(references/project-workflow.md)')) throw Error(`Missing workflow policy entry point: ${name}`);
     const guide = path.join(skill,'references/swift-coding-guide.md');
     if (!fs.existsSync(guide) || !text.includes('(references/swift-coding-guide.md)')) throw Error(`Missing Swift coding guide: ${name}`);
     if (source && hash(guide)!==hash(path.join(base,'architecture/swift-coding-guide.md'))) throw Error('Stale coding guide. Run npm run sync.');

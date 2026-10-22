@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Separate new-app visual defaults from CFA architecture requirements.
+- Extend App Creation through ongoing new-product development and record the
+  project workflow without repeatedly asking or resetting approved designs.
+- Preserve existing-product UI during feature work, adoption, migration and
+  tidy-up; remove recurring theme offers and automatic starter branding.
+- Bundle the shared workflow policy with all eight skills, validate delivery,
+  and document ten scope-regression scenarios for agent evaluation.
+
 ## 0.3.0 — 2026-10-20
 
 - Deliver eight independent AI skills, the `cfa` command with inspector,

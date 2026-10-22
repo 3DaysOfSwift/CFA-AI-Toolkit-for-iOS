@@ -5,6 +5,10 @@ description: Legacy GCD migration: migrate GCD, OperationQueue and callback-base
 
 # Legacy GCD migration
 
+Read [project workflow and design authority](references/project-workflow.md) first.
+Respect the recorded workflow and current request; new-app design defaults do
+not authorize UI changes during maintenance or a narrowly scoped task.
+
 Migrate a legacy application into CFA and Swift Concurrency by preserving its
 product behaviour, not translating concurrency syntax.
 
@@ -27,11 +31,10 @@ Use deliberate passes:
    property, dedicated screen ViewModel and named Feature tests. Correct missing
    tab owners during their migration checkpoint, preserving one authoritative
    owner for data shared by several tabs; do not duplicate stores or collections.
-   Inventory appearance against the specification's Colour Theme policy: seven
-   palettes plus Automatic and a native popup selector, not horizontal theme
-   tabs. Preserve recognised saved choices. Apply and test this policy when
-   appearance is in scope; otherwise report the gap without silently expanding
-   a bounded concurrency migration.
+   Preserve existing visuals and interactions as part of that contract. Do not
+   inventory against new-app palette counts, popup selectors or branding
+   defaults; their absence is not a migration gap. Make visual changes only
+   when explicitly requested, with separate regression evidence.
 2. Move one complete feature at a time into CFA. Give each SwiftUI View a
    bespoke ViewModel, move testable feature decisions into its Feature,
    place shared dependency construction in AppModel and keep persistence behind
@@ -59,18 +62,12 @@ evidence that behaviour was preserved. Record remaining legacy mechanisms and
 why they remain. A pure GCD application is a valid starting point; CFA is the
 target architecture.
 
-## Required app icon
+## Preserve app branding
 
-Apply the specification's Mandatory Initial App Icon rule on every invocation
-for the in-scope iOS app targets. Preserve existing custom icons and repair
-broken target wiring first. If no usable app icon exists, use the bundled
-[CFA starter icon set](assets/AppIcon.appiconset/Contents.json) and
-[original CFA App artwork](assets/AppIcon.appiconset/CFA-App-Icon.png).
-Configure the actual icon set in the app target's build configurations; an
-empty asset folder is not enough. Build and check the installed Simulator
-Home Screen icon when available; report checks that could not run. This is
-mandatory independently of optional colour-theme changes. Never erase app
-data, overwrite custom branding or change bundle identifiers for this check.
+Do not add a CFA starter icon during ordinary maintenance. Preserve existing
+artwork, variants and target identity. Repair icon wiring when it belongs to the
+requested fix; use bundled starter artwork only on an explicit request.
+Do not repeatedly offer branding changes or count their absence as CFA defects.
 
 ## Shared Swift coding standards
 

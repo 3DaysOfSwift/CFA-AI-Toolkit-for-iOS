@@ -5,6 +5,10 @@ description: Adopt CFA in an existing iOS app or bring existing CFA features int
 
 # CFA Architecture Adoption
 
+Read [project workflow and design authority](references/project-workflow.md) first.
+Respect the recorded workflow and current request; new-app design defaults do
+not authorize UI changes during maintenance or a narrowly scoped task.
+
 Restructure an existing app around CFA while preserving its observable behaviour.
 
 A flat `App.swift` or `ContentView` that mixes screen state, persistence, and
@@ -17,7 +21,7 @@ Read [CFA specification](references/cfa-specification.md), [CFA change gate](ref
 2. Define a bounded feature and its behaviour contract. Map each responsibility to its CFA destination before moving code. Inventory top-level tabs: each needs its own concrete Feature, matching AppModel property, dedicated screen ViewModel and named Feature tests. Create missing tab owners with real responsibilities, while keeping shared data under one authoritative owner. Preserve public interfaces with temporary adapters where needed.
 3. Separate screen presentation from feature rules. Introduce or align AppModel.shared as the composition root with only Feature properties and its launch guard; its explicit initializer receives Features, and its single `static live()` builds production dependencies. Move each authoritative value and its mutations to a named Feature. Route SwiftData through `SwiftDataManager`, networking through `NetworkingManager`, app-wide refresh through the earliest lifecycle callback, and screen-owned initial work through that screen's `.task` before it appears.
 4. Migrate one end-to-end feature at a time, checking callers and live wiring. Keep data formats, navigation, errors, ordering and operation lifetimes stable. Remove superseded wiring only once all callers have moved.
-5. When appearance is in scope, apply the specification's Colour Theme policy: seven palettes plus Automatic, named light/dark defaults, and a native popup selector instead of horizontal theme tabs. Preserve recognised saved selections, record the intended UI change, and test persistence and system switching. Report appearance gaps outside a narrowly scoped migration instead of expanding it silently.
+5. Preserve the existing design, palettes, theme selector, Settings content and branding. Do not apply new-app design defaults or report their absence as adoption gaps. An explicitly requested visual change stays limited to that request; record it in the behaviour contract and verify saved preferences and affected interactions.
 6. Build and run relevant regression checks at each meaningful boundary. Compare final ownership against the specification’s review checklist and explain any remaining transitional components.
 
 Use this workflow for an architecture-only adoption when the application is
@@ -29,18 +33,12 @@ concurrency rewrite during a narrowly requested architecture-only adoption.
 
 Deliver a before/after ownership map, behaviour evidence and any remaining migration ledger. Existing CFA feature enhancements may use the same rules at feature scope without restructuring the whole app.
 
-## Required app icon
+## Preserve app branding
 
-Apply the specification's Mandatory Initial App Icon rule on every invocation
-for the in-scope iOS app targets. Preserve existing custom icons and repair
-broken target wiring first. If no usable app icon exists, use the bundled
-[CFA starter icon set](assets/AppIcon.appiconset/Contents.json) and
-[original CFA App artwork](assets/AppIcon.appiconset/CFA-App-Icon.png).
-Configure the actual icon set in the app target's build configurations; an
-empty asset folder is not enough. Build and check the installed Simulator
-Home Screen icon when available; report checks that could not run. This is
-mandatory independently of optional colour-theme changes. Never erase app
-data, overwrite custom branding or change bundle identifiers for this check.
+Do not add a CFA starter icon during ordinary maintenance. Preserve existing
+artwork, variants and target identity. Repair icon wiring when it belongs to the
+requested fix; use bundled starter artwork only on an explicit request.
+Do not repeatedly offer branding changes or count their absence as CFA defects.
 
 ## Shared Swift coding standards
 

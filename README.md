@@ -185,6 +185,23 @@ instead of using Node.js.
 For screenshots, upgrades and troubleshooting, read
 [Installation](docs/INSTALLATION.md).
 
+## New products and established apps
+
+CFA App Creation supports the whole new-product journey, not just generating
+the first files. A project can remain in **new-product development** while you
+shape its screens and features. Its recorded workflow does not change merely
+because the project now exists.
+
+For **established-product maintenance**, CFA preserves your designer's choices.
+Feature work, architecture adoption, migration and tidy-up do not add or
+repeatedly offer themes, footers, branding or replacement icons. These are
+[new-app design defaults](architecture/new-app-design-defaults.md), not
+architecture compliance requirements. Explicit UI requests remain welcome.
+
+Record the workflow once in your project's instructions. Even in new-product
+development, a narrowly requested fix stays narrow; later user choices override
+starter defaults. Read the [workflow policy](architecture/project-workflow.md).
+
 ## Try these CFA prompts
 
 1. `Using CFA, create a new iOS app that finds where I parked my car.`
@@ -206,7 +223,7 @@ The CFA AI Toolkit for iOS contains eight AI skills and one local analysis tool.
 
 | Skill | Use it when you want to… |
 | --- | --- |
-| [CFA App Creation](skills/cfa-app-creation/SKILL.md) | create a new iOS app with CFA from the first screen onward. |
+| [CFA App Creation](skills/cfa-app-creation/SKILL.md) | create and continue shaping a new iOS product with CFA. |
 | [CFA Feature Work](skills/cfa-feature-work/SKILL.md) | add, change or remove a feature in a CFA app. |
 | [CFA Architecture Adoption](skills/cfa-architecture-adoption/SKILL.md) | move an existing modern app into CFA one feature at a time. |
 | [Legacy GCD migration](skills/swift-concurrency-migration/SKILL.md) | replace GCD, operation queues and callbacks with CFA and Swift Concurrency. |

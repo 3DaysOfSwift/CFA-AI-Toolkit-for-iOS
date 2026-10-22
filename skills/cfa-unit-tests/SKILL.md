@@ -5,6 +5,10 @@ description: Write, organise and audit meaningful unit tests for CFA SwiftUI app
 
 # CFA unit tests
 
+Read [project workflow and design authority](references/project-workflow.md) first.
+Respect the recorded workflow and current request; new-app design defaults do
+not authorize UI changes during maintenance or a narrowly scoped task.
+
 Read the [CFA specification](references/cfa-specification.md), [CFA change gate](references/cfa-change-gate.md), [product
 behaviour contract](references/product-behaviour-contract.md) and [Swift coding
 guide](references/swift-coding-guide.md). Keep production decisions in Features

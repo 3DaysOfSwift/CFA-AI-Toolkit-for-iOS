@@ -3,6 +3,10 @@
 Use this gate before changing a CFA app. It is a short design pass and a final
 structural review, not a line-by-line ceremony.
 
+Read [project workflow and design authority](project-workflow.md) first.
+Visual defaults are not architecture invariants; preserve approved product
+designs unless the current request authorizes a change.
+
 ## Before implementation
 
 Write down the affected route for every screen in scope:
@@ -23,7 +27,7 @@ the architecture:
    `AppModel.shared`, while tests can provide an isolated replacement.
 3. Screen View initializers do not receive AppModel, features,
    repositories or ViewModels.
-4. `ThemeManager` is an app-wide presentation dependency supplied through the
+4. When the app uses `ThemeManager`, it is a presentation dependency supplied through the
    SwiftUI environment. AppModel and features are not environment
    values.
 5. Features own feature state and behaviour; ViewModels own screen
@@ -94,10 +98,10 @@ the architecture:
     and used by the tab's dedicated ViewModel. Give it a real responsibility
     and named tests. Cooperating tab Features share one authoritative data
     owner, never competing collections or independent copies of the store.
-21. New apps provide seven complete palettes plus Automatic with named default
-    light/dark palettes. Settings opens a native popup theme menu, never
-    horizontal theme tabs or a segmented control. Follow the specification's
-    Colour Theme policy and preserve recognised saved choices during migration.
+21. New-app visual starting points live in [new-app design defaults](new-app-design-defaults.md).
+    Use them only where appropriate to the recorded workflow and current request;
+    user-approved designs override defaults. Do not require palette counts or
+    a popup theme selector when adopting CFA in an established product.
 22. ViewModels retain handles for their created Tasks by default. Equivalent
     repeated actions reuse and await the existing execution, not a duplicate
     task or silent busy return. Each Feature operation independently shares
@@ -105,11 +109,10 @@ the architecture:
     suspension points. Record input identity, cleanup, cancellation and any
     product-required exception. Never lose a distinct edit as a duplicate.
 
-23. Newly generated apps include the specification's branded Settings About
-    section and CFA footer, with truthful storage/AI details and bundle-derived
-    version/build outside cells. Existing apps receive it only on explicit
-    request, such as “add CFA footer to Settings View”; never repeatedly prompt
-    or fail an ordinary tidy-up because the footer is absent.
+23. The branded Settings About/footer is a new-app default, not a CFA invariant.
+    Existing apps receive it only on an explicit request such as “add CFA footer
+    to Settings View”. Never repeatedly prompt or fail an ordinary tidy-up
+    because themes, a footer or CFA branding are absent.
 
 ## Before delivery
 
@@ -125,18 +128,16 @@ Review the changed source as one feature slice, not as isolated files.
   exposed by AppModel and requested by that tab's ViewModel. Require its named
   Feature tests; test shared data across tabs without duplicating state owners.
 - Confirm that no screen initializer gained dependency plumbing.
-- For creation, migration/adoption and tidy-up, verify each in-scope iOS app
-  target has a populated and correctly configured app icon. Preserve custom
-  artwork; repair its wiring when needed. When no usable icon exists, use the
-  bundled CFA App starter icon. Check the installed Simulator Home Screen icon
-  when available and report verification limits. This is not optional theme work.
-- For creation or appearance changes, verify seven palettes plus Automatic,
-  popup selection, persistence, live system changes, manual overrides and
-  returning to Automatic. Check sheets, contrast and accessible touch targets.
-- Verify the native launch screen uses the default light/dark background assets
-  according to device appearance, independently of a manual in-app theme. Check
-  that its resource is built into the app and no splash delay or storage gate
-  was introduced.
+- Compare visuals and interactions with the baseline. Do not introduce
+  unrequested design changes or restore defaults the user replaced.
+- For initial app design, verify the applicable new-app design defaults and
+  user-approved alternatives: working icon, selected theme behaviour, Settings
+  layout and system launch appearance. An explicit change to one of these in
+  an established app does not opt into the others.
+- For icon fixes, preserve artwork and target identity; new starter artwork
+  requires new-app creation or an explicit request. Report unavailable visual
+  checks accurately.
+- Never introduce a timed splash or storage gate, regardless of visual design.
 - Inspect every newly created or moved Swift file for the imports required by
   its own declarations; imports in another source file do not satisfy this.
 - Confirm that every new screen and feature has the appropriate named

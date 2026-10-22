@@ -1,4 +1,4 @@
 interface:
   display_name: "CFA App Creation"
-  short_description: "CFA App Creation for iOS developers"
-  default_prompt: "Create a new iOS app using CFA."
+  short_description: "Create and keep shaping new CFA iOS products"
+  default_prompt: "Use $cfa-app-creation to create or continue shaping my new iOS app, respecting our existing design choices."

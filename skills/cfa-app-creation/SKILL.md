@@ -1,19 +1,27 @@
 ---
 name: cfa-app-creation
-description: Create new SwiftUI and Xcode iOS projects using Cooperative Feature Architecture. Use whenever a developer asks to create, build or start a new iOS app or SwiftUI project, unless they explicitly request a different architecture or framework.
+description: Create and iteratively shape new SwiftUI iOS products using CFA, from initial Xcode scaffolding through ongoing new-product development. Use for new-app creation and continued product design, unless another architecture is requested. Bounded feature, tidy-up and maintenance tasks retain their own scopes.
 ---
 
 # CFA App Creation
 
-Create the smallest complete working feature in a new Xcode project. CFA is the
-default architecture for new iOS projects. Do not ask whether to use CFA unless
+Read [project workflow and design authority](references/project-workflow.md) first.
+Respect the recorded workflow and current request; new-app design defaults do
+not authorize UI changes during maintenance or a narrowly scoped task.
+
+Create the smallest complete working feature, then continue shaping the new
+product across later requests. Record new-product development in project
+instructions when creating the app. Read [new-app design defaults](references/new-app-design-defaults.md)
+before choosing initial visuals. On later iterations, reuse the existing app
+and honour choices already made; do not restart scaffolding or reapply defaults.
+CFA is the default architecture for new iOS projects. Do not ask whether to use CFA unless
 the developer has explicitly requested a different architecture or framework.
 
 Read [CFA specification](references/cfa-specification.md), [CFA change gate](references/cfa-change-gate.md) and [reference feature](references/reference-feature.md) before designing the project. Respect the user’s app requirements, deployment target and bundle identifier. Check the available Xcode version and installed destinations.
 
 1. Define the first observable user journey and its success/error states. Choose the minimum persistence and external dependencies it needs. For a tab-based app, map every top-level app tab to its own concrete Feature, matching AppModel property, dedicated screen ViewModel and named Feature test file. Follow the specification's tab-Feature rule; shared data keeps one authoritative owner.
 2. Apply the specification’s folder map and ownership rules. Place `App.swift` in `1 - View`. Its `body` declares one stable root View and presentation modifiers, with no conditional startup UI, database access, or stored AppModel; the root View handles navigation only. Keep Xcode's standard `Assets.xcassets` at the app target root; put privacy manifests, entitlements and StoreKit test configuration (`.storekit`) files in `3 - App Resources`, both on disk and in the Xcode navigator. Never create a second asset catalog merely to reposition it. Update StoreKit scheme references to match and keep these development-only files out of Copy Bundle Resources. Use AppModel.shared as the production composition root; keep screen state in dedicated ViewModels and business state in its feature owner.
-3. Every new app includes a complete Settings slice: `SettingsView`, its adjacent `SettingsViewModel`, and `SettingsFeature` exposed as `AppModel.shared.settingsFeature`. Create one app-owned `ThemeManager`, seven complete colour palettes (including light and dark), and a separate Automatic option following named default light/dark palettes. Settings uses a native popup menu, never horizontal theme tabs or a segmented control. Persist the selected mode; verify live system changes and manual overrides. Supply that presentation manager to every screen; never name a feature owner `Manager`. Follow the specification’s Colour Theme section.
+3. Include the complete Settings slice: SettingsView, its adjacent SettingsViewModel and SettingsFeature. For a fresh design without other user direction, use the new-app design defaults for themes and Settings presentation. A supplied design or a later explicit choice overrides these visual defaults. Do not add palettes, reset themes or restore removed content on subsequent iterations.
 4. Connect View → ViewModel → concrete Feature → repository or service. AppModel stores only Features and its launch guard; its explicit initializer assigns injected Features, and its single `static live()` builds production dependencies. If SwiftData is used, create `SwiftDataManager`; if networking is used, create `NetworkingManager` to wrap every `URLSession` call. The app delegate starts the shared system refresh at launch; each screen uses `.task` for its own initial work before it appears. The Feature coordinates duplicate refresh requests. Do not stop at empty tabs, placeholder Features or a project that only compiles.
 5. Keep commands awaitable. Give cancellable tasks an explicit owner, and preserve isolation across feature and repository boundaries without introducing unnecessary actors or protocols.
 6. Before delivery, inventory every screen-level View and every concrete Feature. Require a matching `<Screen>ViewModel.swift` beside each screen, a `<Screen>ViewModelTests.swift` file for each ViewModel, and a `<Feature>Tests.swift` file for each Feature, with meaningful observable assertions. Include Settings in this inventory, even when its UI is initially small; reusable data-only components are not screens. Build the iPhone target, run the tests, and exercise the first journey. Record unavailable simulator/device checks accurately.
@@ -27,25 +35,19 @@ that behaviour is verified. Do not introduce an app-level startup-error screen.
 
 ## Settings About and footer
 
-Apply the specification's Settings About Section and CFA Footer rule by default
-for every new app. Include the app's branding, accurate storage/AI details and
-the CFA architecture attribution. Put the description and bundle-derived
-version/build below the About card, outside cells. Adapt starter copy to the
-actual app; do not carry over another product's capability or privacy claims.
-Verify metadata fallbacks, Dynamic Type and light/dark readability.
+Use the new-app design defaults' Settings About and footer section during
+initial design unless the user specifies otherwise. On later iterations,
+preserve the chosen layout and truthful capability descriptions. Do not
+reintroduce a footer that the user removed or repeatedly offer one.
 
-## Required app icon
+## Initial app icon
 
-Apply the specification's Mandatory Initial App Icon rule on every invocation
-for the in-scope iOS app targets. Preserve existing custom icons and repair
-broken target wiring first. If no usable app icon exists, use the bundled
-[CFA starter icon set](assets/AppIcon.appiconset/Contents.json) and
-[original CFA App artwork](assets/AppIcon.appiconset/CFA-App-Icon.png).
-Configure the actual icon set in the app target's build configurations; an
-empty asset folder is not enough. Build and check the installed Simulator
-Home Screen icon when available; report checks that could not run. This is
-mandatory independently of optional colour-theme changes. Never erase app
-data, overwrite custom branding or change bundle identifiers for this check.
+For initial app creation, follow the new-app design defaults' icon section.
+Use supplied artwork first; otherwise the bundled
+[CFA starter icon set](assets/AppIcon.appiconset/Contents.json) is available.
+Configure and verify the target rather than leaving an empty icon set.
+On later iterations preserve chosen branding; inspect or repair icons when
+the current task calls for it, not as a recurring offer.
 
 ## Shared Swift coding standards
 
