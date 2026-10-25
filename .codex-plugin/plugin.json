@@ -1,6 +1,6 @@
 {
   "name": "ios-app-development-cfa",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "CFA AI Toolkit for iOS: AI skills and tools to build, modernise, test and maintain SwiftUI apps with Swift Concurrency.",
   "author": {
     "name": "3 Days of Swift Concurrency"

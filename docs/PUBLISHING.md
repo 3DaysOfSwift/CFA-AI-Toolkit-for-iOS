@@ -34,8 +34,9 @@ need Python 3. Compatible Codex installation requires `codex plugin add` support
 
 ## Maintainer release procedure
 
-1. Update the version in `package.json`, `.codex-plugin/plugin.json` and
-   `tools/architecture-dashboard/package.json`. Update the changelog.
+1. Update the version in `package.json`, `plugin.json`, `.codex-plugin/plugin.json`
+   and `tools/architecture-dashboard/package.json`. Synchronisation updates the
+   bundled dashboard copy. Update the changelog and add `docs/RELEASE-vVERSION.md`.
 2. Run `node scripts/sync.mjs`, `npm test`, and `npm run validate`.
 3. Run `python3 scripts/release.py --out dist/VERSION` with a fresh directory.
    It repeats validation and tests, then builds plugin and source ZIPs and SHA256SUMS.

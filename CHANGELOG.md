@@ -1,6 +1,21 @@
 # Changelog
 
-## Unreleased
+## 0.3.1 — 2026-10-25
+
+- Add opt-in migration evidence capture: a versioned scenario schema, case-study
+  template, synthetic example and dependency-free local validation helper.
+- Record behaviour contracts, decisions, alternatives, human corrections and
+  verification, separating general Swift Concurrency guidance from CFA choices.
+- Add review fingerprints and publication-eligibility checks; exclude drafts,
+  synthetic examples, holdouts and records without redistribution/privacy clearance.
+  Keep working records outside application repositories and release payloads.
+- Bundle capture tools with the migration skill for portable installation. This
+  is capture infrastructure, not automatic retrieval or a real migration corpus.
+- Add Habit Tracker and Day Streak native Xcode templates and a separate Habit
+  Tracker Pro project demonstrating Swift Charts and a StoreKit Trends unlock.
+- Strengthen Settings, feature-per-tab, test ownership, AppModel composition,
+  lifecycle and feature-owned persistence guidance. Improve template naming,
+  task ownership, inline editing and first-use storage behaviour.
 
 - Separate new-app visual defaults from CFA architecture requirements.
 - Extend App Creation through ongoing new-product development and record the
