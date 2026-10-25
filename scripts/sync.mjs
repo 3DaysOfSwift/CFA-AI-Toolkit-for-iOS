@@ -7,6 +7,12 @@ export const cfaSkills = ['cfa-app-creation', 'cfa-feature-work', 'cfa-architect
 export const skills = [...cfaSkills, 'swift-code-quality'];
 export const iconSkills = ['cfa-app-creation', 'cfa-architecture-adoption', 'swift-concurrency-migration', 'cfa-codebase-tidy'];
 export const starterIcon = 'templates/Xcode/Project Templates/iOS/Application/CFA App.xctemplate/Source/Assets.xcassets/AppIcon.appiconset';
+// Explicit release allowlist: working migration records must never be swept up.
+export const migrationEvidenceFiles = [
+  'evidence.mjs', 'schema.json', 'README.md', 'template/record.json', 'template/case-study.md',
+  'examples/synthetic-serial-writes/record.json', 'examples/synthetic-serial-writes/case-study.md',
+  'examples/synthetic-serial-writes/exercise-note.md'
+];
 export function sync(base = root) {
   const copy = (source,destination) => {
     const from=path.join(base,source), to=path.join(base,destination);
@@ -38,5 +44,11 @@ export function sync(base = root) {
   for(const file of ['README.md','package.json']) copy(`tools/architecture-dashboard/${file}`,`skills/cfa-architecture-review/scripts/dashboard/${file}`);
   for(const skill of skills) copy('LICENSE',`skills/${skill}/LICENSE`);
   copy('LICENSE','skills/cfa-architecture-review/scripts/dashboard/LICENSE');
+  for (const file of migrationEvidenceFiles) {
+    copy(`tools/migration-evidence/${file}`, `skills/swift-concurrency-migration/scripts/evidence/${file}`);
+  }
+  const captureGuide = fs.readFileSync(path.join(base, 'architecture/migration-evidence.md'), 'utf8')
+    .replace('../tools/migration-evidence/README.md', '../scripts/evidence/README.md');
+  fs.writeFileSync(path.join(base, 'skills/swift-concurrency-migration/references/migration-evidence.md'), captureGuide);
 }
 if(process.argv[1] && import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href) { sync(); console.log('Bundled skill dependencies synchronised.'); }

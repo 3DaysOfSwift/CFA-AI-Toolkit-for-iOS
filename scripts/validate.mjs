@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { root, skills, cfaSkills, iconSkills, starterIcon } from './sync.mjs';
+import { root, skills, cfaSkills, iconSkills, starterIcon, migrationEvidenceFiles } from './sync.mjs';
 import { files, hash, json } from './files.mjs';
 import { verifyXcodeTemplateStructure } from './verify-xcode-template-structure.mjs';
 export function validate(base=root,{source=true}={}) {
@@ -23,6 +23,22 @@ export function validate(base=root,{source=true}={}) {
     const portable=json(path.join(base,'plugin.json'));
     if(portable.name!==manifest.name || portable.version!==manifest.version) throw Error('Portable plugin manifest does not match Codex manifest.');
   }
+  const evidenceFolder = path.join(base, 'skills/swift-concurrency-migration/scripts/evidence');
+  if (JSON.stringify(files(evidenceFolder).sort()) !== JSON.stringify([...migrationEvidenceFiles].sort())) {
+    throw Error('Migration evidence package differs from its explicit allowlist; do not package working case records.');
+  }
+  const captureReference = path.join(base, 'skills/swift-concurrency-migration/references/migration-evidence.md');
+  const migrationEntry = fs.readFileSync(path.join(base, 'skills/swift-concurrency-migration/SKILL.md'), 'utf8');
+  if (!fs.existsSync(captureReference) || !migrationEntry.includes('(references/migration-evidence.md)')) throw Error('Missing opt-in migration evidence entry point.');
+  if (source) {
+    if (JSON.stringify(files(path.join(base, 'tools/migration-evidence')).sort()) !== JSON.stringify([...migrationEvidenceFiles].sort())) throw Error('Keep working evidence outside distributable tooling.');
+    for (const file of migrationEvidenceFiles) {
+      if (hash(path.join(evidenceFolder, file)) !== hash(path.join(base, 'tools/migration-evidence', file))) throw Error(`Stale migration evidence dependency: ${file}`);
+    }
+    const guide = fs.readFileSync(path.join(base, 'architecture/migration-evidence.md'), 'utf8').replace('../tools/migration-evidence/README.md', '../scripts/evidence/README.md');
+    if (guide !== fs.readFileSync(captureReference, 'utf8')) throw Error('Stale migration capture guide. Run npm run sync.');
+  }
+  execFileSync(process.execPath, [path.join(evidenceFolder, 'evidence.mjs'), 'validate', path.join(evidenceFolder, 'examples/synthetic-serial-writes/record.json')], { stdio: 'pipe' });
   for(const file of ['LICENSE','README.md','docs/INSTALLATION.md','docs/PRIVACY.md']) if(!fs.existsSync(path.join(base,file))) throw Error(`Missing ${file}`);
   for(const name of skills) {
     const skill=path.join(base,'skills',name);

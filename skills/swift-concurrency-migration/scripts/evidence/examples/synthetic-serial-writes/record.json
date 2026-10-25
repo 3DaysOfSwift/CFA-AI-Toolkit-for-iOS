@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "synthetic-serial-writes",
+  "migrationId": "synthetic-workshop",
+  "revision": 1,
+  "kind": "synthetic",
+  "status": "draft",
+  "evaluationUse": "development",
+  "title": "SYNTHETIC: preserve ordered writes across suspension",
+  "createdAt": "2026-10-25",
+  "author": "CFA synthetic example",
+  "toolkitVersion": "0.3.0",
+  "repository": {"url": null, "beforeCommit": null, "afterCommit": null, "license": null, "allowedUse": "unreviewed", "licenseNotes": "No third-party repository or code was used."},
+  "toolchain": ["Hypothetical Swift 6 iOS project; no build performed"],
+  "scope": {
+    "feature": "Fictional NotesFeature",
+    "symbols": ["Fictional NotesStore.save"],
+    "mechanisms": ["gcd", "callbacks"],
+    "diagnosis": "Hypothesis: replacing an ordered write pipeline with unrelated Tasks may lose required ordering.",
+    "behaviourToPreserve": ["Accepted writes finish in acceptance order; each caller receives its own result."],
+    "constraints": ["Illustrative reasoning only; actual callback and storage semantics are unknown."],
+    "outOfScope": ["UI redesign", "Changing the on-disk format"]
+  },
+  "decision": {
+    "summary": "Illustrate an explicitly ordered feature-owned command queue if the real baseline proves ordering is required.",
+    "rationale": "An actor isolates synchronous state access, but a suspended actor method does not guarantee an entire asynchronous transaction runs serially.",
+    "generalGuidance": "Examine the invariant across suspension points; actor isolation alone is not transaction ordering.",
+    "cfaGuidance": "In CFA the concrete Feature owns the command policy, while a lower-level dependency performs storage work.",
+    "alternatives": [{"approach": "Create an independent Task for every save.", "reason": "In this fictional contract, that does not itself guarantee acceptance-order completion."}],
+    "noAlternativesReason": null
+  },
+  "humanCorrections": {"items": [], "noneReason": "No real migration or human correction occurred; this is an authored synthetic exercise."},
+  "evidence": [{"id": "exercise-note", "kind": "manual", "phase": "during", "reference": "exercise-note.md", "summary": "Synthetic provenance and proposed verification only.", "outcome": "not-run", "command": null, "commit": null, "environment": "No app or runtime involved", "recordedAt": "2026-10-25"}],
+  "result": "not-started",
+  "limitations": ["No source, compiler, tests, simulator or device was inspected. This is not an approved migration precedent."],
+  "lesson": "First establish whether ordering is required, then test the invariant across suspension rather than assuming actor isolation is sufficient.",
+  "classification": "mixed",
+  "confidence": "unassessed",
+  "tags": ["ordering", "actor-isolation", "feature-ownership", "persistence"],
+  "caseStudy": "case-study.md",
+  "review": {"reviewer": null, "reviewedAt": null, "privacy": "unreviewed", "notes": null, "digest": null},
+  "supersededBy": null
+}

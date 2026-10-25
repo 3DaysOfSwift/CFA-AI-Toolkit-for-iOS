@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "new-scenario",
+  "migrationId": "new-migration",
+  "revision": 1,
+  "kind": "real",
+  "status": "draft",
+  "evaluationUse": "development",
+  "title": "New migration scenario",
+  "createdAt": "2000-01-01",
+  "author": null,
+  "toolkitVersion": null,
+  "repository": {
+    "url": null, "beforeCommit": null, "afterCommit": null,
+    "license": null, "allowedUse": "unreviewed", "licenseNotes": null
+  },
+  "toolchain": [],
+  "scope": {
+    "feature": null, "symbols": [], "mechanisms": [], "diagnosis": null,
+    "behaviourToPreserve": [], "constraints": [], "outOfScope": []
+  },
+  "decision": {
+    "summary": null, "rationale": null, "generalGuidance": null, "cfaGuidance": null,
+    "alternatives": [], "noAlternativesReason": null
+  },
+  "humanCorrections": {"items": [], "noneReason": null},
+  "evidence": [],
+  "result": "not-started",
+  "limitations": [],
+  "lesson": null,
+  "classification": null,
+  "confidence": "unassessed",
+  "tags": [],
+  "caseStudy": "case-study.md",
+  "review": {"reviewer": null, "reviewedAt": null, "privacy": "unreviewed", "notes": null, "digest": null},
+  "supersededBy": null
+}

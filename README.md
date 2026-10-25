@@ -443,6 +443,19 @@ These open-source iOS projects show CFA in use:
 See [Apps Made with CFA](docs/APPS-MADE-WITH-CFA.md) to learn what each project
 demonstrates.
 
+## Migration evidence (opt-in)
+
+The migration skill can now capture a case study when requested: the starting
+behaviour, decisions, alternatives, human corrections and actual verification.
+Working records stay outside the customer's app repository. The local template
+and validator distinguish drafts from reviewed cases, general Swift Concurrency
+guidance from CFA choices, and real work from synthetic examples.
+
+This is capture infrastructure, not a trained model or an approved-case retrieval
+service. No real migration cases are included yet. See the
+[capture and review workflow](architecture/migration-evidence.md) and the
+[local tooling guide](skills/swift-concurrency-migration/scripts/evidence/README.md).
+
 ## Build CFA AI Toolkit for iOS from source
 
 If you are contributing to the toolkit itself, run these commands from a source

@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CFA migration scenario record",
+  "description": "Version 1.0.0. Structural schema; the companion validator also checks review gates and local evidence references.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "migrationId", "revision", "kind", "status", "evaluationUse", "title", "createdAt", "author", "toolkitVersion", "repository", "toolchain", "scope", "decision", "humanCorrections", "evidence", "result", "limitations", "lesson", "classification", "confidence", "tags", "caseStudy", "review", "supersededBy"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "id": {"$ref": "#/$defs/identifier"},
+    "migrationId": {"$ref": "#/$defs/identifier"},
+    "revision": {"type": "integer", "minimum": 1},
+    "kind": {"enum": ["real", "synthetic"]},
+    "status": {"enum": ["draft", "reviewed", "approved", "superseded"]},
+    "evaluationUse": {"enum": ["development", "holdout"]},
+    "title": {"$ref": "#/$defs/text"},
+    "createdAt": {"type": "string", "format": "date"},
+    "author": {"$ref": "#/$defs/unknownText"},
+    "toolkitVersion": {"$ref": "#/$defs/unknownText"},
+    "repository": {
+      "type": "object", "additionalProperties": false,
+      "required": ["url", "beforeCommit", "afterCommit", "license", "allowedUse", "licenseNotes"],
+      "properties": {
+        "url": {"$ref": "#/$defs/unknownText"},
+        "beforeCommit": {"$ref": "#/$defs/commit"},
+        "afterCommit": {"$ref": "#/$defs/commit"},
+        "license": {"$ref": "#/$defs/unknownText"},
+        "allowedUse": {"enum": ["unreviewed", "internal-only", "redistributable", "prohibited"]},
+        "licenseNotes": {"$ref": "#/$defs/unknownText"}
+      }
+    },
+    "toolchain": {"$ref": "#/$defs/texts"},
+    "scope": {
+      "type": "object", "additionalProperties": false,
+      "required": ["feature", "symbols", "mechanisms", "diagnosis", "behaviourToPreserve", "constraints", "outOfScope"],
+      "properties": {
+        "feature": {"$ref": "#/$defs/unknownText"},
+        "symbols": {"$ref": "#/$defs/texts"},
+        "mechanisms": {"type": "array", "uniqueItems": true, "items": {"enum": ["gcd", "callbacks", "operation-queue", "delegates", "notifications", "locks", "timers", "other"]}},
+        "diagnosis": {"$ref": "#/$defs/unknownText"},
+        "behaviourToPreserve": {"$ref": "#/$defs/texts"},
+        "constraints": {"$ref": "#/$defs/texts"},
+        "outOfScope": {"$ref": "#/$defs/texts"}
+      }
+    },
+    "decision": {
+      "type": "object", "additionalProperties": false,
+      "required": ["summary", "rationale", "generalGuidance", "cfaGuidance", "alternatives", "noAlternativesReason"],
+      "properties": {
+        "summary": {"$ref": "#/$defs/unknownText"},
+        "rationale": {"$ref": "#/$defs/unknownText"},
+        "generalGuidance": {"$ref": "#/$defs/unknownText"},
+        "cfaGuidance": {"$ref": "#/$defs/unknownText"},
+        "alternatives": {"type": "array", "items": {
+          "type": "object", "additionalProperties": false, "required": ["approach", "reason"],
+          "properties": {"approach": {"$ref": "#/$defs/text"}, "reason": {"$ref": "#/$defs/text"}}
+        }},
+        "noAlternativesReason": {"$ref": "#/$defs/unknownText"}
+      }
+    },
+    "humanCorrections": {
+      "type": "object", "additionalProperties": false, "required": ["items", "noneReason"],
+      "properties": {
+        "items": {"type": "array", "items": {
+          "type": "object", "additionalProperties": false, "required": ["change", "reason", "evidenceIds"],
+          "properties": {
+            "change": {"$ref": "#/$defs/text"}, "reason": {"$ref": "#/$defs/text"},
+            "evidenceIds": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/identifier"}}
+          }
+        }},
+        "noneReason": {"$ref": "#/$defs/unknownText"}
+      }
+    },
+    "evidence": {"type": "array", "items": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "kind", "phase", "reference", "summary", "outcome", "command", "commit", "environment", "recordedAt"],
+      "properties": {
+        "id": {"$ref": "#/$defs/identifier"},
+        "kind": {"enum": ["source", "diff", "build", "test", "manual", "correction", "license"]},
+        "phase": {"enum": ["before", "after", "during"]},
+        "reference": {"$ref": "#/$defs/text"},
+        "summary": {"$ref": "#/$defs/text"},
+        "outcome": {"enum": ["passed", "failed", "not-run", "observed"]},
+        "command": {"$ref": "#/$defs/unknownText"},
+        "commit": {"$ref": "#/$defs/commit"},
+        "environment": {"$ref": "#/$defs/unknownText"},
+        "recordedAt": {"type": "string", "format": "date"}
+      }
+    }},
+    "result": {"enum": ["not-started", "partial", "completed", "blocked"]},
+    "limitations": {"$ref": "#/$defs/texts"},
+    "lesson": {"$ref": "#/$defs/unknownText"},
+    "classification": {"enum": [null, "general-swift-concurrency", "cfa-specific", "mixed"]},
+    "confidence": {"enum": ["unassessed", "limited", "moderate", "high"]},
+    "tags": {"type": "array", "uniqueItems": true, "items": {"enum": ["cancellation", "ordering", "actor-isolation", "sendable", "task-lifetime", "continuations", "persistence", "networking", "ui-behaviour", "feature-ownership", "appmodel", "testing", "performance", "error-delivery"]}},
+    "caseStudy": {"const": "case-study.md"},
+    "review": {
+      "type": "object", "additionalProperties": false,
+      "required": ["reviewer", "reviewedAt", "privacy", "notes", "digest"],
+      "properties": {
+        "reviewer": {"$ref": "#/$defs/unknownText"},
+        "reviewedAt": {"type": ["string", "null"], "format": "date"},
+        "privacy": {"enum": ["unreviewed", "cleared", "blocked"]},
+        "notes": {"$ref": "#/$defs/unknownText"},
+        "digest": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"}
+      }
+    },
+    "supersededBy": {"type": ["string", "null"], "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"}
+  },
+  "$defs": {
+    "identifier": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "maxLength": 100},
+    "text": {"type": "string", "minLength": 1, "pattern": "\\S"},
+    "unknownText": {"type": ["string", "null"], "minLength": 1, "pattern": "\\S"},
+    "texts": {"type": "array", "items": {"$ref": "#/$defs/text"}},
+    "commit": {"type": ["string", "null"], "pattern": "^[a-f0-9]{40}(?:[a-f0-9]{24})?$"}
+  }
+}
