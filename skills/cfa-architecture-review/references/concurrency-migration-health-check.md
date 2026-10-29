@@ -34,7 +34,7 @@ evidence remains unavailable, deliver an Inconclusive report identifying the gap
 Respect a user's pause or cancellation immediately.
 
 Before ending, check that the response contains the scoped Yes / No / Inconclusive
-verdict, operation map, findings (or an explicit statement that none were found),
+verdict, status rows, operation map, findings (or an explicit statement that none were found),
 evidence and coverage limits, and next actions. Provide the saved report's path.
 If these are missing and useful review work remains possible, continue the review
 instead of returning a launch or test-status message as the final answer.
@@ -56,6 +56,37 @@ isolated bug is not automatically an architectural diagnosis.
 
 ## Establish the scope and execution model
 
+### Use the bundled analysis tool
+
+Use the local dashboard tool by default when available and the project contains
+Swift Concurrency. From the skill directory, run
+`node scripts/dashboard/src/cli.mjs --help`, then generate a baseline with
+`node scripts/dashboard/src/cli.mjs <repository> --out <new-report-directory>`.
+Keep output outside application source. If Node.js or the tool is unavailable, or
+the project is legacy-only, record that limitation and continue manual review.
+Do not install dependencies or change the app merely to run the scanner.
+
+Read the bundled `scripts/dashboard/Documentation/OBSERVATIONS.md` and
+`scripts/dashboard/Documentation/REVIEWS.md` before authoring import files.
+Use the baseline's exact source fingerprint and site IDs. Trace source and live
+wiring to author task journeys, task-lifetime reviews and concurrency checks;
+the scanner does not discover complete execution paths automatically. Import
+these with `--observations` and `--review` into a new output directory. Re-scan and
+reconcile evidence if source changes; never bypass fingerprint validation.
+
+Maintain a coverage ledger linking scanned creation sites to reviewed journeys,
+findings or an explicit unresolved boundary. Supplement the scan with wrappers,
+callbacks and relevant paths that lexical matching missed. Documenting a site is
+not proof that every branch or runtime instance was reviewed. Preserve unknown
+dispatch and external framework boundaries rather than inventing complete paths.
+
+Deliver the status-row assessment alongside the source-linked dashboard and
+journeys. The assessment explains the design; the dashboard lets the reader
+inspect its evidence. Inspect the rendered output for readable rows and working
+source links. Do not substitute a bare scanner dashboard for a completed health
+check. This mode does not require numerical ratings; a separately requested full
+dashboard follows the full dashboard workflow and its coverage requirements.
+
 Identify the revision and local changes, production targets and extensions,
 relevant packages, supported OS versions, Swift language mode, default actor
 isolation and enabled concurrency features. Read effective build settings where
@@ -69,10 +100,10 @@ actors, async APIs, continuations, AsyncSequence consumers, queues and callback
 bridges. Read implementations and live dependency construction. The bundled
 scanner can locate candidates; its counts and warnings cannot decide the verdict.
 
-Describe the actual model in a compact table:
-
-| Operation and trigger | State owner | Task/lifetime owner | Isolation | Result and cancellation policy | Evidence |
-| --- | --- | --- | --- | --- | --- |
+Record an operation map with each trigger, state owner, task/lifetime owner,
+isolation, result/cancellation policy and source evidence. Keep this detailed map
+after the reader-facing status rows. Prefer short per-operation blocks over a
+wide table when the ownership paths need substantial explanation.
 
 Distinguish task creation from awaited calls in an existing task, source sites
 from runtime task counts, actor isolation from threads, and data-race protection
@@ -82,6 +113,27 @@ the project's toolchain and authoritative Swift documentation when semantics are
 uncertain; do not impose another compiler version's defaults.
 
 ## Trace behaviour before judging it
+
+First map the application's capabilities and their authoritative state owners,
+using actual responsibilities rather than folder names or a required Feature
+suffix. Identify View, screen coordination and model boundaries. For each important
+business rule, locate its implementation and explain whether it can operate
+without constructing UI. Check whether ViewModels arrange existing capabilities
+or implement business policies that deserve a model owner.
+
+Inspect SwiftUI View bodies, actions and initializers. Distinguish ordinary
+presentation logic and delegated button actions from embedded business rules,
+persistence and multi-step operation coordination. For CFA projects, check inline
+private ViewModel ownership and forbidden initializer injection; in other
+architectures, explain the actual lifetime or ownership consequence rather than
+marking injection as a concurrency defect by itself.
+
+For every reviewed journey, connect the trigger to calls, state commits and
+completion. Identify existing-task execution, new unstructured roots, structured
+children and actor transitions separately. Explain why the chosen lifetime and
+isolation fit the operation. Compare policies across capabilities: consistent
+ownership need not mean identical mechanisms everywhere. Flag incompatible
+assumptions with a concrete failure sequence, not merely a mixture of APIs.
 
 Follow representative operations from user or system trigger through business
 logic and services to the final state mutation. Include the important distinct
@@ -138,6 +190,42 @@ Include counterevidence where it narrows a finding. Separate correctness issues,
 maintenance concerns and optional CFA recommendations. Non-CFA projects need not
 adopt AppModel, feature naming, View construction rules or MainActor-owned Features
 to receive a No verdict.
+
+## Make the report useful at a glance
+
+Immediately after the overall verdict, show concise assessment rows with a leading
+status symbol and written label. The reader must be able to distinguish what works,
+what is wrong and what needs investigation without interpreting an ownership map.
+
+- **✅ Working well:** a traced mechanism supports the stated behaviour. Name the
+  protection and its practical benefit; absence of scanner warnings is insufficient.
+- **❌ Problem:** source evidence or an executed check demonstrates a defect or
+  conflicting design. State the consequence and severity. Label a structural
+  conflict **Architectural conflict** and explain which assumptions contradict each
+  other; label an isolated defect **Local defect** rather than calling it Frankenstein.
+- **⚠️ Needs investigation:** a suspicious pattern or maintenance concern needs
+  clarification. Explain what is strange and what evidence would resolve it.
+- **➖ Not assessed:** evidence or coverage is missing. Never turn an unreviewed
+  area into a green tick.
+
+Use three compact columns: **Assessment | What this means | Evidence**. Begin each
+assessment with its symbol, label and a short concrete conclusion. Keep the meaning
+to one or two sentences. Link concise filenames and line numbers to detailed
+evidence; do not put long filesystem paths or paragraphs in narrow columns. For
+HTML reports, use readable stacked rows on narrow screens and retain text labels
+so meaning does not depend on colour. Put demonstrated problems first, followed by
+concerns, strengths and coverage gaps. Do not manufacture problems for balance.
+
+Assess state ownership, task lifetime, overlapping results, actor reentrancy,
+cancellation/errors, legacy bridges and responsiveness where applicable. A single
+operation can have a green result-ordering check and a red lifetime check; avoid
+giving an entire feature a blanket tick that hides a specific defect. Distinguish
+source-supported strengths from runtime-tested behaviour.
+
+Below these rows, explain each red or amber finding with the relevant code excerpt,
+failure sequence and smallest useful correction. Explicitly answer whether it
+contributes to the overall Frankenstein verdict. Judge the code's conflicting
+assumptions and consequences, not the engineer's competence or intentions.
 
 Keep the report local and outside application source. Never publish source or
 migration evidence as part of a health check. Capture reusable case studies only
