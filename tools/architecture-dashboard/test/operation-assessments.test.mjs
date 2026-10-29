@@ -65,7 +65,8 @@ test('individual checks preserve verified strengths and separate CFA deviations'
   assert.match(html,/6 ✅ Pass/);
   const collapsedRow=html.slice(html.indexOf('<details class="review">'),html.indexOf('</summary>',html.indexOf('<details class="review">')));
   assert.match(collapsedRow,/Does the API observe cancellation\?/);
-  assert.doesNotMatch(collapsedRow,/Does not follow CFA naming/);
+  assert.match(collapsedRow,/CFA conformance: ❌ Fail/);
+  assert.match(html,/0 operations pass · 1 fail/);
   assert.match(html,/How to resolve/);
   assert.match(operationAssessments(imported).verdict,/Inconclusive/);
   const resolved=structuredClone(input);
@@ -96,3 +97,10 @@ test('individual checks preserve verified strengths and separate CFA deviations'
   const mixed=operationAssessments({operations:[{...op,clarity:'investigate',unknowns:['Where is the lifetime policy documented?']}]});
   assert.match(mixed.html,/Concurrency correctness: ✅ Stable · Architectural clarity: ⚠️ Needs investigation/);
  });
+
+test('unreviewed CFA conformance remains explicit despite stable concurrency',()=>{
+ const result=operationAssessments({operations:[op]});
+ assert.match(result.html,/Concurrency correctness: ✅ Stable/);
+ assert.match(result.html,/CFA conformance: ➖ Not assessed/);
+ assert.match(result.html,/0 operations pass · 0 fail · 0 need investigation · 1 not assessed/);
+});
