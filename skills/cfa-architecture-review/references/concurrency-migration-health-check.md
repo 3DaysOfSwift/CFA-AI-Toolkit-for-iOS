@@ -231,3 +231,20 @@ Keep the report local and outside application source. Never publish source or
 migration evidence as part of a health check. Capture reusable case studies only
 when separately authorized, using the toolkit's migration evidence workflow.
 This health check supplies review guidance, not an automatic semantic detector.
+
+### Opening operation assessment
+
+Populate the review input's `operationInventory` and `operations` using
+`scripts/dashboard/Documentation/REVIEWS.md`. This is the report's opening view.
+Enumerate meaningful UI actions and lifecycle/background entry points, including
+synchronous paths with no Task. Include unassessed rows rather than silently
+omitting discovered operations. State the discovery method and whether inventory
+coverage is partial or complete.
+
+Trace what the current code actually does: trigger, calls, authoritative state
+owner, task lifetime and actor boundaries. Link source evidence for each claimed
+boundary. Assess correctness and architectural clarity separately; classify a
+confirmed problem as a local defect or architectural conflict. Put proposed fixes
+only in recommendations. Do not substitute the intended CFA design for observed
+behavior. Record unresolved boundaries and avoid green verdicts until resolved.
+Reanalyse and refresh judgments when source changes; saved reports are snapshots.

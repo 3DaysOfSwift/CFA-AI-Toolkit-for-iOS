@@ -27,10 +27,10 @@ test('explicit isolation annotations are classified, not inferred',()=>{
   assert.equal(d.metrics.find(m=>m.id==='feature-main').value,1);
 });
 
-test('dashboard is first and rendered client JavaScript parses',()=>{
+test('operation assessment is first and rendered client JavaScript parses',()=>{
   const html=render({project:'Demo',generatedAt:'2026-09-13',revision:'abc',dirty:false,files:[],scope:{fileCount:0,skipped:[]},limitations:[]});
   assert.ok(html.indexOf('id="tab-dashboard"')<html.indexOf('id="tab-overview"'));
-  assert.match(html,/id="tab-dashboard"[^>]*aria-selected="true"/);
+  assert.match(html,/id="tab-operations"[^>]*aria-selected="true"/);
   new vm.Script(html.match(/<script>([\s\S]*)<\/script>/)[1]);
 });
 

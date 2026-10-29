@@ -18,6 +18,23 @@ export async function importReview(report,input,root) {
     }
   };
   list(review.findings??[],['title','status','description','check']);
+  if(review.operations) {
+    const inventory=review.operationInventory;
+    if(!inventory || !text(inventory.scope) || !text(inventory.method) || !['partial','complete'].includes(inventory.coverage)) fail('operation inventory scope, method and coverage required');
+    list(review.operations,['id','title','trigger','path','stateOwner','taskOwner','isolation','reason','verification']);
+    const seen=new Set();
+    for(const op of review.operations) {
+      if(seen.has(op.id)) fail('duplicate operation');
+      seen.add(op.id);
+      for(const field of ['correctness','clarity']) if(!['sound','problem','investigate','unassessed'].includes(op[field])) fail('invalid operation '+field);
+      if(!Array.isArray(op.unknowns) || op.unknowns.some(v=>!text(v))) fail('operation unknowns required');
+      if(op.unknowns.length && (op.correctness==='sound' || op.clarity==='sound')) fail('resolve unknowns before marking operation sound');
+      if((op.correctness==='problem'||op.clarity==='problem') && !['local-defect','architectural-conflict'].includes(op.problemKind)) fail('classify operation problem');
+      if(op.recommendation!==undefined && !text(op.recommendation)) fail('invalid recommendation');
+      const t=op.triggerSource;
+      if(!t || !Number.isInteger(t.line) || t.line<1 || !op.evidence.some(e=>e.file===t.file && e.line<=t.line && e.endLine>=t.line)) fail('operation evidence must include trigger');
+    }
+  }
   if(review.concurrencyChecks) {
     list(review.concurrencyChecks,['siteId','title','status','path','trigger','navigation','repetition','lifetime','effect','conclusion','verification']);
     const entries=new Map(report.files.flatMap(f=>f.sites).filter(s=>['task','detached','view-task','refresh'].includes(s.kind)).map(s=>[s.id,s]));

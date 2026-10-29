@@ -133,3 +133,54 @@ SwiftUI MVVM with features and a central composition root. Names and
 folder labels are not mandatory. The CLI rejects a scope with no Swift Concurrency
 syntax; the reviewer must still resolve target membership and custom-name false
 matches. It is a lexical scanner plus authored review, not a Swift compiler.
+
+## Operation assessments
+
+The report opens with operation assessments. These describe the current source,
+including synchronous button actions, app launch, navigation, notifications and
+subscriptions. They are reviewer judgments, validated against source hashes;
+keyword counts do not generate a passing assessment.
+
+Add `operationInventory` and `operations` to a review input:
+
+```json
+{
+  "operationInventory": {
+    "scope": "Settings screen",
+    "method": "Enumerated its button handlers and lifecycle callbacks",
+    "coverage": "partial"
+  },
+  "operations": [{
+    "id": "change-units",
+    "title": "Change display units",
+    "trigger": "Units picker changes",
+    "triggerSource": {"file": "SettingsView.swift", "line": 20},
+    "path": "Picker → SettingsViewModel.setUnits → SettingsFeature.setUnits",
+    "stateOwner": "SettingsFeature owns the selected units",
+    "taskOwner": "Synchronous action; no new Task",
+    "isolation": "MainActor throughout the observed path",
+    "correctness": "sound",
+    "clarity": "sound",
+    "reason": "One state owner applies the selection",
+    "verification": "Source inspection; runtime behavior not exercised",
+    "unknowns": [],
+    "evidence": [{"file": "SettingsView.swift", "line": 20, "endLine": 24}]
+  }]
+}
+```
+
+Include evidence for each claimed path boundary and owner, not just the trigger.
+Both judgment fields accept `sound`, `problem`, `investigate`, or `unassessed`.
+A problem requires `problemKind`: `local-defect` or `architectural-conflict`.
+Use `recommendation` only for proposed changes; never put an intended design in
+`path`, `stateOwner`, `taskOwner`, or `isolation`. Record unresolved dispatch,
+isolation and lifetime boundaries in `unknowns` and do not mark those operations
+sound. The importer reloads excerpts from the source; it does not verify the
+reviewer's reasoning or prove a complete call graph.
+
+Inventory coverage is `partial` or `complete`. A complete inventory requires
+an explicit discovery method and all identified entry points, including rows
+that remain unassessed. Missing or incomplete assessments produce an inconclusive
+overall result. A local defect alone does not establish an architectural conflict.
+Regenerate the analysis and review after source changes. An exported HTML file is
+a dated snapshot and does not monitor the project for changes.
