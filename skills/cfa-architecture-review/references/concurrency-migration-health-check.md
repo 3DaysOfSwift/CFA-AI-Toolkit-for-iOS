@@ -33,6 +33,11 @@ repeat state-changing operations merely to obtain a successful check. If essenti
 evidence remains unavailable, deliver an Inconclusive report identifying the gap.
 Respect a user's pause or cancellation immediately.
 
+When tests run, inspect the command exit status and the complete Xcode result
+bundle, including failures from earlier attempts. A final console suite may be
+only a retry subset. Do not report a clean run from that subset or erase a
+failure because a rerun passed. Explain the cause and preserve regression evidence.
+
 Before ending, check that the response contains the scoped Yes / No / Inconclusive
 verdict, status rows, operation map, findings (or an explicit statement that none were found),
 evidence and coverage limits, and next actions. Provide the saved report's path.
@@ -151,6 +156,11 @@ For each relevant operation, inspect:
   independent writers or conflicting cached state, not harmless value snapshots.
 - Suspension: what assumptions can change during await? Trace validation and
   commit, actor reentrancy, stale results and cleanup of replaced task handles.
+- Derived results: include charts, streaks and other calculated snapshots. A single
+  MainActor owner can still publish an obsolete calculation after an await. Check
+  the empty-input fast path too: a newer empty result may finish before an older
+  nonempty calculation. Require an ordering policy at publication, not merely
+  actor isolation or immutable inputs.
 - Failure and cancellation: errors reaching the caller, cleanup, cancellation
   propagation through bridges and continuation completion on all relevant paths.
   Cancellation is cooperative; cancelling a request alone does not prove a stale
@@ -248,3 +258,12 @@ confirmed problem as a local defect or architectural conflict. Put proposed fixe
 only in recommendations. Do not substitute the intended CFA design for observed
 behavior. Record unresolved boundaries and avoid green verdicts until resolved.
 Reanalyse and refresh judgments when source changes; saved reports are snapshots.
+
+Use individual `checks` for every newly assessed operation (see REVIEWS.md).
+Do not use a generic unresolved verdict merely because runtime tests were not
+run. A source-established ownership property may pass while cancellation remains
+unresolved. Every unresolved check must name its specific question and how to
+resolve it. Every failure must describe the triggering condition and consequence.
+Preserve verified passes beside failures or unknowns. Keep CFA deviations in the
+separate CFA dimension; they do not establish concurrency defects. Reinspect old
+coarse reviews before translating them into individual check verdicts.

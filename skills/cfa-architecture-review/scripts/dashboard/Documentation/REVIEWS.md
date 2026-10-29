@@ -174,8 +174,8 @@ Both judgment fields accept `sound`, `problem`, `investigate`, or `unassessed`.
 A problem requires `problemKind`: `local-defect` or `architectural-conflict`.
 Use `recommendation` only for proposed changes; never put an intended design in
 `path`, `stateOwner`, `taskOwner`, or `isolation`. Record unresolved dispatch,
-isolation and lifetime boundaries in `unknowns` and do not mark those operations
-sound. The importer reloads excerpts from the source; it does not verify the
+isolation and lifetime boundaries in `unknowns`. For individual checks, mark the
+affected property unresolved while retaining independently verified passes. The importer reloads excerpts from the source; it does not verify the
 reviewer's reasoning or prove a complete call graph.
 
 Inventory coverage is `partial` or `complete`. A complete inventory requires
@@ -184,3 +184,29 @@ that remain unassessed. Missing or incomplete assessments produce an inconclusiv
 overall result. A local defect alone does not establish an architectural conflict.
 Regenerate the analysis and review after source changes. An exported HTML file is
 a dated snapshot and does not monitor the project for changes.
+
+### Individual checks
+
+New health checks supply an operation's `checks` array. Each check has `id`,
+`title`, `dimension` (`correctness`, `clarity`, or `cfa`), `status`, `reason`,
+`verification`, and its own source `evidence`. Status is `pass`, `fail`,
+`unresolved`, `not-checked`, or `not-applicable`. A source-inspection pass applies
+to the property inspected; it does not claim runtime testing.
+
+Include these correctness check IDs: `state-ownership`, `actor-isolation`,
+`task-lifetime`, `repeated-requests`, `cancellation`, and `errors`. Include
+`architectural-clarity` in the clarity dimension. For an irrelevant check,
+use `not-applicable` and explain why, rather than omitting it or awarding a pass.
+
+Unresolved checks require `question` and `resolveBy`: the specific unanswered
+question and the evidence or test needed. Failed checks require `consequence`
+and `problemKind` (`local-defect` or `architectural-conflict`). CFA failures use
+`cfa-deviation` and stay in the `cfa` dimension. They do not affect concurrency
+or architectural-clarity verdicts. Describe actual failure scenarios in reasons,
+not merely the category of finding.
+
+The importer derives operation correctness and clarity from these checks. An
+unresolved check preserves all other verified passes; row summaries show their
+counts. Legacy reviews without checks retain their original coarse assessments.
+Do not automatically convert their general positive descriptions into passes:
+reinspect the source and attach evidence for each property.

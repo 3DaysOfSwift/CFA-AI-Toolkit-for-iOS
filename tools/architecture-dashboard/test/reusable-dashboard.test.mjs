@@ -38,6 +38,14 @@ test('test summary rejects inconsistent counts and keeps zero total distinct',()
  assert.equal(importTestResults({passedTests:0,failedTests:0,skippedTests:0,totalTestCount:0,startTime:1}).totalTestCount,0);
 });
 
+test('overall failure is retained even when every reported test passed',()=>{
+ const run={passedTests:4,failedTests:0,skippedTests:0,totalTestCount:4,startTime:1};
+ assert.equal(importTestResults({...run,result:'Failed'}).outcome,'failed');
+ assert.equal(importTestResults({...run,result:'Passed'}).outcome,'passed');
+ assert.equal(importTestResults(run).outcome,'unknown');
+ assert.equal(importTestResults({...run,passedTests:3,failedTests:1,result:'Passed'}).outcome,'failed');
+});
+
 test('generic CLI imports reviewed ratings and test results without an example generator',async()=>{
  const root=await fs.mkdtemp(path.join(os.tmpdir(),'dashboard-fixture-'));
  try {

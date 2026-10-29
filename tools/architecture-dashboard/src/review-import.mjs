@@ -1,3 +1,4 @@
+import {checkOutcome} from './operation-assessments.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
@@ -26,9 +27,28 @@ export async function importReview(report,input,root) {
     for(const op of review.operations) {
       if(seen.has(op.id)) fail('duplicate operation');
       seen.add(op.id);
+      if(op.checks!==undefined) {
+        list(op.checks,['id','title','dimension','status','reason','verification']);
+        const ids=new Set();
+        for(const check of op.checks) {
+          if(ids.has(check.id)) fail('duplicate operation check');
+          ids.add(check.id);
+          if(!['correctness','clarity','cfa'].includes(check.dimension)) fail('invalid check dimension');
+          if(!['pass','fail','unresolved','not-checked','not-applicable'].includes(check.status)) fail('invalid check status');
+          if(check.status==='unresolved' && (!text(check.question)||!text(check.resolveBy))) fail('unresolved check requires question and resolution');
+          if(check.status==='fail' && (!text(check.consequence)||!['local-defect','architectural-conflict','cfa-deviation'].includes(check.problemKind))) fail('failed check requires consequence and classification');
+          if(check.status==='fail' && ((check.dimension==='cfa')!==(check.problemKind==='cfa-deviation'))) fail('keep CFA deviations separate from concurrency defects');
+        }
+        for(const id of ['state-ownership','actor-isolation','task-lifetime','repeated-requests','cancellation','errors','architectural-clarity']) if(!ids.has(id)) fail('missing operation check: '+id);
+        if(op.checks.find(c=>c.id==='architectural-clarity').dimension!=='clarity' || op.checks.filter(c=>c.id!=='architectural-clarity' && ['state-ownership','actor-isolation','task-lifetime','repeated-requests','cancellation','errors'].includes(c.id)).some(c=>c.dimension!=='correctness')) fail('invalid core check dimension');
+        op.correctness=checkOutcome(op.checks,'correctness');
+        op.clarity=checkOutcome(op.checks,'clarity');
+        const conflicts=op.checks.filter(c=>c.dimension!=='cfa'&&c.status==='fail');
+        if(conflicts.length) op.problemKind=conflicts.some(c=>c.problemKind==='architectural-conflict')?'architectural-conflict':'local-defect';
+      }
       for(const field of ['correctness','clarity']) if(!['sound','problem','investigate','unassessed'].includes(op[field])) fail('invalid operation '+field);
       if(!Array.isArray(op.unknowns) || op.unknowns.some(v=>!text(v))) fail('operation unknowns required');
-      if(op.unknowns.length && (op.correctness==='sound' || op.clarity==='sound')) fail('resolve unknowns before marking operation sound');
+      if(!op.checks && op.unknowns.length && (op.correctness==='sound' && op.clarity==='sound')) fail('resolve unknowns before marking operation sound');
       if((op.correctness==='problem'||op.clarity==='problem') && !['local-defect','architectural-conflict'].includes(op.problemKind)) fail('classify operation problem');
       if(op.recommendation!==undefined && !text(op.recommendation)) fail('invalid recommendation');
       const t=op.triggerSource;
