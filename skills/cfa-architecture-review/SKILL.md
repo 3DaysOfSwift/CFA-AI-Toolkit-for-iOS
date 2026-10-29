@@ -1,6 +1,6 @@
 ---
 name: cfa-architecture-review
-description: Review iOS feature ownership and CFA conformance without changing app code; also produce evidence-grounded Xcode architecture and concurrency dashboards when requested. Works with legacy apps through manual source review.
+description: Review iOS feature ownership and CFA conformance without changing app code; also produce evidence-grounded Xcode architecture and concurrency dashboards when requested. Includes a Concurrency Migration Health Check for conflicting ownership and coordination after migration; works with legacy and non-CFA apps.
 ---
 
 # CFA Architecture Review
@@ -14,7 +14,15 @@ When explaining a substantive finding or answering why a rule exists, use
 Read only the relevant topic note. Explain the consequence in the user's context;
 do not impose CFA on another architecture or link to an unpublished article.
 
-Apply the specification's screen-construction invariant within the requested
+For a **Concurrency Migration Health Check**, a **Frankenstein architecture** check,
+or a request to assess how an Xcode project actually uses Swift Concurrency, read
+[Concurrency Migration Health Check](references/concurrency-migration-health-check.md).
+This mode reviews the project's actual architecture, without requiring CFA or a
+dashboard. Keep its correctness verdict separate from CFA conformance.
+Use that workflow's checkpoint and completion check: builds, tests and simulator
+launches do not complete the assessment; finish with its scoped verdict and report.
+
+Apply the specification's screen-construction invariant within a CFA conformance review's requested
 scope: private inline `@State` ViewModel creation, zero screen initializer inputs,
 and no defaulted ViewModel injection or custom State initialization. Distinguish
 stateless snapshot components from feature-connected screens. Review-only work
