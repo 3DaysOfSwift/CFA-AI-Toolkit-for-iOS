@@ -1,0 +1,798 @@
+{
+  "schemaVersion": 1,
+  "provenance": {
+    "basis": "Existing canonical documents; not reconstructed founder history",
+    "editorialPermission": "Matthew Thomas approved documented rationale with explicitly labelled editorial trade-offs on 2026-10-27.",
+    "preparedOn": "2026-10-27"
+  },
+  "auditSources": [
+    "cfa-specification.md",
+    "swift-coding-guide.md"
+  ],
+  "exclusions": [
+    {
+      "file": "cfa-specification.md",
+      "heading": "Purpose of this Document",
+      "reason": "Context, identity or reference entry point; not a separate architecture decision."
+    },
+    {
+      "file": "cfa-specification.md",
+      "heading": "17 Years Experience in iOS",
+      "reason": "Context, identity or reference entry point; not a separate architecture decision."
+    },
+    {
+      "file": "cfa-specification.md",
+      "heading": "A Template for Developers and AI",
+      "reason": "Context, identity or reference entry point; not a separate architecture decision."
+    },
+    {
+      "file": "cfa-specification.md",
+      "heading": "Swift coding standards",
+      "reason": "Context, identity or reference entry point; not a separate architecture decision."
+    },
+    {
+      "file": "cfa-specification.md",
+      "heading": "Name and Scope",
+      "reason": "Context, identity or reference entry point; not a separate architecture decision."
+    },
+    {
+      "file": "cfa-specification.md",
+      "heading": "Prohibited Patterns",
+      "reason": "Summary of multiple rules; section association is not item-by-item checklist coverage."
+    },
+    {
+      "file": "cfa-specification.md",
+      "heading": "Review Checklist",
+      "reason": "Summary of multiple rules; section association is not item-by-item checklist coverage."
+    },
+    {
+      "file": "swift-coding-guide.md",
+      "heading": "Evolving this guide",
+      "reason": "Maintainer process; not a public teaching topic."
+    }
+  ],
+  "topics": [
+    {
+      "id": "readability",
+      "title": "Names explain the work",
+      "classification": "cfa-choice",
+      "ruleIds": [
+        "CFA-READ-01",
+        "CFA-READ-02"
+      ],
+      "note": "decisions/readability.md",
+      "rationaleStatus": "documented-basis-editorial-analysis",
+      "sources": [
+        {
+          "file": "cfa-specification.md",
+          "heading": "Governing Principles"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "Maintenance over Complexity"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "Prefer Readable Domain Language over Architectural Ceremony"
+        },
+        {
+          "file": "swift-coding-guide.md",
+          "heading": "4. Prefer a straightforward solution"
+        },
+        {
+          "file": "swift-coding-guide.md",
+          "heading": "Names describe information, not only mechanics"
+        },
+        {
+          "file": "swift-coding-guide.md",
+          "heading": "Variable-name scan during every tidy-up"
+        },
+        {
+          "file": "swift-coding-guide.md",
+          "heading": "Every Swift file declares the imports it needs"
+        },
+        {
+          "file": "swift-coding-guide.md",
+          "heading": "Check for duplicate types"
+        }
+      ],
+      "priority": {
+        "impact": 2,
+        "confusion": 2,
+        "reach": 3,
+        "basis": "Editorial assessment, not observed frequency",
+        "observedOccurrences": null
+      },
+      "publication": {
+        "status": "planned",
+        "proposedPath": "/cfa/explanations/readability",
+        "url": null,
+        "verifiedOn": null,
+        "verificationEvidence": null
+      },
+      "relatedLessons": []
+    },
+    {
+      "id": "presentation-boundaries",
+      "title": "Business meaning belongs below the screen",
+      "classification": "cfa-choice",
+      "ruleIds": [
+        "CFA-UI-01",
+        "CFA-STATE-01"
+      ],
+      "note": "decisions/presentation-boundaries.md",
+      "rationaleStatus": "documented-basis-editorial-analysis",
+      "sources": [
+        {
+          "file": "cfa-specification.md",
+          "heading": "Coordinated Application Flow"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "Layered Architecture"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "Maintain an Absolute UI and Model Boundary"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "Preserve One Authoritative Owner for Shared State"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "Separate Domain Decisions from Display Decisions"
+        },
+        {
+          "file": "swift-coding-guide.md",
+          "heading": "2. Shared decisions belong in the model"
+        },
+        {
+          "file": "swift-coding-guide.md",
+          "heading": "Keep operation state separate from domain data"
+        }
+      ],
+      "priority": {
+        "impact": 3,
+        "confusion": 3,
+        "reach": 3,
+        "basis": "Editorial assessment, not observed frequency",
+        "observedOccurrences": null
+      },
+      "publication": {
+        "status": "planned",
+        "proposedPath": "/cfa/explanations/presentation-boundaries",
+        "url": null,
+        "verifiedOn": null,
+        "verificationEvidence": null
+      },
+      "relatedLessons": []
+    },
+    {
+      "id": "view-model-ownership",
+      "title": "Why CFA screens own their ViewModels",
+      "classification": "cfa-choice",
+      "ruleIds": [
+        "CFA-SCREEN-01",
+        "CFA-SCREEN-02"
+      ],
+      "note": "decisions/view-model-ownership.md",
+      "rationaleStatus": "documented-basis-editorial-analysis",
+      "sources": [
+        {
+          "file": "cfa-specification.md",
+          "heading": "Give Every Unique Screen Its Own ViewModel"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "Keep SwiftUI View Construction Fast"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "CFA screen structure invariant"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "Keep Screen Initializers Clean"
+        },
+        {
+          "file": "swift-coding-guide.md",
+          "heading": "3. SwiftUI Views describe the interface"
+        }
+      ],
+      "priority": {
+        "impact": 2,
+        "confusion": 3,
+        "reach": 3,
+        "basis": "Editorial assessment, not observed frequency",
+        "observedOccurrences": null
+      },
+      "publication": {
+        "status": "planned",
+        "proposedPath": "/cfa/explanations/view-model-ownership",
+        "url": null,
+        "verifiedOn": null,
+        "verificationEvidence": null
+      },
+      "relatedLessons": []
+    },
+    {
+      "id": "appmodel-composition",
+      "title": "One production graph, isolated test graphs",
+      "classification": "cfa-choice",
+      "ruleIds": [
+        "CFA-GRAPH-01",
+        "CFA-GRAPH-02"
+      ],
+      "note": "decisions/appmodel-composition.md",
+      "rationaleStatus": "documented-basis-editorial-analysis",
+      "sources": [
+        {
+          "file": "cfa-specification.md",
+          "heading": "Use AppModel as the Composition Root and Feature Facade"
+        }
+      ],
+      "priority": {
+        "impact": 3,
+        "confusion": 3,
+        "reach": 3,
+        "basis": "Editorial assessment, not observed frequency",
+        "observedOccurrences": null
+      },
+      "publication": {
+        "status": "planned",
+        "proposedPath": "/cfa/explanations/appmodel-composition",
+        "url": null,
+        "verifiedOn": null,
+        "verificationEvidence": null
+      },
+      "relatedLessons": []
+    },
+    {
+      "id": "feature-ownership",
+      "title": "Features follow responsibilities, not just tabs",
+      "classification": "cfa-choice",
+      "ruleIds": [
+        "CFA-FEATURE-01",
+        "CFA-FEATURE-02"
+      ],
+      "note": "decisions/feature-ownership.md",
+      "rationaleStatus": "documented-basis-editorial-analysis",
+      "sources": [
+        {
+          "file": "cfa-specification.md",
+          "heading": "Define Features by Business Capability, Not by Screen or Tab"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "Domain Type Ownership"
+        }
+      ],
+      "priority": {
+        "impact": 2,
+        "confusion": 3,
+        "reach": 3,
+        "basis": "Editorial assessment, not observed frequency",
+        "observedOccurrences": null
+      },
+      "publication": {
+        "status": "planned",
+        "proposedPath": "/cfa/explanations/feature-ownership",
+        "url": null,
+        "verifiedOn": null,
+        "verificationEvidence": null
+      },
+      "relatedLessons": []
+    },
+    {
+      "id": "concrete-features",
+      "title": "Why CFA does not mirror every Feature with a protocol",
+      "classification": "cfa-choice",
+      "ruleIds": [
+        "CFA-API-01"
+      ],
+      "note": "decisions/concrete-features.md",
+      "rationaleStatus": "documented-basis-editorial-analysis",
+      "sources": [
+        {
+          "file": "cfa-specification.md",
+          "heading": "Organize Behaviour into Cohesive Features"
+        },
+        {
+          "file": "swift-coding-guide.md",
+          "heading": "Name shared feature capabilities as features"
+        },
+        {
+          "file": "swift-coding-guide.md",
+          "heading": "Every type must earn its existence"
+        }
+      ],
+      "priority": {
+        "impact": 2,
+        "confusion": 3,
+        "reach": 3,
+        "basis": "Editorial assessment, not observed frequency",
+        "observedOccurrences": null
+      },
+      "publication": {
+        "status": "planned",
+        "proposedPath": "/cfa/explanations/concrete-features",
+        "url": null,
+        "verifiedOn": null,
+        "verificationEvidence": null
+      },
+      "relatedLessons": []
+    },
+    {
+      "id": "persistence-boundaries",
+      "title": "One storage owner and honest writes",
+      "classification": "mixed",
+      "ruleIds": [
+        "CFA-STORE-01",
+        "CFA-STORE-02",
+        "CFA-STORE-03"
+      ],
+      "note": "decisions/persistence-boundaries.md",
+      "rationaleStatus": "documented-basis-editorial-analysis",
+      "sources": [
+        {
+          "file": "cfa-specification.md",
+          "heading": "Keep Persistence Behind Repository Contracts"
+        },
+        {
+          "file": "swift-coding-guide.md",
+          "heading": "9. SwiftData: one app-owned persistent store"
+        },
+        {
+          "file": "swift-coding-guide.md",
+          "heading": "Choose the simplest storage route that fits the data"
+        },
+        {
+          "file": "swift-coding-guide.md",
+          "heading": "Crash warning: overlapping container initialization"
+        },
+        {
+          "file": "swift-coding-guide.md",
+          "heading": "Persist individual changes without replacing unrelated records"
+        }
+      ],
+      "priority": {
+        "impact": 3,
+        "confusion": 3,
+        "reach": 3,
+        "basis": "Editorial assessment, not observed frequency",
+        "observedOccurrences": null
+      },
+      "publication": {
+        "status": "planned",
+        "proposedPath": "/cfa/explanations/persistence-boundaries",
+        "url": null,
+        "verifiedOn": null,
+        "verificationEvidence": null
+      },
+      "relatedLessons": []
+    },
+    {
+      "id": "storage-failures",
+      "title": "A database failure must not replace the application",
+      "classification": "cfa-choice",
+      "ruleIds": [
+        "CFA-LAUNCH-01",
+        "CFA-ERROR-01"
+      ],
+      "note": "decisions/storage-failures.md",
+      "rationaleStatus": "documented-basis-editorial-analysis",
+      "sources": [
+        {
+          "file": "cfa-specification.md",
+          "heading": "Use Application Launch as an Opportunity to Refresh Features"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "Mandatory: database availability must never gate the interface"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "Keep the SwiftUI App entry point structural"
+        },
+        {
+          "file": "swift-coding-guide.md",
+          "heading": "5. Fail honestly and preserve saved data"
+        },
+        {
+          "file": "swift-coding-guide.md",
+          "heading": "7. Keep launch and interactions responsive"
+        }
+      ],
+      "priority": {
+        "impact": 3,
+        "confusion": 3,
+        "reach": 3,
+        "basis": "Editorial assessment, not observed frequency",
+        "observedOccurrences": null
+      },
+      "publication": {
+        "status": "planned",
+        "proposedPath": "/cfa/explanations/storage-failures",
+        "url": null,
+        "verifiedOn": null,
+        "verificationEvidence": null
+      },
+      "relatedLessons": []
+    },
+    {
+      "id": "unstructured-tasks",
+      "title": "Unstructured tasks need a deliberate owner",
+      "classification": "mixed",
+      "ruleIds": [
+        "CFA-TASK-01",
+        "CFA-TASK-02"
+      ],
+      "note": "decisions/unstructured-tasks.md",
+      "rationaleStatus": "documented-basis-editorial-analysis",
+      "sources": [
+        {
+          "file": "cfa-specification.md",
+          "heading": "Make Concurrency Behaviour Honest and Visible"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "Default: retained ViewModel tasks and shared completion"
+        },
+        {
+          "file": "swift-coding-guide.md",
+          "heading": "6. Make concurrency ownership explicit"
+        }
+      ],
+      "priority": {
+        "impact": 3,
+        "confusion": 3,
+        "reach": 3,
+        "basis": "Editorial assessment, not observed frequency",
+        "observedOccurrences": null
+      },
+      "publication": {
+        "status": "planned",
+        "proposedPath": "/cfa/explanations/unstructured-tasks",
+        "url": null,
+        "verifiedOn": null,
+        "verificationEvidence": null
+      },
+      "relatedLessons": []
+    },
+    {
+      "id": "task-cancellation",
+      "title": "Cancellation is a policy, not a button",
+      "classification": "mixed",
+      "ruleIds": [
+        "CFA-CANCEL-01"
+      ],
+      "note": "decisions/task-cancellation.md",
+      "rationaleStatus": "documented-basis-editorial-analysis",
+      "sources": [
+        {
+          "file": "cfa-specification.md",
+          "heading": "Each Feature owns its overlapping-call policy"
+        }
+      ],
+      "priority": {
+        "impact": 3,
+        "confusion": 3,
+        "reach": 3,
+        "basis": "Editorial assessment, not observed frequency",
+        "observedOccurrences": null
+      },
+      "publication": {
+        "status": "planned",
+        "proposedPath": "/cfa/explanations/task-cancellation",
+        "url": null,
+        "verifiedOn": null,
+        "verificationEvidence": null
+      },
+      "relatedLessons": []
+    },
+    {
+      "id": "overlapping-requests",
+      "title": "Sharing requests and queueing commands",
+      "classification": "mixed",
+      "ruleIds": [
+        "CFA-OVERLAP-01",
+        "CFA-OVERLAP-02"
+      ],
+      "note": "decisions/overlapping-requests.md",
+      "rationaleStatus": "documented-basis-editorial-analysis",
+      "sources": [
+        {
+          "file": "cfa-specification.md",
+          "heading": "Each Feature owns its overlapping-call policy"
+        }
+      ],
+      "priority": {
+        "impact": 3,
+        "confusion": 3,
+        "reach": 3,
+        "basis": "Editorial assessment, not observed frequency",
+        "observedOccurrences": null
+      },
+      "publication": {
+        "status": "planned",
+        "proposedPath": "/cfa/explanations/overlapping-requests",
+        "url": null,
+        "verifiedOn": null,
+        "verificationEvidence": null
+      },
+      "relatedLessons": []
+    },
+    {
+      "id": "isolation-and-sendable",
+      "title": "Isolation does not replace an operation policy",
+      "classification": "mixed",
+      "ruleIds": [
+        "CFA-ISOLATION-01",
+        "CFA-SENDABLE-01"
+      ],
+      "note": "decisions/isolation-and-sendable.md",
+      "rationaleStatus": "documented-basis-editorial-analysis",
+      "sources": [
+        {
+          "file": "cfa-specification.md",
+          "heading": "Make Concurrency Behaviour Honest and Visible"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "Use Observation Deliberately"
+        }
+      ],
+      "priority": {
+        "impact": 3,
+        "confusion": 3,
+        "reach": 3,
+        "basis": "Editorial assessment, not observed frequency",
+        "observedOccurrences": null
+      },
+      "publication": {
+        "status": "planned",
+        "proposedPath": "/cfa/explanations/isolation-and-sendable",
+        "url": null,
+        "verifiedOn": null,
+        "verificationEvidence": null
+      },
+      "relatedLessons": []
+    },
+    {
+      "id": "behavioural-testing",
+      "title": "Test the promises, not the folder names",
+      "classification": "mixed",
+      "ruleIds": [
+        "CFA-TEST-01",
+        "CFA-TIME-01"
+      ],
+      "note": "decisions/behavioural-testing.md",
+      "rationaleStatus": "documented-basis-editorial-analysis",
+      "sources": [
+        {
+          "file": "cfa-specification.md",
+          "heading": "Keep Time and Other Volatile Dependencies Injectable"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "Test the Same Boundaries the Architecture Advertises"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "Test Target Defaults"
+        },
+        {
+          "file": "swift-coding-guide.md",
+          "heading": "8. Test behaviour and state the limits"
+        }
+      ],
+      "priority": {
+        "impact": 3,
+        "confusion": 2,
+        "reach": 3,
+        "basis": "Editorial assessment, not observed frequency",
+        "observedOccurrences": null
+      },
+      "publication": {
+        "status": "planned",
+        "proposedPath": "/cfa/explanations/behavioural-testing",
+        "url": null,
+        "verifiedOn": null,
+        "verificationEvidence": null
+      },
+      "relatedLessons": []
+    },
+    {
+      "id": "preserve-product-behaviour",
+      "title": "Modernising implementation is not redesign permission",
+      "classification": "cfa-choice",
+      "ruleIds": [
+        "CFA-SCOPE-01",
+        "CFA-SCOPE-02"
+      ],
+      "note": "decisions/preserve-product-behaviour.md",
+      "rationaleStatus": "documented-basis-editorial-analysis",
+      "sources": [
+        {
+          "file": "cfa-specification.md",
+          "heading": "Architecture versus product design"
+        },
+        {
+          "file": "project-workflow.md",
+          "heading": "Established-product maintenance"
+        },
+        {
+          "file": "project-workflow.md",
+          "heading": "Checks and conflicting instructions"
+        }
+      ],
+      "priority": {
+        "impact": 3,
+        "confusion": 2,
+        "reach": 3,
+        "basis": "Editorial assessment, not observed frequency",
+        "observedOccurrences": null
+      },
+      "publication": {
+        "status": "planned",
+        "proposedPath": "/cfa/explanations/preserve-product-behaviour",
+        "url": null,
+        "verifiedOn": null,
+        "verificationEvidence": null
+      },
+      "relatedLessons": []
+    },
+    {
+      "id": "project-structure",
+      "title": "Make ownership visible in the project",
+      "classification": "cfa-choice",
+      "ruleIds": [
+        "CFA-PROJECT-01",
+        "CFA-PROJECT-02"
+      ],
+      "note": "decisions/project-structure.md",
+      "rationaleStatus": "documented-basis-editorial-analysis",
+      "sources": [
+        {
+          "file": "cfa-specification.md",
+          "heading": "Project Identity"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "Make the Architecture Visible in the Folder Structure"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "Xcode Template Layout Is a Contract"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "Strict No File Dumping Policy"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "Swift Extensions"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "Supported Orientations and Archive Validation"
+        }
+      ],
+      "priority": {
+        "impact": 2,
+        "confusion": 2,
+        "reach": 2,
+        "basis": "Editorial assessment, not observed frequency",
+        "observedOccurrences": null
+      },
+      "publication": {
+        "status": "planned",
+        "proposedPath": "/cfa/explanations/project-structure",
+        "url": null,
+        "verifiedOn": null,
+        "verificationEvidence": null
+      },
+      "relatedLessons": []
+    },
+    {
+      "id": "new-app-design",
+      "title": "Defaults help a new app; they do not own its design",
+      "classification": "new-app-default",
+      "ruleIds": [
+        "CFA-DESIGN-01"
+      ],
+      "note": "decisions/new-app-design.md",
+      "rationaleStatus": "documented-basis-editorial-analysis",
+      "sources": [
+        {
+          "file": "cfa-specification.md",
+          "heading": "Settings About Section and CFA Footer"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "Mandatory Initial App Icon"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "Colour Theme"
+        },
+        {
+          "file": "cfa-specification.md",
+          "heading": "System Launch Appearance"
+        },
+        {
+          "file": "new-app-design-defaults.md",
+          "heading": "Settings About Section and CFA Footer"
+        },
+        {
+          "file": "new-app-design-defaults.md",
+          "heading": "Mandatory Initial App Icon"
+        },
+        {
+          "file": "new-app-design-defaults.md",
+          "heading": "Colour Theme"
+        },
+        {
+          "file": "new-app-design-defaults.md",
+          "heading": "System Launch Appearance"
+        }
+      ],
+      "priority": {
+        "impact": 1,
+        "confusion": 2,
+        "reach": 2,
+        "basis": "Editorial assessment, not observed frequency",
+        "observedOccurrences": null
+      },
+      "publication": {
+        "status": "planned",
+        "proposedPath": "/cfa/explanations/new-app-design",
+        "url": null,
+        "verifiedOn": null,
+        "verificationEvidence": null
+      },
+      "relatedLessons": []
+    },
+    {
+      "id": "honest-errors-and-editing",
+      "title": "Keep edits visible and failures honest",
+      "classification": "cfa-choice",
+      "ruleIds": [
+        "CFA-EDIT-01",
+        "CFA-ERROR-02"
+      ],
+      "note": "decisions/honest-errors-and-editing.md",
+      "rationaleStatus": "documented-basis-editorial-analysis",
+      "sources": [
+        {
+          "file": "swift-coding-guide.md",
+          "heading": "1. Force unwrapping means choosing a crash"
+        },
+        {
+          "file": "swift-coding-guide.md",
+          "heading": "Inline editing saves directly; dedicated editors may have Save and Cancel"
+        },
+        {
+          "file": "swift-coding-guide.md",
+          "heading": "5. Fail honestly and preserve saved data"
+        }
+      ],
+      "priority": {
+        "impact": 3,
+        "confusion": 2,
+        "reach": 2,
+        "basis": "Editorial assessment, not observed frequency",
+        "observedOccurrences": null
+      },
+      "publication": {
+        "status": "planned",
+        "proposedPath": "/cfa/explanations/honest-errors-and-editing",
+        "url": null,
+        "verifiedOn": null,
+        "verificationEvidence": null
+      },
+      "relatedLessons": []
+    }
+  ]
+}

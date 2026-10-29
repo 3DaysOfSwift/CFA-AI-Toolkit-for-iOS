@@ -25,6 +25,7 @@
   },
   "humanCorrections": {"items": [], "noneReason": null},
   "evidence": [],
+  "completionGate": null,
   "result": "not-started",
   "limitations": [],
   "lesson": null,

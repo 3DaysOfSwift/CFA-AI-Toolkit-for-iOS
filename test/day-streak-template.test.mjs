@@ -6,7 +6,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const project = path.join(root, 'templates/Xcode/Day Streak iOS');
+const project = path.join(root, 'starter-apps/Todays Twenty');
 const native = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/Day Streak.xctemplate');
 
 test('Day Streak native template matches the editable project', () => {

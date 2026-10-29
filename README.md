@@ -88,7 +88,14 @@ iOS app, it can read the CFA architecture instructions and use CFA.
 The installation does not change Xcode or your existing apps. It only makes the
 CFA AI Toolkit for iOS instructions available to your AI coding tool.
 
-## Install the Xcode project templates
+## Xcode Templates and Starter Apps
+
+Choose your starting point:
+
+- **[Xcode Templates](templates/Xcode/README.md):** install a template and create a new project in Xcode. CFA App is the general-purpose foundation; Habit Tracker and Day Streak include product-specific features.
+- **[Starter Apps](starter-apps/README.md):** working apps to get you going fast. Open a project, run it, and make it your own—no template installation required.
+
+### Install the Xcode project templates
 
 The CFA AI Toolkit for iOS includes **CFA App**, **Habit Tracker** and **Day Streak** Xcode templates. Each creates a
 new, runnable CFA app directly from **File → New → Project**. It does not
@@ -109,27 +116,32 @@ the message in the Terminal window before closing it.
 
 Quit and reopen Xcode. Choose **File → New → Project → iOS → CFA App**, **Habit Tracker** or **Day Streak**.
 Xcode asks for your product name and organisation identifier, then creates a
-new project with the CFA folders, feature, network refresh, JSON file
-cache, retry state and colour-theme settings already in place.
+new project. CFA App includes the CFA folders, a feature, network refresh, JSON
+file cache, retry state and colour-theme settings. The other templates provide
+the application-specific features described below.
+
+### Explore the Starter Apps
 
 **Habit Tracker** provides Today, Habits, Day Streak and Settings tabs, completion/count habits,
 daily streaks, lazy SwiftData storage, colour themes and focused unit tests.
 Its editable, ready-to-open project is in
-[`templates/Xcode/Habit Tracker iOS`](templates/Xcode/Habit%20Tracker%20iOS/README.md).
+[`starter-apps/Habit Tracker`](starter-apps/Habit%20Tracker/README.md).
 The native template is generated from that project so its code stays in sync.
 
-**Day Streak** is a daily-activity blueprint demonstrated by **Todays Twenty**: a
+**Todays Twenty** is a daily-activity Starter App and the source of the **Day Streak** template: a
 multiplication game with a cloud of answer buttons, 20 correct first attempts per
 session, one optional extra practice and a reusable DayStreakFeature. It carries over
 Trend's visual design, with seven colour palettes, saved progress and isolated tests.
-Open the [Day Streak project](templates/Xcode/Day%20Streak%20iOS/README.md), or generate
-a new project using its native template. The original Trend project is unchanged.
+Open the [Todays Twenty project](starter-apps/Todays%20Twenty/README.md), or generate
+a new project using the Day Streak template. That template includes the multiplication
+game; it is not a blank streak-only foundation. The original Trend project is unchanged.
 
 For a separate paid-feature example, open
-[Habit Tracker Pro](templates/Xcode/Habit%20Tracker%20Pro%20iOS/README.md).
+[Habit Tracker Pro](starter-apps/Habit%20Tracker%20Pro/README.md).
 It adds a Trends tab with Swift Charts, a one-time StoreKit unlock and local
 purchase tests. The free template remains unchanged; Pro is currently a
-ready-to-open project, not an additional installer template.
+Starter App, not an additional installer template. Starter Apps need your own
+product configuration and release verification before distribution.
 
 Running the installer again updates CFA-installed templates and preserves backup copies.
 It refuses to replace a same-named template from another source.

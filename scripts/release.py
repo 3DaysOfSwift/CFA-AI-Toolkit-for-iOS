@@ -9,6 +9,12 @@ import subprocess
 import zipfile
 
 ROOT = Path(__file__).resolve().parent.parent
+EXCLUSIONS = json.loads((ROOT / 'scripts/release-exclusions.json').read_text())
+
+def is_release_path(relative):
+    return (not any(part in EXCLUSIONS['directoryNames'] for part in relative.parts)
+            and relative.name not in EXCLUSIONS['fileNames']
+            and not any(relative.name.endswith(suffix) for suffix in EXCLUSIONS['fileSuffixes']))
 
 def archive(output, pairs, prefix):
     with zipfile.ZipFile(output, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as z:
@@ -43,7 +49,7 @@ def main():
     run(args.node, 'scripts/build.mjs', str(package))
     plugin_zip = out / f'{name}-{version}-plugin.zip'
     archive(plugin_zip, [(p.relative_to(package).as_posix(), p) for p in package.rglob('*') if p.is_file()], name)
-    allowed = ['.codex-plugin', '.github', 'readme-images', 'architecture', 'skills', 'tools', 'scripts', 'test', 'evals', 'examples', 'templates', 'docs',
+    allowed = ['.codex-plugin', '.github', 'readme-images', 'architecture', 'skills', 'tools', 'scripts', 'test', 'evals', 'examples', 'templates', 'starter-apps', 'docs',
                'README.md', 'LICENSE', 'CHANGELOG.md', 'CONTRIBUTING.md', 'AGENTS.md', '.gitignore', 'Install.command', 'Install Xcode Template.command', 'package.json', 'plugin.json']
     sources = []
     for part in allowed:
@@ -51,7 +57,7 @@ def main():
         if not path.exists():
             continue
         for p in ([path] if path.is_file() else path.rglob('*')):
-            if p.is_file() and p.name != '.DS_Store':
+            if p.is_file() and is_release_path(p.relative_to(ROOT)):
                 sources.append((p.relative_to(ROOT).as_posix(), p))
     source_zip = out / f'{name}-{version}-source.zip'
     archive(source_zip, sources, name)

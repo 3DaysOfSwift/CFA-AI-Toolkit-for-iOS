@@ -48,6 +48,22 @@ The original 3 Days of Swift Concurrency projects use
 `com.3DaysOfSwiftConcurrency.<AppName>` as their organisation convention. It is
 not a requirement of CFA or a default for other developers.
 
+Before handing over every newly created Xcode project, build for a generic iOS
+device and inspect the *built* app's `Info.plist`. It must contain concrete,
+non-empty values for `CFBundleIdentifier`, `CFBundleDisplayName`,
+`CFBundleShortVersionString` (marketing version), and `CFBundleVersion` (build
+number). Do not treat an Xcode build-setting expression or a template token as
+filled-in metadata. This check applies to each app target; test targets use
+their own bundle identifiers but do not need a user-facing display name.
+
+### Test Target Defaults
+
+Create a unit-test target for each new app, but do not create a UI-test target
+or an empty `AppNameUITests` folder. CFA's new-project tests cover Feature and
+ViewModel behaviour in the unit-test target; an unused UI-test target adds
+navigator noise and build work without evidence. Add UI tests only when the
+developer explicitly requests a defined UI automation scenario.
+
 ## Name and Scope
 
 The product is **CFA AI Toolkit for iOS**. Use that exact name for the toolkit
@@ -257,6 +273,29 @@ This is a new-product starting point, not an existing-product conformance rule.
 Follow [project workflow and design authority](project-workflow.md); preserve
 user-approved designs and do not repeatedly offer optional visual changes.
 
+### Supported Orientations and Archive Validation
+
+Every new iOS app must explicitly declare supported interface orientations in
+every app build configuration, including Release. For a universal app, default
+to portrait and both landscapes on iPhone, and all four orientations on iPad.
+Honour an explicit iPhone orientation choice while retaining all four iPad
+orientations when iPad multitasking is supported. Do not set `UIRequiresFullScreen`
+or remove iPad support merely to silence a validation warning.
+
+With generated Info.plist files, set `INFOPLIST_KEY_UISupportedInterfaceOrientations`
+and the iPad override `INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad`.
+Check the resulting app's `UISupportedInterfaceOrientations` and
+`UISupportedInterfaceOrientations~ipad` arrays, not just the project settings.
+For a source Info.plist, declare those arrays directly.
+
+Before delivery, build Release for a generic iOS device and inspect its built
+Info.plist. When preparing an archive, check the plist inside the archived app
+as well. Treat orientation validation warnings as defects; a successful simulator
+build does not establish App Store eligibility. Exercise supported layouts in
+portrait, landscape and iPad resizing before claiming UI compatibility.
+
+Reference: [Apple supported interface orientations](https://developer.apple.com/documentation/bundleresources/information-property-list/uisupportedinterfaceorientations).
+
 ### Swift Extensions
 
 Keep SwiftUI-specific extensions in `1 - View/SwiftUI Extensions`. Place
@@ -341,6 +380,30 @@ It must not acquire feature access or business behaviour.
 
 ### Keep SwiftUI View Construction Fast
 
+**Mandatory CFA screen construction rule:** A feature-connected screen creates
+its own tightly coupled ViewModel directly as the initial value of its private
+stored property: `@State private var viewModel = HomeViewModel()`. Put the
+construction on that declaration line. An explicit type annotation is fine;
+the initializer must still construct the screen's ViewModel with no arguments.
+
+Construct the screen as `HomeView()`, with zero initializer inputs. Never expose
+`init(viewModel:)`, including `init(viewModel: HomeViewModel = HomeViewModel())`.
+A default parameter does not make dependency injection acceptable. Do not move
+construction into a custom `init()`, assign `_viewModel = State(initialValue:)`
+or `State(wrappedValue:)` there, or hide it behind a factory, closure, optional
+placeholder or externally supplied binding. Do not add a preview/test-only
+ViewModel initializer to the production screen. Test the ViewModel directly
+with an isolated Feature; do not inject the ViewModel into its View.
+
+Any initializer input to a feature-connected screen is a CFA code smell to
+investigate: its owning Feature should supply the required data through the
+ViewModel's own initializer and API. This includes IDs, snapshots and callbacks,
+not only reference-type dependencies. Stateless display components are the
+exception: `GraphView(graphData: snapshot)` can render plain data without a
+ViewModel or access to the application graph. Do not disguise a feature screen
+as a component to bypass this rule. This is a CFA convention, not a general
+SwiftUI prohibition on View inputs.
+
 ✅ **Correct — the View owns its bespoke ViewModel and requires no dependency
 injection:**
 
@@ -362,7 +425,7 @@ CoffeeTrackingView()
 struct CoffeeTrackingView: View {
     @State private var viewModel: CoffeeTrackingViewModel
 
-    init(viewModel: CoffeeTrackingViewModel) {
+    init(viewModel: CoffeeTrackingViewModel = CoffeeTrackingViewModel()) {
         _viewModel = State(initialValue: viewModel)
     }
 
@@ -388,8 +451,12 @@ effects. It may retain the feature capabilities it needs from `AppModel.shared`,
 but loading and other asynchronous work begin only through an explicit method.
 `@State` associates the ViewModel with the screen's SwiftUI identity so the same
 logical screen continues to observe its existing ViewModel across redraws.
+That ownership must not be advertised as a guarantee that a default-value
+expression never runs again: evaluation depends on the SwiftUI/toolchain API
+in use. Keep construction cheap and free of observable side effects regardless.
+See [Apple's State documentation](https://developer.apple.com/documentation/swiftui/state).
 
-Apart from plain input data, SwiftUI presentation state, environment-provided
+Apart from SwiftUI presentation state, environment-provided
 presentation values, and this `viewModel`, do not make a screen View the owner
 of long-lived reference objects. The View describes and reflects state; it does
 not become an object-lifetime coordinator.
@@ -431,17 +498,24 @@ through every SwiftUI initializer.
 
 This is mandatory for CFA application screens. Before delivery, verify all three:
 
-1. Every screen-level View owns one dedicated `@State` ViewModel created at its property declaration.
-2. Each ViewModel initializer defaults its narrow live feature dependency from `AppModel.shared` while allowing tests to supply an isolated replacement.
-3. A screen View initializer does not receive `AppModel`, a feature, repository or ViewModel from its caller.
+1. Every screen-level View owns one dedicated ViewModel, constructed without arguments on the same line as its `@State private var viewModel` declaration; never assign its backing State in a custom initializer.
+2. Each ViewModel initializer defaults its narrow live feature dependencies from `AppModel.shared` while allowing tests to supply isolated replacements.
+3. Every feature-connected screen is constructed with zero initializer inputs, including in navigation, sheets and previews. Defaulted parameters are not exceptions.
 
 Do not remove a screen ViewModel, or pass feature dependencies through a screen initializer, merely because a generic architecture guideline would use fewer types. CFA makes the ViewModel boundary explicit so every screen has one clear, testable route into the shared application graph.
 
-Most screens need one feature API. A screen may legitimately need more—for
-example, a habits screen may read both habits and purchase entitlement state.
-Do not invent an artificial facade merely to meet a numerical rule. If the set
-keeps growing, reconsider the screen responsibility or introduce one cohesive
-feature workflow below the ViewModel boundary.
+A screen can present several independent business capabilities. Its ViewModel
+uses the narrow Feature APIs that the screen needs, with no required minimum or
+maximum count. For example, SettingsViewModel may use SettingsFeature for app
+preferences and UserProfileFeature for the profile header. SettingsFeature does
+not need a profile dependency merely because the screen displays an avatar.
+
+When a ViewModel grows, ask: **is it arranging existing capabilities for this
+screen, or implementing a new business capability itself?** Only the latter
+points towards extracting business behaviour into the model. Keep device-specific
+presentation decisions in the presentation layer; extract a focused presentation
+helper only when it clarifies a real responsibility. Do not invent a facade or
+Feature simply to reduce the number of ViewModel dependencies or lines of code.
 
 ## Keep Screen Initializers Clean
 
@@ -467,51 +541,49 @@ TodayView(viewModel: rootViewModel.today)
 TodayView(onAdd: rootViewModel.addEntry)
 ```
 
-A destination may receive a plain, immutable domain value that identifies what
-it displays or edits. A stateless presentational component may receive a display
-struct, such as chart points. Inputs must be data—not access to the application
-graph.
+A feature-connected destination also has zero initializer inputs. Its Feature
+owns the relevant data and selection/context, accessed through its ViewModel.
+During adoption or tidy-up, preserve independent destination/window identity,
+selection and navigation behaviour. Do not replace distinct destination inputs
+with one global mutable selection that makes screens interfere. If preserving
+those behaviours requires a product/ownership decision, explain it before
+changing behaviour. A stateless presentational component may receive a display
+struct, such as chart points; it must not obtain access to the application graph.
 
 Each screen owns the sheet, alert, or navigation destination it presents. Do
 not create an application-wide router merely to move local presentation state
 away from the View.
 
-## Give Every App Tab Its Own Feature
+## Define Features by Business Capability, Not by Screen or Tab
 
-In a tab-based CFA app, every top-level app tab has a distinct concrete Feature
-exposed by AppModel. For example, Today, Habits and Settings map to
-`TodayFeature`, `HabitsFeature` and `SettingsFeature`, with matching
-`todayFeature`, `habitsFeature` and `settingsFeature` properties. Each tab's
-screen ViewModel requests its own Feature. This is a CFA project-structure rule,
-not a requirement imposed by SwiftUI.
+A screen can present several independent business capabilities. A Feature can
+support several screens and device experiences, or have no dedicated screen.
+Features own meaningful application capabilities and their authoritative business
+state; screens and tabs do not determine the number of Features.
 
-Inventory the actual tab destinations before creation or migration. Record each
-route as Tab → screen → dedicated ViewModel → AppModel Feature → named Feature
-tests. Correct a missing tab Feature; having three arbitrary Features does not
-satisfy a three-tab app. Additional non-tab Features are allowed. A system More
-overflow item or a toolbar action is not a separate application tab.
+During creation or migration, main screens are useful clues for discovering
+capabilities, not a requirement to create one Feature per screen or tab. Record
+each route as screen → dedicated ViewModel → required AppModel Features → named
+Feature tests. Several routes may use the same Feature, and a route may use
+several Features. Do not create empty tab owners or duplicate state to satisfy
+a one-to-one mapping.
 
-Give each tab Feature a real domain responsibility, not an empty marker or a
-copy of another Feature. Today owns daily progress and completion behaviour;
-Habits owns the habit collection and its persisted mutations. They cooperate
-through an explicitly injected dependency constructed in `AppModel.live()`.
-The Today Feature reads the same Habits Feature instance; it does not copy its
-collection or open another database. Keep dependencies directional and avoid
-cycles. No tab-selection state, navigation, ViewModel, or matching FeatureAPI
-protocol belongs inside these Features.
+For example, SettingsViewModel can combine SettingsFeature and UserProfileFeature.
+Other screens can observe that same UserProfileFeature through their own
+ViewModels. The profile retains one authoritative owner. Navigation, tab selection
+and device-specific layout remain presentation responsibilities.
 
-Creation and migration must verify this mapping in source and provide one
-named test file per tab Feature. Test cross-tab consistency when tabs share
-data. Nested screens may reuse their owning tab's Feature while retaining
-their own ViewModels; do not invent one Feature per reusable View.
+Start new apps with independent Features using lower-level services supplied
+through their initialisers. A screen combining their outputs does not require
+the Features to depend on each other. An architectural extension that composes
+Features needs an identified business responsibility; do not add one solely
+because a ViewModel has several dependencies. Keep any such composition explicit,
+directional and free of cycles, and preserve existing behaviour during migration.
 
-Tabs are a useful ownership map, not the only reason to create a Feature.
-Separate capabilities with different responsibilities even when they share
-data: habits can exist without streaks. `HabitsFeature` owns habits and recorded
-activity; `DayStreakFeature` depends on it to interpret that history as current
-and longest streaks. The dependency must not point back from Habits to Day
-Streak, and streak calculations do not belong on the base Habit model. Such a
-Feature can later gain its own tab without moving its rules into the UI.
+Verify each screen's actual Feature dependencies and each Feature's named
+behavioural tests. Test consistency across screens that use shared state.
+Introduce an additional Feature when there is a distinct business capability,
+not merely a new tab, screen, visual section or device target.
 
 ## Use AppModel as the Composition Root and Feature Facade
 
@@ -1091,7 +1163,7 @@ values are never stored as already-localised display strings.
 The goal is that a junior developer can follow one clear sentence:
 
 ```text
-The View reports an intention to its ViewModel; the ViewModel asks one Feature;
+The View reports an intention to its ViewModel; the ViewModel asks the relevant Feature;
 the Feature applies the business rules and uses a Repository when data persists.
 ```
 

@@ -3,7 +3,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { root } from './sync.mjs';
 import { validate } from './validate.mjs';
-import { inventory, writeJSON } from './files.mjs';
+import { inventory, writeJSON, isReleasePath } from './files.mjs';
 export function stageRelease(output,base=root) {
   validate(base);
   output=path.resolve(output);
@@ -11,9 +11,10 @@ export function stageRelease(output,base=root) {
   const copy=(relative) => {
     const destination=path.join(output,relative);
     fs.mkdirSync(path.dirname(destination),{recursive:true});
-    fs.cpSync(path.join(base,relative),destination,{recursive:true,errorOnExist:true,force:false});
+    fs.cpSync(path.join(base,relative),destination,{recursive:true,errorOnExist:true,force:false,
+      filter: source => isReleasePath(path.relative(base, source))});
   };
-  for(const relative of ['.codex-plugin','plugin.json','readme-images','skills','LICENSE','Install.command','Install Xcode Template.command','docs','architecture','templates','scripts/install.mjs','scripts/install-xcode-template.mjs','scripts/files.mjs','scripts/sync.mjs'])copy(relative);
+  for(const relative of ['.codex-plugin','plugin.json','readme-images','skills','LICENSE','Install.command','Install Xcode Template.command','docs','architecture','templates','starter-apps','scripts/install.mjs','scripts/install-xcode-template.mjs','scripts/files.mjs','scripts/release-exclusions.json','scripts/sync.mjs'])copy(relative);
   fs.copyFileSync(path.join(base,'README.md'),path.join(output,'README.md'));
   writeJSON(path.join(output,'checksums.json'),inventory(output));
   validate(output,{source:false});

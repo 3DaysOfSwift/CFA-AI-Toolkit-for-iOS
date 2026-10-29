@@ -164,6 +164,25 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
   }
   if (record.result === 'completed') {
     for (const kind of ['build', 'test']) if (!record.evidence.some(item => item.kind === kind && item.phase === 'after' && item.outcome === 'passed' && item.commit === record.repository.afterCommit)) errors.push(`result: completed requires a passed after ${kind} at afterCommit; otherwise use partial`);
+    const gate = record.completionGate;
+    if (!gate) {
+      errors.push('result: completed requires a completionGate; otherwise use partial');
+    } else {
+      const requiredEvidence = [
+        ['navigatorEvidenceId', ['manual', 'diff']],
+        ['featureInventoryEvidenceId', ['source', 'diff']],
+        ['primitiveInventoryEvidenceId', ['source', 'diff']],
+        ['buildEvidenceId', ['build']],
+        ['testEvidenceId', ['test']],
+        ['manualArchitectureReviewEvidenceId', ['manual']]
+      ];
+      for (const [field, kinds] of requiredEvidence) {
+        const item = record.evidence.find(candidate => candidate.id === gate[field]);
+        if (!item || !kinds.includes(item.kind) || item.phase !== 'after' || item.outcome !== 'passed' || item.commit !== record.repository.afterCommit) {
+          errors.push(`completionGate.${field}: requires passed after evidence at afterCommit with kind ${kinds.join(' or ')}`);
+        }
+      }
+    }
   }
   const digestRecord = structuredClone(record);
   digestRecord.review.digest = null;

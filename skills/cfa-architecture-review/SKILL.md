@@ -9,6 +9,17 @@ Read [project workflow and design authority](references/project-workflow.md) fir
 Respect the recorded workflow and current request; new-app design defaults do
 not authorize UI changes during maintenance or a narrowly scoped task.
 
+When explaining a substantive finding or answering why a rule exists, use
+[decision rationale and verified learning links](references/explanations/guide.md).
+Read only the relevant topic note. Explain the consequence in the user's context;
+do not impose CFA on another architecture or link to an unpublished article.
+
+Apply the specification's screen-construction invariant within the requested
+scope: private inline `@State` ViewModel creation, zero screen initializer inputs,
+and no defaulted ViewModel injection or custom State initialization. Distinguish
+stateless snapshot components from feature-connected screens. Review-only work
+reports violations; tests inject Features into ViewModels, not ViewModels into Views.
+
 Review the requested scope without refactoring the application or changing
 project instructions. Missing optional themes, CFA footers or starter branding
 are not architecture findings or rating deductions. Report demonstrated

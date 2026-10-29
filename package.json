@@ -13,7 +13,10 @@
     "sync": "node scripts/sync.mjs",
     "validate": "node scripts/validate.mjs",
     "evals": "node scripts/run-evaluations.mjs",
+    "explanations:audit": "node tools/explanations/explanations.mjs audit",
+    "explanations:validate": "node tools/explanations/explanations.mjs validate",
     "verify:xcode-template": "node scripts/verify-xcode-template-structure.mjs",
+    "verify:ios-app-identity": "node scripts/verify-ios-app-identity.mjs",
     "release": "python3 scripts/release.py"
   }
 }

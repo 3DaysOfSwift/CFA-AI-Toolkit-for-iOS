@@ -1,0 +1,5 @@
+{
+  "directoryNames": [".git", ".build", "DerivedData", "node_modules", "xcuserdata"],
+  "fileNames": [".DS_Store"],
+  "fileSuffixes": [".xcuserstate"]
+}

@@ -21,12 +21,15 @@ the responsibility is not already owned by an existing type.
 Preserve these CFA invariants unless the developer explicitly asks to change
 the architecture:
 
-1. Every screen-level View has one adjacent, dedicated ViewModel created by the
-   View with `@State`.
+1. Every screen-level View has one adjacent, dedicated ViewModel constructed
+   without arguments on its declaration line:
+   `@State private var viewModel = HomeViewModel()`. Never initialize its State
+   inside a custom View initializer or receive a ViewModel from the caller.
 2. Each ViewModel defaults its narrow live feature dependency from
    `AppModel.shared`, while tests can provide an isolated replacement.
-3. Screen View initializers do not receive AppModel, features,
-   repositories or ViewModels.
+3. Feature-connected screens have zero initializer inputs. Defaulted ViewModel
+   parameters, factories, IDs and preview-only injection are not exceptions.
+   Plain snapshot inputs belong to stateless display components, not screens.
 4. When the app uses `ThemeManager`, it is a presentation dependency supplied through the
    SwiftUI environment. AppModel and features are not environment
    values.
@@ -94,10 +97,11 @@ the architecture:
     lifecycle signal that triggered it. Use `refresh()`, `save()` or `retry()`;
     never `refreshTapped()`, `savePressed()` or `screenAppeared()`.
 
-20. Every top-level app tab has its own concrete Feature exposed by AppModel
-    and used by the tab's dedicated ViewModel. Give it a real responsibility
-    and named tests. Cooperating tab Features share one authoritative data
-    owner, never competing collections or independent copies of the store.
+20. Features represent business capabilities, independently of screens and tabs.
+    A screen can present several independent business capabilities through its
+    dedicated ViewModel; several screens may use the same Feature. Give each
+    Feature a real responsibility and named tests, with one authoritative owner
+    for shared business state. Do not invent a Feature to match a tab count.
 21. New-app visual starting points live in [new-app design defaults](new-app-design-defaults.md).
     Use them only where appropriate to the recorded workflow and current request;
     user-approved designs override defaults. Do not require palette counts or
@@ -118,16 +122,56 @@ the architecture:
 
 Review the changed source as one feature slice, not as isolated files.
 
+## Migration progress and completion language
+
+During a migration, default to reporting the next concrete milestone: for
+example, **“Continuing migration: moving the Movies feature into the visible
+CFA ownership structure.”** Do not use “migration complete”, “finished with
+migration”, or equivalent whole-project language for a route-level refactor,
+a source-only check, or a pre-change test baseline.
+
+A route may be described as a **verified feature checkpoint** only after its
+post-change build/tests and behaviour checks pass. It remains part of a
+continuing migration until the agreed project scope is complete.
+
+Before calling a CFA migration complete, capture a completion record that
+identifies all of the following:
+
+- the before/after Xcode navigator map, showing the agreed CFA folders and
+  feature ownership visibly—not just source paths on disk;
+- the feature inventory, including every scoped tab or screen, its concrete
+  Feature dependencies, dedicated ViewModel, composition owner, named tests, and any
+  intentionally retained legacy boundary;
+- a current concurrency inventory showing every scoped GCD, callback,
+  OperationQueue, timer, lock, or delegate route as migrated or explicitly
+  retained with a reason;
+- post-change build and test results at the final commit, plus the relevant
+  manual behaviour regression; and
+- a human architecture review confirming that the navigator communicates the
+  agreed structure.
+
+If any item is absent, failed, or only inferred, say **“Continuing migration”**
+and name the missing checkpoint. Record a failed pilot honestly and block it
+from precedent use; do not reframe it as a completed partial migration.
+
 - Verify repeated ViewModel actions and equivalent Feature calls share one
   execution and completion. Verify queued commands execute in admission order
   and return their own outcomes. Test failure/cancellation cleanup and a later
   retry using controlled dependencies, not sleeps; record exceptions explicitly.
 
-- Trace every affected screen to its ViewModel and default AppModel feature.
-- For a tab-based app, map every top-level app tab to a distinct concrete Feature
-  exposed by AppModel and requested by that tab's ViewModel. Require its named
-  Feature tests; test shared data across tabs without duplicating state owners.
-- Confirm that no screen initializer gained dependency plumbing.
+- Trace every affected screen to its ViewModel and required AppModel Features.
+  Do not require a distinct Feature per tab or screen. Require named tests for
+  each actual Feature; test shared data across screens without duplicating owners.
+- For a growing ViewModel, ask: is it arranging existing capabilities for this
+  screen, or implementing a new business capability itself? Only the latter
+  points towards extracting business behaviour into the model. Keep presentation
+  coordination in the presentation layer; dependency count alone is not a defect.
+- Inventory screen declarations, initializers (including extensions), call sites
+  and previews. Require private inline ViewModel construction and zero screen
+  initializer inputs; reject defaulted injection and custom State assignment.
+  Keep plain-data display components distinct. Test ViewModels directly with
+  isolated Features. Preserve navigation and independent destination identity
+  when correcting existing code; never substitute a global selection silently.
 - Compare visuals and interactions with the baseline. Do not introduce
   unrequested design changes or restore defaults the user replaced.
 - For initial app design, verify the applicable new-app design defaults and

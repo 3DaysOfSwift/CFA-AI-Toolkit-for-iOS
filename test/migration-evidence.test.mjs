@@ -142,7 +142,28 @@ test('completion is not inferred from a build pass or tests at a different commi
   const testEvidence = f.record.evidence.find(e => e.id === 'after-test');
   testEvidence.outcome = 'passed'; testEvidence.commit = 'c'.repeat(40); f.write();
   assert.equal(inspectRecord(f.file).valid, false);
-  testEvidence.commit = f.record.repository.afterCommit; f.seal();
+  testEvidence.commit = f.record.repository.afterCommit; f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.includes('requires a completionGate')));
+  const afterEvidence = (id, kind) => ({
+    id, kind, phase: 'after', commit: f.record.repository.afterCommit,
+    reference: 'evidence.md', summary: 'Fictional completion-gate evidence.',
+    outcome: 'passed', command: null, environment: 'Fixture environment', recordedAt: '2026-10-25'
+  });
+  f.record.evidence.push(
+    afterEvidence('after-navigator', 'manual'),
+    afterEvidence('after-feature-inventory', 'source'),
+    afterEvidence('after-primitive-inventory', 'source'),
+    afterEvidence('after-architecture-review', 'manual')
+  );
+  f.record.completionGate = {
+    navigatorEvidenceId: 'after-navigator',
+    featureInventoryEvidenceId: 'after-feature-inventory',
+    primitiveInventoryEvidenceId: 'after-primitive-inventory',
+    buildEvidenceId: 'after-build',
+    testEvidenceId: 'after-test',
+    manualArchitectureReviewEvidenceId: 'after-architecture-review'
+  };
+  f.seal();
   assert.equal(inspectRecord(f.file).valid, true);
 });
 

@@ -1,6 +1,10 @@
 # Reference feature: recording a note
 
 `NotesView` owns `@State private var viewModel = NotesViewModel()`.
+Callers use `NotesView()` with zero inputs. No custom initializer accepts or
+constructs its ViewModel, even through a default parameter. Unit tests construct
+NotesViewModel directly with an isolated NotesFeature; display-only components
+can still receive plain snapshots.
 `NotesViewModel` retains `NotesFeature`, defaulting to `AppModel.shared.notesFeature`.
 It owns the editable draft and display error. `NotesFeature` validates the text,
 uses an injected repository to save it, and publishes the committed note. A failed

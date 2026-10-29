@@ -482,6 +482,10 @@
 				<string>YES</string>
 				<key>SWIFT_STRICT_CONCURRENCY</key>
 				<string>complete</string>
+				<key>INFOPLIST_KEY_UISupportedInterfaceOrientations</key>
+				<string>UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight</string>
+				<key>INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad</key>
+				<string>UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortraitUpsideDown</string>
 				<key>ENABLE_TESTABILITY</key>
 				<string>YES</string>
 				<key>ASSETCATALOG_COMPILER_APPICON_NAME</key>

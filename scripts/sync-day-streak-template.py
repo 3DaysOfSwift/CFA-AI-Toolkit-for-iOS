@@ -9,7 +9,7 @@ import plistlib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-PROJECT = ROOT / "templates/Xcode/Day Streak iOS"
+PROJECT = ROOT / "starter-apps/Todays Twenty"
 DEST = ROOT / "templates/Xcode/Project Templates/iOS/Application/Day Streak.xctemplate"
 NAME = "TimesThirty"
 TOKEN = "___PACKAGENAMEASIDENTIFIER___"
@@ -62,7 +62,7 @@ def generated_files():
             {"Identifier": "languageChoice", "Default": "Swift", "Type": "popup", "Values": ["Swift"]},
         ],
         "Targets": [
-            {"TargetIdentifier": "com.apple.dt.applicationTarget", "SharedSettings": {**shared, "PRODUCT_BUNDLE_IDENTIFIER": "com.3DaysOfSwiftConcurrency." + TOKEN, "ENABLE_TESTABILITY": "YES", "ASSETCATALOG_COMPILER_APPICON_NAME": "AppIcon", "INFOPLIST_KEY_UIApplicationSceneManifest_Generation": "YES", "INFOPLIST_KEY_UILaunchStoryboardName": "LaunchScreen"}},
+            {"TargetIdentifier": "com.apple.dt.applicationTarget", "SharedSettings": {**shared, "INFOPLIST_KEY_UISupportedInterfaceOrientations": "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight", "INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad": "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortraitUpsideDown", "PRODUCT_BUNDLE_IDENTIFIER": "com.3DaysOfSwiftConcurrency." + TOKEN, "ENABLE_TESTABILITY": "YES", "ASSETCATALOG_COMPILER_APPICON_NAME": "AppIcon", "INFOPLIST_KEY_UIApplicationSceneManifest_Generation": "YES", "INFOPLIST_KEY_UILaunchStoryboardName": "LaunchScreen"}},
             {"TargetIdentifier": "com.3daysofswift.cfa.dayStreakTests", "TargetIdentifierToBeTested": "com.apple.dt.applicationTarget", "Name": TOKEN + "Tests", "ProductType": "com.apple.product-type.bundle.unit-test", "SharedSettings": {**shared, "PRODUCT_NAME": "$(TARGET_NAME)", "PRODUCT_BUNDLE_IDENTIFIER": "com.3DaysOfSwiftConcurrency." + TOKEN + "." + TOKEN + "Tests", "BUNDLE_LOADER": "$(TEST_HOST)", "TEST_HOST": "$(BUILT_PRODUCTS_DIR)/" + TOKEN + ".app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/" + TOKEN}, "Configurations": {"Debug": {}, "Release": {}}, "BuildPhases": [{"Class": phase} for phase in ["Sources", "Frameworks", "Resources"]]},
         ],
     }

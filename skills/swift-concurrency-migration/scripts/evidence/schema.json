@@ -87,6 +87,18 @@
         "recordedAt": {"type": "string", "format": "date"}
       }
     }},
+    "completionGate": {
+      "type": ["object", "null"], "additionalProperties": false,
+      "required": ["navigatorEvidenceId", "featureInventoryEvidenceId", "primitiveInventoryEvidenceId", "buildEvidenceId", "testEvidenceId", "manualArchitectureReviewEvidenceId"],
+      "properties": {
+        "navigatorEvidenceId": {"$ref": "#/$defs/identifier"},
+        "featureInventoryEvidenceId": {"$ref": "#/$defs/identifier"},
+        "primitiveInventoryEvidenceId": {"$ref": "#/$defs/identifier"},
+        "buildEvidenceId": {"$ref": "#/$defs/identifier"},
+        "testEvidenceId": {"$ref": "#/$defs/identifier"},
+        "manualArchitectureReviewEvidenceId": {"$ref": "#/$defs/identifier"}
+      }
+    },
     "result": {"enum": ["not-started", "partial", "completed", "blocked"]},
     "limitations": {"$ref": "#/$defs/texts"},
     "lesson": {"$ref": "#/$defs/unknownText"},

@@ -2,6 +2,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 
+const releaseExclusions = JSON.parse(fs.readFileSync(
+  new URL('./release-exclusions.json', import.meta.url), 'utf8'));
+export function isReleasePath(relative) {
+  const parts = relative.split(/[\\/]/);
+  return !parts.some(part => releaseExclusions.directoryNames.includes(part)) &&
+    !releaseExclusions.fileNames.includes(parts.at(-1)) &&
+    !releaseExclusions.fileSuffixes.some(suffix => parts.at(-1).endsWith(suffix));
+}
+
 export function files(root, prefix = '') {
   return fs.readdirSync(path.join(root, prefix), { withFileTypes: true }).sort((a,b)=>a.name.localeCompare(b.name)).flatMap(entry => {
     const name = path.posix.join(prefix, entry.name);

@@ -31,6 +31,26 @@ function braceBody(source, openingBrace) {
   return source.slice(openingBrace + 1);
 }
 
+// Keep only direct member signatures. Mask method/nested-type bodies without
+// changing offsets, so a nested example cannot satisfy the screen's ownership.
+function memberSignatures(body) {
+  let depth = 0;
+  return body.split('').map(character => {
+    if (character === '{') { depth++; return ' '; }
+    if (character === '}') { depth--; return ' '; }
+    return depth > 0 && character !== '\n' ? ' ' : character;
+  }).join('');
+}
+
+function closingParenthesis(source, opening) {
+  let depth = 0;
+  for (let index = opening; index < source.length; index++) {
+    if (source[index] === '(') depth++;
+    if (source[index] === ')' && --depth === 0) return index;
+  }
+  return -1;
+}
+
 /** A lexical route inventory, not a Swift compiler or proof of CFA conformance. */
 export async function inspect(project) {
   const root = await fs.realpath(project);
@@ -120,16 +140,37 @@ export async function inspect(project) {
   for (const viewFile of [...paths].filter(file => screenPath.test(file) && !file.endsWith('/RootTabView.swift')).sort()) {
     const view = sources.get(viewFile);
     const name = screenName(viewFile);
-    if (!new RegExp(`\\bstruct\\s+${name}\\s*:\\s*View\\b`).test(view)) continue;
+    const declaration = new RegExp(`\\bstruct\\s+${name}\\s*:\\s*View\\b[^\\{]*\\{`).exec(view);
+    if (!declaration) continue;
+    const bodyOffset = declaration.index + declaration[0].length;
+    const body = braceBody(view, bodyOffset - 1);
+    const members = memberSignatures(body);
     const viewModelName = `${name}Model`;
     const viewModelFile = viewFile.replace(/View\.swift$/, 'ViewModel.swift');
     const viewModel = sources.get(viewModelFile);
     const testName = `${viewModelName}Tests.swift`;
     const testFile = [...paths].find(file => file.endsWith(`/${testName}`)) ?? null;
-    const statePattern = new RegExp(`@State\\s+(?:private\\s+)?var\\s+viewModel\\s*=\\s*${viewModelName}\\s*\\(`);
-    const ownsViewModel = statePattern.test(view);
+    const statePattern = new RegExp(`@State\\s+private\\s+var[ \\t]+viewModel(?:[ \\t]*:[ \\t]*${viewModelName})?[ \\t]*=[ \\t]*${viewModelName}[ \\t]*\\([ \\t]*\\)`);
+    const typedStatePattern = new RegExp(`@State\\s+private\\s+var[ \\t]+viewModel[ \\t]*:[ \\t]*${viewModelName}[ \\t]*=[ \\t]*\\.init[ \\t]*\\([ \\t]*\\)`);
+    const ownsViewModel = statePattern.test(members) || typedStatePattern.test(members);
     const dependencies = [];
     if (viewModel) {
+      for (const initializer of members.matchAll(/(?<![.\w])init[?!]?\s*\(/g)) {
+        const opening = initializer.index + initializer[0].length - 1;
+        const closing = closingParenthesis(body, opening);
+        if (closing < 0) continue;
+        if (body.slice(opening + 1, closing).trim()) {
+          findings.push(finding('screen-initializer-inputs', 'warning', `${name} accepts initializer inputs. CFA feature screens require zero inputs; even a defaulted ViewModel parameter is injection. Plain snapshots belong to stateless display components.`, viewFile, lineOf(view, bodyOffset + initializer.index)));
+        }
+        const tail = body.slice(closing + 1);
+        const openingBody = /^\s*(?:(?:async|throws|rethrows)\s*)*\{/.exec(tail);
+        if (openingBody) {
+          const initializerBody = braceBody(tail, openingBody[0].length - 1);
+          if (/\b_?viewModel\s*=/.test(initializerBody)) {
+            findings.push(finding('view-model-initializer-construction', 'warning', `${name} assigns viewModel or its State backing storage in init. Construct ${viewModelName}() on the private @State property declaration instead.`, viewFile, lineOf(view, bodyOffset + initializer.index)));
+          }
+        }
+      }
       for (const match of viewModel.matchAll(/\bAppModel\s*\.\s*shared\s*\.\s*(\w+)/g)) {
         const property = match[1];
         const exposure = appProperties.get(property);
@@ -159,7 +200,7 @@ export async function inspect(project) {
     }
     if (!viewModel) findings.push(finding('view-model-missing', 'warning', `${name} has no adjacent ${viewModelName}.`, viewFile, 1));
     else {
-      if (!ownsViewModel) findings.push(finding('view-model-ownership', 'warning', `${name} does not visibly own @State viewModel = ${viewModelName}().`, viewFile, 1));
+      if (!ownsViewModel) findings.push(finding('view-model-ownership', 'warning', `${name} needs private inline ownership: @State private var viewModel = ${viewModelName}(), with no constructor arguments on that declaration line.`, viewFile, lineOf(view, declaration.index)));
       if (!dependencies.length) findings.push(finding('feature-route-unresolved', 'review', `${viewModelName} has no visible AppModel.shared feature route; inspect whether this screen is presentation-only.`, viewModelFile, 1));
       if (!testFile) findings.push(finding('view-model-tests-missing', 'warning', `No ${testName} was found.`, viewModelFile, 1));
     }
@@ -178,6 +219,7 @@ export async function inspect(project) {
     limitations: [
       'This does not type-check Swift or resolve target membership, protocols, runtime behaviour, or test results.',
       'Unusual declarations, macros, generated code, and custom composition routes may be missed.',
+      'Screen-construction checks use conventionally named screen files and adjacent ViewModels; extension initializers, implicit memberwise inputs, aliases and actual call sites still need manual review.',
       'Root storage-gate detection uses conventional root names and storage identifiers; aliases, helper functions, and blocking overlays require manual failure-path review.',
       'A visible route is not proof that business rules, concurrency, persistence, or UI behaviour are correct.'
     ]

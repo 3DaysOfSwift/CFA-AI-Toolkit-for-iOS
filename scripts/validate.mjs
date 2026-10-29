@@ -2,10 +2,18 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { root, skills, cfaSkills, iconSkills, starterIcon, migrationEvidenceFiles } from './sync.mjs';
+import { root, skills, cfaSkills, iconSkills, starterIcon, migrationEvidenceFiles, explanationFiles } from './sync.mjs';
+import { validateCatalogue, audit } from '../tools/explanations/explanations.mjs';
 import { files, hash, json } from './files.mjs';
 import { verifyXcodeTemplateStructure } from './verify-xcode-template-structure.mjs';
+import { verifyTemplateOrientations } from './verify-ios-orientations.mjs';
 export function validate(base=root,{source=true}={}) {
+  const explanationDirectory = path.join(base, 'architecture/explanations');
+  const explanationCatalogue = json(path.join(explanationDirectory, 'catalogue.json'));
+  validateCatalogue(explanationCatalogue, explanationDirectory, { sourceRoot: path.join(base, 'architecture') });
+  if (audit(explanationCatalogue, path.join(base, 'architecture')).unmapped.length) {
+    throw Error('Unmapped canonical sections: run npm run explanations:audit and update the rationale catalogue.');
+  }
   const manifest=json(path.join(base,'.codex-plugin/plugin.json'));
   if(manifest.name!=='ios-app-development-cfa') throw Error('Unexpected plugin identifier.');
   if(manifest.interface?.displayName!=='CFA AI Toolkit for iOS') throw Error('Unexpected plugin display name.');
@@ -39,10 +47,30 @@ export function validate(base=root,{source=true}={}) {
     if (guide !== fs.readFileSync(captureReference, 'utf8')) throw Error('Stale migration capture guide. Run npm run sync.');
   }
   execFileSync(process.execPath, [path.join(evidenceFolder, 'evidence.mjs'), 'validate', path.join(evidenceFolder, 'examples/synthetic-serial-writes/record.json')], { stdio: 'pipe' });
+  const orientationChecker = path.join(base, 'skills/cfa-app-creation/scripts/verify-ios-orientations.mjs');
+  if (!fs.existsSync(orientationChecker)) throw Error('Missing bundled orientation checker.');
+  if (source && hash(orientationChecker) !== hash(path.join(base, 'scripts/verify-ios-orientations.mjs'))) {
+    throw Error('Stale orientation checker. Run npm run sync.');
+  }
+  const appIdentityChecker = path.join(base, 'skills/cfa-app-creation/scripts/verify-ios-app-identity.mjs');
+  if (!fs.existsSync(appIdentityChecker)) throw Error('Missing bundled app identity checker.');
+  if (source && hash(appIdentityChecker) !== hash(path.join(base, 'scripts/verify-ios-app-identity.mjs'))) {
+    throw Error('Stale app identity checker. Run npm run sync.');
+  }
   for(const file of ['LICENSE','README.md','docs/INSTALLATION.md','docs/PRIVACY.md']) if(!fs.existsSync(path.join(base,file))) throw Error(`Missing ${file}`);
   for(const name of skills) {
     const skill=path.join(base,'skills',name);
     const text=fs.readFileSync(path.join(skill,'SKILL.md'),'utf8');
+    const explanations = path.join(skill, 'references/explanations');
+    if (!text.includes('(references/explanations/guide.md)')) throw Error(`Missing rationale entry point: ${name}`);
+    if (JSON.stringify(files(explanations).sort()) !== JSON.stringify([...explanationFiles].sort())) throw Error(`Unexpected rationale files: ${name}`);
+    for (const file of explanationFiles) {
+      if (hash(path.join(explanations, file)) !== hash(path.join(explanationDirectory, file))) throw Error(`Stale rationale dependency: ${name}/${file}`);
+    }
+    validateCatalogue(json(path.join(explanations, 'catalogue.json')), explanations);
+    const explanationHelper = path.join(skill, 'scripts/explanations.mjs');
+    if (!fs.existsSync(explanationHelper)) throw Error(`Missing explanation helper: ${name}`);
+    if (source && hash(explanationHelper) !== hash(path.join(base, 'tools/explanations/explanations.mjs'))) throw Error(`Stale explanation helper: ${name}`);
     if(!text.startsWith('---\n') || !text.includes(`name: ${name}\n`) || !/^description: .+/m.test(text)) throw Error(`Invalid skill: ${name}`);
     if(text.includes('[TODO:')) throw Error(`Unfinished skill: ${name}`);
     if (iconSkills.includes(name)) {
@@ -97,7 +125,10 @@ export function validate(base=root,{source=true}={}) {
     for(const dir of ['src','Documentation']) for(const file of files(path.join(base,'tools/architecture-dashboard',dir))) {
       if(hash(path.join(base,'tools/architecture-dashboard',dir,file))!==hash(path.join(base,'skills/cfa-architecture-review/scripts/dashboard',dir,file))) throw Error(`Stale bundled tool: ${file}`);
     }
-    if (process.platform === 'darwin') verifyXcodeTemplateStructure(path.join(base, 'templates/Xcode/Project Templates/iOS/Application/CFA App.xctemplate'));
+    if (process.platform === 'darwin') {
+      verifyXcodeTemplateStructure(path.join(base, 'templates/Xcode/Project Templates/iOS/Application/CFA App.xctemplate'));
+      verifyTemplateOrientations(base);
+    }
     execFileSync('python3', [path.join(base, 'scripts/sync-habit-template.py'), '--check'], { stdio: 'pipe' });
   }
   return manifest;

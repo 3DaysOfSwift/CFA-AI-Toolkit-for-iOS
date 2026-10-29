@@ -9,6 +9,11 @@ Read [project workflow and design authority](references/project-workflow.md) fir
 Respect the recorded workflow and current request; new-app design defaults do
 not authorize UI changes during maintenance or a narrowly scoped task.
 
+When explaining a substantive finding or answering why a rule exists, use
+[decision rationale and verified learning links](references/explanations/guide.md).
+Read only the relevant topic note. Explain the consequence in the user's context;
+do not impose CFA on another architecture or link to an unpublished article.
+
 Read the [Swift coding guide](references/swift-coding-guide.md) before writing or changing Swift.
 
 Build code that a senior iOS engineer can understand from the type names and call flow. Prefer the smallest complete design that meets the stated behaviour. Do not use a folder diagram, a fashionable pattern or hypothetical future flexibility as a reason to add a type.

@@ -8,10 +8,48 @@ import { stageRelease } from '../scripts/build.mjs';
 import { root, skills, iconSkills, starterIcon } from '../scripts/sync.mjs';
 import { validate } from '../scripts/validate.mjs';
 import { install } from '../scripts/install.mjs';
-import { json, hash, inventory } from '../scripts/files.mjs';
+import { json, hash, inventory, isReleasePath } from '../scripts/files.mjs';
 
 function sandbox(t) { const dir=fs.mkdtempSync(path.join(os.tmpdir(),'cfa-test-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));return dir; }
 function release(t) {const dir=sandbox(t);return {dir,source:stageRelease(path.join(dir,'ios-app-development-cfa'))};}
+
+test('release omits local Xcode state and build outputs, but retains shared project configuration', t => {
+ for (const file of ['A.xcodeproj/xcuserdata/person.xcuserdatad/state', 'View.xcuserstate',
+  '.DS_Store', 'App/.build/debug/out', 'App/DerivedData/out', 'App/.git/config']) assert.equal(isReleasePath(file),false,file);
+ for (const file of ['A.xcodeproj/xcshareddata/xcschemes/App.xcscheme',
+  'Package.swift', '.swiftpm/configuration/registries.json', 'Package.resolved']) assert.equal(isReleasePath(file),true,file);
+ const {source}=release(t);
+ assert.ok(Object.keys(inventory(source)).every(isReleasePath));
+ const helper=path.join(source,'skills/cfa-architecture-review/scripts/explanations.mjs');
+ const lookup=spawnSync(process.execPath,[helper,'lookup','CFA-TASK-01'],{encoding:'utf8'});
+ assert.equal(lookup.status,0,lookup.stderr);
+ assert.deepEqual(JSON.parse(lookup.stdout).links,[]);
+});
+
+test('release keeps runnable Starter Apps separate from installable Xcode templates', t => {
+ const {dir,source}=release(t);
+ const projects = [
+  'Habit Tracker/HabitTrackerTemplate.xcodeproj/project.pbxproj',
+  'Habit Tracker Pro/HabitTrackerPro.xcodeproj/project.pbxproj',
+  'Todays Twenty/TimesThirty.xcodeproj/project.pbxproj'
+ ];
+ for (const project of projects) {
+  const relative=path.join('starter-apps',project);
+  assert.equal(hash(path.join(source,relative)),hash(path.join(root,relative)));
+ }
+ for (const relative of ['starter-apps/README.md','templates/Xcode/README.md']) {
+  assert.ok(fs.existsSync(path.join(source,relative)),relative);
+ }
+ for (const old of ['Habit Tracker iOS','Habit Tracker Pro iOS','Day Streak iOS']) {
+  assert.equal(fs.existsSync(path.join(source,'templates/Xcode',old)),false);
+ }
+ const destination=path.join(dir,'xcode-templates');
+ const result=spawnSync(process.execPath,[path.join(source,'scripts/install-xcode-template.mjs'),'--destination',destination],{encoding:'utf8'});
+ assert.equal(result.status,0,result.stderr);
+ const applicationFolder=path.join(destination,'Project Templates/iOS/Application');
+ assert.deepEqual(fs.readdirSync(applicationFolder).sort(),['CFA App.xctemplate','Day Streak.xctemplate','Habit Tracker.xctemplate']);
+ assert.equal(fs.existsSync(path.join(destination,'starter-apps')),false);
+});
 
 test('standalone release carries scanner dependencies and scans outside the source checkout',t=>{
  const {dir,source}=release(t); const destination=path.join(dir,'customer');

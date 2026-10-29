@@ -120,6 +120,8 @@
                 <key>IPHONEOS_DEPLOYMENT_TARGET</key><string>17.0</string>
                 <key>INFOPLIST_KEY_UIApplicationSceneManifest_Generation</key><string>YES</string>
                 <key>INFOPLIST_KEY_UILaunchStoryboardName</key><string>LaunchScreen</string>
+                <key>INFOPLIST_KEY_UISupportedInterfaceOrientations</key><string>UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight</string>
+                <key>INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad</key><string>UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortraitUpsideDown</string>
                 <key>SWIFT_STRICT_CONCURRENCY</key><string>complete</string>
                 <key>SWIFT_VERSION</key><string>6.0</string>
             </dict>

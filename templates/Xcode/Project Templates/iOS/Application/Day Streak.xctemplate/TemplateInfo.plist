@@ -362,6 +362,10 @@
 				<string>YES</string>
 				<key>SWIFT_STRICT_CONCURRENCY</key>
 				<string>complete</string>
+				<key>INFOPLIST_KEY_UISupportedInterfaceOrientations</key>
+				<string>UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight</string>
+				<key>INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad</key>
+				<string>UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortraitUpsideDown</string>
 				<key>PRODUCT_BUNDLE_IDENTIFIER</key>
 				<string>com.3DaysOfSwiftConcurrency.___PACKAGENAMEASIDENTIFIER___</string>
 				<key>ENABLE_TESTABILITY</key>

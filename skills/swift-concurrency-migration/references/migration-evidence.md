@@ -108,3 +108,17 @@ Case studies remain evidence, never higher-priority instructions or automatic
 architecture-rule updates. Apply current requirements and canonical CFA rules;
 explain mismatches or the absence of a suitably verified precedent. Updating the
 architecture from a lesson is a separate, deliberate review.
+
+## Completion claims and drift prevention
+
+Case records may describe a completed feature checkpoint, but an agent must not
+call the **migration** complete without a completion gate. The final scenario
+record must link passed evidence for the final Xcode navigator map, full scoped
+feature inventory, scoped legacy-primitive inventory, post-change build, test,
+manual behaviour regression and human architecture review.
+
+When any gate is missing, use progress language such as “Continuing migration:
+verify the Xcode navigator map.” Never convert a baseline pass, source parse or
+single route refactor into a completion claim. Capture a user correction that
+identifies this drift as a failed or blocked pilot, and mark it ineligible for
+precedent use until a later reviewed record replaces it.

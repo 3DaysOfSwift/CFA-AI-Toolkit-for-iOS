@@ -59,6 +59,17 @@ ViewModels own presentation state: drafts, focus, selection, navigation, loading
 
 ## 3. SwiftUI Views describe the interface
 
+**CFA-specific ownership:** A feature-connected screen declares its backing
+object directly: `@State private var viewModel = HomeViewModel()`. Keep the
+no-argument construction on the property declaration line. Instantiate the
+screen as `HomeView()`, with zero inputs. Never receive a ViewModel in a custom
+initializer, even with a default value, or assign its State backing storage
+there. Feature data reaches the screen through its own ViewModel; tests inject
+an isolated Feature into the ViewModel, not a ViewModel into the View. Stateless
+components may receive plain display snapshots, such as graph data. This rule
+belongs to CFA, not to all SwiftUI code. Keep ViewModel construction cheap and
+side-effect-free; state ownership is not a promise about allocation counts.
+
 **Rule:** Keep Views declarative and free of imperative workflows in almost all cases. Move multi-step event handling into the ViewModel belonging to that View.
 
 **ViewModel intent naming:** Name a ViewModel method for the work it performs,
@@ -130,7 +141,7 @@ when its work completes.
 
 The SwiftUI environment is for app-wide presentation dependencies such as `ThemeManager`, locale-aware formatting or accessibility configuration. Do not place `AppModel` or a feature in the environment. Use the active architecture's declared composition route for feature dependencies. In CFA, a View owns its ViewModel and that ViewModel defaults its narrow live feature dependency from `AppModel.shared`; do not replace that route with screen-initializer plumbing.
 
-**Review:** Does each screen start its own initial work in `.task` before it appears, when that work belongs to the screen? Does the app lifecycle begin shared system refresh early without blocking the root UI? A reader should see what the screen displays and which intents it forwards without tracing storage calls, bundle/system reads, formatting work, business rules, or multi-step tasks in its body. Does the ViewModel have only its defaulted Feature input?
+**Review:** Does each screen start its own initial work in `.task` before it appears, when that work belongs to the screen? Does the app lifecycle begin shared system refresh early without blocking the root UI? A reader should see what the screen displays and which intents it forwards without tracing storage calls, bundle/system reads, formatting work, business rules, or multi-step tasks in its body. Does the ViewModel receive only the narrow Feature dependencies it needs, each with its live default? A screen can present several independent business capabilities. For a growing ViewModel, ask whether it is arranging existing capabilities for this screen or implementing a new business capability itself; only the latter points towards extracting business behaviour into the model.
 
 ### Inline editing saves directly; dedicated editors may have Save and Cancel
 

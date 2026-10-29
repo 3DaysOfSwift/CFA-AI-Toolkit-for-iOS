@@ -9,6 +9,17 @@ Read [project workflow and design authority](references/project-workflow.md) fir
 Respect the recorded workflow and current request; new-app design defaults do
 not authorize UI changes during maintenance or a narrowly scoped task.
 
+When explaining a substantive finding or answering why a rule exists, use
+[decision rationale and verified learning links](references/explanations/guide.md).
+Read only the relevant topic note. Explain the consequence in the user's context;
+do not impose CFA on another architecture or link to an unpublished article.
+
+Apply the specification's screen-construction invariant within the requested
+scope: private inline `@State` ViewModel creation, zero screen initializer inputs,
+and no defaulted ViewModel injection or custom State initialization. Distinguish
+stateless snapshot components from feature-connected screens. Review-only work
+reports violations; tests inject Features into ViewModels, not ViewModels into Views.
+
 Migrate a legacy application into CFA and Swift Concurrency by preserving its
 product behaviour, not translating concurrency syntax.
 
@@ -27,10 +38,12 @@ Use deliberate passes:
    operation and callback; record protected state, ordering, lifetime, error
    delivery, cancellation and callback-execution requirements. Create a product
    behaviour contract from tests, source and manual journeys.
-   Map each top-level app tab to its own concrete Feature, matching AppModel
-   property, dedicated screen ViewModel and named Feature tests. Correct missing
-   tab owners during their migration checkpoint, preserving one authoritative
-   owner for data shared by several tabs; do not duplicate stores or collections.
+   Map each screen to its dedicated ViewModel and required concrete AppModel
+   Features, with named tests for each actual Feature. A screen can present
+   several independent business capabilities; several screens can use the same
+   Feature. Identify missing business owners rather than inventing one per tab.
+   Preserve one authoritative owner for shared business state; do not duplicate
+   stores or collections.
    Preserve existing visuals and interactions as part of that contract. Do not
    inventory against new-app palette counts, popup selectors or branding
    defaults; their absence is not a migration gap. Make visual changes only
@@ -61,6 +74,49 @@ Completion requires an updated primitive inventory, relevant build/tests and
 evidence that behaviour was preserved. Record remaining legacy mechanisms and
 why they remain. A pure GCD application is a valid starting point; CFA is the
 target architecture.
+
+## Anti-drift progress reporting
+
+Default to **“Continuing migration: <next visible feature or verification
+milestone>.”** A route-level refactor, source parsing, or a baseline test run
+is not a completed migration. Do not say “migration complete”, “finished with
+migration”, or equivalent whole-project language until the completion gate in
+[CFA change gate](references/cfa-change-gate.md) is satisfied.
+
+Completion evidence must include the final Xcode navigator map, scoped feature
+inventory, remaining-primitive inventory, post-change build/tests, manual
+behaviour regression and human architecture review. If one is missing, report
+the work as continuing and name that checkpoint. Record failed pilots as
+blocked evidence; they are not reusable migration precedents.
+
+## Continuation contract
+
+A request to migrate, continue, finish or take a migration “to the end” is an
+implementation request, not permission to stop after a reconnaissance pass, a
+folder move, a single converted callback, or a baseline build. Continue through
+the remaining safe, in-scope feature slices until the completion evidence above
+exists or an actual authority/external-state blocker prevents further work.
+
+Do not treat an unavailable simulator, an unavailable device, or a failed
+post-change check as a reason to abandon independent migration work. Record the
+exact verification gap, then continue with the next feature, source inventory,
+test preparation, or navigator correction that can be completed safely. Stop
+only when the developer asks to pause, a required product decision is missing,
+or the same external blocker prevents every remaining meaningful action.
+
+Before yielding control with an incomplete migration, state all three items:
+
+1. **Current evidence:** the feature slices and verification that genuinely
+   exist, without extrapolating from source parsing or a prior baseline.
+2. **Unresolved scope:** each remaining top-level feature, legacy primitive
+   category, and verification gate required for completion.
+3. **Next executable checkpoint:** the precise in-scope action that should run
+   next, phrased as `Continuing migration: …`.
+
+Never end an incomplete migration response with completion language, a generic
+handoff, or a request for confirmation merely because one checkpoint has
+finished. A human may choose to pause; the agent must not silently choose that
+on the migration's behalf.
 
 ## Optional migration case-study capture
 
