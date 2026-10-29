@@ -156,6 +156,13 @@ For each relevant operation, inspect:
   independent writers or conflicting cached state, not harmless value snapshots.
 - Suspension: what assumptions can change during await? Trace validation and
   commit, actor reentrancy, stale results and cleanup of replaced task handles.
+- Operation results: trace how a caller identifies the record its operation
+  created. Comparing a shared collection before and after an await can select
+  another caller's insertion, even when persistence itself is serialized.
+  Prefer an identity or value returned by the operation that performed the write.
+  Check overlapping commands with different inputs and ordering: both records
+  may persist correctly while the callers receive the wrong assessment, receipt
+  or navigation destination. A successful write alone does not verify its result.
 - Derived results: include charts, streaks and other calculated snapshots. A single
   MainActor owner can still publish an obsolete calculation after an await. Check
   the empty-input fast path too: a newer empty result may finish before an older
