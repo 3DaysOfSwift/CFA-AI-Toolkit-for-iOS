@@ -32,7 +32,7 @@ test('partial inventories and unknowns never receive a clean verdict; problems a
  const bad={...op,id:'bad',title:'<script>alert(1)</script>',correctness:'problem',problemKind:'architectural-conflict',recommendation:'Move ownership later'};
  const result=operationAssessments({...data,operations:[op,bad]});
  assert.match(result.verdict,/Yes/);
- assert.ok(result.html.indexOf('❌ Problem ·')<result.html.indexOf('✅ Sound ·'));
+ assert.ok(result.html.indexOf('❌ Problem ·')<result.html.indexOf('✅ Stable ·'));
  assert.ok(!result.html.includes('<script>'));
  assert.match(result.html,/Suggested change/);
  assert.match(operationAssessments().verdict,/Inconclusive/);
@@ -94,5 +94,5 @@ test('individual checks preserve verified strengths and separate CFA deviations'
   assert.match(result.html,/Correctness checks passed for all 1 assessed operations/);
   assert.match(result.html,/not a whole-app pass/);
   const mixed=operationAssessments({operations:[{...op,clarity:'investigate',unknowns:['Where is the lifetime policy documented?']}]});
-  assert.match(mixed.html,/Concurrency correctness: ✅ Sound · Architectural clarity: ⚠️ Needs investigation/);
+  assert.match(mixed.html,/Concurrency correctness: ✅ Stable · Architectural clarity: ⚠️ Needs investigation/);
  });
