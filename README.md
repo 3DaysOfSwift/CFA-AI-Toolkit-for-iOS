@@ -84,8 +84,6 @@ All eight skills share 17 local design-decision references and verified links to
 free public tutorials. They answer your question directly and can offer a relevant
 article for more detail, such as [why use AppModel in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/appmodel-composition).
 The references work offline; visiting the website or enrolling in training is optional.
-See [the publication record](docs/EXPLANATIONS-PUBLICATION-v0.3.3.md) for the dated
-review and its limits.
 
 ## Install CFA AI Toolkit for iOS once
 

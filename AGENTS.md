@@ -33,3 +33,14 @@ Do not infer native host compatibility or public publication from a valid manife
 
 Do not publish to a remote repository or release service without an explicit destination
 and authorization. The source repository can be committed/tagged locally for preparation.
+
+## Public documentation
+
+Write READMEs, release announcements and articles for the developer using the
+product. Never copy prompts, assistant responses, conversational history or
+internal task reports into them. Keep editorial approval status, publication
+checklists, incidental broken-link investigations, test-run narration and
+speculative disclaimers out of public product copy. Retain useful installation
+instructions and material product constraints. Internal verification belongs in
+maintainer records, not reader-facing prose. This is Matthew Thomas's explicit
+standing preference.
