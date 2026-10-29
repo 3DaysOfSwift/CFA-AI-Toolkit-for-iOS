@@ -165,6 +165,15 @@ For each relevant operation, inspect:
   propagation through bridges and continuation completion on all relevant paths.
   Cancellation is cooperative; cancelling a request alone does not prove a stale
   result cannot commit. Check identity/generation or equivalent ordering logic.
+- Cancellation before side effects: a check before an await does not cover
+  cancellation during that await. Trace the interval between preparation or access
+  checks and starting a payment, write or other external effect. Check cancellation
+  again at the dispatch boundary when the operation is meant to stop. For queued
+  work, inspect cancellation after admission and before performing new I/O.
+  Distinguish this from a write that has already succeeded: suppressing publication
+  after a durable commit can leave application state inconsistent with storage.
+  Establish the operation's intended policy; do not require every shared or
+  app-owned operation to stop when one caller cancels.
 - Responsiveness: blocking waits and expensive processing on an executor needed
   by other work, including MainActor. Measure before asserting a measured slowdown.
 
