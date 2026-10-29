@@ -634,6 +634,24 @@ exposes them as AppModel properties.
 
 ## Organize Behaviour into Cohesive Features
 
+A CFA Feature owns the authoritative application state for a business capability
+and exposes the operations that manage it. Features are isolated to the main
+actor and made available through AppModel, even when no screen currently displays
+their capability. This is a CFA architecture convention, not a Swift requirement.
+
+Lower-level services fetch, persist or process data. They may retain internal
+state needed to perform their work, such as in-flight requests, cached responses
+or database machinery. They do not become Features merely because they contain
+mutable state, and must not become competing authorities for business state.
+Do not add a second application-level cache without a concrete requirement.
+
+For example, UserProfileFeature owns the current profile used by the application;
+UserProfileAPI returns profile data without maintaining a second current-user
+model. PostFeedFeature owns its posts, pagination cursor and loading/error state;
+its API adapter returns pages. During migration, locate where downloaded data is
+retained and managed as a candidate Feature boundary. API response shapes and
+endpoint counts are clues, not a requirement for one Feature per endpoint.
+
 A concrete feature owns one coherent application capability. Name its type
 after that capability with the `Feature` suffix: `SettingsFeature`,
 `PurchasesFeature`, `HabitsFeature`. Do not name feature owners `Manager` or
@@ -1075,8 +1093,10 @@ when it represents completed asynchronous work.
 
 ## Preserve One Authoritative Owner for Shared State
 
-Every piece of persisted or shared feature state has one authoritative owner:
-its feature. ViewModels expose, format, and temporarily edit that state;
+Every piece of shared mutable application state has one authoritative Feature
+owner on the main actor. Persistence records and implementation caches are
+representations used by lower-level services, not additional authorities for the
+application's current business state. ViewModels expose, format, and temporarily edit that state;
 they do not maintain competing copies that require manual synchronization.
 
 ViewModel-owned drafts, selections, focus, loading presentation, and transient

@@ -15,7 +15,7 @@ A compiler-clean operation can still apply an obsolete result after an await. Ma
 
 ## Documented rationale
 
-The specification separates actor isolation, immutable values, operation ordering and observation. CFA chooses main-actor UI-facing Features with explicit workers where the work requires them.
+The specification separates actor isolation, immutable values, operation ordering and observation. CFA chooses main-actor Features owning authoritative application state, including capabilities with no current screen, with explicit workers where the work requires them. Lower-level services retain their own appropriate isolation for internal machinery; their mutable internals alone do not make them Features. Matthew Thomas confirmed this ownership distinction on 2026-10-29.
 
 ## Trade-offs and alternatives
 

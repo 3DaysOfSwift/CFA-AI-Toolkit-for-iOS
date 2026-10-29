@@ -3,11 +3,11 @@
 Topic: `feature-ownership`  
 Rules: `CFA-FEATURE-01`, `CFA-FEATURE-02`  
 Classification: cfa-choice  
-Status: screen/Feature relationship and extraction criterion confirmed by Matthew Thomas on 2026-10-29; other trade-offs remain editorial analysis.
+Status: Feature definition, state ownership, screen/Feature relationship and extraction criterion confirmed by Matthew Thomas on 2026-10-29; other trade-offs remain editorial analysis.
 
 ## Rule
 
-A screen can present several independent business capabilities. Features follow business responsibilities, not a one-to-one screen or tab mapping. Each screen owns its dedicated ViewModel, which uses the Features it needs. Shared business state retains one authoritative owner.
+A CFA Feature owns the authoritative application state for a business capability and exposes the operations that manage it. Features are isolated to the main actor and made available through AppModel. A screen can present several independent business capabilities. Features follow business responsibilities, not a one-to-one screen or tab mapping. Each screen owns its dedicated ViewModel, which uses the Features it needs.
 
 ## Problem
 
@@ -19,6 +19,8 @@ Matthew Thomas confirmed that a screen can present several independent business 
 
 For a growing ViewModel, ask: **is it arranging existing capabilities for this screen, or implementing a new business capability itself?** Only the latter points towards extracting business behaviour into the model. Presentation coordination stays in the presentation layer. An architectural extension is justified by a newly identified responsibility, not by dependency count alone.
 
+The authoritative state distinction is also confirmed by Matthew Thomas. UserProfileFeature owns the current profile; its API adapter fetches values. PostFeedFeature owns the post collection and pagination policy; its provider returns pages. A service's private request tracking, cache or database machinery does not turn it into a business Feature. Avoid competing application-level copies of the same state.
+
 ## Trade-offs and alternatives
 
 Editorial analysis: several Feature dependencies make a screen's needs explicit, but require clear presentation coordination and tests. A facade introduced solely to hide that count adds indirection without identifying a new capability. A focused presentation helper may be useful when device-specific coordination becomes complex.
@@ -29,7 +31,7 @@ This is a CFA convention, not a SwiftUI requirement. One Feature may support sev
 
 ## Verification
 
-Map each screen to its dedicated ViewModel, required Features and behavioural tests. Accept multiple Features per screen and multiple screens per Feature. Exercise cross-screen consistency and check that new business rules have a model owner while presentation decisions remain in presentation.
+Map each screen to its dedicated ViewModel, required Features and behavioural tests. Accept multiple Features per screen and multiple screens per Feature. Locate the authority for each business value separately from storage/cache representations. Exercise cross-screen consistency, outdated pagination responses and failed updates; check that new business rules have a model owner while presentation decisions remain in presentation. Do not infer ownership from names alone.
 
 ## Evidence and provenance
 

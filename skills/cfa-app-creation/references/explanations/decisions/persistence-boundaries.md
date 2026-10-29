@@ -9,6 +9,8 @@ Status: documented basis with editorial analysis; not a founder-approved histori
 
 CFA uses one app-owned SwiftData storage boundary when a database is warranted. Repositories expose domain operations, retain storage representations internally, and persist record-level mutations without replacing unrelated data.
 
+Features own authoritative application state. A persisted record, implementation cache or database context is not a second business authority. Storage services may retain internal machinery, but must not maintain a competing current profile or feed independently of its Feature.
+
 ## Problem
 
 Per-feature containers duplicate initialization and ownership. Replacing a collection from a stale snapshot can lose someone else's edit. Quiet in-memory fallbacks turn failure into apparent empty success.

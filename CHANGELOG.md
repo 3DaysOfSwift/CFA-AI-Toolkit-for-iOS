@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.3.2 — 2026-10-29
+
+- Define Features as main-actor owners of authoritative application state for
+  business capabilities. Distinguish that ownership from service-internal caches,
+  request tracking and storage machinery.
+- Replace mandatory Feature-per-tab ownership with capability-based boundaries.
+  Screens may combine several Features; growing ViewModels extract business
+  behaviour only when it represents a model responsibility.
+- Bundle a shared explanation catalogue, 17 design-decision notes and local
+  lookup/validation tools with all eight skills. Separate confirmed rationale
+  from editorial analysis; never offer unverified article URLs as published links.
+- Separate runnable Starter Apps from installable Xcode templates and exclude
+  local Xcode state/build output from release archives.
+- Strengthen screen construction checks, app identity/orientation verification,
+  migration completion evidence and the corresponding workflow guidance.
+- Preserve product behaviour during adoption. Existing composed Features are
+  reviewed as explicit architectural extensions, not mechanically split or removed.
+
 ## 0.3.1 — 2026-10-25
 
 - Add opt-in migration evidence capture: a versioned scenario schema, case-study

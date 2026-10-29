@@ -102,6 +102,9 @@ the architecture:
     dedicated ViewModel; several screens may use the same Feature. Give each
     Feature a real responsibility and named tests, with one authoritative owner
     for shared business state. Do not invent a Feature to match a tab count.
+    Features own authoritative application state on the main actor. Distinguish
+    service-internal request tracking, caches and storage machinery from that
+    business authority; do not promote all stateful helpers into AppModel.
 21. New-app visual starting points live in [new-app design defaults](new-app-design-defaults.md).
     Use them only where appropriate to the recorded workflow and current request;
     user-approved designs override defaults. Do not require palette counts or

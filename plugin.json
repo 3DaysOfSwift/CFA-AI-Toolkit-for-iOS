@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "ios-app-development-cfa",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "CFA AI Toolkit for iOS: AI skills and tools to build, modernise, test and maintain SwiftUI apps with Swift Concurrency.",
   "author": {
     "name": "3 Days of Swift Concurrency",

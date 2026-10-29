@@ -1,5 +1,25 @@
 # Explanation response evaluation
 
+## Feature-boundary clarification cases (v0.3.2)
+
+These are manual evaluation inputs and expected review criteria, not executed
+agent trials or automated proof of semantic correctness.
+
+- A Settings screen uses SettingsFeature and UserProfileFeature. Accept both
+  dependencies; do not create a combined Feature solely to hide the count.
+- A feed provider returns pages while PostFeedFeature owns posts, cursor and
+  loading state. Keep one business authority; inspect stale-result and pagination
+  policy without introducing a duplicate in-memory feed cache.
+- A networking actor retains in-flight requests and an image cache. Keep this
+  implementation state below the Feature boundary rather than exposing every
+  stateful helper through AppModel.
+- A watch ViewModel selects a compact arrangement of existing book/progress data.
+  Keep device presentation in presentation. If it starts defining which books
+  satisfy a daily learning goal, identify that business rule for model extraction.
+- An existing TodayFeature composes other Features. Preserve behaviour and assess
+  its business responsibility as an architectural extension; do not mechanically
+  remove it to apply a new-app starting rule.
+
 These are manual host-evaluation cases, not executed test results. Run with the
 packaged skill in an isolated workspace. Record host/model, plugin version,
 prompt, actual output and pass/fail evidence outside a customer's app.
