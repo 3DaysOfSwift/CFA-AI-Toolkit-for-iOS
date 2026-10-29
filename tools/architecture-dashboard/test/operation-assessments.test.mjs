@@ -66,6 +66,7 @@ test('individual checks preserve verified strengths and separate CFA deviations'
   const collapsedRow=html.slice(html.indexOf('<details class="review">'),html.indexOf('</summary>',html.indexOf('<details class="review">')));
   assert.match(collapsedRow,/Does the API observe cancellation\?/);
   assert.match(collapsedRow,/CFA conformance: ❌ Fail/);
+  assert.match(collapsedRow,/CFA · Feature naming: Does not follow CFA naming/);
   assert.match(html,/0 operations pass · 1 fail/);
   assert.match(html,/How to resolve/);
   assert.match(operationAssessments(imported).verdict,/Inconclusive/);
@@ -74,7 +75,11 @@ test('individual checks preserve verified strengths and separate CFA deviations'
   resolved.operations[0].unknowns=[];
   const good=await importReview(report,resolved,root);
   assert.equal(good.operations[0].correctness,'sound');
-  assert.match(operationAssessments(good).verdict,/No architectural conflicts/);
+  const stableWithDeviation=operationAssessments(good);
+  assert.match(stableWithDeviation.verdict,/No architectural conflicts/);
+  assert.equal(stableWithDeviation.counts.sound,1);
+  assert.equal(stableWithDeviation.counts.problem,0);
+  assert.match(stableWithDeviation.html,/CFA · Feature naming: Does not follow CFA naming/);
   for(const mutate of [c=>delete c.question,c=>delete c.resolveBy]) {
    const invalid=structuredClone(input);mutate(invalid.operations[0].checks.find(c=>c.id==='cancellation'));
    await assert.rejects(importReview(report,invalid,root),/requires question/);
