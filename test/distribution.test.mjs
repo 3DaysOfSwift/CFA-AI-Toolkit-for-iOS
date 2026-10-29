@@ -23,7 +23,7 @@ test('release omits local Xcode state and build outputs, but retains shared proj
  const helper=path.join(source,'skills/cfa-architecture-review/scripts/explanations.mjs');
  const lookup=spawnSync(process.execPath,[helper,'lookup','CFA-TASK-01'],{encoding:'utf8'});
  assert.equal(lookup.status,0,lookup.stderr);
- assert.deepEqual(JSON.parse(lookup.stdout).links,[]);
+ assert.equal(JSON.parse(lookup.stdout).links[0].url,'https://www.3daysofswiftconcurrency.com/cfa/explanation/unstructured-tasks');
 });
 
 test('release keeps runnable Starter Apps separate from installable Xcode templates', t => {

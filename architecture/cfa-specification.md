@@ -645,6 +645,17 @@ or database machinery. They do not become Features merely because they contain
 mutable state, and must not become competing authorities for business state.
 Do not add a second application-level cache without a concrete requirement.
 
+The default execution boundary is MainActor-isolated Features above services
+that perform networking, persistence and expensive processing under their own
+isolation. A NetworkingManager may be an actor; ordinary helpers can be owned
+by a worker actor without each becoming an actor. Avoid MainActor isolation for
+those workers unless a framework API requires it. Keep such requirements at
+a narrow adapter boundary. A separate type or async keyword alone does not
+move execution off MainActor: synchronous helpers run with their caller, and
+async execution depends on explicit isolation and compiler settings. Keep small
+coordination work cheap and move expensive work across a deliberate boundary.
+Actors provide isolation, not dedicated threads.
+
 For example, UserProfileFeature owns the current profile used by the application;
 UserProfileAPI returns profile data without maintaining a second current-user
 model. PostFeedFeature owns its posts, pagination cursor and loading/error state;
@@ -1078,7 +1089,8 @@ For supported modern deployment targets, use `@Observable` rather than Combine
 publisher plumbing for UI-readable reference state.
 
 - Put `@Observable` on ViewModels and UI-observed features.
-- Put those types on `@MainActor` when their state is read by SwiftUI.
+- Put ViewModels and all Features on `@MainActor`; a Feature without a current
+  screen follows the same isolation convention.
 - Own a ViewModel with `@State` in its View.
 - Create an `@Bindable` projection only when a SwiftUI control requires a
   writable binding.

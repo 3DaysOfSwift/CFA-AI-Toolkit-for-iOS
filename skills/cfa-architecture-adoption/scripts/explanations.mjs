@@ -45,7 +45,7 @@ export function validatePublication(publication) {
   try { url = new URL(publication.url); } catch { throw Error('Invalid publication URL'); }
   requireValue(url.protocol === 'https:' && url.hostname === 'www.3daysofswiftconcurrency.com' &&
     !url.username && !url.password && !url.port && !url.search && !url.hash &&
-    /^\/(cfa\/explanations|blog|articles)\/[a-z0-9%-]+$/.test(url.pathname),
+    /^\/(cfa\/explanations?|blog|articles)\/[a-z0-9%-]+$/.test(url.pathname),
   'Publication URL must be a clean HTTPS explanation or lesson on the publisher site');
   requireValue(validDate(publication.verifiedOn), 'Publication needs a valid non-future verification date');
   const evidence = publication.verificationEvidence;
@@ -97,7 +97,7 @@ export function validateCatalogue(catalogue, directory, { sourceRoot } = {}) {
       Number.isInteger(priority[key]) && priority[key] >= 1 && priority[key] <= 3) &&
       nonempty(priority.basis), 'Invalid editorial priority');
     requireValue(priority.observedOccurrences === null, 'Measured demand is not supported without an evidence-backed demand schema');
-    requireValue(topic.publication?.proposedPath === `/cfa/explanations/${topic.id}`, 'Invalid proposed explanation path');
+    requireValue([`/cfa/explanation/${topic.id}`, `/cfa/explanations/${topic.id}`].includes(topic.publication?.proposedPath), 'Invalid proposed explanation path');
     validatePublication(topic.publication);
     requireValue(Array.isArray(topic.relatedLessons), 'Invalid related lessons');
     for (const lesson of topic.relatedLessons) {

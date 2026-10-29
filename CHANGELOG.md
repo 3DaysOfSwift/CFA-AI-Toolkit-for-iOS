@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.3 — 2026-10-29
+
+- Activate all 17 verified free explanation URLs across the eight skills, with
+  dated content-review evidence and updated local publication notes.
+- Support the site's existing singular `/cfa/explanation/{slug}` routes while
+  retaining strict HTTPS, host, path and verification requirements.
+- Clarify MainActor ownership for all Features and the execution boundary for
+  networking, persistence and processing services; separate types and `async`
+  alone do not move work off the main actor.
+- Record the website's real-app teaching revisions, anonymous desktop/mobile
+  checks and corrected outgoing links. Preserve the illustrated training card.
+- Retain offline explanations and suppress links for planned, withdrawn or
+  unverified resources. No automatic application refactoring is introduced.
+
 ## 0.3.2 — 2026-10-29
 
 - Define Features as main-actor owners of authoritative application state for

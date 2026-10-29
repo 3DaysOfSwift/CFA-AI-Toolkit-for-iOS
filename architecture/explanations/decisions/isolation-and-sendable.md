@@ -7,7 +7,7 @@ Status: documented basis with editorial analysis; not a founder-approved histori
 
 ## Rule
 
-Keep UI-observed state on its intended actor, send appropriate values across boundaries, and inspect suspension points. Do not use unchecked annotations or detached tasks merely to silence diagnostics.
+Keep ViewModels and Features on MainActor, put networking, persistence and expensive processing behind appropriately isolated services, send suitable values across boundaries, and inspect suspension points. Do not use unchecked annotations or detached tasks merely to silence diagnostics.
 
 ## Problem
 
@@ -43,6 +43,7 @@ Which supported toolchain configurations should the first public examples cover?
 
 ## Publication
 
-Planned explanation path: `/cfa/explanations/isolation-and-sendable`.
-Not published or verified. Do not offer that path as a working link.
-Use the local explanation directly until the catalogue contains a verified URL.
+[Read the public explanation](https://www.3daysofswiftconcurrency.com/cfa/explanation/isolation-and-sendable).
+Verified on 2026-10-29 for topic relevance, anonymous access, readable code,
+desktop/mobile layout and the training footer. The catalogue records the review
+evidence. This dated verification does not imply that the page was checked today.

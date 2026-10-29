@@ -104,11 +104,23 @@
         "observedOccurrences": null
       },
       "publication": {
-        "status": "planned",
-        "proposedPath": "/cfa/explanations/readability",
-        "url": null,
-        "verifiedOn": null,
-        "verificationEvidence": null
+        "status": "published",
+        "proposedPath": "/cfa/explanation/readability",
+        "url": "https://www.3daysofswiftconcurrency.com/cfa/explanation/readability",
+        "verifiedOn": "2026-10-29",
+        "verificationEvidence": {
+          "method": "rendered-content-review",
+          "title": "Why use descriptive names in our code?",
+          "relevance": "Reviewed against CFA-READ-01, CFA-READ-02 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
+          "anonymousAccess": true,
+          "desktopViewport": "1280x900",
+          "mobileViewport": "390x844",
+          "codeFormattingVerified": true,
+          "trainingFooterVerified": true,
+          "tutorialHTMLSHA256": "d8845fab4b7708990ca2c1040f209cc6ae4aa0c6713e839c33f3dd421e0b4a5f",
+          "websiteCommit": "d83657f"
+        }
       },
       "relatedLessons": []
     },
@@ -160,11 +172,23 @@
         "observedOccurrences": null
       },
       "publication": {
-        "status": "planned",
-        "proposedPath": "/cfa/explanations/presentation-boundaries",
-        "url": null,
-        "verifiedOn": null,
-        "verificationEvidence": null
+        "status": "published",
+        "proposedPath": "/cfa/explanation/presentation-boundaries",
+        "url": "https://www.3daysofswiftconcurrency.com/cfa/explanation/presentation-boundaries",
+        "verifiedOn": "2026-10-29",
+        "verificationEvidence": {
+          "method": "rendered-content-review",
+          "title": "Why use a UI and model boundary in our code?",
+          "relevance": "Reviewed against CFA-UI-01, CFA-STATE-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
+          "anonymousAccess": true,
+          "desktopViewport": "1280x900",
+          "mobileViewport": "390x844",
+          "codeFormattingVerified": true,
+          "trainingFooterVerified": true,
+          "tutorialHTMLSHA256": "17ce939cbc018a745354a378318d4ba0caff66c2a3f1a60e81047d5fc61c101a",
+          "websiteCommit": "d83657f"
+        }
       },
       "relatedLessons": []
     },
@@ -208,11 +232,23 @@
         "observedOccurrences": null
       },
       "publication": {
-        "status": "planned",
-        "proposedPath": "/cfa/explanations/view-model-ownership",
-        "url": null,
-        "verifiedOn": null,
-        "verificationEvidence": null
+        "status": "published",
+        "proposedPath": "/cfa/explanation/view-model-ownership",
+        "url": "https://www.3daysofswiftconcurrency.com/cfa/explanation/view-model-ownership",
+        "verifiedOn": "2026-10-29",
+        "verificationEvidence": {
+          "method": "rendered-content-review",
+          "title": "Why use screen-owned ViewModels in our code?",
+          "relevance": "Reviewed against CFA-SCREEN-01, CFA-SCREEN-02 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
+          "anonymousAccess": true,
+          "desktopViewport": "1280x900",
+          "mobileViewport": "390x844",
+          "codeFormattingVerified": true,
+          "trainingFooterVerified": true,
+          "tutorialHTMLSHA256": "25aae987522f301005cdcf922961758dc9f20a2eb50158c03063c525e3debb41",
+          "websiteCommit": "d83657f"
+        }
       },
       "relatedLessons": []
     },
@@ -240,11 +276,23 @@
         "observedOccurrences": null
       },
       "publication": {
-        "status": "planned",
-        "proposedPath": "/cfa/explanations/appmodel-composition",
-        "url": null,
-        "verifiedOn": null,
-        "verificationEvidence": null
+        "status": "published",
+        "proposedPath": "/cfa/explanation/appmodel-composition",
+        "url": "https://www.3daysofswiftconcurrency.com/cfa/explanation/appmodel-composition",
+        "verifiedOn": "2026-10-29",
+        "verificationEvidence": {
+          "method": "rendered-content-review",
+          "title": "Why use AppModel in our code?",
+          "relevance": "Reviewed against CFA-GRAPH-01, CFA-GRAPH-02 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
+          "anonymousAccess": true,
+          "desktopViewport": "1280x900",
+          "mobileViewport": "390x844",
+          "codeFormattingVerified": true,
+          "trainingFooterVerified": true,
+          "tutorialHTMLSHA256": "e83f14c6fc16bd40bca7ca91840b480d73673dda235d3335ca7d01cb7a75582e",
+          "websiteCommit": "d83657f"
+        }
       },
       "relatedLessons": []
     },
@@ -276,11 +324,23 @@
         "observedOccurrences": null
       },
       "publication": {
-        "status": "planned",
-        "proposedPath": "/cfa/explanations/feature-ownership",
-        "url": null,
-        "verifiedOn": null,
-        "verificationEvidence": null
+        "status": "published",
+        "proposedPath": "/cfa/explanation/feature-ownership",
+        "url": "https://www.3daysofswiftconcurrency.com/cfa/explanation/feature-ownership",
+        "verifiedOn": "2026-10-29",
+        "verificationEvidence": {
+          "method": "rendered-content-review",
+          "title": "Why use cohesive features in our code?",
+          "relevance": "Reviewed against CFA-FEATURE-01, CFA-FEATURE-02 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
+          "anonymousAccess": true,
+          "desktopViewport": "1280x900",
+          "mobileViewport": "390x844",
+          "codeFormattingVerified": true,
+          "trainingFooterVerified": true,
+          "tutorialHTMLSHA256": "b81aa195a506b1b89a1d0c9dae8bd0c6966642826e9fff9d3fb676a779b65de8",
+          "websiteCommit": "d83657f"
+        }
       },
       "relatedLessons": []
     },
@@ -315,11 +375,23 @@
         "observedOccurrences": null
       },
       "publication": {
-        "status": "planned",
-        "proposedPath": "/cfa/explanations/concrete-features",
-        "url": null,
-        "verifiedOn": null,
-        "verificationEvidence": null
+        "status": "published",
+        "proposedPath": "/cfa/explanation/concrete-features",
+        "url": "https://www.3daysofswiftconcurrency.com/cfa/explanation/concrete-features",
+        "verifiedOn": "2026-10-29",
+        "verificationEvidence": {
+          "method": "rendered-content-review",
+          "title": "Why use concrete features in our code?",
+          "relevance": "Reviewed against CFA-API-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
+          "anonymousAccess": true,
+          "desktopViewport": "1280x900",
+          "mobileViewport": "390x844",
+          "codeFormattingVerified": true,
+          "trainingFooterVerified": true,
+          "tutorialHTMLSHA256": "a5e1e37d95d134ac7938c3cdc85ea4171e882b3c53dd621724edca5f7ddd04eb",
+          "websiteCommit": "d83657f"
+        }
       },
       "relatedLessons": []
     },
@@ -364,11 +436,23 @@
         "observedOccurrences": null
       },
       "publication": {
-        "status": "planned",
-        "proposedPath": "/cfa/explanations/persistence-boundaries",
-        "url": null,
-        "verifiedOn": null,
-        "verificationEvidence": null
+        "status": "published",
+        "proposedPath": "/cfa/explanation/persistence-boundaries",
+        "url": "https://www.3daysofswiftconcurrency.com/cfa/explanation/persistence-boundaries",
+        "verifiedOn": "2026-10-29",
+        "verificationEvidence": {
+          "method": "rendered-content-review",
+          "title": "Why use record-level persistence boundaries in our code?",
+          "relevance": "Reviewed against CFA-STORE-01, CFA-STORE-02, CFA-STORE-03 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
+          "anonymousAccess": true,
+          "desktopViewport": "1280x900",
+          "mobileViewport": "390x844",
+          "codeFormattingVerified": true,
+          "trainingFooterVerified": true,
+          "tutorialHTMLSHA256": "20a06b5644bab48d4b9165100bf7221909e1d2e7f34104bd52b1d2d87952bbb7",
+          "websiteCommit": "d83657f"
+        }
       },
       "relatedLessons": []
     },
@@ -412,11 +496,23 @@
         "observedOccurrences": null
       },
       "publication": {
-        "status": "planned",
-        "proposedPath": "/cfa/explanations/storage-failures",
-        "url": null,
-        "verifiedOn": null,
-        "verificationEvidence": null
+        "status": "published",
+        "proposedPath": "/cfa/explanation/storage-failures",
+        "url": "https://www.3daysofswiftconcurrency.com/cfa/explanation/storage-failures",
+        "verifiedOn": "2026-10-29",
+        "verificationEvidence": {
+          "method": "rendered-content-review",
+          "title": "Why use recoverable storage requests in our code?",
+          "relevance": "Reviewed against CFA-LAUNCH-01, CFA-ERROR-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
+          "anonymousAccess": true,
+          "desktopViewport": "1280x900",
+          "mobileViewport": "390x844",
+          "codeFormattingVerified": true,
+          "trainingFooterVerified": true,
+          "tutorialHTMLSHA256": "21774e04c3302b8f07003bd175a91fba930b24dc4b6d01e82208f302681c25a5",
+          "websiteCommit": "d83657f"
+        }
       },
       "relatedLessons": []
     },
@@ -452,11 +548,23 @@
         "observedOccurrences": null
       },
       "publication": {
-        "status": "planned",
-        "proposedPath": "/cfa/explanations/unstructured-tasks",
-        "url": null,
-        "verifiedOn": null,
-        "verificationEvidence": null
+        "status": "published",
+        "proposedPath": "/cfa/explanation/unstructured-tasks",
+        "url": "https://www.3daysofswiftconcurrency.com/cfa/explanation/unstructured-tasks",
+        "verifiedOn": "2026-10-29",
+        "verificationEvidence": {
+          "method": "rendered-content-review",
+          "title": "Unstructured tasks need an owner\u2014not a ban",
+          "relevance": "Reviewed against CFA-TASK-01, CFA-TASK-02 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
+          "anonymousAccess": true,
+          "desktopViewport": "1280x900",
+          "mobileViewport": "390x844",
+          "codeFormattingVerified": true,
+          "trainingFooterVerified": true,
+          "tutorialHTMLSHA256": "a93d99bdbdc9ea108fbcbb6ac456d8df08f97086cbd54bcf92d2e80d56844267",
+          "websiteCommit": "d83657f"
+        }
       },
       "relatedLessons": []
     },
@@ -483,11 +591,23 @@
         "observedOccurrences": null
       },
       "publication": {
-        "status": "planned",
-        "proposedPath": "/cfa/explanations/task-cancellation",
-        "url": null,
-        "verifiedOn": null,
-        "verificationEvidence": null
+        "status": "published",
+        "proposedPath": "/cfa/explanation/task-cancellation",
+        "url": "https://www.3daysofswiftconcurrency.com/cfa/explanation/task-cancellation",
+        "verifiedOn": "2026-10-29",
+        "verificationEvidence": {
+          "method": "rendered-content-review",
+          "title": "Cancellation is a policy, not a button",
+          "relevance": "Reviewed against CFA-CANCEL-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
+          "anonymousAccess": true,
+          "desktopViewport": "1280x900",
+          "mobileViewport": "390x844",
+          "codeFormattingVerified": true,
+          "trainingFooterVerified": true,
+          "tutorialHTMLSHA256": "b65b73a4471c05d5f0d14807fa1d18e949fc66618d5e38d241c666cacbfda0db",
+          "websiteCommit": "d83657f"
+        }
       },
       "relatedLessons": []
     },
@@ -515,11 +635,23 @@
         "observedOccurrences": null
       },
       "publication": {
-        "status": "planned",
-        "proposedPath": "/cfa/explanations/overlapping-requests",
-        "url": null,
-        "verifiedOn": null,
-        "verificationEvidence": null
+        "status": "published",
+        "proposedPath": "/cfa/explanation/overlapping-requests",
+        "url": "https://www.3daysofswiftconcurrency.com/cfa/explanation/overlapping-requests",
+        "verifiedOn": "2026-10-29",
+        "verificationEvidence": {
+          "method": "rendered-content-review",
+          "title": "Two callers. One refresh. No lost edits.",
+          "relevance": "Reviewed against CFA-OVERLAP-01, CFA-OVERLAP-02 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
+          "anonymousAccess": true,
+          "desktopViewport": "1280x900",
+          "mobileViewport": "390x844",
+          "codeFormattingVerified": true,
+          "trainingFooterVerified": true,
+          "tutorialHTMLSHA256": "9273981fec176527a87d014a1d28d29d29398df046a85a996a6888fb9df206aa",
+          "websiteCommit": "d83657f"
+        }
       },
       "relatedLessons": []
     },
@@ -551,11 +683,23 @@
         "observedOccurrences": null
       },
       "publication": {
-        "status": "planned",
-        "proposedPath": "/cfa/explanations/isolation-and-sendable",
-        "url": null,
-        "verifiedOn": null,
-        "verificationEvidence": null
+        "status": "published",
+        "proposedPath": "/cfa/explanation/isolation-and-sendable",
+        "url": "https://www.3daysofswiftconcurrency.com/cfa/explanation/isolation-and-sendable",
+        "verifiedOn": "2026-10-29",
+        "verificationEvidence": {
+          "method": "rendered-content-review",
+          "title": "Why use actors and Sendable values in our code?",
+          "relevance": "Reviewed against CFA-ISOLATION-01, CFA-SENDABLE-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
+          "anonymousAccess": true,
+          "desktopViewport": "1280x900",
+          "mobileViewport": "390x844",
+          "codeFormattingVerified": true,
+          "trainingFooterVerified": true,
+          "tutorialHTMLSHA256": "300b9ff8b299b93725a157457fcdf9a917e3aecbd836040fb6543c4f0c3bd2b9",
+          "websiteCommit": "d83657f"
+        }
       },
       "relatedLessons": []
     },
@@ -595,11 +739,23 @@
         "observedOccurrences": null
       },
       "publication": {
-        "status": "planned",
-        "proposedPath": "/cfa/explanations/behavioural-testing",
-        "url": null,
-        "verifiedOn": null,
-        "verificationEvidence": null
+        "status": "published",
+        "proposedPath": "/cfa/explanation/behavioural-testing",
+        "url": "https://www.3daysofswiftconcurrency.com/cfa/explanation/behavioural-testing",
+        "verifiedOn": "2026-10-29",
+        "verificationEvidence": {
+          "method": "rendered-content-review",
+          "title": "Why use behavioural tests in our code?",
+          "relevance": "Reviewed against CFA-TEST-01, CFA-TIME-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
+          "anonymousAccess": true,
+          "desktopViewport": "1280x900",
+          "mobileViewport": "390x844",
+          "codeFormattingVerified": true,
+          "trainingFooterVerified": true,
+          "tutorialHTMLSHA256": "8aa253ba82bc62f949b9ab3e881247add04a0bd62ac31b86d64f7f79fc487cfa",
+          "websiteCommit": "d83657f"
+        }
       },
       "relatedLessons": []
     },
@@ -635,11 +791,23 @@
         "observedOccurrences": null
       },
       "publication": {
-        "status": "planned",
-        "proposedPath": "/cfa/explanations/preserve-product-behaviour",
-        "url": null,
-        "verifiedOn": null,
-        "verificationEvidence": null
+        "status": "published",
+        "proposedPath": "/cfa/explanation/preserve-product-behaviour",
+        "url": "https://www.3daysofswiftconcurrency.com/cfa/explanation/preserve-product-behaviour",
+        "verifiedOn": "2026-10-29",
+        "verificationEvidence": {
+          "method": "rendered-content-review",
+          "title": "Why use behaviour-preserving migration in our code?",
+          "relevance": "Reviewed against CFA-SCOPE-01, CFA-SCOPE-02 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
+          "anonymousAccess": true,
+          "desktopViewport": "1280x900",
+          "mobileViewport": "390x844",
+          "codeFormattingVerified": true,
+          "trainingFooterVerified": true,
+          "tutorialHTMLSHA256": "39753042f5ce3e31db447cc2df56edbdc8c0ae9ae8341d94cb894373c5a18261",
+          "websiteCommit": "d83657f"
+        }
       },
       "relatedLessons": []
     },
@@ -687,11 +855,23 @@
         "observedOccurrences": null
       },
       "publication": {
-        "status": "planned",
-        "proposedPath": "/cfa/explanations/project-structure",
-        "url": null,
-        "verifiedOn": null,
-        "verificationEvidence": null
+        "status": "published",
+        "proposedPath": "/cfa/explanation/project-structure",
+        "url": "https://www.3daysofswiftconcurrency.com/cfa/explanation/project-structure",
+        "verifiedOn": "2026-10-29",
+        "verificationEvidence": {
+          "method": "rendered-content-review",
+          "title": "Why use an ownership-based project structure in our code?",
+          "relevance": "Reviewed against CFA-PROJECT-01, CFA-PROJECT-02 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
+          "anonymousAccess": true,
+          "desktopViewport": "1280x900",
+          "mobileViewport": "390x844",
+          "codeFormattingVerified": true,
+          "trainingFooterVerified": true,
+          "tutorialHTMLSHA256": "11015d771f098555259e79d8e07a439f45fe1178c64f40c022e3e458f4314222",
+          "websiteCommit": "d83657f"
+        }
       },
       "relatedLessons": []
     },
@@ -746,11 +926,23 @@
         "observedOccurrences": null
       },
       "publication": {
-        "status": "planned",
-        "proposedPath": "/cfa/explanations/new-app-design",
-        "url": null,
-        "verifiedOn": null,
-        "verificationEvidence": null
+        "status": "published",
+        "proposedPath": "/cfa/explanation/new-app-design",
+        "url": "https://www.3daysofswiftconcurrency.com/cfa/explanation/new-app-design",
+        "verifiedOn": "2026-10-29",
+        "verificationEvidence": {
+          "method": "rendered-content-review",
+          "title": "Why use opt-in design defaults in our code?",
+          "relevance": "Reviewed against CFA-DESIGN-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
+          "anonymousAccess": true,
+          "desktopViewport": "1280x900",
+          "mobileViewport": "390x844",
+          "codeFormattingVerified": true,
+          "trainingFooterVerified": true,
+          "tutorialHTMLSHA256": "930e0ce65fb98ea183d1247e5d131e26726734b8de5e97180e6b0976e30549f1",
+          "websiteCommit": "d83657f"
+        }
       },
       "relatedLessons": []
     },
@@ -786,11 +978,23 @@
         "observedOccurrences": null
       },
       "publication": {
-        "status": "planned",
-        "proposedPath": "/cfa/explanations/honest-errors-and-editing",
-        "url": null,
-        "verifiedOn": null,
-        "verificationEvidence": null
+        "status": "published",
+        "proposedPath": "/cfa/explanation/honest-errors-and-editing",
+        "url": "https://www.3daysofswiftconcurrency.com/cfa/explanation/honest-errors-and-editing",
+        "verifiedOn": "2026-10-29",
+        "verificationEvidence": {
+          "method": "rendered-content-review",
+          "title": "Why use recoverable editing workflows in our code?",
+          "relevance": "Reviewed against CFA-EDIT-01, CFA-ERROR-02 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
+          "anonymousAccess": true,
+          "desktopViewport": "1280x900",
+          "mobileViewport": "390x844",
+          "codeFormattingVerified": true,
+          "trainingFooterVerified": true,
+          "tutorialHTMLSHA256": "8fcc03f2c308f37c5160eee3185a22cda5a43c4e0932b098ff95eeb06f195833",
+          "websiteCommit": "d83657f"
+        }
       },
       "relatedLessons": []
     }

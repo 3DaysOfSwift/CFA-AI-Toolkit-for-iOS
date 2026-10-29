@@ -33,7 +33,11 @@ test('all inventoried canonical sections are associated or explicitly excluded',
 });
 
 test('rule lookup returns relevant local rationale without inventing planned URLs', () => {
-  const catalogue = validate(read());
+  const catalogue = read();
+  catalogue.topics.find(topic => topic.id === 'unstructured-tasks').publication = {
+    status: 'planned', proposedPath: '/cfa/explanations/unstructured-tasks', url: null, verifiedOn: null, verificationEvidence: null
+  };
+  validate(catalogue);
   const byRule = lookup(catalogue, 'CFA-TASK-01');
   assert.equal(byRule.id, 'unstructured-tasks');
   assert.equal(byRule.note, 'decisions/unstructured-tasks.md');
@@ -44,7 +48,7 @@ test('rule lookup returns relevant local rationale without inventing planned URL
 
 test('published links need content verification, not merely a status flag', () => {
   const catalogue = read(), topic = catalogue.topics.find(t => t.id === 'unstructured-tasks');
-  topic.publication = { ...topic.publication, status: 'published' };
+  topic.publication = { ...topic.publication, status: 'published', url: null, verifiedOn: null, verificationEvidence: null };
   assert.throws(() => validate(catalogue), /publication URL/);
   topic.publication = { ...topic.publication, ...live, verificationEvidence: null };
   assert.throws(() => validate(catalogue), /content-review/);
@@ -59,7 +63,7 @@ test('lookup deduplicates links and never adds unrelated topics', () => {
   topic.relatedLessons = [{ title: 'Same resource', ...live }];
   validate(catalogue);
   assert.equal(lookup(catalogue, topic.id).links.length, 1);
-  assert.deepEqual(lookup(catalogue, 'readability').links, []);
+  assert.ok(lookup(catalogue, 'readability').links.every(link => link.url !== live.url));
 });
 
 test('unpublished and withdrawn resources cannot leak public URLs', () => {
@@ -132,7 +136,30 @@ test('standalone skill helper works after copying only one skill, without reposi
   const result = JSON.parse(output);
   assert.equal(result.id, 'unstructured-tasks');
   assert.ok(fs.readFileSync(path.join(skill, 'references/explanations', result.note), 'utf8').includes('## Documented rationale'));
-  assert.deepEqual(result.links, []);
+  assert.equal(result.links[0].url, read().topics.find(topic => topic.id === 'unstructured-tasks').publication.url);
   assert.throws(() => execFileSync(process.execPath, [path.join(skill, 'scripts/explanations.mjs'), 'audit'],
     { cwd: temp, stdio: 'pipe' }), /Audit requires canonical/);
+});
+
+
+test('all seventeen public catalogue links have dated content evidence and retain their canonical routes', () => {
+  const catalogue = validate(read());
+  assert.equal(catalogue.topics.length, 17);
+  for (const topic of catalogue.topics) {
+    assert.equal(topic.publication.status, 'published');
+    assert.equal(topic.publication.url, `https://www.3daysofswiftconcurrency.com/cfa/explanation/${topic.id}`);
+    assert.match(topic.publication.verificationEvidence.tutorialHTMLSHA256, /^[a-f0-9]{64}$/);
+    assert.equal(lookup(catalogue, topic.id).links[0].url, topic.publication.url);
+    const note = fs.readFileSync(path.join(directory, topic.note), 'utf8');
+    assert.ok(note.includes(topic.publication.url));
+    assert.ok(!note.includes('Not published or verified'));
+  }
+});
+
+test('both supported explanation route forms validate but similar prefixes do not', () => {
+  validatePublication(live);
+  validatePublication({ ...live, url: live.url.replace('/explanations/', '/explanation/') });
+  for (const suffix of ['explanation-other', 'explanationss', 'explanations/nested']) {
+    assert.throws(() => validatePublication({ ...live, url: live.url.replace('explanations', suffix) }), /clean HTTPS/);
+  }
 });

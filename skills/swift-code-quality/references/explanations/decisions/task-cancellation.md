@@ -43,6 +43,7 @@ Agree on a reusable shared-waiter cancellation example before prescribing one im
 
 ## Publication
 
-Planned explanation path: `/cfa/explanations/task-cancellation`.
-Not published or verified. Do not offer that path as a working link.
-Use the local explanation directly until the catalogue contains a verified URL.
+[Read the public explanation](https://www.3daysofswiftconcurrency.com/cfa/explanation/task-cancellation).
+Verified on 2026-10-29 for topic relevance, anonymous access, readable code,
+desktop/mobile layout and the training footer. The catalogue records the review
+evidence. This dated verification does not imply that the page was checked today.

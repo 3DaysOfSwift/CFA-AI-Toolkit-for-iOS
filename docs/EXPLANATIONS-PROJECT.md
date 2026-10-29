@@ -1,6 +1,6 @@
 # CFA explanations and decision rationale
 
-Target release: **0.3.2**, pending release verification and approval to publish.
+Publication release: **0.3.3**. The local explanation system shipped in v0.3.2.
 Project owner: Matthew Thomas. Started 27 October 2026.
 
 ## Outcome
@@ -85,8 +85,7 @@ card. This is not Wix Blog. The current premium article implementation uses
 the presentation without inheriting premium access restrictions or changing
 existing /blog routes.
 
-Proposed index: `/cfa/explanations`.
-Proposed item route: `/cfa/explanations/{slug}`.
+Public item route: `/cfa/explanation/{slug}` (singular). Preserve existing links.
 
 Matthew authorised creation and publication of the free library and explicitly
 requested a new CMS table. Created **CFA Explanations** (`CFAExplanations`) on
@@ -102,42 +101,39 @@ recorded CMS item ID; never insert duplicates on a repeated upload.
 Keep unpublished drafts and internal provenance notes outside this public
 collection; hiding a record in the page UI would not make its data private.
 
-Three articles were uploaded on 2026-10-27: unstructured tasks, task
-cancellation and overlapping requests. Read-back confirmed all three saved
-HTML values exactly match the upload. Delivery files and CMS identities are
-recorded in the sibling `../cfa-explanations/` output directory (relative to
-the toolkit repository root). Its Item-page script is prepared but has not
-been installed in Wix. Nine content/renderer tests pass; the three complete
-Swift examples type-check with Swift 6, using a compile-only support harness.
-These checks are not runtime concurrency tests or a live Wix rendering check.
+All seventeen explanations were reviewed and published on 29 October 2026.
+Fourteen use the approved real-app, code-first teaching structure; the original
+three retain their concurrency teaching sequence with the common visual layout.
+All preserve the illustrated training card. Publication was authorised by Matthew
+Thomas; that does not imply his individual technical review of every claim.
 
-Wix currently generates item links at `/cfa/explanation/{slug}` (singular),
-with list-link fields for both `/cfa/explanation` and `/cfa/explanations`.
-Reconcile the intended routes before marking catalogue links published.
-CMS insertion alone does not install page code or publish the site.
+Anonymous production requests returned the expected article titles. Every page
+was checked at desktop and mobile widths for content, code formatting, loaded
+footer artwork, canonical URL and horizontal overflow. All 46 outgoing destinations
+responded successfully after correcting two Apple links and replacing the broken
+site `/tool` destination with the toolkit's public GitHub repository.
 
-For each article: write from the note, include a recognisable problem and
-corrected example, state trade-offs and verification, distinguish CFA from
-Swift, and put any scope note after the training card. Respect the approved
-article template and do not reuse an existing CMS item identity.
+The catalogue now holds each actual URL, review date, title, relevance and content
+hash. The website repository records the full dated review in commit `d83657f`.
+See [the publication record](EXPLANATIONS-PUBLICATION-v0.3.3.md) for scope and limits.
+The eight skills still answer directly, offering a relevant link only when useful.
+They do not require a visit to the site or a purchase.
 
-No explanation page has been verified published. Proposed paths must not be emitted as
-live links. After authorized publication, check anonymous access, full topic
-content, code formatting, navigation, canonical path and related destinations.
-Record actual URL, date, reviewer and specific relevance in the catalogue.
-An HTTP response or a validator success alone is insufficient.
+CMS updates, site publication and Git pushes are separate actions. A later content
+edit needs fresh review; today's record must not be treated as proof of future
+content or continued URL availability.
 
 ## Release gates
 
 - [x] Source-grounded initial rationale notes and catalogue.
 - [x] Offline skill lookup and unpublished-link suppression.
-- [ ] Resolve or explicitly retain the high-impact editorial questions.
+- [x] Retain the unresolved editorial questions explicitly as future work.
 - [ ] Complete realistic host response evaluations; fixtures are not execution.
-- [ ] Publish and visually verify the first CMS explanations with authorization.
-- [ ] Add their verified links and rerun lookup/publication tests.
-- [ ] Review all pre-existing uncommitted changes for the release.
-- [ ] Run full tests, source validation and isolated release packaging.
-- [ ] Authorize, commit/tag/push/publish, then install the release.
+- [x] Publish and verify all seventeen CMS explanations with authorization.
+- [x] Add their verified links; release validation exercises link eligibility.
+- [x] Keep unrelated website renderer edits out of this release.
+- [x] Run 119 tests, source validation, archive checks and temporary installations.
+- [x] Prepare v0.3.3 for the authorised GitHub release. Real-host installation is separate.
 
 The offline rationale increment can ship without public explanations only if
 release notes explicitly say that no new explanation URLs are live. A release
