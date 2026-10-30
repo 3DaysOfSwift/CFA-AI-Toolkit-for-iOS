@@ -59,16 +59,11 @@ ViewModels own presentation state: drafts, focus, selection, navigation, loading
 
 ## 3. SwiftUI Views describe the interface
 
-**CFA-specific ownership:** A feature-connected screen declares its backing
-object directly: `@State private var viewModel = HomeViewModel()`. Keep the
-no-argument construction on the property declaration line. Instantiate the
-screen as `HomeView()`, with zero inputs. Never receive a ViewModel in a custom
-initializer, even with a default value, or assign its State backing storage
-there. Feature data reaches the screen through its own ViewModel; tests inject
-an isolated Feature into the ViewModel, not a ViewModel into the View. Stateless
-components may receive plain display snapshots, such as graph data. This rule
-belongs to CFA, not to all SwiftUI code. Keep ViewModel construction cheap and
-side-effect-free; state ownership is not a promise about allocation counts.
+**CFA-specific ownership:** Screens construct and own a private ViewModel,
+inline by default. A detail View may accept selected value data and use it to
+construct its own State-backed ViewModel in its initializer. Never pass a
+ViewModel into a View. Keep construction cheap and side-effect-free; State
+ownership does not promise that initialization expressions execute only once.
 
 **Rule:** Keep Views declarative and free of imperative workflows in almost all cases. Move multi-step event handling into the ViewModel belonging to that View.
 
@@ -88,13 +83,9 @@ shared feature state to the owning Feature. Bindings, simple conditional
 rendering, and short layout-local values that directly describe the rendered
 interface remain declarative View code.
 
-In CFA, a screen ViewModel has one narrow initializer input only: its owning
-Feature, defaulted from `AppModel.shared`. Do not add convenience inputs
-for bundle values, URLs, strings, dates, defaults, services, or other UI data.
-That information belongs to the owning Feature and flows to the View
-through the ViewModel. Tests may pass an isolated Feature through that
-same single parameter; production screens instantiate their ViewModel with no
-arguments.
+A ViewModel may accept selected value data for its detail screen and defaults
+its narrow Feature dependencies from AppModel.shared. Tests may provide
+isolated Features. Screen selection remains presentation state.
 
 ```swift
 // Dedicated editor: describe the Save control and forward intent.
@@ -313,7 +304,7 @@ When an active architecture explicitly requires a named boundary, its contract t
 
 Do not turn unreadable saved data into an empty collection that will overwrite the original. Do not use `try?` to hide a failed purchase, save or migration. Optional best-effort work may use it only when failure is deliberately harmless and understood.
 
-For persistence, prepare the proposed state, commit it, then expose confirmed success. Preserve rollback, retry and duplicate protection. If optimistic UI is intentional, define rollback and make pending state distinguishable from saved state. Cancelled work should not appear as a successful result.
+For persistence, prepare the proposed state, commit it, then expose confirmed success. Preserve drafts, retry and duplicate protection. Never publish an unsaved change as authoritative state. Cancelled work should not appear as a successful result.
 
 **Review:** Exercise failed writes and retries. Confirm neither progress nor rewards are silently lost or duplicated.
 

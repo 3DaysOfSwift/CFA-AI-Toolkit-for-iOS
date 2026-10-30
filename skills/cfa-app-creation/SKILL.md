@@ -15,9 +15,9 @@ Read only the relevant topic note. Explain the consequence in the user's context
 do not impose CFA on another architecture or link to an unpublished article.
 
 Apply the specification's screen-construction invariant within the requested
-scope: private inline `@State` ViewModel creation, zero screen initializer inputs,
-and no defaulted ViewModel injection or custom State initialization. Distinguish
-stateless snapshot components from feature-connected screens. Review-only work
+scope: private ViewModel ownership with inline `@State` construction by default.
+A detail View may construct its own State-backed ViewModel from selected value data
+in its initializer. Never inject or share ViewModels; keep selection out of Features. Review-only work
 reports violations; tests inject Features into ViewModels, not ViewModels into Views.
 
 Create the smallest complete working feature, then continue shaping the new

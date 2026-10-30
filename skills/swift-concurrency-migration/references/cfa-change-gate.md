@@ -21,15 +21,13 @@ the responsibility is not already owned by an existing type.
 Preserve these CFA invariants unless the developer explicitly asks to change
 the architecture:
 
-1. Every screen-level View has one adjacent, dedicated ViewModel constructed
-   without arguments on its declaration line:
-   `@State private var viewModel = HomeViewModel()`. Never initialize its State
-   inside a custom View initializer or receive a ViewModel from the caller.
-2. Each ViewModel defaults its narrow live feature dependency from
-   `AppModel.shared`, while tests can provide an isolated replacement.
-3. Feature-connected screens have zero initializer inputs. Defaulted ViewModel
-   parameters, factories, IDs and preview-only injection are not exceptions.
-   Plain snapshot inputs belong to stateless display components, not screens.
+1. Each screen owns a private dedicated ViewModel, constructed inline by default.
+   A detail View may construct its own State-backed ViewModel in its initializer
+   from selected value data. Never pass in or share a ViewModel.
+2. ViewModels default narrow Feature dependencies from AppModel.shared; tests
+   may provide isolated Features.
+3. Preserve independent screen and scene selection in presentation, not shared
+   Features. Selected detail data may be passed into the View.
 4. When the app uses `ThemeManager`, it is a presentation dependency supplied through the
    SwiftUI environment. AppModel and features are not environment
    values.
@@ -169,12 +167,9 @@ from precedent use; do not reframe it as a completed partial migration.
   screen, or implementing a new business capability itself? Only the latter
   points towards extracting business behaviour into the model. Keep presentation
   coordination in the presentation layer; dependency count alone is not a defect.
-- Inventory screen declarations, initializers (including extensions), call sites
-  and previews. Require private inline ViewModel construction and zero screen
-  initializer inputs; reject defaulted injection and custom State assignment.
-  Keep plain-data display components distinct. Test ViewModels directly with
-  isolated Features. Preserve navigation and independent destination identity
-  when correcting existing code; never substitute a global selection silently.
+- Inventory screen initializers and call sites. Verify private ViewModel
+  ownership, allow selected-value detail initialization, and reject ViewModel
+  injection or shared selection in Features. Preserve independent destinations.
 - Compare visuals and interactions with the baseline. Do not introduce
   unrequested design changes or restore defaults the user replaced.
 - For initial app design, verify the applicable new-app design defaults and

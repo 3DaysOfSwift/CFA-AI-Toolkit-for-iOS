@@ -5,6 +5,36 @@ Concurrency and assess whether its architecture combines conflicting models of
 ownership, lifetime or coordination. It also works before or during a migration.
 Do not assume a migration occurred unless history or the developer establishes it.
 
+## Whole-app coverage is the default
+
+A Health Check covers the whole application unless the user explicitly requests
+one operation, screen or another bounded scope. Do not ask whether they want the
+whole app checked, or silently replace that scope with representative examples.
+A focused architecture review remains available when explicitly requested.
+
+Build the operation inventory from all in-scope first-party production targets,
+including extensions and local packages. Discover user actions and system entry
+points: buttons, bindings that initiate work, navigation, launch, scene lifecycle,
+deep links, notifications, background handlers, delegates, callbacks and observers.
+Include synchronous operations; no Task is required for ordinary synchronous work.
+Trace shared helpers once, then link every caller and inspect differences in its
+inputs, state, cancellation and completion policy. Do not count helper methods as
+separate user operations merely to increase coverage totals.
+
+Maintain a ledger for every discovered entry point: source location, meaningful
+operation, reviewed path, individual check results, and remaining work. Reconcile
+it against the production target/file inventory and scanner candidates, and record
+why an excluded candidate is not an operation. A scanner miss, unknown dispatch or
+unavailable dependency must remain visible rather than disappear from coverage.
+Whole-app source review is not proof of every possible runtime execution.
+
+Partial reports are checkpoints. Continue through the remaining inventory while
+source and review actions are available. A demonstrated defect may establish a
+verdict early, but does not complete the rest of the app's review. Finish with one
+consolidated report covering the identified operations and explicit unresolved
+questions. If unavailable evidence prevents finishing, identify that blocker and
+label the assessment incomplete; never present a sample as a completed Health Check.
+
 ## Keep the assessment on course
 
 The deliverable is an evidence-based architecture report. A successful build,
@@ -140,11 +170,11 @@ isolation fit the operation. Compare policies across capabilities: consistent
 ownership need not mean identical mechanisms everywhere. Flag incompatible
 assumptions with a concrete failure sequence, not merely a mixture of APIs.
 
-Follow representative operations from user or system trigger through business
-logic and services to the final state mutation. Include the important distinct
-coordination mechanisms, not just the easiest screen. For a whole-project verdict,
-maintain coverage of in-scope production features and concurrency boundaries;
-unreviewed areas preclude an unqualified negative verdict.
+Follow every inventoried operation from user or system trigger through business
+logic and services to final state mutation or completion, including synchronous
+paths and the distinct coordination mechanisms. Shared-path evidence may be
+reused only after checking the caller-specific contract. Unreviewed operations
+remain pending and preclude a completed whole-app assessment.
 
 For each relevant operation, inspect:
 
@@ -223,7 +253,7 @@ Immediately after the overall verdict, show concise assessment rows with a leadi
 status symbol and written label. The reader must be able to distinguish what works,
 what is wrong and what needs investigation without interpreting an ownership map.
 
-- **✅ Working well:** a traced mechanism supports the stated behaviour. Name the
+- **✅ Stable:** a traced mechanism supports the stated behaviour. Name the
   protection and its practical benefit; absence of scanner warnings is insufficient.
 - **❌ Problem:** source evidence or an executed check demonstrates a defect or
   conflicting design. State the consequence and severity. Label a structural

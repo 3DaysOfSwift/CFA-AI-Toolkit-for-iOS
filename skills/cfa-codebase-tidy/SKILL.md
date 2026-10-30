@@ -15,9 +15,9 @@ Read only the relevant topic note. Explain the consequence in the user's context
 do not impose CFA on another architecture or link to an unpublished article.
 
 Apply the specification's screen-construction invariant within the requested
-scope: private inline `@State` ViewModel creation, zero screen initializer inputs,
-and no defaulted ViewModel injection or custom State initialization. Distinguish
-stateless snapshot components from feature-connected screens. Review-only work
+scope: private ViewModel ownership with inline `@State` construction by default.
+A detail View may construct its own State-backed ViewModel from selected value data
+in its initializer. Never inject or share ViewModels; keep selection out of Features. Review-only work
 reports violations; tests inject Features into ViewModels, not ViewModels into Views.
 
 Read the project's AGENTS.md, the bundled [CFA specification](references/cfa-specification.md) and [CFA change gate](references/cfa-change-gate.md). Preserve the [product behaviour contract](references/product-behaviour-contract.md). This workflow refines an existing CFA architecture; do not invent a new application framework. Use architecture adoption for adopting CFA and read-only architecture review when changes are not requested.

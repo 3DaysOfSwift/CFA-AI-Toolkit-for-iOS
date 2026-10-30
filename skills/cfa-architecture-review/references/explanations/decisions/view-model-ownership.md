@@ -7,7 +7,7 @@ Status: documented basis with editorial analysis; not a founder-approved histori
 
 ## Rule
 
-A CFA feature-connected screen owns its dedicated ViewModel using a private inline State initial value and has zero initializer inputs. The ViewModel resolves narrow live Features and permits isolated Feature dependencies in tests.
+A CFA screen owns its dedicated private ViewModel, inline by default. A detail View may receive selected value data and construct its State-backed ViewModel in its initializer; ViewModels are never passed into Views. The ViewModel resolves narrow live Features and permits isolated Feature dependencies in tests.
 
 ## Problem
 
@@ -39,7 +39,7 @@ on 2026-10-27. That permission is not individual technical or historical approva
 
 ## Open question
 
-We need an approved worked design for two simultaneous detail windows with different selected records under the zero-input screen rule. Do not invent a global-selection workaround.
+Verify a worked implementation with two independent scenes and selected snapshots. Do not use a global selection workaround.
 
 ## Publication
 

@@ -380,29 +380,21 @@ It must not acquire feature access or business behaviour.
 
 ### Keep SwiftUI View Construction Fast
 
-**Mandatory CFA screen construction rule:** A feature-connected screen creates
-its own tightly coupled ViewModel directly as the initial value of its private
-stored property: `@State private var viewModel = HomeViewModel()`. Put the
-construction on that declaration line. An explicit type annotation is fine;
-the initializer must still construct the screen's ViewModel with no arguments.
+**CFA screen ownership:** A screen owns its dedicated private ViewModel. By
+ default construct it inline: `@State private var viewModel = HomeViewModel()`.
+A detail screen may receive selected value data and initialise its own private
+State-backed ViewModel in its View initializer using that value. Never accept,
+share, inject or compute a ViewModel supplied by another View. Keep initializers
+cheap and free of work-starting side effects. Stateless display components may
+also receive snapshots.
 
-Construct the screen as `HomeView()`, with zero initializer inputs. Never expose
-`init(viewModel:)`, including `init(viewModel: HomeViewModel = HomeViewModel())`.
-A default parameter does not make dependency injection acceptable. Do not move
-construction into a custom `init()`, assign `_viewModel = State(initialValue:)`
-or `State(wrappedValue:)` there, or hide it behind a factory, closure, optional
-placeholder or externally supplied binding. Do not add a preview/test-only
-ViewModel initializer to the production screen. Test the ViewModel directly
-with an isolated Feature; do not inject the ViewModel into its View.
-
-Any initializer input to a feature-connected screen is a CFA code smell to
-investigate: its owning Feature should supply the required data through the
-ViewModel's own initializer and API. This includes IDs, snapshots and callbacks,
-not only reference-type dependencies. Stateless display components are the
-exception: `GraphView(graphData: snapshot)` can render plain data without a
-ViewModel or access to the application graph. Do not disguise a feature screen
-as a component to bypass this rule. This is a CFA convention, not a general
-SwiftUI prohibition on View inputs.
+The supplied snapshot is initial input, not automatically refreshed state.
+State is retained for a SwiftUI identity; a changed input does not automatically
+replace its ViewModel. Separate destinations and scenes need independent
+presentation selections. Features own authoritative data, not tab or scene
+selection. Preserve a detail snapshot and navigation when background data changes;
+use explicit refresh by default where appropriate. Live updates are a product
+choice. See the presentation-boundaries decision for the Next Rocket Launch policy.
 
 ✅ **Correct — the View owns its bespoke ViewModel and requires no dependency
 injection:**
@@ -444,7 +436,7 @@ remain fast and must not start loading, persistence, networking, observation,
 or any other work as a side effect.
 
 Every screen conventionally names its one direct backing object `viewModel` and
-creates it at the property declaration.
+creates it at the property declaration unless the selected-data detail exception applies.
 
 The ViewModel initializer must also be quick and free of work-starting side
 effects. It may retain the feature capabilities it needs from `AppModel.shared`,
@@ -498,9 +490,9 @@ through every SwiftUI initializer.
 
 This is mandatory for CFA application screens. Before delivery, verify all three:
 
-1. Every screen-level View owns one dedicated ViewModel, constructed without arguments on the same line as its `@State private var viewModel` declaration; never assign its backing State in a custom initializer.
+1. Every screen owns a private dedicated ViewModel, constructed inline by default. A detail View may initialise its own State-backed ViewModel from selected value data in its initializer.
 2. Each ViewModel initializer defaults its narrow live feature dependencies from `AppModel.shared` while allowing tests to supply isolated replacements.
-3. Every feature-connected screen is constructed with zero initializer inputs, including in navigation, sheets and previews. Defaulted parameters are not exceptions.
+3. Never pass a ViewModel into a View. Selected value data is permitted for detail destinations; preserve independent destination identity.
 
 Do not remove a screen ViewModel, or pass feature dependencies through a screen initializer, merely because a generic architecture guideline would use fewer types. CFA makes the ViewModel boundary explicit so every screen has one clear, testable route into the shared application graph.
 
@@ -541,14 +533,10 @@ TodayView(viewModel: rootViewModel.today)
 TodayView(onAdd: rootViewModel.addEntry)
 ```
 
-A feature-connected destination also has zero initializer inputs. Its Feature
-owns the relevant data and selection/context, accessed through its ViewModel.
-During adoption or tidy-up, preserve independent destination/window identity,
-selection and navigation behaviour. Do not replace distinct destination inputs
-with one global mutable selection that makes screens interfere. If preserving
-those behaviours requires a product/ownership decision, explain it before
-changing behaviour. A stateless presentational component may receive a display
-struct, such as chart points; it must not obtain access to the application graph.
+A detail destination may receive selected value data and construct its own
+ViewModel. The Feature owns authoritative data; screen and scene selection
+remain presentation concerns. Preserve independent navigation and existing
+product behaviour. A stateless component may receive display data.
 
 Each screen owns the sheet, alert, or navigation destination it presents. Do
 not create an application-wide router merely to move local presentation state
@@ -758,8 +746,9 @@ from the model actor into a feature, ViewModel, or View. A small,
 deliberately UI-owned context may be main-actor isolated when its work is proven
 short, but that is an exception—not the default commercial persistence design.
 
-Feature state becomes authoritative only after persistence succeeds unless the
-feature explicitly defines optimistic behaviour and rollback.
+Publish changes to authoritative Feature state only after persistence succeeds.
+Keep an editable draft on failure and report the error; do not present unsaved
+changes as saved. Loading and error presentation may update independently.
 
 Define what persistence success means. In a local-first application, a command
 may succeed once data is durably stored on the device while remote

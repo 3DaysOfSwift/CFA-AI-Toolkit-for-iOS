@@ -17,15 +17,16 @@ do not impose CFA on another architecture or link to an unpublished article.
 For a **Concurrency Migration Health Check**, a **Frankenstein architecture** check,
 or a request to assess how an Xcode project actually uses Swift Concurrency, read
 [Concurrency Migration Health Check](references/concurrency-migration-health-check.md).
-This mode reviews the project's actual architecture, without requiring CFA or a
-dashboard. Keep its correctness verdict separate from CFA conformance.
+This mode reviews the whole application by default; use a narrower scope only
+when explicitly requested. It reviews the project's actual architecture without
+requiring CFA or a dashboard. Keep its correctness verdict separate from CFA conformance.
 Use that workflow's checkpoint and completion check: builds, tests and simulator
 launches do not complete the assessment; finish with its scoped verdict and report.
 
 Apply the specification's screen-construction invariant within a CFA conformance review's requested
-scope: private inline `@State` ViewModel creation, zero screen initializer inputs,
-and no defaulted ViewModel injection or custom State initialization. Distinguish
-stateless snapshot components from feature-connected screens. Review-only work
+scope: private ViewModel ownership with inline `@State` construction by default.
+A detail View may construct its own State-backed ViewModel from selected value data
+in its initializer. Never inject or share ViewModels; keep selection out of Features. Review-only work
 reports violations; tests inject Features into ViewModels, not ViewModels into Views.
 
 Review the requested scope without refactoring the application or changing

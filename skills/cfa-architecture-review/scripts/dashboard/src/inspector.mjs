@@ -160,7 +160,7 @@ export async function inspect(project) {
         const closing = closingParenthesis(body, opening);
         if (closing < 0) continue;
         if (body.slice(opening + 1, closing).trim()) {
-          findings.push(finding('screen-initializer-inputs', 'warning', `${name} accepts initializer inputs. CFA feature screens require zero inputs; even a defaulted ViewModel parameter is injection. Plain snapshots belong to stateless display components.`, viewFile, lineOf(view, bodyOffset + initializer.index)));
+          findings.push(finding('screen-initializer-inputs', 'review', `${name} accepts initializer inputs. Verify that detail inputs are selected value data and no ViewModel is injected.`, viewFile, lineOf(view, bodyOffset + initializer.index)));
         }
         const tail = body.slice(closing + 1);
         const openingBody = /^\s*(?:(?:async|throws|rethrows)\s*)*\{/.exec(tail);
@@ -200,7 +200,7 @@ export async function inspect(project) {
     }
     if (!viewModel) findings.push(finding('view-model-missing', 'warning', `${name} has no adjacent ${viewModelName}.`, viewFile, 1));
     else {
-      if (!ownsViewModel) findings.push(finding('view-model-ownership', 'warning', `${name} needs private inline ownership: @State private var viewModel = ${viewModelName}(), with no constructor arguments on that declaration line.`, viewFile, lineOf(view, declaration.index)));
+      if (!ownsViewModel) findings.push(finding('view-model-ownership', 'review', `${name} does not use the default inline ViewModel pattern. Verify private ownership; a detail View may construct its own State-backed ViewModel from selected value data.`, viewFile, lineOf(view, declaration.index)));
       if (!dependencies.length) findings.push(finding('feature-route-unresolved', 'review', `${viewModelName} has no visible AppModel.shared feature route; inspect whether this screen is presentation-only.`, viewModelFile, 1));
       if (!testFile) findings.push(finding('view-model-tests-missing', 'warning', `No ${testName} was found.`, viewModelFile, 1));
     }
