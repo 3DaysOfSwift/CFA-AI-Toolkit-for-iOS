@@ -1,0 +1,36 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import {spawnSync} from 'node:child_process';
+import {fileURLToPath} from 'node:url';
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+test('SwiftSyntax inventory ignores comments and strings and records source-located syntax', {skip: process.platform !== 'darwin'}, t => {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'swift-syntax-inventory-'));
+  t.after(() => fs.rmSync(temp, {recursive:true, force:true}));
+  const selected = spawnSync('xcode-select',['-p'],{encoding:'utf8'});
+  assert.equal(selected.status,0,selected.stderr);
+  const host = path.join(selected.stdout.trim(),'Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host');
+  const executable = path.join(temp,'inventory');
+  const build = spawnSync('xcrun',['swiftc','-module-cache-path',path.join(temp,'cache'),'-I',host,'-L',host,'-Xlinker','-rpath','-Xlinker',host,path.join(here,'../architecture-dashboard/src/syntax-inventory.swift'),'-o',executable],{encoding:'utf8'});
+  assert.equal(build.status,0,build.stderr);
+  const app=path.join(temp,'App'); fs.mkdirSync(app);
+  fs.writeFileSync(path.join(app,'Example.swift'), `// Task { Button("fake") {} }\nstruct Example {\n  let label = "await Task { }"\n  func start() {\n    Task { await work(); Task { await work() } }\n    Button("Run") { start() }\n      .task { await work() }\n  }\n}\n`);
+  fs.mkdirSync(path.join(app,'ExampleTests')); fs.writeFileSync(path.join(app,'ExampleTests','Skipped.swift'),'actor Skipped {}');
+  const run=spawnSync(executable,[app],{encoding:'utf8'});
+  assert.equal(run.status,0,run.stderr);
+  const result=JSON.parse(run.stdout);
+  assert.deepEqual(result.files,['Example.swift']);
+  assert.deepEqual(result.warnings,[]);
+  const count=kind => result.items.filter(item=>item.kind===kind).length;
+  assert.equal(count('type.struct'),1); assert.equal(count('function'),1);
+  assert.equal(count('concurrency.task'),2); assert.equal(count('concurrency.await'),3);
+  assert.equal(count('entry.button'),1); assert.equal(count('type.actor'),0);
+  assert.equal(result.items.find(item=>item.kind==='concurrency.task').line,5);
+  const tasks=result.items.filter(item=>item.kind==='concurrency.task');
+  assert.equal(tasks[0].enclosingFunction,'start');
+  assert.equal(tasks[1].lexicalTaskParent,'Example.swift:5:5');
+  assert.equal(result.items.find(item=>item.kind==='entry.viewTask').line,7);
+});

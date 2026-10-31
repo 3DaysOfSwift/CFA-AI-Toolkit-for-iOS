@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {coverageGaps, inventoryCandidates} from '../src/whole-app-health.mjs';
+import {coverageGaps, inventoryCandidates, taskCandidates} from '../src/whole-app-health.mjs';
 import {renderHealthReport} from '../src/health-report.mjs';
 import {prepare, finish} from '../src/whole-app-health.mjs';
 import fs from 'node:fs/promises';
@@ -32,18 +32,43 @@ test('unknown operations and target membership cannot yield a pass score', () =>
   assert.match(html,/Score unavailable/); assert.match(html,/Needs investigation/); assert.doesNotMatch(html,/Good foundation/);
 });
 
+test('syntax entry points join the inventory without duplicating lexical findings', () => {
+  const combined=structuredClone(report);
+  combined.syntax={status:'available',files:['App.swift'],warnings:[],items:[
+    {kind:'entry.launchCallback',file:'App.swift',line:2,column:1},
+    {kind:'entry.main',file:'App.swift',line:1,column:1},
+    {kind:'concurrency.task',file:'App.swift',line:3,column:1}
+  ]};
+  const candidates=inventoryCandidates(combined);
+  assert.equal(candidates.length,2);
+  assert.equal(candidates.filter(c=>c.kind==='launch-callback').length,1);
+  assert.equal(candidates.filter(c=>c.kind==='main').length,1);
+  assert.match(coverageGaps(combined,complete()).join(' '),/entry points/);
+  assert.equal(taskCandidates(combined).length,1);
+  assert.match(coverageGaps(combined,complete()).join(' '),/task sites/);
+});
+
+test('unavailable or inconsistent parser evidence does not become a pass', () => {
+  const missing=structuredClone(report); missing.syntax={status:'unavailable',reason:'Xcode unavailable'};
+  assert.match(coverageGaps(missing,complete()).join(' '),/Xcode unavailable/);
+  const mismatch=structuredClone(report); mismatch.syntax={status:'available',files:[],items:[],warnings:[]};
+  assert.match(coverageGaps(mismatch,complete()).join(' '),/different files/);
+});
+
 test('report rescans source, surfaces coverage gaps and rejects stale review', async () => {
   const base=await fs.mkdtemp(path.join(os.tmpdir(),'whole-health-test-'));
   try {
     const project=path.join(base,'app'); await fs.mkdir(project);
     await fs.writeFile(path.join(project,'App.swift'),'struct App {}\n');
-    const inventory=await prepare(project,path.join(base,'inventory'));
+    const syntax=async()=>({status:'available',files:['App.swift'],items:[],warnings:[]});
+    const inventory=await prepare(project,path.join(base,'inventory'),syntax);
+    assert.match(await fs.readFile(path.join(base,'inventory','task-map.html'),'utf8'),/Task sites/);
     const review={schemaVersion:1,sourceFingerprint:inventory.sourceFingerprint,author:'Reviewer',scope:'App target',presentation:{app:'App',summary:'Summary',conclusion:'Conclusion',criteria:[{title:'A',detail:'Checked',status:'pass'}]}};
     const reviewPath=path.join(base,'review.json'); await fs.writeFile(reviewPath,JSON.stringify(review));
-    const output=path.join(base,'report.html'); const result=await finish(project,reviewPath,output);
+    const output=path.join(base,'report.html'); const result=await finish(project,reviewPath,output,undefined,syntax);
     assert.ok(result.gaps.length > 0);
     assert.match(await fs.readFile(output,'utf8'),/Score unavailable/);
     await fs.writeFile(path.join(project,'App.swift'),'struct Changed {}\n');
-    await assert.rejects(finish(project,reviewPath,path.join(base,'stale.html')),/fingerprint mismatch/);
+    await assert.rejects(finish(project,reviewPath,path.join(base,'stale.html'),undefined,syntax),/fingerprint mismatch/);
   } finally { await fs.rm(base,{recursive:true,force:true}); }
 });

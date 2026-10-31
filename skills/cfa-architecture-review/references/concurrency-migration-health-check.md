@@ -36,7 +36,15 @@ Run the packaged scanner on the current checkout before each Health Check:
 node scripts/dashboard/src/whole-app-health.mjs prepare <project-root> <new-inventory-directory>
 ```
 
-Read `inventory.json` and reconcile the full production target and file list,
+Read `inventory.json` and `task-map.json`. SwiftSyntax records source locations,
+enclosing functions and lexical nesting of explicit tasks. Lexical nesting is not
+task parentage: nested `Task {}` creates independent unstructured work. Group
+children and SwiftUI tasks need their own ownership review. Follow callers and
+the compiler index where available; record each source-supported relationship in
+the operation steps and each unresolved relationship as unknown. Never invent a
+complete tree from syntax alone.
+
+Reconcile the full production target and file list,
 including sources the lexical scan cannot resolve. Record each file and detected
 type review, all detected candidate entry points, and each meaningful user or
 system operation using `scripts/dashboard/Documentation/REVIEWS.md`. Include
@@ -44,7 +52,9 @@ system operation using `scripts/dashboard/Documentation/REVIEWS.md`. Include
 `targetInventoryVerified` (true only after verifying membership), and
 `entryPoints` entries with each candidate `siteId` and either `operationId` or a
 specific `excludedReason`. The matching operation evidence must include the
-entry point. Add a `presentation` object with app, summary, conclusion and
+entry point. Reconcile every entry in `task-map.json` in `taskSites` using the
+same `siteId` / `operationId` or `excludedReason` structure; operation evidence
+must include the associated task site. Add a `presentation` object with app, summary, conclusion and
 criteria for the concise report. Each criterion needs title, detail, status
 (`pass`, `concern`, `problem`) and source evidence. Use the app's own PNG icon
 when available. Keep the inventory and review outside the app source tree.
@@ -55,7 +65,7 @@ After review, run:
 node scripts/dashboard/src/whole-app-health.mjs report <project-root> <review.json> <new-report.html> [app-icon.png]
 ```
 
-The tool rescans and checks the source fingerprint, evidence ranges, file/type
+The tool reruns SwiftSyntax and rescans and checks the source fingerprint, evidence ranges, file/type
 coverage and candidate reconciliation before generating the report. Missing
 reviews, unresolved operations, skipped files or unverified target membership
 appear as investigation findings; no overall percentage is shown in that case.

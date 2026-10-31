@@ -72,6 +72,10 @@ node src/cli.mjs /path/to/app --observations observations.json --out reports/obs
 
 For a whole-app Health Check, first run
 `node src/whole-app-health.mjs prepare <project-root> <new-inventory-directory>`.
+On macOS with Xcode, this also compiles a local SwiftSyntax inventory and writes
+`task-map.json` with source-located tasks and lexical nesting. It does not infer
+task ownership or runtime parentage. Parser failure and scope mismatches remain
+visible for investigation.
 Reconcile the current inventory against the production targets, files, types and
 operation entry points, then use `node src/whole-app-health.mjs report
 <project-root> <review.json> <new-report.html> [app-icon.png]`. The report is

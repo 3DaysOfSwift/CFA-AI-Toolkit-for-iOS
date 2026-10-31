@@ -6,16 +6,48 @@ import {fileURLToPath} from 'node:url';
 import {analyse} from './analyse.mjs';
 import {importReview} from './review-import.mjs';
 import {renderHealthReport} from './health-report.mjs';
+import {collectSyntax} from './syntax-evidence.mjs';
 
 const candidateKinds = new Set(['launch-callback', 'button-action', 'view-task', 'refresh']);
+const taskKinds = new Set(['concurrency.task','concurrency.detached','concurrency.taskGroup','concurrency.groupChild','entry.viewTask','entry.refreshable']);
+export function taskCandidates(report) {
+  return (report.syntax?.items || []).filter(item=>taskKinds.has(item.kind)).map(item=>({...item,id:`syntax-task:${item.file}:${item.line}:${item.column}:${item.kind}`}));
+}
+export function renderTaskMap(taskMap) {
+  const esc=value=>String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
+  const labels={'concurrency.task':'Unstructured task','concurrency.detached':'Detached task','concurrency.taskGroup':'Task group','concurrency.groupChild':'Possible group child','entry.viewTask':'Possible SwiftUI task','entry.refreshable':'Possible SwiftUI refresh'};
+  const rows=taskMap.sites.map(site=>`<li><strong>${esc(labels[site.kind] || site.kind)}</strong> · ${esc(site.file)}:${site.line}:${site.column}<br><span>${site.enclosingFunction ? `Function: ${esc(site.enclosingFunction)}` : 'Enclosing function not identified'}${site.lexicalTaskParent ? ` · Written inside task at ${esc(site.lexicalTaskParent)}` : ''}</span></li>`).join('');
+  return `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Task sites</title><style>body{font:16px/1.6 system-ui;background:#111214;color:#f2f3f4;max-width:900px;margin:50px auto;padding:0 24px}h1{font-size:2.4rem}p,span{color:#bac4c8}li{padding:14px 0;border-bottom:1px solid #373b3f;overflow-wrap:anywhere}</style><h1>Task sites</h1><p>${esc(taskMap.note)}</p><p>${taskMap.sites.length} sites · SwiftSyntax ${esc(taskMap.status)}</p><ul>${rows}</ul></html>`;
+}
 export function inventoryCandidates(report) {
-  return report.files.flatMap(file => file.sites.filter(site => candidateKinds.has(site.kind)));
+  const candidates = report.files.flatMap(file => file.sites.filter(site => candidateKinds.has(site.kind)));
+  const kindMap = {'entry.launchCallback':'launch-callback','entry.button':'button-action','entry.viewTask':'view-task','entry.refreshable':'refresh','entry.main':'main'};
+  const available = new Map();
+  for (const site of candidates) {
+    const key=JSON.stringify([site.file,site.line,site.kind]);
+    available.set(key,(available.get(key) || 0)+1);
+  }
+  for (const item of report.syntax?.items || []) {
+    const kind = kindMap[item.kind];
+    if (!kind) continue;
+    const key=JSON.stringify([item.file,item.line,kind]);
+    if (available.get(key)) { available.set(key,available.get(key)-1); continue; }
+    candidates.push({id:`syntax:${item.file}:${item.line}:${item.column}:${kind}`,kind,file:item.file,line:item.line,label:`SwiftSyntax ${item.kind}`});
+  }
+  return candidates;
 }
 export function coverageGaps(report, review) {
   const gaps = [];
   if (!review.productionTargets?.length || review.productionTargets.some(t => typeof t !== 'string' || !t.trim())) gaps.push('Production targets and local packages have not been accounted for.');
   if (review.targetInventoryVerified !== true) gaps.push('Production target membership and excluded sources need verification.');
   if (report.scope.skipped.length) gaps.push(`${report.scope.skipped.length} source files could not be scanned.`);
+  if (report.syntax?.status === 'unavailable') gaps.push(report.syntax.reason);
+  if (report.syntax?.warnings?.length) gaps.push(`${report.syntax.warnings.length} Swift files have parser warnings requiring investigation.`);
+  if (report.syntax?.status === 'available') {
+    const scannerFiles = new Set(report.files.map(file=>file.path));
+    const syntaxFiles = new Set(report.syntax.files);
+    if ([...scannerFiles].some(file=>!syntaxFiles.has(file)) || [...syntaxFiles].some(file=>!scannerFiles.has(file))) gaps.push('The SwiftSyntax and source inventories cover different files.');
+  }
   const fileReviews = new Map((review.fileReviews || []).map(item => [item.file, item]));
   const missingFiles = report.files.filter(file => !fileReviews.has(file.path) || fileReviews.get(file.path).status === 'unassessed');
   if (missingFiles.length) gaps.push(`${missingFiles.length} Swift files still need review: ${missingFiles.map(file => file.path).join(', ')}.`);
@@ -50,13 +82,41 @@ export function coverageGaps(report, review) {
   }
   const missingEntries = candidates.filter(site => !entries.has(site.id));
   if (missingEntries.length) gaps.push(`${missingEntries.length} detected entry points still need reconciliation.`);
+  const tasks = taskCandidates(report), taskEntries = new Map();
+  for (const entry of review.taskSites || []) {
+    if (!entry.siteId || taskEntries.has(entry.siteId)) throw Error('Task reconciliation needs unique site IDs.');
+    if (Boolean(entry.operationId) === Boolean(entry.excludedReason)) throw Error('Each task site needs an operation ID or an exclusion reason.');
+    if (entry.excludedReason && (typeof entry.excludedReason !== 'string' || !entry.excludedReason.trim())) throw Error('A task exclusion needs a reason.');
+    const site=tasks.find(item=>item.id===entry.siteId);
+    if (!site) throw Error('Task site does not match the current inventory.');
+    if (entry.operationId) {
+      const op=operations.find(item=>item.id===entry.operationId);
+      if (!op || !op.evidence.some(ref=>ref.file===site.file && ref.line<=site.line && ref.endLine>=site.line)) throw Error('Operation evidence must include its reconciled task site.');
+    }
+    taskEntries.set(entry.siteId,entry);
+  }
+  const missingTasks=tasks.filter(site=>!taskEntries.has(site.id));
+  if (missingTasks.length) gaps.push(`${missingTasks.length} detected task sites still need reconciliation.`);
   return gaps;
 }
-export async function prepare(root, output) {
-  const report = await analyse(root, {excludedOutput:path.resolve(output)});
+async function currentInventory(root, excludedOutput, syntaxProvider = collectSyntax) {
+  const report = await analyse(root, {excludedOutput});
+  report.syntax = await syntaxProvider(root);
+  const after = await analyse(root, {excludedOutput});
+  if (report.sourceFingerprint !== after.sourceFingerprint) throw Error('Source changed while collecting syntax evidence. Run the inventory again.');
+  report.syntax.sourceFingerprint = report.sourceFingerprint;
+  return report;
+}
+export async function prepare(root, output, syntaxProvider = collectSyntax) {
+  const report = await currentInventory(root, path.resolve(output), syntaxProvider);
   if (!report.files.length) throw Error('No Swift source files found.');
   await fs.mkdir(output, {recursive:false});
   await fs.writeFile(path.join(output,'inventory.json'), JSON.stringify(report,null,2)+'\n', {flag:'wx'});
+  const taskMap = {sourceFingerprint:report.sourceFingerprint, status:report.syntax.status,
+    note:'Syntax locations and lexical nesting are leads only. Task parentage, ownership and call relationships require source review.',
+    sites:taskCandidates(report)};
+  await fs.writeFile(path.join(output,'task-map.json'),JSON.stringify(taskMap,null,2)+'\n',{flag:'wx'});
+  await fs.writeFile(path.join(output,'task-map.html'),renderTaskMap(taskMap),{flag:'wx'});
   return report;
 }
 async function appIcon(root) {
@@ -78,14 +138,15 @@ async function appIcon(root) {
     return images.length ? path.join(assets[0],images[0].filename) : null;
   } catch { return null; }
 }
-export async function finish(root, input, output, icon) {
-  const report = await analyse(root, {excludedOutput:path.dirname(path.resolve(output))});
+export async function finish(root, input, output, icon, syntaxProvider = collectSyntax) {
+  const report = await currentInventory(root, path.dirname(path.resolve(output)), syntaxProvider);
   const raw = JSON.parse(await fs.readFile(input,'utf8'));
   const review = await importReview(report,raw,root);
   const gaps = coverageGaps(report,review);
   const presentation = review.presentation;
   if (!presentation?.app || !presentation.summary || !presentation.conclusion || !Array.isArray(presentation.criteria) || !presentation.criteria.length) throw Error('Provide presentation app, summary, conclusion and criteria.');
   const data = {...presentation, scope:review.scope, scoreAvailable:gaps.length===0};
+  data.operations = (review.operations || []).map(op=>({title:op.title,path:op.path,taskOwner:op.taskOwner,isolation:op.isolation,reason:op.reason,unknowns:op.unknowns,steps:op.steps}));
   if (gaps.length) data.criteria = [...data.criteria, ...gaps.map((detail, index) => ({status:'concern', title:`Investigation needed ${index+1}`, detail}))];
   const selectedIcon = icon || await appIcon(root);
   const iconData = selectedIcon ? `data:image/png;base64,${(await fs.readFile(selectedIcon)).toString('base64')}` : '';
