@@ -1,0 +1,106 @@
+#!/usr/bin/env node
+import fs from 'node:fs/promises';
+import {realpathSync} from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {analyse} from './analyse.mjs';
+import {importReview} from './review-import.mjs';
+import {renderHealthReport} from './health-report.mjs';
+
+const candidateKinds = new Set(['launch-callback', 'button-action', 'view-task', 'refresh']);
+export function inventoryCandidates(report) {
+  return report.files.flatMap(file => file.sites.filter(site => candidateKinds.has(site.kind)));
+}
+export function coverageGaps(report, review) {
+  const gaps = [];
+  if (!review.productionTargets?.length || review.productionTargets.some(t => typeof t !== 'string' || !t.trim())) gaps.push('Production targets and local packages have not been accounted for.');
+  if (review.targetInventoryVerified !== true) gaps.push('Production target membership and excluded sources need verification.');
+  if (report.scope.skipped.length) gaps.push(`${report.scope.skipped.length} source files could not be scanned.`);
+  const fileReviews = new Map((review.fileReviews || []).map(item => [item.file, item]));
+  const missingFiles = report.files.filter(file => !fileReviews.has(file.path) || fileReviews.get(file.path).status === 'unassessed');
+  if (missingFiles.length) gaps.push(`${missingFiles.length} Swift files still need review: ${missingFiles.map(file => file.path).join(', ')}.`);
+  const types = new Map((review.typeReviews || []).map(item => [JSON.stringify([item.file,item.line,item.kind,item.name]), item]));
+  const missingTypes = report.files.flatMap(file => file.declarations.map(d => ({...d,file:file.path}))).filter(d => {
+    const item = types.get(JSON.stringify([d.file,d.line,d.type,d.name]));
+    return !item || item.status === 'unassessed';
+  });
+  if (missingTypes.length) gaps.push(`${missingTypes.length} detected types still need review.`);
+  if ((review.fileReviews || []).some(item => item.status === 'investigate') || (review.typeReviews || []).some(item => item.status === 'investigate')) gaps.push('Some file or type findings still need investigation.');
+  const operations = review.operations || [];
+  if (review.operationInventory?.coverage !== 'complete') gaps.push('The operation inventory has not been reconciled with the application entry points.');
+  if (!operations.length) gaps.push('No application operations have been reviewed.');
+  const openOperations = operations.filter(op => !op.checks?.length || op.checks.some(c => ['unresolved','not-checked'].includes(c.status)) || op.unknowns?.length);
+  if (openOperations.length) gaps.push(`${openOperations.length} operations have unresolved checks or boundaries.`);
+  const entries = new Map();
+  for (const entry of review.entryPoints || []) {
+    if (!entry.siteId || entries.has(entry.siteId)) throw Error('Entry-point reconciliation needs unique site IDs.');
+    if (Boolean(entry.operationId) === Boolean(entry.excludedReason)) throw Error('Each entry point needs an operation ID or an exclusion reason.');
+    if (entry.operationId && !operations.some(op => op.id === entry.operationId)) throw Error('Entry point references an unknown operation.');
+    if (entry.excludedReason && (typeof entry.excludedReason !== 'string' || !entry.excludedReason.trim())) throw Error('An exclusion reason must explain the exclusion.');
+    entries.set(entry.siteId, entry);
+  }
+  const candidates = inventoryCandidates(report);
+  const validIDs = new Set(candidates.map(site => site.id));
+  for (const id of entries.keys()) if (!validIDs.has(id)) throw Error('Entry point does not match the current inventory.');
+  for (const site of candidates) {
+    const entry = entries.get(site.id);
+    if (!entry?.operationId) continue;
+    const op = operations.find(item => item.id === entry.operationId);
+    if (!op.evidence.some(ref => ref.file === site.file && ref.line <= site.line && ref.endLine >= site.line)) throw Error('Operation evidence must include its reconciled entry point.');
+  }
+  const missingEntries = candidates.filter(site => !entries.has(site.id));
+  if (missingEntries.length) gaps.push(`${missingEntries.length} detected entry points still need reconciliation.`);
+  return gaps;
+}
+export async function prepare(root, output) {
+  const report = await analyse(root, {excludedOutput:path.resolve(output)});
+  if (!report.files.length) throw Error('No Swift source files found.');
+  await fs.mkdir(output, {recursive:false});
+  await fs.writeFile(path.join(output,'inventory.json'), JSON.stringify(report,null,2)+'\n', {flag:'wx'});
+  return report;
+}
+async function appIcon(root) {
+  const assets = [];
+  async function walk(directory) {
+    for (const item of await fs.readdir(directory,{withFileTypes:true})) {
+      if (!item.isDirectory() || item.name.startsWith('.') || /^(?:node_modules|Pods|Carthage|DerivedData|build|reports)$/i.test(item.name) || /tests?$/i.test(item.name)) continue;
+      const next=path.join(directory,item.name);
+      if (item.name === 'AppIcon.appiconset') assets.push(next);
+      else await walk(next);
+    }
+  }
+  await walk(root);
+  if (assets.length !== 1) return null;
+  try {
+    const contents=JSON.parse(await fs.readFile(path.join(assets[0],'Contents.json'),'utf8'));
+    const images=(contents.images || []).filter(image => typeof image.filename === 'string' && path.basename(image.filename) === image.filename && image.filename.toLowerCase().endsWith('.png'));
+    images.sort((a,b) => (Number.parseFloat(b.size) || 0) * (Number.parseInt(b.scale) || 1) - (Number.parseFloat(a.size) || 0) * (Number.parseInt(a.scale) || 1));
+    return images.length ? path.join(assets[0],images[0].filename) : null;
+  } catch { return null; }
+}
+export async function finish(root, input, output, icon) {
+  const report = await analyse(root, {excludedOutput:path.dirname(path.resolve(output))});
+  const raw = JSON.parse(await fs.readFile(input,'utf8'));
+  const review = await importReview(report,raw,root);
+  const gaps = coverageGaps(report,review);
+  const presentation = review.presentation;
+  if (!presentation?.app || !presentation.summary || !presentation.conclusion || !Array.isArray(presentation.criteria) || !presentation.criteria.length) throw Error('Provide presentation app, summary, conclusion and criteria.');
+  const data = {...presentation, scope:review.scope, scoreAvailable:gaps.length===0};
+  if (gaps.length) data.criteria = [...data.criteria, ...gaps.map((detail, index) => ({status:'concern', title:`Investigation needed ${index+1}`, detail}))];
+  const selectedIcon = icon || await appIcon(root);
+  const iconData = selectedIcon ? `data:image/png;base64,${(await fs.readFile(selectedIcon)).toString('base64')}` : '';
+  await fs.writeFile(output,renderHealthReport(data,iconData),{flag:'wx'});
+  return {gaps,files:report.files.length,operations:(review.operations || []).length};
+}
+if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  try {
+    const [mode, root, input, output, icon] = process.argv.slice(2);
+    if (mode === 'prepare' && root && input && !output) {
+      const result = await prepare(root,input);
+      console.log(`Inventoried ${result.files.length} Swift files and ${inventoryCandidates(result).length} possible entry points. Review inventory.json before producing the report.`);
+    } else if (mode === 'report' && root && input && output) {
+      const result = await finish(root,input,output,icon);
+      console.log(`Inventoried ${result.files} source files, ${result.operations} recorded operations; ${result.gaps.length} coverage gaps. Report: ${output}`);
+    } else throw Error('Usage: node whole-app-health.mjs prepare <project> <new-inventory-dir> | report <project> <review.json> <new-report.html> [app-icon.png]');
+  } catch (error) { console.error(error.message); process.exitCode=1; }
+}

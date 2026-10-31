@@ -210,3 +210,43 @@ unresolved check preserves all other verified passes; row summaries show their
 counts. Legacy reviews without checks retain their original coarse assessments.
 Do not automatically convert their general positive descriptions into passes:
 reinspect the source and attach evidence for each property.
+# File and type reviews
+
+The baseline lists every scanned Swift file and lexical type declaration as
+unassessed. Add optional `fileReviews` and `typeReviews` arrays to the existing
+review input (with its matching `sourceFingerprint`, `scope` and `author`):
+
+```json
+{
+  "fileReviews": [{
+    "file": "App/FeedFeature.swift", "status": "problem",
+    "reason": "An obsolete result can replace a newer result.",
+    "verification": "Source review; runtime behaviour not tested.",
+    "evidence": [{"file": "App/FeedFeature.swift", "line": 1, "endLine": 20}]
+  }],
+  "typeReviews": [{
+    "file": "App/FeedFeature.swift", "line": 1, "kind": "class",
+    "name": "FeedFeature", "status": "problem",
+    "reason": "An obsolete result can replace a newer result.",
+    "verification": "Source review; runtime behaviour not tested.",
+    "evidence": [{"file": "App/FeedFeature.swift", "line": 1, "endLine": 20}],
+    "acceptance": {"by": "Developer", "reason": "Accepted for this release."}
+  }]
+}
+```
+
+Status is `sound`, `problem`, `investigate` or `unassessed`. `sound` means no
+problem found in the reviewed scope, not a proof of correctness. Acceptance is
+optional, requires an explicit developer decision and a `problem` status, and
+does not erase or convert the finding. Type identity must match the scanner's
+file, declaration line, kind and name. Its evidence must contain the declaration.
+The importer checks source hashes and locations, not the truth of the review.
+For multiple problems, a `problem` review can include `issues`: an array of
+objects with `title`, `detail` and source `evidence` for each distinct issue.
+
+An operation may also contain an optional ordered `steps` array. Every step has
+`id`, `title`, `relation`, `detail` and source `evidence`. The first step is an
+`event` with no parent; later steps have `parentId` referencing an earlier step
+and relation `same-task`, `child-task`, `unstructured-task`, `framework-task`,
+or `unknown`. These are reviewer-authored relationships, not an inferred call
+graph. Include synchronous events and preserve unknown boundaries.

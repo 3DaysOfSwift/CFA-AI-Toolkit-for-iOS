@@ -19,6 +19,30 @@ export async function importReview(report,input,root) {
     }
   };
   list(review.findings??[],['title','status','description','check']);
+  for (const [key, isType] of [['fileReviews',false],['typeReviews',true]]) {
+    if (review[key] === undefined) continue;
+    list(review[key],['file','status','reason','verification']);
+    const seen = new Set();
+    for (const item of review[key]) {
+      const file = report.files.find(f => f.path === item.file);
+      if (!file) fail('reviewed file is outside the scan');
+      if (!['sound','problem','investigate','unassessed'].includes(item.status)) fail('invalid file or type status');
+      if (!item.evidence.some(e => e.file === item.file)) fail('review evidence must include its file');
+      if (item.issues !== undefined) {
+        list(item.issues,['title','detail']);
+        if (item.status !== 'problem' && item.issues.length) fail('issues require a problem status');
+      }
+      let id = item.file;
+      if (isType) {
+        if (!text(item.name) || !text(item.kind) || !Number.isInteger(item.line) || !file.declarations.some(d => d.name === item.name && d.type === item.kind && d.line === item.line)) fail('type review must match a scanned declaration');
+        if (!item.evidence.some(e => e.file === item.file && e.line <= item.line && e.endLine >= item.line)) fail('type evidence must include its declaration');
+        id = JSON.stringify([item.file,item.line,item.kind,item.name]);
+      }
+      if (seen.has(id)) fail('duplicate file or type review');
+      seen.add(id);
+      if (item.acceptance !== undefined && (item.status !== 'problem' || !text(item.acceptance?.by) || !text(item.acceptance?.reason))) fail('acceptance requires a problem, developer and reason');
+    }
+  }
   if(review.operations) {
     const inventory=review.operationInventory;
     if(!inventory || !text(inventory.scope) || !text(inventory.method) || !['partial','complete'].includes(inventory.coverage)) fail('operation inventory scope, method and coverage required');
@@ -27,6 +51,18 @@ export async function importReview(report,input,root) {
     for(const op of review.operations) {
       if(seen.has(op.id)) fail('duplicate operation');
       seen.add(op.id);
+      if (op.steps !== undefined) {
+        list(op.steps,['id','title','relation','detail']);
+        if (!op.steps.length) fail('operation steps must not be empty');
+        const stepIDs = new Set();
+        for (const [index, step] of op.steps.entries()) {
+          if (stepIDs.has(step.id)) fail('duplicate operation step');
+          if (!['event','same-task','child-task','unstructured-task','framework-task','unknown'].includes(step.relation)) fail('invalid operation step relation');
+          if (index === 0 && (step.relation !== 'event' || step.parentId !== undefined)) fail('first operation step must be an event');
+          if (index > 0 && (!text(step.parentId) || !stepIDs.has(step.parentId) || step.relation === 'event')) fail('operation step needs an earlier parent');
+          stepIDs.add(step.id);
+        }
+      }
       if(op.checks!==undefined) {
         list(op.checks,['id','title','dimension','status','reason','verification']);
         const ids=new Set();
@@ -53,6 +89,7 @@ export async function importReview(report,input,root) {
       if(op.recommendation!==undefined && !text(op.recommendation)) fail('invalid recommendation');
       const t=op.triggerSource;
       if(!t || !Number.isInteger(t.line) || t.line<1 || !op.evidence.some(e=>e.file===t.file && e.line<=t.line && e.endLine>=t.line)) fail('operation evidence must include trigger');
+      if(op.steps?.length && !op.steps[0].evidence.some(e=>e.file===t.file && e.line<=t.line && e.endLine>=t.line)) fail('event step evidence must include trigger');
     }
   }
   if(review.concurrencyChecks) {

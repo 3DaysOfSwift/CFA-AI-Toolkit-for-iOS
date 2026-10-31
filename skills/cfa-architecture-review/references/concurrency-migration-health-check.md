@@ -28,6 +28,66 @@ why an excluded candidate is not an operation. A scanner miss, unknown dispatch 
 unavailable dependency must remain visible rather than disappear from coverage.
 Whole-app source review is not proof of every possible runtime execution.
 
+## Produce the Health Check report
+
+Run the packaged scanner on the current checkout before each Health Check:
+
+```
+node scripts/dashboard/src/whole-app-health.mjs prepare <project-root> <new-inventory-directory>
+```
+
+Read `inventory.json` and reconcile the full production target and file list,
+including sources the lexical scan cannot resolve. Record each file and detected
+type review, all detected candidate entry points, and each meaningful user or
+system operation using `scripts/dashboard/Documentation/REVIEWS.md`. Include
+`productionTargets` (an array of reviewed target and local-package names),
+`targetInventoryVerified` (true only after verifying membership), and
+`entryPoints` entries with each candidate `siteId` and either `operationId` or a
+specific `excludedReason`. The matching operation evidence must include the
+entry point. Add a `presentation` object with app, summary, conclusion and
+criteria for the concise report. Each criterion needs title, detail, status
+(`pass`, `concern`, `problem`) and source evidence. Use the app's own PNG icon
+when available. Keep the inventory and review outside the app source tree.
+
+After review, run:
+
+```
+node scripts/dashboard/src/whole-app-health.mjs report <project-root> <review.json> <new-report.html> [app-icon.png]
+```
+
+The tool rescans and checks the source fingerprint, evidence ranges, file/type
+coverage and candidate reconciliation before generating the report. Missing
+reviews, unresolved operations, skipped files or unverified target membership
+appear as investigation findings; no overall percentage is shown in that case.
+The scanner is lexical: a complete result also requires the reviewer to find
+entry points it cannot detect, resolve target membership, and assess call paths.
+Never infer a complete app assessment from a matching count or scanner output.
+
+## Review files and types, then trace operations
+
+Start by inventorying every in-scope production Swift file, including files
+without type declarations, and each type declared there. Review state ownership,
+isolation, task lifetime, overlapping work, cancellation, error handling and
+observable results where applicable. A synchronous file is not a failure. Record
+one of: no problems found in the reviewed behaviour, problem, needs investigation,
+or not assessed. A green result requires completed, evidenced checks; a scanner
+match count or absence of concurrency syntax is not a pass. Follow callers and
+dependencies whenever a type's behaviour cannot be judged in isolation.
+
+The developer may explicitly accept a documented problem. Record who accepted it
+and why; preserve the original problem and evidence rather than marking it green.
+Do not infer acceptance from silence. A problem or accepted issue does not block
+operation tracing: the interactions may expose its severity or contradict it.
+
+Next map each discovered operation from its actual user or system event. For
+each source-supported step, record whether it is synchronous or in the same
+task, a structured child task, an unstructured task, a framework-owned task, or
+an unknown relationship. `Task {}` creates an unstructured task even inside
+another task; an `await` alone is not a new task. Include operations that never
+create a task. Describe unresolved dynamic dispatch and external boundaries;
+neither lexical nesting nor a scan proves a call graph or runtime execution.
+Link findings and accepted decisions to the affected operations where relevant.
+
 Partial reports are checkpoints. Continue through the remaining inventory while
 source and review actions are available. A demonstrated defect may establish a
 verdict early, but does not complete the rest of the app's review. Finish with one
@@ -146,6 +206,29 @@ from correctness across suspension points. An async declaration or separate type
 does not establish that CPU-intensive work executes away from MainActor. Consult
 the project's toolchain and authoritative Swift documentation when semantics are
 uncertain; do not impose another compiler version's defaults.
+
+### Review the launch signal
+
+Trace each applicable app and scene lifecycle entry point from its synchronous
+callback to the initialization and loading signals it actually invokes. Show
+where the callback returns, which essential startup signals run synchronously,
+and which are first scheduled in a Task, queue, View lifecycle or another
+asynchronous mechanism. For this health check, the toolkit's preferred launch
+policy is to signal initial application loading synchronously from the applicable
+lifecycle callback; the receiving owners may start their own asynchronous work.
+Identify a deferred initial signal as a departure from that policy and highlight
+the exact source path to the team, including its ownership and ordering effects.
+
+Apply this review to CFA and non-CFA apps without requiring any particular
+architecture, AppModel name or launch delegate. First establish which work the
+app actually needs at launch and whether the callback applies to that target or
+scene. A Task is not automatically a Swift Concurrency error or evidence of a
+measured slowdown; a deliberate deferral may fit the product. Distinguish the
+synchronous signal from completion: do not require the callback to wait for
+network requests or perform blocking disk I/O. Describe a concrete consequence
+or mark it unverified, and measure on a representative device before claiming a
+launch-time difference. If the lifecycle path cannot be established, mark the
+check as needing investigation rather than guessing.
 
 ## Trace behaviour before judging it
 

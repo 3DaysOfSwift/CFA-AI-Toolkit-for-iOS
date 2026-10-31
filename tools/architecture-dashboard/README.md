@@ -68,13 +68,59 @@ node src/cli.mjs /path/to/app --observations observations.json --out reports/obs
 
 ## Current capabilities
 
+### Readable Health Check report
+
+For a whole-app Health Check, first run
+`node src/whole-app-health.mjs prepare <project-root> <new-inventory-directory>`.
+Reconcile the current inventory against the production targets, files, types and
+operation entry points, then use `node src/whole-app-health.mjs report
+<project-root> <review.json> <new-report.html> [app-icon.png]`. The report is
+generated only after the review evidence is checked against the current source;
+unresolved coverage is shown as an investigation and does not receive a score.
+The scanner cannot establish target membership or discover every event by itself.
+
+The review's `presentation` contains `app`, `summary`, `conclusion` and
+`criteria`. Each criterion has a `title`, `detail`, `status` (`pass`, `concern`
+or `problem`) and optional `evidence`. The score equally weights reviewed
+criteria (1, ½ or 0 respectively). It is an approximate summary of the chosen
+criteria, not a scanner verdict or proof of whole-app coverage. Describe the
+scope accurately so readers understand what the score represents. The internal
+report renderer is not a substitute for the whole-app review workflow.
+
+### Experimental compiler-index map
+
+On macOS with Xcode selected, map call sites from an existing Swift compiler
+index for a specific module. Use an isolated index from a recent build of the
+intended target and configuration; the map cannot verify that the supplied index
+is current or complete. The command reads the index and does not build or alter
+the application. It compiles a small temporary helper using Xcode's libIndexStore.
+
+```sh
+node src/program-map.mjs /path/to/project /path/to/Index.noindex/DataStore ModuleName /path/to/new-map
+```
+
+The output includes a launch-callback tree, searchable indexed call sites and
+symbol identifiers. The generated entry point, framework callbacks, dynamic
+dispatch and closure/task boundaries can be absent or misleading; the index
+does not show runtime execution or establish task ownership. Calls without a
+resolved in-module caller remain in the searchable inventory, not the tree.
+Source hashes describe files at report time and do not verify index freshness.
+Report files contain source paths and symbols; review them before sharing.
+
 - Maps `@main` declarations and source locations of task/scheduling instructions.
+- Locates some app-launch callbacks and button actions as possible event entry
+  points; this is not a complete inventory of lifecycle or user actions.
 - Separates unstructured tasks, detached tasks, async-let bindings, group scopes,
   possible child creation sites and framework callbacks.
 - Provides filters, file drill-down, source excerpts and review questions.
 - Finds limited GCD, blocking-work and UI-responsibility warnings.
 - Records scan scope and a Swift-source fingerprint for observation alignment.
 - Runs offline, without analytics, external fonts, scripts or CDN assets.
+- Lists scanned files and detected types as unassessed until a source-backed
+  reviewer supplies a result; records explicit developer acceptance of a problem
+  without changing the finding to a pass.
+- Displays reviewer-authored event and task trees with evidence for each step.
+  The scanner does not automatically infer those trees.
 
 This is a **lexical inventory prototype**, not a Swift compiler, runtime profiler
 or completed architecture audit. Counts describe matched source sites, not active

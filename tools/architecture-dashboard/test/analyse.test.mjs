@@ -24,6 +24,10 @@ test('framework modifiers, detached work and group scopes have distinct kinds',(
   const source='Task.detached { }\n.task(id: item) { }\n.refreshable { }\nwithThrowingTaskGroup(of: Int.self) { group in group.addTask { 1 } }';
   assert.deepEqual(scanSource(source,'A.swift').sites.map(s=>s.kind),['detached','view-task','refresh','group','group-child']);
 });
+test('discovers possible synchronous entry points without declaring them complete',()=>{
+  const source='func application(_ app: UIApplication, didFinishLaunchingWithOptions opts: Options?) -> Bool { true }\nButton("Refresh") { refresh() }';
+  assert.deepEqual(scanSource(source,'App.swift').sites.map(s=>s.kind),['launch-callback','button-action']);
+});
 test('architecture warnings depend on source location, not every conditional',()=>{
   const source='if visible { show() }; let day = calendar.startOfDay(for: date)';
   assert.equal(scanSource(source,'CoffeeViewModel.swift').sites.filter(s=>s.kind==='ui-rule').length,1);

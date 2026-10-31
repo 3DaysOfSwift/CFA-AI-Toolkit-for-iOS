@@ -39,6 +39,8 @@ export function maskSwift(source) {
 }
 
 const rules = [
+  ['launch-callback', 'Possible application lifecycle callback', /\bfunc\s+application\s*\([^{}]*?\bdidFinishLaunchingWithOptions\b/g],
+  ['button-action', 'Possible button entry point', /\bButton\s*(?:\([^{}\n]*\))?\s*\{/g],
   ['await', 'Possible suspension point', /\bawait\b/g],
   ['main-actor', 'Explicit MainActor annotation', /@MainActor\b/g],
   ['task', 'Unstructured task', /\bTask\s*(?:<[^;{}]+?>)?\s*(?:\.\s*init\s*)?(?:\([^;{}]*?\))?\s*\{/g],

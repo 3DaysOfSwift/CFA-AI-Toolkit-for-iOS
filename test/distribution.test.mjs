@@ -76,6 +76,30 @@ test('standalone release carries scanner dependencies and scans outside the sour
  assert.equal(fs.readFileSync(path.join(fixture,'Feature.swift'),'utf8'),'actor Feature { func refresh() async { await Task.yield() } }');
 });
 
+test('installed architecture-review skill inventories an app and creates its Health Check report',t=>{
+ const {dir,source}=release(t), destination=path.join(dir,'customer');
+ install({source,destination,mode:'skills'});
+ const skill=path.join(destination,'.agents/skills/cfa-architecture-review');
+ const cli=path.join(skill,'scripts/dashboard/src/whole-app-health.mjs');
+ assert.ok(fs.existsSync(path.join(skill,'scripts/dashboard/src/health-report.mjs')));
+ const app=path.join(dir,'example-app'); fs.mkdirSync(app);
+ const sourceFile=path.join(app,'Example.swift');
+ fs.writeFileSync(sourceFile,'struct Example { func refresh() async { await Task.yield() } }\n');
+ const inventory=path.join(dir,'health-inventory');
+ const scan=spawnSync(process.execPath,[cli,'prepare',app,inventory],{cwd:dir,encoding:'utf8'});
+ assert.equal(scan.status,0,scan.stderr);
+ const fingerprint=json(path.join(inventory,'inventory.json')).sourceFingerprint;
+ const review=path.join(dir,'health-review.json');
+ fs.writeFileSync(review,JSON.stringify({schemaVersion:1,sourceFingerprint:fingerprint,author:'Reviewer',scope:'Example app',presentation:{app:'Example',summary:'Example assessment',conclusion:'More evidence is needed.',criteria:[{title:'Example',detail:'Investigated.',status:'concern'}]}}));
+ const report=path.join(dir,'health-report.html');
+ const generation=spawnSync(process.execPath,[cli,'report',app,review,report],{cwd:dir,encoding:'utf8'});
+ assert.equal(generation.status,0,generation.stderr);
+ const html=fs.readFileSync(report,'utf8');
+ assert.match(html,/Example/); assert.match(html,/Score unavailable/);
+ assert.match(html,/Investigation needed/); assert.doesNotMatch(html,/Good foundation/);
+ assert.equal(fs.readFileSync(sourceFile,'utf8'),'struct Example { func refresh() async { await Task.yield() } }\n');
+});
+
 test('portable installation accepts an explicit host skill directory',t=>{
  const {dir,source}=release(t); const destination=path.join(dir,'customer');
  const skillsDirectory=path.join(destination,'.claude','skills');
