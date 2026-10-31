@@ -25,7 +25,7 @@ Editorial analysis: this sacrifices initializer-based screen injection and makes
 
 ## Scope and exceptions
 
-This is a CFA convention, not a SwiftUI ban on View inputs. Stateless data-only components may receive snapshots. Do not replace two independent destinations with one shared selection just to remove parameters; unresolved destination/window identity requires an ownership decision before changing behaviour.
+This is a CFA convention, not a SwiftUI ban on View inputs. Reusable presentation components may receive snapshots, bindings and action closures that report intent to their screen; they do not own the screen’s ViewModel or business rules. Do not replace two independent destinations with one shared selection just to remove parameters; unresolved destination/window identity requires an ownership decision before changing behaviour.
 
 ## Verification
 

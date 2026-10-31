@@ -373,10 +373,11 @@ still have different presentation behaviour, lifetimes, state, and future
 requirements. Reuse belongs below the ViewModel boundary in a feature,
 or in a stateless presentational View.
 
-A small reusable View that only renders plain display data may remain stateless
-and need no ViewModel. Examples include a chart receiving chart data, a streak
-banner receiving a snapshot, or a reusable card receiving strings and colours.
-It must not acquire feature access or business behaviour.
+A reusable presentation View may receive display data, bindings, and action
+closures without needing a ViewModel. For example, a refresh button may call
+an action supplied by its screen. The screen forwards that intent to its own
+ViewModel, and the Feature owns the business operation. The component must not
+acquire a Feature or ViewModel, or implement business rules.
 
 ### Keep SwiftUI View Construction Fast
 
@@ -578,7 +579,21 @@ TodayView(onAdd: rootViewModel.addEntry)
 A detail destination may receive selected value data and construct its own
 ViewModel. The Feature owns authoritative data; screen and scene selection
 remain presentation concerns. Preserve independent navigation and existing
-product behaviour. A stateless component may receive display data.
+product behaviour. A reusable presentation component may receive display data,
+bindings and actions that report user intent to its screen, for example:
+
+```swift
+struct RefreshButton: View {
+    let action: () -> Void
+    var body: some View { Button("Refresh", action: action) }
+}
+
+RefreshButton { viewModel.refresh() }
+```
+
+This does not make the closure a business service or transfer another screen's
+ViewModel responsibilities. Screen Views retain their own ViewModels; reusable
+components forward intent without implementing business rules.
 
 Each screen owns the sheet, alert, or navigation destination it presents. Do
 not create an application-wide router merely to move local presentation state
@@ -1248,7 +1263,8 @@ Reject or refactor the following during review:
 - reusable business rules in a ViewModel;
 - one ViewModel shared by multiple unique screens;
 - ViewModels stored by AppModel, a root ViewModel, or another ViewModel;
-- Views receiving ViewModels, features, AppModel, or service closures;
+- Views receiving ViewModels, Features, AppModel, or repositories;
+- screen Views receiving service closures or another screen’s ViewModel actions;
 - ViewModels depending on the whole AppModel instead of the smallest coherent
   set of narrow feature APIs;
 - features containing navigation, sheets, dialogs, or screen names;
@@ -1279,8 +1295,9 @@ Before accepting a change, answer every question:
 2. Does every unique screen have its own adjacent ViewModel?
 3. Is each ViewModel named `viewModel`, owned with `@State`, and released with
    its View?
-4. Can every View be created without receiving a ViewModel, AppModel, feature,
-   repository, or behavioural closure?
+4. Can every View be created without receiving a ViewModel, AppModel, Feature,
+   or repository, and do screen Views avoid receiving another screen’s actions?
+   Reusable presentation components may receive action closures.
 5. Does every business decision live in a feature or lower Model layer?
 6. Would an Apple Watch app be able to reuse the decision without copying UI
    code?
