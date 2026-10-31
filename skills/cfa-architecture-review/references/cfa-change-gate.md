@@ -63,9 +63,9 @@ the architecture:
 11. Views remain declarative. Bundle/system reads and presentation formatting
     belong to the adjacent ViewModel; business, persistence, and shared state
     belong to the owning Feature.
-12. A ViewModel initializer accepts only its narrow feature dependency, defaulted
-    from `AppModel.shared`. UI data is exposed by that feature and read through
-    the ViewModel; do not add convenience initializer parameters.
+12. A ViewModel initializer defaults its narrow Feature dependencies from
+    `AppModel.shared`. A detail ViewModel may also receive selected value data;
+    avoid unrelated convenience parameters.
 13. Each local data responsibility uses the simplest single persistence route.
     A replaceable remote snapshot uses one JSON cache; SwiftData is reserved
     for genuinely structured, queryable, growing, or relational local data.

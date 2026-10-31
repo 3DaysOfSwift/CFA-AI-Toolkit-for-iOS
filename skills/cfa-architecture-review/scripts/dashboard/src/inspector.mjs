@@ -159,15 +159,17 @@ export async function inspect(project) {
         const opening = initializer.index + initializer[0].length - 1;
         const closing = closingParenthesis(body, opening);
         if (closing < 0) continue;
-        if (body.slice(opening + 1, closing).trim()) {
-          findings.push(finding('screen-initializer-inputs', 'review', `${name} accepts initializer inputs. Verify that detail inputs are selected value data and no ViewModel is injected.`, viewFile, lineOf(view, bodyOffset + initializer.index)));
+        const parameters = body.slice(opening + 1, closing);
+        if (parameters.trim()) {
+          const injectedViewModel = /:\s*(?:any\s+)?\w*ViewModel\b/.test(parameters);
+          findings.push(finding('screen-initializer-inputs', injectedViewModel ? 'warning' : 'review', injectedViewModel ? `${name} appears to accept a ViewModel; CFA screens construct their own.` : `${name} accepts initializer inputs. Verify that detail inputs are selected value data and no ViewModel is injected.`, viewFile, lineOf(view, bodyOffset + initializer.index)));
         }
         const tail = body.slice(closing + 1);
         const openingBody = /^\s*(?:(?:async|throws|rethrows)\s*)*\{/.exec(tail);
         if (openingBody) {
           const initializerBody = braceBody(tail, openingBody[0].length - 1);
           if (/\b_?viewModel\s*=/.test(initializerBody)) {
-            findings.push(finding('view-model-initializer-construction', 'warning', `${name} assigns viewModel or its State backing storage in init. Construct ${viewModelName}() on the private @State property declaration instead.`, viewFile, lineOf(view, bodyOffset + initializer.index)));
+            findings.push(finding('view-model-initializer-construction', 'review', `${name} assigns ViewModel state in init. Verify it constructs its own ViewModel from selected detail data and does not accept an injected ViewModel.`, viewFile, lineOf(view, bodyOffset + initializer.index)));
           }
         }
       }

@@ -396,6 +396,48 @@ selection. Preserve a detail snapshot and navigation when background data change
 use explicit refresh by default where appropriate. Live updates are a product
 choice. See the presentation-boundaries decision for the Next Rocket Launch policy.
 
+Published snapshot structs representing data received from an API or persistence
+layer must use `let` properties. Treat them as immutable values, including their
+contents; do not embed mutable reference state that undermines the snapshot.
+Decode or construct a new snapshot when confirmed data changes. Never mutate a
+local copy and retain or present it as saved state. Editable form fields are
+temporary unsaved drafts, distinct from published snapshots. Submit changes to
+the responsible Feature, persist them, and publish confirmed state only after
+the persistence operation succeeds.
+
+For example, the destination constructs its own ViewModel from the selected
+value. `LaunchSnapshot` below is an illustrative domain value; the Feature and
+the rest of the screen are omitted:
+
+```swift
+@MainActor
+struct LaunchDetailView: View {
+    @State private var viewModel: LaunchDetailViewModel
+
+    init(launch: LaunchSnapshot) {
+        _viewModel = State(initialValue: LaunchDetailViewModel(launch: launch))
+    }
+
+    var body: some View {
+        Text(viewModel.launch.name)
+    }
+}
+
+@MainActor @Observable
+final class LaunchDetailViewModel {
+    let launch: LaunchSnapshot
+
+    init(launch: LaunchSnapshot) {
+        self.launch = launch
+    }
+}
+```
+
+Each independently identified destination owns its own state. The example
+does not establish multi-scene behaviour by itself: verify it in the app.
+An initializer may be evaluated again for a replacement View value, even when
+SwiftUI retains the existing State. It must not initiate side effects.
+
 ✅ **Correct — the View owns its bespoke ViewModel and requires no dependency
 injection:**
 
@@ -458,9 +500,9 @@ A ViewModel:
 - is named after exactly one View;
 - uses `@MainActor` and `@Observable` when it exposes UI-observed state;
 - is created and owned by its View using `@State`;
-- accepts only its narrow owning Feature in its initializer, defaulted
-  from `AppModel.shared`; it does not accept bundle metadata, URLs, defaults,
-  services, or other convenience presentation inputs;
+- accepts narrow Feature dependencies defaulted from `AppModel.shared`; a detail
+  ViewModel also accepts its selected value snapshot. Do not add unrelated
+  convenience inputs, services or externally supplied ViewModels;
 - lives only as long as that View lives;
 - is never cached by a root ViewModel, another ViewModel, or AppModel;
 - never calls another ViewModel;
@@ -754,6 +796,16 @@ Define what persistence success means. In a local-first application, a command
 may succeed once data is durably stored on the device while remote
 synchronization remains pending. Expose synchronization state separately; never
 claim remote success when only the local write succeeded.
+
+When restoring a non-critical user preference, treat a missing or obsolete
+recognised-format value as a compatibility case when the product defines a safe
+default. For example, use the system appearance if a saved theme no longer
+exists, without asking the user to intervene. Preserve the old value where
+appropriate and replace it only through an intentional migration or a successful
+user choice. Distinguish this from unreadable or corrupt storage and failed
+writes, which remain errors; never apply a default to user records or other
+important data as if they had been loaded or saved successfully. Test the
+fallback, a known value, and genuine storage failures.
 
 Never silently discard a business or persistence failure. Preserve user input
 after a failed command and expose a recoverable error. `try?` is reserved for

@@ -46,6 +46,19 @@ struct HomeView: View {
     ['view-model-ownership', 2]
   ]);
   assert.ok(findings.every(item => item.file === viewPath));
+  assert.equal(findings[0].severity, 'warning');
+});
+
+test('selected detail data and owned State are reviewed rather than rejected', async t => {
+  const { findings } = await inspectView(t, `struct HomeView: View {
+    @State private var viewModel: HomeViewModel
+    init(launch: LaunchSnapshot) {
+      _viewModel = State(initialValue: HomeViewModel(launch: launch))
+    }
+    var body: some View { Text("Home") }
+  }`);
+  assert.ok(findings.length > 0);
+  assert.ok(findings.every(item => item.severity === 'review'));
 });
 
 for (const expression of [

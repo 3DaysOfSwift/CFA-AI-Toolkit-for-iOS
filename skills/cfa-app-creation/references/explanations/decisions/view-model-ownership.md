@@ -17,6 +17,8 @@ Passing a screen's backing object through parent Views spreads dependency plumbi
 
 The specification deliberately gives each screen one local, testable presentation boundary. A screen can present several independent business capabilities, so its ViewModel may receive multiple narrow Feature dependencies. For a growing ViewModel, ask: is it arranging existing capabilities for this screen, or implementing a new business capability itself? Only the latter points towards extracting business behaviour into the model. Presentation reuse can stay in presentation helpers. Keep screen construction cheap and free of work-starting side effects.
 
+A detail View’s selected value supplies the initial state for its ViewModel. SwiftUI keeps state by View identity, so changing an input does not automatically replace an existing ViewModel. Separate scene or destination identities must retain independent selections. Construction must remain cheap: depending on the SwiftUI implementation, a replacement View value can construct a candidate ViewModel even when existing state is retained.
+
 ## Trade-offs and alternatives
 
 Editorial analysis: this sacrifices initializer-based screen injection and makes preview configuration and independent destination context less straightforward. State ownership does not guarantee that an initializer expression is evaluated only once.
