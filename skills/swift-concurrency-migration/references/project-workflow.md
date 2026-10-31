@@ -4,6 +4,23 @@ CFA governs engineering boundaries, not a customer's visual identity. Read the
 project's existing instructions and current request before applying toolkit
 defaults. This policy takes precedence over template styling and design advice.
 
+## Commit existing work before new work
+
+Before beginning a new task in a Git repository, inspect the working tree and
+staging area. When there are existing changes unrelated to the new task, review
+them and commit that earlier work separately before making new changes. Use a
+meaningful commit message and preserve the contents; do not discard, reset or
+silently combine them with the new task. This rule also applies before a
+read-only review: the commit records the existing changes, but the review does
+not otherwise modify the app.
+
+Inspect staged and untracked files before including them. Never commit secrets,
+generated private data, or unresolved merge conflicts. If the existing work
+cannot be safely committed, explain the specific obstacle and continue any
+independent work that does not disturb it. A baseline commit does not authorize
+pushing or publishing. User instructions and repository restrictions take
+precedence over this default.
+
 ## Record the workflow once
 
 Use an existing project instructions file (normally AGENTS.md); merge a small
