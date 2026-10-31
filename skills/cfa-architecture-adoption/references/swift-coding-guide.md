@@ -304,7 +304,7 @@ When an active architecture explicitly requires a named boundary, its contract t
 
 Do not turn unreadable saved data into an empty collection that will overwrite the original. Do not use `try?` to hide a failed purchase, save or migration. Optional best-effort work may use it only when failure is deliberately harmless and understood.
 
-For persistence, prepare the proposed state, commit it, then expose confirmed success. Preserve drafts, retry and duplicate protection. Never publish an unsaved change as authoritative state. Cancelled work should not appear as a successful result.
+For durable user edits, prepare the proposed state, commit it, then expose confirmed success. Preserve drafts, retry and duplicate protection. Never present an unsaved edit as saved. A successful remote response may be shown immediately while a replaceable local cache is saved separately; cache failure must not discard that response or claim offline availability. Use bounded retries and prevent older cache writes from replacing newer data. Cancelled work should not appear as a successful result.
 
 **Review:** Exercise failed writes and retries. Confirm neither progress nor rewards are silently lost or duplicated.
 

@@ -11,7 +11,13 @@ CFA uses one app-owned SwiftData storage boundary when a database is warranted. 
 
 Features own authoritative application state. A persisted record, implementation cache or database context is not a second business authority. Storage services may retain internal machinery, but must not maintain a competing current profile or feed independently of its Feature.
 
-Persist proposed changes before publishing them as authoritative Feature state. On failure, keep the existing state, retain the editable draft and report the error for retry. Loading and error presentation may update separately.
+Persist user edits and other durable commands before reporting them as saved. On failure, keep the existing state, retain the editable draft and report the error for retry. Loading and error presentation may update separately.
+
+An optional local cache of a successful remote response is different: show the
+current response without waiting for the cache. Try the cache write with a
+bounded retry, preserve any previous good cache on failure, and do not imply the
+new data is available offline unless it was saved. Keep writes ordered so an
+older snapshot cannot replace a newer one.
 
 Published snapshot structs for API or persisted data use `let` properties and
 represent immutable values. Replace them with newly constructed confirmed
@@ -27,7 +33,7 @@ Per-feature containers duplicate initialization and ownership. Replacing a colle
 
 The coding guide chooses a single store owner for consistency and explicitly distinguishes replaceable JSON snapshots from queryable durable data. Its recorded overlapping-container investigation motivates cautious initialization; it is not an Apple-confirmed explanation of framework internals.
 
-Publishing only after persistence succeeds avoids displaying unsaved changes as saved and avoids rolling back an optimistic authoritative update. The user can keep editing or retry after failure.
+Publishing durable edits as saved only after persistence succeeds avoids displaying unsaved changes as saved and avoids rolling back an optimistic authoritative update. The user can keep editing or retry after failure. A downloaded response is already confirmed by its remote source; an optional local cache must not prevent the user from seeing it.
 
 ## Trade-offs and alternatives
 

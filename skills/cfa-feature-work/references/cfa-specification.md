@@ -748,7 +748,8 @@ A concrete feature:
 - exposes its domain methods and properties directly, without a feature protocol;
 - owns business rules, validation, calculations, and classifications;
 - coordinates repositories and lower-level collaborators for its workflow;
-- publishes shared feature state after successful persistence;
+- publishes durable edits as saved only after their required persistence succeeds;
+  a successful remote response need not wait for an optional local cache;
 - may be used by several different ViewModels without sharing those ViewModels;
 - hides its internal collaborators from callers;
 - has methods named after their real action or result.
@@ -803,9 +804,19 @@ from the model actor into a feature, ViewModel, or View. A small,
 deliberately UI-owned context may be main-actor isolated when its work is proven
 short, but that is an exception—not the default commercial persistence design.
 
-Publish changes to authoritative Feature state only after persistence succeeds.
-Keep an editable draft on failure and report the error; do not present unsaved
-changes as saved. Loading and error presentation may update independently.
+Publish user edits and other durable commands as saved only after the required
+authoritative persistence succeeds. Keep an editable draft on failure and report
+the error; do not present unsaved changes as saved. Loading and error
+presentation may update independently.
+
+A replaceable local cache of data already obtained from an authoritative remote
+source is different: publish a successful, current response without waiting for
+the optional cache write. Attempt caching independently, use a bounded retry,
+and do not misrepresent an unsaved cache as available offline. A cache failure
+must not turn the successful remote response into a failed download or discard
+the data. Preserve an existing good cache when a replacement fails and prevent
+older writes from overwriting newer snapshots. This exception does not apply to
+user edits, purchases, reminders, or other changes that require a durable save.
 
 Define what persistence success means. In a local-first application, a command
 may succeed once data is durably stored on the device while remote
