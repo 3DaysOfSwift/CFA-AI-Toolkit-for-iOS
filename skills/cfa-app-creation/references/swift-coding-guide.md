@@ -166,6 +166,8 @@ Prefer explicit names and sequential steps over clever chains, nested ternaries 
 
 Keep one authoritative source of each piece of state. Derive values instead of storing redundant flags unless a measured cache needs them. Keep cache invalidation inputs explicit. Avoid broad rewrites when a small correction addresses the problem.
 
+After changing a code path, check its former callers, helpers, state and tests for code made redundant by that change. During implementation, remove confirmed unused code within the task's scope and update tests to exercise the current behaviour; read-only reviews report findings without changing code. Check target membership, framework callbacks, dynamic entry points and public or externally consumed APIs before treating an apparent absence of references as proof that code is unused; preserve anything whose use is uncertain.
+
 **Review:** Can a new reader identify the inputs, decision, state changes and outcome without following unnecessary indirection?
 
 ### Names describe information, not only mechanics
@@ -189,6 +191,8 @@ condition, such as `isSaving`, `isRefreshing`, `isPurchasePending` or
 `isPurchasingOrRestoring`. A flag shared by purchase and restore operations
 must not be called `isPurchasing`, because that hides half its meaning. Keep
 names accurate without inventing extra state solely for naming purposes.
+
+Name task handles and task collections for the work and lifecycle they actually represent, consistently with the operation that creates them. Do not add qualifiers such as `initial` unless they describe a real restriction; avoid a broad name if the task only covers one narrower phase. Revisit names when a change alters their purpose.
 
 **Review:** Read each declaration without its implementation. Can a reader identify the information it stores, not merely the API or container it uses?
 
@@ -313,6 +317,8 @@ For durable user edits, prepare the proposed state, commit it, then expose confi
 **Rule:** Use Swift concurrency with a clear task owner and a deliberate policy for overlapping work.
 
 Use structured child tasks for independent work whose lifetime belongs to the current operation. Give longer-lived tasks an owner and cancellation policy. A `Task` does not automatically move expensive work off the main actor; use suitable actor workers for parsing, persistence and generation. Do not add detached tasks merely to silence isolation errors.
+
+When already in an asynchronous operation, call sequential work with `await` in the current task. For independent concurrent work that belongs to that operation, use `async let` or a task group. Create an unstructured task only when its separate lifetime, shared ownership, or a synchronous entry point requires it; do not add a task merely to call and wait for another task. Awaiting suspends the task, not the UI thread. A structured scope waits for its children and cancellation propagates to them; an unstructured task needs an explicit lifetime and cancellation policy. When work is shared, cancelling one caller must respect the Feature's policy for other callers.
 
 In CFA, ViewModels retain a named handle for each unstructured Task they create
 by default. Repeated equivalent actions reuse that handle and await its outcome,

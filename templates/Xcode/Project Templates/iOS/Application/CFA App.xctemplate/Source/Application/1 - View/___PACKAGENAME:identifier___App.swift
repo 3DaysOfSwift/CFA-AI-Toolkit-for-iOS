@@ -1,14 +1,13 @@
 import SwiftUI
 import UIKit
 
+@MainActor
 final class CFAAppDelegate: NSObject, UIApplicationDelegate {
     func application(
         _: UIApplication,
         didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
-        Task { @MainActor in
-            await AppModel.shared.applicationDidFinishLaunching()
-        }
+        AppModel.shared.applicationDidFinishLaunching()
 
         return true
     }

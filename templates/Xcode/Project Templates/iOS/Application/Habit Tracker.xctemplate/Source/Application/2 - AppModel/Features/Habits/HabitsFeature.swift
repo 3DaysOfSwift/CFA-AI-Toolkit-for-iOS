@@ -4,6 +4,7 @@ import Observation
 @MainActor
 @Observable
 final class HabitsFeature {
+    @ObservationIgnored private var startupTask: Task<Void, Never>?
     private let repository: any HabitsRepository
     private(set) var habits: [Habit] = []
     private(set) var isLoading = false
@@ -11,6 +12,14 @@ final class HabitsFeature {
 
     init(repository: any HabitsRepository) {
         self.repository = repository
+    }
+
+    func startLoading() {
+        guard startupTask == nil else { return }
+        startupTask = Task { [weak self] in
+            await self?.reload()
+            self?.startupTask = nil
+        }
     }
 
     func reload() async {

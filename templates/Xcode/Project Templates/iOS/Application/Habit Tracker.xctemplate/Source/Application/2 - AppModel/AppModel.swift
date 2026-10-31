@@ -31,9 +31,9 @@ final class AppModel {
         )
     }
 
-    func applicationDidFinishLaunching() async {
+    func applicationDidFinishLaunching() {
         guard !didFinishLaunching else { return }
         didFinishLaunching = true
-        await habitsFeature.reload()
+        habitsFeature.startLoading()
     }
 }

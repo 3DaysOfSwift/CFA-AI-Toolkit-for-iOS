@@ -3,6 +3,7 @@ import Observation
 @MainActor
 @Observable
 final class GitReposFeature {
+    @ObservationIgnored private var startupTask: Task<Void, Never>?
     private let provider: any GitReposProvider
     private let cache: any RepoCache
 
@@ -13,6 +14,14 @@ final class GitReposFeature {
     init(provider: any GitReposProvider, cache: any RepoCache) {
         self.provider = provider
         self.cache = cache
+    }
+
+    func startLoading() {
+        guard startupTask == nil else { return }
+        startupTask = Task { [weak self] in
+            await self?.refresh()
+            self?.startupTask = nil
+        }
     }
 
     func refresh() async {

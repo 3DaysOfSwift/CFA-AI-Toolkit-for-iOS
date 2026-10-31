@@ -39,12 +39,11 @@ final class AppModel {
         )
     }
 
-    func applicationDidFinishLaunching() async {
+    func applicationDidFinishLaunching() {
         guard !didFinishLaunching else { return }
         didFinishLaunching = true
-        async let habits: Void = habitsFeature.reload()
-        async let purchases: Void = purchasesFeature.prepare()
-        _ = await (habits, purchases)
+        habitsFeature.startLoading()
+        purchasesFeature.startLoading()
     }
 
     func applicationDidBecomeActive() async {

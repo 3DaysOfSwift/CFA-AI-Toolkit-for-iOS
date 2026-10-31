@@ -63,6 +63,11 @@ export function verifyXcodeTemplateStructure(templateDirectory = defaultTemplate
   if (!/didFinishLaunchingWithOptions/.test(appSource) || /\.task\s*\{[^}]*applicationDidFinishLaunching/s.test(appSource)) {
     fail('Application launch must be signalled from the app delegate, not a View .task.');
   }
+  if (!/AppModel\.shared\.applicationDidFinishLaunching\(\)/.test(appSource) ||
+      /Task\s*\{[^}]*applicationDidFinishLaunching/s.test(appSource) ||
+      !/func\s+applicationDidFinishLaunching\(\)\s*\{/.test(appModelSource)) {
+    fail('The app delegate must call the synchronous AppModel launch method directly.');
+  }
   const sceneBody = /\bvar\s+body\s*:\s*some\s+Scene\s*\{([\s\S]*)/.exec(appSource)?.[1] ?? '';
   if (!/WindowGroup\s*\{\s*RootTabView\s*\(\s*\)/.test(sceneBody) ||
       /\b(?:if|switch|ModelContainer|ProgressView|ContentUnavailableView)\b/.test(sceneBody)) {

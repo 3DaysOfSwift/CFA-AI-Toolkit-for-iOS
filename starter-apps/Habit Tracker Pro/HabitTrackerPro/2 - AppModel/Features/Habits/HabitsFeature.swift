@@ -13,6 +13,16 @@ final class HabitsFeature {
         self.repository = repository
     }
 
+    @ObservationIgnored private var startupTask: Task<Void, Never>?
+
+    func startLoading() {
+        guard startupTask == nil else { return }
+        startupTask = Task { [weak self] in
+            await self?.reload()
+            self?.startupTask = nil
+        }
+    }
+
     func reload() async {
         guard !isLoading else { return }
         isLoading = true

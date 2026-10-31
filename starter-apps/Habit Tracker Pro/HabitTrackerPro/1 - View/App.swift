@@ -6,7 +6,7 @@ final class AppLaunchDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
-        Task { await AppModel.shared.applicationDidFinishLaunching() }
+        AppModel.shared.applicationDidFinishLaunching()
         return true
     }
 

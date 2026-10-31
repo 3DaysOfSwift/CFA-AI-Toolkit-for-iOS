@@ -46,10 +46,12 @@ the architecture:
 8. API operations return domain data or throw. Features keep domain
    data, operation state and retained errors as separate values; no result-like
    `LoadState` enum may carry all three.
-9. Application launch begins at the application lifecycle boundary. AppModel's
-   `applicationDidFinishLaunching()` uses a Boolean guard and awaits feature
-   refreshes without storing a Task handle. The app delegate starts an app-wide
-   refresh at the earliest launch callback, without blocking UI preparation.
+9. Application launch begins at the application lifecycle boundary. The app
+   delegate directly calls AppModel's synchronous `applicationDidFinishLaunching()`;
+   AppModel uses a Boolean guard and synchronously invokes Feature startup methods.
+   Features own their asynchronous work. Returning from the callback confirms
+   startup was initiated, not that disk or network loading has finished.
+   Keep synchronous startup brief and do not block on disk or network I/O.
    A screen `.task` starts screen-owned initial asynchronous work before that
    View appears; it is not a substitute for launch. When both paths request the
    same refresh, a shared Feature retains one in-flight `Task<Void, Never>` and

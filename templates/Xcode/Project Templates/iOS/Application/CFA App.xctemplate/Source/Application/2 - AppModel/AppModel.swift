@@ -14,11 +14,11 @@ final class AppModel {
         hasFinishedLaunching = false
     }
 
-    func applicationDidFinishLaunching() async {
+    func applicationDidFinishLaunching() {
         guard !hasFinishedLaunching else { return }
         hasFinishedLaunching = true
 
-        await gitReposFeature.refresh()
+        gitReposFeature.startLoading()
     }
 
     static func live() -> AppModel {

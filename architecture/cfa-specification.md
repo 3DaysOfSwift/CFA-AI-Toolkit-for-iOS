@@ -894,7 +894,7 @@ Other retained task lifetimes include:
 
 - cancelling an obsolete progress calculation when a new range is selected;
 - retaining a long-lived StoreKit transaction observer;
-- ensuring several scenes await the same launch workflow.
+- sharing a Feature-owned refresh among callers from several scenes.
 
 ### Each Feature owns its overlapping-call policy
 
@@ -1041,20 +1041,22 @@ WindowGroup {
 Construction must not silently trigger asynchronous side effects. Initializers
 assemble valid objects; clearly named methods perform work.
 
-The first few seconds after launch are a valuable opportunity. The application
-lifecycle—not RootTabView—tells AppModel that launch completed:
+The application lifecycle—not RootTabView—signals AppModel synchronously from
+the earliest applicable launch callback:
 
 ```swift
-func applicationDidFinishLaunching() async
+func applicationDidFinishLaunching()
 ```
 
 AppModel keeps one simple Boolean to ensure the method runs once. It does not
-store a Task handle. The app delegate creates the launch Task and awaits this
-method; AppModel then awaits the required feature refreshes. Call it from the
-earliest applicable application lifecycle callback, such as
-`UIApplicationDelegate.application(_:didFinishLaunchingWithOptions:)`, not a
-SwiftUI View or scene `.task`. A synchronous delegate callback may create one
-Task to enter the async method; the callback itself is the launch signal.
+store a Task handle. The app delegate calls this synchronous method directly,
+without wrapping the AppModel call in a Task. AppModel synchronously invokes
+the Features' named startup methods; each Feature owns any asynchronous tasks
+needed for its refresh or local restoration. The delegate returns after those
+startup methods have been invoked, not after their network or disk work has
+finished. Call from `UIApplicationDelegate.application(_:didFinishLaunchingWithOptions:)`,
+not a SwiftUI View or scene `.task`. Keep synchronous work brief, avoid blocking
+network or disk I/O on the main thread, and measure launch and first-frame timing.
 Do not store `AppModel.shared` in the App, delegate, View, or another object's
 property. A local reference for a single call is fine. A ViewModel's defaulted
 Feature dependency may read `AppModel.shared.<feature>` once at construction.
@@ -1083,7 +1085,7 @@ confirmed current data. Reading a property must not secretly begin asynchronous
 work. A ViewModel exposes these values as presentation-ready properties; its View
 shows loading, failure, cached data, and retry for that feature.
 
-Never use `.task { await AppModel.shared.applicationDidFinishLaunching() }`
+Never use `.task { AppModel.shared.applicationDidFinishLaunching() }`
 or an equivalent View-tied call to signal application launch. The app delegate
 signals launch at the earliest applicable application lifecycle callback and
 starts the shared system refresh concurrently with UI preparation.
