@@ -19,6 +19,19 @@ export async function importReview(report,input,root) {
     }
   };
   list(review.findings??[],['title','status','description','check']);
+  if (review.fileBatches !== undefined) {
+    list(review.fileBatches,['title','reason','verification']);
+    const seen = new Set();
+    for (const batch of review.fileBatches) {
+      if (!Array.isArray(batch.files) || !batch.files.length) fail('file batch needs source files');
+      for (const file of batch.files) {
+        if (!text(file) || !report.files.some(item => item.path === file)) fail('batch file is outside the scan');
+        if (seen.has(file)) fail('duplicate batch file');
+        if (!batch.evidence.some(ref => ref.file === file)) fail('batch evidence must include each source file');
+        seen.add(file);
+      }
+    }
+  }
   for (const [key, isType] of [['fileReviews',false],['typeReviews',true]]) {
     if (review[key] === undefined) continue;
     list(review[key],['file','status','reason','verification']);

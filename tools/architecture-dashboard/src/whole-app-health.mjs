@@ -13,6 +13,25 @@ const taskKinds = new Set(['concurrency.task','concurrency.detached','concurrenc
 export function taskCandidates(report) {
   return (report.syntax?.items || []).filter(item=>taskKinds.has(item.kind)).map(item=>({...item,id:`syntax-task:${item.file}:${item.line}:${item.column}:${item.kind}`}));
 }
+// Describe the next concrete review work without treating inventory as evidence.
+export function nextWork(report, review, limit = 8) {
+  const reviewed = new Set((review.fileBatches || []).flatMap(batch => batch.files || []));
+  for (const item of review.fileReviews || []) if (item.status !== 'unassessed') reviewed.add(item.file);
+  const entries = new Set((review.entryPoints || []).map(item => item.siteId));
+  const tasks = new Set((review.taskSites || []).map(item => item.siteId));
+  const pendingFiles = report.files.filter(file => !reviewed.has(file.path)).map(file => file.path);
+  const pendingEntries = inventoryCandidates(report).filter(site => !entries.has(site.id));
+  const pendingTasks = taskCandidates(report).filter(site => !tasks.has(site.id));
+  return {
+    pendingFiles: pendingFiles.length,
+    pendingEntryPoints: pendingEntries.length,
+    pendingTaskSites: pendingTasks.length,
+    nextFiles: pendingFiles.slice(0, limit),
+    nextEntryPoints: pendingEntries.slice(0, limit),
+    nextTaskSites: pendingTasks.slice(0, limit),
+    gaps: coverageGaps(report, review)
+  };
+}
 export function renderTaskMap(taskMap) {
   const esc=value=>String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
   const labels={'concurrency.task':'Unstructured task','concurrency.detached':'Detached task','concurrency.taskGroup':'Task group','concurrency.groupChild':'Possible group child','entry.viewTask':'Possible SwiftUI task','entry.refreshable':'Possible SwiftUI refresh'};
@@ -49,15 +68,10 @@ export function coverageGaps(report, review) {
     if ([...scannerFiles].some(file=>!syntaxFiles.has(file)) || [...syntaxFiles].some(file=>!scannerFiles.has(file))) gaps.push('The SwiftSyntax and source inventories cover different files.');
   }
   const fileReviews = new Map((review.fileReviews || []).map(item => [item.file, item]));
-  const missingFiles = report.files.filter(file => !fileReviews.has(file.path) || fileReviews.get(file.path).status === 'unassessed');
+  const batchFiles = new Set((review.fileBatches || []).flatMap(batch => batch.files || []));
+  const missingFiles = report.files.filter(file => !batchFiles.has(file.path) && (!fileReviews.has(file.path) || fileReviews.get(file.path).status === 'unassessed'));
   if (missingFiles.length) gaps.push(`${missingFiles.length} Swift files still need review: ${missingFiles.map(file => file.path).join(', ')}.`);
-  const types = new Map((review.typeReviews || []).map(item => [JSON.stringify([item.file,item.line,item.kind,item.name]), item]));
-  const missingTypes = report.files.flatMap(file => file.declarations.map(d => ({...d,file:file.path}))).filter(d => {
-    const item = types.get(JSON.stringify([d.file,d.line,d.type,d.name]));
-    return !item || item.status === 'unassessed';
-  });
-  if (missingTypes.length) gaps.push(`${missingTypes.length} detected types still need review.`);
-  if ((review.fileReviews || []).some(item => item.status === 'investigate') || (review.typeReviews || []).some(item => item.status === 'investigate')) gaps.push('Some file or type findings still need investigation.');
+  if ((review.fileReviews || []).some(item => item.status === 'investigate') || (review.typeReviews || []).some(item => item.status === 'investigate')) gaps.push('Some recorded file or type findings still need investigation.');
   const operations = review.operations || [];
   if (review.operationInventory?.coverage !== 'complete') gaps.push('The operation inventory has not been reconciled with the application entry points.');
   if (!operations.length) gaps.push('No application operations have been reviewed.');
@@ -112,6 +126,18 @@ export async function prepare(root, output, syntaxProvider = collectSyntax) {
   if (!report.files.length) throw Error('No Swift source files found.');
   await fs.mkdir(output, {recursive:false});
   await fs.writeFile(path.join(output,'inventory.json'), JSON.stringify(report,null,2)+'\n', {flag:'wx'});
+  const checklist = {
+    sourceFingerprint: report.sourceFingerprint,
+    note: 'Review each item against its source and record evidence in the review input. Scanner candidates are leads; verify target membership and discover additional entry points manually.',
+    productionTargets: {status:'pending', targets:[]},
+    files: report.files.map(file=>({file:file.path,status:'pending'})),
+    entryPoints: inventoryCandidates(report).map(site=>({siteId:site.id,file:site.file,line:site.line,kind:site.kind,status:'pending'})),
+    taskSites: taskCandidates(report).map(site=>({siteId:site.id,file:site.file,line:site.line,kind:site.kind,status:'pending'})),
+    operations: {status:'pending', note:'Discover and trace user actions and system events, including operations the scanner cannot detect.'}
+  };
+  await fs.writeFile(path.join(output,'checklist.json'),JSON.stringify(checklist,null,2)+'\n',{flag:'wx'});
+  const draft = {schemaVersion:1,sourceFingerprint:report.sourceFingerprint,author:'Health Check reviewer',scope:'Whole application',productionTargets:[],targetInventoryVerified:false,fileReviews:[],fileBatches:[],operationInventory:{scope:'Whole application',method:'Source review and scanner inventory',coverage:'partial'},operations:[],entryPoints:[],taskSites:[]};
+  await fs.writeFile(path.join(output,'review-draft.json'),JSON.stringify(draft,null,2)+'\n',{flag:'wx'});
   const taskMap = {sourceFingerprint:report.sourceFingerprint, status:report.syntax.status,
     note:'Syntax locations and lexical nesting are leads only. Task parentage, ownership and call relationships require source review.',
     sites:taskCandidates(report)};
@@ -138,16 +164,29 @@ async function appIcon(root) {
     return images.length ? path.join(assets[0],images[0].filename) : null;
   } catch { return null; }
 }
+export async function progress(root, input, syntaxProvider = collectSyntax) {
+  const report = await currentInventory(root, path.dirname(path.resolve(input)), syntaxProvider);
+  const raw = JSON.parse(await fs.readFile(input,'utf8'));
+  const review = await importReview(report,raw,root);
+  return {gaps:coverageGaps(report,review),files:report.files.length,operations:(review.operations || []).length};
+}
+export async function next(root, input, syntaxProvider = collectSyntax) {
+  const report = await currentInventory(root, path.dirname(path.resolve(input)), syntaxProvider);
+  const raw = JSON.parse(await fs.readFile(input,'utf8'));
+  const review = await importReview(report,raw,root);
+  return nextWork(report,review);
+}
 export async function finish(root, input, output, icon, syntaxProvider = collectSyntax) {
   const report = await currentInventory(root, path.dirname(path.resolve(output)), syntaxProvider);
   const raw = JSON.parse(await fs.readFile(input,'utf8'));
   const review = await importReview(report,raw,root);
   const gaps = coverageGaps(report,review);
+  if (gaps.length) throw Error('Health Check is not complete; no report was generated. Complete the review checklist:\n- ' + gaps.join('\n- '));
   const presentation = review.presentation;
-  if (!presentation?.app || !presentation.summary || !presentation.conclusion || !Array.isArray(presentation.criteria) || !presentation.criteria.length) throw Error('Provide presentation app, summary, conclusion and criteria.');
-  const data = {...presentation, scope:review.scope, scoreAvailable:gaps.length===0};
+  if (!presentation?.app || !presentation.summary || !presentation.verdict?.trim() || !presentation.conclusion || !Array.isArray(presentation.criteria) || !presentation.criteria.length) throw Error('Provide presentation app, summary, verdict, conclusion and criteria.');
+  const data = {...presentation, scope:review.scope};
   data.operations = (review.operations || []).map(op=>({title:op.title,path:op.path,taskOwner:op.taskOwner,isolation:op.isolation,reason:op.reason,unknowns:op.unknowns,steps:op.steps}));
-  if (gaps.length) data.criteria = [...data.criteria, ...gaps.map((detail, index) => ({status:'concern', title:`Investigation needed ${index+1}`, detail}))];
+  data.coverageGaps = gaps;
   const selectedIcon = icon || await appIcon(root);
   const iconData = selectedIcon ? `data:image/png;base64,${(await fs.readFile(selectedIcon)).toString('base64')}` : '';
   await fs.writeFile(output,renderHealthReport(data,iconData),{flag:'wx'});
@@ -159,9 +198,15 @@ if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.me
     if (mode === 'prepare' && root && input && !output) {
       const result = await prepare(root,input);
       console.log(`Inventoried ${result.files.length} Swift files and ${inventoryCandidates(result).length} possible entry points. Review inventory.json before producing the report.`);
+    } else if (mode === 'progress' && root && input && !output) {
+      const result = await progress(root,input);
+      console.log(result.gaps.length ? 'Remaining review work:\n- ' + result.gaps.join('\n- ') : 'Source checklist reconciled. Add a substantive presentation and generate the report.');
+    } else if (mode === 'next' && root && input && !output) {
+      const result = await next(root,input);
+      console.log(JSON.stringify(result,null,2));
     } else if (mode === 'report' && root && input && output) {
       const result = await finish(root,input,output,icon);
       console.log(`Inventoried ${result.files} source files, ${result.operations} recorded operations; ${result.gaps.length} coverage gaps. Report: ${output}`);
-    } else throw Error('Usage: node whole-app-health.mjs prepare <project> <new-inventory-dir> | report <project> <review.json> <new-report.html> [app-icon.png]');
+    } else throw Error('Usage: node whole-app-health.mjs prepare <project> <new-inventory-dir> | progress <project> <review.json> | next <project> <review.json> | report <project> <review.json> <new-report.html> [app-icon.png]');
   } catch (error) { console.error(error.message); process.exitCode=1; }
 }

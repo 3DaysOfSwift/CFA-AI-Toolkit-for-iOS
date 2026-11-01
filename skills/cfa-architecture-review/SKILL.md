@@ -20,8 +20,7 @@ or a request to assess how an Xcode project actually uses Swift Concurrency, rea
 This mode reviews the whole application by default; use a narrower scope only
 when explicitly requested. It reviews the project's actual architecture without
 requiring CFA or a dashboard. Keep its correctness verdict separate from CFA conformance.
-Run the bundled `whole-app-health.mjs` inventory and reconcile the full source,
-types and entry points as described in that workflow, then generate the single
+Run the bundled `whole-app-health.mjs` inventory and reconcile the full source and entry points in evidence-backed operation batches as described in that workflow, then generate the single
 app-specific Health Check HTML report using its validated review input.
 Use that workflow's checkpoint and completion check: builds, tests and simulator
 launches do not complete the assessment; finish with its scoped verdict and report.
@@ -45,7 +44,7 @@ For a dashboard or detailed concurrency analysis, read the [dashboard workflow](
 
 A focused CFA review does not require an app-wide dashboard or numerical ratings. A requested full dashboard requires the complete source-evidence workflow. Do not infer testing evidence from source inspection or claim race freedom from a score.
 
-Deliver findings and verification limits. Keep generated reports outside app source. App changes, architecture adoption and concurrency migration require their own requested scope; this review does not authorize them.
+Deliver findings and verification limits. Save the final Health Check report in `reports/health-check/` at the app repository root, outside the app target’s source directory. Keep working inventory and checkpoints outside app source. App changes, architecture adoption and concurrency migration require their own requested scope; this review does not authorize them.
 
 ## Shared Swift coding standards
 

@@ -36,7 +36,7 @@ Run the packaged scanner on the current checkout before each Health Check:
 node scripts/dashboard/src/whole-app-health.mjs prepare <project-root> <new-inventory-directory>
 ```
 
-Read `inventory.json` and `task-map.json`. SwiftSyntax records source locations,
+Read `inventory.json`, `checklist.json` and `task-map.json`; record source-backed judgments incrementally in the generated `review-draft.json`. Run `node scripts/dashboard/src/whole-app-health.mjs next <project-root> <review-draft.json>` after each batch to list concrete pending files, entry points and task sites. Continue reviewing related operations and reusing shared-path evidence; do not stop after saving a checkpoint. The command does not itself inspect or assess the code. Use the checklist to cover source files, candidate entry points and task sites through meaningful operation batches and justified exclusions. Verify production target membership and add manually discovered operations. Continue until all applicable items are reconciled. SwiftSyntax records source locations,
 enclosing functions and lexical nesting of explicit tasks. Lexical nesting is not
 task parentage: nested `Task {}` creates independent unstructured work. Group
 children and SwiftUI tasks need their own ownership review. Follow callers and
@@ -45,44 +45,43 @@ the operation steps and each unresolved relationship as unknown. Never invent a
 complete tree from syntax alone.
 
 Reconcile the full production target and file list,
-including sources the lexical scan cannot resolve. Record each file and detected
-type review, all detected candidate entry points, and each meaningful user or
-system operation using `scripts/dashboard/Documentation/REVIEWS.md`. Include
+including sources the lexical scan cannot resolve. Record evidence-backed file batches, detected candidate entry points and each meaningful user or system operation using `scripts/dashboard/Documentation/REVIEWS.md`. A shared helper can be reviewed once and linked from multiple operations after checking each caller. Individual type verdicts are optional. Include
 `productionTargets` (an array of reviewed target and local-package names),
 `targetInventoryVerified` (true only after verifying membership), and
 `entryPoints` entries with each candidate `siteId` and either `operationId` or a
 specific `excludedReason`. The matching operation evidence must include the
 entry point. Reconcile every entry in `task-map.json` in `taskSites` using the
 same `siteId` / `operationId` or `excludedReason` structure; operation evidence
-must include the associated task site. Add a `presentation` object with app, summary, conclusion and
+must include the associated task site. Add a `presentation` object with app, summary, verdict, conclusion and
 criteria for the concise report. Each criterion needs title, detail, status
 (`pass`, `concern`, `problem`) and source evidence. Use the app's own PNG icon
-when available. Keep the inventory and review outside the app source tree.
+when available. Keep the inventory and working review outside the app source tree. Save the final report in `reports/health-check/` at the app repository root, outside the app target’s source directory.
 
 After review, run:
 
 ```
-node scripts/dashboard/src/whole-app-health.mjs report <project-root> <review.json> <new-report.html> [app-icon.png]
+node scripts/dashboard/src/whole-app-health.mjs report <project-root> <review.json> <project-root>/reports/health-check/<new-report.html> [app-icon.png]
 ```
 
 The tool reruns SwiftSyntax and rescans and checks the source fingerprint, evidence ranges, file/type
 coverage and candidate reconciliation before generating the report. Missing
 reviews, unresolved operations, skipped files or unverified target membership
-appear as investigation findings; no overall percentage is shown in that case.
+prevent report generation. Use the command’s diagnostics to continue the checklist;
+do not bypass the gate or claim completion from counts alone. If evidence cannot be
+obtained, report the blocker to the user without generating an overall health score.
 The scanner is lexical: a complete result also requires the reviewer to find
 entry points it cannot detect, resolve target membership, and assess call paths.
 Never infer a complete app assessment from a matching count or scanner output.
 
-## Review files and types, then trace operations
+## Review operations in batches
 
-Start by inventorying every in-scope production Swift file, including files
-without type declarations, and each type declared there. Review state ownership,
+Inventory every in-scope production Swift file, including files without type declarations. Group related screens and shared services into meaningful operations; inspect their files and reuse shared-path evidence after checking each caller. Record each inspected file in an evidence-backed batch. Review state ownership,
 isolation, task lifetime, overlapping work, cancellation, error handling and
 observable results where applicable. A synchronous file is not a failure. Record
 one of: no problems found in the reviewed behaviour, problem, needs investigation,
 or not assessed. A green result requires completed, evidenced checks; a scanner
 match count or absence of concurrency syntax is not a pass. Follow callers and
-dependencies whenever a type's behaviour cannot be judged in isolation.
+dependencies when behaviour cannot be judged in isolation. Do not create a separate verdict for every type merely to satisfy the inventory.
 
 The developer may explicitly accept a documented problem. Record who accepted it
 and why; preserve the original problem and evidence rather than marking it green.
@@ -342,6 +341,15 @@ to receive a No verdict.
 
 ## Make the report useful at a glance
 
+Write the verdict card as a concise, evidence-backed assessment of the app’s
+architecture and Swift Concurrency: what works well and any material concern.
+Describe the app, not the review process. Do not use the card for commit hashes,
+scan coverage, test counts, inventory status or work remaining. Keep supporting
+evidence with the relevant findings; do not imply unreviewed code was assessed.
+The `presentation.verdict` field is required and supplies this card text; do not
+copy the review scope or a procedural summary into it.
+
+
 Immediately after the overall verdict, show concise assessment rows with a leading
 status symbol and written label. The reader must be able to distinguish what works,
 what is wrong and what needs investigation without interpreting an ownership map.
@@ -376,7 +384,7 @@ failure sequence and smallest useful correction. Explicitly answer whether it
 contributes to the overall Frankenstein verdict. Judge the code's conflicting
 assumptions and consequences, not the engineer's competence or intentions.
 
-Keep the report local and outside application source. Never publish source or
+Keep the report local in `reports/health-check/` at the repository root, outside application source. Never publish source or
 migration evidence as part of a health check. Capture reusable case studies only
 when separately authorized, using the toolkit's migration evidence workflow.
 This health check supplies review guidance, not an automatic semantic detector.

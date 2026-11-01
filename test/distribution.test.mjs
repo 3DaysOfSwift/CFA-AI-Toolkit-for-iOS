@@ -90,13 +90,13 @@ test('installed architecture-review skill inventories an app and creates its Hea
  assert.equal(scan.status,0,scan.stderr);
  const fingerprint=json(path.join(inventory,'inventory.json')).sourceFingerprint;
  const review=path.join(dir,'health-review.json');
- fs.writeFileSync(review,JSON.stringify({schemaVersion:1,sourceFingerprint:fingerprint,author:'Reviewer',scope:'Example app',presentation:{app:'Example',summary:'Example assessment',conclusion:'More evidence is needed.',criteria:[{title:'Example',detail:'Investigated.',status:'concern'}]}}));
+ fs.writeFileSync(review,JSON.stringify({schemaVersion:1,sourceFingerprint:fingerprint,author:'Reviewer',scope:'Example app',presentation:{app:'Example',summary:'Example assessment',verdict:'Clear ownership',conclusion:'More evidence is needed.',criteria:[{title:'Example',detail:'Investigated.',status:'concern'}]}}));
  const report=path.join(dir,'health-report.html');
  const generation=spawnSync(process.execPath,[cli,'report',app,review,report],{cwd:dir,encoding:'utf8'});
- assert.equal(generation.status,0,generation.stderr);
- const html=fs.readFileSync(report,'utf8');
- assert.match(html,/Example/); assert.match(html,/Score unavailable/);
- assert.match(html,/Investigation needed/); assert.doesNotMatch(html,/Good foundation/);
+ assert.notEqual(generation.status,0);
+ assert.match(generation.stderr,/no report was generated/);
+ assert.equal(fs.existsSync(report),false);
+ assert.ok(fs.existsSync(path.join(inventory,'checklist.json')));
  assert.equal(fs.readFileSync(sourceFile,'utf8'),'struct Example { func refresh() async { await Task.yield() } }\n');
 });
 

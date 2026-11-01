@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {coverageGaps, inventoryCandidates, taskCandidates} from '../src/whole-app-health.mjs';
+import {coverageGaps, inventoryCandidates, taskCandidates, nextWork} from '../src/whole-app-health.mjs';
 import {renderHealthReport} from '../src/health-report.mjs';
-import {prepare, finish} from '../src/whole-app-health.mjs';
+import {prepare, finish, progress} from '../src/whole-app-health.mjs';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -10,12 +10,24 @@ import path from 'node:path';
 const report = {scope:{skipped:[]}, files:[{path:'App.swift',declarations:[{type:'struct',name:'App',line:1}],sites:[{id:'entry',kind:'launch-callback',file:'App.swift',line:2}]}]};
 const complete = () => ({productionTargets:['App'],targetInventoryVerified:true, fileReviews:[{file:'App.swift',status:'sound'}],typeReviews:[{file:'App.swift',line:1,kind:'struct',name:'App',status:'sound'}],operationInventory:{coverage:'complete'},operations:[{id:'launch',checks:[{status:'pass'}],unknowns:[],evidence:[{file:'App.swift',line:2,endLine:2}]}],entryPoints:[{siteId:'entry',operationId:'launch'}]});
 
-test('coverage requires every file, type and detected entry point', () => {
+test('next work resumes from recorded evidence and retains the completion gate', () => {
+  const pending=complete(); pending.fileReviews=[]; pending.entryPoints=[];
+  const work=nextWork(report,pending);
+  assert.deepEqual(work.nextFiles,['App.swift']);
+  assert.equal(work.nextEntryPoints[0].id,'entry');
+  assert.ok(work.gaps.length);
+  assert.deepEqual(nextWork(report,complete()).nextFiles,[]);
+  assert.deepEqual(nextWork(report,complete()).gaps,[]);
+});
+
+test('coverage requires source files and detected entry points, without individual type verdicts', () => {
   assert.equal(inventoryCandidates(report).length,1);
   assert.deepEqual(coverageGaps(report,complete()),[]);
   const review=complete(); review.fileReviews=[]; review.typeReviews=[]; review.entryPoints=[];
   const gaps=coverageGaps(report,review).join(' ');
-  assert.match(gaps,/Swift files/); assert.match(gaps,/types/); assert.match(gaps,/entry points/);
+  assert.match(gaps,/Swift files/); assert.doesNotMatch(gaps,/types/); assert.match(gaps,/entry points/);
+  const batched=complete(); batched.fileReviews=[]; batched.typeReviews=[]; batched.fileBatches=[{files:['App.swift']}];
+  assert.deepEqual(coverageGaps(report,batched),[]);
 });
 
 test('refuses stale entry IDs and unsupported caller links', () => {
@@ -28,8 +40,8 @@ test('refuses stale entry IDs and unsupported caller links', () => {
 test('unknown operations and target membership cannot yield a pass score', () => {
   const review=complete(); review.targetInventoryVerified=false; review.operations[0].unknowns=['Unresolved callback'];
   assert.equal(coverageGaps(report,review).length,2);
-  const html=renderHealthReport({app:'App',summary:'Summary',scope:'Scope',conclusion:'Conclusion',scoreAvailable:false,criteria:[{title:'Open question',detail:'Investigate',status:'concern'}]});
-  assert.match(html,/Score unavailable/); assert.match(html,/Needs investigation/); assert.doesNotMatch(html,/Good foundation/);
+  const html=renderHealthReport({app:'App',summary:'Summary',verdict:'Clear ownership',scope:'Scope',conclusion:'Conclusion',scoreAvailable:false,criteria:[{title:'Open question',detail:'Investigate',status:'concern'}]});
+  assert.match(html,/50%/); assert.match(html,/Needs attention/);
 });
 
 test('syntax entry points join the inventory without duplicating lexical findings', () => {
@@ -60,14 +72,38 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
   try {
     const project=path.join(base,'app'); await fs.mkdir(project);
     await fs.writeFile(path.join(project,'App.swift'),'struct App {}\n');
-    const syntax=async()=>({status:'available',files:['App.swift'],items:[],warnings:[]});
+    await fs.writeFile(path.join(project,'Value.swift'),'struct Value {}\n');
+    const syntax=async()=>({status:'available',files:['App.swift','Value.swift'],items:[],warnings:[]});
     const inventory=await prepare(project,path.join(base,'inventory'),syntax);
     assert.match(await fs.readFile(path.join(base,'inventory','task-map.html'),'utf8'),/Task sites/);
-    const review={schemaVersion:1,sourceFingerprint:inventory.sourceFingerprint,author:'Reviewer',scope:'App target',presentation:{app:'App',summary:'Summary',conclusion:'Conclusion',criteria:[{title:'A',detail:'Checked',status:'pass'}]}};
+    const draftPath=path.join(base,'inventory','review-draft.json');
+    const pending=await progress(project,draftPath,syntax);
+    assert.ok(pending.gaps.some(gap=>gap.includes('Swift files')));
+    const review={schemaVersion:1,sourceFingerprint:inventory.sourceFingerprint,author:'Reviewer',scope:'App target',presentation:{app:'App',summary:'Summary',verdict:'Clear ownership',conclusion:'Conclusion',criteria:[{title:'A',detail:'Checked',status:'pass'}]}};
     const reviewPath=path.join(base,'review.json'); await fs.writeFile(reviewPath,JSON.stringify(review));
-    const output=path.join(base,'report.html'); const result=await finish(project,reviewPath,output,undefined,syntax);
-    assert.ok(result.gaps.length > 0);
-    assert.match(await fs.readFile(output,'utf8'),/Score unavailable/);
+    const checklist=JSON.parse(await fs.readFile(path.join(base,'inventory','checklist.json'),'utf8'));
+    assert.equal(checklist.files[0].status,'pending');
+    assert.equal(checklist.files.length,2);
+    const output=path.join(base,'report.html');
+    await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/no report was generated/);
+    await assert.rejects(fs.access(output));
+    const evidence=[{file:'App.swift',line:1,endLine:1},{file:'Value.swift',line:1,endLine:1}];
+    const checks=['state-ownership','actor-isolation','task-lifetime','repeated-requests','cancellation','errors','architectural-clarity'].map(id=>({id,title:id,dimension:id==='architectural-clarity'?'clarity':'correctness',status:'pass',reason:'Reviewed',verification:'Source inspection',evidence}));
+    Object.assign(review,{productionTargets:['App'],targetInventoryVerified:true,
+      fileBatches:[{title:'Application entry',files:['App.swift','Value.swift'],reason:'Reviewed entry and ownership',verification:'Source inspection',evidence}],
+      operationInventory:{scope:'App',method:'Source review',coverage:'complete'},
+      operations:[{id:'launch',title:'Start',trigger:'Launch',path:'App',stateOwner:'App',taskOwner:'App',isolation:'Main actor',reason:'Reviewed',verification:'Source inspection',correctness:'sound',clarity:'sound',unknowns:[],triggerSource:{file:'App.swift',line:1},checks,evidence}]});
+    await fs.writeFile(reviewPath,JSON.stringify(review));
+    assert.deepEqual((await progress(project,reviewPath,syntax)).gaps,[]);
+    const badBatch=structuredClone(review); badBatch.fileBatches[0].evidence=[{file:'App.swift',line:1,endLine:1}];
+    await fs.writeFile(reviewPath,JSON.stringify(badBatch));
+    await assert.rejects(progress(project,reviewPath,syntax),/batch evidence must include each source file/);
+    await fs.writeFile(reviewPath,JSON.stringify(review));
+    const result=await finish(project,reviewPath,output,undefined,syntax);
+    assert.deepEqual(result.gaps,[]);
+    const html=await fs.readFile(output,'utf8');
+    assert.match(html,/100%/);
+    assert.doesNotMatch(html,/What still needs checking/);
     await fs.writeFile(path.join(project,'App.swift'),'struct Changed {}\n');
     await assert.rejects(finish(project,reviewPath,path.join(base,'stale.html'),undefined,syntax),/fingerprint mismatch/);
   } finally { await fs.rm(base,{recursive:true,force:true}); }
