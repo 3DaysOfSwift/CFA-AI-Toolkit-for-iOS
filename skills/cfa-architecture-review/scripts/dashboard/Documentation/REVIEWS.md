@@ -185,6 +185,12 @@ overall result. A local defect alone does not establish an architectural conflic
 Regenerate the analysis and review after source changes. An exported HTML file is
 a dated snapshot and does not monitor the project for changes.
 
+Use one operation for each meaningful action with a distinct behavioural path;
+shared code can be cited by several operations after each caller is checked. Set
+the optional `group` text to the capability name, such as `Reminders`, to display
+related actions together. Do not collapse setting and removing a reminder into
+one verdict just because they use the same Feature.
+
 ### Individual checks
 
 New health checks supply an operation's `checks` array. Each check has `id`,
@@ -197,6 +203,24 @@ Include these correctness check IDs: `state-ownership`, `actor-isolation`,
 `task-lifetime`, `repeated-requests`, `cancellation`, and `errors`. Include
 `architectural-clarity` in the clarity dimension. For an irrelevant check,
 use `not-applicable` and explain why, rather than omitting it or awarding a pass.
+
+### Timing scenarios
+
+New whole-app review drafts set `behaviourScenariosRequired: true`. For each
+operation, record a `scenarios` array containing the four IDs `repeat`, `leave`,
+`late-result` and `failure`. Each entry has `id`, `title`, `status` (`pass`,
+`problem`, `unresolved`, or `not-applicable`), `outcome`, `verification`, and
+source `evidence` using the same checked file and line references as other review
+items. A `problem` also needs a `consequence`. Explain why a scenario is not
+applicable when appropriate; do not invent an issue or runtime result. Unresolved
+or missing scenarios block a new whole-app report until assessed. Older reviews
+without the flag remain readable and are not silently upgraded.
+
+Trace repeated triggers, navigation or caller departure, older results arriving
+late, and failures through the actual state and task owners. Record the observed
+policy, test or reproduction separately from source-only reasoning. The report
+shows the operation's behavioural checks and applicable scenarios with their
+evidence; the tool validates provenance and completeness, not their truth.
 
 Unresolved checks require `question` and `resolveBy`: the specific unanswered
 question and the evidence or test needed. Failed checks require `consequence`

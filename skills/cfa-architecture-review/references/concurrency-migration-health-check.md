@@ -21,12 +21,84 @@ Trace shared helpers once, then link every caller and inspect differences in its
 inputs, state, cancellation and completion policy. Do not count helper methods as
 separate user operations merely to increase coverage totals.
 
+Give each meaningful action with a distinct result, failure, cancellation or
+ownership path its own operation, even if it shares services with another action.
+For example, setting, removing, loading and retrying reminders need separate
+assessments. Group related actions under a capability in the report; reuse shared
+source evidence only after reviewing the action-specific path. Do not combine
+multiple actions into one generic verdict or manufacture separate operations for
+identical presentation controls.
+
 Maintain a ledger for every discovered entry point: source location, meaningful
 operation, reviewed path, individual check results, and remaining work. Reconcile
 it against the production target/file inventory and scanner candidates, and record
 why an excluded candidate is not an operation. A scanner miss, unknown dispatch or
 unavailable dependency must remain visible rather than disappear from coverage.
 Whole-app source review is not proof of every possible runtime execution.
+
+## Required app-level checks
+
+In addition to tracing operations, assess each of these questions for the app as a
+whole. Record the relevant source or measurement, a concise judgment and its
+practical implication. Use Yes, No or Inconclusive when a yes/no answer is useful;
+do not guess when the evidence cannot support a judgment. Surface meaningful
+results in the report, rather than presenting scanner counts as findings.
+
+1. **Deliberate concurrency:** Is there a recognisable policy for where work
+   starts, who owns it, how results reach state and how lifetime is controlled?
+   Trace multiple meaningful operations and distinguish intentional synchronous
+   work from missing concurrency. Explain the policy or the inconsistency.
+2. **Frankenstein architecture:** Do conflicting ownership, isolation or lifetime
+   assumptions create an incoherent design? Trace task creation and callers,
+   including migrations from queues when history is available. Replacing a queue
+   with an unstructured task, nested tasks, mixed APIs or using `Task` on MainActor
+   is a lead for investigation, not a defect by itself; `Task` alone does not
+   guarantee work leaves the main actor. Apply the evidence-based verdict below.
+3. **Discoverable capabilities:** Can developers find the app's business
+   capabilities, their state owners and supporting services in the project?
+   Inspect actual target membership, folders and wiring; assess discoverability
+   without requiring CFA folder names or a particular number of Features.
+4. **View and Model boundaries:** Locate business decisions, authoritative state,
+   presentation state and UI code. Identify concrete cases where a business rule
+   is coupled to a particular UI, and explain the resulting maintenance impact.
+5. **Additional targets:** Assess whether existing business capabilities could be
+   reused by another UI or extension. Inspect imports, target membership, platform
+   availability, lifecycle, storage and process boundaries. A shared source folder
+   or singleton alone does not prove code compiles in a widget, watchOS or another
+   process; identify what is verified and what would require adaptation.
+6. **Actor design:** Identify actors' state, responsibilities, callers and
+   isolation boundaries. Examine unnecessary hops, reentrancy and overlapping
+   ownership where evidence warrants it. Neither an actor count nor similar names
+   establish misuse or justify merging; assess their actual invariants and roles.
+7. **State observation:** Trace how a screen receives current state and updates,
+   including identity, snapshots, actor boundaries, subscriptions and cleanup.
+   Consider the product's intended freshness policy; a deliberately stable detail
+   snapshot is not a defect merely because it does not update automatically.
+8. **Launch performance:** Trace startup and its loading signals, then measure
+   launch using available tooling when feasible. State the measurement definition,
+   device or simulator, build configuration, cold or warm conditions, sample count
+   and result. A launch command's success or a cache decoding benchmark is not an
+   app launch time. If measurement is unavailable, state that plainly and never
+   invent a duration; continue the source review and report useful findings.
+9. **Cancellation:** For each relevant operation, determine who may cancel, whether
+   cancellation propagates or is deliberately independent, and whether work and
+   state commits respond appropriately. Check long loops and suspension boundaries
+   where needed. Not every task requires an explicit `Task.checkCancellation()`:
+   awaited APIs may cooperate, and some short or intentionally independent work
+   need not cancel. Describe an actual consequence before classifying a problem.
+10. **Mutable value copies:** Identify mutable value types that represent shared
+    application data, and trace where copies are created, edited, retained and
+    refreshed. Determine which owner holds the authoritative value and whether a
+    retained copy can diverge or overwrite newer changes; describe the sequence
+    and consequence with source evidence. Distinguish an intentional local editing
+    draft or stable display snapshot from a second purported source of truth. A
+    `var` property alone does not establish a synchronization bug. When checking
+    CFA conformance, also assess published snapshots against CFA's immutable-value
+    convention and report a deviation separately from a demonstrated defect.
+
+Keep Swift Concurrency correctness, general architecture and optional CFA-specific
+conformance distinct. An app can have a deliberate non-CFA design, and a CFA
+layout alone does not prove concurrency correctness or runtime performance.
 
 ## Produce the Health Check report
 
@@ -82,6 +154,13 @@ one of: no problems found in the reviewed behaviour, problem, needs investigatio
 or not assessed. A green result requires completed, evidenced checks; a scanner
 match count or absence of concurrency syntax is not a pass. Follow callers and
 dependencies when behaviour cannot be judged in isolation. Do not create a separate verdict for every type merely to satisfy the inventory.
+
+For every operation, complete the four source-backed timing scenarios defined in
+`scripts/dashboard/Documentation/REVIEWS.md`: repeated triggers, caller departure,
+older results arriving late and failure. Mark irrelevant scenarios not applicable
+with a reason. Explain actual outcomes, ownership and consequences; distinguish
+source reasoning from tests that were actually run. Newly prepared reviews require
+these assessments before the final report can be generated.
 
 The developer may explicitly accept a documented problem. Record who accepted it
 and why; preserve the original problem and evidence rather than marking it green.

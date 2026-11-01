@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0 — 2026-11-01
+
+- Add a Swift Concurrency Health Check with source inventory, SwiftSyntax task-site evidence and an app-specific report.
+- Review ownership, isolation, cancellation and timing scenarios for individual app operations; group related actions in the report.
+- Add guidance on launch signals, immutable snapshots, state ownership and optional remote-data caches.
+- Improve the report layout and retain source-backed evidence alongside reviewer judgments.
+
 ## 0.3.3 — 2026-10-29
 
 - Activate all 17 verified free explanation URLs across the eight skills, with

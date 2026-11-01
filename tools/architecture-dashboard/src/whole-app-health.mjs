@@ -77,6 +77,11 @@ export function coverageGaps(report, review) {
   if (!operations.length) gaps.push('No application operations have been reviewed.');
   const openOperations = operations.filter(op => !op.checks?.length || op.checks.some(c => ['unresolved','not-checked'].includes(c.status)) || op.unknowns?.length);
   if (openOperations.length) gaps.push(`${openOperations.length} operations have unresolved checks or boundaries.`);
+  if (review.behaviourScenariosRequired === true) {
+    const required = ['repeat','leave','late-result','failure'];
+    const incomplete = operations.filter(op => required.some(id => !op.scenarios?.some(s => s.id === id && s.status !== 'unresolved')));
+    if (incomplete.length) gaps.push(`${incomplete.length} operations need timing-scenario assessments.`);
+  }
   const entries = new Map();
   for (const entry of review.entryPoints || []) {
     if (!entry.siteId || entries.has(entry.siteId)) throw Error('Entry-point reconciliation needs unique site IDs.');
@@ -136,7 +141,7 @@ export async function prepare(root, output, syntaxProvider = collectSyntax) {
     operations: {status:'pending', note:'Discover and trace user actions and system events, including operations the scanner cannot detect.'}
   };
   await fs.writeFile(path.join(output,'checklist.json'),JSON.stringify(checklist,null,2)+'\n',{flag:'wx'});
-  const draft = {schemaVersion:1,sourceFingerprint:report.sourceFingerprint,author:'Health Check reviewer',scope:'Whole application',productionTargets:[],targetInventoryVerified:false,fileReviews:[],fileBatches:[],operationInventory:{scope:'Whole application',method:'Source review and scanner inventory',coverage:'partial'},operations:[],entryPoints:[],taskSites:[]};
+  const draft = {schemaVersion:1,sourceFingerprint:report.sourceFingerprint,author:'Health Check reviewer',scope:'Whole application',behaviourScenariosRequired:true,productionTargets:[],targetInventoryVerified:false,fileReviews:[],fileBatches:[],operationInventory:{scope:'Whole application',method:'Source review and scanner inventory',coverage:'partial'},operations:[],entryPoints:[],taskSites:[]};
   await fs.writeFile(path.join(output,'review-draft.json'),JSON.stringify(draft,null,2)+'\n',{flag:'wx'});
   const taskMap = {sourceFingerprint:report.sourceFingerprint, status:report.syntax.status,
     note:'Syntax locations and lexical nesting are leads only. Task parentage, ownership and call relationships require source review.',
@@ -185,7 +190,7 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
   const presentation = review.presentation;
   if (!presentation?.app || !presentation.summary || !presentation.verdict?.trim() || !presentation.conclusion || !Array.isArray(presentation.criteria) || !presentation.criteria.length) throw Error('Provide presentation app, summary, verdict, conclusion and criteria.');
   const data = {...presentation, scope:review.scope};
-  data.operations = (review.operations || []).map(op=>({title:op.title,path:op.path,taskOwner:op.taskOwner,isolation:op.isolation,reason:op.reason,unknowns:op.unknowns,steps:op.steps}));
+  data.operations = (review.operations || []).map(op=>({group:op.group,title:op.title,path:op.path,stateOwner:op.stateOwner,taskOwner:op.taskOwner,isolation:op.isolation,reason:op.reason,unknowns:op.unknowns,steps:op.steps,checks:op.checks,scenarios:op.scenarios}));
   data.coverageGaps = gaps;
   const selectedIcon = icon || await appIcon(root);
   const iconData = selectedIcon ? `data:image/png;base64,${(await fs.readFile(selectedIcon)).toString('base64')}` : '';

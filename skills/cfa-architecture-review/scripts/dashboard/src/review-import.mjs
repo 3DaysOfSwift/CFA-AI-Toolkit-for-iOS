@@ -64,6 +64,7 @@ export async function importReview(report,input,root) {
     for(const op of review.operations) {
       if(seen.has(op.id)) fail('duplicate operation');
       seen.add(op.id);
+      if (op.group !== undefined && !text(op.group)) fail('operation group must be a non-empty name');
       if (op.steps !== undefined) {
         list(op.steps,['id','title','relation','detail']);
         if (!op.steps.length) fail('operation steps must not be empty');
@@ -74,6 +75,17 @@ export async function importReview(report,input,root) {
           if (index === 0 && (step.relation !== 'event' || step.parentId !== undefined)) fail('first operation step must be an event');
           if (index > 0 && (!text(step.parentId) || !stepIDs.has(step.parentId) || step.relation === 'event')) fail('operation step needs an earlier parent');
           stepIDs.add(step.id);
+        }
+      }
+      if (op.scenarios !== undefined) {
+        list(op.scenarios,['id','title','status','outcome','verification']);
+        const ids = new Set();
+        for (const scenario of op.scenarios) {
+          if (ids.has(scenario.id)) fail('duplicate operation scenario');
+          ids.add(scenario.id);
+          if (!['repeat','leave','late-result','failure'].includes(scenario.id)) fail('invalid operation scenario');
+          if (!['pass','problem','unresolved','not-applicable'].includes(scenario.status)) fail('invalid scenario status');
+          if (scenario.status === 'problem' && !text(scenario.consequence)) fail('scenario problem needs a consequence');
         }
       }
       if(op.checks!==undefined) {

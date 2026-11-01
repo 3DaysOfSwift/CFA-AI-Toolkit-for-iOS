@@ -29,7 +29,7 @@ test('reports the verdict and escapes reviewer content', () => {
 
 test('supports a qualitative assessment without a percentage', () => {
   const html = renderHealthReport({app:'App', summary:'Summary', verdict:'Clear ownership', scope:'App', conclusion:'Conclusion', qualitativeOnly:true, criteria:[{title:'Ownership', detail:'Checked', status:'pass'}]});
-  assert.match(html, /Assessment/);
+  assert.match(html, /<div class="caption">Result<\/div>/);
   assert.match(html, /Strong concurrency design/);
   assert.doesNotMatch(html, />100%<|>Health score</);
 });
@@ -48,4 +48,12 @@ test('conclusion uses ticks while concerns remain marked in findings', () => {
   assert.match(html, /conclusion-mark pass" aria-hidden="true">✓/);
   assert.match(html, /conclusion-tick pass" aria-hidden="true">✓/);
   assert.match(html, /indicator concern" aria-label="concern">!/);
+});
+
+test('groups distinct actions under their capability without merging them', () => {
+  const op = (title, group) => ({title,group,path:'Screen to Feature',stateOwner:'Feature',taskOwner:'Feature',isolation:'MainActor',reason:'Reviewed'});
+  const html=renderHealthReport({app:'App',summary:'Summary',verdict:'Clear ownership',scope:'App',conclusion:'Conclusion',criteria:[{title:'Ownership',detail:'Checked',status:'pass'}],operations:[op('Set reminder','Reminders'),op('Open launch','Navigation'),op('Remove reminder','Reminders')]});
+  assert.equal((html.match(/class="operation-group">Reminders/g) || []).length,1);
+  assert.ok(html.indexOf('Set reminder') < html.indexOf('Remove reminder'));
+  assert.ok(html.indexOf('Remove reminder') < html.indexOf('operation-group">Navigation'));
 });
