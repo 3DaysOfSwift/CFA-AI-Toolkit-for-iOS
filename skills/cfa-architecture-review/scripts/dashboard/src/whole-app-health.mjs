@@ -3,10 +3,10 @@ import fs from 'node:fs/promises';
 import {realpathSync} from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {analyse} from './analyse.mjs';
 import {importReview} from './review-import.mjs';
 import {renderHealthReport} from './health-report.mjs';
 import {collectSyntax} from './syntax-evidence.mjs';
+import {collectProjectAnalysis} from './project-analysis.mjs';
 
 const candidateKinds = new Set(['launch-callback', 'button-action', 'view-task', 'refresh']);
 const taskKinds = new Set(['concurrency.task','concurrency.detached','concurrency.taskGroup','concurrency.groupChild','entry.viewTask','entry.refreshable']);
@@ -118,19 +118,18 @@ export function coverageGaps(report, review) {
   if (missingTasks.length) gaps.push(`${missingTasks.length} detected task sites still need reconciliation.`);
   return gaps;
 }
-async function currentInventory(root, excludedOutput, syntaxProvider = collectSyntax) {
-  const report = await analyse(root, {excludedOutput});
-  report.syntax = await syntaxProvider(root);
-  const after = await analyse(root, {excludedOutput});
-  if (report.sourceFingerprint !== after.sourceFingerprint) throw Error('Source changed while collecting syntax evidence. Run the inventory again.');
+async function currentInventory(root, excludedOutput, syntaxProvider = collectSyntax, options = {}) {
+  const {inventory:report,analysis} = await collectProjectAnalysis(root, {...options,output:excludedOutput}, {syntax:syntaxProvider});
+  report.syntax = analysis.syntax;
   report.syntax.sourceFingerprint = report.sourceFingerprint;
-  return report;
+  return {report,analysis};
 }
-export async function prepare(root, output, syntaxProvider = collectSyntax) {
-  const report = await currentInventory(root, path.resolve(output), syntaxProvider);
+export async function prepare(root, output, syntaxProvider = collectSyntax, options = {}) {
+  const {report,analysis} = await currentInventory(root, path.resolve(output), syntaxProvider, options);
   if (!report.files.length) throw Error('No Swift source files found.');
   await fs.mkdir(output, {recursive:false});
   await fs.writeFile(path.join(output,'inventory.json'), JSON.stringify(report,null,2)+'\n', {flag:'wx'});
+  await fs.writeFile(path.join(output,'project-analysis.json'), JSON.stringify(analysis,null,2)+'\n', {flag:'wx'});
   const checklist = {
     sourceFingerprint: report.sourceFingerprint,
     note: 'Review each item against its source and record evidence in the review input. Scanner candidates are leads; verify target membership and discover additional entry points manually.',
@@ -170,19 +169,19 @@ async function appIcon(root) {
   } catch { return null; }
 }
 export async function progress(root, input, syntaxProvider = collectSyntax) {
-  const report = await currentInventory(root, path.dirname(path.resolve(input)), syntaxProvider);
+  const {report} = await currentInventory(root, path.dirname(path.resolve(input)), syntaxProvider);
   const raw = JSON.parse(await fs.readFile(input,'utf8'));
   const review = await importReview(report,raw,root);
   return {gaps:coverageGaps(report,review),files:report.files.length,operations:(review.operations || []).length};
 }
 export async function next(root, input, syntaxProvider = collectSyntax) {
-  const report = await currentInventory(root, path.dirname(path.resolve(input)), syntaxProvider);
+  const {report} = await currentInventory(root, path.dirname(path.resolve(input)), syntaxProvider);
   const raw = JSON.parse(await fs.readFile(input,'utf8'));
   const review = await importReview(report,raw,root);
   return nextWork(report,review);
 }
 export async function finish(root, input, output, icon, syntaxProvider = collectSyntax) {
-  const report = await currentInventory(root, path.dirname(path.resolve(output)), syntaxProvider);
+  const {report} = await currentInventory(root, path.dirname(path.resolve(output)), syntaxProvider);
   const raw = JSON.parse(await fs.readFile(input,'utf8'));
   const review = await importReview(report,raw,root);
   const gaps = coverageGaps(report,review);
@@ -199,10 +198,14 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
 }
 if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
-    const [mode, root, input, output, icon] = process.argv.slice(2);
-    if (mode === 'prepare' && root && input && !output) {
-      const result = await prepare(root,input);
+    const [mode, root, input, output, icon, moduleFlag, moduleName] = process.argv.slice(2);
+    if (mode === 'prepare' && root && input && (!output || (output === '--index-store' && icon && moduleFlag === '--module' && moduleName && process.argv.length === 9))) {
+      const result = await prepare(root,input,collectSyntax,output ? {indexStore:icon,module:moduleName} : {});
       console.log(`Inventoried ${result.files.length} Swift files and ${inventoryCandidates(result).length} possible entry points. Review inventory.json before producing the report.`);
+      if (output) {
+        const analysis = JSON.parse(await fs.readFile(path.join(input,'project-analysis.json'),'utf8'));
+        console.log(`Compiler index: ${analysis.compilerIndex.status}${analysis.compilerIndex.status === 'unavailable' ? ` — ${analysis.compilerIndex.reason}` : ''}.`);
+      }
     } else if (mode === 'progress' && root && input && !output) {
       const result = await progress(root,input);
       console.log(result.gaps.length ? 'Remaining review work:\n- ' + result.gaps.join('\n- ') : 'Source checklist reconciled. Add a substantive presentation and generate the report.');
@@ -212,6 +215,6 @@ if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.me
     } else if (mode === 'report' && root && input && output) {
       const result = await finish(root,input,output,icon);
       console.log(`Inventoried ${result.files} source files, ${result.operations} recorded operations; ${result.gaps.length} coverage gaps. Report: ${output}`);
-    } else throw Error('Usage: node whole-app-health.mjs prepare <project> <new-inventory-dir> | progress <project> <review.json> | next <project> <review.json> | report <project> <review.json> <new-report.html> [app-icon.png]');
+    } else throw Error('Usage: node whole-app-health.mjs prepare <project> <new-inventory-dir> [--index-store <path> --module <name>] | progress <project> <review.json> | next <project> <review.json> | report <project> <review.json> <new-report.html> [app-icon.png]');
   } catch (error) { console.error(error.message); process.exitCode=1; }
 }

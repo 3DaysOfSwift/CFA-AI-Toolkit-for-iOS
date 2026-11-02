@@ -68,6 +68,29 @@ node src/cli.mjs /path/to/app --observations observations.json --out reports/obs
 
 ## Current capabilities
 
+### Shared project analysis
+
+`project-analysis.mjs` creates a source-fingerprinted analysis record for review
+and migration. It combines the SwiftSyntax inventory, including written call
+expressions and task sites, with optional compiler-indexed call relationships:
+
+```sh
+node src/project-analysis.mjs /path/to/project --out /path/to/new-analysis.json
+node src/project-analysis.mjs /path/to/project --out /path/to/new-analysis.json --index-store /path/to/Index.noindex/DataStore --module ModuleName
+```
+
+The index must correspond to the intended target and configuration. Its freshness
+is unverified; a missing or unreadable index is recorded as unavailable. Syntax
+calls do not resolve overloads, and indexed calls are not a runtime task tree.
+Written calls include possible indexed matches on the same source line; those are
+navigation leads, not confirmed matches, and may be ambiguous.
+Inspect callers, actor boundaries, ownership and behaviour before making a
+judgment. Health Check preparation writes the same record as
+`project-analysis.json`; add `--index-store <path> --module <name>` to its
+`prepare` command to include an existing index. The migration skill bundles the
+same analyser for its baseline. Analysis output may contain source paths and
+symbols, so review it before sharing.
+
 ### Readable Health Check report
 
 For a whole-app Health Check, first run

@@ -38,6 +38,13 @@ Use deliberate passes:
    operation and callback; record protected state, ordering, lifetime, error
    delivery, cancellation and callback-execution requirements. Create a product
    behaviour contract from tests, source and manual journeys.
+   For a project-wide baseline, run the bundled shared analysis:
+   `node scripts/project-analysis/project-analysis.mjs <project-root> --out <new-analysis.json>`.
+   When an existing compiler index and its module are available, add
+   `--index-store <path> --module <module>`. Treat syntax calls as candidates and
+   indexed calls as build-specific evidence with unverified freshness; inspect
+   callers, ownership and behaviour before changing code. An unavailable index
+   does not block source review. Keep analysis files outside application source.
    Map each screen to its dedicated ViewModel and required concrete AppModel
    Features, with named tests for each actual Feature. A screen can present
    several independent business capabilities; several screens can use the same

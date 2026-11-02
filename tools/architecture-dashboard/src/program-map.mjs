@@ -43,7 +43,7 @@ export function launchTree(calls, maxDepth = 5) {
   return roots.map(([id, list]) => ({name: list[0].caller, file: list[0].file, line: list[0].line, children: children(id, new Set(), 0)}));
 }
 
-export async function generate(root, index, moduleName, output) {
+export async function collectIndexedCalls(root, index, moduleName) {
   root = await fs.realpath(root); index = await fs.realpath(index);
   const temporary = await fs.mkdtemp(path.join(os.tmpdir(), 'cfa-index-map-'));
   let stdout;
@@ -56,6 +56,12 @@ export async function generate(root, index, moduleName, output) {
   } finally { await fs.rm(temporary, {recursive: true, force: true}); }
   const calls = buildMap(stdout.split('\n').filter(Boolean).map(line => JSON.parse(line)), root);
   if (!calls.length) throw Error('No indexed calls found inside the project for this module. Check the module, index and build.');
+  return calls;
+}
+
+export async function generate(root, index, moduleName, output) {
+  root = await fs.realpath(root);
+  const calls = await collectIndexedCalls(root, index, moduleName);
   const files = [...new Set(calls.map(call => call.file))];
   const hashes = {};
   for (const file of files) {

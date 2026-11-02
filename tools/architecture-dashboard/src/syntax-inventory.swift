@@ -65,6 +65,8 @@ final class SourceInventory: SyntaxVisitor {
     override func visit(_ node: AwaitExprSyntax) -> SyntaxVisitorContinueKind { record("concurrency.await", "await", node); return .visitChildren }
     override func visit(_ node: FunctionCallExprSyntax) -> SyntaxVisitorContinueKind {
         let called = node.calledExpression.trimmedDescription
+        // A written call is a candidate, not a resolved callee or proof of execution.
+        record("call.expression", called, node)
         switch called {
         case "Task", "Task.init": record("concurrency.task", called, node); tasks.append(taskLocation(node))
         case "Task.detached": record("concurrency.detached", called, node); tasks.append(taskLocation(node))

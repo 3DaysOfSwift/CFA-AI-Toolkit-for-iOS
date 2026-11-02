@@ -116,6 +116,14 @@ the compiler index where available; record each source-supported relationship in
 the operation steps and each unresolved relationship as unknown. Never invent a
 complete tree from syntax alone.
 
+The prepare command also writes `project-analysis.json`, the shared evidence map
+used by migration. If a suitable existing compiler index is available, add
+`--index-store <path> --module <module>` after the inventory directory. Indexed
+calls are build-specific leads whose freshness and completeness are unverified;
+they do not establish task parentage or runtime execution. If the index cannot
+be read, its unavailable status and reason remain in the analysis. Continue the
+source review rather than treating absent indexed calls as proof of absence.
+
 Reconcile the full production target and file list,
 including sources the lexical scan cannot resolve. Record evidence-backed file batches, detected candidate entry points and each meaningful user or system operation using `scripts/dashboard/Documentation/REVIEWS.md`. A shared helper can be reviewed once and linked from multiple operations after checking each caller. Individual type verdicts are optional. Include
 `productionTargets` (an array of reviewed target and local-package names),

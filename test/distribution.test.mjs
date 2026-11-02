@@ -69,6 +69,13 @@ test('standalone release carries scanner dependencies and scans outside the sour
  assert.equal(execution.status,0,execution.stderr);
  assert.ok(fs.existsSync(path.join(report,'report.html')));
  assert.equal(json(path.join(report,'report.json')).scope.fileCount,1);
+ const analysis=path.join(dir,'migration-analysis.json');
+ const migration=path.join(destination,'.agents/skills/swift-concurrency-migration/scripts/project-analysis/project-analysis.mjs');
+ const migrationRun=spawnSync(process.execPath,[migration,fixture,'--out',analysis],{cwd:dir,encoding:'utf8',timeout:120000});
+ assert.equal(migrationRun.status,0,migrationRun.stderr);
+ const shared=json(analysis);
+ assert.equal(shared.files.length,1);
+ assert.equal(shared.compilerIndex.status,'not-requested');
  assert.ok(fs.existsSync(result.command));
  const command=spawnSync(result.command,['dashboard',fixture],{cwd:dir,encoding:'utf8'});
  assert.equal(command.status,0,command.stderr);

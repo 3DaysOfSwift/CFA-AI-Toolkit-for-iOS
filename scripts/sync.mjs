@@ -8,6 +8,7 @@ export const skills = [...cfaSkills, 'swift-code-quality'];
 export const explanationFiles = ['guide.md', 'catalogue.json',
   ...JSON.parse(fs.readFileSync(path.join(root, 'architecture/explanations/catalogue.json'), 'utf8')).topics.map(topic => topic.note)];
 export const iconSkills = ['cfa-app-creation', 'cfa-architecture-adoption', 'swift-concurrency-migration', 'cfa-codebase-tidy'];
+export const projectAnalysisFiles = ['project-analysis.mjs','analyse.mjs','dashboard.mjs','syntax-evidence.mjs','syntax-inventory.swift','program-map.mjs','index-program-map.c','indexstore.h'];
 export const starterIcon = 'templates/Xcode/Project Templates/iOS/Application/CFA App.xctemplate/Source/Assets.xcassets/AppIcon.appiconset';
 // Explicit release allowlist: working migration records must never be swept up.
 export const migrationEvidenceFiles = [
@@ -48,6 +49,10 @@ export function sync(base = root) {
   }
   for(const dir of ['src','Documentation']) for(const file of files(path.join(tool,dir))) copy(`tools/architecture-dashboard/${dir}/${file}`,`skills/cfa-architecture-review/scripts/dashboard/${dir}/${file}`);
   for(const file of ['README.md','package.json']) copy(`tools/architecture-dashboard/${file}`,`skills/cfa-architecture-review/scripts/dashboard/${file}`);
+  // Migration can run the same project analysis without another installed skill.
+  for (const file of projectAnalysisFiles) {
+    copy(`tools/architecture-dashboard/src/${file}`, `skills/swift-concurrency-migration/scripts/project-analysis/${file}`);
+  }
   for(const skill of skills) copy('LICENSE',`skills/${skill}/LICENSE`);
   copy('scripts/verify-ios-orientations.mjs', 'skills/cfa-app-creation/scripts/verify-ios-orientations.mjs');
   copy('scripts/verify-ios-app-identity.mjs', 'skills/cfa-app-creation/scripts/verify-ios-app-identity.mjs');
