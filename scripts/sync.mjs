@@ -60,6 +60,14 @@ export function sync(base = root) {
   for (const file of migrationEvidenceFiles) {
     copy(`tools/migration-evidence/${file}`, `skills/swift-concurrency-migration/scripts/evidence/${file}`);
   }
+  const migrationExamples = path.join(base, 'skills/swift-concurrency-migration/assets/migration-examples');
+  if (fs.existsSync(migrationExamples)) {
+    if (fs.lstatSync(migrationExamples).isSymbolicLink()) throw Error('Refusing to replace linked migration examples.');
+    fs.rmSync(migrationExamples, {recursive:true});
+  }
+  for (const file of files(path.join(base, 'examples/migration')).filter(file => !file.includes('.playground/playground.xcworkspace/'))) {
+    copy(`examples/migration/${file}`, `skills/swift-concurrency-migration/assets/migration-examples/${file}`);
+  }
   const captureGuide = fs.readFileSync(path.join(base, 'architecture/migration-evidence.md'), 'utf8')
     .replace('../tools/migration-evidence/README.md', '../scripts/evidence/README.md');
   fs.writeFileSync(path.join(base, 'skills/swift-concurrency-migration/references/migration-evidence.md'), captureGuide);

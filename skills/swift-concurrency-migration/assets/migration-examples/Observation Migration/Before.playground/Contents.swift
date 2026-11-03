@@ -1,0 +1,42 @@
+import Foundation
+import Combine
+import PlaygroundSupport
+
+PlaygroundPage.current.needsIndefiniteExecution = true
+
+// MARK: - Legacy implementation
+// SwiftUI can observe the legacy object's @Published property.
+@MainActor
+final class LegacyHabitModel: ObservableObject {
+    @Published private(set) var completedDays = 0
+    func completeToday() { completedDays += 1 }
+}
+
+// MARK: - Test fixtures
+// Test-only notification counter.
+// allows the callbacks to record notifications safely.
+final class NotificationCount: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value = 0
+    func record() { lock.lock(); defer { lock.unlock() }; value += 1 }
+    func read() -> Int { lock.lock(); defer { lock.unlock() }; return value }
+}
+
+// MARK: - Behaviour check
+@MainActor
+func runExample() {
+    let model = LegacyHabitModel()
+    let count = NotificationCount()
+    let subscription = model.objectWillChange.sink { count.record() }
+    model.completeToday()
+    model.completeToday()
+    precondition(model.completedDays == 2 && count.read() == 2)
+    withExtendedLifetime(subscription) {}
+    print("Passed: Combine publishes both updates.")
+}
+
+// MARK: - Run before example
+Task { @MainActor in
+     runExample()
+    PlaygroundPage.current.finishExecution()
+}

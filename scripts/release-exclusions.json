@@ -1,5 +1,5 @@
 {
-  "directoryNames": [".git", ".build", "DerivedData", "node_modules", "xcuserdata"],
+  "directoryNames": [".git", ".build", "DerivedData", "node_modules", "xcuserdata", "playground.xcworkspace"],
   "fileNames": [".DS_Store"],
   "fileSuffixes": [".xcuserstate"]
 }

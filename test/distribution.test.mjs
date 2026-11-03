@@ -71,6 +71,12 @@ test('standalone release carries scanner dependencies and scans outside the sour
  assert.equal(json(path.join(report,'report.json')).scope.fileCount,1);
  const analysis=path.join(dir,'migration-analysis.json');
  const migration=path.join(destination,'.agents/skills/swift-concurrency-migration/scripts/project-analysis/project-analysis.mjs');
+ for (const name of ['Serial Weight Saves','Callback Networking','MainActor Result','Observation Migration']) {
+  for (const relative of [`${name}/Before.playground/Contents.swift`, `${name}/After.playground/Contents.swift`, `${name}/case.md`]) {
+  const example=path.join(destination,'.agents/skills/swift-concurrency-migration/assets/migration-examples',relative);
+  assert.equal(hash(example),hash(path.join(root,'examples/migration',relative)));
+  }
+ }
  const migrationRun=spawnSync(process.execPath,[migration,fixture,'--out',analysis],{cwd:dir,encoding:'utf8',timeout:120000});
  assert.equal(migrationRun.status,0,migrationRun.stderr);
  const shared=json(analysis);

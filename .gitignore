@@ -4,3 +4,4 @@ dist/
 .build/
 reports/
 *.xcuserstate
+*.playground/playground.xcworkspace/

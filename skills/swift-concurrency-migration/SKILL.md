@@ -32,6 +32,11 @@ supported targets. Do not replace `DispatchQueue.async` with `Task { }` as a
 mechanical operation: doing that leaves ownership, ordering and lifetime
 ambiguous.
 
+For runnable ordered-save, callback-networking, MainActor-publication and
+Observation examples, see the bundled [migration playgrounds](assets/migration-examples/README.md).
+These illustrative cases do not establish the actual app's ordering, callback-execution,
+persistence, availability or cancellation requirements; inspect those independently.
+
 Use deliberate passes:
 
 1. Establish a baseline. Inventory every queue, barrier, group, semaphore,

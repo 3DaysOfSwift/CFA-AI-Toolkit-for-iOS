@@ -28,6 +28,7 @@ export function validate(base=root,{source=true}={}) {
     if (width !== height || width < 48 || width > 4096) throw Error(`CFA ${field} must be a square image between 48 and 4096 pixels.`);
   }
   if(source) {
+    for (const file of files(path.join(base,'examples/migration')).filter(file => !file.includes('.playground/playground.xcworkspace/'))) if (hash(path.join(base,'examples/migration',file)) !== hash(path.join(base,'skills/swift-concurrency-migration/assets/migration-examples',file))) throw Error(`Stale migration example: ${file}`);
     for (const file of projectAnalysisFiles) if (hash(path.join(base,'tools/architecture-dashboard/src',file)) !== hash(path.join(base,'skills/swift-concurrency-migration/scripts/project-analysis',file))) throw Error(`Stale migration project analysis: ${file}`);
     const portable=json(path.join(base,'plugin.json'));
     if(portable.name!==manifest.name || portable.version!==manifest.version) throw Error('Portable plugin manifest does not match Codex manifest.');
