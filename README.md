@@ -244,7 +244,7 @@ The CFA AI Toolkit for iOS contains eight AI skills and one local analysis tool.
 | --- | --- |
 | [CFA App Creation](skills/cfa-app-creation/SKILL.md) | create and continue shaping a new iOS product with CFA. |
 | [CFA Feature Work](skills/cfa-feature-work/SKILL.md) | add, change or remove a feature in a CFA app. |
-| [CFA Architecture Adoption](skills/cfa-architecture-adoption/SKILL.md) | move an existing modern app into CFA one feature at a time. |
+| [CFA Architecture Adoption](skills/cfa-architecture-adoption/SKILL.md) | move a whole existing modern app into CFA in one upgrade, then review it. |
 | [Legacy GCD migration](skills/swift-concurrency-migration/SKILL.md) | replace GCD, operation queues and callbacks with CFA and Swift Concurrency. |
 | [CFA Architecture Review](skills/cfa-architecture-review/SKILL.md) | inspect architecture and concurrency, including a Concurrency Migration Health Check, without changing the app. |
 | [CFA Codebase Tidy](skills/cfa-codebase-tidy/SKILL.md) | simplify a CFA project after feature work. |
@@ -361,9 +361,10 @@ GCD often protects important behaviour: save order, shared state, cancellation,
 error delivery and the rule that an old request must not overwrite a new result.
 
 The Legacy GCD migration skill first records that existing behaviour. It then
-creates clear CFA feature boundaries and moves concurrency one feature at a
-time. Builds, tests and manual regression testing check that the migrated app
-still does what the original app did.
+upgrades the whole app into CFA and Swift Concurrency in one change, with clear
+feature boundaries, rather than shipping a partly migrated app. Builds, tests
+and manual regression testing check that the upgraded app still does what the
+original app did.
 
 ## CFA Inspector
 
@@ -493,6 +494,42 @@ packages to install.
 Read [Contributing](CONTRIBUTING.md), the [release process](docs/PUBLISHING.md),
 the [validation record](docs/VALIDATION.md) and [Privacy](docs/PRIVACY.md).
 
+## For AI assistants
+
+This section is for AI coding assistants (Codex, Claude Code, Cursor and others) working in this repository or in an app that uses CFA.
+
+**Canonical sources, in this order**
+
+1. [`architecture/cfa-specification.md`](architecture/cfa-specification.md): the canonical architecture.
+2. [`architecture/swift-coding-guide.md`](architecture/swift-coding-guide.md): Swift standards.
+3. [`architecture/cfa-change-gate.md`](architecture/cfa-change-gate.md): the invariants to keep and the completion record a change needs.
+4. [`architecture/project-workflow.md`](architecture/project-workflow.md): commit existing work first, and record the workflow mode once.
+
+**Pick the skill that matches the task** (folders in [`skills/`](skills)):
+`cfa-app-creation`, `cfa-feature-work`, `cfa-architecture-adoption`, `swift-concurrency-migration` (Legacy GCD migration), `cfa-architecture-review` (read-only), `cfa-codebase-tidy`, `cfa-unit-tests`, `swift-code-quality`.
+
+**Rules to keep in every change**
+
+- Path: View → dedicated ViewModel → Feature → Repository. Views never receive ViewModels, Features, AppModel or repositories.
+- Each screen owns a private ViewModel, created inline with `@State`. The ViewModel defaults its narrow Feature dependencies from `AppModel.shared`.
+- Features are concrete `@MainActor @Observable` classes named `…Feature`, with no matching protocol. They are never called Managers.
+- Features keep domain data, operation state and errors as separate values. Never use a `LoadState` enum that carries all three.
+- Overlapping calls share one retained `Task<Void, Never>`, cleared in `defer`. Distinct edits are queued and never dropped.
+- AppModel stores only `shared`, the concrete Features and one launch Boolean, and has a single `static func live()`. The app delegate calls `applicationDidFinishLaunching()`.
+- `App.body` has a stable root. Database availability never gates the UI. SwiftData goes through `SwiftDataManager` and a `@ModelActor`. `URLSession` goes through `NetworkingManager`.
+- Write `@MainActor` explicitly on Features, ViewModels and AppModel, and use actors for shared storage. Never use locks, GCD inside async code, or `@unchecked Sendable` as an escape hatch.
+- Name ViewModel methods for the work they do: `refresh()`, `save()`, `retry()`.
+- Tests: one suite per ViewModel, plus named `FeatureTests` for each Feature. Use an isolated AppModel graph, never `AppModel.shared`, and no sleeps.
+- Preserve an established product's design. Themes, footers and branding are defaults for new apps only.
+- Upgrade a legacy GCD app as one whole-app change. Do not release a partly upgraded app.
+- A change is complete only when the change gate and the specification's Review Checklist pass, with the build and tests run at the final commit.
+
+**Further reading**
+
+- Formal reference (26 pages), starting at <https://www.3daysofswiftconcurrency.com/blog/cfa-reference-overview>
+- Decision rules: <https://www.3daysofswiftconcurrency.com/blog/cfa-reference-decision-rules>
+- Explanations of why CFA makes each choice: <https://www.3daysofswiftconcurrency.com/cfa/explanation/appmodel-composition> and 16 related pages
+
 ## Further reading
 
 Start with the [installation and first-use guide](docs/INSTALLATION.md), then use
@@ -500,7 +537,7 @@ the [CFA architecture specification](architecture/cfa-specification.md) to
 understand the structure the AI skills create and maintain. These articles from
 3 Days of Swift Concurrency explain the ideas behind that workflow:
 
-- [Can I Delay Learning Swift Concurrency?](https://www.3daysofswiftconcurrency.com/blog/can-i-delay-learning-swift-concurrency%3F) — a practical case for modernising existing iOS apps incrementally.
+- [Can I Delay Learning Swift Concurrency?](https://www.3daysofswiftconcurrency.com/blog/can-i-delay-learning-swift-concurrency%3F) — a practical case for upgrading existing iOS apps to Swift Concurrency now.
 - [What Does async Mean in Swift?](https://www.3daysofswiftconcurrency.com/articles/what-does-async-mean-in-swift) — why asynchronous work changes application architecture.
 - [What Is a Logical Race in Swift Concurrency?](https://www.3daysofswiftconcurrency.com/blog/what-is-a-logical-race-in-swift-concurrency) — why feature ownership and request ordering still matter when code is data-race safe.
 
