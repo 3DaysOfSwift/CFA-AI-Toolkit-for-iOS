@@ -80,7 +80,7 @@ test('new-project templates contain no UI-test targets or empty UI-test folders'
   ];
 
   for (const template of nativeTemplates) {
-    const info = JSON.parse(execFileSync('plutil', ['-convert', 'json', '-o', '-', path.join(base, template, 'TemplateInfo.plist')], { encoding: 'utf8' }));
+    const info = JSON.parse(execFileSync('python3', ['-c', 'import json, plistlib, sys; print(json.dumps(plistlib.load(open(sys.argv[1], "rb"))))', path.join(base, template, 'TemplateInfo.plist')], { encoding: 'utf8' }));
     assert.ok(!info.Targets.some(target => target.ProductType === 'com.apple.product-type.bundle.ui-testing'));
     assert.ok(![...info.Nodes, ...Object.keys(info.Definitions)].some(name => /UITests/i.test(name)));
   }

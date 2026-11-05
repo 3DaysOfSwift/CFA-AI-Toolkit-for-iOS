@@ -11,7 +11,7 @@ const native = path.join(root, 'templates/Xcode/Project Templates/iOS/Applicatio
 
 test('Day Streak native template matches the editable project', () => {
   execFileSync('python3', ['scripts/sync-day-streak-template.py', '--check'], { cwd: root });
-  const info = JSON.parse(execFileSync('plutil', ['-convert', 'json', '-o', '-', path.join(native, 'TemplateInfo.plist')], { encoding: 'utf8' }));
+  const info = JSON.parse(execFileSync('python3', ['-c', 'import json, plistlib, sys; print(json.dumps(plistlib.load(open(sys.argv[1], "rb"))))', path.join(native, 'TemplateInfo.plist')], { encoding: 'utf8' }));
   for (const node of info.Nodes) {
     assert.ok(fs.existsSync(path.join(native, info.Definitions[node].Path)), node);
   }
