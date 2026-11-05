@@ -77,6 +77,18 @@ Use deliberate passes:
    than silently dropping inputs. Give root Tasks explicit cancellation owners.
 4. Re-run the relevant behaviour and concurrency tests. Record the remaining
    legacy primitives, completed feature milestones and verification gaps.
+5. As the scoped features take shape, reconcile their physical locations and
+   Xcode navigator groups with the CFA folder map. Revisit temporary locations,
+   including existing Swift packages, and perform safe in-scope moves rather
+   than merely noting that files are misplaced. Follow the placement and module
+   checks in [migration workflow](references/concurrency-migration.md#reconcile-cfa-file-placement).
+   Rebuild and test affected targets after moving code. Document an intentional
+   package boundary or a genuine blocker with its reason and next step.
+6. Before the final migration handoff, perform the [hybrid implementation
+   review](references/concurrency-migration.md#review-hybrid-implementations).
+   Trace actual paths across legacy and modern mechanisms, identify redundant
+   adapters and remaining users of dependencies, and recommend or perform
+   in-scope simplifications that preserve behaviour and platform support.
 
 Keep migrated operations directly awaitable. Use structured child tasks for work owned by a calling operation; give independent tasks explicit lifetime and cancellation owners. Bridge callbacks only when an appropriate native async API is unavailable, accounting for exactly-once completion and cancellation races.
 

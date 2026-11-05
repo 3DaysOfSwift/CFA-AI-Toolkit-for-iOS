@@ -141,7 +141,10 @@ Before calling a CFA migration complete, capture a completion record that
 identifies all of the following:
 
 - the before/after Xcode navigator map, showing the agreed CFA folders and
-  feature ownership visibly—not just source paths on disk;
+  feature ownership visibly—not just source paths on disk. Reconcile temporary
+  package placements and move files into their intended locations when safe;
+  record intentional package boundaries or unresolved blockers, and verify
+  target membership and affected builds after moves;
 - the feature inventory, including every scoped tab or screen, its concrete
   Feature dependencies, dedicated ViewModel, composition owner, named tests, and any
   intentionally retained legacy boundary;

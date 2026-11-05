@@ -2,6 +2,59 @@
 
 Adopt CFA while preserving product behaviour. Begin at an operation boundary with known behaviour.
 
+## Reconcile CFA file placement
+
+Before implementation, map the scoped app and its packages, targets, source
+roots and Xcode navigator groups against the folder map in the CFA specification.
+For each migrated slice, choose its intended View, AppModel/Features or supporting
+storage location. When an existing dependency forces a temporary location, record
+both the current and intended locations and the dependency preventing the move.
+
+As features are migrated, revisit that list; before declaring the scoped migration
+complete, compare the actual on-disk paths and Xcode navigator with the intended
+map. Move misplaced CFA files into their intended locations when safe and within
+scope. A feature folder inside an unrelated pre-existing Swift package is not
+automatically the intended app-level location just because its contents are
+grouped together. Conversely, a package may be the intentional home of a shared
+module: do not dismantle it, change its public API, or assume its files can be
+moved into the app target without checking its consumers and build constraints.
+
+For each move, preserve the relevant target memberships, package product and
+module boundaries, imports, access control, resources, build settings and tests.
+Update Xcode project or package references as appropriate, then build and run the
+affected targets and behaviour tests. Verify both filesystem and navigator; a
+cosmetic group alone does not move files or prove that they compile in the right
+target. Keep an intentional package placement when it is required or explicitly
+agreed, explain why it differs from the default map, and report an unresolved
+move and its concrete blocker rather than silently treating it as complete.
+
+## Review hybrid implementations
+
+Near the end of a migration, scan the scoped first-party targets, extensions,
+tests and dependencies for remaining reactive frameworks, callbacks, Combine,
+Observation and other relevant mechanisms. Trace each meaningful boundary from
+the source of state or asynchronous work to its consumers. For example, an
+async Feature may still publish its results through a ReactiveSwift signal to
+an existing UIKit screen. Identify who owns the state, transformations,
+subscriptions and lifetime, and whether an adapter remains necessary.
+
+For each hybrid path, distinguish a temporary bridge or duplicate state from a
+deliberate integration. Assess whether a simpler supported design can preserve
+the existing screen's update timing, ordering, initial and subsequent values,
+errors, cancellation, subscription lifetime, threading and other observable
+behaviour. Observation is available on iOS 17 and later; it is not a drop-in
+replacement for reactive stream operators. Choose a mechanism supported by the
+project's deployment targets and consumers, and keep Combine or an existing
+reactive framework where its capabilities or integrations are still required.
+Using a framework alongside Swift Concurrency is not, by itself, a defect.
+
+Implement safe, in-scope cleanup when the migration request authorizes it;
+otherwise provide a concrete recommendation and its trade-offs. Remove an
+adapter or dependency only after checking all target and package consumers,
+including tests and public APIs, and verifying the affected builds and behaviour.
+Record remaining hybrids with their purpose and next step; do not call a project
+fully migrated to a single mechanism when scoped consumers still require another.
+
 ## Preserve concurrency guarantees
 
 First establish the CFA boundary for one complete feature: a bespoke ViewModel
