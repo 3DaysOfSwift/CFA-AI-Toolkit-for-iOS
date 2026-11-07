@@ -14,7 +14,7 @@ export function stageRelease(output,base=root) {
     fs.cpSync(path.join(base,relative),destination,{recursive:true,errorOnExist:true,force:false,
       filter: source => isReleasePath(path.relative(base, source))});
   };
-  for(const relative of ['.codex-plugin','plugin.json','readme-images','skills','LICENSE','Install.command','Install Xcode Template.command','docs','architecture','templates','starter-apps','scripts/install.mjs','scripts/install-xcode-template.mjs','scripts/files.mjs','scripts/release-exclusions.json','scripts/sync.mjs'])copy(relative);
+  for(const relative of ['.codex-plugin','plugin.json','readme-images','skills','LICENSE','Install.command','Install Xcode Template.command','docs','architecture','templates','starter-apps','scripts/install.mjs','scripts/install-xcode-template.mjs','scripts/files.mjs','scripts/release-exclusions.json','scripts/sync.mjs','scripts/spec-topics.mjs'])copy(relative);
   fs.copyFileSync(path.join(base,'README.md'),path.join(output,'README.md'));
   writeJSON(path.join(output,'checksums.json'),inventory(output));
   validate(output,{source:false});

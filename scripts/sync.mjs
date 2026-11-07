@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { files } from './files.mjs';
+import { specTopics } from './spec-topics.mjs';
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const cfaSkills = ['cfa-app-creation', 'cfa-feature-work', 'cfa-architecture-adoption', 'swift-concurrency-migration', 'cfa-architecture-review', 'cfa-codebase-tidy', 'cfa-unit-tests'];
 export const skills = [...cfaSkills, 'swift-code-quality'];
@@ -22,6 +23,17 @@ export function sync(base = root) {
     fs.mkdirSync(path.dirname(to),{recursive:true});
     fs.copyFileSync(from,to);
   };
+  const topicFiles = specTopics(base);
+  for (const destination of ['architecture/spec', ...cfaSkills.map(name => `skills/${name}/references/spec`)]) {
+    const folder = path.join(base, destination);
+    fs.mkdirSync(folder, { recursive: true });
+    for (const file of files(folder)) if (!topicFiles.has(file)) throw Error(`Unexpected specification file in ${destination}: ${file}; move or remove it deliberately before synchronising.`);
+    for (const [file, contents] of topicFiles) {
+      const target = path.join(folder, file);
+      fs.mkdirSync(path.dirname(target), { recursive: true });
+      fs.writeFileSync(target, contents);
+    }
+  }
   for (const name of skills) {
     for (const file of ['project-workflow.md', 'new-app-design-defaults.md']) {
       copy(`architecture/${file}`, `skills/${name}/references/${file}`);

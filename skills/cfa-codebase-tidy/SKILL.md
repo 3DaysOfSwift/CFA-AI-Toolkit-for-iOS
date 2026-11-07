@@ -5,6 +5,8 @@ description: Iteratively tidy an existing CFA SwiftUI codebase for educational r
 
 # CFA codebase tidy
 
+Read the [CFA specification reading map](references/spec/README.md) to locate applicable topics. The complete CFA specification remains authoritative; use it for whole-app audits.
+
 Read [project workflow and design authority](references/project-workflow.md) first.
 Respect the recorded workflow and current request; new-app design defaults do
 not authorize UI changes during maintenance or a narrowly scoped task.

@@ -18,6 +18,16 @@ application harder to understand, change, and maintain.
 
 ## A Template for Developers and AI
 
+Explore [open-source iOS app examples](spec/examples/open-source-apps.md) for
+real source code related to CFA capabilities and migration. Each link identifies
+what to inspect. Real apps evolve and may contain older conventions or ongoing
+migration work; use the current specification as the authority rather than
+assuming an entire referenced project conforms to every rule.
+
+For the reasons behind CFA decisions, browse the [CFA explanations](spec/explanations.md)
+and select the topic relevant to the work. The specification remains authoritative
+when an explanation reflects an earlier version of the guidance.
+
 This architecture is offered as a practical gift to the iOS community. Its
 consistent Xcode project structure gives developers a shared visual map of the
 application and gives AI models strong, representative input. New features can
@@ -137,19 +147,20 @@ View
   ↓
 ViewModel
   ↓
-Feature API
-  ↓
 Feature
   ↓
-Repository
-  ↓
-External System
+Microservices
 ```
 
 User intent moves down through the layers and state or results flow back up. A
-View reports intent to its ViewModel, the ViewModel requests a capability from
-the Feature API, the concrete Feature applies the application's rules, and the
-Repository interacts with storage, a server, or a device API.
+View reports intent to its ViewModel, the ViewModel calls the concrete Feature,
+and the Feature applies the application's rules. Its internal microservices,
+such as networking, data-storage and device API adapters, interact with local
+storage, remote servers or system APIs when the capability needs them. These
+are supporting code inside the app, not necessarily separately deployed server
+applications. The Feature's API is its
+exposed methods and state, not a separate layer. AppModel constructs and makes
+Features available; it is not a separate step in every operation.
 
 Keep this route short, but never bypass an established owner for convenience.
 Doing so places knowledge in the wrong type: a View begins to understand
@@ -656,12 +667,58 @@ Each screen owns the sheet, alert, or navigation destination it presents. Do
 not create an application-wide router merely to move local presentation state
 away from the View.
 
+**Deep links and notification destinations.** When an app supports these
+entry points, use a dedicated `DeepLinkingFeature` for the shared destination
+handling of incoming links and actions on local and push notifications. It
+interprets and validates each request, owns the pending destinations and uses a
+storage service to persist their safe representations. AppModel exposes the
+Feature. System callbacks forward requests into this same system; do not assume
+that every push notification contains a navigable destination.
+
+The receiving scene owns navigation, presentation and decisions about leaving
+its current screen. Do not place tab selection, sheets or screen dismissal in
+the Feature. A scene-provided asynchronous handler can attempt a destination and
+return `true` only after navigation to that page occurs. The Feature removes
+the corresponding pending request after that result, not merely because the
+user agreed to navigate. A `false` result, cancellation, unavailable scene or
+failed navigation leaves it pending; a later scene can offer it again. The
+destination screen then owns its own data loading, errors and refresh: do not
+wait for content to load before treating navigation as successful.
+
+For example, when a user selects a pending item in Settings, its ViewModel
+asks `DeepLinkingFeature` to open that request. The Feature invokes the handler
+for the receiving scene; the scene navigates and reports the result. Configure
+the handler with a scene-appropriate lifetime so multiple windows do not share a
+single navigation state. This is the intended responsibility flow; choose the
+concrete handler and registration mechanism to suit the app and test it.
+
+Protect an unsaved edit or an active payment flow from interruption. If a user
+chooses to continue editing, retain the request across launches and offer it
+again through a pending-notifications or pending-links area. Remove an item on
+successful navigation or explicit dismissal. Support multiple incoming requests
+without silently replacing earlier ones, and avoid duplicate handling when
+scenes receive the same event. Do not create a separate notification history
+or global UI router by default. Store only safe data needed to identify and
+present a request; handle expired or unavailable destinations clearly. Persist
+before claiming a request is safely kept, and handle storage failures honestly.
+
+Record local notifications the app creates and push notifications it receives or
+handles as appropriate to the product. iOS does not guarantee delivery of every
+background push to the app; a product requiring a complete notification inbox
+needs an appropriate durable source, such as server-side history, rather than a
+promise that local callbacks see every event.
+
 ## Define Features by Business Capability, Not by Screen or Tab
 
 A screen can present several independent business capabilities. A Feature can
 support several screens and device experiences, or have no dedicated screen.
 Features own meaningful application capabilities and their authoritative business
 state; screens and tabs do not determine the number of Features.
+
+For a real implementation of a Feature owning domain state, inspect
+[Trend's WeightLogFeature](https://github.com/3DaysOfSwift/Trend-iOS-App-Swift-Concurrency-CFA/blob/2a747bc222535e9fda01ed722e9c2c103fb98905/Trend/2%20-%20AppModel/Features/WeightLog/WeightLogFeature.swift).
+The linked project illustrates this specific responsibility; assess its other
+architectural choices separately against the current specification.
 
 During creation or migration, main screens are useful clues for discovering
 capabilities, not a requirement to create one Feature per screen or tab. Record
@@ -710,6 +767,30 @@ comments even when it calls different APIs for each. Similarly, a
 form one coherent capability. Choose boundaries from the app's actual business
 requirements; do not multiply similar Features merely to mirror HTTP calls.
 
+For a small application, an existing account operation can coordinate the
+Features affected by it directly. For example, `UserProfileFeature.signOut()`
+can call explicit account-data clearing operations on `OrdersFeature` and
+`FavouritesFeature`. The profile Feature coordinates the workflow; each
+affected Feature remains the owner of its own state. Supply dependencies through
+initialisation, keep the direction of dependencies free of cycles, and do not
+create a separate coordinator or event infrastructure solely to relay this call.
+If the workflow grows into a distinct capability, reassess its boundary rather
+than assuming that a separate coordinating Feature is always required.
+When sign-out fails before the session ends, keep the user signed in and retain
+their account data; report the failure so they can retry. After successful
+sign-out, clear account-specific Feature state. If the authentication service
+can partially succeed before reporting an error, reconcile its actual session
+state rather than assuming either outcome.
+
+During migration, inspect whether an existing account-change event system can
+be simplified into explicit calls without losing behaviour. Trace every sign-out
+and account-switch entry point, including external session expiry. Define what
+happens when authentication or cleanup fails, and prevent work started under an
+old account from republishing its data after a switch. Cancellation alone does
+not guarantee that work has stopped; validate the current account or a session
+generation before publishing results. Preserve the product's privacy and
+storage requirements, and test these behaviours before removing observers.
+
 Business requirements also determine how many instances of a domain entity
 exist. For a simple shopping app, start with one shared `ShoppingCartFeature`
 owning one cart. Introduce multiple carts only when the product needs them:
@@ -723,6 +804,35 @@ needs rather than creating a separate Feature instance for each ViewModel.
 
 `AppModel.shared` is the one production application graph. This is an explicit
 architectural decision, not an accidental global variable.
+
+For additional device and extension targets, include the shared AppModel and
+related Model source in each target, and include only the Views and ViewModels
+designed for that target. Each running process or device has its own
+`AppModel.shared` and Feature instances; the singleton shares memory within its
+process, not across targets or devices. Verify target membership, platform and
+extension API availability, and lifecycle requirements. Adapt composition or
+platform-specific services where necessary without duplicating business rules.
+
+Share useful immutable snapshots to make existing capabilities available to
+additional presentations. An iPhone app and widget can exchange a snapshot via
+an App Group container: safely write it before requesting a WidgetKit timeline
+reload, and handle missing or unreadable data. WidgetKit controls refresh timing.
+A Watch app runs on another device and cannot read the iPhone's App Group
+folder: transfer a copy using Watch Connectivity when appropriate, or use a
+product-appropriate cloud or server mechanism. Account for reachability, delayed
+delivery, stale data and conflicts according to the product. A Feature refreshes
+its own observable state when a relevant external change reaches its data
+source; observation alone does not synchronize separate processes or devices.
+
+The planned Next Rocket Launch multi-device showcase will demonstrate this
+arrangement in a separate Xcode project in the same repository: shared Model
+source, device-specific iPhone and Watch presentations, an iPhone widget and a
+Watch countdown complication. The iPhone widget can read an App Group snapshot;
+the iPhone can send the next launch to the Watch using Watch Connectivity. A
+larger snapshot file transfer is an option when the Watch needs it. This is an
+example project's intended design, not a requirement that every CFA app create
+these targets or use the same transfer method. Verify the implementation and
+device behaviour before presenting the showcase as complete.
 
 AppModel:
 
@@ -739,9 +849,10 @@ AppModel:
 - contains no SwiftUI, navigation state, screen identity, or feature-specific
   business rules.
 
-AppModel's stored properties are exactly one `static let shared = AppModel.live()`,
-the concrete Feature references, and one private Boolean guarding launch. No
-other stored state belongs here: no service, repository, `ModelContainer`,
+AppModel's stored properties include one `static let shared = AppModel.live()`,
+the concrete Feature references, one private Boolean guarding launch, and any
+private Task handles required to own app-wide listeners. No other application
+state belongs here: no service, repository, `ModelContainer`,
 startup error, loading flag, navigation state, or presentation text. A failed
 feature load is retained and presented by that Feature and its screen ViewModel.
 The singleton guarantees shared access to the application graph; it does not
@@ -765,6 +876,41 @@ services, repositories, and Features and passes only Features to `init`.
 Tests construct isolated graphs by passing test Features to that same explicit
 initializer. `live()` may use local lower-level values, but never retains or
 exposes them as AppModel properties.
+
+**App-wide listeners.**
+
+AppModel starts and owns listeners needed independently of the currently
+visible screen, such as an app-wide StoreKit update stream or account events.
+Retain their Task handles in AppModel when the listener is asynchronous; start
+each listener once, and define how it is cancelled or replaced when needed,
+including in isolated tests. An app-lifetime listener may otherwise run until
+the app terminates. AppModel forwards each event to the relevant Feature; that
+Feature interprets it and owns the resulting business state and behaviour.
+Keep event handling small in AppModel and avoid adding subscriptions unless the
+app actually needs them.
+
+Work needed only while a screen is visible belongs to that screen or its
+ViewModel, with a lifetime appropriate to the presentation. Do not make a
+screen-owned listener responsible for events the app must receive when that
+screen is absent.
+
+**Background work.** Each Feature owns the background capability and business
+work associated with its domain. During synchronous application launch,
+AppModel can call a Feature's registration method so the Feature registers its
+own system background handlers. For BGTaskScheduler, register every permitted
+identifier once and before launch finishes; scheduling is separate, and the
+system decides when eligible work runs. Handle expiration, cancellation and
+the system's completion requirements. Do not create a central background-work
+Feature merely to coordinate unrelated capabilities.
+
+When iOS delivers an event through an app delegate or another app-level entry
+point, route it through AppModel to the appropriate Feature while honouring the
+system callback and completion contract. Background pushes are not guaranteed
+to arrive. Use the appropriate system mechanism, such as a background URLSession
+for supported transfers; an ordinary Swift Task does not grant background runtime.
+Work that should continue when one screen disappears is owned by its Feature,
+not by that screen. This is distinct from whether iOS permits it to continue
+after the whole app enters the background.
 
 ## Organize Behaviour into Cohesive Features
 
@@ -939,10 +1085,43 @@ the data. Preserve an existing good cache when a replacement fails and prevent
 older writes from overwriting newer snapshots. This exception does not apply to
 user edits, purchases, reminders, or other changes that require a durable save.
 
+For a real schedule Feature using cached provider data, inspect
+[Next Rocket Launch's LaunchScheduleFeature](https://github.com/3DaysOfSwift/RocketLaunch-iOS-App-Swift-Concurrency/blob/3ecaa30c76428bd8a6f5db8fd5506b6c20b846f7/Swift%20Concurrency%20Project/RocketLaunch/2%20-%20AppModel/Features/Launch%20Schedule/LaunchScheduleFeature.swift).
+Treat the linked implementation as a source to examine, not as proof that its
+entire project conforms to every current rule.
+
+For replaceable server data, a saved snapshot can provide a fast initial display
+and limited offline access without introducing offline editing or a sync engine.
+When the product needs both restoration and a fresh request, start them
+independently rather than delaying the request for the optional cache. Publish
+restored data only if a newer authoritative response has not already superseded
+it. A missing, incompatible or unreadable optional snapshot must not block the
+normal download; retain any existing valid in-memory data on refresh failure.
+Choose caching and freshness behaviour according to the product's requirements.
+
 Define what persistence success means. In a local-first application, a command
 may succeed once data is durably stored on the device while remote
 synchronization remains pending. Expose synchronization state separately; never
 claim remote success when only the local write succeeded.
+
+Do not add offline editing or cross-device synchronization to a new app by
+default. When the product needs sync across a person's Apple devices, first
+consider the system-managed option appropriate to the data: SwiftData with
+CloudKit for compatible model data, or iCloud documents for document-based
+content. Verify capabilities, deployment target, account availability, schema
+constraints, conflicts and behaviour on real devices; system-managed sync is
+not instantaneous or a replacement for local error handling. Do not put a
+live SwiftData store in iCloud Drive as a substitute for CloudKit integration.
+
+When the product instead requires synchronization with its own server, use
+the server's contract and introduce a dedicated sync service when needed. If
+offline edits are supported, durably save each edit and its pending-sync
+metadata together before publishing it as locally saved. Preserve pending
+changes across failures and restarts, make retries safe against duplication,
+and apply a product-defined conflict and rejection policy. Report local saving
+and server confirmation truthfully. Whether offline edits are allowed, how
+conflicts are resolved, and what status the user sees are product decisions,
+not universal CFA defaults.
 
 When restoring a non-critical user preference, treat a missing or obsolete
 recognised-format value as a compatibility case when the product defines a safe
@@ -1044,6 +1223,12 @@ Choose the lifetime deliberately:
 
 - durable commands such as persistence normally continue after presentation
   disappears;
+- a Feature-owned shared refresh normally continues when a screen leaves, even
+  if that screen was its only current caller. Keep successfully downloaded
+  data in the Feature for later use, and let equivalent future callers join the
+  in-flight request. A departing screen may stop waiting without cancelling
+  the Feature's refresh; choose a different policy only for a specific product
+  or resource requirement;
 - replaceable work such as searches, previews, and recalculations cancels when
   superseded;
 - presentation-only work cancels when its screen disappears if continuing would
@@ -1169,10 +1354,11 @@ the earliest applicable launch callback:
 func applicationDidFinishLaunching()
 ```
 
-AppModel keeps one simple Boolean to ensure the method runs once. It does not
-store a Task handle. The app delegate calls this synchronous method directly,
+AppModel keeps one simple Boolean to ensure the method runs once. The app
+delegate calls this synchronous method directly,
 without wrapping the AppModel call in a Task. AppModel synchronously invokes
-the Features' named startup methods; each Feature owns any asynchronous tasks
+the Features' named startup methods and starts any app-wide listeners it owns;
+each Feature owns any asynchronous tasks
 needed for its refresh or local restoration. The delegate returns after those
 startup methods have been invoked, not after their network or disk work has
 finished. Call from `UIApplicationDelegate.application(_:didFinishLaunchingWithOptions:)`,

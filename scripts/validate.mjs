@@ -7,7 +7,14 @@ import { validateCatalogue, audit } from '../tools/explanations/explanations.mjs
 import { files, hash, json } from './files.mjs';
 import { verifyXcodeTemplateStructure } from './verify-xcode-template-structure.mjs';
 import { verifyTemplateOrientations } from './verify-ios-orientations.mjs';
+import { specTopics } from './spec-topics.mjs';
 export function validate(base=root,{source=true}={}) {
+  const expectedTopics = specTopics(base);
+  for (const folder of ['architecture/spec', ...cfaSkills.map(name => `skills/${name}/references/spec`)]) {
+    const directory = path.join(base, folder);
+    if (!fs.existsSync(directory) || JSON.stringify(files(directory).sort()) !== JSON.stringify([...expectedTopics.keys()].sort())) throw Error(`Missing or unexpected specification topics: ${folder}`);
+    for (const [file, contents] of expectedTopics) if (fs.readFileSync(path.join(directory, file), 'utf8') !== contents) throw Error(`Stale specification topic: ${folder}/${file}. Run npm run sync.`);
+  }
   const explanationDirectory = path.join(base, 'architecture/explanations');
   const explanationCatalogue = json(path.join(explanationDirectory, 'catalogue.json'));
   validateCatalogue(explanationCatalogue, explanationDirectory, { sourceRoot: path.join(base, 'architecture') });

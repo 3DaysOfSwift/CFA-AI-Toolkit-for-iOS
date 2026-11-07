@@ -1,0 +1,816 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "CFA-SPEC-STRUCT-01",
+      "title": "Keep the project structure understandable",
+      "section": "Make the Architecture Visible in the Folder Structure",
+      "applies": "Creating or restructuring a CFA app",
+      "strength": "Required",
+      "rule": "Group Views and ViewModels separately from AppModel, Features and their services; retain actual Xcode target membership.",
+      "why": "Developers can locate capability ownership without following arbitrary layers.",
+      "verify": "Inspect folders, target membership, resource paths and build configuration.",
+      "example": "Place NotesView and NotesViewModel together in the View layer, and NotesFeature in the Model layer.",
+      "explanationIds": [
+        "project-structure"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-UI-01",
+      "title": "Keep business decisions in the Model",
+      "section": "Maintain an Absolute UI and Model Boundary",
+      "applies": "Creating or changing UI",
+      "strength": "Required",
+      "rule": "Views render and forward intent; Features own domain decisions and authoritative state.",
+      "why": "A different device can reuse the same business capability.",
+      "verify": "Trace validation, calculations and persistence from the screen to their model owner.",
+      "example": "A weight screen sends a save request to its Feature; the Feature validates and persists the value.",
+      "explanationIds": [
+        "presentation-boundaries"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-UI-02",
+      "title": "Each screen owns its ViewModel",
+      "section": "Give Every Unique Screen Its Own ViewModel",
+      "applies": "Creating or reviewing a SwiftUI screen",
+      "strength": "Required",
+      "rule": "A screen creates and retains its own private ViewModel; do not pass or share ViewModels between Views.",
+      "why": "Presentation state remains local to the screen.",
+      "verify": "Inspect screen declarations, navigation destinations, previews and ViewModel construction.",
+      "example": "NotesView declares its own private State-backed NotesViewModel.",
+      "explanationIds": [
+        "view-model-ownership"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-UI-03",
+      "title": "Pass selected values to detail screens",
+      "section": "Give Every Unique Screen Its Own ViewModel",
+      "applies": "A destination needs a selected item",
+      "strength": "Permitted exception",
+      "rule": "Pass a selected immutable snapshot to the detail View and construct its own State-backed ViewModel in the View initializer.",
+      "why": "Each destination can preserve its selection independently.",
+      "verify": "Test two independently selected destinations and confirm refresh does not silently replace a displayed snapshot.",
+      "example": "Two launch detail destinations each receive their own selected launch snapshot.",
+      "explanationIds": [
+        "view-model-ownership"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-UI-04",
+      "title": "Keep view construction and edits local",
+      "section": "Keep Screen Initializers Clean",
+      "applies": "Creating screens and editing saved values",
+      "strength": "Required with product-specific behaviour",
+      "rule": "Keep View initializers free of I/O and work; a simple unsaved text-field value stays local until Save or Cancel.",
+      "why": "Screen creation remains predictable and cancelled edits do not change authoritative state.",
+      "verify": "Inspect initialization and test failed saves, retry and cancellation.",
+      "example": "An unsaved weight field remains on screen after a failed save and is discarded by Cancel.",
+      "explanationIds": [
+        "honest-errors-and-editing"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-FEATURE-01",
+      "title": "Define Features by capability",
+      "section": "Define Features by Business Capability, Not by Screen or Tab",
+      "applies": "Identifying domain ownership",
+      "strength": "Required",
+      "rule": "Features represent business capabilities and own authoritative application state; do not generate a Feature simply for each screen.",
+      "why": "A Feature can serve multiple screens or targets.",
+      "verify": "Map actual capabilities and state owners; check that screens consume the Features they need.",
+      "example": "A Settings screen can use SettingsFeature and UserProfileFeature without creating a Feature just for the screen.",
+      "explanationIds": [
+        "feature-ownership",
+        "concrete-features"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-FEATURE-02",
+      "title": "Compose Features only for real workflows",
+      "section": "Define Features by Business Capability, Not by Screen or Tab",
+      "applies": "A business workflow genuinely spans Features",
+      "strength": "Default",
+      "rule": "Prefer independent Features; an existing Feature or distinct coordinating Feature can coordinate other Features when a real business responsibility requires it.",
+      "why": "Avoid both feature spaghetti and needless coordinators.",
+      "verify": "Trace the workflow, verify one owner per state and check dependencies for cycles.",
+      "example": "A Today capability can coordinate existing Features when its reusable selection decisions belong in the Model.",
+      "explanationIds": [
+        "feature-ownership"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-ACCOUNT-01",
+      "title": "Coordinate account changes explicitly",
+      "section": "Define Features by Business Capability, Not by Screen or Tab",
+      "applies": "Sign-out, account switching or session expiration affects other Features",
+      "strength": "Default",
+      "rule": "UserProfileFeature may call affected Features directly; if sign-out fails before the session ends, retain the session and account data. After success clear affected state and prevent stale requests republishing old data.",
+      "why": "A visible direct workflow avoids unnecessary event infrastructure while protecting account data.",
+      "verify": "Test failed and successful sign-out, account switch, in-flight requests and partial authentication outcomes.",
+      "example": "After successful sign-out, UserProfileFeature asks OrdersFeature and FavouritesFeature to clear account data.",
+      "explanationIds": []
+    },
+    {
+      "id": "CFA-SPEC-APP-01",
+      "title": "Compose the application model once per process",
+      "section": "Use AppModel as the Composition Root and Feature Facade",
+      "applies": "Composing a CFA app or target",
+      "strength": "Required",
+      "rule": "AppModel constructs and exposes concrete Features through an explicit graph and contains no UI navigation or Feature business rules.",
+      "why": "The Model has one visible entry point within each process.",
+      "verify": "Review live composition, initializer dependencies and isolated test graphs.",
+      "example": "AppModel.live() constructs NotesFeature and its storage dependency for the application graph.",
+      "explanationIds": [
+        "appmodel-composition"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-APP-02",
+      "title": "Own application-wide listeners at AppModel",
+      "section": "Use AppModel as the Composition Root and Feature Facade",
+      "applies": "An event must be observed independent of a screen",
+      "strength": "Required when applicable",
+      "rule": "AppModel owns app-wide listener tasks and forwards events to the responsible Feature; screen-only observation stays with its screen or ViewModel.",
+      "why": "Lifetime follows the scope that requires the event.",
+      "verify": "Verify listener startup, event forwarding, lifetime, cancellation and test isolation.",
+      "example": "AppModel owns an app-wide purchase event listener and forwards updates to PurchasesFeature.",
+      "explanationIds": []
+    },
+    {
+      "id": "CFA-SPEC-DEVICE-01",
+      "title": "Share Model code across device targets",
+      "section": "Use AppModel as the Composition Root and Feature Facade",
+      "applies": "Adding a widget or another device target",
+      "strength": "Required with platform constraints",
+      "rule": "Include shared Model source and target-specific Views and ViewModels; each process has its own AppModel and Features.",
+      "why": "Capabilities can be reused without assuming shared process memory.",
+      "verify": "Build each target, verify API availability and test snapshot transfer and updates.",
+      "example": "An iPhone widget reads a shared App Group snapshot; a Watch receives a copy through Watch Connectivity.",
+      "explanationIds": []
+    },
+    {
+      "id": "CFA-SPEC-LINK-01",
+      "title": "Preserve deferred destinations",
+      "section": "Keep Screen Initializers Clean",
+      "applies": "Handling deep links or notification destinations",
+      "strength": "Required when applicable",
+      "rule": "DeepLinkingFeature owns validated pending requests; the receiving scene owns navigation. Remove a request after successful navigation or explicit dismissal.",
+      "why": "The user can keep editing without losing the destination.",
+      "verify": "Test durable restoration, refusal, successful navigation, multiple requests, storage failure and scene isolation.",
+      "example": "A launch notification remains pending when a user chooses to keep editing; opening its page removes the request.",
+      "explanationIds": []
+    },
+    {
+      "id": "CFA-SPEC-SVC-01",
+      "title": "Keep microservices small and well placed",
+      "section": "Organize Behaviour into Cohesive Features",
+      "applies": "Choosing or sharing lower-level services",
+      "strength": "Default",
+      "rule": "Keep a service with its Feature while ownership remains descriptive; place generic services in a shared location when justified.",
+      "why": "Organizing code around capability makes it easier to find.",
+      "verify": "Inspect actual service users, mutable state, dependency injection and responsibilities.",
+      "example": "A launch-specific provider can stay in the schedule folder; a generic network wrapper may move to shared services.",
+      "explanationIds": []
+    },
+    {
+      "id": "CFA-SPEC-NET-01",
+      "title": "Let independent requests progress",
+      "section": "Organize Behaviour into Cohesive Features",
+      "applies": "Designing network services",
+      "strength": "Required unless a documented policy limits concurrency",
+      "rule": "Prefer a simple stateless NetworkingManager when suitable; do not assume an actor serializes an entire suspended request.",
+      "why": "Avoid accidental bottlenecks and data races.",
+      "verify": "Test overlapping requests and inspect isolation, request limits and URLSession configuration.",
+      "example": "Independent launch providers initiate requests without waiting for another provider to finish.",
+      "explanationIds": [
+        "isolation-and-sendable"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-STORE-01",
+      "title": "Publish durable edits after saving",
+      "section": "Keep Persistence Behind Repository Contracts",
+      "applies": "Saving a user edit or other durable command",
+      "strength": "Required",
+      "rule": "Publish confirmed saved state only after required authoritative persistence succeeds; preserve input on failure.",
+      "why": "The UI must not claim that an unsaved change was saved.",
+      "verify": "Inject failed and successful writes; check state and retry behaviour.",
+      "example": "A failed weight save leaves the saved collection unchanged and retains the entered value for retry.",
+      "explanationIds": [
+        "persistence-boundaries"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-CACHE-01",
+      "title": "Use optional snapshots without blocking fresh data",
+      "section": "Keep Persistence Behind Repository Contracts",
+      "applies": "Caching replaceable server data",
+      "strength": "Required when using this cache pattern",
+      "rule": "Start restoration and refresh independently where both are needed; a successful current response does not wait for an optional cache write and must not be overwritten by an older snapshot.",
+      "why": "Previously downloaded data can appear quickly without sacrificing fresher server data.",
+      "verify": "Test missing, corrupt, slow and failed cache operations and out-of-order completion.",
+      "example": "A schedule refresh publishes new server data even if its optional snapshot write is slow or fails.",
+      "explanationIds": [
+        "persistence-boundaries"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-SYNC-01",
+      "title": "Choose synchronization to match the product",
+      "section": "Keep Persistence Behind Repository Contracts",
+      "applies": "An app requires cross-device data or offline edits",
+      "strength": "Default",
+      "rule": "Do not add offline editing by default; prefer suitable system-managed sync, and use a dedicated server sync solution only when needed.",
+      "why": "The simplest storage strategy depends on actual product requirements.",
+      "verify": "Verify capabilities, schema, failure, retry and conflict behaviour on supported devices.",
+      "example": "SwiftData with CloudKit may suit a compatible Apple-device app; a server-backed app follows its server contract.",
+      "explanationIds": [
+        "persistence-boundaries"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-TASK-01",
+      "title": "Define task ownership and overlapping-call policy",
+      "section": "Make Concurrency Behaviour Honest and Visible",
+      "applies": "Starting asynchronous operations",
+      "strength": "Required",
+      "rule": "Each Feature defines whether equivalent calls share execution or commands queue, and owns work that must outlive a screen.",
+      "why": "Task lifetime and repeated actions remain predictable.",
+      "verify": "Test overlapping callers, cancellation, failure, stale results and operation cleanup.",
+      "example": "Two equivalent refresh callers await the same Feature-owned request.",
+      "explanationIds": [
+        "unstructured-tasks",
+        "overlapping-requests"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-TASK-02",
+      "title": "Keep shared refreshes alive across navigation",
+      "section": "Make Concurrency Behaviour Honest and Visible",
+      "applies": "A screen leaves during a Feature-owned refresh",
+      "strength": "Default",
+      "rule": "Continue the shared refresh and retain successful data even when the screen that requested it leaves; later equivalent callers can join.",
+      "why": "The user may return and benefit from completed work.",
+      "verify": "Cancel the screen waiter and verify the request and another caller remain correct.",
+      "example": "A schedule refresh continues after the user leaves the screen and its result is available on return.",
+      "explanationIds": [
+        "overlapping-requests",
+        "task-cancellation"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-LAUNCH-01",
+      "title": "Start the model synchronously",
+      "section": "Use Application Launch as an Opportunity to Refresh Features",
+      "applies": "Handling app launch",
+      "strength": "Required",
+      "rule": "The app delegate calls AppModel startup synchronously; Features start asynchronous work without blocking launch on disk or network.",
+      "why": "App-wide startup signals are issued before the delegate returns.",
+      "verify": "Inspect the launch callback, repeated launch guard and first-frame behaviour.",
+      "example": "The application delegate calls AppModel startup directly; Features start their own asynchronous refreshes.",
+      "explanationIds": []
+    },
+    {
+      "id": "CFA-SPEC-BG-01",
+      "title": "Feature-owned background capabilities",
+      "section": "Use AppModel as the Composition Root and Feature Facade",
+      "applies": "Registering iOS background work",
+      "strength": "Required when applicable",
+      "rule": "Features own their domain work and may register handlers synchronously during app startup; route system callbacks and satisfy expiration and completion contracts.",
+      "why": "System lifecycle handling stays separate from feature behaviour.",
+      "verify": "Verify task identifiers, launch registration, expiration, completion and actual device behaviour.",
+      "example": "AppModel asks a Feature to register an eligible system background handler during launch.",
+      "explanationIds": []
+    },
+    {
+      "id": "CFA-SPEC-OBS-01",
+      "title": "Observe authoritative state",
+      "section": "Use Observation Deliberately",
+      "applies": "Displaying shared model data",
+      "strength": "Required",
+      "rule": "Expose observable Feature state while retaining a single owner; observation alone does not synchronize independent devices or processes.",
+      "why": "Views can update without creating competing domain state.",
+      "verify": "Trace the observed property from its Feature owner to the displayed View.",
+      "example": "A View reads an observable Feature value and updates when that value changes.",
+      "explanationIds": []
+    },
+    {
+      "id": "CFA-SPEC-PAY-01",
+      "title": "Check paid capability entry points",
+      "section": "Preserve One Authoritative Owner for Shared State",
+      "applies": "A product marks a capability paid",
+      "strength": "Required when applicable",
+      "rule": "PurchasesFeature owns entitlement state; the ViewModel checks it before the capability is presented or called. A server protects its own operations.",
+      "why": "Pricing changes remain separate from capability behaviour.",
+      "verify": "Trace every known paid entry point and test locked and entitled outcomes.",
+      "example": "An export screen checks PurchasesFeature before presenting or calling the paid export capability.",
+      "explanationIds": []
+    },
+    {
+      "id": "CFA-SPEC-TEST-01",
+      "title": "Test architecture at its boundaries",
+      "section": "Test the Same Boundaries the Architecture Advertises",
+      "applies": "Implementing or changing CFA behaviour",
+      "strength": "Required",
+      "rule": "Test observable behaviour with isolated Feature dependencies and real ownership boundaries.",
+      "why": "Tests establish behaviour rather than reproduce implementation details.",
+      "verify": "Run relevant tests and builds; state what was not executed.",
+      "example": "A Feature test injects a failing storage dependency and verifies that the saved value stays unchanged.",
+      "explanationIds": [
+        "behavioural-testing"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-DESIGN-01",
+      "title": "Preserve product intent",
+      "section": "Architecture versus product design",
+      "applies": "Creating, migrating or maintaining an app",
+      "strength": "Required",
+      "rule": "Follow the requested scope and existing design; avoid adding optional product capabilities or changing behaviour without a requirement.",
+      "why": "Architecture should support the product rather than silently redesign it.",
+      "verify": "Compare changes with the requested journey and existing behaviour contract.",
+      "example": "A migration preserves the existing purchase flow instead of introducing a new paywall design.",
+      "explanationIds": [
+        "preserve-product-behaviour"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-ID-01",
+      "title": "Respect project identity",
+      "section": "Project Identity",
+      "applies": "Creating or adapting an Xcode project",
+      "strength": "Required",
+      "rule": "Follow the project identity rules and user-specified bundle identifier; never change existing identifiers merely to match an example.",
+      "why": "Identifiers control signing, capabilities and published app continuity.",
+      "example": "A new target derives its bundle identifier from the product name and requested prefix.",
+      "verify": "Inspect all build configurations and the built app metadata.",
+      "explanationIds": []
+    },
+    {
+      "id": "CFA-SPEC-STRUCT-02",
+      "title": "Maintain template and resource membership",
+      "section": "Make the Architecture Visible in the Folder Structure",
+      "applies": "Editing project layout or templates",
+      "strength": "Required",
+      "rule": "Preserve the Xcode template layout contract, resource lookup and target membership.",
+      "why": "A correct folder tree is not sufficient if Xcode does not compile or bundle the files.",
+      "example": "A migrated Feature is moved into its proper folder and retained in the intended target.",
+      "verify": "Inspect the project and build all affected targets.",
+      "explanationIds": [
+        "project-structure"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-UI-05",
+      "title": "Keep presentation state out of Features",
+      "section": "Maintain an Absolute UI and Model Boundary",
+      "applies": "Implementing navigation or display interactions",
+      "strength": "Required",
+      "rule": "Keep screen-specific presentation, focus, selection and navigation within the presentation layer.",
+      "why": "Multiple scenes can present the same model independently.",
+      "example": "Two launch detail screens retain different selected snapshots.",
+      "verify": "Review independent windows and navigation while shared data updates.",
+      "explanationIds": [
+        "presentation-boundaries"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-SNAPSHOT-01",
+      "title": "Publish immutable domain snapshots",
+      "section": "Give Every Unique Screen Its Own ViewModel",
+      "applies": "Exposing API or persistence data as domain values",
+      "strength": "Required",
+      "rule": "Use let properties for published snapshot structs and construct replacement values after confirmed changes.",
+      "why": "A copy should not diverge by being mutated as though it were authoritative.",
+      "example": "A new launch value replaces an earlier snapshot after a successful refresh.",
+      "verify": "Inspect published value types and ensure callers use Feature commands to change durable data.",
+      "explanationIds": []
+    },
+    {
+      "id": "CFA-SPEC-STATE-01",
+      "title": "Keep one authoritative Feature owner",
+      "section": "Preserve One Authoritative Owner for Shared State",
+      "applies": "Managing shared application state",
+      "strength": "Required",
+      "rule": "A single MainActor Feature owns each piece of authoritative shared application state; lower services may own implementation machinery.",
+      "why": "Callers can identify which component decides the current business state.",
+      "example": "WeightLogFeature owns saved weight entries while a storage service handles persistence.",
+      "verify": "Trace reads and writes through all screens and services and check for competing authorities.",
+      "explanationIds": [
+        "presentation-boundaries",
+        "feature-ownership"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-APP-03",
+      "title": "Avoid an application-wide ViewModel",
+      "section": "Use AppModel as the Composition Root and Feature Facade",
+      "applies": "Composing the presentation layer",
+      "strength": "Required",
+      "rule": "Keep ViewModels owned by their screens and out of AppModel.",
+      "why": "AppModel exposes model capabilities without owning UI state.",
+      "example": "Each screen creates a ViewModel that accesses the required concrete Features.",
+      "verify": "Inspect AppModel properties and the ViewModel ownership tree.",
+      "explanationIds": [
+        "view-model-ownership",
+        "appmodel-composition"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-CONC-01",
+      "title": "Use MainActor for Features",
+      "section": "Organize Behaviour into Cohesive Features",
+      "applies": "Defining a CFA Feature",
+      "strength": "Required",
+      "rule": "Isolate Feature owners to MainActor; give underlying work an appropriate isolation strategy and avoid expensive blocking work on MainActor.",
+      "why": "Observable state is coordinated while substantial processing remains responsive.",
+      "example": "A Feature publishes a decoded schedule returned by a suitably isolated provider.",
+      "verify": "Inspect isolation annotations and run responsiveness checks where appropriate.",
+      "explanationIds": [
+        "isolation-and-sendable"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-CONC-02",
+      "title": "Check suspension and stale results",
+      "section": "Make Concurrency Behaviour Honest and Visible",
+      "applies": "Updating state across async suspension",
+      "strength": "Required",
+      "rule": "Treat await as a possible suspension and check that the operation is still entitled to publish its result.",
+      "why": "Actor isolation does not make an entire async workflow atomic.",
+      "example": "An earlier search cannot overwrite a newer query result.",
+      "verify": "Force out-of-order results and cancellation in controlled tests.",
+      "explanationIds": [
+        "isolation-and-sendable"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-CONC-03",
+      "title": "Use cancellation to match the work",
+      "section": "Make Concurrency Behaviour Honest and Visible",
+      "applies": "Designing task lifetime",
+      "strength": "Required",
+      "rule": "Define cancellation at the operation boundary; cancel obsolete presentation work while preserving independent shared and durable work.",
+      "why": "Leaving one screen should not accidentally abandon work needed elsewhere.",
+      "example": "A superseded search stops while a shared refresh continues.",
+      "verify": "Test a cancelled waiter, a later caller and stale completion.",
+      "explanationIds": [
+        "task-cancellation"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-PREF-01",
+      "title": "Restore safe defaults for obsolete preferences",
+      "section": "Keep Persistence Behind Repository Contracts",
+      "applies": "Restoring a non-critical preference",
+      "strength": "Default",
+      "rule": "Use a product-defined safe fallback for a missing or obsolete recognized value; distinguish storage corruption and failed writes.",
+      "why": "An old theme should not force the user to solve an internal compatibility issue.",
+      "example": "An unavailable saved colour theme falls back to system appearance.",
+      "verify": "Test a known preference, an obsolete value and a genuine storage error.",
+      "explanationIds": [
+        "storage-failures"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-LINK-02",
+      "title": "Keep scene navigation independent",
+      "section": "Keep Screen Initializers Clean",
+      "applies": "Opening a link or notification in a multi-window app",
+      "strength": "Required when applicable",
+      "rule": "Route each destination through a scene-appropriate handler without putting scene navigation state inside DeepLinkingFeature.",
+      "why": "A link should not unexpectedly redirect another window.",
+      "example": "A Settings screen asks the Feature to open its pending item in the receiving scene.",
+      "verify": "Test two scenes, declined navigation and unavailable destination handling.",
+      "explanationIds": []
+    },
+    {
+      "id": "CFA-SPEC-OBS-02",
+      "title": "Keep transient field edits in the View",
+      "section": "Preserve One Authoritative Owner for Shared State",
+      "applies": "Editing a simple text field",
+      "strength": "Default",
+      "rule": "Keep the unsaved field value locally in the View until Save or Cancel; persisted values remain Feature-owned.",
+      "why": "An abandoned edit does not become shared application state.",
+      "example": "A weight editor keeps the entered number after a failed save.",
+      "verify": "Exercise save, failure, retry and Cancel without mutating the Feature early.",
+      "explanationIds": [
+        "honest-errors-and-editing"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-TIME-01",
+      "title": "Inject volatile dependencies",
+      "section": "Keep Time and Other Volatile Dependencies Injectable",
+      "applies": "Business decisions depend on time or another changing external value",
+      "strength": "Required when applicable",
+      "rule": "Supply volatile dependencies in a controllable form rather than hiding them in business decisions.",
+      "why": "Time-dependent behaviour can be reproduced in tests.",
+      "example": "A countdown decision uses an injected clock.",
+      "verify": "Test boundary dates and time zones using controlled inputs.",
+      "explanationIds": [
+        "behavioural-testing"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-API-01",
+      "title": "Use readable Feature commands",
+      "section": "Organize Behaviour into Cohesive Features",
+      "applies": "Designing a Feature API",
+      "strength": "Required",
+      "rule": "Expose domain-oriented operations and values instead of deep storage graphs or generic mechanics.",
+      "why": "Callers can understand what a capability does from its API.",
+      "example": "A weight Feature exposes a named operation to save an entry.",
+      "verify": "Read call sites and check they do not manipulate repositories or nested implementation state.",
+      "explanationIds": [
+        "feature-ownership",
+        "concrete-features",
+        "readability"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-MAINT-01",
+      "title": "Prefer straightforward change",
+      "section": "Prefer Readable Domain Language over Architectural Ceremony",
+      "applies": "Implementing or migrating code",
+      "strength": "Default",
+      "rule": "Choose the simplest structure that preserves necessary behaviour, ownership and safety.",
+      "why": "Fewer unnecessary layers improve comprehension and maintenance.",
+      "example": "A sign-out workflow uses direct Feature calls instead of a new event bus.",
+      "verify": "Trace the whole workflow and remove scaffolding with no demonstrated purpose.",
+      "explanationIds": [
+        "readability"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-ERROR-01",
+      "title": "Handle failures honestly",
+      "section": "Keep Persistence Behind Repository Contracts",
+      "applies": "Storage, network or business work fails",
+      "strength": "Required",
+      "rule": "Do not silently claim success; preserve user input and expose a recoverable error when required.",
+      "why": "The user needs to know whether an operation succeeded.",
+      "example": "An unsuccessful durable save leaves the editor available for retry.",
+      "verify": "Inject failures and verify displayed outcomes and state.",
+      "explanationIds": [
+        "storage-failures",
+        "honest-errors-and-editing"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-FLOW-01",
+      "title": "Keep the dependency flow explicit",
+      "section": "Layered Architecture",
+      "applies": "Designing or reviewing application structure",
+      "strength": "Required",
+      "rule": "Keep the relationship View \u2192 ViewModel \u2192 Feature \u2192 Microservices; AppModel composes and exposes Features.",
+      "why": "Dependencies follow clear ownership instead of scattered business decisions.",
+      "example": "A screen ViewModel asks a schedule Feature, which calls a networking microservice.",
+      "verify": "Trace a user operation through each layer and inspect reverse dependencies.",
+      "explanationIds": [
+        "presentation-boundaries"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-FLOW-02",
+      "title": "Coordinate without unnecessary layers",
+      "section": "Coordinated Application Flow",
+      "applies": "Implementing a feature workflow",
+      "strength": "Required",
+      "rule": "Keep the cooperating parts connected by clear responsibilities and avoid bypassing the Feature that owns a business action.",
+      "why": "The execution path remains understandable and testable.",
+      "example": "A refresh reaches the schedule Feature before its provider.",
+      "verify": "Trace the entry point, owners, state changes and dependencies.",
+      "explanationIds": [
+        "presentation-boundaries"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-UI-06",
+      "title": "Separate domain and display decisions",
+      "section": "Separate Domain Decisions from Display Decisions",
+      "applies": "Formatting or presenting Feature results",
+      "strength": "Required",
+      "rule": "Features decide domain meaning; ViewModels translate results for display and Views render them.",
+      "why": "Business decisions stay reusable across devices.",
+      "example": "A Feature determines a domain result and the ViewModel prepares its display label.",
+      "verify": "Inspect calculations and business classification for leaks into Views and ViewModels.",
+      "explanationIds": [
+        "presentation-boundaries"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-CORE-01",
+      "title": "Apply CFA governing principles",
+      "section": "Governing Principles",
+      "applies": "Building or reviewing a CFA app",
+      "strength": "Required",
+      "rule": "Use the governing ownership, Swift Concurrency and readability principles together rather than applying one in isolation.",
+      "why": "Individual conventions are meaningful only as a coherent architecture.",
+      "example": "A shared Feature owns state and exposes operations to multiple dedicated ViewModels.",
+      "verify": "Review Feature boundaries, isolation and the full source principles.",
+      "explanationIds": []
+    },
+    {
+      "id": "CFA-SPEC-MAINT-02",
+      "title": "Avoid complexity without product value",
+      "section": "Maintenance over Complexity",
+      "applies": "Adding an abstraction or migration layer",
+      "strength": "Default",
+      "rule": "Keep structures simple enough to understand while preserving real behaviour and safety.",
+      "why": "Unnecessary layers obscure the system and increase maintenance cost.",
+      "example": "A small sign-out workflow makes explicit Feature calls instead of adding an event bus.",
+      "verify": "Identify each layer\u2019s concrete responsibility and remove unjustified duplication.",
+      "explanationIds": [
+        "readability"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-REVIEW-01",
+      "title": "Apply the full conformance checklist",
+      "section": "Review Checklist",
+      "applies": "Auditing a CFA implementation",
+      "strength": "Required",
+      "rule": "Review the complete checklist against the actual app and report findings with evidence.",
+      "why": "A single passing rule cannot establish whole-app conformance.",
+      "example": "An audit checks ViewModel ownership, Feature state and task lifetimes.",
+      "verify": "Trace each applicable checklist item and distinguish unverified behaviour from passes.",
+      "explanationIds": []
+    },
+    {
+      "id": "CFA-SPEC-REVIEW-02",
+      "title": "Avoid prohibited CFA patterns",
+      "section": "Prohibited Patterns",
+      "applies": "Implementing or auditing CFA code",
+      "strength": "Required",
+      "rule": "Check the full prohibited-pattern list and its applicable context.",
+      "why": "Known architecture violations should not survive as isolated exceptions.",
+      "example": "A View does not receive another screen\u2019s ViewModel.",
+      "verify": "Search source and target membership, then verify actual usage and tests.",
+      "explanationIds": []
+    },
+    {
+      "id": "CFA-SPEC-TEST-02",
+      "title": "Create focused test targets",
+      "section": "Project Identity",
+      "applies": "Creating an Xcode project",
+      "strength": "Required with explicit exception",
+      "rule": "Create a unit-test target; add a UI-test target only for a specifically requested UI automation scenario.",
+      "why": "Empty test targets add noise without evidence.",
+      "example": "A new project has Feature and ViewModel unit tests.",
+      "verify": "Inspect targets and run the relevant unit tests.",
+      "explanationIds": [
+        "behavioural-testing"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-STRUCT-03",
+      "title": "Keep the template layout and assets correct",
+      "section": "Make the Architecture Visible in the Folder Structure",
+      "applies": "Creating or editing the CFA Xcode template",
+      "strength": "Required",
+      "rule": "Keep App.swift, the root asset catalog and app resources in their prescribed locations and maintain Xcode navigator references.",
+      "why": "A template must produce a usable project with the expected structure.",
+      "example": "A StoreKit configuration stays in App Resources and remains linked from its scheme.",
+      "verify": "Run the template structure verifier and inspect a generated project.",
+      "explanationIds": [
+        "project-structure"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-STRUCT-04",
+      "title": "Do not create dumping-ground folders",
+      "section": "Make the Architecture Visible in the Folder Structure",
+      "applies": "Organising files",
+      "strength": "Required",
+      "rule": "Use folder names that describe the responsibility of their contents rather than vague catch-all folders.",
+      "why": "Related implementation remains easy to locate.",
+      "example": "A networking helper lives with the networking capability rather than a generic Helpers folder.",
+      "verify": "Inspect folder names and the actual responsibilities of their contents.",
+      "explanationIds": [
+        "project-structure"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-STRUCT-05",
+      "title": "Apply optional visual defaults only in scope",
+      "section": "Make the Architecture Visible in the Folder Structure",
+      "applies": "Shaping a new app or changing an existing product",
+      "strength": "Default with scope restriction",
+      "rule": "Use new-product visual defaults when applicable and preserve existing approved designs during maintenance.",
+      "why": "An architecture task should not silently redesign an existing product.",
+      "example": "Do not add a CFA Settings footer to an established app unless the request or workflow calls for it.",
+      "verify": "Compare UI changes with user instructions and the product design authority.",
+      "explanationIds": [
+        "new-app-design"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-STRUCT-06",
+      "title": "Validate device orientation configuration",
+      "section": "Make the Architecture Visible in the Folder Structure",
+      "applies": "Creating an iOS app or preparing its archive",
+      "strength": "Required",
+      "rule": "Declare supported orientations in each configuration and inspect the built or archived Info.plist; honour explicit product choices.",
+      "why": "A simulator build alone does not prove archive configuration or layout compatibility.",
+      "example": "A universal app declares appropriate iPhone and iPad orientations.",
+      "verify": "Build Release for a generic iOS device and inspect the built orientation arrays.",
+      "explanationIds": [
+        "project-structure"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-STRUCT-07",
+      "title": "Organise extensions and domain types by purpose",
+      "section": "Make the Architecture Visible in the Folder Structure",
+      "applies": "Adding Swift extensions or domain values",
+      "strength": "Required",
+      "rule": "Follow the specification\u2019s placement rules for extensions and keep domain types with their semantic owner.",
+      "why": "Related types remain understandable independently of storage representation.",
+      "example": "A launch snapshot belongs with the launch capability rather than being defined by its database schema.",
+      "verify": "Review extension and type ownership against the full source section.",
+      "explanationIds": [
+        "project-structure"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-UI-07",
+      "title": "Keep SwiftUI construction fast",
+      "section": "Give Every Unique Screen Its Own ViewModel",
+      "applies": "Constructing a SwiftUI View or ViewModel",
+      "strength": "Required",
+      "rule": "Avoid blocking I/O, slow work and asynchronous side effects in initializers and body construction.",
+      "why": "SwiftUI may construct Views repeatedly and must remain responsive.",
+      "example": "A ViewModel is initialized cheaply and asks its Feature to start work through a named method.",
+      "verify": "Inspect initializers and measure slow paths where needed.",
+      "explanationIds": [
+        "view-model-ownership"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-TASK-03",
+      "title": "Retain ViewModel-owned unstructured tasks",
+      "section": "Make Concurrency Behaviour Honest and Visible",
+      "applies": "A ViewModel creates an unstructured Task",
+      "strength": "Default",
+      "rule": "Retain a named handle per independently managed operation; repeated equivalent actions reuse the existing task.",
+      "why": "Task ownership and shared completion stay visible.",
+      "example": "Repeated refresh taps return the same active task handle.",
+      "verify": "Test repeated taps, completion cleanup, cancellation and replacement.",
+      "explanationIds": [
+        "unstructured-tasks",
+        "overlapping-requests"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-LAUNCH-02",
+      "title": "Never gate UI on database availability",
+      "section": "Use Application Launch as an Opportunity to Refresh Features",
+      "applies": "Launching when persistence is slow or unavailable",
+      "strength": "Required",
+      "rule": "Start required work without blocking navigation or first presentation on a database loading gate.",
+      "why": "Users can access unaffected capabilities and see honest loading or failure states.",
+      "example": "The root screen appears while a Feature restores local data.",
+      "verify": "Test slow and failed storage, navigation and first-frame responsiveness.",
+      "explanationIds": [
+        "storage-failures"
+      ]
+    },
+    {
+      "id": "CFA-SPEC-LAUNCH-03",
+      "title": "Keep the SwiftUI App entry point structural",
+      "section": "Use Application Launch as an Opportunity to Refresh Features",
+      "applies": "Implementing the SwiftUI App entry point",
+      "strength": "Required",
+      "rule": "Keep the App structure focused on scene composition and use the application lifecycle for the synchronous AppModel launch signal.",
+      "why": "Startup ownership remains independent of any one View.",
+      "example": "The app delegate invokes AppModel directly before returning from launch.",
+      "verify": "Inspect the App and delegate and confirm no view task starts the shared launch workflow.",
+      "explanationIds": []
+    }
+  ],
+  "non_rule_sections": [
+    {
+      "section": "Purpose of this Document",
+      "reason": "Scope or reading context; not an independent implementable rule."
+    },
+    {
+      "section": "17 Years Experience in iOS",
+      "reason": "Scope or reading context; not an independent implementable rule."
+    },
+    {
+      "section": "A Template for Developers and AI",
+      "reason": "Scope or reading context; not an independent implementable rule."
+    },
+    {
+      "section": "Swift coding standards",
+      "reason": "Scope or reading context; not an independent implementable rule."
+    },
+    {
+      "section": "Name and Scope",
+      "reason": "Scope or reading context; not an independent implementable rule."
+    }
+  ]
+}
