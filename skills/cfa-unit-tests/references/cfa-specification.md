@@ -158,6 +158,22 @@ application behaviour. Do not add layers for their own sake; use the fewest
 layers needed while keeping every responsibility clear, testable, and easy to
 find.
 
+**Keep single-app code in the app target.**
+
+For a new app, keep first-party application code in the app target and use
+purpose-named folders to communicate ownership. Do not create a local Swift
+package merely to group code, mimic a folder, or prepare for hypothetical reuse.
+A single-app project can be cleanly organized without introducing another module.
+
+Introduce a separate package only for a clear, current need, such as code shared
+across multiple apps or a demonstrable independent distribution or build
+boundary. Explain the benefit and costs. For existing projects, respect their
+established boundaries and the requested scope; do not automatically remove or
+create packages as an unrelated cleanup. Evaluate each possible consolidation
+against actual consumers, resources, tests, generated code, and build settings.
+Measure runtime or build performance before claiming a package boundary helps
+or hurts it.
+
 ## Make the Architecture Visible in the Folder Structure
 
 Use this top-level reading order:
@@ -543,7 +559,7 @@ A ViewModel:
 - names methods for the work it performs, not the UI gesture or lifecycle
   signal that reached it: use `refresh()`, `save()` and `retry()`, never
   `refreshTapped()`, `savePressed()` or `screenAppeared()`;
-- owns screen-specific error text, loading state, drafts, and presentation state;
+- owns screen-specific error text, loading state and coordinated presentation state;
 - contains no reusable business rule.
 
 The ViewModel initializer provides the live feature as its default while
@@ -580,6 +596,10 @@ points towards extracting business behaviour into the model. Keep device-specifi
 presentation decisions in the presentation layer; extract a focused presentation
 helper only when it clarifies a real responsibility. Do not invent a facade or
 Feature simply to reduce the number of ViewModel dependencies or lines of code.
+Size alone is not a reason to split a ViewModel: the coordination of a richer
+screen may legitimately take more code. Extract a focused presentation helper
+only when its responsibility and benefit are clear; keep business behaviour in
+the Model.
 
 ## Keep Screen Initializers Clean
 
@@ -654,10 +674,42 @@ Features needs an identified business responsibility; do not add one solely
 because a ViewModel has several dependencies. Keep any such composition explicit,
 directional and free of cycles, and preserve existing behaviour during migration.
 
+An evolving app may reveal a distinct, reusable business capability that
+coordinates other Features. This coordinating Feature—sometimes called a
+“big brother Feature” in discussion—is a normal Feature in AppModel and the
+standard Feature folder structure. It owns its own business decisions and uses
+the existing Features rather than duplicating their authoritative state. For
+example, a Today capability may decide which accomplishments or resources to
+show using data from another Feature. A screen merely arranging existing data
+does not by itself justify that extra Feature, and a migration must not create
+one coordinator for every screen.
+
+Conversely, work that sounds like coordination is not necessarily several
+Features. If the product's checkout is one cohesive capability, a
+`CheckoutFeature` can own its cart and coordinate a private payment service to
+complete a purchase. Split or compose capabilities only when actual business
+responsibilities and reuse justify it.
+
 Verify each screen's actual Feature dependencies and each Feature's named
 behavioural tests. Test consistency across screens that use shared state.
 Introduce an additional Feature when there is a distinct business capability,
 not merely a new tab, screen, visual section or device target.
+
+An API endpoint is evidence about a capability, not an instruction to create
+one Feature per endpoint. For example, one `PostFeature` can own posts and their
+comments even when it calls different APIs for each. Similarly, a
+`UserProfileFeature` can own profile, account and login behaviour when those
+form one coherent capability. Choose boundaries from the app's actual business
+requirements; do not multiply similar Features merely to mirror HTTP calls.
+
+Business requirements also determine how many instances of a domain entity
+exist. For a simple shopping app, start with one shared `ShoppingCartFeature`
+owning one cart. Introduce multiple carts only when the product needs them:
+for example, one per restaurant, one shared across scenes, or separate carts per
+scene. Scene-specific presentation chooses which cart to display; the Feature
+owns the cart data and should not depend on tabs or screen layout. When separate
+scene carts are required, define their identity and lifetime from the product's
+needs rather than creating a separate Feature instance for each ViewModel.
 
 ## Use AppModel as the Composition Root and Feature Facade
 
@@ -763,6 +815,38 @@ Use a `NetworkingManager` whenever the app makes network requests. It owns
 `URLSession` and wraps every session call; feature-specific API adapters decode
 responses and provide domain-oriented operations. AppModel may construct this
 manager as a local inside `live()`, but stores and exposes only Features.
+
+For a new app, start with a simple stateless `NetworkingManager` value type when
+that satisfies the application's session and concurrency requirements. Inject
+it into the providers or Features that need it. A small local struct can be
+stored on the stack or in registers, avoiding a separate heap allocation for
+the wrapper and its associated overhead. Storage is context-dependent: a struct
+stored inside a class is typically inline within that heap-allocated object,
+and reference properties such as URLSession retain their own storage. Prefer
+sharing a suitably configured session where appropriate; copying a struct does
+not create an independent URLSession. Do not assume that every struct is stack
+allocated or that changing the wrapper measurably accelerates network requests.
+Check Sendable conformance, actor isolation and the project's Swift language
+and default-isolation settings.
+
+Independent network requests should be able to progress in parallel unless a
+documented product, security or service policy requires otherwise. An actor
+may be appropriate for shared mutable state, such as request accounting or a
+system-wide request limit. Actor isolation serializes access to its state, but
+an actor can accept another call when a request suspends at `await`; an actor
+does not by itself serialize whole downloads. Keep synchronous actor work short,
+avoid accidentally awaiting a previous request, and test overlapping requests
+with controlled dependencies. URLSession configuration, connection limits,
+server behaviour and the caller's task structure can affect actual overlap;
+measure a suspected bottleneck before changing the design.
+
+Keep a service with its owning Feature while that location remains descriptive,
+even if another Feature uses it—for example, launch-data providers may remain
+beside the schedule Feature. Move a broadly applicable service such as generic
+networking to a clearly named shared location when no one Feature naturally
+owns it. AppModel may compose a shared dependency where common configuration or
+shared state is needed; otherwise use the simplest value or instances that meet
+the real requirements.
 
 Reserve other infrastructure names for the service's actual job: `SettingsStore`,
 `LocationClient`, `PurchaseService`, or a justified `LocationManager`. These
@@ -1209,13 +1293,33 @@ representations used by lower-level services, not additional authorities for the
 application's current business state. ViewModels expose, format, and temporarily edit that state;
 they do not maintain competing copies that require manual synchronization.
 
-ViewModel-owned drafts, selections, focus, loading presentation, and transient
-errors are permitted because they belong to one screen. Persisted collections,
+Local editing state may live in the View; ViewModel-owned drafts, selections,
+focus, loading presentation, and transient errors are permitted when needed by
+the screen. A simple unsaved text-field edit stays in View-local state until
+the user saves or cancels. Persisted collections,
 entitlements, synchronization status, and domain results belong to their feature.
 
 Feature APIs expose state as read-only and provide named commands for mutation.
 Views and ViewModels never mutate a feature collection directly. Every domain
 mutation passes through the feature that owns its rules and persistence.
+
+For paid capabilities, `PurchasesFeature` owns entitlement state. The screen's
+ViewModel combines it with the relevant capability Feature and checks the
+current entitlement before presenting or calling a paid capability; otherwise
+it presents the appropriate locked or purchase experience. Apply this to every
+relevant entry point, including alternative screens and other callers. Keep
+pricing and purchase checks out of the capability Feature so its behaviour can
+be reused as the product's pricing changes. Payment-provider services can be
+owned by the purchase capability. Server-protected operations still require
+server-side authorisation: a UI check is not a security boundary.
+
+A CFA conformance audit must trace known paid capability entry points and flag
+an established unguarded path with its source and consequence. First establish
+which capabilities are paid from product requirements and entitlement policy;
+do not infer a paid capability from a name alone. If an entry point, dynamic
+dispatch or entitlement check cannot be resolved, report it as unverified rather
+than claiming the check passed. Exercise locked and entitled outcomes and
+relevant alternate entry points in behavioural tests.
 
 ## Separate Domain Decisions from Display Decisions
 

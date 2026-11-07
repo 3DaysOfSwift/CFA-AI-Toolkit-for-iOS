@@ -70,6 +70,16 @@ results in the report, rather than presenting scanner counts as findings.
    isolation boundaries. Examine unnecessary hops, reentrancy and overlapping
    ownership where evidence warrants it. Neither an actor count nor similar names
    establish misuse or justify merging; assess their actual invariants and roles.
+   For networking, trace independent requests from their callers through the
+   networking service to URLSession. Look for sequential awaits, explicit queues,
+   shared task chains, blocking calls or expensive synchronous actor-isolated
+   work that delays another request. Consider session connection limits and
+   intentional rate policies. An actor serializes isolated execution between
+   suspension points, but it may process another call while a request is
+   suspended; an actor alone is not evidence that transfers cannot overlap.
+   `@concurrent` is not a prerequisite for overlapping actor-initiated requests.
+   Report a source-supported risk separately from a measured delay, and use a
+   controlled overlapping-request test or profiling where practical.
 7. **State observation:** Trace how a screen receives current state and updates,
    including identity, snapshots, actor boundaries, subscriptions and cleanup.
    Consider the product's intended freshness policy; a deliberately stable detail

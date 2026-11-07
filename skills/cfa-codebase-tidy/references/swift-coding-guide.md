@@ -49,11 +49,17 @@ func publish() async {
     }
 }
 
-// Story feature: enforce entitlement and weekly allowance here,
-// then save before making the new publication visible.
+// Story feature: enforce the weekly allowance here, then save before
+// making the new publication visible. The caller checks paid access.
 ```
 
-ViewModels own presentation state: drafts, focus, selection, navigation, loading indicators and user-facing messages. They coordinate with feature APIs; they do not duplicate domain decisions. Derived presentation values may stay there.
+Views may own local editing state, focus and presentation details. ViewModels
+coordinate screen state and feature APIs; they do not duplicate domain decisions.
+Keep a simple unsaved text-field edit in View-local state when it exists only
+while that editor is open. The View passes the value to its ViewModel when the
+user saves; a failed save keeps the text for retry and Cancel discards it. A
+separate ViewModel or durable draft is appropriate only when the product's
+interaction or lifetime needs justify it.
 
 **Review:** Would another target have to copy this decision to behave correctly? If so, put it in the owning feature and test it through that feature's public API.
 
