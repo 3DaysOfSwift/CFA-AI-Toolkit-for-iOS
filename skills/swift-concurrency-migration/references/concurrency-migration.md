@@ -28,6 +28,31 @@ target. Keep an intentional package placement when it is required or explicitly
 agreed, explain why it differs from the default map, and report an unresolved
 move and its concrete blocker rather than silently treating it as complete.
 
+## Final CFA audit and correction
+
+After the scoped feature migration and placement and hybrid reviews, audit the
+actual first-party source, tests, targets, packages, filesystem and Xcode navigator
+against the CFA specification and change gate. Cover the agreed migration scope,
+including feature and state ownership, View/ViewModel boundaries, AppModel
+composition, concurrency, persistence, behaviour and project structure. Use
+the established scope and product constraints; an intentional, documented
+exception is not automatically a defect.
+
+For every misplaced file, compare its actual disk path and navigator group with
+the appropriate CFA location, including files temporarily placed in an existing
+package. Apply the placement checks above. Correct identified, safe in-scope
+deviations yourself without waiting for the developer to identify each file or
+approve routine moves. Update target membership and references, preserve the
+product and verify the affected builds and tests.
+
+Re-audit the changed areas and the full scoped placement map after corrections;
+repeat while actionable deviations remain. Finish when no known in-scope,
+correctable deviations remain and required verification is complete. If an
+actual dependency, incompatible requirement or unavailable verification blocks
+completion, continue independent work and state the specific remaining issue
+and evidence. Do not claim whole-project compliance beyond what was inspected
+or silently treat an incomplete audit as a pass.
+
 ## Review hybrid implementations
 
 Near the end of a migration, scan the scoped first-party targets, extensions,

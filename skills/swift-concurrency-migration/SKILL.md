@@ -89,6 +89,11 @@ Use deliberate passes:
    Trace actual paths across legacy and modern mechanisms, identify redundant
    adapters and remaining users of dependencies, and recommend or perform
    in-scope simplifications that preserve behaviour and platform support.
+7. Perform the [final CFA audit and correction](references/concurrency-migration.md#final-cfa-audit-and-correction)
+   across the agreed migration scope. Inspect both physical file locations and
+   the Xcode navigator, correct actionable deviations autonomously, and repeat
+   the audit and affected verification after corrections. Do not rely on the
+   developer to spot misplaced files or guide routine corrections.
 
 Keep migrated operations directly awaitable. Use structured child tasks for work owned by a calling operation; give independent tasks explicit lifetime and cancellation owners. Bridge callbacks only when an appropriate native async API is unavailable, accounting for exactly-once completion and cancellation races.
 

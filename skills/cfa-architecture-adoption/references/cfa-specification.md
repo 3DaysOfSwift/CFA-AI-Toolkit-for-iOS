@@ -298,11 +298,28 @@ Reference: [Apple supported interface orientations](https://developer.apple.com/
 
 ### Swift Extensions
 
-Keep SwiftUI-specific extensions in `1 - View/SwiftUI Extensions`. Place
-reusable extensions of Swift or Foundation types in `4 - Swift Extensions`.
-This makes it immediately clear whether an extension belongs to presentation
-or can be used throughout the application. Name a general extension after the
-type and capability it adds, such as `Date+StartOfWeek.swift`.
+Reserve `4 - Swift Extensions` for broadly reusable extensions of Swift standard
+library or Foundation types. A filename containing `+`, or a file written in
+Swift, does not by itself make the file a general Swift extension. Name a
+general extension after the type and capability it adds, such as
+`Date+StartOfWeek.swift`.
+
+Place feature-specific extensions, model conversions and transport mappings
+with the Feature or adapter that owns their meaning, even when they use Swift's
+`extension` syntax. Keep SwiftUI-specific extensions in `1 - View/SwiftUI
+Extensions`; UIKit-specific helpers and extensions belong with their owning
+screen or shared presentation components. Standalone protocols, types,
+platform-observation helpers, generated localization code and free functions
+belong with their actual owner; do not use `4 - Swift Extensions` as a general
+utilities folder. Cohesive private support declarations may remain beside the
+extension they support. Avoid splitting tightly coupled declarations solely to
+satisfy a folder name.
+
+During a structural cleanup, inspect each file's declarations and callers,
+not only its filename. Move files without changing behaviour, preserve Xcode
+target membership and resource lookup, update generation/build scripts that
+reference their paths, and verify the affected build and tests. The same
+ownership reasoning applies to existing UIKit and mixed-UI projects.
 
 ### Domain Type Ownership
 
