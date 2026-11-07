@@ -305,15 +305,27 @@ general extension after the type and capability it adds, such as
 `Date+StartOfWeek.swift`.
 
 Place feature-specific extensions, model conversions and transport mappings
-with the Feature or adapter that owns their meaning, even when they use Swift's
-`extension` syntax. Keep SwiftUI-specific extensions in `1 - View/SwiftUI
-Extensions`; UIKit-specific helpers and extensions belong with their owning
-screen or shared presentation components. Standalone protocols, types,
-platform-observation helpers, generated localization code and free functions
-belong with their actual owner; do not use `4 - Swift Extensions` as a general
-utilities folder. Cohesive private support declarations may remain beside the
-extension they support. Avoid splitting tightly coupled declarations solely to
-satisfy a folder name.
+with the Feature, View or adapter that owns their meaning. First question an
+extension to `AppModel`: prefer removing it by putting behaviour in the
+appropriate Feature. If an extension remains justified, place it with the
+owning Feature or View; put genuinely app-wide extensions beside `AppModel`.
+
+Keep SwiftUI-specific extensions in `1 - View/SwiftUI Extensions`. Extensions
+of UIKit types belong in the View layer, alongside their owner or in a shared
+`UIKit Extensions` folder. Keep related protocols beside the concrete types
+and behaviour they support; do not create a generic `Protocols` folder. A
+shared `UIKit Helpers` folder is appropriate for non-extension helpers used by
+many views without a more specific owner. Cohesive private support declarations
+may remain with the extension they support.
+
+A broadly reusable `String` extension belongs in `4 - Swift Extensions`.
+Shared generated or system strings that are not extensions belong with their
+purpose, for example `Shared System Strings` in the View layer for localized
+presentation text. App-wide system constants may live beside `AppModel` in a
+purpose-named folder. Keep generation paths and related lookup code together.
+Platform protocols follow the same behaviour-first ownership rule; they do not
+belong in a catch-all protocols folder. Never use `4 - Swift Extensions` as a
+general utilities folder.
 
 During a structural cleanup, inspect each file's declarations and callers,
 not only its filename. Move files without changing behaviour, preserve Xcode
