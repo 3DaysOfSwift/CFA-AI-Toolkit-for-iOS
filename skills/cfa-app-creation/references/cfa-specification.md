@@ -165,6 +165,14 @@ purpose-named folders to communicate ownership. Do not create a local Swift
 package merely to group code, mimic a folder, or prepare for hypothetical reuse.
 A single-app project can be cleanly organized without introducing another module.
 
+Encapsulation alone is not sufficient reason to extract app-owned code into a
+separate module. A team working across the whole app must still understand, debug
+and change that implementation; additional imports, access-control declarations,
+targets and dependency configuration can add friction. Prefer clear Feature
+ownership, appropriate access control and purpose-named folders within the app
+target unless a separate boundary provides a concrete benefit that outweighs
+those costs.
+
 Introduce a separate package only for a clear, current need, such as code shared
 across multiple apps or a demonstrable independent distribution or build
 boundary. Explain the benefit and costs. For existing projects, respect their
