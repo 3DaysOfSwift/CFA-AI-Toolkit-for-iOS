@@ -347,6 +347,20 @@ test('reports a feature property stored under a different name', async t => {
   assert.ok(report.findings.some(item => item.code === 'feature-parameter-name'));
 });
 
+test('checks Feature labels after the first initializer parameter', async t => {
+  const root = await fixture(t, {
+    'Application/1 - View/Views/Chat/ChatView.swift': 'struct ChatView: View { @State private var viewModel = ChatViewModel() }',
+    'Application/1 - View/Views/Chat/ChatViewModel.swift': 'final class ChatViewModel { init(profileFeature: ProfileFeature = AppModel.shared.profileFeature, chats: ChatsFeature = AppModel.shared.chatsFeature) {} }',
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() }; let profileFeature: ProfileFeature; let chatsFeature: ChatsFeature }',
+    'Application/2 - AppModel/Features/Chats/ChatsFeature.swift': 'final class ChatsFeature {}',
+    'Application/2 - AppModel/Features/Profile/ProfileFeature.swift': 'final class ProfileFeature {}',
+    'ApplicationTests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}'
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'feature-parameter-name');
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].message, /chatsFeature as chats/);
+});
+
 test('does not treat a method-local Feature as a stored ViewModel dependency', async t => {
   const root = await fixture(t, {
     'Application/1 - View/Views/Chat/ChatView.swift': 'struct ChatView: View { @State private var viewModel = ChatViewModel() }',

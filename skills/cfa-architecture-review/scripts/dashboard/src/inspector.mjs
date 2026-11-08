@@ -237,9 +237,15 @@ export async function inspect(project) {
               findings.push(finding('feature-reference-name', 'warning', `${viewModelName} stores ${featureType} as ${local[1]}; use ${property}.`, viewModelFile, lineOf(viewModel, local.index)));
             }
           }
-          for (const initializer of viewModel.matchAll(/\binit\s*\(\s*(\w+)\s*:\s*(?:any\s+)?\w+Feature(?:API)?\s*=\s*AppModel\s*\.\s*shared\s*\.\s*(\w+)/g)) {
-            if (initializer[2] === property && initializer[1] !== property) {
-              findings.push(finding('feature-parameter-name', 'warning', `${viewModelName} receives ${property} as ${initializer[1]}; use ${property} for the initializer label.`, viewModelFile, lineOf(viewModel, initializer.index)));
+          for (const initializer of viewModelMembers.matchAll(/\binit\s*\(/g)) {
+            const opening = initializer.index + initializer[0].lastIndexOf('(');
+            const closing = closingParenthesis(viewModelMembers, opening);
+            if (closing < 0) continue;
+            const parameters = viewModelMembers.slice(opening + 1, closing);
+            for (const parameter of parameters.matchAll(/(?:^|,)\s*(\w+)\s*:\s*(?:any\s+)?\w+Feature(?:API)?\s*=\s*AppModel\s*\.\s*shared\s*\.\s*(\w+)/g)) {
+              if (parameter[2] === property && parameter[1] !== property) {
+                findings.push(finding('feature-parameter-name', 'warning', `${viewModelName} receives ${property} as ${parameter[1]}; use ${property} for the initializer label.`, viewModelFile, lineOf(viewModel, initializer.index)));
+              }
             }
           }
         }
