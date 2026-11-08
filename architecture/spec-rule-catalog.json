@@ -314,7 +314,7 @@
       "section": "Preserve One Authoritative Owner for Shared State",
       "applies": "A product marks a capability paid",
       "strength": "Required when applicable",
-      "rule": "PurchasesFeature owns entitlement state; the ViewModel checks it before the capability is presented or called. A server protects its own operations.",
+      "rule": "PurchasesFeature owns entitlement state; the screen ViewModel checks it before presenting or calling the capability. Check every relevant entry point, including other callers. A server protects its own operations.",
       "why": "Pricing changes remain separate from capability behaviour.",
       "verify": "Trace every known paid entry point and test locked and entitled outcomes.",
       "example": "An export screen checks PurchasesFeature before presenting or calling the paid export capability.",

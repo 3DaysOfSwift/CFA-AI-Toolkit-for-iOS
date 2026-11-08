@@ -4,7 +4,7 @@
 
 **Strength:** Required when applicable.
 
-**Guidance:** PurchasesFeature owns entitlement state; the ViewModel checks it before the capability is presented or called. A server protects its own operations.
+**Guidance:** PurchasesFeature owns entitlement state; the screen ViewModel checks it before presenting or calling the capability. Check every relevant entry point, including other callers. A server protects its own operations.
 
 **Why:** Pricing changes remain separate from capability behaviour.
 
