@@ -267,9 +267,9 @@ failure states, persistent colour themes and focused tests.
 
 CFA makes a deliberate distinction between two valid refresh paths. The app
 delegate starts an app-wide system refresh at the earliest launch callback, so
-shared work can run while the UI is prepared. Each screen uses SwiftUI
-`.task` for its own initial asynchronous work; SwiftUI starts that work before
-the View appears. Neither path blocks the first frame or promises that a remote
+shared work can run while the UI is prepared. When a screen needs its own
+initial asynchronous work, it can use SwiftUI `.task` to start it as the View
+appears. Neither path promises that a remote
 request has already finished. The owning Feature coordinates duplicate requests
 and publishes observed loading, cached, empty, success or error state.
 
