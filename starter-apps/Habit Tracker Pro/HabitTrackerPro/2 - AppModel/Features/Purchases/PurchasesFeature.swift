@@ -20,6 +20,7 @@ final class PurchasesFeature {
     init(store: any PurchaseStore) { self.store = store }
 
     @ObservationIgnored private var startupTask: Task<Void, Never>?
+    @ObservationIgnored private var offerTask: Task<Void, Never>?
 
     func startLoading() {
         guard startupTask == nil else { return }
@@ -37,15 +38,22 @@ final class PurchasesFeature {
     func transactionUpdates() -> AsyncStream<Void> { store.updates() }
 
     func loadOffer() async {
-        guard !isLoadingOffer else { return }
-        isLoadingOffer = true
-        defer { isLoadingOffer = false }
-        do {
-            offer = try await store.offer()
-            offerError = nil
-        } catch {
-            offerError = error.localizedDescription
+        if let offerTask {
+            await offerTask.value
+            return
         }
+        isLoadingOffer = true
+        let task = Task { @MainActor in
+            defer { isLoadingOffer = false; offerTask = nil }
+            do {
+                offer = try await store.offer()
+                offerError = nil
+            } catch {
+                offerError = error.localizedDescription
+            }
+        }
+        offerTask = task
+        await task.value
     }
 
     func refreshEntitlement() async {

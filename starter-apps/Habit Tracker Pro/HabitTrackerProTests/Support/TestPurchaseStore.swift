@@ -7,6 +7,9 @@ final class TestPurchaseStore: PurchaseStore {
     var outcome: PurchaseOutcome = .purchased
     var failsVerification = false
     var failsOffer = false
+    var holdsOffer = false
+    var offerGate: CheckedContinuation<Void, Never>?
+    private(set) var offerCount = 0
     var failsPurchase = false
     var restoredAccess = false
     var purchaseCount = 0
@@ -21,6 +24,8 @@ final class TestPurchaseStore: PurchaseStore {
     private var startWaiter: CheckedContinuation<Void, Never>?
 
     func offer() async throws -> PurchaseOffer {
+        offerCount += 1
+        if holdsOffer { await withCheckedContinuation { offerGate = $0 } }
         if failsOffer { throw PurchaseError.unavailable }
         return PurchaseOffer(title: "Unlock Trends", displayPrice: "$4.99")
     }
