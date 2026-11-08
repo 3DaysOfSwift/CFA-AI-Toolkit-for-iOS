@@ -152,6 +152,13 @@ test('release validation rejects a missing workflow policy and an entry point th
  assert.throws(()=>validate(source,{source:false}),/Missing workflow policy entry point/);
 });
 
+test('release validation rejects a stale bundled reference Feature', t => {
+ const {source}=release(t);
+ const reference=path.join(source,'skills/cfa-app-creation/references/reference-feature.md');
+ fs.appendFileSync(reference,'\nOutdated example.\n');
+ assert.throws(()=>validate(source,{source:false}),/Stale reference Feature: cfa-app-creation/);
+});
+
 test('portable skills carry the original CFA App icon without needing the source checkout', t => {
  const {dir,source}=release(t);
  const destination=path.join(dir,'customer');

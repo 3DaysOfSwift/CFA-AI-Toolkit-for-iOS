@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { root, skills, cfaSkills, iconSkills, starterIcon, migrationEvidenceFiles, explanationFiles, projectAnalysisFiles } from './sync.mjs';
+import { root, skills, cfaSkills, referenceFeatureSkills, iconSkills, starterIcon, migrationEvidenceFiles, explanationFiles, projectAnalysisFiles } from './sync.mjs';
 import { validateCatalogue, audit } from '../tools/explanations/explanations.mjs';
 import { files, hash, json } from './files.mjs';
 import { verifyXcodeTemplateStructure } from './verify-xcode-template-structure.mjs';
@@ -75,6 +75,11 @@ export function validate(base=root,{source=true}={}) {
   for(const name of skills) {
     const skill=path.join(base,'skills',name);
     const text=fs.readFileSync(path.join(skill,'SKILL.md'),'utf8');
+    if (referenceFeatureSkills.includes(name)) {
+      const reference = path.join(skill, 'references/reference-feature.md');
+      if (!fs.existsSync(reference) || !text.includes('(references/reference-feature.md)')) throw Error(`Missing reference Feature entry point: ${name}`);
+      if (hash(reference) !== hash(path.join(base, 'architecture/reference-feature.md'))) throw Error(`Stale reference Feature: ${name}. Run npm run sync.`);
+    }
     const explanations = path.join(skill, 'references/explanations');
     if (!text.includes('(references/explanations/guide.md)')) throw Error(`Missing rationale entry point: ${name}`);
     if (JSON.stringify(files(explanations).sort()) !== JSON.stringify([...explanationFiles].sort())) throw Error(`Unexpected rationale files: ${name}`);

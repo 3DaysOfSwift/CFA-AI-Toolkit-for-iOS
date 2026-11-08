@@ -5,6 +5,7 @@ import { files } from './files.mjs';
 import { specTopics } from './spec-topics.mjs';
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const cfaSkills = ['cfa-app-creation', 'cfa-feature-work', 'cfa-architecture-adoption', 'swift-concurrency-migration', 'cfa-architecture-review', 'cfa-codebase-tidy', 'cfa-unit-tests'];
+export const referenceFeatureSkills = ['cfa-app-creation', 'cfa-feature-work', 'cfa-architecture-adoption', 'swift-concurrency-migration'];
 export const skills = [...cfaSkills, 'swift-code-quality'];
 export const explanationFiles = ['guide.md', 'catalogue.json',
   ...JSON.parse(fs.readFileSync(path.join(root, 'architecture/explanations/catalogue.json'), 'utf8')).topics.map(topic => topic.note)];
@@ -51,7 +52,7 @@ export function sync(base = root) {
   }
   for (const name of cfaSkills) copy('architecture/cfa-specification.md',`skills/${name}/references/cfa-specification.md`);
   for (const name of cfaSkills) copy('architecture/cfa-change-gate.md',`skills/${name}/references/cfa-change-gate.md`);
-  for (const name of ['cfa-app-creation','cfa-feature-work','cfa-architecture-adoption','swift-concurrency-migration']) copy('architecture/reference-feature.md',`skills/${name}/references/reference-feature.md`);
+  for (const name of referenceFeatureSkills) copy('architecture/reference-feature.md',`skills/${name}/references/reference-feature.md`);
   for (const name of ['cfa-feature-work','cfa-architecture-adoption','swift-concurrency-migration','cfa-codebase-tidy','cfa-unit-tests']) copy('architecture/product-behaviour-contract.md',`skills/${name}/references/product-behaviour-contract.md`);
   const tool=path.join(base,'tools/architecture-dashboard');
   const bundled=path.join(base,'skills/cfa-architecture-review/scripts/dashboard');
