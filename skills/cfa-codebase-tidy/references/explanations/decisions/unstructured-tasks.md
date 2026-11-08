@@ -23,7 +23,7 @@ Editorial analysis: retaining handles adds lifecycle and cleanup obligations. Re
 
 ## Scope and exceptions
 
-Unstructured tasks are not inherently wrong. Swift task semantics are separate from CFA's chosen ViewModel convention. A handle is not automatic cancellation or a guarantee of no retained-object cycle. Durable saves may need to outlive a screen.
+Unstructured tasks are not inherently wrong. Swift task semantics are separate from CFA's chosen ViewModel convention. A handle is not automatic cancellation or a guarantee of no retained-object cycle. Durable saves may need to outlive a screen. A Feature-owned shared refresh normally continues when a screen leaves, retaining its result for later use; presentation-only work can stop when it no longer has value.
 
 ## Verification
 
