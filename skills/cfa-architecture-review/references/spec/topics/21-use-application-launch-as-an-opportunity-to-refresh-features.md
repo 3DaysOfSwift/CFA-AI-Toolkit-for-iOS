@@ -94,7 +94,8 @@ the Features' named startup methods and starts any app-wide listeners it owns;
 each Feature owns any asynchronous tasks
 needed for its refresh or local restoration. The delegate returns after those
 startup methods have been invoked, not after their network or disk work has
-finished. Call from `UIApplicationDelegate.application(_:didFinishLaunchingWithOptions:)`,
+finished. Starting tasks in source order does not guarantee the order in which
+their network or disk operations begin. Call from `UIApplicationDelegate.application(_:didFinishLaunchingWithOptions:)`,
 not a SwiftUI View or scene `.task`. Keep synchronous work brief, avoid blocking
 network or disk I/O on the main thread, and measure launch and first-frame timing.
 Do not store `AppModel.shared` in the App, delegate, View, or another object's
