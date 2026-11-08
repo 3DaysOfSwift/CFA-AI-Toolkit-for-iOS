@@ -5,6 +5,29 @@ import Testing
 @Suite("Trends purchases", .timeLimit(.minutes(1)))
 @MainActor
 struct PurchasesFeatureTests {
+    @Test func cancellingPurchaseWaiterDoesNotStrandRestore() async {
+        let store = TestPurchaseStore()
+        store.holdsPurchase = true
+        store.restoredAccess = true
+        let feature = PurchasesFeature(store: store)
+        let purchase = Task { await feature.purchaseTrends() }
+        while store.purchaseGate == nil { await Task.yield() }
+        var restoreStarted = false
+        let restore = Task {
+            restoreStarted = true
+            await feature.restorePurchases()
+        }
+        while !restoreStarted { await Task.yield() }
+        purchase.cancel()
+        #expect(store.restoreCount == 0 && feature.isPurchasingOrRestoring)
+        store.holdsPurchase = false
+        store.purchaseGate?.resume()
+        store.purchaseGate = nil
+        await purchase.value
+        await restore.value
+        #expect(store.purchaseCount == 1 && store.restoreCount == 1)
+        #expect(feature.hasTrendsAccess && !feature.isPurchasingOrRestoring)
+    }
     @Test func overlappingPurchasesShareCompletion() async {
         let store = TestPurchaseStore()
         store.holdsPurchase = true
