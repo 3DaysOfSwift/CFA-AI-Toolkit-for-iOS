@@ -34,11 +34,13 @@ not permission to ignore the covered behaviour.
 
 ## Translate Evidence into Requirements
 
-Create `MIGRATION_BEHAVIOUR_CONTRACT.md` in the private working evidence folder
-outside the application repository and toolkit release source. Place a reviewed
-copy in the application repository only when the developer requests it. Give each
-requirement a stable identifier such as `BEH-001` and express it as one
-plain-English sentence describing an externally observable result.
+Create `MIGRATION_BEHAVIOUR_CONTRACT.md` in a private working directory outside
+the application repository and toolkit release source. If an optional case-study
+evidence workspace has been agreed, the contract may be kept there; creating the
+contract does not itself start case-study capture. Place a reviewed copy in the
+application repository only when the developer requests it. Give each requirement
+a stable identifier such as `BEH-001` and express it as one plain-English sentence
+describing an externally observable result.
 
 Prefer:
 
