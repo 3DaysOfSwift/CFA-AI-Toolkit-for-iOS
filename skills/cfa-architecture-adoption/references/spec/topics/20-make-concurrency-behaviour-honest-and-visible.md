@@ -51,7 +51,7 @@ intent; the ViewModel stores, replaces, or cancels the Task.
 Other retained task lifetimes include:
 
 - cancelling an obsolete progress calculation when a new range is selected;
-- retaining a long-lived StoreKit transaction observer;
+- AppModel retaining an app-wide StoreKit transaction observer;
 - sharing a Feature-owned refresh among callers from several scenes.
 
 ### Each Feature owns its overlapping-call policy
