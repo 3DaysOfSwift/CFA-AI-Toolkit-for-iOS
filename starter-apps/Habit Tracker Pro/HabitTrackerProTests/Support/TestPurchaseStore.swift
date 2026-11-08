@@ -13,6 +13,9 @@ final class TestPurchaseStore: PurchaseStore {
     var failsPurchase = false
     var restoredAccess = false
     var purchaseCount = 0
+    var holdsPurchase = false
+    var purchaseGate: CheckedContinuation<Void, Never>?
+    private(set) var restoreCount = 0
     private(set) var updateSubscriptionCount = 0
     var finishCount = 0
     private var finishWaiter: CheckedContinuation<Void, Never>?
@@ -31,6 +34,7 @@ final class TestPurchaseStore: PurchaseStore {
     }
     func purchase() async throws -> PurchaseOutcome {
         purchaseCount += 1
+        if holdsPurchase { await withCheckedContinuation { purchaseGate = $0 } }
         if failsPurchase { throw PurchaseError.unavailable }
         if case .purchased = outcome { entitled = true }
         return outcome
@@ -46,7 +50,7 @@ final class TestPurchaseStore: PurchaseStore {
         }
         return entitled
     }
-    func restore() async throws { entitled = restoredAccess }
+    func restore() async throws { restoreCount += 1; entitled = restoredAccess }
     func updates() -> AsyncStream<Void> {
         updateSubscriptionCount += 1
         return AsyncStream { updateContinuation = $0 }

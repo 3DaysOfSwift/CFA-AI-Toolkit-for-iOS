@@ -21,6 +21,8 @@ final class PurchasesFeature {
 
     @ObservationIgnored private var startupTask: Task<Void, Never>?
     @ObservationIgnored private var offerTask: Task<Void, Never>?
+    private enum PurchaseAction { case purchase, restore }
+    @ObservationIgnored private var lastAction: (id: UUID, kind: PurchaseAction, task: Task<Void, Never>)?
 
     func startLoading() {
         guard startupTask == nil else { return }
@@ -81,11 +83,39 @@ final class PurchasesFeature {
     }
 
     func purchaseTrends() async {
-        guard !isPurchasingOrRestoring, !hasTrendsAccess, !isPurchasePending else { return }
+        await enqueue(.purchase).value
+    }
+
+    func restorePurchases() async {
+        await enqueue(.restore).value
+    }
+
+    // StoreKit actions cannot overlap. Adjacent equivalent requests share a result;
+    // different requests run in their admission order, even after an earlier failure.
+    private func enqueue(_ kind: PurchaseAction) -> Task<Void, Never> {
+        if let lastAction, lastAction.kind == kind { return lastAction.task }
+        let previous = lastAction?.task
+        let id = UUID()
         isPurchasingOrRestoring = true
+        let task = Task { @MainActor in
+            await previous?.value
+            switch kind {
+            case .purchase: await performPurchase()
+            case .restore: await performRestore()
+            }
+            if lastAction?.id == id {
+                lastAction = nil
+                isPurchasingOrRestoring = false
+            }
+        }
+        lastAction = (id, kind, task)
+        return task
+    }
+
+    private func performPurchase() async {
+        guard !hasTrendsAccess, !isPurchasePending else { return }
         actionError = nil
         notice = nil
-        defer { isPurchasingOrRestoring = false }
         do {
             switch try await store.purchase() {
             case .purchased:
@@ -102,12 +132,9 @@ final class PurchasesFeature {
         }
     }
 
-    func restorePurchases() async {
-        guard !isPurchasingOrRestoring else { return }
-        isPurchasingOrRestoring = true
+    private func performRestore() async {
         actionError = nil
         notice = nil
-        defer { isPurchasingOrRestoring = false }
         do {
             try await store.restore()
             await refreshEntitlement()

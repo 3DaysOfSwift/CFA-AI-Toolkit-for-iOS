@@ -5,6 +5,54 @@ import Testing
 @Suite("Trends purchases", .timeLimit(.minutes(1)))
 @MainActor
 struct PurchasesFeatureTests {
+    @Test func overlappingPurchasesShareCompletion() async {
+        let store = TestPurchaseStore()
+        store.holdsPurchase = true
+        let feature = PurchasesFeature(store: store)
+        let first = Task { await feature.purchaseTrends() }
+        while store.purchaseGate == nil { await Task.yield() }
+        var started = false
+        var finished = false
+        let second = Task {
+            started = true
+            await feature.purchaseTrends()
+            finished = true
+        }
+        while !started { await Task.yield() }
+        #expect(!finished && store.purchaseCount == 1)
+        store.holdsPurchase = false
+        store.purchaseGate?.resume()
+        store.purchaseGate = nil
+        await first.value
+        await second.value
+        #expect(finished && feature.hasTrendsAccess && !feature.isPurchasingOrRestoring)
+    }
+    @Test func restoreWaitsForAnOverlappingPurchase() async {
+        let store = TestPurchaseStore()
+        store.holdsPurchase = true
+        store.failsPurchase = true
+        store.restoredAccess = true
+        let feature = PurchasesFeature(store: store)
+        let purchase = Task { await feature.purchaseTrends() }
+        while store.purchaseGate == nil { await Task.yield() }
+        var restoreStarted = false
+        var restoreFinished = false
+        let restore = Task {
+            restoreStarted = true
+            await feature.restorePurchases()
+            restoreFinished = true
+        }
+        while !restoreStarted { await Task.yield() }
+        #expect(!restoreFinished && store.restoreCount == 0)
+        #expect(feature.isPurchasingOrRestoring)
+        store.holdsPurchase = false
+        store.purchaseGate?.resume()
+        store.purchaseGate = nil
+        await purchase.value
+        await restore.value
+        #expect(restoreFinished && store.restoreCount == 1)
+        #expect(feature.hasTrendsAccess && !feature.isPurchasingOrRestoring)
+    }
     @Test func overlappingOfferLoadsWaitForOneRequest() async {
         let store = TestPurchaseStore()
         store.holdsOffer = true
