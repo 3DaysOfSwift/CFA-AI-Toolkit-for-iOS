@@ -104,6 +104,7 @@ struct TodayFeatureTests {
     }
 }
 
+// The observation callback can run concurrently; every access to changed holds this lock.
 private final class ObservationProbe: @unchecked Sendable {
     private let lock = NSLock()
     private var changed = false
