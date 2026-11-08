@@ -78,7 +78,10 @@ Use deliberate passes:
    its stored properties include Features, the launch guard and any app-wide
    listener handles required by the specification. Use
    `SwiftDataManager` for SwiftData and `NetworkingManager` for `URLSession`;
-   signal launch from the app lifecycle, not a View `.task`. Do not move GCD
+   call the AppModel launch signal directly and synchronously from the app
+   lifecycle callback, without wrapping it in a Task or using a View `.task`.
+   Features may start asynchronous work without making launch wait for disk or
+   network completion. Do not move GCD
    syntax mechanically during this pass.
 3. Convert that feature’s asynchronous model work into directly awaitable
    Swift Concurrency. ViewModels retain created task handles by default and
