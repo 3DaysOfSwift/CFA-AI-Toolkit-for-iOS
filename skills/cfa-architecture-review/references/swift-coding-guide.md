@@ -102,7 +102,7 @@ func save() -> Task<Void, Never> {
     let task = Task {
         defer { saveTask = nil }
         do {
-            try await feature.save(draftToSave)
+            try await notesFeature.save(draftToSave)
             message = "Saved."
         } catch {
             self.error = error.localizedDescription
@@ -114,7 +114,7 @@ func save() -> Task<Void, Never> {
 ```
 
 The example assumes a main-actor ViewModel, a stored `Task<Void, Never>?` named
-`saveTask`, an explicit feature dependency and an unchanged editor draft while
+`saveTask`, an explicit `notesFeature` dependency and an unchanged editor draft while
 saving. Repeated taps reuse the handle; async callers and tests use
 `await viewModel.save().value`. If input changes during saving, queue that
 distinct edit rather than silently treating it as a duplicate. A persistent
