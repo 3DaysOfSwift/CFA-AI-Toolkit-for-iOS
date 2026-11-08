@@ -22,7 +22,7 @@ final class GitReposFeature {
         self.cache = cache
     }
 
-    // Start networking first; restoring the optional cache never delays it.
+    // Schedule refresh before cache restoration; either task may begin first.
     func startLoading() {
         _ = startRefreshIfNeeded()
         startCacheRestoreIfNeeded()
