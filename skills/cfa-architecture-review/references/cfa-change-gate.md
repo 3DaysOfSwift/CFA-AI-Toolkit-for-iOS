@@ -196,8 +196,9 @@ If any item is absent, failed, or only inferred, say **â€œContinuing migrationâ€
 and name the missing checkpoint. Record a failed pilot honestly and block it
 from precedent use; do not reframe it as a completed partial migration.
 
-- Verify repeated ViewModel actions and equivalent Feature calls share one
-  execution and completion. Verify queued commands execute in admission order
+- Where one execution satisfies equivalent ViewModel actions or Feature calls,
+  verify those callers share its completion. Do not coalesce distinct commands
+  that must each take effect. Verify queued commands execute in admission order
   and return their own outcomes. Test failure/cancellation cleanup and a later
   retry using controlled dependencies, not sleeps; record exceptions explicitly.
 
