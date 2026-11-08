@@ -47,14 +47,14 @@ need Python 3. Compatible Codex installation requires `codex plugin add` support
    evidence of native activation. Test migration against an app with a known build
    and behaviour baseline before advertising migration compatibility.
 6. Commit source and tag the matching version, for example `v0.1.0-beta.1`.
-7. Once a GitHub owner/repository is selected, add the remote and push the source
-   and tag. The included manual Release workflow builds a **draft** GitHub release.
+7. Verify the GitHub remote and push the source and tag. The included manual
+   Release workflow builds a **draft** GitHub release.
    Review its assets and notes before publishing it. The draft workflow must exist
    on the default branch before it can be dispatched.
 
-The prepared local repository does not create a GitHub repository or publish a
-release. No hosted download URL is fabricated. A maintainer must choose the public
-destination and perform the publication step.
+The configured repository is `3DaysOfSwift/CFA-AI-Toolkit-for-iOS`. Building a
+local package or draft does not publish a new release; a maintainer must review
+and publish it.
 
 ## Customer delivery
 
