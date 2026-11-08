@@ -1019,8 +1019,9 @@ Feature. A Feature may ask it to load or save; neither AppModel nor any View or
 ViewModel opens a database or handles a `ModelContainer`. Keep SwiftData
 records and contexts inside the persistence boundary; preserve actor isolation.
 
-Use a `NetworkingManager` whenever the app makes network requests. It owns
-`URLSession` and wraps every session call; feature-specific API adapters decode
+Use a `NetworkingManager` whenever the app makes network requests. It is a
+lower-level service, not a Feature. It owns `URLSession` and wraps every session
+call; feature-specific API adapters decode
 responses and provide domain-oriented operations. AppModel may construct this
 manager as a local inside `live()` and pass it to Features; it does not store or
 expose the manager as an AppModel property.
