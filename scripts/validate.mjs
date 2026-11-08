@@ -35,8 +35,9 @@ export function validate(base=root,{source=true}={}) {
     if (width !== height || width < 48 || width > 4096) throw Error(`CFA ${field} must be a square image between 48 and 4096 pixels.`);
   }
   if(source) {
-    const sourceExamples = files(path.join(base,'examples/migration')).filter(file => !file.includes('.playground/playground.xcworkspace/')).sort();
-    const bundledExamples = files(path.join(base,'skills/swift-concurrency-migration/assets/migration-examples')).sort();
+    const isExampleContent = file => !file.includes('.playground/playground.xcworkspace/');
+    const sourceExamples = files(path.join(base,'examples/migration')).filter(isExampleContent).sort();
+    const bundledExamples = files(path.join(base,'skills/swift-concurrency-migration/assets/migration-examples')).filter(isExampleContent).sort();
     if (JSON.stringify(sourceExamples) !== JSON.stringify(bundledExamples)) throw Error('Migration example files differ from the bundled skill. Run npm run sync.');
     for (const file of sourceExamples) if (hash(path.join(base,'examples/migration',file)) !== hash(path.join(base,'skills/swift-concurrency-migration/assets/migration-examples',file))) throw Error(`Stale migration example: ${file}`);
     for (const file of projectAnalysisFiles) if (hash(path.join(base,'tools/architecture-dashboard/src',file)) !== hash(path.join(base,'skills/swift-concurrency-migration/scripts/project-analysis',file))) throw Error(`Stale migration project analysis: ${file}`);
