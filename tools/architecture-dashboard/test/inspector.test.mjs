@@ -41,6 +41,7 @@ test('reports a missing named feature test file', async t => {
   });
   const report = await inspect(root);
   assert.deepEqual(report.findings.map(item => item.code), ['feature-tests-missing']);
+  assert.equal(report.findings[0].severity, 'review');
   assert.match(report.findings[0].message, /SettingsFeatureTests.swift/);
   assert.match(report.findings[0].message, /scanned directory/);
 });
@@ -57,6 +58,7 @@ test('reports test search scope when tests are beside the scanned app folder', a
   const isMissingTest = item => ['feature-tests-missing', 'view-model-tests-missing'].includes(item.code);
   const scoped = (await inspect(path.join(root, 'Application'))).findings.filter(isMissingTest);
   assert.equal(scoped.length, 2);
+  assert.ok(scoped.every(item => item.severity === 'review'));
   assert.ok(scoped.every(item => /scanned directory/.test(item.message)));
   assert.equal((await inspect(root)).findings.filter(isMissingTest).length, 0);
 });

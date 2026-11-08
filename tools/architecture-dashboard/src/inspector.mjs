@@ -110,7 +110,7 @@ export async function inspect(project) {
     if (featureTypeSuffix.test(property.type) && !property.type.endsWith('API')) {
       const testName = `${property.type}Tests.swift`;
       if (![...paths].some(file => file.includes('/FeatureTests/') && file.endsWith(`/${testName}`))) {
-        findings.push(finding('feature-tests-missing', 'warning', `No ${testName} was found under FeatureTests in the scanned directory. Check the project root and test target before concluding the test is missing.`, appModelFile, property.line));
+        findings.push(finding('feature-tests-missing', 'review', `No ${testName} was found under FeatureTests in the scanned directory. Check the project root and test target before concluding the test is missing.`, appModelFile, property.line));
       }
     }
   }
@@ -259,7 +259,7 @@ export async function inspect(project) {
     else if (viewModel) {
       if (!ownsViewModel) findings.push(finding('view-model-ownership', 'review', `${name} does not use the default inline ViewModel pattern. Verify private ownership; a detail View may construct its own State-backed ViewModel from selected value data.`, viewFile, lineOf(view, declaration.index)));
       if (!dependencies.length) findings.push(finding('feature-route-unresolved', 'review', `${viewModelName} has no visible AppModel.shared feature route; inspect whether this screen is presentation-only.`, viewModelFile, 1));
-      if (!testFile) findings.push(finding('view-model-tests-missing', 'warning', `No ${testName} was found in the scanned directory. Check the project root and test target before concluding the test is missing.`, viewModelFile, 1));
+      if (!testFile) findings.push(finding('view-model-tests-missing', 'review', `No ${testName} was found in the scanned directory. Check the project root and test target before concluding the test is missing.`, viewModelFile, 1));
     }
     screens.push({ name, viewFile, viewModelFile: viewModel ? viewModelFile : null, ownsViewModel, structuralRoot, testFile, dependencies });
   }
