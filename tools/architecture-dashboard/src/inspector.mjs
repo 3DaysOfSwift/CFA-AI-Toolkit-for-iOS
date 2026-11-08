@@ -195,8 +195,8 @@ export async function inspect(project) {
       : '';
     const testName = `${viewModelName}Tests.swift`;
     const testFile = [...paths].find(file => file.endsWith(`/${testName}`)) ?? null;
-    const statePattern = new RegExp(`@State\\s+private\\s+var[ \\t]+viewModel(?:[ \\t]*:[ \\t]*${viewModelName})?[ \\t]*=[ \\t]*${viewModelName}[ \\t]*\\([ \\t]*\\)`);
-    const typedStatePattern = new RegExp(`@State\\s+private\\s+var[ \\t]+viewModel[ \\t]*:[ \\t]*${viewModelName}[ \\t]*=[ \\t]*\\.init[ \\t]*\\([ \\t]*\\)`);
+    const statePattern = new RegExp(`@State\\s+private\\s+var\\s+viewModel(?:\\s*:\\s*${viewModelName})?\\s*=\\s*${viewModelName}\\s*\\(\\s*\\)`);
+    const typedStatePattern = new RegExp(`@State\\s+private\\s+var\\s+viewModel\\s*:\\s*${viewModelName}\\s*=\\s*\\.init\\s*\\(\\s*\\)`);
     let ownsViewModel = statePattern.test(members) || typedStatePattern.test(members);
     const dependencies = [];
     if (viewModel) {

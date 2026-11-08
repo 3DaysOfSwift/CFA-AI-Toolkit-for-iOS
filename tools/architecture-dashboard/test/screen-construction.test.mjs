@@ -81,7 +81,8 @@ for (const expression of [
 for (const declaration of [
   '@State private var viewModel = HomeViewModel()',
   '@State private var viewModel: HomeViewModel = HomeViewModel()',
-  '@State private var viewModel: HomeViewModel = .init()'
+  '@State private var viewModel: HomeViewModel = .init()',
+  '@State private var viewModel =\n HomeViewModel()'
 ]) {
   test('accepts private inline no-argument ownership: ' + declaration, async t => {
     const { report, findings } = await inspectView(t, `struct HomeView: View {
@@ -96,8 +97,7 @@ for (const declaration of [
 for (const declaration of [
   '@State var viewModel = HomeViewModel()',
   '@State private var viewModel = HomeViewModel(homeFeature: feature)',
-  '@State private var viewModel = makeViewModel()',
-  '@State private var viewModel =\n HomeViewModel()'
+  '@State private var viewModel = makeViewModel()'
 ]) {
   test('reports nonconforming ownership: ' + declaration, async t => {
     const { findings } = await inspectView(t, `struct HomeView: View {
