@@ -83,7 +83,7 @@ func runExample() async {
     precondition(firstResult && !rejectedResult && lastResult)
     // Concurrent tasks can be admitted in either order; both valid saves must persist.
     precondition(queuedFeature.weights.sorted() == [80, 82] && queuedStored == queuedFeature.weights)
-    print("Passed: valid saves stayed ordered; the invalid value was rejected.")
+    print("Passed: valid saves were retained; the invalid value was rejected.")
 }
 
 // MARK: - Run after example

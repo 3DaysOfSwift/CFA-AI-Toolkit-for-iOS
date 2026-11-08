@@ -6,7 +6,7 @@ A serial Dispatch queue accepts weight saves and invokes completion on its queue
 
 ## Behaviour to preserve
 
-Valid saves remain in submission order; invalid values are rejected. The CFA Feature publishes only confirmed saves and can continue after failure.
+Valid saves remain in the order admitted by the serial queue or Feature; invalid values are rejected. Creating separate Tasks in a particular order does not guarantee their calls reach the Feature in that order. The CFA Feature publishes only confirmed saves and can continue after failure.
 
 ## Migration
 
