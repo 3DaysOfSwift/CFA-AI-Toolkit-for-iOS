@@ -44,6 +44,7 @@ struct TodayView: View {
                                 ForEach(viewModel.habits) { habit in
                                     HabitTodayRow(habit: habit, theme: theme,
                                                   isComplete: viewModel.isCompleteToday(habit),
+                                                  isSaving: viewModel.isSaving(habit),
                                                   amount: Binding(get: { viewModel.amountText(for: habit) },
                                                                   set: { viewModel.editAmount($0, for: habit) }),
                                                   canIncrement: viewModel.canIncrement(habit),
@@ -114,6 +115,7 @@ private struct HabitTodayRow: View {
     let habit: Habit
     let theme: AppColourTheme
     let isComplete: Bool
+    let isSaving: Bool
     @Binding var amount: String
     let canIncrement: Bool
     let statusText: String?
@@ -133,6 +135,7 @@ private struct HabitTodayRow: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .disabled(isSaving)
                 .accessibilityLabel(isComplete ? "Mark \(habit.name) incomplete" : "Complete \(habit.name)")
 
                 VStack(alignment: .leading, spacing: 5) {
