@@ -45,6 +45,22 @@ test('reports a missing named feature test file', async t => {
   assert.match(report.findings[0].message, /scanned directory/);
 });
 
+test('reports test search scope when tests are beside the scanned app folder', async t => {
+  const root = await fixture(t, {
+    'Application/1 - View/Views/Chat/ChatView.swift': 'struct ChatView: View { @State private var viewModel = ChatViewModel() }',
+    'Application/1 - View/Views/Chat/ChatViewModel.swift': 'final class ChatViewModel { init(chatsFeature: ChatsFeature = AppModel.shared.chatsFeature) {} }',
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() }; let chatsFeature: ChatsFeature }',
+    'Application/2 - AppModel/Features/Chats/ChatsFeature.swift': 'final class ChatsFeature {}',
+    'ApplicationTests/ViewModelTests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}',
+    'ApplicationTests/FeatureTests/ChatsFeatureTests.swift': 'struct ChatsFeatureTests {}'
+  });
+  const isMissingTest = item => ['feature-tests-missing', 'view-model-tests-missing'].includes(item.code);
+  const scoped = (await inspect(path.join(root, 'Application'))).findings.filter(isMissingTest);
+  assert.equal(scoped.length, 2);
+  assert.ok(scoped.every(item => /scanned directory/.test(item.message)));
+  assert.equal((await inspect(root)).findings.filter(isMissingTest).length, 0);
+});
+
 test('does not mistake composition locals for AppModel properties', async t => {
   const root = await fixture(t, {
     'Application/1 - View/Views/Chat/ChatView.swift': 'struct ChatView: View { @State private var viewModel = ChatViewModel() }',
