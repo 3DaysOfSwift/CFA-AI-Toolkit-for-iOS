@@ -49,6 +49,8 @@ final class PurchasesFeature {
     }
 
     func refreshEntitlement() async {
+        // A newer StoreKit event may change access while an earlier read is suspended.
+        // Only the latest read may publish its result.
         entitlementRevision += 1
         let revision = entitlementRevision
         do {
