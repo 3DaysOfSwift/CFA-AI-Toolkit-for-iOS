@@ -15,6 +15,10 @@ struct GitReposFeatureTests {
                         summary: "Example", stars: 3, updatedAt: Date(timeIntervalSince1970: 0))
         try await cache.saveRepos([repo])
         #expect(try await cache.loadRepos() == [repo])
+        let withoutDescription = Repo(id: 43, fullName: "Example/Other", repositoryURL: url,
+                                      summary: nil, stars: 0, updatedAt: Date(timeIntervalSince1970: 0))
+        try await cache.saveRepos([repo, withoutDescription])
+        #expect(try await cache.loadRepos() == [repo, withoutDescription])
         try Data("invalid JSON".utf8).write(to: directory.appending(path: "git-repositories.json"), options: .atomic)
         do {
             _ = try await cache.loadRepos()
