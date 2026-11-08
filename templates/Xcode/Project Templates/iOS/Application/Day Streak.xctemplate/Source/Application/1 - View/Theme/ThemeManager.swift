@@ -86,7 +86,7 @@ final class ThemeManager {
     }
 
     func select(_ theme: ThemeChoice) {
-        selectedTheme = theme
         defaults.set(theme.rawValue, forKey: "selectedTheme")
+        selectedTheme = theme
     }
 }

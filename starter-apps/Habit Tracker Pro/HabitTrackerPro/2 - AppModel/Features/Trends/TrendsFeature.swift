@@ -28,27 +28,22 @@ struct HabitTrend: Identifiable, Sendable {
 @Observable
 final class TrendsFeature {
     private let habitsFeature: HabitsFeature
-    private let purchasesFeature: PurchasesFeature
     private let calendar: Calendar
     private let currentDate: () -> Date
 
-    init(habitsFeature: HabitsFeature, purchasesFeature: PurchasesFeature,
-         calendar: Calendar = .current, currentDate: @escaping () -> Date = { .now }) {
+    init(habitsFeature: HabitsFeature,
+         calendar: Calendar = .autoupdatingCurrent, currentDate: @escaping () -> Date = { .now }) {
         self.habitsFeature = habitsFeature
-        self.purchasesFeature = purchasesFeature
         self.calendar = calendar
         self.currentDate = currentDate
     }
 
-    var hasAccess: Bool { purchasesFeature.hasTrendsAccess }
     var isLoading: Bool { habitsFeature.isLoading }
     var loadError: String? { habitsFeature.loadError }
     func reload() async { await habitsFeature.reload() }
 
-    /// Paid calculations are guarded here, not only in the screen.
-    /// No duplicate habit collection or second persistent store.
+    /// Calculate trends from the habits already owned by HabitsFeature.
     var trends: [HabitTrend] {
-        guard hasAccess else { return [] }
         let today = calendar.startOfDay(for: currentDate())
         return habitsFeature.habits.map { habit in
             var amounts: [Date: Int] = [:]

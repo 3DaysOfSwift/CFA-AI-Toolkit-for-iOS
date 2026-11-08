@@ -1,11 +1,15 @@
 ## Test the Same Boundaries the Architecture Advertises
 
-The test navigator contains two primary groups:
+The test navigator includes these primary groups:
 
 ```text
 View model tests
 AppModel tests
+Feature tests
 ```
+
+Add persistence, integration, concurrency and support groups when the project
+needs them; keep the named Feature and ViewModel test homes easy to find.
 
 Rules for tests:
 

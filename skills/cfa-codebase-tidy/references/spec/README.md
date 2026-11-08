@@ -4,7 +4,7 @@ The authoritative source is [cfa-specification.md](../cfa-specification.md). The
 
 ## Find guidance by task
 
-- Working code: [bundled starter apps and open-source iOS projects](examples/open-source-apps.md).
+- Working code: [bundled starter apps and open-source iOS projects](examples/open-source-apps.md), and [runnable Notes and deep-link examples](examples/README.md).
 - Learn why: [CFA explanations](explanations.md).
 - Feature boundaries and shared workflows: [Define Features by Business Capability, Not by Screen or Tab](topics/16-define-features-by-business-capability-not-by-screen-or-tab.md); [Organize Behaviour into Cohesive Features](topics/18-organize-behaviour-into-cohesive-features.md).
 - AppModel, startup, device targets and listeners: [Use AppModel as the Composition Root and Feature Facade](topics/17-use-appmodel-as-the-composition-root-and-feature-facade.md); [Use Application Launch as an Opportunity to Refresh Features](topics/21-use-application-launch-as-an-opportunity-to-refresh-features.md).

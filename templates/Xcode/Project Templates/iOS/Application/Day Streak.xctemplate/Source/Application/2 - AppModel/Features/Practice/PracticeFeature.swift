@@ -22,7 +22,7 @@ final class PracticeFeature {
     @ObservationIgnored private var operationTask: Task<Void, Error>?
     @ObservationIgnored private var operationID: UUID?
 
-    init(repository: any SessionRepository, calendar: Calendar = .current,
+    init(repository: any SessionRepository, calendar: Calendar = .autoupdatingCurrent,
          now: @escaping () -> Date = Date.init,
          makeQuestion: @escaping (Difficulty) -> MultiplicationQuestion = MultiplicationQuestion.random) {
         self.repository = repository
@@ -80,7 +80,7 @@ final class PracticeFeature {
                 calendar.isDate(storedSessions[index].day, inSameDayAs: today) &&
                 !storedSessions[index].isComplete &&
                 storedSessions[index].correctCount >= PracticeSession.target {
-                storedSessions[index].completedAt = now()
+                storedSessions[index] = storedSessions[index].updating(completedAt: now())
                 try await repository.save(storedSessions[index])
             }
             sessions = storedSessions
@@ -105,29 +105,28 @@ final class PracticeFeature {
                 guard session.question.id == questionID else { throw PracticeError.staleQuestion }
                 guard !session.question.isResolved, session.question.choices.contains(value) else { return }
                 if value == session.question.answer {
-                    session.question.isAnswered = true
-                    if session.question.wrongAnswers.isEmpty {
-                        session.correctCount += 1
-                    }
-                    if session.correctCount >= PracticeSession.target { session.completedAt = now() }
+                    let correctCount = session.correctCount + (session.question.wrongAnswers.isEmpty ? 1 : 0)
+                    session = session.updating(question: session.question.updating(isAnswered: true),
+                                               correctCount: correctCount,
+                                               completedAt: correctCount >= PracticeSession.target ? now() : nil)
                 } else {
-                    session.question.wrongAnswers.insert(value)
+                    session = session.updating(question: session.question.updating(
+                        wrongAnswers: session.question.wrongAnswers.union([value])))
                 }
             case let .reveal(questionID):
                 guard session.question.id == questionID else { throw PracticeError.staleQuestion }
                 guard !session.question.isResolved else { return }
-                session.question.isRevealed = true
+                session = session.updating(question: session.question.updating(isRevealed: true))
             case let .next(questionID):
                 guard session.question.id == questionID else { throw PracticeError.staleQuestion }
                 guard session.question.isResolved else { throw PracticeError.unresolvedQuestion }
-                session.questionNumber += 1
-                session.question = makeQuestion(session.difficulty)
+                session = session.updating(question: makeQuestion(session.difficulty),
+                                           questionNumber: session.questionNumber + 1)
             case let .difficulty(difficulty):
                 guard session.canChangeDifficulty else { throw PracticeError.difficultyLocked }
                 // Changing the first question must not bank repeatable points.
-                session.difficulty = difficulty
-                session.correctCount = 0
-                session.question = makeQuestion(difficulty)
+                session = session.updating(difficulty: difficulty, question: makeQuestion(difficulty),
+                                           correctCount: 0)
             case .refresh, .start:
                 return
             }

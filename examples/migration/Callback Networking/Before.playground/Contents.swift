@@ -21,7 +21,8 @@ struct LegacyLaunchAPI: Sendable {
 
 // MARK: - Test fixtures
 // Deterministic network fixture; no real service is contacted.
-// supplies deterministic responses without a network.
+// URLSession owns the protocol lifecycle; this subclass adds no mutable state.
+// Reassess the unchecked conformance if the fixture gains shared state.
 final class FixtureURLProtocol: URLProtocol, @unchecked Sendable {
     override class func canInit(with request: URLRequest) -> Bool { true }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }

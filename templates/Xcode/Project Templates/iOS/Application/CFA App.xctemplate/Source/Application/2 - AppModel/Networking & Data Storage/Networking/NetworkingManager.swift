@@ -1,6 +1,6 @@
 import Foundation
 
-actor NetworkingManager {
+nonisolated struct NetworkingManager: Sendable {
     private let session: URLSession
 
     init(session: URLSession = .shared) {

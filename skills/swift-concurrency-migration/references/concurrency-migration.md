@@ -82,11 +82,12 @@ fully migrated to a single mechanism when scoped consumers still require another
 
 ## Preserve concurrency guarantees
 
-First establish the CFA boundary for one complete feature: a bespoke ViewModel
-for each View, a concrete Feature for business decisions and AppModel for
-composition. Then migrate asynchronous model work below the View layer. Keep
-SwiftUI declarative until the Model exposes useful, directly testable async
-functions.
+First establish the CFA boundary for one complete feature: a dedicated ViewModel
+for each screen-level SwiftUI View, a concrete Feature for business decisions
+and AppModel for composition. Reusable presentation components do not
+automatically need their own ViewModel. Then migrate asynchronous model work
+below the View layer. Keep SwiftUI declarative until the Model exposes useful,
+directly testable async functions.
 
 Inventory every queue, group, barrier, semaphore, callback, delegate, and
 operation. For each one, determine:
@@ -99,9 +100,12 @@ operation. For each one, determine:
 - how errors and cancellation currently behave.
 
 Maintain a concurrency inventory alongside the migration ledger. For every
-legacy primitive, record the guarantee it currently provides, its intended
-Swift Concurrency replacement, and the test or observation that proves the
-guarantee was preserved.
+legacy primitive in scope, record the guarantee it currently provides, its
+intended Swift Concurrency replacement or the concrete reason it must remain,
+and the test or observation that shows the guarantee was preserved. An adapter
+or framework-required primitive can remain when removing it would break a
+supported integration or change required behaviour; do not retain one merely
+to avoid the migration work.
 
 Replace behaviour, not syntax. Do not mechanically translate `DispatchQueue`
 calls into `Task`, actors, continuations, `async let`, or task groups. Preserve
@@ -109,8 +113,9 @@ the ordering, lifetime, isolation, and concurrency guarantees required by the
 product. Keep feature commands as `async` functions that tests can call and
 await directly.
 
-When adapting callback APIs, use a checked continuation only when an async API
-is not already available. Prove that every execution path resumes the
+When adapting callback APIs, prefer a native async API when it preserves the
+required behaviour and is available on the supported platforms. Use a checked
+continuation when a callback bridge is needed. Prove that every execution path resumes the
 continuation exactly once, including success, failure, cancellation, and early
 exit paths. A continuation is a bridge to an existing callback lifetime; it
 must not invent different cancellation or ordering behaviour.

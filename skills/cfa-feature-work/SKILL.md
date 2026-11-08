@@ -19,7 +19,8 @@ do not impose CFA on another architecture or link to an unpublished article.
 Apply the specification's screen-construction invariant within the requested
 scope: private ViewModel ownership with inline `@State` construction by default.
 A detail View may construct its own State-backed ViewModel from selected value data
-in its initializer. Never inject or share ViewModels; keep selection out of Features. Review-only work
+in its initializer. Never inject or share ViewModels; keep screen and scene navigation selections
+out of Features. Review-only work
 reports violations; tests inject Features into ViewModels, not ViewModels into Views.
 
 Read the [CFA specification](references/cfa-specification.md), [CFA change
@@ -38,7 +39,8 @@ If the project is already CFA, make the smallest complete vertical change:
 
 1. Add or change the feature-owned domain behaviour in its Feature and
    repository boundary.
-2. Give every new SwiftUI View its own adjacent, bespoke ViewModel. Views remain
+2. Give every new screen-level SwiftUI View its own adjacent, bespoke ViewModel.
+   Reusable presentation components do not automatically need one. Views remain
    declarative and forward intent; business decisions stay in the feature model.
 3. Wire dependencies through AppModel. Do not create global singletons or add
    generic manager layers.

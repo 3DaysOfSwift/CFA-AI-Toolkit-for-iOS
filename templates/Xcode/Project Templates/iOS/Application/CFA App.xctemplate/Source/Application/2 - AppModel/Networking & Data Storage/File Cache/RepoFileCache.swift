@@ -18,6 +18,7 @@ actor RepoFileCache: RepoCache {
 
     func saveRepos(_ repos: [Repo]) throws {
         let data = try JSONEncoder().encode(repos)
+        try FileManager.default.createDirectory(at: cacheFileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
         try data.write(to: cacheFileURL, options: .atomic)
     }
 }

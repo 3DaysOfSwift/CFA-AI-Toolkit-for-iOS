@@ -16,7 +16,7 @@ struct TrendsView: View {
                             .foregroundStyle(themeManager.selectedTheme.secondaryText)
                         if let error = viewModel.loadError {
                             Text(error)
-                            Button("Try again") { Task { await viewModel.retry() } }
+                            Button("Try again") { viewModel.retry() }
                                 .frame(minHeight: 48)
                         }
                         if viewModel.isLoading { ProgressView("Loading your habits…") }

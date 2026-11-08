@@ -24,7 +24,7 @@ final class DayStreakFeature {
     private let calendar: Calendar
     private let currentDate: () -> Date
 
-    init(habitsFeature: HabitsFeature, calendar: Calendar = .current,
+    init(habitsFeature: HabitsFeature, calendar: Calendar = .autoupdatingCurrent,
          currentDate: @escaping () -> Date = { .now }) {
         self.habitsFeature = habitsFeature
         self.calendar = calendar

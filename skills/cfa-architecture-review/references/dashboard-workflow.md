@@ -30,8 +30,11 @@ Verify that the selected iOS target uses Swift Concurrency. If it does not,
 explain that this skill does not apply; offer a separate migration review rather
 than a misleading zero-score dashboard. GCD may coexist with Swift Concurrency.
 Do not require Trend, an `AppModel` class name, or this repository's folder names.
-For SwiftUI MVVM, trace View → ViewModel → feature API/manager → integration,
-and identify the project's actual composition root and live wiring.
+For an unfamiliar SwiftUI MVVM project, trace its actual View → ViewModel →
+feature owner → supporting services and integrations, and identify its actual
+composition root and live wiring. When describing CFA, use the agreed layer
+names: View → ViewModel → Feature → Microservices. Existing projects may use
+different names or boundaries; report what is present rather than relabelling it.
 
 Make concurrent behaviour understandable without requiring the reader to decode
 source code or a dense sequence diagram. Start with the developer's requested

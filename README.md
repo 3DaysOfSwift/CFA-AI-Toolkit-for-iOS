@@ -117,14 +117,15 @@ You can alternatively run the same installer from Terminal:
 ./Install\ Xcode\ Template.command
 ```
 
-The installer prints the exact folder it created. If it does not print
-**“CFA App is installed in Xcode”**, the installation did not finish—read
-the message in the Terminal window before closing it.
+The installer prints each folder as it is installed. Wait for the final
+**“Quit and reopen Xcode”** instruction before closing the Terminal window;
+an earlier message for one template alone does not confirm that all components
+were installed. If an error appears, read it before closing the window.
 
 Quit and reopen Xcode. Choose **File → New → Project → iOS → CFA App**, **Habit Tracker** or **Day Streak**.
 Xcode asks for your product name and organisation identifier, then creates a
 new project. CFA App includes the CFA folders, a feature, network refresh, JSON
-file cache, retry state and colour-theme settings. The other templates provide
+file cache, retry state, colour-theme settings and a unit-test target. The other templates provide
 the application-specific features described below.
 
 ### Explore the Starter Apps
@@ -361,10 +362,11 @@ GCD often protects important behaviour: save order, shared state, cancellation,
 error delivery and the rule that an old request must not overwrite a new result.
 
 The Legacy GCD migration skill first records that existing behaviour. It then
-upgrades the whole app into CFA and Swift Concurrency in one change, with clear
-feature boundaries, rather than shipping a partly migrated app. Builds, tests
-and manual regression testing check that the upgraded app still does what the
-original app did.
+migrates the agreed scope to CFA and Swift Concurrency with clear feature
+boundaries. A verified feature checkpoint is progress, not proof that the agreed
+migration is complete. Builds, tests and manual regression testing check that
+the migrated app preserves its intended behaviour; justified retained boundaries
+are recorded.
 
 ## CFA Inspector
 
@@ -510,18 +512,18 @@ This section is for AI coding assistants (Codex, Claude Code, Cursor and others)
 
 **Rules to keep in every change**
 
-- Path: View → dedicated ViewModel → Feature → Repository. Views never receive ViewModels, Features, AppModel or repositories.
+- Path: View → dedicated ViewModel → Feature → Microservices. These supporting services can include repositories, networking and device API adapters. Views never receive ViewModels, Features, AppModel or repositories.
 - Each screen owns a private ViewModel, created inline with `@State` by default. A detail View may initialise its own State-backed ViewModel from selected value data. The ViewModel defaults its narrow Feature dependencies from `AppModel.shared`.
-- Features are concrete `@MainActor @Observable` classes named `…Feature`, with no matching protocol. They are never called Managers.
+- Features are concrete `@MainActor` classes named `…Feature`, with no matching protocol. Use `@Observable` when a Feature exposes UI-observed state. Features are never called Managers.
 - Features keep domain data, operation state and errors as separate values. Never use a `LoadState` enum that carries all three.
-- Overlapping calls share one retained `Task<Void, Never>`, cleared in `defer`. Distinct edits are queued and never dropped.
+- Each Feature defines its overlapping-call policy: equivalent operations normally share their in-flight work, while distinct edits are queued and never dropped. Keep task ownership and completion explicit.
 - AppModel stores `shared`, the concrete Features, one launch Boolean and private task handles for app-wide listeners, and has a single `static func live()`. The app delegate calls `applicationDidFinishLaunching()`.
-- `App.body` has a stable root. Database availability never gates the UI. SwiftData goes through `SwiftDataManager` and a `@ModelActor`. `URLSession` goes through `NetworkingManager`.
+- `App.body` has a stable root. Database availability never gates the UI. SwiftData goes through `SwiftDataManager`, with a `@ModelActor` for non-trivial persistence work. `URLSession` goes through `NetworkingManager`.
 - Write `@MainActor` explicitly on Features, ViewModels and AppModel, and use actors for shared storage. Never use locks, GCD inside async code, or `@unchecked Sendable` as an escape hatch.
 - Name ViewModel methods for the work they do: `refresh()`, `save()`, `retry()`.
 - Tests: one suite per ViewModel, plus named `FeatureTests` for each Feature. Use an isolated AppModel graph, never `AppModel.shared`, and no sleeps.
 - Preserve an established product's design. Themes, footers and branding are defaults for new apps only.
-- Upgrade a legacy GCD app as one whole-app change. Do not release a partly upgraded app.
+- Migrate the agreed scope to CFA and Swift Concurrency while preserving behavior; do not describe a feature checkpoint as a completed whole-app migration.
 - A change is complete only when the change gate and the specification's Review Checklist pass, with the build and tests run at the final commit.
 
 **Further reading**

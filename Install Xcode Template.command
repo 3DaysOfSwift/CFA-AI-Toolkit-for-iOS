@@ -3,7 +3,7 @@ set -eu
 cd "$(dirname "$0")"
 destination_root="${CFA_TEMPLATE_DESTINATION:-$HOME/Library/Developer/Xcode/Templates}"
 relative_directory="Project Templates/iOS/Application"
-template_names=("CFA App" "Habit Tracker" "Day Streak")
+template_names=("CFA App" "CFA App Tests" "Habit Tracker" "Habit Tracker Tests" "Day Streak" "Day Streak Tests")
 
 finish() {
   local result_code=$?

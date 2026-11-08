@@ -119,11 +119,14 @@ private(set) var isRefreshing = false
 private(set) var refreshError: (any Error)?
 ```
 
-`refresh()` is an explicit feature command. It may first publish saved
-data from SwiftData, then request newer data, update storage, and publish the
-confirmed current data. Reading a property must not secretly begin asynchronous
-work. A ViewModel exposes these values as presentation-ready properties; its View
-shows loading, failure, cached data, and retry for that feature.
+`refresh()` is an explicit feature command. It may display a saved snapshot
+while requesting newer data. When the server is authoritative and local storage
+is only a replaceable cache, publish a successful current response without waiting
+for the optional cache write; an older cache restore must not replace that response.
+User edits that require durable storage follow the separate save-before-publish
+rule. Reading a property must not secretly begin asynchronous work. A ViewModel
+exposes these values as presentation-ready properties; its View shows loading,
+failure, cached data, and retry for that feature.
 
 Never use `.task { AppModel.shared.applicationDidFinishLaunching() }`
 or an equivalent View-tied call to signal application launch. The app delegate

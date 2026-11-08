@@ -18,8 +18,8 @@ final class SettingsFeature {
     }
 
     func selectTheme(_ theme: AppColourTheme) {
-        selectedTheme = theme
         defaults.set(theme.rawValue, forKey: selectedColourThemeStorageKey)
+        selectedTheme = theme
     }
 
     var developerWebsiteURL: URL? {

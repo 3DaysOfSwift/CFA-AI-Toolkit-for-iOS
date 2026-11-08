@@ -36,6 +36,14 @@ final class PracticeViewModel {
     var streak: Int { dayStreakFeature.currentStreak }
     var week: [StreakDay] { dayStreakFeature.week }
     var preferredDifficulty: Difficulty { settingsFeature.preferredDifficulty }
+    func isCorrectAnswer(_ answer: Int, in question: MultiplicationQuestion) -> Bool {
+        question.isResolved && answer == question.answer
+    }
+
+    func isIncorrectAnswer(_ answer: Int, in question: MultiplicationQuestion) -> Bool {
+        question.wrongAnswers.contains(answer)
+    }
+
     var feedback: String {
         guard let question = session?.question else { return "" }
         if question.isRevealed { return "Answer revealed. This question earns no point." }
@@ -51,8 +59,10 @@ final class PracticeViewModel {
         if let refreshTask { return refreshTask }
         let task = Task { @MainActor in
             defer { refreshTask = nil }
-            do { try await practiceFeature.perform(.refresh) }
-            catch {
+            do {
+                try await practiceFeature.perform(.refresh)
+                errorMessage = nil
+            } catch {
                 retryCommand = .refresh
                 errorMessage = error.localizedDescription
             }
@@ -127,5 +137,6 @@ final class PracticeViewModel {
         }
     }
 
-    func retry() { perform(retryCommand) }
+    @discardableResult
+    func retry() -> Task<Void, Never> { perform(retryCommand) }
 }

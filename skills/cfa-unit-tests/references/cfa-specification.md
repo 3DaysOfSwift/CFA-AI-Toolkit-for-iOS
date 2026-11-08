@@ -713,6 +713,9 @@ return `true` only after navigation to that page occurs. The Feature removes
 the corresponding pending request after that result, not merely because the
 user agreed to navigate. A `false` result, cancellation, unavailable scene or
 failed navigation leaves it pending; a later scene can offer it again. The
+scene handler checks cancellation before navigating and returns `false` if it
+does not navigate. If it has already navigated, it returns `true` even if
+cancellation arrives afterward, so an opened request is not offered again. The
 destination screen then owns its own data loading, errors and refresh: do not
 wait for content to load before treating navigation as successful.
 
@@ -737,11 +740,11 @@ or global UI router by default. Store only safe data needed to identify and
 present a request; handle expired or unavailable destinations clearly. Persist
 before claiming a request is safely kept, and handle storage failures honestly.
 
-Record local notifications the app creates and push notifications it receives or
-handles as appropriate to the product. iOS does not guarantee delivery of every
-background push to the app; a product requiring a complete notification inbox
-needs an appropriate durable source, such as server-side history, rather than a
-promise that local callbacks see every event.
+For this pending list, record notification actions received from the system,
+not notifications merely scheduled or delivered. iOS does not guarantee that
+every background push is delivered to the app. If a product separately requires
+a complete notification inbox, choose an appropriate durable source for that
+requirement; do not assume local callbacks capture every delivery.
 
 ## Define Features by Business Capability, Not by Screen or Tab
 
@@ -901,19 +904,25 @@ The singleton guarantees shared access to the application graph; it does not
 create thread safety. Actor isolation and immutable values do that.
 
 Tests construct isolated application graphs and never mutate
-`AppModel.shared`. Previews inject isolated feature implementations when they
-need controlled state. Multiple production scenes use the shared graph so they
-cannot accidentally disagree about persisted application state.
+`AppModel.shared`. Previews keep the same View → ViewModel → Feature →
+microservice boundaries as the app: a screen constructs and owns its ViewModel,
+and its ViewModel accesses Features. A normal preview can simply use
+`#Preview { NotesView() }`: the View constructs its ViewModel, whose default
+Feature dependency comes from `AppModel.shared`. Do not inject a ViewModel into
+a screen or place a SwiftData container or context on a View or preview.
+Multiple production scenes use the shared graph so they cannot accidentally
+disagree about persisted application state.
 
 Do not give AppModel every function in the application. It is a facade over
 coherent features, not a god object. A command concerning one feature
 belongs on that feature's API and concrete implementation.
 
 Do not hide production dependency construction in default initializer values.
-`AppModel.init` is fully explicit and only assigns its supplied Features and
-initialises the private launch guard to `false`; it does not construct or
-resolve dependencies. No AppModel stored property has a default value except
-`shared`. Exactly one `static func live() -> AppModel` constructs the live
+`AppModel.init` is fully explicit: it assigns its supplied Features, initialises
+the private launch guard to `false` and initialises any app-wide listener task
+handles to `nil`. It does not construct or resolve dependencies. No AppModel
+stored property has a default value except `shared`. Exactly one
+`static func live() -> AppModel` constructs the live
 services, repositories, and Features and passes only Features to `init`.
 Tests construct isolated graphs by passing test Features to that same explicit
 initializer. `live()` may use local lower-level values, but never retains or
@@ -999,7 +1008,9 @@ initializer labels, and local references, including a reference copied from
 **Feature protocols are a waste of time.** In CFA, ViewModels depend directly
 on concrete features. Do not create matching `FeatureAPI` protocols. Test a
 ViewModel with a concrete feature whose repository or provider is replaced
-by a test double.
+by a test double. Throughout this specification, “Feature API” means the
+methods and properties exposed by that concrete Feature; it does not mean a
+separate protocol or an additional architectural layer.
 
 Use a `SwiftDataManager` whenever the app uses SwiftData. It owns container and
 context creation/opening and hands a narrow storage capability to the owning
@@ -1107,8 +1118,8 @@ Repository implementations:
 - throw meaningful errors rather than silently inventing success.
 
 For production SwiftData repositories with non-trivial reads, writes, imports,
-or data sets, use a dedicated `@ModelActor`. It owns its `ModelContext`; feature
-features remain `@MainActor` and publish only immutable `Sendable` domain
+or data sets, use a dedicated `@ModelActor`. It owns its `ModelContext`; Features
+remain `@MainActor` and publish only immutable `Sendable` domain
 values after awaiting the repository. SwiftData `@Model` records never cross
 from the model actor into a feature, ViewModel, or View. A small,
 deliberately UI-owned context may be main-actor isolated when its work is proven
@@ -1118,6 +1129,15 @@ Publish user edits and other durable commands as saved only after the required
 authoritative persistence succeeds. Keep an editable draft on failure and report
 the error; do not present unsaved changes as saved. Loading and error
 presentation may update independently.
+
+For simple preferences, `UserDefaults.set` updates the process's in-memory
+defaults immediately and writes to disk asynchronously; it does not report a
+durable-write result. Update the defaults before publishing the preference,
+but do not present the return from `set` as proof that the disk write succeeded.
+If a product requires confirmed persistence and recoverable write errors, use an
+appropriate storage API that provides those results instead. Apple documents
+[UserDefaults write behaviour](https://developer.apple.com/documentation/foundation/userdefaults)
+and says [`synchronize()` is unnecessary and should not be used](https://developer.apple.com/documentation/foundation/userdefaults/synchronize()).
 
 A replaceable local cache of data already obtained from an authoritative remote
 source is different: publish a successful, current response without waiting for
@@ -1438,11 +1458,14 @@ private(set) var isRefreshing = false
 private(set) var refreshError: (any Error)?
 ```
 
-`refresh()` is an explicit feature command. It may first publish saved
-data from SwiftData, then request newer data, update storage, and publish the
-confirmed current data. Reading a property must not secretly begin asynchronous
-work. A ViewModel exposes these values as presentation-ready properties; its View
-shows loading, failure, cached data, and retry for that feature.
+`refresh()` is an explicit feature command. It may display a saved snapshot
+while requesting newer data. When the server is authoritative and local storage
+is only a replaceable cache, publish a successful current response without waiting
+for the optional cache write; an older cache restore must not replace that response.
+User edits that require durable storage follow the separate save-before-publish
+rule. Reading a property must not secretly begin asynchronous work. A ViewModel
+exposes these values as presentation-ready properties; its View shows loading,
+failure, cached data, and retry for that feature.
 
 Never use `.task { AppModel.shared.applicationDidFinishLaunching() }`
 or an equivalent View-tied call to signal application launch. The app delegate
@@ -1593,12 +1616,16 @@ they do not alter domain meaning.
 
 ## Test the Same Boundaries the Architecture Advertises
 
-The test navigator contains two primary groups:
+The test navigator includes these primary groups:
 
 ```text
 View model tests
 AppModel tests
+Feature tests
 ```
+
+Add persistence, integration, concurrency and support groups when the project
+needs them; keep the named Feature and ViewModel test homes easy to find.
 
 Rules for tests:
 
@@ -1694,11 +1721,12 @@ Before accepting a change, answer every question:
 5. Does every business decision live in a feature or lower Model layer?
 6. Would an Apple Watch app be able to reuse the decision without copying UI
    code?
-7. Does each ViewModel depend on the smallest coherent set of narrow,
-   replaceable feature APIs?
-8. Does AppModel only assemble and expose features or coordinate a genuinely
-   application-wide workflow?
-9. Are persistence and external-system details behind repository contracts?
+7. Does each ViewModel depend on the smallest coherent set of concrete
+   Features needed by its screen?
+8. Does AppModel assemble and expose Features, own app-wide listener tasks,
+   and limit coordination to genuinely application-wide responsibilities?
+9. Is persistence accessed through repository protocols, and are other
+   external-system details handled by appropriate microservices?
 10. Are async operations directly testable, with no Task handle stored by a
     View and every meaningful Task lifetime stored by its ViewModel or other
     correct owner?

@@ -17,9 +17,10 @@ struct PurchasesFeatureTests {
                              dayStreakFeature: DayStreakFeature(habitsFeature: habits),
                              settingsFeature: SettingsFeature(defaults: defaults),
                              purchasesFeature: feature,
-                             trendsFeature: TrendsFeature(habitsFeature: habits, purchasesFeature: feature))
+                             trendsFeature: TrendsFeature(habitsFeature: habits))
         model.applicationDidFinishLaunching()
         model.applicationDidFinishLaunching()
+        #expect(store.updateSubscriptionCount == 1)
         await store.waitForFinishes(1)
         store.entitled = true
         store.updateContinuation?.yield(())
@@ -99,6 +100,20 @@ struct PurchasesFeatureTests {
         store.failsVerification = false
         await feature.refreshEntitlement()
         #expect(feature.hasTrendsAccess)
+    }
+
+    @Test func successfulOfferDoesNotHideEntitlementFailure() async {
+        let store = TestPurchaseStore()
+        let feature = PurchasesFeature(store: store)
+        store.failsVerification = true
+        await feature.prepare()
+        #expect(feature.offer != nil)
+        #expect(feature.errorMessage != nil)
+        #expect(!feature.hasTrendsAccess)
+
+        store.failsVerification = false
+        await feature.refreshEntitlement()
+        #expect(feature.errorMessage == nil)
     }
 
     @Test func staleEntitlementCannotUndoRevocation() async {

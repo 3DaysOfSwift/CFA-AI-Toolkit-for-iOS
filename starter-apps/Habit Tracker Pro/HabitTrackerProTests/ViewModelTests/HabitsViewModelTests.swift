@@ -20,4 +20,17 @@ struct HabitsViewModelTests {
 
         #expect(viewModel.habitCountSummary == "1 daily habit")
     }
+
+    @Test("Describes count and completion habits for the screen")
+    func habitDescriptions() {
+        let feature = HabitsFeature(repository: InMemoryHabitsRepository())
+        let viewModel = HabitsViewModel(habitsFeature: feature)
+        let count = Habit(id: UUID(), name: "Walk", tracking: .count,
+                          unit: "steps", dailyTarget: 10, entries: [])
+        let completion = Habit(id: UUID(), name: "Read", tracking: .completion,
+                               unit: "", dailyTarget: nil, entries: [])
+        #expect(viewModel.description(for: count) == "Count in steps · target 10")
+        #expect(viewModel.description(for: completion) == "Daily completion")
+    }
+
 }

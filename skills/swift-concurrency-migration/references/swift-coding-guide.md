@@ -124,7 +124,7 @@ Bindings, conditional content, `ForEach` and direct dismissal are declarative UI
 
 Use the application lifecycle for an app-wide system refresh that should begin at launch. The UIKit delegate callback starts that shared work before scene display preparation; it does not wait for a network or storage operation to finish. This gives shared work an early opportunity to overlap with UI construction. Do not use a screen `.task` as the sole trigger for app-wide work, persistent saves or work that must outlive a screen.
 
-When launch and a screen `.task` can request the same refresh, the Feature owns one in-flight `Task<Void, Never>`. The first caller creates it; subsequent callers await its `value` rather than starting duplicate work or returning early. Derive `isRefreshing` from the stored handle and clear the handle in the task's `defer` after publishing its outcome. This is a Feature-owned task, not a structured child of a screen task, because the work may outlive that screen. Use another documented policy only when the product contract genuinely differs. UIKit delegate and layout code belongs in a named presentation adapter when needed. Do not create extra layers just to move a trivial assignment.
+When launch and a screen `.task` can request an equivalent refresh, the Feature owns the in-flight work. The first caller starts it; subsequent callers await the same outcome rather than starting duplicate work or returning early. Retain the appropriate task handle, expose accurate refresh status, and clear the handle after the outcome without letting an older completion clear newer work. The task's result and error types should match the operation. This Feature-owned work may outlive the screen. Use another documented policy only when the product contract genuinely differs. UIKit delegate and layout code belongs in a named presentation adapter when needed. Do not create extra layers just to move a trivial assignment.
 
 For a synchronous Button action that begins a refresh, the ViewModel also owns
 one screen interaction task. Its `refresh()` method returns the stored
@@ -136,7 +136,7 @@ when its work completes.
 
 The SwiftUI environment is for app-wide presentation dependencies such as `ThemeManager`, locale-aware formatting or accessibility configuration. Do not place `AppModel` or a feature in the environment. Use the active architecture's declared composition route for feature dependencies. In CFA, a View owns its ViewModel and that ViewModel defaults its narrow live feature dependency from `AppModel.shared`; do not replace that route with screen-initializer plumbing.
 
-**Review:** Does each screen start its own initial work in `.task` before it appears, when that work belongs to the screen? Does the app lifecycle begin shared system refresh early without blocking the root UI? A reader should see what the screen displays and which intents it forwards without tracing storage calls, bundle/system reads, formatting work, business rules, or multi-step tasks in its body. Does the ViewModel receive only the narrow Feature dependencies it needs, each with its live default? A screen can present several independent business capabilities. For a growing ViewModel, ask whether it is arranging existing capabilities for this screen or implementing a new business capability itself; only the latter points towards extracting business behaviour into the model.
+**Review:** When a screen has initial work tied to its lifetime, does it start that work using `.task` without assuming the work finishes before the screen appears? Does the app lifecycle begin shared system refresh early without blocking the root UI? A reader should see what the screen displays and which intents it forwards without tracing storage calls, bundle/system reads, formatting work, business rules, or multi-step tasks in its body. Does the ViewModel receive only the narrow Feature dependencies it needs, each with its live default? A screen can present several independent business capabilities. For a growing ViewModel, ask whether it is arranging existing capabilities for this screen or implementing a new business capability itself; only the latter points towards extracting business behaviour into the model.
 
 ### Inline editing saves directly; dedicated editors may have Save and Cancel
 
@@ -327,7 +327,7 @@ For durable user edits, prepare the proposed state, commit it, then expose confi
 
 **Rule:** Use Swift concurrency with a clear task owner and a deliberate policy for overlapping work.
 
-Use structured child tasks for independent work whose lifetime belongs to the current operation. Give longer-lived tasks an owner and cancellation policy. A `Task` does not automatically move expensive work off the main actor; use suitable actor workers for parsing, persistence and generation. Do not add detached tasks merely to silence isolation errors.
+Use structured child tasks for independent work whose lifetime belongs to the current operation. Give longer-lived tasks an owner and cancellation policy. A `Task` does not automatically move expensive work off the main actor; choose an appropriate execution and isolation strategy for parsing, persistence and generation. An actor can protect shared mutable worker state, but stateless work does not require one merely because it is asynchronous. Do not add detached tasks merely to silence isolation errors.
 
 When already in an asynchronous operation, call sequential work with `await` in the current task. For independent concurrent work that belongs to that operation, use `async let` or a task group. Create an unstructured task only when its separate lifetime, shared ownership, or a synchronous entry point requires it; do not add a task merely to call and wait for another task. Awaiting suspends the task, not the UI thread. A structured scope waits for its children and cancellation propagates to them; an unstructured task needs an explicit lifetime and cancellation policy. When work is shared, cancelling one caller must respect the Feature's policy for other callers.
 
@@ -380,8 +380,9 @@ Run focused tests, then the relevant wider suite and build. Source parsing is no
 
 **Rule:** Choose one local persistence route for one responsibility. For a
 small, replaceable remote snapshot that is loaded and saved as one value, use a
-JSON file cache. Encode and decode the domain value once, whether its source is
-disk or the network. Do not add SwiftData alongside a JSON cache merely to
+JSON file cache by default. Decode the network response and map it to the
+domain snapshot as needed; encode and decode that snapshot at the cache
+boundary. Do not add SwiftData alongside a JSON cache merely to
 store the same downloaded data.
 
 Instant Loading binary snapshots are an advanced opt-in for a sufficiently
@@ -490,7 +491,9 @@ Likewise, a worker actor created after the container cannot protect its creation
 When isolated test graphs legitimately need independent containers, route their
 creation through one shared off-main-actor opener, with no suspension during
 container creation. Coalesce concurrent opening requests within each store.
-Keep tests parallel and normal operations on their own worker actors. Moving
+Keep tests parallel where their fixtures and shared resources permit it, and
+isolate persistence operations with an appropriate storage worker. This does
+not require an actor for each operation or for stateless helpers. Moving
 creation into detached tasks alone does not prevent this race. Do not work
 around it by removing uniqueness constraints or migration/versioned schemas:
 those variants also crashed in the investigation.

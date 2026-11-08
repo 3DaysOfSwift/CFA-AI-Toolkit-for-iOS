@@ -12,11 +12,12 @@ Before accepting a change, answer every question:
 5. Does every business decision live in a feature or lower Model layer?
 6. Would an Apple Watch app be able to reuse the decision without copying UI
    code?
-7. Does each ViewModel depend on the smallest coherent set of narrow,
-   replaceable feature APIs?
-8. Does AppModel only assemble and expose features or coordinate a genuinely
-   application-wide workflow?
-9. Are persistence and external-system details behind repository contracts?
+7. Does each ViewModel depend on the smallest coherent set of concrete
+   Features needed by its screen?
+8. Does AppModel assemble and expose Features, own app-wide listener tasks,
+   and limit coordination to genuinely application-wide responsibilities?
+9. Is persistence accessed through repository protocols, and are other
+   external-system details handled by appropriate microservices?
 10. Are async operations directly testable, with no Task handle stored by a
     View and every meaningful Task lifetime stored by its ViewModel or other
     correct owner?

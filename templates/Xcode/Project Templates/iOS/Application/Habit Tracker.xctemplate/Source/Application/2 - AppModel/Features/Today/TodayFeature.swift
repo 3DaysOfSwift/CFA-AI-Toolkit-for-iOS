@@ -13,7 +13,11 @@ final class TodayFeature {
     }
 
     var habits: [Habit] { habitsFeature.habits }
-    var completedHabitCount: Int { habits.filter(\.isCompleteToday).count }
+    var completedHabitCount: Int { habits.filter { habitsFeature.isCompleteToday($0) }.count }
+    var today: Date { habitsFeature.today }
+
+    func valueToday(for habit: Habit) -> Int { habitsFeature.valueToday(for: habit) }
+    func isCompleteToday(_ habit: Habit) -> Bool { habitsFeature.isCompleteToday(habit) }
     var isLoading: Bool { habitsFeature.isLoading }
     var loadError: String? { habitsFeature.loadError }
 
@@ -21,7 +25,7 @@ final class TodayFeature {
 
     func valueForTogglingCompletion(habitID: UUID) -> Int? {
         guard let habit = habits.first(where: { $0.id == habitID }) else { return nil }
-        return habit.isCompleteToday ? 0 : (habit.dailyTarget ?? 1)
+        return habitsFeature.isCompleteToday(habit) ? 0 : (habit.dailyTarget ?? 1)
     }
 
     func recordToday(habitID: UUID, value: Int) async throws {

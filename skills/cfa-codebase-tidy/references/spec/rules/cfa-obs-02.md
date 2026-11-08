@@ -4,7 +4,7 @@
 
 **Strength:** Default.
 
-**Guidance:** Keep the unsaved field value in the screen ViewModel until Save or Cancel; persisted values remain Feature-owned.
+**Guidance:** Keep the unsaved field value in the screen ViewModel until a save succeeds or the user cancels; retain it after a failed save. Persisted values remain Feature-owned.
 
 **Why:** An abandoned edit does not become shared application state.
 

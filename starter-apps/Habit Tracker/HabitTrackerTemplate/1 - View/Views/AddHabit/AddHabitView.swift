@@ -21,6 +21,7 @@ struct AddHabitView: View {
                             .keyboardType(.numberPad)
                     }
                 }
+                .disabled(viewModel.isSaving)
                 Section {
                     Text("You can change today’s progress from the Today tab. Your history stays on this device.")
                         .font(.footnote).foregroundStyle(theme.secondaryText)
@@ -33,6 +34,7 @@ struct AddHabitView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
+                        .disabled(viewModel.isSaving)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") { viewModel.save() }
@@ -49,6 +51,7 @@ struct AddHabitView: View {
                 if didSave { dismiss() }
             }
         }
+        .interactiveDismissDisabled(viewModel.isSaving)
         .tint(theme.tint)
         .preferredColorScheme(theme.colorScheme)
     }

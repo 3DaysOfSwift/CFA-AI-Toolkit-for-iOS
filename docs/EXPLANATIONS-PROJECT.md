@@ -63,10 +63,13 @@ when an architectural decision actually changes, then update related notes and
 skills. The public article explains that decision rather than becoming a
 competing source of architectural instructions.
 
-## Decisions to resolve with Matthew
+## Outstanding explanation work
 
-1. **Independent destinations:** a worked zero-input screen design for two
-   detail windows showing different records without one global selection.
+1. **Independent destinations:** verify the agreed selected-snapshot approach
+   with two detail windows showing different records without one global selection.
+   A detail View can receive its selected snapshot and construct its own
+   State-backed ViewModel; this is an example and verification task, not an
+   unresolved zero-input rule.
 2. **Graph scope:** how CFA should describe multi-account/document-scoped
    products while retaining explicit shared production composition.
 3. **Evidence:** which real migrations or investigations are approved for

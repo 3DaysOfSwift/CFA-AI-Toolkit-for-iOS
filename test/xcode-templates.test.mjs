@@ -8,6 +8,14 @@ import { execFileSync, spawnSync } from 'node:child_process';
 const root = path.resolve(import.meta.dirname, '..');
 const names = ['CFA App', 'Habit Tracker', 'Day Streak'];
 
+test('native templates provide the accent color expected by generated Xcode projects', () => {
+  for (const name of names) {
+    const file = path.join(root, 'templates/Xcode/Project Templates/iOS/Application', `${name}.xctemplate/Source/Assets.xcassets/AccentColor.colorset/Contents.json`);
+    const asset = JSON.parse(fs.readFileSync(file, 'utf8'));
+    assert.ok(asset.colors.some(color => color.idiom === 'universal'), name);
+  }
+});
+
 for (const [name, application, assets, configuration, light, dark] of [
   ['Habit Tracker', 'Habit Tracker/HabitTrackerTemplate', 'Habit Tracker/HabitTrackerTemplate/Assets.xcassets', 'Habit Tracker/HabitTrackerTemplate.xcodeproj/project.pbxproj', [0.96, 0.96, 0.94], [0.08, 0.09, 0.09]],
   ['Habit Tracker Pro', 'Habit Tracker Pro/HabitTrackerPro', 'Habit Tracker Pro/HabitTrackerPro/Assets.xcassets', 'Habit Tracker Pro/HabitTrackerPro.xcodeproj/project.pbxproj', [0.96, 0.96, 0.94], [0.08, 0.09, 0.09]],
@@ -94,6 +102,15 @@ test('new-project templates contain no UI-test targets or empty UI-test folders'
   }
 });
 
+test('new-project templates define the app display name from the product name', () => {
+  for (const name of names) {
+    const file = path.join(root, 'templates/Xcode/Project Templates/iOS/Application', `${name}.xctemplate/TemplateInfo.plist`);
+    const info = JSON.parse(execFileSync('python3', ['-c', 'import json, plistlib, sys; print(json.dumps(plistlib.load(open(sys.argv[1], "rb"))))', file], { encoding: 'utf8' }));
+    const settings = info.Targets.find(target => target.TargetIdentifier === 'com.apple.dt.applicationTarget' || !target.TargetIdentifier)?.SharedSettings;
+    assert.equal(settings?.INFOPLIST_KEY_CFBundleDisplayName, '$(PRODUCT_NAME)', `${name} must supply a resolved display name`);
+  }
+});
+
 function temporary(t) {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'cfa-xcode-templates-'));
   t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
@@ -110,6 +127,9 @@ test('all three Xcode templates install and updating preserves the previous copy
   const destination = temporary(t);
   install(destination);
   for (const name of names) assert.ok(fs.existsSync(path.join(target(destination, name), 'TemplateInfo.plist')));
+  assert.ok(fs.existsSync(path.join(target(destination, 'CFA App Tests'), 'TemplateInfo.plist')));
+  assert.ok(fs.existsSync(path.join(target(destination, 'Habit Tracker Tests'), 'TemplateInfo.plist')));
+  assert.ok(fs.existsSync(path.join(target(destination, 'Day Streak Tests'), 'TemplateInfo.plist')));
   fs.writeFileSync(path.join(target(destination, 'Habit Tracker'), 'local-note.txt'), 'Keep this');
   install(destination, '--replace');
   const parent = path.dirname(target(destination, 'Habit Tracker'));
@@ -148,4 +168,65 @@ test('Node-free macOS installer installs and updates all three templates', { ski
   execFileSync('/bin/zsh', ['Install Xcode Template.command'], options);
   execFileSync('/bin/zsh', ['Install Xcode Template.command'], options);
   for (const name of names) assert.ok(fs.existsSync(path.join(target(destination, name), 'TemplateInfo.plist')));
+  assert.ok(fs.existsSync(path.join(target(destination, 'CFA App Tests'), 'TemplateInfo.plist')));
+  assert.ok(fs.existsSync(path.join(target(destination, 'Habit Tracker Tests'), 'TemplateInfo.plist')));
+  assert.ok(fs.existsSync(path.join(target(destination, 'Day Streak Tests'), 'TemplateInfo.plist')));
 });
+
+
+test('CFA App template publishes fresh data without waiting for its optional cache', {skip: process.platform !== 'darwin', timeout: 120000}, () => {
+  const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/CFA App.xctemplate/Source/Application/2 - AppModel');
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'cfa-template-behavior-'));
+  try {
+    const executable = path.join(directory, 'test');
+    const files = [
+      path.join(source, 'Features/Git Repos/Repo.swift'),
+      path.join(source, 'Features/Git Repos/GitReposFeature.swift'),
+      path.join(source, 'Networking & Data Storage/Protocols/GitReposProvider.swift'),
+      path.join(root, 'test/fixtures/CFAAppTemplateBehavior.swift')
+    ];
+    const build = spawnSync('xcrun', ['swiftc', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(directory, 'cache'), ...files, '-o', executable], {encoding: 'utf8', timeout: 90000});
+    assert.equal(build.status, 0, build.stderr || build.error?.message);
+    const run = spawnSync(executable, [], {encoding: 'utf8', timeout: 15000});
+    assert.equal(run.status, 0, run.stderr || run.error?.message);
+    assert.match(run.stdout, /independent restore, shared refresh/);
+  } finally { fs.rmSync(directory, {recursive: true, force: true}); }
+});
+
+test('CFA App includes a separate unit-test template component', {skip: process.platform !== 'darwin'}, () => {
+  const template = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/CFA App.xctemplate');
+  const info = JSON.parse(execFileSync('plutil', ['-convert', 'json', '-o', '-', path.join(template, 'TemplateInfo.plist')], {encoding: 'utf8'}));
+  const component = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/CFA App Tests.xctemplate');
+  const testInfo = JSON.parse(execFileSync('plutil', ['-convert', 'json', '-o', '-', path.join(component, 'TemplateInfo.plist')], {encoding: 'utf8'}));
+  const option = info.Options.find(item => item.Identifier === 'cfaUnitTests');
+  assert.equal(option.Units.Include.Components[0].Identifier, testInfo.Identifier);
+  const testFiles = ['AppModelTests/AppModelTests.swift', 'FeatureTests/GitReposFeatureTests.swift', 'FeatureTests/SettingsFeatureTests.swift', 'NetworkingTests/NetworkingManagerTests.swift', 'ViewModelTests/GitReposViewModelTests.swift', 'ViewModelTests/SettingsViewModelTests.swift', 'ViewModelTests/RootTabViewModelTests.swift', 'Support/TestDependencies.swift'];
+  for (const file of testFiles) {
+    assert.ok(testInfo.Nodes.includes(file), `Missing test source ${file}`);
+    assert.ok(fs.existsSync(path.join(component, testInfo.Definitions[file].Path)));
+  }
+  assert.equal(info.Targets.filter(target => target.ProductType === 'com.apple.product-type.bundle.ui-testing').length, 0);
+});
+
+for (const [name, optionName] of [['Habit Tracker', 'cfaHabitTests'], ['Day Streak', 'cfaDayTests']]) {
+  test(`${name} keeps its test sources in its linked unit-test component`, {skip: process.platform !== 'darwin'}, () => {
+    const base = path.join(root, 'templates/Xcode/Project Templates/iOS/Application');
+    const app = path.join(base, `${name}.xctemplate`);
+    const component = path.join(base, `${name} Tests.xctemplate`);
+    const readPlist = directory => JSON.parse(execFileSync('plutil', ['-convert', 'json', '-o', '-', path.join(directory, 'TemplateInfo.plist')], {encoding: 'utf8'}));
+    const info = readPlist(app);
+    const tests = readPlist(component);
+    const option = info.Options.find(item => item.Identifier === optionName);
+    assert.equal(option.Units.Include.Components[0].Identifier, tests.Identifier);
+    assert.equal(info.Targets.length, 1);
+    assert.equal(tests.Targets[0].TargetIdentifierToBeTested, 'com.apple.dt.applicationTarget');
+    assert.ok(tests.Nodes.length > 0);
+    assert.ok(info.Nodes.every(node => !node.endsWith('Tests.swift')));
+    for (const node of tests.Nodes) {
+      assert.ok(fs.existsSync(path.join(component, tests.Definitions[node].Path)), node);
+      if (node.endsWith('Tests.swift')) {
+        assert.match(fs.readFileSync(path.join(component, tests.Definitions[node].Path), 'utf8'), /@testable import ___PROJECTNAME:identifier___/);
+      }
+    }
+  });
+}

@@ -22,11 +22,34 @@ actor ControlledNotes: NotesRepository {
     }
 }
 
+actor RetryableNotes: NotesRepository {
+    private var attempts = 0
+    let note = Note(id: UUID(), text: "Previously saved")
+    func load() async throws -> [Note] {
+        attempts += 1
+        if attempts == 1 { throw CocoaError(.fileReadNoPermission) }
+        return [note]
+    }
+    func save(_ note: Note) async throws {}
+}
+
 @main struct NotesReferenceTests {
     @MainActor static func main() async throws {
+        let retryRepository = RetryableNotes()
+        let retryFeature = NotesFeature(repository: retryRepository)
+        let retryModel = NotesEditorViewModel(notesFeature: retryFeature)
+        await retryModel.load().value
+        precondition(retryModel.loadError != nil && retryFeature.notes.isEmpty)
+        await retryModel.load().value
+        precondition(retryModel.loadError == nil && retryFeature.notes.map(\.text) == ["Previously saved"])
+
         let repository = ControlledNotes()
         let feature = NotesFeature(repository: repository)
         let model = NotesEditorViewModel(notesFeature: feature)
+        model.text = "  "
+        let empty = await model.save().value
+        precondition(!empty && model.text == "  " && model.saveError == "Enter a note before saving.")
+        precondition(feature.notes.isEmpty)
         model.text = "fail"
         let failure = await model.save().value
         precondition(!failure && model.text == "fail" && model.saveError != nil && feature.notes.isEmpty)

@@ -24,6 +24,7 @@ final class AppModel {
         self.purchasesFeature = purchasesFeature
         self.trendsFeature = trendsFeature
         didFinishLaunching = false
+        transactionUpdatesTask = nil
     }
 
     static func live() -> AppModel {
@@ -36,7 +37,7 @@ final class AppModel {
             dayStreakFeature: DayStreakFeature(habitsFeature: habitsFeature),
             settingsFeature: SettingsFeature(defaults: .standard),
             purchasesFeature: purchasesFeature,
-            trendsFeature: TrendsFeature(habitsFeature: habitsFeature, purchasesFeature: purchasesFeature)
+            trendsFeature: TrendsFeature(habitsFeature: habitsFeature)
         )
     }
 

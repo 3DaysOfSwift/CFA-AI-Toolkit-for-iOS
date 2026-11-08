@@ -30,7 +30,8 @@ launches do not complete the assessment; finish with its scoped verdict and repo
 Apply the specification's screen-construction invariant within a CFA conformance review's requested
 scope: private ViewModel ownership with inline `@State` construction by default.
 A detail View may construct its own State-backed ViewModel from selected value data
-in its initializer. Never inject or share ViewModels; keep selection out of Features. Review-only work
+in its initializer. Never inject or share ViewModels; keep screen and scene navigation selections
+out of Features. Review-only work
 reports violations; tests inject Features into ViewModels, not ViewModels into Views.
 
 Review the requested scope without refactoring the application or changing

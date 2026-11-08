@@ -761,7 +761,7 @@
     },
     {
       "id": "preserve-product-behaviour",
-      "title": "Modernising implementation is not redesign permission",
+      "title": "Migration preserves product behaviour",
       "classification": "cfa-choice",
       "ruleIds": [
         "CFA-SCOPE-01",

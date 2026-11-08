@@ -32,9 +32,16 @@ final class LegacyWeightLog: @unchecked Sendable {
 @MainActor
 func runExample() async {
     let model = LegacyWeightLog()
-    model.save(70) { _ in }
-    model.save(-1) { _ in }
-    model.save(72) { _ in }
+    let results = AsyncStream<Bool>.makeStream()
+    model.save(70) { results.continuation.yield($0) }
+    model.save(-1) { results.continuation.yield($0) }
+    model.save(72) { results.continuation.yield($0) }
+    var iterator = results.stream.makeAsyncIterator()
+    let first = await iterator.next()
+    let invalid = await iterator.next()
+    let last = await iterator.next()
+    results.continuation.finish()
+    precondition(first == true && invalid == false && last == true)
     let saved = await withCheckedContinuation { continuation in
         model.read { continuation.resume(returning: $0) }
     }

@@ -9,15 +9,15 @@ struct TrendsPaywallViewModelTests {
         let feature = PurchasesFeature(store: store)
         let viewModel = TrendsPaywallViewModel(purchasesFeature: feature)
         #expect(!viewModel.canPurchase)
-        await viewModel.retry()
+        await viewModel.retry().value
         #expect(viewModel.purchaseTitle == "Unlock Trends · $4.99")
         #expect(viewModel.canPurchase)
         store.outcome = .pending
-        await viewModel.purchase()
+        await viewModel.purchase().value
         #expect(!viewModel.canPurchase)
         #expect(viewModel.notice != nil)
         store.restoredAccess = true
-        await viewModel.restore()
+        await viewModel.restore().value
         #expect(feature.hasTrendsAccess)
     }
 }

@@ -24,13 +24,17 @@ actor HabitRepository: HabitsRepository {
         modelContext.insert(StoredHabit(id: habit.id, name: habit.name,
                                         trackingRawValue: habit.tracking.rawValue,
                                         unit: habit.unit, dailyTarget: habit.dailyTarget))
-        try modelContext.save()
+        do { try modelContext.save() }
+        catch { modelContext.rollback(); throw error }
     }
 
-    func record(habitID: UUID, date: Date, value: Int) async throws {
+    func record(habitID: UUID, entryID: UUID, date: Date, value: Int) async throws {
         let habitID = habitID
+        let entryID = entryID
+        let habitDescriptor = FetchDescriptor<StoredHabit>(predicate: #Predicate { $0.id == habitID })
+        guard try !modelContext.fetch(habitDescriptor).isEmpty else { throw HabitError.habitNotFound }
         let descriptor = FetchDescriptor<StoredHabitEntry>(
-            predicate: #Predicate { $0.habitID == habitID && $0.date == date }
+            predicate: #Predicate { $0.habitID == habitID && $0.id == entryID }
         )
         if let existing = try modelContext.fetch(descriptor).first {
             if value == 0 {
@@ -39,9 +43,10 @@ actor HabitRepository: HabitsRepository {
                 existing.value = value
             }
         } else if value > 0 {
-            modelContext.insert(StoredHabitEntry(id: UUID(), habitID: habitID, date: date, value: value))
+            modelContext.insert(StoredHabitEntry(id: entryID, habitID: habitID, date: date, value: value))
         }
-        try modelContext.save()
+        do { try modelContext.save() }
+        catch { modelContext.rollback(); throw error }
     }
 }
 

@@ -18,7 +18,7 @@ struct DayStreakView: View {
                         if let error = viewModel.loadError {
                             Text("Couldn’t load your activity").font(.headline)
                             Text(error)
-                            Button("Try again") { Task { await viewModel.retryLoading() } }
+                            Button("Try again") { viewModel.retryLoading() }
                                 .frame(minWidth: 48, minHeight: 48)
                                 .buttonStyle(.bordered).disabled(viewModel.isLoading)
                         }

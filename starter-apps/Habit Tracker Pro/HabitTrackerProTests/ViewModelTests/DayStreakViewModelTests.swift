@@ -29,11 +29,11 @@ struct DayStreakViewModelTests {
         let repository = StreakLoadingRepository()
         let habitsFeature = HabitsFeature(repository: repository)
         let viewModel = DayStreakViewModel(dayStreakFeature: DayStreakFeature(habitsFeature: habitsFeature))
-        await viewModel.retryLoading()
+        await viewModel.retryLoading().value
         #expect(viewModel.loadError != nil)
         #expect(!viewModel.isLoading)
         await repository.allowLoading()
-        await viewModel.retryLoading()
+        await viewModel.retryLoading().value
         #expect(viewModel.loadError == nil)
     }
 }
@@ -46,5 +46,5 @@ private actor StreakLoadingRepository: HabitsRepository {
         return []
     }
     func insertHabit(_ habit: Habit) async throws {}
-    func record(habitID: UUID, date: Date, value: Int) async throws {}
+    func record(habitID: UUID, entryID: UUID, date: Date, value: Int) async throws {}
 }

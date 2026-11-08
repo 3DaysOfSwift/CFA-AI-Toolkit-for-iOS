@@ -5,16 +5,19 @@ import Observation
 @Observable
 final class TrendsViewModel {
     private let trendsFeature: TrendsFeature
+    private let purchasesFeature: PurchasesFeature
     var selectedHabitID: UUID?
 
-    init(trendsFeature: TrendsFeature = AppModel.shared.trendsFeature) {
+    init(trendsFeature: TrendsFeature = AppModel.shared.trendsFeature,
+         purchasesFeature: PurchasesFeature = AppModel.shared.purchasesFeature) {
         self.trendsFeature = trendsFeature
+        self.purchasesFeature = purchasesFeature
     }
 
-    var hasAccess: Bool { trendsFeature.hasAccess }
-    var isLoading: Bool { trendsFeature.isLoading }
-    var loadError: String? { trendsFeature.loadError }
-    var trends: [HabitTrend] { trendsFeature.trends }
+    var hasAccess: Bool { purchasesFeature.hasTrendsAccess }
+    var isLoading: Bool { hasAccess && trendsFeature.isLoading }
+    var loadError: String? { hasAccess ? trendsFeature.loadError : nil }
+    var trends: [HabitTrend] { hasAccess ? trendsFeature.trends : [] }
     var selectedTrend: HabitTrend? {
         trends.first(where: { $0.id == selectedHabitID }) ?? trends.first
     }
@@ -22,5 +25,16 @@ final class TrendsViewModel {
         get { selectedTrend?.id }
         set { selectedHabitID = newValue }
     }
-    func retry() async { await trendsFeature.reload() }
+    @ObservationIgnored private var retryTask: Task<Void, Never>?
+    @discardableResult
+    func retry() -> Task<Void, Never> {
+        if let retryTask { return retryTask }
+        let task = Task { [weak self, trendsFeature] in
+            defer { self?.retryTask = nil }
+            guard self?.hasAccess == true else { return }
+            await trendsFeature.reload()
+        }
+        retryTask = task
+        return task
+    }
 }

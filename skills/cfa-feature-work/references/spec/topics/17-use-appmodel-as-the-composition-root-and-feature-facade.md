@@ -57,19 +57,25 @@ The singleton guarantees shared access to the application graph; it does not
 create thread safety. Actor isolation and immutable values do that.
 
 Tests construct isolated application graphs and never mutate
-`AppModel.shared`. Previews inject isolated feature implementations when they
-need controlled state. Multiple production scenes use the shared graph so they
-cannot accidentally disagree about persisted application state.
+`AppModel.shared`. Previews keep the same View → ViewModel → Feature →
+microservice boundaries as the app: a screen constructs and owns its ViewModel,
+and its ViewModel accesses Features. A normal preview can simply use
+`#Preview { NotesView() }`: the View constructs its ViewModel, whose default
+Feature dependency comes from `AppModel.shared`. Do not inject a ViewModel into
+a screen or place a SwiftData container or context on a View or preview.
+Multiple production scenes use the shared graph so they cannot accidentally
+disagree about persisted application state.
 
 Do not give AppModel every function in the application. It is a facade over
 coherent features, not a god object. A command concerning one feature
 belongs on that feature's API and concrete implementation.
 
 Do not hide production dependency construction in default initializer values.
-`AppModel.init` is fully explicit and only assigns its supplied Features and
-initialises the private launch guard to `false`; it does not construct or
-resolve dependencies. No AppModel stored property has a default value except
-`shared`. Exactly one `static func live() -> AppModel` constructs the live
+`AppModel.init` is fully explicit: it assigns its supplied Features, initialises
+the private launch guard to `false` and initialises any app-wide listener task
+handles to `nil`. It does not construct or resolve dependencies. No AppModel
+stored property has a default value except `shared`. Exactly one
+`static func live() -> AppModel` constructs the live
 services, repositories, and Features and passes only Features to `init`.
 Tests construct isolated graphs by passing test Features to that same explicit
 initializer. `live()` may use local lower-level values, but never retains or

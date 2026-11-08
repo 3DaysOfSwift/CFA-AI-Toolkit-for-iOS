@@ -199,78 +199,6 @@
 			<key>Group</key>
 			<string>3 - App Resources</string>
 		</dict>
-		<key>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/DayStreakFeatureTests.swift</key>
-		<dict>
-			<key>Path</key>
-			<string>Source/Tests/FeatureTests/DayStreakFeatureTests.swift</string>
-			<key>TargetIdentifiers</key>
-			<array>
-				<string>com.3daysofswift.cfa.dayStreakTests</string>
-			</array>
-		</dict>
-		<key>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/PracticeFeatureTests.swift</key>
-		<dict>
-			<key>Path</key>
-			<string>Source/Tests/FeatureTests/PracticeFeatureTests.swift</string>
-			<key>TargetIdentifiers</key>
-			<array>
-				<string>com.3daysofswift.cfa.dayStreakTests</string>
-			</array>
-		</dict>
-		<key>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/SettingsFeatureTests.swift</key>
-		<dict>
-			<key>Path</key>
-			<string>Source/Tests/FeatureTests/SettingsFeatureTests.swift</string>
-			<key>TargetIdentifiers</key>
-			<array>
-				<string>com.3daysofswift.cfa.dayStreakTests</string>
-			</array>
-		</dict>
-		<key>___PACKAGENAMEASIDENTIFIER___Tests/StorageTests/SwiftDataManagerTests.swift</key>
-		<dict>
-			<key>Path</key>
-			<string>Source/Tests/StorageTests/SwiftDataManagerTests.swift</string>
-			<key>TargetIdentifiers</key>
-			<array>
-				<string>com.3daysofswift.cfa.dayStreakTests</string>
-			</array>
-		</dict>
-		<key>___PACKAGENAMEASIDENTIFIER___Tests/Support/TestSupport.swift</key>
-		<dict>
-			<key>Path</key>
-			<string>Source/Tests/Support/TestSupport.swift</string>
-			<key>TargetIdentifiers</key>
-			<array>
-				<string>com.3daysofswift.cfa.dayStreakTests</string>
-			</array>
-		</dict>
-		<key>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/DayStreakViewModelTests.swift</key>
-		<dict>
-			<key>Path</key>
-			<string>Source/Tests/ViewModelTests/DayStreakViewModelTests.swift</string>
-			<key>TargetIdentifiers</key>
-			<array>
-				<string>com.3daysofswift.cfa.dayStreakTests</string>
-			</array>
-		</dict>
-		<key>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/PracticeViewModelTests.swift</key>
-		<dict>
-			<key>Path</key>
-			<string>Source/Tests/ViewModelTests/PracticeViewModelTests.swift</string>
-			<key>TargetIdentifiers</key>
-			<array>
-				<string>com.3daysofswift.cfa.dayStreakTests</string>
-			</array>
-		</dict>
-		<key>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/SettingsViewModelTests.swift</key>
-		<dict>
-			<key>Path</key>
-			<string>Source/Tests/ViewModelTests/SettingsViewModelTests.swift</string>
-			<key>TargetIdentifiers</key>
-			<array>
-				<string>com.3daysofswift.cfa.dayStreakTests</string>
-			</array>
-		</dict>
 		<key>Assets.xcassets</key>
 		<dict>
 			<key>Path</key>
@@ -302,14 +230,6 @@
 		<string>2 - AppModel/User Data Storage/SwiftDataManager.swift</string>
 		<string>3 - App Resources/LaunchScreen.storyboard</string>
 		<string>3 - App Resources/PrivacyInfo.xcprivacy</string>
-		<string>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/DayStreakFeatureTests.swift</string>
-		<string>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/PracticeFeatureTests.swift</string>
-		<string>___PACKAGENAMEASIDENTIFIER___Tests/FeatureTests/SettingsFeatureTests.swift</string>
-		<string>___PACKAGENAMEASIDENTIFIER___Tests/StorageTests/SwiftDataManagerTests.swift</string>
-		<string>___PACKAGENAMEASIDENTIFIER___Tests/Support/TestSupport.swift</string>
-		<string>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/DayStreakViewModelTests.swift</string>
-		<string>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/PracticeViewModelTests.swift</string>
-		<string>___PACKAGENAMEASIDENTIFIER___Tests/ViewModelTests/SettingsViewModelTests.swift</string>
 		<string>Assets.xcassets</string>
 	</array>
 	<key>Options</key>
@@ -346,6 +266,41 @@
 				<string>Swift</string>
 			</array>
 		</dict>
+		<dict>
+			<key>Identifier</key>
+			<string>testingSystem</string>
+			<key>Override</key>
+			<string>None</string>
+		</dict>
+		<dict>
+			<key>Identifier</key>
+			<string>cfaDayTests</string>
+			<key>Name</key>
+			<string>CFA Unit Tests:</string>
+			<key>Type</key>
+			<string>popup</string>
+			<key>Values</key>
+			<array>
+				<string>Include</string>
+			</array>
+			<key>Default</key>
+			<string>Include</string>
+			<key>Units</key>
+			<dict>
+				<key>Include</key>
+				<dict>
+					<key>Components</key>
+					<array>
+						<dict>
+							<key>Identifier</key>
+							<string>com.3daysofswift.cfa.day-unit-tests</string>
+							<key>Name</key>
+							<string>___PACKAGENAME___Tests</string>
+						</dict>
+					</array>
+				</dict>
+			</dict>
+		</dict>
 	</array>
 	<key>Targets</key>
 	<array>
@@ -362,72 +317,23 @@
 				<string>YES</string>
 				<key>SWIFT_STRICT_CONCURRENCY</key>
 				<string>complete</string>
+				<key>SWIFT_DEFAULT_ACTOR_ISOLATION</key>
+				<string>nonisolated</string>
 				<key>INFOPLIST_KEY_UISupportedInterfaceOrientations</key>
 				<string>UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight</string>
 				<key>INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad</key>
 				<string>UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortraitUpsideDown</string>
-				<key>PRODUCT_BUNDLE_IDENTIFIER</key>
-				<string>com.3DaysOfSwiftConcurrency.___PACKAGENAMEASIDENTIFIER___</string>
 				<key>ENABLE_TESTABILITY</key>
 				<string>YES</string>
 				<key>ASSETCATALOG_COMPILER_APPICON_NAME</key>
 				<string>AppIcon</string>
+				<key>INFOPLIST_KEY_CFBundleDisplayName</key>
+				<string>$(PRODUCT_NAME)</string>
 				<key>INFOPLIST_KEY_UIApplicationSceneManifest_Generation</key>
 				<string>YES</string>
 				<key>INFOPLIST_KEY_UILaunchStoryboardName</key>
 				<string>LaunchScreen</string>
 			</dict>
-		</dict>
-		<dict>
-			<key>TargetIdentifier</key>
-			<string>com.3daysofswift.cfa.dayStreakTests</string>
-			<key>TargetIdentifierToBeTested</key>
-			<string>com.apple.dt.applicationTarget</string>
-			<key>Name</key>
-			<string>___PACKAGENAMEASIDENTIFIER___Tests</string>
-			<key>ProductType</key>
-			<string>com.apple.product-type.bundle.unit-test</string>
-			<key>SharedSettings</key>
-			<dict>
-				<key>SWIFT_VERSION</key>
-				<string>6.0</string>
-				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
-				<string>18.0</string>
-				<key>GENERATE_INFOPLIST_FILE</key>
-				<string>YES</string>
-				<key>SWIFT_STRICT_CONCURRENCY</key>
-				<string>complete</string>
-				<key>PRODUCT_NAME</key>
-				<string>$(TARGET_NAME)</string>
-				<key>PRODUCT_BUNDLE_IDENTIFIER</key>
-				<string>com.3DaysOfSwiftConcurrency.___PACKAGENAMEASIDENTIFIER___.___PACKAGENAMEASIDENTIFIER___Tests</string>
-				<key>BUNDLE_LOADER</key>
-				<string>$(TEST_HOST)</string>
-				<key>TEST_HOST</key>
-				<string>$(BUILT_PRODUCTS_DIR)/___PACKAGENAMEASIDENTIFIER___.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/___PACKAGENAMEASIDENTIFIER___</string>
-			</dict>
-			<key>Configurations</key>
-			<dict>
-				<key>Debug</key>
-				<dict/>
-				<key>Release</key>
-				<dict/>
-			</dict>
-			<key>BuildPhases</key>
-			<array>
-				<dict>
-					<key>Class</key>
-					<string>Sources</string>
-				</dict>
-				<dict>
-					<key>Class</key>
-					<string>Frameworks</string>
-				</dict>
-				<dict>
-					<key>Class</key>
-					<string>Resources</string>
-				</dict>
-			</array>
 		</dict>
 	</array>
 </dict>

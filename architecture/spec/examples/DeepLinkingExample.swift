@@ -73,9 +73,14 @@ final class DeepLinkingFeature {
         publish(try await store.insert(request))
     }
 
-    // A scene returns true after navigation occurs; it does not wait for data loading.
+    // Explicit dismissal removes the saved request as well as its visible entry.
+    func dismiss(id: String) async throws {
+        publish(try await store.remove(id: id))
+    }
+
+    // The scene checks cancellation and returns true only after navigation occurs.
     func open(id: String, inScene navigate: @MainActor (DestinationRequest) async -> Bool) async throws {
-        guard !opening.contains(id), let request = pending.first(where: { $0.id == id }) else { return }
+        guard !Task.isCancelled, !opening.contains(id), let request = pending.first(where: { $0.id == id }) else { return }
         opening.insert(id)
         defer { opening.remove(id) }
         guard await navigate(request) else { return }
@@ -105,6 +110,62 @@ final class DeepLinkingFeature {
         try await firstRun.open(id: request.id) { _ in false } // User keeps editing.
         precondition(firstRun.pending == [request])
 
+        // Two scenes cannot open the same pending request at the same time.
+        var releaseNavigation: CheckedContinuation<Bool, Never>?
+        let firstAttempt = Task { @MainActor in
+            try await firstRun.open(id: request.id) { _ in
+                await withCheckedContinuation { releaseNavigation = $0 }
+            }
+        }
+        while releaseNavigation == nil { await Task.yield() }
+        var secondSceneOpened = false
+        try await firstRun.open(id: request.id) { _ in
+            secondSceneOpened = true
+            return true
+        }
+        precondition(!secondSceneOpened && firstRun.pending == [request])
+        releaseNavigation?.resume(returning: false)
+        try await firstAttempt.value
+        precondition(firstRun.pending == [request])
+
+        // After one scene declines, another scene can open the same request.
+        var secondSceneDestination: DestinationRequest?
+        try await firstRun.open(id: request.id) { destination in
+            secondSceneDestination = destination
+            return true
+        }
+        precondition(secondSceneDestination == request && firstRun.pending.isEmpty)
+        try await firstRun.receive(request) // Continue the remaining scenarios with a pending request.
+
+        // A cancelled scene attempt cannot consume the pending request.
+        var finishCancelledNavigation: CheckedContinuation<Bool, Never>?
+        let cancelledAttempt = Task { @MainActor in
+            try await firstRun.open(id: request.id) { _ in
+                let allowed = await withCheckedContinuation { finishCancelledNavigation = $0 }
+                return allowed && !Task.isCancelled
+            }
+        }
+        while finishCancelledNavigation == nil { await Task.yield() }
+        cancelledAttempt.cancel()
+        finishCancelledNavigation?.resume(returning: true)
+        try await cancelledAttempt.value
+        precondition(firstRun.pending == [request])
+
+        // A cancellation arriving after navigation must not restore an opened item.
+        let opened = DestinationRequest(id: "notification-opened", title: "Opened launch", launchID: "launch-44")
+        try await firstRun.receive(opened)
+        var finishOpenedNavigation: CheckedContinuation<Bool, Never>?
+        let openedAttempt = Task { @MainActor in
+            try await firstRun.open(id: opened.id) { _ in
+                await withCheckedContinuation { finishOpenedNavigation = $0 }
+            }
+        }
+        while finishOpenedNavigation == nil { await Task.yield() }
+        openedAttempt.cancel()
+        finishOpenedNavigation?.resume(returning: true) // The scene already navigated.
+        try await openedAttempt.value
+        precondition(firstRun.pending == [request])
+
         let nextRun = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
         try await nextRun.restore()
         precondition(nextRun.pending == [request])
@@ -116,6 +177,12 @@ final class DeepLinkingFeature {
         let lastRun = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
         try await lastRun.restore()
         precondition(lastRun.pending.isEmpty)
+        let dismissed = DestinationRequest(id: "notification-2", title: "Another launch", launchID: "launch-43")
+        try await lastRun.receive(dismissed)
+        try await lastRun.dismiss(id: dismissed.id)
+        let afterDismissal = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
+        try await afterDismissal.restore()
+        precondition(afterDismissal.pending.isEmpty)
 
         let badURL = folder.appendingPathComponent("missing-directory/pending.json")
         let unavailable = DeepLinkingFeature(store: PendingRequestStore(fileURL: badURL))

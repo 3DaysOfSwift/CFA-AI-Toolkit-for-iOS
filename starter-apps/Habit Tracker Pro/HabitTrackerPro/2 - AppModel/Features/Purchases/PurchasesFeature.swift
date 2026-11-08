@@ -11,7 +11,10 @@ final class PurchasesFeature {
     private(set) var isLoadingOffer = false
     private(set) var isPurchasingOrRestoring = false
     private(set) var isPurchasePending = false
-    private(set) var errorMessage: String?
+    private var entitlementError: String?
+    private var offerError: String?
+    private var actionError: String?
+    var errorMessage: String? { entitlementError ?? actionError ?? offerError }
     private(set) var notice: String?
 
     init(store: any PurchaseStore) { self.store = store }
@@ -39,9 +42,9 @@ final class PurchasesFeature {
         defer { isLoadingOffer = false }
         do {
             offer = try await store.offer()
-            errorMessage = nil
+            offerError = nil
         } catch {
-            errorMessage = error.localizedDescription
+            offerError = error.localizedDescription
         }
     }
 
@@ -52,31 +55,32 @@ final class PurchasesFeature {
             let hasAccess = try await store.hasTrendsAccess()
             guard revision == entitlementRevision else { return }
             hasTrendsAccess = hasAccess
+            entitlementError = nil
             if hasAccess {
                 isPurchasePending = false
                 notice = nil
-                errorMessage = nil
+                actionError = nil
             }
             // Deliver/revoke access before acknowledging verified transactions.
             await store.finishTransactions()
         } catch {
             guard revision == entitlementRevision else { return }
             hasTrendsAccess = false
-            errorMessage = error.localizedDescription
+            entitlementError = error.localizedDescription
         }
     }
 
     func purchaseTrends() async {
         guard !isPurchasingOrRestoring, !hasTrendsAccess, !isPurchasePending else { return }
         isPurchasingOrRestoring = true
-        errorMessage = nil
+        actionError = nil
         notice = nil
         defer { isPurchasingOrRestoring = false }
         do {
             switch try await store.purchase() {
             case .purchased:
                 await refreshEntitlement()
-                if !hasTrendsAccess { errorMessage = PurchaseError.unverified.localizedDescription }
+                if !hasTrendsAccess && entitlementError == nil { actionError = PurchaseError.unverified.localizedDescription }
             case .pending:
                 isPurchasePending = true
                 notice = "Your purchase is awaiting approval. Trends will unlock after it is approved."
@@ -84,14 +88,14 @@ final class PurchasesFeature {
                 break
             }
         } catch {
-            errorMessage = error.localizedDescription
+            actionError = error.localizedDescription
         }
     }
 
     func restorePurchases() async {
         guard !isPurchasingOrRestoring else { return }
         isPurchasingOrRestoring = true
-        errorMessage = nil
+        actionError = nil
         notice = nil
         defer { isPurchasingOrRestoring = false }
         do {
@@ -101,7 +105,7 @@ final class PurchasesFeature {
                 notice = "No Trends purchase was found for this Apple Account."
             }
         } catch {
-            errorMessage = error.localizedDescription
+            actionError = error.localizedDescription
         }
     }
 }

@@ -18,27 +18,34 @@ final class AddHabitViewModel {
         self.habitsFeature = habitsFeature
     }
 
-    func save() {
-        guard saveTask == nil else { return }
+    @discardableResult
+    func save() -> Task<Void, Never> {
+        if let saveTask { return saveTask }
         isSaving = true
         let habitsFeature = self.habitsFeature
-        saveTask = Task {
+        let submittedName = name
+        let submittedTracking = tracking
+        let submittedUnit = unit
+        let submittedTargetText = dailyTargetText
+        let task = Task {
             defer {
                 isSaving = false
                 saveTask = nil
             }
             do {
-                let parsedTarget = dailyTargetText.isEmpty ? nil : Int(dailyTargetText)
-                if !dailyTargetText.isEmpty, parsedTarget == nil {
+                let parsedTarget = submittedTargetText.isEmpty ? nil : Int(submittedTargetText)
+                if !submittedTargetText.isEmpty, parsedTarget == nil {
                     throw HabitError.invalidTarget
                 }
-                try await habitsFeature.addHabit(name: name, tracking: tracking,
-                                                 unit: unit, dailyTarget: parsedTarget)
+                try await habitsFeature.addHabit(name: submittedName, tracking: submittedTracking,
+                                                 unit: submittedUnit, dailyTarget: parsedTarget)
                 errorMessage = nil
                 didSave = true
             } catch {
                 errorMessage = error.localizedDescription
             }
         }
+        saveTask = task
+        return task
     }
 }

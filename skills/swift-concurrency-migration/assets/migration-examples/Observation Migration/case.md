@@ -10,7 +10,10 @@ Both models reach two completed days. Combine notifies twice; one Observation tr
 
 ## Migration
 
-The Feature uses @Observable; UI isolation remains explicit. Re-register one-shot observation when appropriate.
+The Feature uses @Observable; UI isolation remains explicit. The runnable check
+shows a second tracking registration receiving a later change. SwiftUI normally
+establishes observation as it evaluates the properties a View reads; manual
+re-registration is shown here to make one-shot tracking visible.
 
 ## Run and verify
 

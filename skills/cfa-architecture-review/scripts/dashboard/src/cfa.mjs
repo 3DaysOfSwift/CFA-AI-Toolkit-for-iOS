@@ -28,21 +28,38 @@ This iOS project uses Cooperative Feature Architecture (CFA). The supporting
 product is CFA AI Toolkit for iOS. Match each request to the relevant installed
 skill from that toolkit before changing the project.
 
-- Preserve the CFA call path: View → ViewModel → feature → provider or cache.
+- Preserve the CFA call path: View → ViewModel → Feature → Microservices (such as providers, storage or device API adapters).
 - Every screen has a dedicated ViewModel. A concrete feature owner uses the
   Feature suffix; its AppModel property, ViewModel dependency and initializer
   label use the matching lower-camel-case Feature name. Use concrete features
   directly; do not add matching FeatureAPI protocols. Lower-level services keep names that
   describe their actual jobs.
+- A detail View may receive selected immutable value data and construct its own
+  State-backed ViewModel in its initializer. Do not inject or share ViewModels;
+  keep each scene's selection in presentation, not in a shared Feature.
 - Keep Views declarative. Feature state and business decisions belong outside
   the View layer.
+- Published domain snapshots use immutable properties and contents, without
+  mutable reference state that undermines them; replace them after confirmed
+  changes. The screen ViewModel owns temporary unsaved editor values.
+- Start with independent Features; compose them only for a genuine business
+  responsibility, without duplicating authoritative state or creating cycles.
 - AppModel stores shared, concrete Features, one private launch guard and any
   private task handles needed to own app-wide listeners.
+  AppModel starts those listeners and forwards events to the responsible Feature.
+  Features own their background capabilities and register handlers when needed;
+  honor system callback, expiration and completion requirements.
   Its explicit initializer assigns injected Features; one static live() factory
   constructs production dependencies. Never store a service or UI error there.
 - SwiftData uses SwiftDataManager; URLSession calls use NetworkingManager.
   Features own those collaborators. Signal app launch from an application
   lifecycle callback, never a View .task.
+- A Feature-owned shared refresh normally continues when a screen leaves;
+  preserve its result for later callers unless a specific product or resource
+  requirement calls for another cancellation policy.
+- Publish durable user edits as saved only after required persistence succeeds.
+  A current server response need not wait for an optional cache write; prevent
+  an older cached snapshot from replacing fresher data.
 - App.body installs a stable root View and presentation modifiers only. Keep
   startup conditionals, database loading and feature error UI out of App and
   out of the root navigation View; feature screens present their own state.

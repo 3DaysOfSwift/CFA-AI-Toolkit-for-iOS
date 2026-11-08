@@ -75,8 +75,7 @@ struct PracticeFeatureTests {
     func savedProgressAboveNewTargetCompletesWithoutLosingAnswers(count: Int) async throws {
         let env = TestEnvironment()
         try await env.start()
-        var saved = try #require(env.practice.currentSession)
-        saved.correctCount = count
+        let saved = try #require(env.practice.currentSession).updating(correctCount: count)
         try await env.repository.save(saved)
         let reopened = TestEnvironment(repository: env.repository, clock: env.clock)
         try await reopened.practice.perform(.refresh)
@@ -150,6 +149,10 @@ struct PracticeFeatureTests {
         await env.repository.fail(false)
         try await env.practice.perform(.answer(questionID: question.id, value: 81))
         #expect(env.practice.currentSession?.correctCount == 1)
+        let reopened = TestEnvironment(repository: env.repository, clock: env.clock)
+        try await reopened.practice.perform(.refresh)
+        #expect(reopened.practice.currentSession?.correctCount == 1)
+        #expect(reopened.practice.currentSession?.question.isResolved == true)
     }
 
     @Test func failedFetchDoesNotCreateOrOverwriteData() async throws {

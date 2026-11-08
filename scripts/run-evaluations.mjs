@@ -3,7 +3,6 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const flatAppDirectory = path.join(root, 'evals', 'flat-app');
 
 function requireText(file, description) {
   if (!fs.existsSync(file)) throw Error(`Missing ${description}: ${file}`);
@@ -27,7 +26,7 @@ export function runEvaluations(base = root) {
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
   try {
     runEvaluations();
-    console.log('CFA evaluation fixtures are present and internally consistent.');
+    console.log('Flat-app evaluation fixture contains its required markers.');
   } catch (error) {
     console.error(error.message);
     process.exitCode = 1;

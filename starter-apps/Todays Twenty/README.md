@@ -6,9 +6,8 @@ Open `TimesThirty.xcodeproj`, select the **TimesThirty** scheme and an iPhone si
 then Run. iOS 18+, Swift 6, Xcode 26.2. No account, backend or purchase is required.
 For a physical device, choose your development team in Signing & Capabilities.
 
-The original **Trend** project is untouched. This app carries over its gradient hero
-cards, rounded surfaces, restrained typography, seven-day streak strip, native tabs
-and Daylight/Midnight/Quiet palettes. Seven colour palettes plus Automatic are available.
+The app includes gradient hero cards, rounded surfaces, a seven-day streak strip,
+native tabs and seven colour palettes plus Automatic.
 It uses the toolkit's starter app icon, ready to replace with a product-specific icon.
 Its bundle identifier is `com.3DaysOfSwiftConcurrency.TimesThirty`.
 
@@ -39,9 +38,8 @@ Its bundle identifier is `com.3DaysOfSwiftConcurrency.TimesThirty`.
   the current streak, not history or the longest streak. Calendar arithmetic handles DST.
 
 This is a local, offline learning aid, not a tamper-proof reward system. Changing the
-device clock, deleting app data or reinstalling can affect the limits. The calendar/time
-zone is captured when the app's feature graph is created; restart after changing time zones.
-History is local to the device; there is no sync, server validation, analytics or local AI.
+device clock, deleting app data or reinstalling can affect the limits. Calendar calculations
+use the device’s current calendar and time zone. History is local to the device; there is no sync, server validation, analytics or local AI.
 
 ## Reuse the blueprint
 
@@ -81,8 +79,7 @@ python3 scripts/sync-day-streak-template.py --check
 ```
 
 Run these from the toolkit root. Do not edit the generated `.xctemplate` sources.
-The toolkit installer includes it alongside CFA App and Habit Tracker. Installation is
-opt-in; creating this project did not install or replace anything in your Xcode library.
+The toolkit installer includes it alongside CFA App and Habit Tracker.
 
 ## Verification
 
@@ -98,31 +95,3 @@ preferences, database-directory failures and reopening the on-disk store.
 For release readiness, also run the app on iPhone and iPad. Check light/dark and all themes,
 VoiceOver, the largest Dynamic Type size, Reduce Motion, keyboard-free operation, wrong and
 revealed answers, completing both sessions, background/foreground and persisted recovery.
-Source type-checking and macOS logic tests do not replace simulator/device UI validation.
-
-### Initial validation — 21 October 2026
-
-- All 24 Swift Testing cases passed on macOS, including real on-disk SwiftData round trips,
-  using a temporary package harness that has since been removed. The tests remain in
-  the Xcode test target; this historical result is not an iOS test run.
-- All app Swift files passed the Swift 6 iOS 18 simulator-target compiler type-check.
-- Native-template source synchronisation and installer tests passed; toolkit validation
-  and its 63-test JavaScript suite passed.
-- The CFA inspector mapped all three feature screens to their ViewModels, Features and
-  tests. Its two lexical warnings were manually reviewed: ContentView is intentionally
-  a structural root; `retryCommand` is a nested command value, not an aliased Feature.
-- A full simulator build was attempted but asset/storyboard compilation could not access
-  CoreSimulator in the agent's restricted environment. Simulator launch, screenshots,
-  New Project wizard generation and on-device UI checks remain unverified. This is not
-  a claim of a successful full Xcode build. The macOS storage tests also emitted sandbox
-  notification-registration warnings; their save/reopen assertions passed.
-
-### Compiler repair — 21 October 2026
-
-The first Xcode run exposed a Swift 6.2.3 compiler crash during SettingsView code
-generation for a bound actor-isolated difficulty setter. Type-checking alone did
-not detect it. The crash was reproduced with actual x86_64 simulator compilation.
-The two picker bindings now use explicit setter closures, without changing their
-behaviour. All app Swift sources subsequently compiled and linked for both arm64
-and x86_64 simulator targets, and the generated template was resynchronised.
-This compiler check does not replace full Xcode resource compilation or UI testing.

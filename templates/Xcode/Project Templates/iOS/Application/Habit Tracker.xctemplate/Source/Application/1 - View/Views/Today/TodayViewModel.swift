@@ -19,10 +19,22 @@ final class TodayViewModel {
     var habits: [Habit] { todayFeature.habits }
     var isLoading: Bool { todayFeature.isLoading }
     var loadError: String? { todayFeature.loadError }
-    func retryLoading() async { await todayFeature.reload() }
+    @ObservationIgnored private var retryTask: Task<Void, Never>?
+    @discardableResult
+    func retryLoading() -> Task<Void, Never> {
+        if let retryTask { return retryTask }
+        let task = Task { [weak self, todayFeature] in
+            defer { self?.retryTask = nil }
+            await todayFeature.reload()
+        }
+        retryTask = task
+        return task
+    }
     var completedHabitCount: Int { todayFeature.completedHabitCount }
-    var todayHeading: String { Date.now.formatted(.dateTime.weekday(.wide).month(.wide).day()) }
+    var todayHeading: String { todayFeature.today.formatted(.dateTime.weekday(.wide).month(.wide).day()) }
     var isRecording: Bool { recordTask != nil }
+
+    func isCompleteToday(_ habit: Habit) -> Bool { todayFeature.isCompleteToday(habit) }
 
     func toggle(_ habit: Habit) {
         guard !isSaving(habit) else { return }
@@ -32,12 +44,17 @@ final class TodayViewModel {
 
     func amountText(for habit: Habit) -> String {
         let currentHabit = habits.first(where: { $0.id == habit.id }) ?? habit
-        return amountDrafts[habit.id] ?? String(currentHabit.todayValue)
+        return amountDrafts[habit.id] ?? String(todayFeature.valueToday(for: currentHabit))
     }
 
     func editAmount(_ text: String, for habit: Habit) {
         amountDrafts[habit.id] = text
-        guard let value = Int(text), value >= 0 else { return }
+        guard let value = Int(text), value >= 0 else {
+            pendingValues[habit.id] = nil
+            failedValues[habit.id] = nil
+            if failedValues.isEmpty { errorMessage = nil }
+            return
+        }
         startRecording(habitID: habit.id, value: value)
     }
 
@@ -98,7 +115,8 @@ final class TodayViewModel {
                     }
                     if failedValues.isEmpty { errorMessage = nil }
                 } catch {
-                    if pendingValues[habitID] == nil {
+                    let draftStillMatches = amountDrafts[habitID].map { Int($0) == value } ?? true
+                    if pendingValues[habitID] == nil && draftStillMatches {
                         failedValues[habitID] = value
                         errorMessage = error.localizedDescription
                     }

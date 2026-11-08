@@ -26,11 +26,30 @@ struct MultiplicationQuestion: Codable, Equatable, Sendable, Identifiable {
     let left: Int
     let right: Int
     let choices: [Int]
-    var wrongAnswers: Set<Int> = []
-    var isRevealed = false
-    var isAnswered = false
+    let wrongAnswers: Set<Int>
+    let isRevealed: Bool
+    let isAnswered: Bool
     var answer: Int { left * right }
     var isResolved: Bool { isRevealed || isAnswered }
+
+    init(id: UUID, left: Int, right: Int, choices: [Int], wrongAnswers: Set<Int> = [],
+         isRevealed: Bool = false, isAnswered: Bool = false) {
+        self.id = id
+        self.left = left
+        self.right = right
+        self.choices = choices
+        self.wrongAnswers = wrongAnswers
+        self.isRevealed = isRevealed
+        self.isAnswered = isAnswered
+    }
+
+    func updating(wrongAnswers: Set<Int>? = nil, isRevealed: Bool? = nil,
+                  isAnswered: Bool? = nil) -> Self {
+        Self(id: id, left: left, right: right, choices: choices,
+             wrongAnswers: wrongAnswers ?? self.wrongAnswers,
+             isRevealed: isRevealed ?? self.isRevealed,
+             isAnswered: isAnswered ?? self.isAnswered)
+    }
 
     static func random(difficulty: Difficulty) -> Self {
         let left = Int.random(in: difficulty.factors)
@@ -54,13 +73,36 @@ struct PracticeSession: Codable, Equatable, Identifiable, Sendable {
     let id: UUID
     let day: Date
     let isExtraPractice: Bool
-    var difficulty: Difficulty
-    var question: MultiplicationQuestion
-    var questionNumber = 1
-    var correctCount = 0
-    var completedAt: Date?
+    let difficulty: Difficulty
+    let question: MultiplicationQuestion
+    let questionNumber: Int
+    let correctCount: Int
+    let completedAt: Date?
     var isComplete: Bool { completedAt != nil }
     var canChangeDifficulty: Bool { questionNumber == 1 && !isComplete }
+
+    init(id: UUID, day: Date, isExtraPractice: Bool, difficulty: Difficulty,
+         question: MultiplicationQuestion, questionNumber: Int = 1,
+         correctCount: Int = 0, completedAt: Date? = nil) {
+        self.id = id
+        self.day = day
+        self.isExtraPractice = isExtraPractice
+        self.difficulty = difficulty
+        self.question = question
+        self.questionNumber = questionNumber
+        self.correctCount = correctCount
+        self.completedAt = completedAt
+    }
+
+    func updating(difficulty: Difficulty? = nil, question: MultiplicationQuestion? = nil,
+                  questionNumber: Int? = nil, correctCount: Int? = nil,
+                  completedAt: Date? = nil) -> Self {
+        Self(id: id, day: day, isExtraPractice: isExtraPractice,
+             difficulty: difficulty ?? self.difficulty, question: question ?? self.question,
+             questionNumber: questionNumber ?? self.questionNumber,
+             correctCount: correctCount ?? self.correctCount,
+             completedAt: completedAt ?? self.completedAt)
+    }
 }
 
 enum PracticeError: LocalizedError {

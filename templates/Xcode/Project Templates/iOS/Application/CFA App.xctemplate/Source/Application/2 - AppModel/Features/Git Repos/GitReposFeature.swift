@@ -1,9 +1,15 @@
+import Foundation
 import Observation
 
 @MainActor
 @Observable
 final class GitReposFeature {
-    @ObservationIgnored private var startupTask: Task<Void, Never>?
+    @ObservationIgnored private var refreshTask: Task<Void, Never>?
+    @ObservationIgnored private var cacheRestoreTask: Task<Void, Never>?
+    @ObservationIgnored private var cacheWriteTask: Task<Void, Never>?
+    @ObservationIgnored private var cacheWriteID: UUID?
+    @ObservationIgnored private var didStartCacheRestore = false
+    @ObservationIgnored private var hasFreshResponse = false
     private let provider: any GitReposProvider
     private let cache: any RepoCache
 
@@ -16,43 +22,66 @@ final class GitReposFeature {
         self.cache = cache
     }
 
+    // Start networking first; restoring the optional cache never delays it.
     func startLoading() {
-        guard startupTask == nil else { return }
-        startupTask = Task { [weak self] in
-            await self?.refresh()
-            self?.startupTask = nil
-        }
+        _ = startRefreshIfNeeded()
+        startCacheRestoreIfNeeded()
     }
 
     func refresh() async {
-        guard !isRefreshing else { return }
+        let task = startRefreshIfNeeded()
+        startCacheRestoreIfNeeded()
+        await task.value
+    }
 
+    private func startRefreshIfNeeded() -> Task<Void, Never> {
+        if let refreshTask { return refreshTask }
         isRefreshing = true
         refreshError = nil
-        defer { isRefreshing = false }
-
-        if repos.isEmpty {
-            await loadSavedRepos()
+        let task = Task { @MainActor in
+            defer { isRefreshing = false; refreshTask = nil }
+            do {
+                let response = try await provider.fetchRepos()
+                let downloaded = response.map(Repo.init(response:))
+                repos = downloaded
+                hasFreshResponse = true
+                refreshError = nil
+                saveCacheInBackground(downloaded)
+            } catch is CancellationError {
+                return
+            } catch {
+                refreshError = error
+            }
         }
+        refreshTask = task
+        return task
+    }
 
-        do {
-            let responses = try await provider.fetchRepos()
-            let downloadedRepos = responses.map(Repo.init(response:))
-            try await cache.saveRepos(downloadedRepos)
-            repos = try await cache.loadRepos()
-            refreshError = nil
-        } catch is CancellationError {
-            return
-        } catch {
-            refreshError = error
+    private func startCacheRestoreIfNeeded() {
+        guard !didStartCacheRestore else { return }
+        didStartCacheRestore = true
+        cacheRestoreTask = Task { @MainActor in
+            defer { cacheRestoreTask = nil }
+            guard let saved = try? await cache.loadRepos(), !hasFreshResponse else { return }
+            repos = saved
         }
     }
 
-    private func loadSavedRepos() async {
-        do {
-            repos = try await cache.loadRepos()
-        } catch {
-            refreshError = error
+    // Preserve write order so an older snapshot cannot replace a newer one.
+    private func saveCacheInBackground(_ snapshot: [Repo]) {
+        let previous = cacheWriteTask
+        let id = UUID()
+        let task = Task { @MainActor in
+            await previous?.value
+            defer {
+                if cacheWriteID == id { cacheWriteTask = nil; cacheWriteID = nil }
+            }
+            for _ in 0..<2 {
+                do { try await cache.saveRepos(snapshot); return }
+                catch { /* The remote response is already available. */ }
+            }
         }
+        cacheWriteTask = task
+        cacheWriteID = id
     }
 }

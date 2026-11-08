@@ -65,6 +65,7 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.equal(repeated.status, 0, repeated.stderr);
   assert.equal(doctor.status, 0, doctor.stderr);
   assert.match(content, /Keep this text\./);
+  assert.match(content, /View → ViewModel → Feature → Microservices/);
   assert.equal((content.match(/CFA Toolkit project guidance/g) ?? []).length, 1);
   assert.match(repeated.stdout, /already enabled/);
   assert.match(doctor.stdout, /PASS CFA project guidance/);

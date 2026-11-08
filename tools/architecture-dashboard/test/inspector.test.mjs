@@ -44,6 +44,20 @@ test('reports a missing named feature test file', async t => {
   assert.match(report.findings[0].message, /SettingsFeatureTests.swift/);
 });
 
+test('does not mistake composition locals for AppModel properties', async t => {
+  const root = await fixture(t, {
+    'Application/1 - View/Views/Chat/ChatView.swift': 'struct ChatView: View { @State private var viewModel = ChatViewModel() }',
+    'Application/1 - View/Views/Chat/ChatViewModel.swift': 'final class ChatViewModel { init(chatFeature: ChatFeature = AppModel.shared.chatFeature) {} }',
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { let chatFeature: ChatFeature = ChatFeature(); return AppModel() } }',
+    'Application/2 - AppModel/Features/Chat/ChatFeature.swift': 'final class ChatFeature {}',
+    'ApplicationTests/ViewModelTests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}'
+  });
+  const report = await inspect(root);
+  assert.ok(report.findings.some(item => item.code === 'unresolved-feature'));
+  assert.ok(!report.findings.some(item => item.code === 'feature-tests-missing'));
+  assert.equal(report.screens[0].dependencies[0].featureType, null);
+});
+
 test('flags AppModel dumping-ground state and View-tied launch or storage', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': '@MainActor final class AppModel {\n    let habitsFeature: HabitsFeature\n    private(set) var modelContainer: ModelContainer?\n    private(set) var startupError: String?\n    private var didFinishLaunching: Bool = false\n}',
@@ -52,12 +66,86 @@ test('flags AppModel dumping-ground state and View-tied launch or storage', asyn
   });
   const report = await inspect(root);
   const codes = report.findings.map(item => item.code);
-  for (const code of ['app-model-live-factory', 'app-model-non-feature-state', 'app-model-default-value', 'stored-app-model', 'view-tied-app-launch', 'view-swiftdata-access']) {
+  for (const code of ['app-model-live-factory', 'app-model-non-feature-state', 'app-model-boolean-purpose', 'stored-app-model', 'view-tied-app-launch', 'view-swiftdata-access']) {
     assert.ok(codes.includes(code), `Expected ${code}`);
+  }
+  for (const code of ['stored-app-model', 'view-swiftdata-access', 'view-tied-app-launch']) {
+    assert.equal(report.findings.find(item => item.code === code).severity, 'review');
   }
 });
 
-test('does not flag a private AppModel listener task as a non-Feature property', async t => {
+test('a launch call in preview code is a review hint, not a production assertion', async t => {
+  const root = await fixture(t, {
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
+    'Application/1 - View/PreviewSupport.swift': '#Preview { DemoView().task { AppModel.shared.applicationDidFinishLaunching() } }'
+  });
+  const finding = (await inspect(root)).findings.find(item => item.code === 'view-tied-app-launch');
+  assert.equal(finding.severity, 'review');
+  assert.match(finding.message, /preview or test/);
+});
+
+test('does not identify a launch guard by the order of private Boolean properties', async t => {
+  const root = await fixture(t, {
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel {\n    private var unrelatedFlag: Bool = false\n    private var didFinishLaunching: Bool\n    static func live() -> AppModel { AppModel() }\n}'
+  });
+  const findings = (await inspect(root)).findings;
+  const booleans = findings.filter(item => item.code === 'app-model-boolean-purpose');
+  assert.equal(booleans.length, 2);
+  assert.ok(booleans.every(item => item.severity === 'review'));
+  assert.ok(!findings.some(item => item.code === 'app-model-non-feature-state' && /didFinishLaunching/.test(item.message)));
+  assert.ok(!findings.some(item => /launch guard unrelatedFlag/.test(item.message)));
+});
+
+test('local and preview storage references are not asserted to be production violations', async t => {
+  const root = await fixture(t, {
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
+    'Application/1 - View/PreviewSupport.swift': 'func makePreview() { let model: AppModel = AppModel.live(); let container: ModelContainer = previewContainer }'
+  });
+  const findings = (await inspect(root)).findings;
+  assert.equal(findings.find(item => item.code === 'stored-app-model').severity, 'review');
+  assert.match(findings.find(item => item.code === 'stored-app-model').message, /local value or preview/);
+  assert.equal(findings.find(item => item.code === 'view-swiftdata-access').severity, 'review');
+  assert.match(findings.find(item => item.code === 'view-swiftdata-access').message, /previews retain the same CFA boundaries/);
+});
+
+test('identifies a launch signal scheduled inside a delegate Task without flagging independent work', async t => {
+  const root = await fixture(t, {
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
+    'Application/AppDelegate.swift': 'class AppDelegate {\n func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool {\n Task { await AppModel.shared.applicationDidFinishLaunching() }\n return true\n }\n}',
+    'Application/OtherDelegate.swift': 'class OtherDelegate { func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { AppModel.shared.applicationDidFinishLaunching(); Task { await refresh() }; return true } }'
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'scheduled-app-model-launch');
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].severity, 'review');
+  assert.equal(findings[0].file, 'Application/AppDelegate.swift');
+  assert.equal(findings[0].line, 3);
+});
+
+test('a live factory in an extension is not reported as definitely absent', async t => {
+  const root = await fixture(t, {
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel {}',
+    'Application/2 - AppModel/AppModel+Live.swift': 'extension AppModel { static func live() -> AppModel { AppModel() } }'
+  });
+  const finding = (await inspect(root)).findings.find(item => item.code === 'app-model-live-factory');
+  assert.equal(finding.severity, 'review');
+  assert.match(finding.message, /including extensions and active compilation conditions/);
+});
+
+test('a Feature exposed in an extension remains an unresolved review, not a missing-property claim', async t => {
+  const root = await fixture(t, {
+    'Application/1 - View/Views/Chat/ChatView.swift': 'struct ChatView: View { @State private var viewModel = ChatViewModel() }',
+    'Application/1 - View/Views/Chat/ChatViewModel.swift': 'final class ChatViewModel { init(chatFeature: ChatFeature = AppModel.shared.chatFeature) {} }',
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static let shared = AppModel(); static func live() -> AppModel { AppModel() } }',
+    'Application/2 - AppModel/AppModel+Chat.swift': 'extension AppModel { var chatFeature: ChatFeature { ChatFeature() } }',
+    'Application/2 - AppModel/Features/Chat/ChatFeature.swift': 'final class ChatFeature {}',
+    'ApplicationTests/ViewModelTests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}'
+  });
+  const finding = (await inspect(root)).findings.find(item => item.code === 'unresolved-feature');
+  assert.equal(finding.severity, 'review');
+  assert.match(finding.message, /Check extensions, inferred types and target membership/);
+});
+
+test('requests review of an AppModel task without assuming its purpose', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel {\n    private var transactionUpdatesTask: Task<Void, Never>?\n    let settingsFeature: SettingsFeature\n    static func live() -> AppModel { AppModel() }\n}',
     'Application/2 - AppModel/Features/Settings/SettingsFeature.swift': 'final class SettingsFeature {}',
@@ -65,6 +153,28 @@ test('does not flag a private AppModel listener task as a non-Feature property',
   });
   const report = await inspect(root);
   assert.ok(!report.findings.some(item => item.code === 'app-model-non-feature-state'));
+  assert.ok(report.findings.some(item => item.code === 'app-model-task-purpose' && item.severity === 'review' && /transactionUpdatesTask/.test(item.message)));
+});
+
+test('inspects AppModel properties regardless of indentation', async t => {
+  const root = await fixture(t, {
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel {\n  private var twoSpaceTask: Task<Void, Never>?\n\tprivate var tabTask: Task<Void, Never>?\n        private var unexpectedCache: String\n    static func live() -> AppModel { AppModel() }\n}'
+  });
+  const findings = (await inspect(root)).findings;
+  assert.ok(findings.some(item => item.code === 'app-model-task-purpose' && /twoSpaceTask/.test(item.message)));
+  assert.ok(findings.some(item => item.code === 'app-model-task-purpose' && /tabTask/.test(item.message)));
+  assert.ok(findings.some(item => item.code === 'app-model-non-feature-state' && /unexpectedCache/.test(item.message)));
+});
+
+test('inspects annotated AppModel properties without treating a private task as a verified listener', async t => {
+  const root = await fixture(t, {
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel {\n    @ObservationIgnored private var updateTask: Task<Void, Never>?\n    @ObservationIgnored private var secretCache: String\n    @ObservationIgnored\n    private var backupTask: Task<Void, Never>?\n    static func live() -> AppModel { AppModel() }\n}'
+  });
+  const report = await inspect(root);
+  const checks = report.findings.filter(item => item.code === 'app-model-task-purpose');
+  assert.equal(checks.length, 2);
+  assert.ok(checks.every(item => item.severity === 'review'));
+  assert.ok(report.findings.some(item => item.code === 'app-model-non-feature-state' && /secretCache/.test(item.message)));
 });
 
 test('does not mistake a structural tab root or nested Feature value for a missing or renamed owner', async t => {
@@ -77,9 +187,35 @@ test('does not mistake a structural tab root or nested Feature value for a missi
     'ApplicationTests/ViewModelTests/PracticeViewModelTests.swift': 'struct PracticeViewModelTests {}',
     'ApplicationTests/FeatureTests/PracticeFeatureTests.swift': 'struct PracticeFeatureTests {}'
   });
-  const codes = (await inspect(root)).findings.map(item => item.code);
+  const report = await inspect(root);
+  const codes = report.findings.map(item => item.code);
   assert.ok(!codes.includes('view-model-missing'));
   assert.ok(!codes.includes('feature-reference-name'));
+  assert.match(renderInspection(report), /ContentView: structural tab root/);
+  assert.doesNotMatch(renderInspection(report), /ContentView: missing ViewModel/);
+  assert.match(renderInspection(report), /2 View candidates/);
+});
+
+test('flags matching FeatureAPI protocols for review without flagging unrelated service protocols', async t => {
+  const root = await fixture(t, {
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
+    'Application/2 - AppModel/Features/ChatFeature.swift': 'protocol ChatFeatureAPI {}\nfinal class ChatFeature {}\nprotocol ChatRepository {}',
+    'Application/2 - AppModel/Features/OtherFeature.swift': 'protocol OtherFeatureAPI {}'
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'matching-feature-protocol');
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].severity, 'review');
+  assert.match(findings[0].message, /ChatFeatureAPI.*ChatFeature/);
+});
+
+test('asks whether a View without a ViewModel is a screen or reusable component', async t => {
+  const root = await fixture(t, {
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
+    'Application/1 - View/Views/Settings/SettingsRowView.swift': 'struct SettingsRowView: View { let title: String; var body: some View { Text(title) } }'
+  });
+  const finding = (await inspect(root)).findings.find(item => item.code === 'view-model-missing');
+  assert.equal(finding?.severity, 'review');
+  assert.match(finding.message, /screen requiring a dedicated ViewModel or a reusable presentation component/);
 });
 
 test('flags SwiftData without a manager and direct URLSession calls', async t => {
@@ -88,9 +224,22 @@ test('flags SwiftData without a manager and direct URLSession calls', async t =>
     'Application/2 - AppModel/Storage/HabitStore.swift': 'import SwiftData\nfinal class HabitStore {}',
     'Application/2 - AppModel/Networking/GitHubAPI.swift': 'import Foundation\nfinal class GitHubAPI { func load() async throws { _ = try await URLSession.shared.data(from: url) } }'
   });
-  const codes = (await inspect(root)).findings.map(item => item.code);
+  const findings = (await inspect(root)).findings;
+  const codes = findings.map(item => item.code);
   assert.ok(codes.includes('swiftdata-manager-missing'));
   assert.ok(codes.includes('direct-url-session'));
+  assert.equal(findings.find(item => item.code === 'swiftdata-manager-missing').severity, 'review');
+  assert.equal(findings.find(item => item.code === 'direct-url-session').severity, 'review');
+});
+
+test('a SwiftData import in tests is a target-membership review, not an app defect', async t => {
+  const root = await fixture(t, {
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
+    'ApplicationTests/StorageTests.swift': 'import SwiftData\nstruct StorageTests {}'
+  });
+  const finding = (await inspect(root)).findings.find(item => item.code === 'swiftdata-manager-missing');
+  assert.equal(finding.severity, 'review');
+  assert.match(finding.message, /includes tests and does not resolve target membership/);
 });
 
 test('flags conditional database startup presentation in App.body', async t => {
@@ -98,9 +247,11 @@ test('flags conditional database startup presentation in App.body', async t => {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
     'Application/1 - View/HabitApp.swift': 'import SwiftUI\nstruct HabitApp: App { var body: some Scene { WindowGroup { if ready { RootTabView().modelContainer(container) } else { ProgressView("Opening") } } } }'
   });
-  const codes = (await inspect(root)).findings.map(item => item.code);
+  const findings = (await inspect(root)).findings;
+  const codes = findings.map(item => item.code);
   assert.ok(codes.includes('conditional-app-body'));
   assert.ok(codes.includes('app-startup-presentation'));
+  assert.ok(findings.filter(item => ['conditional-app-body', 'app-startup-presentation'].includes(item.code)).every(item => item.severity === 'review'));
 });
 
 test('flags storage-gated conventional roots as review hints', async t => {
@@ -168,7 +319,7 @@ test('reports old feature-owner types and mismatched feature references', async 
   assert.equal(report.screens[0].dependencies[0].featureType, 'ChatsManager');
 });
 
-test('reports a feature local stored under a different name', async t => {
+test('reports a feature property stored under a different name', async t => {
   const root = await fixture(t, {
     'Application/1 - View/Views/Chat/ChatView.swift': 'import SwiftUI\nstruct ChatView: View { @State private var viewModel = ChatViewModel(); var body: some View { Text("Hi") } }',
     'Application/1 - View/Views/Chat/ChatViewModel.swift': 'final class ChatViewModel { private let chats: ChatsFeature; init(chats: ChatsFeature = AppModel.shared.chatsFeature) { self.chats = chats } }',
@@ -179,4 +330,17 @@ test('reports a feature local stored under a different name', async t => {
   const report = await inspect(root);
   assert.ok(report.findings.some(item => item.code === 'feature-reference-name'));
   assert.ok(report.findings.some(item => item.code === 'feature-parameter-name'));
+});
+
+test('does not treat a method-local Feature as a stored ViewModel dependency', async t => {
+  const root = await fixture(t, {
+    'Application/1 - View/Views/Chat/ChatView.swift': 'struct ChatView: View { @State private var viewModel = ChatViewModel() }',
+    'Application/1 - View/Views/Chat/ChatViewModel.swift': 'final class ChatViewModel { private let chatsFeature: ChatsFeature; init(chatsFeature: ChatsFeature = AppModel.shared.chatsFeature) { self.chatsFeature = chatsFeature }; func inspect() { let local: ChatsFeature = chatsFeature } }',
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() }; let chatsFeature: ChatsFeature }',
+    'Application/2 - AppModel/Features/Chats/ChatsFeature.swift': 'final class ChatsFeature {}',
+    'ApplicationTests/FeatureTests/Chats/ChatsFeatureTests.swift': 'struct ChatsFeatureTests {}',
+    'ApplicationTests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}'
+  });
+  const findings = (await inspect(root)).findings;
+  assert.ok(!findings.some(item => item.code === 'feature-reference-name'));
 });

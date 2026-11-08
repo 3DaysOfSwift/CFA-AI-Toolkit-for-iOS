@@ -69,6 +69,9 @@ return `true` only after navigation to that page occurs. The Feature removes
 the corresponding pending request after that result, not merely because the
 user agreed to navigate. A `false` result, cancellation, unavailable scene or
 failed navigation leaves it pending; a later scene can offer it again. The
+scene handler checks cancellation before navigating and returns `false` if it
+does not navigate. If it has already navigated, it returns `true` even if
+cancellation arrives afterward, so an opened request is not offered again. The
 destination screen then owns its own data loading, errors and refresh: do not
 wait for content to load before treating navigation as successful.
 
@@ -93,9 +96,9 @@ or global UI router by default. Store only safe data needed to identify and
 present a request; handle expired or unavailable destinations clearly. Persist
 before claiming a request is safely kept, and handle storage failures honestly.
 
-Record local notifications the app creates and push notifications it receives or
-handles as appropriate to the product. iOS does not guarantee delivery of every
-background push to the app; a product requiring a complete notification inbox
-needs an appropriate durable source, such as server-side history, rather than a
-promise that local callbacks see every event.
+For this pending list, record notification actions received from the system,
+not notifications merely scheduled or delivered. iOS does not guarantee that
+every background push is delivered to the app. If a product separately requires
+a complete notification inbox, choose an appropriate durable source for that
+requirement; do not assume local callbacks capture every delivery.
 

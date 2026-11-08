@@ -11,6 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PROJECT = ROOT / "starter-apps/Habit Tracker"
 DEST = ROOT / "templates/Xcode/Project Templates/iOS/Application/Habit Tracker.xctemplate"
+TEST_DEST = DEST.parent / "Habit Tracker Tests.xctemplate"
 NAME = "HabitTrackerTemplate"
 TOKEN = "___PACKAGENAMEASIDENTIFIER___"
 
@@ -19,6 +20,9 @@ def generated_files():
     outputs = {}
     definitions = {}
     nodes = []
+    test_outputs = {}
+    test_definitions = {}
+    test_nodes = []
     for folder, source_folder, target in [
         (NAME, "Application", "com.apple.dt.applicationTarget"),
         (NAME + "Tests", "Tests", "com.3daysofswift.cfa.habitTrackerTests"),
@@ -34,6 +38,12 @@ def generated_files():
                 continue
             if relative == "1 - View/App.swift":
                 relative = "1 - View/___PACKAGENAMEASIDENTIFIER___App.swift"
+            if source_folder == "Tests":
+                source = f"Source/{relative}"
+                test_outputs[source] = file.read_text().replace(NAME, "___PROJECTNAME:identifier___").encode()
+                test_definitions[relative] = {"Path": source}
+                test_nodes.append(relative)
+                continue
             source = f"Source/{source_folder}/{relative}"
             outputs[source] = file.read_text().replace(NAME, TOKEN).encode()
             node = relative if source_folder == "Application" else f"{TOKEN}Tests/{relative}"
@@ -46,7 +56,7 @@ def generated_files():
             nodes.append(node)
     definitions["Assets.xcassets"] = {"Path": "Source/Assets.xcassets", "TargetIdentifiers": ["com.apple.dt.applicationTarget"]}
     nodes.append("Assets.xcassets")
-    shared = {"SWIFT_VERSION": "6.0", "IPHONEOS_DEPLOYMENT_TARGET": "18.0", "GENERATE_INFOPLIST_FILE": "YES", "SWIFT_STRICT_CONCURRENCY": "complete"}
+    shared = {"SWIFT_VERSION": "6.0", "IPHONEOS_DEPLOYMENT_TARGET": "18.0", "GENERATE_INFOPLIST_FILE": "YES", "SWIFT_STRICT_CONCURRENCY": "complete", "SWIFT_DEFAULT_ACTOR_ISOLATION": "nonisolated"}
     info = {
         "Kind": "Xcode.Xcode3.ProjectTemplateUnitKind",
         "Identifier": "com.3daysofswift.cfa.habitTracker",
@@ -60,35 +70,40 @@ def generated_files():
         "Options": [
             {"Identifier": "appLifecycle", "Default": "SwiftUI", "Type": "popup", "Values": ["SwiftUI"], "RequiredOptionsForValues": {"SwiftUI": {"userInterface": "SwiftUI"}}},
             {"Identifier": "languageChoice", "Default": "Swift", "Type": "popup", "Values": ["Swift"]},
+            {"Identifier": "testingSystem", "Override": "None"},
+            {"Identifier": "cfaHabitTests", "Name": "CFA Unit Tests:", "Type": "popup", "Values": ["Include"], "Default": "Include", "Units": {"Include": {"Components": [{"Identifier": "com.3daysofswift.cfa.habit-unit-tests", "Name": "___PACKAGENAME___Tests"}]}}},
         ],
         "Targets": [
-            {"TargetIdentifier": "com.apple.dt.applicationTarget", "SharedSettings": {**shared, "INFOPLIST_KEY_UISupportedInterfaceOrientations": "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight", "INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad": "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortraitUpsideDown", "ENABLE_TESTABILITY": "YES", "ASSETCATALOG_COMPILER_APPICON_NAME": "AppIcon", "INFOPLIST_KEY_UIApplicationSceneManifest_Generation": "YES", "INFOPLIST_KEY_UILaunchStoryboardName": "LaunchScreen"}},
-            {"TargetIdentifier": "com.3daysofswift.cfa.habitTrackerTests", "TargetIdentifierToBeTested": "com.apple.dt.applicationTarget", "Name": TOKEN + "Tests", "ProductType": "com.apple.product-type.bundle.unit-test", "SharedSettings": {**shared, "PRODUCT_NAME": "$(TARGET_NAME)", "PRODUCT_BUNDLE_IDENTIFIER": "___ORGANIZATIONIDENTIFIER___." + TOKEN + "." + TOKEN + "Tests", "BUNDLE_LOADER": "$(TEST_HOST)", "TEST_HOST": "$(BUILT_PRODUCTS_DIR)/" + TOKEN + ".app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/" + TOKEN}, "Configurations": {"Debug": {}, "Release": {}}, "BuildPhases": [{"Class": phase} for phase in ["Sources", "Frameworks", "Resources"]]},
+            {"TargetIdentifier": "com.apple.dt.applicationTarget", "SharedSettings": {**shared, "INFOPLIST_KEY_UISupportedInterfaceOrientations": "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight", "INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad": "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortraitUpsideDown", "ENABLE_TESTABILITY": "YES", "ASSETCATALOG_COMPILER_APPICON_NAME": "AppIcon", "INFOPLIST_KEY_CFBundleDisplayName": "$(PRODUCT_NAME)", "INFOPLIST_KEY_UIApplicationSceneManifest_Generation": "YES", "INFOPLIST_KEY_UILaunchStoryboardName": "LaunchScreen"}},
         ],
     }
     outputs["TemplateInfo.plist"] = plistlib.dumps(info, sort_keys=False)
     outputs["CFA-TEMPLATE.json"] = (json.dumps({"product": "cooperative-feature-architecture", "template": "Habit Tracker", "version": 1}, indent=2) + "\n").encode()
-    return outputs
+    test_info = {"Kind": "Xcode.Xcode3.ProjectTemplateUnitKind", "Identifier": "com.3daysofswift.cfa.habit-unit-tests", "Concrete": False, "Ancestors": ["com.apple.dt.unit.unitTestBundleBase.app.SwiftUI", "com.apple.dt.unit.multiPlatform.base"], "Nodes": test_nodes, "Definitions": test_definitions, "Targets": [{"TargetIdentifier": "com.apple.dt.applicationUnitTestBundleTarget", "TargetIdentifierToBeTested": "com.apple.dt.applicationTarget", "SharedSettings": {"SWIFT_VERSION": "6.0", "IPHONEOS_DEPLOYMENT_TARGET": "18.0", "SWIFT_STRICT_CONCURRENCY": "complete", "SWIFT_DEFAULT_ACTOR_ISOLATION": "nonisolated", "PRODUCT_BUNDLE_IDENTIFIER": "___VARIABLE_bundleIdentifierPrefix___.___PROJECTNAME:identifier___.___PACKAGENAME:identifier___"}}]}
+    test_outputs["TemplateInfo.plist"] = plistlib.dumps(test_info, sort_keys=False)
+    test_outputs["CFA-TEMPLATE.json"] = (json.dumps({"product": "cooperative-feature-architecture", "template": "Habit Tracker Tests", "version": 1}, indent=2) + "\n").encode()
+    return {DEST: outputs, TEST_DEST: test_outputs}
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
-    outputs = generated_files()
-    existing = {f.relative_to(DEST).as_posix() for f in DEST.rglob("*") if f.is_file() and not f.name.startswith(".")}
-    unexpected = existing - outputs.keys()
-    if unexpected:
-        raise SystemExit(f"Unexpected template files (review manually): {sorted(unexpected)}")
-    for relative, content in outputs.items():
-        file = DEST / relative
-        if args.check:
-            if not file.exists() or file.read_bytes() != content:
-                raise SystemExit(f"Stale Habit Tracker template: {relative}. Run python3 scripts/sync-habit-template.py")
-        else:
-            file.parent.mkdir(parents=True, exist_ok=True)
-            file.write_bytes(content)
-    print(f"Habit Tracker template {'verified' if args.check else 'synchronised'} ({len(outputs)} files).")
+    groups = generated_files()
+    for destination, outputs in groups.items():
+        existing = {f.relative_to(destination).as_posix() for f in destination.rglob("*") if f.is_file() and not f.name.startswith(".")}
+        unexpected = existing - outputs.keys()
+        if unexpected:
+            raise SystemExit(f"Unexpected template files (review manually): {sorted(unexpected)}")
+        for relative, content in outputs.items():
+            file = destination / relative
+            if args.check:
+                if not file.exists() or file.read_bytes() != content:
+                    raise SystemExit(f"Stale Habit Tracker template: {relative}. Run python3 scripts/sync-habit-template.py")
+            else:
+                file.parent.mkdir(parents=True, exist_ok=True)
+                file.write_bytes(content)
+    print(f"Habit Tracker templates {'verified' if args.check else 'synchronised'} ({sum(map(len, groups.values()))} files).")
 
 
 if __name__ == "__main__":

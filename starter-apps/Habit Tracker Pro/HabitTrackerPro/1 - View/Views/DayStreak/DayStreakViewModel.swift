@@ -13,7 +13,17 @@ final class DayStreakViewModel {
     var summaries: [HabitStreakSummary] { dayStreakFeature.summaries }
     var isLoading: Bool { dayStreakFeature.isLoading }
     var loadError: String? { dayStreakFeature.loadError }
-    func retryLoading() async { await dayStreakFeature.reload() }
+    @ObservationIgnored private var retryTask: Task<Void, Never>?
+    @discardableResult
+    func retryLoading() -> Task<Void, Never> {
+        if let retryTask { return retryTask }
+        let task = Task { [weak self, dayStreakFeature] in
+            defer { self?.retryTask = nil }
+            await dayStreakFeature.reload()
+        }
+        retryTask = task
+        return task
+    }
 
     func weekday(for day: StreakDay) -> String { day.date.formatted(.dateTime.weekday(.narrow)) }
     func accessibilityLabel(for day: StreakDay) -> String {

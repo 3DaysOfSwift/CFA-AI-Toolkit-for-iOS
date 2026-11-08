@@ -11,12 +11,15 @@ struct AppModelTests {
         let suiteName = "HabitTrackerPro.AppModelTests.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suiteName))
         defer { defaults.removePersistentDomain(forName: suiteName) }
-        let habitsFeature = HabitsFeature(repository: InMemoryHabitsRepository())
+        let date = Date(timeIntervalSince1970: 1_700_000_000)
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let habitsFeature = HabitsFeature(repository: InMemoryHabitsRepository(), calendar: calendar, currentDate: { date })
         let todayFeature = TodayFeature(habitsFeature: habitsFeature)
-        let dayStreakFeature = DayStreakFeature(habitsFeature: habitsFeature)
+        let dayStreakFeature = DayStreakFeature(habitsFeature: habitsFeature, calendar: calendar, currentDate: { date })
         let settingsFeature = SettingsFeature(defaults: defaults)
         let purchasesFeature = PurchasesFeature(store: TestPurchaseStore())
-        let trendsFeature = TrendsFeature(habitsFeature: habitsFeature, purchasesFeature: purchasesFeature)
+        let trendsFeature = TrendsFeature(habitsFeature: habitsFeature, calendar: calendar, currentDate: { date })
         let appModel = AppModel(todayFeature: todayFeature, habitsFeature: habitsFeature,
                                 dayStreakFeature: dayStreakFeature, settingsFeature: settingsFeature,
                                 purchasesFeature: purchasesFeature, trendsFeature: trendsFeature)
@@ -30,7 +33,7 @@ struct AppModelTests {
         try await appModel.habitsFeature.addHabit(name: "Read", tracking: .completion, unit: "", dailyTarget: nil)
         let habit = try #require(appModel.todayFeature.habits.first)
         try await appModel.todayFeature.recordToday(habitID: habit.id, value: 1)
-        #expect(appModel.habitsFeature.habits.first?.todayValue == 1)
+        #expect(appModel.habitsFeature.habits.first?.value(on: date, calendar: calendar) == 1)
         #expect(appModel.todayFeature.completedHabitCount == 1)
         #expect(appModel.dayStreakFeature.summaries.first?.currentStreak == 1)
     }

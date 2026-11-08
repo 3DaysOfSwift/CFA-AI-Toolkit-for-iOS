@@ -28,11 +28,19 @@ the architecture:
    may provide isolated Features.
 3. Preserve independent screen and scene selection in presentation, not shared
    Features. Selected detail data may be passed into the View.
+   When a new app supports deep links or notification actions, its
+   DeepLinkingFeature records received opening requests and retains deferred
+   destinations; scheduling or delivery alone does not add one. The receiving
+   scene owns navigation. Remove a pending request after successful navigation
+   or explicit dismissal, and preserve existing history during migration.
 4. When the app uses `ThemeManager`, it is a presentation dependency supplied through the
    SwiftUI environment. AppModel and features are not environment
    values.
 5. Features own feature state and behaviour; ViewModels own screen
-   presentation state and route user intent to their feature.
+   presentation state and route user intent to their feature. Published API
+   or persistence snapshots use immutable `let` properties and contents, and
+   are replaced after confirmed changes. Do not embed mutable reference state
+   that undermines the snapshot; temporary editor drafts are presentation state.
 6. RootTabView is structural only. It presents tabs and navigation; it does not
    refresh features, interpret feature failures, or own feature loading state.
 7. Every concrete feature type ends in `Feature`, such as `SettingsFeature`.
@@ -52,13 +60,16 @@ the architecture:
    Features own their asynchronous work. Returning from the callback confirms
    startup was initiated, not that disk or network loading has finished.
    Keep synchronous startup brief and do not block on disk or network I/O.
-   A screen `.task` starts screen-owned initial asynchronous work before that
-   View appears; it is not a substitute for launch. When both paths request the
-   same refresh, a shared Feature retains one in-flight `Task<Void, Never>` and
-   every caller awaits its value; it clears the task in `defer` after publishing
-   the outcome. A ViewModel retains one Button-triggered interaction task and
-   returns it from `refresh()`; repeated Button presses reuse it and async
-   callers await its value.
+   A screen `.task` starts screen-owned initial work with that View's lifetime;
+   it is not a substitute for launch or a guarantee that loading finishes before
+   the View appears. When both paths request an equivalent refresh, the Feature
+   owns and shares the in-flight work, and callers await its outcome. Clear its
+   retained handle after completion without letting older work clear newer work.
+   A shared Feature refresh normally continues when a screen leaves, even if
+   that screen was its only caller; keep the result for later use. A different
+   cancellation policy needs a specific product or resource reason.
+   A ViewModel retains a handle for each independently managed button action;
+   equivalent repeated actions reuse that handle, which async callers can await.
 10. A non-trivial SwiftData repository is a `@ModelActor`. Its `ModelContext`
     and SwiftData records stay inside that actor; it returns `Sendable` domain
     values to the main-actor concrete feature type.
@@ -72,18 +83,29 @@ the architecture:
     A replaceable remote snapshot normally uses one JSON cache; SwiftData is reserved
     for genuinely structured, queryable, growing, or relational local data.
     Do not persist the same snapshot through both a database and a file cache.
+    Publish durable user edits as saved only after required persistence succeeds.
+    A current server response does not wait for an optional cache write: publish
+    it, attempt caching independently, and prevent older cached data replacing it.
 14. AppModel stores `shared`, concrete Features, one private launch Boolean,
     and private task handles needed to own app-wide listeners. Its explicit
-    initializer assigns injected Features and the guard;
+    initializer assigns injected Features, sets the launch guard to false and
+    initializes any app-wide listener task handles to nil;
     its single `static live()` constructs all production dependencies. No
     service, container, loading/error presentation state, or defaulted Feature
-    property belongs in AppModel.
+    property belongs in AppModel. AppModel starts and owns app-wide listeners
+    and forwards events to the responsible Feature, which interprets them.
+    Feature-owned background capabilities register their own handlers when
+    needed; route system callbacks to them and honor expiration and completion.
+    For additional device or extension targets, include the appropriate shared
+    Model source and target-specific presentation. Each process has its own
+    AppModel and Feature instances; synchronize data through an appropriate
+    platform mechanism rather than assuming shared memory.
 15. SwiftData access goes through `SwiftDataManager`; every `URLSession` call
     goes through `NetworkingManager`. Features own those lower-level
     collaborators. Views/ViewModels never open storage or make transport calls.
 16. The app delegate's launch callback signals `applicationDidFinishLaunching`.
     No View `.task` performs app launch, and no App, delegate, or View stores an
-    AppModel reference. ViewModels retain only their narrow Feature.
+    AppModel reference. ViewModels retain only the narrow Features needed by their screen.
 17. The SwiftUI `App.body` declares a stable root View and app-wide presentation
     modifiers only. No startup `if`/`switch`, storage gating, database loading,
     feature error display, or AppModel property belongs there. The root View
@@ -106,6 +128,11 @@ the architecture:
     Features own authoritative application state on the main actor. Distinguish
     service-internal request tracking, caches and storage machinery from that
     business authority; do not promote all stateful helpers into AppModel.
+    When account changes affect other Features, coordinate the real workflow
+    explicitly. If sign-out fails before the session ends, retain account state;
+    after success clear affected state and prevent old requests from republishing
+    it. Reconcile partial authentication outcomes and handle cleanup failures
+    honestly; preserve user-owned or unsynchronised work according to the product.
 21. New-app visual starting points live in [new-app design defaults](new-app-design-defaults.md).
     Use them only where appropriate to the recorded workflow and current request;
     user-approved designs override defaults. Do not require palette counts or
@@ -179,7 +206,8 @@ from precedent use; do not reframe it as a completed partial migration.
   coordination in the presentation layer; dependency count alone is not a defect.
 - Inventory screen initializers and call sites. Verify private ViewModel
   ownership, allow selected-value detail initialization, and reject ViewModel
-  injection or shared selection in Features. Preserve independent destinations.
+  injection or shared screen and scene navigation selection in Features.
+  Preserve independent destinations.
 - Compare visuals and interactions with the baseline. Do not introduce
   unrequested design changes or restore defaults the user replaced.
 - For initial app design, verify the applicable new-app design defaults and

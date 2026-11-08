@@ -13,8 +13,8 @@ Repository implementations:
 - throw meaningful errors rather than silently inventing success.
 
 For production SwiftData repositories with non-trivial reads, writes, imports,
-or data sets, use a dedicated `@ModelActor`. It owns its `ModelContext`; feature
-features remain `@MainActor` and publish only immutable `Sendable` domain
+or data sets, use a dedicated `@ModelActor`. It owns its `ModelContext`; Features
+remain `@MainActor` and publish only immutable `Sendable` domain
 values after awaiting the repository. SwiftData `@Model` records never cross
 from the model actor into a feature, ViewModel, or View. A small,
 deliberately UI-owned context may be main-actor isolated when its work is proven
@@ -24,6 +24,15 @@ Publish user edits and other durable commands as saved only after the required
 authoritative persistence succeeds. Keep an editable draft on failure and report
 the error; do not present unsaved changes as saved. Loading and error
 presentation may update independently.
+
+For simple preferences, `UserDefaults.set` updates the process's in-memory
+defaults immediately and writes to disk asynchronously; it does not report a
+durable-write result. Update the defaults before publishing the preference,
+but do not present the return from `set` as proof that the disk write succeeded.
+If a product requires confirmed persistence and recoverable write errors, use an
+appropriate storage API that provides those results instead. Apple documents
+[UserDefaults write behaviour](https://developer.apple.com/documentation/foundation/userdefaults)
+and says [`synchronize()` is unnecessary and should not be used](https://developer.apple.com/documentation/foundation/userdefaults/synchronize()).
 
 A replaceable local cache of data already obtained from an authoritative remote
 source is different: publish a successful, current response without waiting for

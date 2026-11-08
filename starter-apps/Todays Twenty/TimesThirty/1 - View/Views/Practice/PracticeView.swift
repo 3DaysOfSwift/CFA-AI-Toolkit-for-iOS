@@ -14,7 +14,7 @@ struct PracticeView: View {
                 ScrollView {
                     VStack(spacing: 22) {
                         if let error = viewModel.errorMessage {
-                            OperationErrorView(message: error, retry: viewModel.retry)
+                            OperationErrorView(message: error) { viewModel.retry() }
                         }
                         if let session = viewModel.session {
                             if session.isComplete { completion(session) }
@@ -120,8 +120,8 @@ struct PracticeView: View {
     }
 
     private func answerButton(_ answer: Int, index: Int, question: MultiplicationQuestion) -> some View {
-        let isCorrect = question.isResolved && answer == question.answer
-        let isWrong = question.wrongAnswers.contains(answer)
+        let isCorrect = viewModel.isCorrectAnswer(answer, in: question)
+        let isWrong = viewModel.isIncorrectAnswer(answer, in: question)
         let background = isCorrect ? themeManager.current.success : isWrong ? themeManager.current.error : themeManager.current.surface
         return Button {
             viewModel.perform(.answer(questionID: question.id, value: answer))

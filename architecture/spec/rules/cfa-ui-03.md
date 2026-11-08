@@ -4,7 +4,7 @@
 
 **Strength:** Permitted exception.
 
-**Guidance:** Pass a selected immutable snapshot to the detail View and construct its own State-backed ViewModel in the View initializer.
+**Guidance:** A detail View may receive a selected immutable snapshot and use it to construct its own State-backed ViewModel in the View initializer.
 
 **Why:** Each destination can preserve its selection independently.
 

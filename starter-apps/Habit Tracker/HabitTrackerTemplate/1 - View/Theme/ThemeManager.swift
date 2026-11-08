@@ -14,7 +14,7 @@ final class ThemeManager {
     }
 
     func select(_ theme: AppColourTheme) {
-        selectedTheme = theme
         defaults.set(theme.id, forKey: "selectedTheme")
+        selectedTheme = theme
     }
 }

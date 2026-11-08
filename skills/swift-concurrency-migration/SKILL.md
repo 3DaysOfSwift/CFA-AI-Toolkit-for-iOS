@@ -1,6 +1,6 @@
 ---
 name: swift-concurrency-migration
-description: Legacy GCD migration: migrate GCD, OperationQueue and callback-based iOS apps to Cooperative Feature Architecture and Swift Concurrency while preserving product behaviour. Use when a developer asks to modernise or migrate a legacy iOS codebase; not for a small isolated API conversion.
+description: Legacy GCD migration: migrate GCD, OperationQueue and callback-based iOS apps to Cooperative Feature Architecture and Swift Concurrency while preserving product behaviour. Use when a developer requests migration of a legacy iOS codebase to CFA and Swift Concurrency; not for general modernisation or a small isolated API conversion.
 ---
 
 # Legacy GCD migration
@@ -19,7 +19,8 @@ do not impose CFA on another architecture or link to an unpublished article.
 Apply the specification's screen-construction invariant within the requested
 scope: private ViewModel ownership with inline `@State` construction by default.
 A detail View may construct its own State-backed ViewModel from selected value data
-in its initializer. Never inject or share ViewModels; keep selection out of Features. Review-only work
+in its initializer. Never inject or share ViewModels; keep screen and scene navigation selections
+out of Features. Review-only work
 reports violations; tests inject Features into ViewModels, not ViewModels into Views.
 
 Migrate a legacy application into CFA and Swift Concurrency by preserving its
@@ -52,8 +53,11 @@ Use deliberate passes:
    indexed calls as build-specific evidence with unverified freshness; inspect
    callers, ownership and behaviour before changing code. An unavailable index
    does not block source review. Keep analysis files outside application source.
-   Map each screen to its dedicated ViewModel and required concrete AppModel
-   Features, with named tests for each actual Feature. A screen can present
+   Map each screen-level SwiftUI View to its dedicated ViewModel and required
+   concrete AppModel Features, with named tests for each actual Feature. For
+   existing UIKit screens, trace their presentation owners and Feature boundaries
+   without assuming the migration requires rewriting the UI in SwiftUI or adding
+   a new ViewModel to every controller. A screen can present
    several independent business capabilities; several screens can use the same
    Feature. Identify missing business owners rather than inventing one per tab.
    Preserve one authoritative owner for shared business state; do not duplicate
@@ -66,8 +70,9 @@ Use deliberate passes:
    redesign. Do not inventory against new-app styling or branding defaults;
    their absence is not a migration gap. Resolve ambiguous or materially changed
    product behaviour with the developer.
-2. Move one complete feature at a time into CFA. Give each SwiftUI View a
-   bespoke ViewModel, move testable feature decisions into its Feature,
+2. Move one complete feature at a time into CFA. Give each screen-level SwiftUI View a
+   dedicated ViewModel; reusable presentation components do not automatically need
+   one. Move testable feature decisions into its Feature,
    place shared dependency construction in AppModel and keep persistence behind
    repositories. AppModel's single `static live()` constructs dependencies;
    its stored properties include Features, the launch guard and any app-wide
@@ -78,8 +83,10 @@ Use deliberate passes:
 3. Convert that feature’s asynchronous model work into directly awaitable
    Swift Concurrency. ViewModels retain created task handles by default and
    equivalent repeated actions await the shared execution. Each Feature
-   independently shares equivalent in-flight requests or queues distinct
-   commands sequentially across awaits. Preserve required product semantics;
+   independently shares equivalent in-flight requests or queues commands that
+   must each execute sequentially across awaits. Determine equivalence from the
+   product behaviour: matching inputs alone do not make two user commands the
+   same action, and required repeated writes must not be coalesced. Preserve required product semantics;
    document exceptions such as latest-request-wins or independent work rather
    than silently dropping inputs. Give root Tasks explicit cancellation owners.
 4. Re-run the relevant behaviour and concurrency tests. Record the remaining

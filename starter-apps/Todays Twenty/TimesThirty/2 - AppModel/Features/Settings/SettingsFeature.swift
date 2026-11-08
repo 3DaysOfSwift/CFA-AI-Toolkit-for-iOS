@@ -7,16 +7,21 @@ final class SettingsFeature {
     private let defaults: UserDefaults
     let version: String
 
-    init(defaults: UserDefaults, bundle: Bundle = .main) {
+    init(defaults: UserDefaults, appInformation: [String: Any] = Bundle.main.infoDictionary ?? [:]) {
         self.defaults = defaults
         preferredDifficulty = Difficulty(rawValue: defaults.string(forKey: "preferredDifficulty") ?? "") ?? .everyday
-        let number = bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
-        let build = bundle.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
+        func information(_ key: String) -> String {
+            guard let value = appInformation[key] as? String,
+                  !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return "—" }
+            return value
+        }
+        let number = information("CFBundleShortVersionString")
+        let build = information("CFBundleVersion")
         version = "Version \(number) (\(build))"
     }
 
     func selectDifficulty(_ difficulty: Difficulty) {
-        preferredDifficulty = difficulty
         defaults.set(difficulty.rawValue, forKey: "preferredDifficulty")
+        preferredDifficulty = difficulty
     }
 }

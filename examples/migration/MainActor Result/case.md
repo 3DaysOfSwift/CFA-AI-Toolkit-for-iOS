@@ -10,7 +10,7 @@ Both examples publish Artemis on MainActor. The migrated example also retains th
 
 ## Migration
 
-The Feature awaits its provider and publishes observable state on MainActor.
+The Feature awaits its provider and publishes observable state on MainActor. Requests with different inputs are queued so an older result cannot overwrite a later request.
 
 ## Run and verify
 
@@ -18,4 +18,4 @@ Open and run `Before.playground` and `After.playground`. Each prints `Passed:` a
 
 ## Boundaries
 
-The legacy example does not model failure; overlapping requests, cancellation and real network work are outside this case.
+The legacy example does not model failure; cancellation and real network work are outside this case.

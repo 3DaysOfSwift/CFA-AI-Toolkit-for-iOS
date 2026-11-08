@@ -8,7 +8,7 @@
 
 **Why:** Migration changes how the app works internally without silently removing what users rely on.
 
-**Example:** A migration retains the purchase flow while adopting a modern system tab bar and correcting a verified defect.
+**Example:** A migration retains the purchase flow, corrects an in-scope verified defect, and accepts a minor tab bar appearance change required by the platform.
 
 **Explanation:** [Why use behaviour-preserving migration in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/preserve-product-behaviour).
 

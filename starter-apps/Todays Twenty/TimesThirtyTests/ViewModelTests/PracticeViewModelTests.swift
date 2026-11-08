@@ -4,6 +4,23 @@ import Testing
 
 @MainActor
 struct PracticeViewModelTests {
+    @Test func answerFeedbackReflectsQuestionState() throws {
+        let env = TestEnvironment()
+        let name = "TimesThirtyTests.\(UUID())"
+        let defaults = try #require(UserDefaults(suiteName: name))
+        defer { defaults.removePersistentDomain(forName: name) }
+        let model = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
+                                      settingsFeature: SettingsFeature(defaults: defaults))
+        let question = MultiplicationQuestion(id: UUID(), left: 3, right: 4, choices: [12, 13])
+        #expect(!model.isCorrectAnswer(12, in: question))
+        let attempted = question.updating(wrongAnswers: [13])
+        #expect(model.isIncorrectAnswer(13, in: attempted))
+        #expect(!model.isIncorrectAnswer(12, in: attempted))
+        let revealed = attempted.updating(isRevealed: true)
+        #expect(model.isCorrectAnswer(12, in: revealed))
+        #expect(!model.isCorrectAnswer(13, in: revealed))
+    }
+
     @Test(arguments: [false, true])
     func resolvedAnswerAdvancesOnceAfterTwoSeconds(reveal: Bool) async throws {
         let env = TestEnvironment()
@@ -126,6 +143,22 @@ struct PracticeViewModelTests {
         #expect(model.feedback.contains("One point"))
     }
 
+    @Test func successfulRefreshClearsAnEarlierLoadError() async throws {
+        let env = TestEnvironment()
+        let name = "TimesThirtyTests.\(UUID())"
+        let defaults = try #require(UserDefaults(suiteName: name))
+        defer { defaults.removePersistentDomain(forName: name) }
+        let model = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
+                                      settingsFeature: SettingsFeature(defaults: defaults))
+        await env.repository.fail(true)
+        await model.refresh().value
+        #expect(model.errorMessage != nil)
+        await env.repository.fail(false)
+        await model.refresh().value
+        #expect(model.hasLoaded)
+        #expect(model.errorMessage == nil)
+    }
+
     @Test func errorAndRetryAreScreenScoped() async throws {
         let env = TestEnvironment()
         let name = "TimesThirtyTests.\(UUID())"
@@ -137,7 +170,7 @@ struct PracticeViewModelTests {
         await model.perform(.refresh).value
         #expect(model.errorMessage != nil)
         await env.repository.fail(false)
-        await model.perform(.refresh).value
+        await model.retry().value
         #expect(model.errorMessage == nil)
         #expect(model.hasLoaded)
     }

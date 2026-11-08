@@ -18,17 +18,32 @@ actor LaunchProvider {
 @MainActor @Observable
 final class LaunchFeature {
     @ObservationIgnored private let provider: LaunchProvider
+    @ObservationIgnored private var refreshTask: Task<Void, Never>?
+    @ObservationIgnored private var refreshID: UUID?
     private(set) var name = "No launch loaded"
     private(set) var errorMessage: String?
     init(provider: LaunchProvider) { self.provider = provider }
 
+    // Requests may have different inputs, so each is processed in order.
     func refresh(available: Bool) async {
-        do {
-            let downloadedName = try await provider.download(available: available)
-            name = downloadedName
-            errorMessage = nil
-        } catch {
-            errorMessage = "The launch could not be loaded."
+        let previous = refreshTask
+        let id = UUID()
+        let task = Task { @MainActor in
+            await previous?.value
+            do {
+                let downloadedName = try await provider.download(available: available)
+                name = downloadedName
+                errorMessage = nil
+            } catch {
+                errorMessage = "The launch could not be loaded."
+            }
+        }
+        refreshTask = task
+        refreshID = id
+        await task.value
+        if refreshID == id {
+            refreshTask = nil
+            refreshID = nil
         }
     }
 }

@@ -31,7 +31,7 @@ Per-feature containers duplicate initialization and ownership. Replacing a colle
 
 ## Documented rationale
 
-The coding guide chooses a single store owner for consistency and explicitly distinguishes replaceable JSON snapshots from queryable durable data. Its recorded overlapping-container investigation motivates cautious initialization; it is not an Apple-confirmed explanation of framework internals.
+The coding guide chooses a single store owner for consistency and distinguishes replaceable snapshots, which use JSON by default, from queryable durable data. Its recorded overlapping-container investigation motivates cautious initialization; it is not an Apple-confirmed explanation of framework internals.
 
 Publishing durable edits as saved only after persistence succeeds avoids displaying unsaved changes as saved and avoids rolling back an optimistic authoritative update. The user can keep editing or retry after failure. A downloaded response is already confirmed by its remote source; an optional local cache must not prevent the user from seeing it.
 

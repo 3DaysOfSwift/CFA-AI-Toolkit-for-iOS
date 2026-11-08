@@ -151,8 +151,10 @@ Report files contain source paths and symbols; review them before sharing.
 
 This is a **lexical inventory prototype**, not a Swift compiler, runtime profiler
 or completed architecture audit. Counts describe matched source sites, not active
-tasks. Declaration roles are naming heuristics. It does not resolve Xcode target
-membership, conditional compilation, wrappers, inferred isolation or call graphs.
+tasks. Declaration roles are naming heuristics. The lexical dashboard does not
+resolve Xcode target membership, conditional compilation, wrappers, inferred
+isolation or call graphs. The separate shared project analysis can add optional
+indexed call relationships, subject to the freshness and ambiguity limits above.
 Swift string interpolation and regex literal parsing are incomplete. It can
 miss real sites or match custom APIs with familiar names. Unknowns stay unknown.
 

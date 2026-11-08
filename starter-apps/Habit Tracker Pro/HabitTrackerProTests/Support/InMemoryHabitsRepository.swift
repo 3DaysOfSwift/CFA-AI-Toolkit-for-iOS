@@ -4,10 +4,6 @@ import Foundation
 
 actor InMemoryHabitsRepository: HabitsRepository {
     private var stored: [Habit]
-    private var lastInserted: Habit?
-    private var insertWaiter: CheckedContinuation<Habit, Never>?
-    private var lastRecorded: (UUID, Int)?
-    private var recordWaiter: CheckedContinuation<(UUID, Int), Never>?
 
     init(habits: [Habit] = []) {
         stored = habits
@@ -17,24 +13,20 @@ actor InMemoryHabitsRepository: HabitsRepository {
 
     func insertHabit(_ habit: Habit) async throws {
         stored.append(habit)
-        lastInserted = habit
-        insertWaiter?.resume(returning: habit)
-        insertWaiter = nil
     }
 
-    func record(habitID: UUID, date: Date, value: Int) async throws {
-        lastRecorded = (habitID, value)
-        recordWaiter?.resume(returning: (habitID, value))
-        recordWaiter = nil
+    func record(habitID: UUID, entryID: UUID, date: Date, value: Int) async throws {
+        guard stored.contains(where: { $0.id == habitID }) else { throw HabitError.habitNotFound }
+        if let index = stored.firstIndex(where: { $0.id == habitID }) {
+            var entries = stored[index].entries
+            if let entryIndex = entries.firstIndex(where: { $0.id == entryID }) {
+                if value == 0 { entries.remove(at: entryIndex) }
+                else { entries[entryIndex] = HabitEntry(id: entries[entryIndex].id, date: entries[entryIndex].date, value: value) }
+            } else if value > 0 {
+                entries.append(HabitEntry(id: entryID, date: date, value: value))
+            }
+            stored[index] = stored[index].replacingEntries(entries)
+        }
     }
 
-    func waitForInsert() async -> Habit {
-        if let lastInserted { return lastInserted }
-        return await withCheckedContinuation { insertWaiter = $0 }
-    }
-
-    func waitForRecord() async -> (UUID, Int) {
-        if let lastRecorded { return lastRecorded }
-        return await withCheckedContinuation { recordWaiter = $0 }
-    }
 }

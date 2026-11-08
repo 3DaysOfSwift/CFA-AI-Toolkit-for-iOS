@@ -10,7 +10,7 @@ Both implementations return Artemis on success and report HTTP 503 as an error.
 
 ## Migration
 
-The provider actor returns the decoded value using URLSession’s async API. The continuation is used only by the legacy behaviour check.
+The provider actor asks `NetworkingManager` for data using URLSession’s async API, checks the response and returns the decoded value. The continuation is used only by the legacy behaviour check.
 
 ## Run and verify
 

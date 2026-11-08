@@ -39,7 +39,7 @@ enum NoteError: Error { case emptyText }
 @MainActor @Observable
 final class NotesFeature {
     private let repository: any NotesRepository
-    @ObservationIgnored private var lastSave: Task<Void, Never>?
+    @ObservationIgnored private var lastSave: (id: UUID, task: Task<Void, Never>)?
     @ObservationIgnored private var loading: (id: UUID, task: Task<[Note], Error>)?
     private var didLoad = false
     private(set) var notes: [Note] = []
@@ -74,14 +74,19 @@ final class NotesFeature {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { throw NoteError.emptyText }
         let note = Note(id: UUID(), text: trimmed)
-        let previous = lastSave
+        let previous = lastSave?.task
+        let id = UUID()
         let operation = Task { @MainActor in
             await previous?.value
             try await loadIfNeeded()
             try await repository.save(note)
             notes.append(note)
         }
-        lastSave = Task { _ = try? await operation.value }
+        let completion = Task { _ = try? await operation.value }
+        lastSave = (id, completion)
+        defer {
+            if lastSave?.id == id { lastSave = nil }
+        }
         try await operation.value
     }
 }
@@ -110,6 +115,7 @@ final class AppModel {
 final class NotesEditorViewModel {
     private let notesFeature: NotesFeature
     @ObservationIgnored private var saveTask: Task<Bool, Never>?
+    @ObservationIgnored private var loadTask: Task<Void, Never>?
     var text = ""
     private(set) var isSaving = false
     private(set) var saveError: String?
@@ -119,9 +125,16 @@ final class NotesEditorViewModel {
         self.notesFeature = notesFeature
     }
 
-    func load() async {
-        do { try await notesFeature.loadIfNeeded(); loadError = nil }
-        catch { loadError = "Notes could not be loaded. Please try again." }
+    @discardableResult
+    func load() -> Task<Void, Never> {
+        if let loadTask { return loadTask }
+        let task = Task { @MainActor in
+            defer { loadTask = nil }
+            do { try await notesFeature.loadIfNeeded(); loadError = nil }
+            catch { loadError = "Notes could not be loaded. Please try again." }
+        }
+        loadTask = task
+        return task
     }
 
     @discardableResult
@@ -136,6 +149,9 @@ final class NotesEditorViewModel {
                 try await notesFeature.save(submittedText)
                 onSuccess()
                 return true
+            } catch NoteError.emptyText {
+                self?.saveError = "Enter a note before saving."
+                return false
             } catch {
                 self?.saveError = "The note could not be saved. Please try again."
                 return false
@@ -155,12 +171,15 @@ struct NotesEditorView: View {
         Form {
             TextField("Note", text: $viewModel.text).disabled(viewModel.isSaving)
             if let error = viewModel.saveError { Text(error) }
-            if let error = viewModel.loadError { Text(error) }
+            if let error = viewModel.loadError {
+                Text(error)
+                Button("Try again") { viewModel.load() }
+            }
             Button("Save") { viewModel.save { dismiss() } }
                 .disabled(viewModel.isSaving)
             Button("Cancel", role: .cancel) { dismiss() }
                 .disabled(viewModel.isSaving)
         }
-        .task { await viewModel.load() }
+        .task { await viewModel.load().value }
     }
 }

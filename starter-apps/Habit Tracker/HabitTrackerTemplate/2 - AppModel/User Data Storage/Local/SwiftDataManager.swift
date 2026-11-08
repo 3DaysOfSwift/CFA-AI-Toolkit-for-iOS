@@ -38,7 +38,7 @@ actor SwiftDataManager: HabitsRepository {
         try await repository().insertHabit(habit)
     }
 
-    func record(habitID: UUID, date: Date, value: Int) async throws {
-        try await repository().record(habitID: habitID, date: date, value: value)
+    func record(habitID: UUID, entryID: UUID, date: Date, value: Int) async throws {
+        try await repository().record(habitID: habitID, entryID: entryID, date: date, value: value)
     }
 }

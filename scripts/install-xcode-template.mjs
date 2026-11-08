@@ -5,7 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const toolkitRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const templateNames = ['CFA App', 'Habit Tracker', 'Day Streak'];
+const templateNames = ['CFA App', 'CFA App Tests', 'Habit Tracker', 'Habit Tracker Tests', 'Day Streak', 'Day Streak Tests'];
 
 function usage() {
   console.log(`Install CFA App, Habit Tracker and Day Streak into Xcode\n\nnode scripts/install-xcode-template.mjs [--replace] [--destination directory]\n\nBy default, Xcode templates are installed in:\n~/Library/Developer/Xcode/Templates`);

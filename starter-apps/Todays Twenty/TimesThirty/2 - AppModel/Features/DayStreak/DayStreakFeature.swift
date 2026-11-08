@@ -13,7 +13,7 @@ final class DayStreakFeature {
     private let practiceFeature: PracticeFeature
     private let calendar: Calendar
 
-    init(practiceFeature: PracticeFeature, calendar: Calendar = .current) {
+    init(practiceFeature: PracticeFeature, calendar: Calendar = .autoupdatingCurrent) {
         self.practiceFeature = practiceFeature
         self.calendar = calendar
     }

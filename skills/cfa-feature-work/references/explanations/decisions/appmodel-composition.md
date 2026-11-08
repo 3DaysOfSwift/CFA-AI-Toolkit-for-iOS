@@ -19,7 +19,7 @@ The specification explicitly chooses shared production composition to keep scene
 
 ## Trade-offs and alternatives
 
-Editorial analysis: convenient production access introduces a globally reachable entry point. Tests and previews need deliberate isolation, and account- or document-scoped products may require an additional ownership design rather than an assumed universal graph.
+Editorial analysis: convenient production access introduces a globally reachable entry point. Tests use isolated graphs; a normal preview constructs the View and uses its ordinary ViewModel and Feature dependencies. Account- or document-scoped products may require an additional ownership design rather than an assumed universal graph.
 
 ## Scope and exceptions
 

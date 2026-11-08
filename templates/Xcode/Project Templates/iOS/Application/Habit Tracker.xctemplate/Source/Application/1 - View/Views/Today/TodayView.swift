@@ -9,53 +9,57 @@ struct TodayView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    header
-                    if !viewModel.habits.isEmpty || (viewModel.loadError == nil && !viewModel.isLoading) {
-                        progressCard
-                    }
-                    if let loadError = viewModel.loadError {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Couldn’t load your habits").font(.headline)
-                            Text(loadError)
-                            Button("Try again") { Task { await viewModel.retryLoading() } }
-                                .disabled(viewModel.isLoading)
+            // Re-evaluate the displayed day and completion state across midnight.
+            TimelineView(.periodic(from: .now, by: 60)) { _ in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 24) {
+                        header
+                        if !viewModel.habits.isEmpty || (viewModel.loadError == nil && !viewModel.isLoading) {
+                            progressCard
                         }
-                        .foregroundStyle(theme.primaryText)
-                    }
-                    if viewModel.isLoading {
-                        ProgressView("Loading your habits…")
-                    }
-                    if viewModel.habits.isEmpty && viewModel.loadError == nil && !viewModel.isLoading {
-                        ContentUnavailableView {
-                            Label("No habits yet", systemImage: "circle.dashed")
-                        } description: {
-                            Text("Add a habit to start tracking your daily progress.")
-                        } actions: {
-                            Button("Add Habit") { isShowingAddHabit = true }
-                                .buttonStyle(.borderedProminent)
+                        if let loadError = viewModel.loadError {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Couldn’t load your habits").font(.headline)
+                                Text(loadError)
+                                Button("Try again") { viewModel.retryLoading() }
+                                    .disabled(viewModel.isLoading)
+                            }
+                            .foregroundStyle(theme.primaryText)
                         }
-                        .foregroundStyle(theme.secondaryText)
-                    } else {
-                        VStack(spacing: 12) {
-                            ForEach(viewModel.habits) { habit in
-                                HabitTodayRow(habit: habit, theme: theme,
-                                              amount: Binding(get: { viewModel.amountText(for: habit) },
-                                                              set: { viewModel.editAmount($0, for: habit) }),
-                                              canIncrement: viewModel.canIncrement(habit),
-                                              statusText: viewModel.statusText(for: habit),
-                                              needsRetry: viewModel.needsRetry(habit),
-                                              onToggle: { viewModel.toggle(habit) },
-                                              onIncrement: { viewModel.increment(habit) },
-                                              onRetry: viewModel.retrySaving)
+                        if viewModel.isLoading {
+                            ProgressView("Loading your habits…")
+                        }
+                        if viewModel.habits.isEmpty && viewModel.loadError == nil && !viewModel.isLoading {
+                            ContentUnavailableView {
+                                Label("No habits yet", systemImage: "circle.dashed")
+                            } description: {
+                                Text("Add a habit to start tracking your daily progress.")
+                            } actions: {
+                                Button("Add Habit") { isShowingAddHabit = true }
+                                    .buttonStyle(.borderedProminent)
+                            }
+                            .foregroundStyle(theme.secondaryText)
+                        } else {
+                            VStack(spacing: 12) {
+                                ForEach(viewModel.habits) { habit in
+                                    HabitTodayRow(habit: habit, theme: theme,
+                                                  isComplete: viewModel.isCompleteToday(habit),
+                                                  amount: Binding(get: { viewModel.amountText(for: habit) },
+                                                                  set: { viewModel.editAmount($0, for: habit) }),
+                                                  canIncrement: viewModel.canIncrement(habit),
+                                                  statusText: viewModel.statusText(for: habit),
+                                                  needsRetry: viewModel.needsRetry(habit),
+                                                  onToggle: { viewModel.toggle(habit) },
+                                                  onIncrement: { viewModel.increment(habit) },
+                                                  onRetry: viewModel.retrySaving)
+                                }
                             }
                         }
                     }
+                    .padding(20)
                 }
-                .padding(20)
+                .background(theme.background)
             }
-            .background(theme.background)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) { Text("Today").font(.headline).foregroundStyle(theme.primaryText) }
@@ -109,6 +113,7 @@ struct TodayView: View {
 private struct HabitTodayRow: View {
     let habit: Habit
     let theme: AppColourTheme
+    let isComplete: Bool
     @Binding var amount: String
     let canIncrement: Bool
     let statusText: String?
@@ -121,14 +126,14 @@ private struct HabitTodayRow: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 12) {
                 Button(action: onToggle) {
-                    Image(systemName: habit.isCompleteToday ? "checkmark.circle.fill" : "circle")
+                    Image(systemName: isComplete ? "checkmark.circle.fill" : "circle")
                         .font(.system(size: 28))
-                        .foregroundStyle(habit.isCompleteToday ? theme.tint : theme.secondaryText)
+                        .foregroundStyle(isComplete ? theme.tint : theme.secondaryText)
                         .frame(width: 48, height: 48)
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(habit.isCompleteToday ? "Mark \(habit.name) incomplete" : "Complete \(habit.name)")
+                .accessibilityLabel(isComplete ? "Mark \(habit.name) incomplete" : "Complete \(habit.name)")
 
                 VStack(alignment: .leading, spacing: 5) {
                     Text(habit.name).font(.headline).foregroundStyle(theme.primaryText)

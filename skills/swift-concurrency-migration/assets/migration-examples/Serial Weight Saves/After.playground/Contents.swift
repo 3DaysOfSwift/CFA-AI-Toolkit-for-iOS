@@ -23,6 +23,7 @@ actor WeightStorage {
 final class WeightLogFeature {
     @ObservationIgnored private let storage: WeightStorage
     @ObservationIgnored private var lastSave: Task<Bool, Never>?
+    @ObservationIgnored private var lastSaveID: UUID?
     private(set) var weights: [Int] = []
     private(set) var saveError: String?
 
@@ -32,7 +33,11 @@ final class WeightLogFeature {
     @discardableResult
     func save(_ weight: Int) -> Task<Bool, Never> {
         let previous = lastSave
+        let id = UUID()
         let task = Task {
+            defer {
+                if lastSaveID == id { lastSave = nil; lastSaveID = nil }
+            }
             _ = await previous?.value
             do {
                 try await storage.save(weight)
@@ -45,6 +50,7 @@ final class WeightLogFeature {
             }
         }
         lastSave = task
+        lastSaveID = id
         return task
     }
 }
@@ -65,6 +71,19 @@ func runExample() async {
     let stored = await storage.read()
     precondition(finalSaved && feature.weights == [70, 72] && stored == feature.weights)
     precondition(feature.saveError == nil)
+
+    // Submit all three before awaiting, including a failed middle operation.
+    let queuedStorage = WeightStorage()
+    let queuedFeature = WeightLogFeature(storage: queuedStorage)
+    let firstQueued = queuedFeature.save(80)
+    let rejectedQueued = queuedFeature.save(-1)
+    let lastQueued = queuedFeature.save(82)
+    let firstResult = await firstQueued.value
+    let rejectedResult = await rejectedQueued.value
+    let lastResult = await lastQueued.value
+    let queuedStored = await queuedStorage.read()
+    precondition(firstResult && !rejectedResult && lastResult)
+    precondition(queuedFeature.weights == [80, 82] && queuedStored == [80, 82])
     print("Passed: valid saves stayed ordered; the invalid value was rejected.")
 }
 

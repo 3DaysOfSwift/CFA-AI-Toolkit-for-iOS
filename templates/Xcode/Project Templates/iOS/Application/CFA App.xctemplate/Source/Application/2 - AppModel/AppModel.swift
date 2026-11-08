@@ -22,24 +22,13 @@ final class AppModel {
     }
 
     static func live() -> AppModel {
-        do {
-            let networkingManager = NetworkingManager()
-            let cachesDirectoryURL = try FileManager.default.url(
-                for: .cachesDirectory,
-                in: .userDomainMask,
-                appropriateFor: nil,
-                create: true
-            )
-
-            return AppModel(
-                gitReposFeature: GitReposFeature(
-                    provider: GitHubAPI(networkingManager: networkingManager),
-                    cache: RepoFileCache(cacheDirectoryURL: cachesDirectoryURL)
-                ),
-                settingsFeature: SettingsFeature()
-            )
-        } catch {
-            preconditionFailure("Unable to open the Git Repositories cache directory: \(error.localizedDescription)")
-        }
+        let networkingManager = NetworkingManager()
+        return AppModel(
+            gitReposFeature: GitReposFeature(
+                provider: GitHubAPI(networkingManager: networkingManager),
+                cache: RepoFileCache(cacheDirectoryURL: .cachesDirectory)
+            ),
+            settingsFeature: SettingsFeature()
+        )
     }
 }

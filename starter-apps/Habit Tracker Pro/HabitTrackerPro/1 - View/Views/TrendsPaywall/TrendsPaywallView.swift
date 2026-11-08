@@ -36,7 +36,7 @@ struct TrendsPaywallView: View {
             Label("Daily activity and target lines", systemImage: "chart.bar")
             Label("Four weeks of completion patterns", systemImage: "calendar")
             Label("Every habit, one permanent unlock", systemImage: "checkmark.seal")
-            Button { Task { await viewModel.purchase() } } label: {
+            Button { viewModel.purchase() } label: {
                 Text(viewModel.purchaseTitle).font(.headline)
                     .foregroundStyle(theme.onTint)
                     .frame(maxWidth: .infinity, minHeight: 52)
@@ -49,10 +49,10 @@ struct TrendsPaywallView: View {
             if let notice = viewModel.notice { Text(notice).font(.callout) }
             if let error = viewModel.errorMessage {
                 Text(error).font(.callout)
-                Button("Try again") { Task { await viewModel.retry() } }
+                Button("Try again") { viewModel.retry() }
                     .frame(minHeight: 48).disabled(viewModel.isPurchasingOrRestoring || viewModel.isLoadingOffer)
             }
-            Button("Restore Purchases") { Task { await viewModel.restore() } }
+            Button("Restore Purchases") { viewModel.restore() }
                 .frame(maxWidth: .infinity, minHeight: 48).disabled(viewModel.isPurchasingOrRestoring)
         }
         .foregroundStyle(theme.primaryText)

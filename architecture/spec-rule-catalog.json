@@ -61,7 +61,7 @@
       "section": "Give Every Unique Screen Its Own ViewModel",
       "applies": "A destination needs a selected item",
       "strength": "Permitted exception",
-      "rule": "Pass a selected immutable snapshot to the detail View and construct its own State-backed ViewModel in the View initializer.",
+      "rule": "A detail View may receive a selected immutable snapshot and use it to construct its own State-backed ViewModel in the View initializer.",
       "why": "Each destination can preserve its selection independently.",
       "verify": "Test two independently selected destinations and confirm refresh does not silently replace a displayed snapshot.",
       "example": "Two launch detail destinations each receive their own selected launch snapshot.",
@@ -75,7 +75,7 @@
       "section": "Keep Screen Initializers Clean",
       "applies": "Creating screens and editing saved values",
       "strength": "Required with product-specific behaviour",
-      "rule": "Keep View initializers free of I/O and work; the screen ViewModel owns unsaved text-field values until Save or Cancel.",
+      "rule": "Keep View initializers free of I/O and work; the screen ViewModel owns unsaved text-field values until a save succeeds or the user cancels; retain the draft after a failed save.",
       "why": "Screen creation remains predictable and cancelled edits do not change authoritative state.",
       "verify": "Inspect initialization and test failed saves, retry and cancellation.",
       "example": "An unsaved weight field remains on screen after a failed save and is discarded by Cancel.",
@@ -343,7 +343,7 @@
       "rule": "Preserve business outcomes and capabilities while migrating to CFA and Swift Concurrency; fix confirmed in-scope defects and allow necessary minor platform-driven presentation differences without seeking unrelated modernisation.",
       "why": "Migration changes how the app works internally without silently removing what users rely on.",
       "verify": "Compare the requested journey and business outcomes; test defect fixes and document material platform-driven differences.",
-      "example": "A migration retains the purchase flow while adopting a modern system tab bar and correcting a verified defect.",
+      "example": "A migration retains the purchase flow, corrects an in-scope verified defect, and accepts a minor tab bar appearance change required by the platform.",
       "explanationIds": [
         "preserve-product-behaviour"
       ]
@@ -504,7 +504,7 @@
       "section": "Preserve One Authoritative Owner for Shared State",
       "applies": "Editing a simple text field",
       "strength": "Default",
-      "rule": "Keep the unsaved field value in the screen ViewModel until Save or Cancel; persisted values remain Feature-owned.",
+      "rule": "Keep the unsaved field value in the screen ViewModel until a save succeeds or the user cancels; retain it after a failed save. Persisted values remain Feature-owned.",
       "why": "An abandoned edit does not become shared application state.",
       "example": "A weight editor keeps the entered number after a failed save.",
       "verify": "Exercise save, failure, retry and Cancel without mutating the Feature early.",

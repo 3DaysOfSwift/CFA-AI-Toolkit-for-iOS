@@ -47,7 +47,7 @@ test('release keeps runnable Starter Apps separate from installable Xcode templa
  const result=spawnSync(process.execPath,[path.join(source,'scripts/install-xcode-template.mjs'),'--destination',destination],{encoding:'utf8'});
  assert.equal(result.status,0,result.stderr);
  const applicationFolder=path.join(destination,'Project Templates/iOS/Application');
- assert.deepEqual(fs.readdirSync(applicationFolder).sort(),['CFA App.xctemplate','Day Streak.xctemplate','Habit Tracker.xctemplate']);
+ assert.deepEqual(fs.readdirSync(applicationFolder).sort(),['CFA App Tests.xctemplate','CFA App.xctemplate','Day Streak Tests.xctemplate','Day Streak.xctemplate','Habit Tracker Tests.xctemplate','Habit Tracker.xctemplate']);
  assert.equal(fs.existsSync(path.join(destination,'starter-apps')),false);
 });
 

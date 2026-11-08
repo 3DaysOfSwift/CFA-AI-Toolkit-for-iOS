@@ -43,7 +43,9 @@ initializer labels, and local references, including a reference copied from
 **Feature protocols are a waste of time.** In CFA, ViewModels depend directly
 on concrete features. Do not create matching `FeatureAPI` protocols. Test a
 ViewModel with a concrete feature whose repository or provider is replaced
-by a test double.
+by a test double. Throughout this specification, “Feature API” means the
+methods and properties exposed by that concrete Feature; it does not mean a
+separate protocol or an additional architectural layer.
 
 Use a `SwiftDataManager` whenever the app uses SwiftData. It owns container and
 context creation/opening and hands a narrow storage capability to the owning

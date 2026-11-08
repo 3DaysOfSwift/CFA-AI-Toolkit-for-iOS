@@ -27,6 +27,28 @@ struct GitReposView: View {
             .background(palette.background)
             .navigationTitle("Git Repos")
             .toolbarColorScheme(resolvedTheme.colorScheme, for: .navigationBar)
+            .safeAreaInset(edge: .bottom) {
+                if !viewModel.repos.isEmpty, viewModel.isRefreshing {
+                    ProgressView("Refreshing GitHub repositories…")
+                        .tint(palette.tint)
+                        .foregroundStyle(palette.primaryText)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(palette.surface)
+                } else if !viewModel.repos.isEmpty, let message = viewModel.refreshFailureMessage {
+                    VStack(spacing: 8) {
+                        Text(message)
+                            .font(.footnote)
+                        Button("Try again") { viewModel.refresh() }
+                            .buttonStyle(.borderedProminent)
+                            .tint(palette.tint)
+                    }
+                    .foregroundStyle(palette.primaryText)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(palette.surface)
+                }
+            }
         }
     }
 
@@ -56,7 +78,7 @@ struct GitReposView: View {
             Text(message)
         } actions: {
             Button("Try again") {
-                Task { await viewModel.refresh() }
+                viewModel.refresh()
             }
             .buttonStyle(.borderedProminent)
             .tint(palette.tint)

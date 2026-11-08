@@ -32,7 +32,7 @@ final class SettingsFeature {
 
     func selectFirstWeekday(_ weekday: Int) {
         guard [1, 2].contains(weekday) else { return }
-        firstWeekday = weekday
         defaults.set(weekday, forKey: "firstWeekday")
+        firstWeekday = weekday
     }
 }

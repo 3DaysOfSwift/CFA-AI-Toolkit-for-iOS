@@ -62,25 +62,34 @@ export async function inspect(project) {
   const paths = new Set(sources.keys());
   const appModelFile = [...paths].find(file => /(?:^|\/)2 - AppModel\/AppModel\.swift$/.test(file));
   const appModel = appModelFile ? sources.get(appModelFile) : '';
+  const appModelDeclaration = /\bclass\s+AppModel\b[^\{]*\{/.exec(appModel);
+  const appModelBodyStart = appModelDeclaration ? appModelDeclaration.index + appModelDeclaration[0].length : 0;
+  // Keep original offsets while excluding unrelated types and method-local values.
+  const appMembers = appModelDeclaration
+    ? appModel.slice(0, appModelBodyStart).replace(/[^\n]/g, ' ') + memberSignatures(braceBody(appModel, appModelBodyStart - 1))
+    : '';
   const appProperties = new Map();
-  for (const match of appModel.matchAll(/\b(?:let|var)\s+(\w+)\s*:\s*(?:any\s+)?(\w+)/g)) {
+  for (const match of appMembers.matchAll(/\b(?:let|var)\s+(\w+)\s*:\s*(?:any\s+)?(\w+)/g)) {
     appProperties.set(match[1], { type: match[2], line: lineOf(appModel, match.index) });
   }
 
   const findings = [];
   if (!appModelFile) findings.push(finding('app-model-missing', 'warning', 'No AppModel.swift was found under 2 - AppModel.', null, null));
   if (appModelFile) {
-    const liveFactories = [...appModel.matchAll(/\bstatic\s+func\s+live\s*\(/g)];
-    if (liveFactories.length !== 1) findings.push(finding('app-model-live-factory', 'warning', `AppModel needs exactly one static live() factory; found ${liveFactories.length}.`, appModelFile, 1));
-    let launchGuards = 0;
-    for (const match of appModel.matchAll(/^[ \t]{4}(private\s+)?(?:private\(set\)\s+)?(?:let|var)\s+(\w+)\s*:\s*(?:any\s+)?(\w+)(\s*=)?/gm)) {
+    const liveFactories = [...appMembers.matchAll(/\bstatic\s+func\s+live\s*\(/g)];
+    if (liveFactories.length !== 1) findings.push(finding('app-model-live-factory', 'review', `Found ${liveFactories.length} static live() declarations directly inside AppModel. Verify the single production factory, including extensions and active compilation conditions.`, appModelFile, 1));
+    for (const match of appMembers.matchAll(/^[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(private[ \t]+)?(?:private\(set\)[ \t]+)?(?:let|var)[ \t]+(\w+)[ \t]*:[ \t]*(?:any[ \t]+)?(\w+)([ \t]*=)?/gm)) {
       const [, privateModifier, name, type, defaultValue] = match;
-      if (type === 'Bool' && privateModifier && launchGuards++ === 0) {
-        if (defaultValue) findings.push(finding('app-model-default-value', 'warning', `AppModel launch guard ${name} has a default value; initialise it in the explicit initializer.`, appModelFile, lineOf(appModel, match.index)));
+      if (type === 'Bool' && privateModifier) {
+        // A declaration's order and type do not establish its purpose.
+        findings.push(finding('app-model-boolean-purpose', 'review', `AppModel declares private Bool ${name}; verify whether it is the launch guard and whether its initialization and use follow the AppModel rules.`, appModelFile, lineOf(appModel, match.index)));
         continue;
       }
-      // A private Task can own an app-wide listener; its actual purpose needs review.
-      if (type === 'Task' && privateModifier) continue;
+      // Lexical analysis cannot establish whether this is an app-wide listener.
+      if (type === 'Task' && privateModifier) {
+        findings.push(finding('app-model-task-purpose', 'review', `AppModel retains ${name}; verify it owns an app-wide listener and that its lifecycle is managed.`, appModelFile, lineOf(appModel, match.index)));
+        continue;
+      }
       if (!featureTypeSuffix.test(type)) findings.push(finding('app-model-non-feature-state', 'warning', `AppModel stores ${name}: ${type}; check that it is a Feature, launch guard or private app-wide listener handle.`, appModelFile, lineOf(appModel, match.index)));
       if (defaultValue) findings.push(finding('app-model-default-value', 'warning', `AppModel property ${name} has a default value; initialise it in the explicit initializer.`, appModelFile, lineOf(appModel, match.index)));
     }
@@ -106,15 +115,44 @@ export async function inspect(project) {
     }
   }
 
+  // A matching FeatureAPI protocol is a review hint: lexical scanning cannot
+  // resolve conditional compilation, target membership or legacy boundaries.
+  const concreteFeatures = new Set();
+  for (const source of sources.values()) {
+    for (const match of source.matchAll(/\bclass\s+(\w+Feature)\b/g)) concreteFeatures.add(match[1]);
+  }
+  for (const [file, source] of sources) {
+    for (const match of source.matchAll(/\bprotocol\s+(\w+FeatureAPI)\b/g)) {
+      const feature = match[1].slice(0, -3);
+      if (concreteFeatures.has(feature)) {
+        findings.push(finding('matching-feature-protocol', 'review', `${match[1]} has a matching ${feature} declaration. Verify whether the app can use the concrete Feature and substitute its lower-level collaborators.`, file, lineOf(source, match.index)));
+      }
+    }
+  }
+
   const screens = [];
   const usesSwiftData = [...sources].some(([file, source]) => file.endsWith('.swift') && /\bimport\s+SwiftData\b/.test(source));
   if (usesSwiftData && ![...paths].some(file => file.endsWith('/SwiftDataManager.swift'))) {
-    findings.push(finding('swiftdata-manager-missing', 'warning', 'SwiftData is imported, but no SwiftDataManager.swift was found.', null, null));
+    findings.push(finding('swiftdata-manager-missing', 'review', 'SwiftData is imported, but no SwiftDataManager.swift was found. Check whether the import belongs to an app target and whether an appropriate storage boundary exists; this scan also includes tests and does not resolve target membership.', null, null));
   }
   for (const [file, source] of sources) {
     if (!file.endsWith('.swift') || file.endsWith('/NetworkingManager.swift')) continue;
     if (/\bURLSession\s*\.|\bURLSession\s*\(/.test(source)) {
-      findings.push(finding('direct-url-session', 'warning', 'A URLSession call is outside NetworkingManager.', file, 1));
+      findings.push(finding('direct-url-session', 'review', 'URLSession appears outside NetworkingManager. Check whether this is a production network request that should use a NetworkingManager; shared configuration or instances are needed only when appropriate.', file, 1));
+    }
+  }
+  // A Task inside the lifecycle callback is valid for independent work. Flag
+  // only a lexical launch-signal match inside its closure for human review.
+  for (const [file, source] of sources) {
+    for (const callback of source.matchAll(/\bfunc\s+application\s*\([^{}]*\bdidFinishLaunchingWithOptions\b[^{}]*\)\s*(?:->\s*[^\{]+)?\s*\{/g)) {
+      const start = callback.index + callback[0].length - 1;
+      const body = braceBody(source, start);
+      for (const task of body.matchAll(/\bTask\s*(?:\.\s*detached\s*)?\{/g)) {
+        const taskBody = braceBody(body, task.index + task[0].length - 1);
+        if (/\bapplicationDidFinishLaunching\s*\(/.test(taskBody)) {
+          findings.push(finding('scheduled-app-model-launch', 'review', 'The launch callback appears to signal AppModel from a Task. Check whether the app-wide startup signal should be called synchronously; Feature-owned asynchronous work can still start its own tasks.', file, lineOf(source, start + 1 + task.index)));
+        }
+      }
     }
   }
   for (const [file, source] of sources) {
@@ -123,8 +161,8 @@ export async function inspect(project) {
       const sceneBody = /\bvar\s+body\s*:\s*some\s+Scene\s*\{/.exec(source);
       if (sceneBody) {
         const body = braceBody(source, sceneBody.index + sceneBody[0].length - 1);
-        if (/\b(?:if|switch)\b/.test(body)) findings.push(finding('conditional-app-body', 'warning', 'App.body branches on state; keep a stable structural root View and present feature states in feature screens.', file, lineOf(source, sceneBody.index)));
-        if (/\.modelContainer\s*\(|\b(?:ProgressView|ContentUnavailableView)\s*\(/.test(body)) findings.push(finding('app-startup-presentation', 'warning', 'App.body contains database or startup presentation. Database availability must never gate the interface; present failed data requests through the Feature, screen ViewModel and feature screen.', file, lineOf(source, sceneBody.index)));
+        if (/\b(?:if|switch)\b/.test(body)) findings.push(finding('conditional-app-body', 'review', 'App.body contains a conditional. Check whether it gates root navigation on storage or an unrelated condition.', file, lineOf(source, sceneBody.index)));
+        if (/\.modelContainer\s*\(|\b(?:ProgressView|ContentUnavailableView)\s*\(/.test(body)) findings.push(finding('app-startup-presentation', 'review', 'App.body contains storage or loading presentation. Check whether database availability gates the interface; a lexical match alone cannot establish this.', file, lineOf(source, sceneBody.index)));
       }
     }
     // Known root conventions only: this is a review hint, not data-flow analysis.
@@ -135,9 +173,9 @@ export async function inspect(project) {
         findings.push(finding('root-storage-gate', 'review', 'Root navigation may gate the interface on storage availability. Open storage within a Feature data request and present its error in the feature screen, never a root wrapper or app-wide blocking overlay.', file, lineOf(source, rootView.index)));
       }
     }
-    if (/\.task\s*\{[^}]*applicationDidFinishLaunching\s*\(/s.test(source)) findings.push(finding('view-tied-app-launch', 'warning', 'Application launch is signalled from a View .task; use the app lifecycle callback.', file, 1));
-    if (/\b(?:let|var)\s+\w+\s*:\s*AppModel\b/.test(source)) findings.push(finding('stored-app-model', 'warning', 'A View-layer type stores AppModel; retain only narrow Features in ViewModels.', file, 1));
-    if (/\b(?:ModelContainer|ModelContext)\b/.test(source)) findings.push(finding('view-swiftdata-access', 'warning', 'SwiftData container/context appears in the View layer; use SwiftDataManager behind a Feature.', file, 1));
+    if (/\.task\s*\{[^}]*applicationDidFinishLaunching\s*\(/s.test(source)) findings.push(finding('view-tied-app-launch', 'review', 'A View-layer .task appears to call applicationDidFinishLaunching. Check whether this is production launch behavior rather than a preview or test, and use the app lifecycle callback for the shared launch signal.', file, 1));
+    if (/\b(?:let|var)\s+\w+\s*:\s*AppModel\b/.test(source)) findings.push(finding('stored-app-model', 'review', 'An AppModel-typed declaration appears in the View layer. Check whether a View or ViewModel retains it; this lexical match may be a local value or preview.', file, 1));
+    if (/\b(?:ModelContainer|ModelContext)\b/.test(source)) findings.push(finding('view-swiftdata-access', 'review', 'A SwiftData container/context appears in a View-layer file. Check whether a View or preview accesses storage directly; previews retain the same CFA boundaries. A lexical match alone does not establish how the value is used.', file, 1));
   }
   for (const viewFile of [...paths].filter(file => screenPath.test(file) && !file.endsWith('/RootTabView.swift')).sort()) {
     const view = sources.get(viewFile);
@@ -150,6 +188,11 @@ export async function inspect(project) {
     const viewModelName = `${name}Model`;
     const viewModelFile = viewFile.replace(/View\.swift$/, 'ViewModel.swift');
     const viewModel = sources.get(viewModelFile);
+    const viewModelDeclaration = viewModel && new RegExp(`\\bclass\\s+${viewModelName}\\b[^\\{]*\\{`).exec(viewModel);
+    const viewModelBodyStart = viewModelDeclaration ? viewModelDeclaration.index + viewModelDeclaration[0].length : 0;
+    const viewModelMembers = viewModelDeclaration
+      ? viewModel.slice(0, viewModelBodyStart).replace(/[^\n]/g, ' ') + memberSignatures(braceBody(viewModel, viewModelBodyStart - 1))
+      : '';
     const testName = `${viewModelName}Tests.swift`;
     const testFile = [...paths].find(file => file.endsWith(`/${testName}`)) ?? null;
     const statePattern = new RegExp(`@State\\s+private\\s+var[ \\t]+viewModel(?:[ \\t]*:[ \\t]*${viewModelName})?[ \\t]*=[ \\t]*${viewModelName}[ \\t]*\\([ \\t]*\\)`);
@@ -186,10 +229,10 @@ export async function inspect(project) {
         const collaborators = [...featureSource.matchAll(/\b(?:private\s+)?let\s+\w+\s*:\s*(?:any\s+)?(\w+(?:Repository|Provider|Responding|Client|Store|Service))\b/g)]
           .map(item => item[1]);
         dependencies.push({ property, featureType, featureFile, collaborators: [...new Set(collaborators)], line: lineOf(viewModel, match.index) });
-        if (!exposure) findings.push(finding('unresolved-feature', 'warning', `${viewModelName} references AppModel.shared.${property}, but that property was not found.`, viewModelFile, lineOf(viewModel, match.index)));
-        else if (!featureFile) findings.push(finding('feature-source-missing', 'warning', `${featureType} is exposed by AppModel but its source declaration was not found.`, appModelFile, exposure.line));
+        if (!exposure) findings.push(finding('unresolved-feature', 'review', `${viewModelName} references AppModel.shared.${property}, but the inspector could not resolve it in the primary AppModel declaration. Check extensions, inferred types and target membership.`, viewModelFile, lineOf(viewModel, match.index)));
+        else if (!featureFile) findings.push(finding('feature-source-missing', 'review', `${featureType} is exposed by AppModel, but the inspector could not locate its declaration. Check aliases, generated code and target membership.`, appModelFile, exposure.line));
         if (exposure && featureTypeSuffix.test(featureType)) {
-          for (const local of viewModel.matchAll(/\b(?:let|var)\s+(\w+)\s*:\s*(?:any\s+)?(\w+Feature(?:API)?)\b(?!\s*\.)/g)) {
+          for (const local of viewModelMembers.matchAll(/\b(?:let|var)\s+(\w+)\s*:\s*(?:any\s+)?(\w+Feature(?:API)?)\b(?!\s*\.)/g)) {
             if (featurePropertyName(local[2]) === property && local[1] !== property) {
               findings.push(finding('feature-reference-name', 'warning', `${viewModelName} stores ${featureType} as ${local[1]}; use ${property}.`, viewModelFile, lineOf(viewModel, local.index)));
             }
@@ -203,13 +246,13 @@ export async function inspect(project) {
       }
     }
     const structuralRoot = name === 'ContentView' && /\bTabView\s*\{/.test(body) && !/\b(?:AppModel|\w+Feature)\b/.test(members);
-    if (!viewModel && !structuralRoot) findings.push(finding('view-model-missing', 'warning', `${name} has no adjacent ${viewModelName}.`, viewFile, 1));
+    if (!viewModel && !structuralRoot) findings.push(finding('view-model-missing', 'review', `${name} has no adjacent ${viewModelName}. Verify whether it is a screen requiring a dedicated ViewModel or a reusable presentation component.`, viewFile, 1));
     else if (viewModel) {
       if (!ownsViewModel) findings.push(finding('view-model-ownership', 'review', `${name} does not use the default inline ViewModel pattern. Verify private ownership; a detail View may construct its own State-backed ViewModel from selected value data.`, viewFile, lineOf(view, declaration.index)));
       if (!dependencies.length) findings.push(finding('feature-route-unresolved', 'review', `${viewModelName} has no visible AppModel.shared feature route; inspect whether this screen is presentation-only.`, viewModelFile, 1));
       if (!testFile) findings.push(finding('view-model-tests-missing', 'warning', `No ${testName} was found.`, viewModelFile, 1));
     }
-    screens.push({ name, viewFile, viewModelFile: viewModel ? viewModelFile : null, ownsViewModel, testFile, dependencies });
+    screens.push({ name, viewFile, viewModelFile: viewModel ? viewModelFile : null, ownsViewModel, structuralRoot, testFile, dependencies });
   }
 
   return {
@@ -232,10 +275,14 @@ export async function inspect(project) {
 }
 
 export function renderInspection(report) {
-  const lines = [`CFA inspection: ${report.project}`, `${report.scope.screens} screens · ${report.scope.swiftFiles} Swift files · ${report.findings.length} findings`, ''];
+  const lines = [`CFA inspection: ${report.project}`, `${report.scope.screens} View candidates · ${report.scope.swiftFiles} Swift files · ${report.findings.length} findings`, ''];
   for (const screen of report.screens) {
+    if (screen.structuralRoot && !screen.viewModelFile) {
+      lines.push(`${screen.name}: structural tab root · no ViewModel required by this pattern`);
+      continue;
+    }
     const routes = screen.dependencies.map(dependency => `${dependency.property}${dependency.featureType ? ` (${dependency.featureType})` : ' (unresolved)'}`);
-    lines.push(`${screen.name}: ${screen.viewModelFile ? screenName(screen.viewModelFile) : 'missing ViewModel'} → ${routes.join(', ') || 'no visible feature route'} · ${screen.testFile ? 'tests found' : 'no tests found'}`);
+    lines.push(`${screen.name}: ${screen.viewModelFile ? screenName(screen.viewModelFile) : 'no adjacent ViewModel; review screen role'} → ${routes.join(', ') || 'no visible feature route'} · ${screen.testFile ? 'matching test file found' : 'no test file found'}`);
   }
   if (report.findings.length) {
     lines.push('', 'Findings:');

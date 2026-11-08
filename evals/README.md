@@ -4,10 +4,14 @@ These small fixtures preserve behaviour that the Toolkit must maintain as its
 skills evolve. They are not application templates and are not copied into a
 developer's Xcode project.
 
-Run `npm run evals` to check that every fixture has its expected outcome.
-Before a CFA release, give the fixture and its ordinary-language request to an
-installed AI host. Compare the response with the expected outcome. Record any
-misrouting as a narrow skill correction rather than adding a generic router.
+Run `npm run evals` to check that the flat-app fixture and its expected-outcome
+file contain the required markers. This is a structural check; it does not run
+an AI or verify its response, and it does not evaluate the other fixtures.
+
+Before a CFA release, give each applicable fixture and its ordinary-language
+request to an installed AI host. Compare the response with the expected outcome.
+Record any misrouting as a narrow skill correction rather than adding a generic
+router.
 
 ## Flat app
 

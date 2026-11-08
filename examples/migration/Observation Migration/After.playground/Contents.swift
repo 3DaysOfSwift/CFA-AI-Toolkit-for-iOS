@@ -32,7 +32,12 @@ func runExample() {
     feature.completeToday()
     feature.completeToday()
     precondition(feature.completedDays == 2 && count.read() == 1)
-    print("Passed: Observation tracking reports the first update and is one-shot.")
+
+    // An observer that needs another notification registers its next read.
+    withObservationTracking { _ = feature.completedDays } onChange: { count.record() }
+    feature.completeToday()
+    precondition(feature.completedDays == 3 && count.read() == 2)
+    print("Passed: Observation tracking is one-shot and can be registered again.")
 }
 
 // MARK: - Run after example

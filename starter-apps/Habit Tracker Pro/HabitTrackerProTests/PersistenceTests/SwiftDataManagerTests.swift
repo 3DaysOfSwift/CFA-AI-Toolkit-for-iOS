@@ -8,6 +8,17 @@ import Testing
 // SwiftData schema initialization. Other feature and ViewModel suites stay parallel.
 @Suite("SwiftData store preparation", .serialized)
 struct SwiftDataManagerTests {
+    @Test("A missing stored habit cannot accept an entry")
+    func rejectsEntryForMissingHabit() async throws {
+        let fixture = try StoreFixture()
+        defer { fixture.remove() }
+        let manager = SwiftDataManager(configuration: fixture.configuration)
+        await #expect(throws: HabitError.habitNotFound) {
+            try await manager.record(habitID: UUID(), entryID: UUID(), date: .now, value: 1)
+        }
+        #expect(try await manager.fetchHabits().isEmpty)
+    }
+
     @Test("The explicit default configuration keeps the existing store location")
     func preservesDefaultStoreLocation() {
         let configuration = ModelConfiguration(for: StoredHabit.self, StoredHabitEntry.self)
@@ -30,7 +41,8 @@ struct SwiftDataManagerTests {
                           unit: "reps", dailyTarget: 10, entries: [])
         try await manager.insertHabit(habit)
         let date = Date(timeIntervalSince1970: 1_700_000_000)
-        try await manager.record(habitID: habit.id, date: date, value: 14)
+        let entryID = UUID()
+        try await manager.record(habitID: habit.id, entryID: entryID, date: date, value: 14)
 
         let reopenedManager = SwiftDataManager(configuration: fixture.configuration)
         let savedHabits = try await reopenedManager.fetchHabits()
@@ -39,7 +51,37 @@ struct SwiftDataManagerTests {
         #expect(savedHabit.id == habit.id)
         #expect(savedHabit.name == "Pull ups")
         #expect(savedHabit.entries.count == 1)
+        #expect(savedHabit.entries.first?.id == entryID)
         #expect(savedHabit.entries.first?.value == 14)
+    }
+
+    @Test("Updating a same-day entry preserves its identity and can delete it")
+    @MainActor
+    func updatesExistingNonMidnightEntry() async throws {
+        let fixture = try StoreFixture()
+        defer { fixture.remove() }
+        let manager = SwiftDataManager(configuration: fixture.configuration)
+        let habit = Habit(id: UUID(), name: "Walk", tracking: .count,
+                          unit: "steps", dailyTarget: 10, entries: [])
+        try await manager.insertHabit(habit)
+        let calendar = Calendar.current
+        let day = calendar.startOfDay(for: Date(timeIntervalSince1970: 1_700_000_000))
+        let recordedAt = try #require(calendar.date(byAdding: .hour, value: 12, to: day))
+        let entryID = UUID()
+        try await manager.record(habitID: habit.id, entryID: entryID, date: recordedAt, value: 3)
+
+        let feature = HabitsFeature(repository: manager, calendar: calendar, currentDate: { recordedAt })
+        await feature.reload()
+        try await feature.recordToday(habitID: habit.id, value: 7)
+        let updated = try #require(feature.habits.first?.entries.first)
+        #expect(updated.id == entryID && updated.date == recordedAt && updated.value == 7)
+        let stored = try await manager.fetchHabits()
+        #expect(stored.first?.entries == [updated])
+
+        try await feature.recordToday(habitID: habit.id, value: 0)
+        #expect(feature.habits.first?.entries.isEmpty == true)
+        let afterDelete = try await manager.fetchHabits()
+        #expect(afterDelete.first?.entries.isEmpty == true)
     }
 
     @Test("A file blocking the store directory is preserved and the same manager can retry")
@@ -120,6 +162,9 @@ private struct StoreFixture {
     }
 
     func remove() {
+        // SwiftData may keep its SQLite store open after the last operation.
+        // Leave created stores in the system temporary directory for OS cleanup.
+        guard !FileManager.default.fileExists(atPath: storeURL.path) else { return }
         do {
             try FileManager.default.removeItem(at: directory)
         } catch {

@@ -19,7 +19,7 @@ struct HabitsView: View {
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(habit.name).font(.headline).foregroundStyle(theme.primaryText)
-                            Text(description(for: habit)).font(.subheadline).foregroundStyle(theme.secondaryText)
+                            Text(viewModel.description(for: habit)).font(.subheadline).foregroundStyle(theme.secondaryText)
                         }
                         Spacer()
                     }
@@ -35,7 +35,7 @@ struct HabitsView: View {
                     } description: {
                         Text(loadError)
                     } actions: {
-                        Button("Try again") { Task { await viewModel.retryLoading() } }
+                        Button("Try again") { viewModel.retryLoading() }
                     }
                 } else if viewModel.isLoading {
                     ProgressView("Loading your habits…")
@@ -54,13 +54,5 @@ struct HabitsView: View {
             .sheet(isPresented: $isShowingAddHabit) { AddHabitView() }
         }
         .tint(theme.tint)
-    }
-
-    private func description(for habit: Habit) -> String {
-        if habit.tracking == .count {
-            let target = habit.dailyTarget.map { " · target \($0)" } ?? ""
-            return "Count\(habit.unit.isEmpty ? "" : " in \(habit.unit)")\(target)"
-        }
-        return habit.dailyTarget.map { "Daily target: \($0)" } ?? "Daily completion"
     }
 }

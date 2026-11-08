@@ -24,7 +24,12 @@ test('Day Streak native template matches the editable project', () => {
       `TimesThirtyTests/ViewModelTests/${name}ViewModelTests.swift`
     ]) assert.ok(fs.existsSync(path.join(project, relative)), relative);
   }
-  assert.equal(info.Targets[0].SharedSettings.PRODUCT_BUNDLE_IDENTIFIER, 'com.3DaysOfSwiftConcurrency.___PACKAGENAMEASIDENTIFIER___');
+  assert.equal(info.Targets.length, 1);
+  assert.equal(info.Targets[0].SharedSettings.SWIFT_DEFAULT_ACTOR_ISOLATION, 'nonisolated');
+  const testTemplate = path.join(path.dirname(native), 'Day Streak Tests.xctemplate');
+  const testInfo = JSON.parse(execFileSync('python3', ['-c', 'import json, plistlib, sys; print(json.dumps(plistlib.load(open(sys.argv[1], "rb"))))', path.join(testTemplate, 'TemplateInfo.plist')], { encoding: 'utf8' }));
+  assert.equal(testInfo.Targets[0].SharedSettings.PRODUCT_BUNDLE_IDENTIFIER, '___VARIABLE_bundleIdentifierPrefix___.___PROJECTNAME:identifier___.___PACKAGENAME:identifier___');
+  for (const node of testInfo.Nodes) assert.ok(fs.existsSync(path.join(testTemplate, testInfo.Definitions[node].Path)), node);
 });
 
 test('Day Streak ships matching light/dark launch colours and a starter icon', () => {
