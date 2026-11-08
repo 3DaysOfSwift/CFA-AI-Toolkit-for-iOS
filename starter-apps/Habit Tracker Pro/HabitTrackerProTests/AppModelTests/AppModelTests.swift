@@ -13,7 +13,7 @@ struct AppModelTests {
         defer { defaults.removePersistentDomain(forName: suiteName) }
         let date = Date(timeIntervalSince1970: 1_700_000_000)
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
         let habitsFeature = HabitsFeature(repository: InMemoryHabitsRepository(), calendar: calendar, currentDate: { date })
         let todayFeature = TodayFeature(habitsFeature: habitsFeature)
         let dayStreakFeature = DayStreakFeature(habitsFeature: habitsFeature, calendar: calendar, currentDate: { date })

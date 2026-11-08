@@ -98,8 +98,9 @@ struct GitReposFeatureTests {
     }
 
     @Test func sharedRefreshAndOptionalCacheStayIndependent() async throws {
-        let provider = GatedReposProvider()
-        let cache = GatedRepoCache()
+        let url = try #require(URL(string: "https://example.org"))
+        let provider = GatedReposProvider(url: url)
+        let cache = GatedRepoCache(url: url)
         let feature = GitReposFeature(provider: provider, cache: cache)
         feature.startLoading()
         await provider.waitForFirstRequest()
@@ -139,9 +140,12 @@ struct GitReposFeatureTests {
 
 // Controlled suspension makes request sharing and cache ordering observable.
 private actor GatedReposProvider: GitReposProvider {
+    private let url: URL
     private(set) var calls = 0
     private var started: CheckedContinuation<Void, Never>?
     private var release: CheckedContinuation<Void, Never>?
+
+    init(url: URL) { self.url = url }
 
     func waitForFirstRequest() async {
         if calls > 0 { return }
@@ -156,12 +160,13 @@ private actor GatedReposProvider: GitReposProvider {
             await withCheckedContinuation { release = $0 }
         }
         return [GitHubRepoResponse(id: id, fullName: "repo-\(id)",
-            repositoryURL: URL(string: "https://example.org")!, description: nil,
+            repositoryURL: url, description: nil,
             stars: 0, updatedAt: .now)]
     }
 }
 
 private actor GatedRepoCache: RepoCache {
+    private let url: URL
     private var restore: CheckedContinuation<[Repo], Error>?
     private var restoreStarted = false
     private var restoreWaiter: CheckedContinuation<Void, Never>?
@@ -170,6 +175,8 @@ private actor GatedRepoCache: RepoCache {
     private var writeWaiter: CheckedContinuation<Void, Never>?
     private var finishWaiter: CheckedContinuation<Void, Never>?
     private(set) var storedIDs: [Int] = []
+
+    init(url: URL) { self.url = url }
 
     func loadRepos() async throws -> [Repo] {
         restoreStarted = true; restoreWaiter?.resume(); restoreWaiter = nil
@@ -180,7 +187,7 @@ private actor GatedRepoCache: RepoCache {
         await withCheckedContinuation { restoreWaiter = $0 }
     }
     func releaseRestore() {
-        let old = Repo(id: 99, fullName: "old", repositoryURL: URL(string: "https://example.org")!,
+        let old = Repo(id: 99, fullName: "old", repositoryURL: url,
                        summary: "", stars: 0, updatedAt: .now)
         restore?.resume(returning: [old]); restore = nil
     }
