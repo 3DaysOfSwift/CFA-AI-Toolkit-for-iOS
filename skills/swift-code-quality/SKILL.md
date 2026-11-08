@@ -36,7 +36,7 @@ For every new Feature, ViewModel, protocol, actor or persistence type, state one
 - A ViewModel earns its existence by owning presentation state or an asynchronous/multi-step UI workflow. A pass-through ViewModel is a defect, not a pattern—unless the active architecture explicitly requires one dedicated ViewModel for every screen.
 - A protocol earns its existence only at a real substitution boundary—usually deterministic tests, multiple production implementations, or a public library contract.
 - An actor earns its existence through a concrete isolation or coordination requirement, such as protecting shared mutable state; it is not a generic “background work” marker.
-- SwiftUI environment values are presentation dependencies. Put `ThemeManager` there when it is app-wide. Do not put `AppModel` or features in the environment; use the active architecture's declared composition route for feature dependencies.
+- Follow the active architecture's dependency route. In CFA, use the SwiftUI environment for app-wide presentation dependencies such as `ThemeManager`, not `AppModel` or Features. Other architectures may use the environment differently.
 - Keep dependency direction visible: View → optional ViewModel → feature → provider/storage. A View may call its feature directly for a trivial intent only when the active architecture permits it. CFA requires View → ViewModel → feature for every screen.
 - Name ViewModel methods for the work they perform, not for a UI gesture or lifecycle signal. Prefer `refresh()`, `save()` and `retry()` over `refreshTapped()`, `savePressed()` and `screenAppeared()`.
 
