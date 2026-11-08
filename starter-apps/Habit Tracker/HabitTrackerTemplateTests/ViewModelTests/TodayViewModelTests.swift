@@ -1,4 +1,5 @@
 import Foundation
+import Observation
 import Testing
 
 @testable import HabitTrackerTemplate
@@ -53,6 +54,29 @@ struct TodayViewModelTests {
         viewModel.increment(habit)
         await viewModel.waitForPendingSaves()
         #expect(feature.habits.first?.value(on: testDate, calendar: .current) == 15)
+    }
+
+    @Test("Saving state notifies the screen when a write starts and finishes")
+    func savingStateIsObservable() async {
+        let habit = countHabit()
+        let repository = CountEditingRepository(habits: [habit], holdsFirstWrite: true)
+        let feature = HabitsFeature(repository: repository, currentDate: { self.testDate })
+        await feature.reload()
+        let viewModel = TodayViewModel(todayFeature: TodayFeature(habitsFeature: feature))
+        let changes = AsyncStream<Void>.makeStream()
+        withObservationTracking { _ = viewModel.isSaving(habit) } onChange: { changes.continuation.yield(()) }
+        viewModel.editAmount("2", for: habit)
+        var iterator = changes.stream.makeAsyncIterator()
+        _ = await iterator.next()
+        await repository.waitForFirstWrite()
+        #expect(viewModel.isSaving(habit))
+
+        withObservationTracking { _ = viewModel.isSaving(habit) } onChange: { changes.continuation.yield(()) }
+        await repository.releaseFirstWrite()
+        _ = await iterator.next()
+        await viewModel.waitForPendingSaves()
+        #expect(!viewModel.isSaving(habit))
+        changes.continuation.finish()
     }
 
     @Test("Typing during a suspended save preserves the latest edit")
