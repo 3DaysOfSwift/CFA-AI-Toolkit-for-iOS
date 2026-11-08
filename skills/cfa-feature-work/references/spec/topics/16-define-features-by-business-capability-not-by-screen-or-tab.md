@@ -72,6 +72,13 @@ sign-out, clear account-specific Feature state. If the authentication service
 can partially succeed before reporting an error, reconcile its actual session
 state rather than assuming either outcome.
 
+When the app's sign-out contract promises a fresh-install experience, clear
+account-specific memory, caches and locally stored files as part of successful
+sign-out. Identify data that belongs to the account before deleting it; handle
+unsynchronised user work transparently and do not treat independent purchases
+or user-owned documents as disposable account caches. Keep the signed-out
+experience and cleanup failures truthful.
+
 During migration, inspect whether an existing account-change event system can
 be simplified into explicit calls without losing behaviour. Trace every sign-out
 and account-switch entry point, including external session expiry. Define what

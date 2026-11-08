@@ -515,7 +515,7 @@ This section is for AI coding assistants (Codex, Claude Code, Cursor and others)
 - Features are concrete `@MainActor @Observable` classes named `…Feature`, with no matching protocol. They are never called Managers.
 - Features keep domain data, operation state and errors as separate values. Never use a `LoadState` enum that carries all three.
 - Overlapping calls share one retained `Task<Void, Never>`, cleared in `defer`. Distinct edits are queued and never dropped.
-- AppModel stores only `shared`, the concrete Features and one launch Boolean, and has a single `static func live()`. The app delegate calls `applicationDidFinishLaunching()`.
+- AppModel stores `shared`, the concrete Features, one launch Boolean and private task handles for app-wide listeners, and has a single `static func live()`. The app delegate calls `applicationDidFinishLaunching()`.
 - `App.body` has a stable root. Database availability never gates the UI. SwiftData goes through `SwiftDataManager` and a `@ModelActor`. `URLSession` goes through `NetworkingManager`.
 - Write `@MainActor` explicitly on Features, ViewModels and AppModel, and use actors for shared storage. Never use locks, GCD inside async code, or `@unchecked Sendable` as an escape hatch.
 - Name ViewModel methods for the work they do: `refresh()`, `save()`, `retry()`.

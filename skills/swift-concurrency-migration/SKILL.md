@@ -58,15 +58,20 @@ Use deliberate passes:
    Feature. Identify missing business owners rather than inventing one per tab.
    Preserve one authoritative owner for shared business state; do not duplicate
    stores or collections.
-   Preserve existing visuals and interactions as part of that contract. Do not
-   inventory against new-app palette counts, popup selectors or branding
-   defaults; their absence is not a migration gap. Make visual changes only
-   when explicitly requested, with separate regression evidence.
+   Preserve the business outcomes, available capabilities and intended user
+   journeys. Fix confirmed defects within scope and verify the correction.
+   Migration to CFA and Swift Concurrency is the goal, not a search for unrelated
+   modernisation. Required system replacements may introduce minor platform-driven visual or
+   interaction differences; record and test those without imposing an unrelated
+   redesign. Do not inventory against new-app styling or branding defaults;
+   their absence is not a migration gap. Resolve ambiguous or materially changed
+   product behaviour with the developer.
 2. Move one complete feature at a time into CFA. Give each SwiftUI View a
    bespoke ViewModel, move testable feature decisions into its Feature,
    place shared dependency construction in AppModel and keep persistence behind
-   repositories. AppModel's single `static live()` constructs dependencies,
-   while its stored properties are only Features and the launch guard. Use
+   repositories. AppModel's single `static live()` constructs dependencies;
+   its stored properties include Features, the launch guard and any app-wide
+   listener handles required by the specification. Use
    `SwiftDataManager` for SwiftData and `NetworkingManager` for `URLSession`;
    signal launch from the app lifecycle, not a View `.task`. Do not move GCD
    syntax mechanically during this pass.

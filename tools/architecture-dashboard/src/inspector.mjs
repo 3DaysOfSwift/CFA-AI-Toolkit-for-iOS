@@ -79,7 +79,9 @@ export async function inspect(project) {
         if (defaultValue) findings.push(finding('app-model-default-value', 'warning', `AppModel launch guard ${name} has a default value; initialise it in the explicit initializer.`, appModelFile, lineOf(appModel, match.index)));
         continue;
       }
-      if (!featureTypeSuffix.test(type)) findings.push(finding('app-model-non-feature-state', 'warning', `AppModel stores ${name}: ${type}; it should store only Features and one private launch guard.`, appModelFile, lineOf(appModel, match.index)));
+      // A private Task can own an app-wide listener; its actual purpose needs review.
+      if (type === 'Task' && privateModifier) continue;
+      if (!featureTypeSuffix.test(type)) findings.push(finding('app-model-non-feature-state', 'warning', `AppModel stores ${name}: ${type}; check that it is a Feature, launch guard or private app-wide listener handle.`, appModelFile, lineOf(appModel, match.index)));
       if (defaultValue) findings.push(finding('app-model-default-value', 'warning', `AppModel property ${name} has a default value; initialise it in the explicit initializer.`, appModelFile, lineOf(appModel, match.index)));
     }
   }

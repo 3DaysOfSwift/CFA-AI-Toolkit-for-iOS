@@ -6,10 +6,11 @@ representations used by lower-level services, not additional authorities for the
 application's current business state. ViewModels expose, format, and temporarily edit that state;
 they do not maintain competing copies that require manual synchronization.
 
-Local editing state may live in the View; ViewModel-owned drafts, selections,
-focus, loading presentation, and transient errors are permitted when needed by
-the screen. A simple unsaved text-field edit stays in View-local state until
-the user saves or cancels. Persisted collections,
+The screen's ViewModel owns editable field values and other screen presentation
+state, including unsaved drafts, selections, loading presentation and transient
+errors. SwiftUI-specific state such as focus may remain in the View. A text-field
+draft is not saved application state: retain it on save failure for retry and
+discard it on cancellation. Persisted collections,
 entitlements, synchronization status, and domain results belong to their feature.
 
 Feature APIs expose state as read-only and provide named commands for mutation.

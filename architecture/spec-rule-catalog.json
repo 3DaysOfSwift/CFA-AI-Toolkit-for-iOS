@@ -63,7 +63,7 @@
       "section": "Keep Screen Initializers Clean",
       "applies": "Creating screens and editing saved values",
       "strength": "Required with product-specific behaviour",
-      "rule": "Keep View initializers free of I/O and work; a simple unsaved text-field value stays local until Save or Cancel.",
+      "rule": "Keep View initializers free of I/O and work; the screen ViewModel owns unsaved text-field values until Save or Cancel.",
       "why": "Screen creation remains predictable and cancelled edits do not change authoritative state.",
       "verify": "Inspect initialization and test failed saves, retry and cancellation.",
       "example": "An unsaved weight field remains on screen after a failed save and is discarded by Cancel.",
@@ -328,10 +328,10 @@
       "section": "Architecture versus product design",
       "applies": "Creating, migrating or maintaining an app",
       "strength": "Required",
-      "rule": "Follow the requested scope and existing design; avoid adding optional product capabilities or changing behaviour without a requirement.",
-      "why": "Architecture should support the product rather than silently redesign it.",
-      "verify": "Compare changes with the requested journey and existing behaviour contract.",
-      "example": "A migration preserves the existing purchase flow instead of introducing a new paywall design.",
+      "rule": "Preserve business outcomes and capabilities while migrating to CFA and Swift Concurrency; fix confirmed in-scope defects and allow necessary minor platform-driven presentation differences without seeking unrelated modernisation.",
+      "why": "Migration changes how the app works internally without silently removing what users rely on.",
+      "verify": "Compare the requested journey and business outcomes; test defect fixes and document material platform-driven differences.",
+      "example": "A migration retains the purchase flow while adopting a modern system tab bar and correcting a verified defect.",
       "explanationIds": [
         "preserve-product-behaviour"
       ]
@@ -488,11 +488,11 @@
     },
     {
       "id": "CFA-SPEC-OBS-02",
-      "title": "Keep transient field edits in the View",
+      "title": "Keep unsaved field edits in the ViewModel",
       "section": "Preserve One Authoritative Owner for Shared State",
       "applies": "Editing a simple text field",
       "strength": "Default",
-      "rule": "Keep the unsaved field value locally in the View until Save or Cancel; persisted values remain Feature-owned.",
+      "rule": "Keep the unsaved field value in the screen ViewModel until Save or Cancel; persisted values remain Feature-owned.",
       "why": "An abandoned edit does not become shared application state.",
       "example": "A weight editor keeps the entered number after a failed save.",
       "verify": "Exercise save, failure, retry and Cancel without mutating the Feature early.",

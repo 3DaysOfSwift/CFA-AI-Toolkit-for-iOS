@@ -64,6 +64,22 @@ test('deep-link example persists a deferred request and completes after navigati
   } finally { fs.rmSync(directory, { recursive: true, force: true }); }
 });
 
+test('Notes reference preserves failed drafts and serialises independent saves', { skip: process.platform !== 'darwin', timeout: 120000 }, () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'cfa-notes-example-'));
+  try {
+    const source = path.join(root, 'architecture/spec-examples/NotesReference.swift');
+    const tests = path.join(root, 'architecture/spec-examples/NotesReferenceTests.swift');
+    const reference = fs.readFileSync(path.join(root, 'architecture/reference-feature.md'), 'utf8');
+    assert.ok(reference.includes(fs.readFileSync(source, 'utf8')), 'Reference code must match the tested source');
+    const executable = path.join(directory, 'notes');
+    const build = spawnSync('xcrun', ['swiftc', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(directory, 'cache'), source, tests, '-o', executable], { encoding: 'utf8', timeout: 90000 });
+    assert.equal(build.status, 0, build.stderr || build.error?.message);
+    const run = spawnSync(executable, [], { encoding: 'utf8', timeout: 15000 });
+    assert.equal(run.status, 0, run.stderr || run.error?.message);
+    assert.match(run.stdout, /failed save, retry, ordered overlap and JSON storage passed/);
+  } finally { fs.rmSync(directory, { recursive: true, force: true }); }
+});
+
 test('navigation exposes the agreed account, refresh and multi-device boundaries', () => {
   const topics = specTopics(root);
   const account = topics.get('rules/cfa-account-01.md');

@@ -1,4 +1,4 @@
-# Modernising implementation is not redesign permission
+# Migration preserves product behaviour
 
 Topic: `preserve-product-behaviour`  
 Rules: `CFA-SCOPE-01`, `CFA-SCOPE-02`  
@@ -7,7 +7,7 @@ Status: documented basis with editorial analysis; not a founder-approved histori
 
 ## Rule
 
-Adoption, migration and tidy-up preserve the established product's behaviour and visual decisions. Apply only explicitly requested changes; keep new-product defaults out of maintenance conformance.
+Adoption, migration and tidy-up preserve established business outcomes and user-facing capabilities. Migration changes the implementation as needed to adopt CFA and Swift Concurrency; it does not seek unrelated modernisation. Correct confirmed defects within scope and allow minor platform-driven presentation differences when replacement components are necessary. Keep new-product defaults out of maintenance conformance and do not introduce an unrelated redesign.
 
 ## Problem
 
@@ -15,11 +15,11 @@ A technically tidy migration can still break the app by changing navigation, can
 
 ## Documented rationale
 
-The workflow policy gives product design authority to the developer and scopes each task. It distinguishes a demonstrated functional/accessibility defect from an optional stylistic preference.
+The workflow policy gives product design authority to the developer and scopes each task. It distinguishes a demonstrated functional/accessibility defect from an optional stylistic preference. A migration changes how the app works internally without silently removing what users can do.
 
 ## Trade-offs and alternatives
 
-Editorial analysis: preserving a legacy contract can make implementation less elegant and require temporary adapters. Record the conflict and obtain direction rather than silently simplify away behaviour.
+Editorial analysis: preserving a legacy contract can make implementation less elegant and require temporary adapters. Investigate uncertainties rather than treating every old implementation detail as a requirement or silently removing a capability.
 
 ## Scope and exceptions
 

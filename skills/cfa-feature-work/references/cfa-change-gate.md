@@ -69,11 +69,12 @@ the architecture:
     `AppModel.shared`. A detail ViewModel may also receive selected value data;
     avoid unrelated convenience parameters.
 13. Each local data responsibility uses the simplest single persistence route.
-    A replaceable remote snapshot uses one JSON cache; SwiftData is reserved
+    A replaceable remote snapshot normally uses one JSON cache; SwiftData is reserved
     for genuinely structured, queryable, growing, or relational local data.
     Do not persist the same snapshot through both a database and a file cache.
-14. AppModel stores only `shared`, concrete Features, and one private launch
-    Boolean. Its explicit initializer assigns injected Features and the guard;
+14. AppModel stores `shared`, concrete Features, one private launch Boolean,
+    and private task handles needed to own app-wide listeners. Its explicit
+    initializer assigns injected Features and the guard;
     its single `static live()` constructs all production dependencies. No
     service, container, loading/error presentation state, or defaulted Feature
     property belongs in AppModel.

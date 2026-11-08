@@ -4,7 +4,7 @@
 
 **Strength:** Required with product-specific behaviour.
 
-**Guidance:** Keep View initializers free of I/O and work; a simple unsaved text-field value stays local until Save or Cancel.
+**Guidance:** Keep View initializers free of I/O and work; the screen ViewModel owns unsaved text-field values until Save or Cancel.
 
 **Why:** Screen creation remains predictable and cancelled edits do not change authoritative state.
 

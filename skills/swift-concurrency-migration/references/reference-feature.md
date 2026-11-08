@@ -1,37 +1,190 @@
 # Reference feature: recording a note
 
-`NotesView` owns `@State private var viewModel = NotesViewModel()`.
-Callers use `NotesView()` with zero inputs. No custom initializer accepts or
-constructs its ViewModel, even through a default parameter. Unit tests construct
-NotesViewModel directly with an isolated NotesFeature; display-only components
-can still receive plain snapshots.
-`NotesViewModel` retains `NotesFeature`, defaulting to `AppModel.shared.notesFeature`.
-It owns the editable draft and display error. `NotesFeature` validates the text,
-uses an injected repository to save it, and publishes the committed note. A failed
-save retains the draft and leaves the feature’s collection unchanged.
+This complete feature slice follows the path from a screen through its dedicated
+ViewModel, Feature and JSON persistence service. The screen ViewModel owns the
+unsaved text. The Feature queues admitted saves in order, persists each note
+before publication, and continues owned work when a caller stops waiting. A
+failed save leaves the editor open with its text available for retry. Cancel
+closes the editor without saving; the buttons are disabled during a save.
 
-`AppModel.live()` constructs the repository and feature. The AppModel initializer
-requires those dependencies explicitly. Tests assemble a separate graph and never
-mutate the production singleton. `Note` is a feature-owned immutable domain value;
-SwiftData representations live inside the repository implementation.
+The code below is also available as [NotesReference.swift](spec/examples/NotesReference.swift).
+The accompanying [executable checks](spec/examples/NotesReferenceTests.swift)
+cover failed persistence, retry, ordered overlapping saves, JSON storage and a
+fresh editor. Run them on macOS with Xcode and Swift 6:
 
-The concrete feature offers domain commands, not mutable storage objects. Tests
-construct it with a fake `NotesRepository`; no matching feature protocol is
-needed. An actor
-can isolate the repository or a substantial worker. Use MainActor for observable
-publication; do not move expensive file/CPU work onto it merely for convenience.
-
-Folder map:
-
-```text
-1 - View/Views/Notes/NotesView.swift
-1 - View/Views/Notes/NotesViewModel.swift
-2 - AppModel/AppModel.swift
-2 - AppModel/Features/Notes/NotesFeature.swift
-2 - AppModel/Features/Notes/Note.swift
-2 - AppModel/User Data Storage/Protocols/NotesRepository.swift
-2 - AppModel/User Data Storage/Local/LocalNotesRepository.swift
+```sh
+xcrun swiftc -swift-version 6 -parse-as-library NotesReference.swift NotesReferenceTests.swift -o /tmp/cfa-notes-tests
+/tmp/cfa-notes-tests
 ```
 
-The minimal example in the toolkit demonstrates these boundaries. It is a small
-teaching fixture, not a production app template or an implementation of every CFA rule.
+Run from the folder containing both files. The checks do not simulate SwiftUI
+navigation or a device. The example provides a composable editor and AppModel;
+to use it as an app, place the types in their CFA folders and supply the app's
+normal scene and lifecycle wiring. Use the existing starter apps for full Xcode
+projects and compare them against the current specification.
+
+```swift
+import Foundation
+import Observation
+import SwiftUI
+
+// A note is a snapshot of a successfully saved value.
+struct Note: Identifiable, Codable, Sendable, Equatable {
+    let id: UUID
+    let text: String
+}
+
+protocol NotesRepository: Sendable {
+    func load() async throws -> [Note]
+    func save(_ note: Note) async throws
+}
+
+// A small JSON file is sufficient for this example's single collection.
+actor JSONNotesRepository: NotesRepository {
+    let file: URL
+    init(file: URL) { self.file = file }
+
+    func load() async throws -> [Note] {
+        do {
+            return try JSONDecoder().decode([Note].self, from: Data(contentsOf: file))
+        } catch let error as CocoaError where error.code == .fileReadNoSuchFile {
+            return []
+        }
+    }
+
+    func save(_ note: Note) async throws {
+        let notes = try await load()
+        let data = try JSONEncoder().encode(notes + [note])
+        try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try data.write(to: file, options: .atomic)
+    }
+}
+
+enum NoteError: Error { case emptyText }
+
+@MainActor @Observable
+final class NotesFeature {
+    private let repository: any NotesRepository
+    @ObservationIgnored private var lastSave: Task<Void, Never>?
+    @ObservationIgnored private var loading: (id: UUID, task: Task<[Note], Error>)?
+    private var didLoad = false
+    private(set) var notes: [Note] = []
+
+    init(repository: any NotesRepository) { self.repository = repository }
+
+    func loadIfNeeded() async throws {
+        guard !didLoad else { return }
+        let task: Task<[Note], Error>
+        let id: UUID
+        if let loading {
+            task = loading.task
+            id = loading.id
+        } else {
+            task = Task { try await repository.load() }
+            id = UUID()
+            loading = (id, task)
+        }
+        do {
+            let loaded = try await task.value
+            if !didLoad { notes = loaded; didLoad = true }
+            if loading?.id == id { loading = nil }
+        } catch {
+            if loading?.id == id { loading = nil }
+            throw error
+        }
+    }
+
+    // Every admitted save runs after the preceding save, even after a failure.
+    // The Feature owns the work so a disappearing editor does not cancel it.
+    func save(_ text: String) async throws {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { throw NoteError.emptyText }
+        let note = Note(id: UUID(), text: trimmed)
+        let previous = lastSave
+        let operation = Task { @MainActor in
+            await previous?.value
+            try await loadIfNeeded()
+            try await repository.save(note)
+            notes.append(note)
+        }
+        lastSave = Task { _ = try? await operation.value }
+        try await operation.value
+    }
+}
+
+@MainActor
+final class AppModel {
+    static let shared = AppModel.live()
+    let notesFeature: NotesFeature
+    private var hasLaunched = false
+
+    init(notesFeature: NotesFeature) { self.notesFeature = notesFeature }
+    static func live() -> AppModel {
+        let directory = URL.applicationSupportDirectory
+        return AppModel(notesFeature: NotesFeature(repository: JSONNotesRepository(file: directory.appendingPathComponent("notes.json"))))
+    }
+    func applicationDidFinishLaunching() {
+        guard !hasLaunched else { return }
+        hasLaunched = true
+    }
+}
+
+@MainActor @Observable
+final class NotesEditorViewModel {
+    private let notesFeature: NotesFeature
+    @ObservationIgnored private var saveTask: Task<Bool, Never>?
+    var text = ""
+    private(set) var isSaving = false
+    private(set) var saveError: String?
+    private(set) var loadError: String?
+
+    init(notesFeature: NotesFeature = AppModel.shared.notesFeature) {
+        self.notesFeature = notesFeature
+    }
+
+    func load() async {
+        do { try await notesFeature.loadIfNeeded(); loadError = nil }
+        catch { loadError = "Notes could not be loaded. Please try again." }
+    }
+
+    @discardableResult
+    func save(onSuccess: @escaping @MainActor () -> Void = {}) -> Task<Bool, Never> {
+        if let saveTask { return saveTask }
+        let submittedText = text
+        isSaving = true
+        saveError = nil
+        let task = Task { [weak self, notesFeature] in
+            defer { self?.isSaving = false; self?.saveTask = nil }
+            do {
+                try await notesFeature.save(submittedText)
+                onSuccess()
+                return true
+            } catch {
+                self?.saveError = "The note could not be saved. Please try again."
+                return false
+            }
+        }
+        saveTask = task
+        return task
+    }
+}
+
+struct NotesEditorView: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var viewModel = NotesEditorViewModel()
+
+    var body: some View {
+        @Bindable var viewModel = viewModel
+        Form {
+            TextField("Note", text: $viewModel.text).disabled(viewModel.isSaving)
+            if let error = viewModel.saveError { Text(error) }
+            if let error = viewModel.loadError { Text(error) }
+            Button("Save") { viewModel.save { dismiss() } }
+                .disabled(viewModel.isSaving)
+            Button("Cancel", role: .cancel) { dismiss() }
+                .disabled(viewModel.isSaving)
+        }
+        .task { await viewModel.load() }
+    }
+}
+```

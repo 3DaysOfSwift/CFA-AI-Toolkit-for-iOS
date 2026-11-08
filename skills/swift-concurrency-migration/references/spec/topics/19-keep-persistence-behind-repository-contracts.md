@@ -41,6 +41,11 @@ entire project conforms to every current rule.
 
 For replaceable server data, a saved snapshot can provide a fast initial display
 and limited offline access without introducing offline editing or a sync engine.
+Use a JSON file as the understandable default when a simple cache is appropriate.
+The Instant Loading binary snapshot technique is an advanced, opt-in approach
+suited to a sufficiently stable format; its decoder must safely reject incompatible
+or corrupt data. Help a developer apply it when requested, but do not propose it
+as part of creating or migrating a project.
 When the product needs both restoration and a fresh request, start them
 independently rather than delaying the request for the optional cache. Publish
 restored data only if a newer authoritative response has not already superseded
@@ -61,6 +66,10 @@ content. Verify capabilities, deployment target, account availability, schema
 constraints, conflicts and behaviour on real devices; system-managed sync is
 not instantaneous or a replacement for local error handling. Do not put a
 live SwiftData store in iCloud Drive as a substitute for CloudKit integration.
+If the same item can be edited on multiple devices while offline, decide the
+conflict outcome for that data: a latest version may suit a simple preference,
+while user-created work may need both versions preserved or a user choice.
+Do not assume the framework eliminates all product-level conflict decisions.
 
 When the product instead requires synchronization with its own server, use
 the server's contract and introduce a dedicated sync service when needed. If

@@ -1,6 +1,6 @@
 ## A Template for Developers and AI
 
-Explore [open-source iOS app examples](../../spec/examples/open-source-apps.md) for
+Explore the [CFA project examples](../../spec/examples/open-source-apps.md) for
 real source code related to CFA capabilities and migration. Each link identifies
 what to inspect. Real apps evolve and may contain older conventions or ongoing
 migration work; use the current specification as the authority rather than

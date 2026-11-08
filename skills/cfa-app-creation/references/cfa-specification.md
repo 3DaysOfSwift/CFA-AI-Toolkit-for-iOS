@@ -18,7 +18,7 @@ application harder to understand, change, and maintain.
 
 ## A Template for Developers and AI
 
-Explore [open-source iOS app examples](spec/examples/open-source-apps.md) for
+Explore the [CFA project examples](spec/examples/open-source-apps.md) for
 real source code related to CFA capabilities and migration. Each link identifies
 what to inspect. Real apps evolve and may contain older conventions or ongoing
 migration work; use the current specification as the authority rather than
@@ -46,6 +46,20 @@ Read [project workflow and design authority](project-workflow.md) before applyin
 this specification. Architecture rules define ownership and execution boundaries;
 [new-app design defaults](new-app-design-defaults.md) define optional starting
 visual choices. They must not turn migration, review or tidy-up into a redesign.
+
+For migration, prioritise preserving the application's business behaviour and
+user-facing capabilities while moving its implementation to CFA and Swift
+Concurrency. Modernisation is not a separate migration objective: make changes
+needed for the migration and supported platforms, not a search for unrelated
+upgrades. Do not preserve a
+confirmed defect merely because it was present in the old code: fix defects
+within the migration scope, protect the intended behaviour with tests and
+explain the correction. Preserve stored data and meaningful interactions.
+Platform changes or necessary replacement of deprecated components may cause
+minor visual or interaction differences; record
+material differences rather than requiring pixel-identical results. Do not
+silently remove capabilities, impose new-app defaults, or invent business rules.
+Resolve genuinely ambiguous product decisions with the developer.
 
 ## Project Identity
 
@@ -667,13 +681,22 @@ Each screen owns the sheet, alert, or navigation destination it presents. Do
 not create an application-wide router merely to move local presentation state
 away from the View.
 
-**Deep links and notification destinations.** When an app supports these
+**Deep links and notification destinations.** In a new app that supports these
 entry points, use a dedicated `DeepLinkingFeature` for the shared destination
 handling of incoming links and actions on local and push notifications. It
 interprets and validates each request, owns the pending destinations and uses a
 storage service to persist their safe representations. AppModel exposes the
 Feature. System callbacks forward requests into this same system; do not assume
 that every push notification contains a navigable destination.
+
+Record a request when the app is asked to open a URL or receives a user action
+on a local or push notification. Scheduling a notification or its delivery alone
+does not add it to the pending list. The Settings screen presents the recorded
+pending requests; it is not a separate history of delivered notifications.
+
+During migration, preserve existing deep-link, notification and history
+capabilities; the new-app defaults below do not authorize removing them. Adopt
+this design when appropriate to the requested migration and existing behaviour.
 
 The receiving scene owns navigation, presentation and decisions about leaving
 its current screen. Do not place tab selection, sheets or screen dismissal in
@@ -691,6 +714,10 @@ for the receiving scene; the scene navigates and reports the result. Configure
 the handler with a scene-appropriate lifetime so multiple windows do not share a
 single navigation state. This is the intended responsibility flow; choose the
 concrete handler and registration mechanism to suit the app and test it.
+Either window can open a shared pending request. On successful navigation in
+one window, remove the shared pending item without changing another window's
+navigation. Coordinate concurrent attempts so the same request is not opened
+twice inadvertently.
 
 Protect an unsaved edit or an active payment flow from interruption. If a user
 chooses to continue editing, retain the request across launches and offer it
@@ -781,6 +808,13 @@ their account data; report the failure so they can retry. After successful
 sign-out, clear account-specific Feature state. If the authentication service
 can partially succeed before reporting an error, reconcile its actual session
 state rather than assuming either outcome.
+
+When the app's sign-out contract promises a fresh-install experience, clear
+account-specific memory, caches and locally stored files as part of successful
+sign-out. Identify data that belongs to the account before deleting it; handle
+unsynchronised user work transparently and do not treat independent purchases
+or user-owned documents as disposable account caches. Keep the signed-out
+experience and cleanup failures truthful.
 
 During migration, inspect whether an existing account-change event system can
 be simplified into explicit calls without losing behaviour. Trace every sign-out
@@ -1092,6 +1126,11 @@ entire project conforms to every current rule.
 
 For replaceable server data, a saved snapshot can provide a fast initial display
 and limited offline access without introducing offline editing or a sync engine.
+Use a JSON file as the understandable default when a simple cache is appropriate.
+The Instant Loading binary snapshot technique is an advanced, opt-in approach
+suited to a sufficiently stable format; its decoder must safely reject incompatible
+or corrupt data. Help a developer apply it when requested, but do not propose it
+as part of creating or migrating a project.
 When the product needs both restoration and a fresh request, start them
 independently rather than delaying the request for the optional cache. Publish
 restored data only if a newer authoritative response has not already superseded
@@ -1112,6 +1151,10 @@ content. Verify capabilities, deployment target, account availability, schema
 constraints, conflicts and behaviour on real devices; system-managed sync is
 not instantaneous or a replacement for local error handling. Do not put a
 live SwiftData store in iCloud Drive as a substitute for CloudKit integration.
+If the same item can be edited on multiple devices while offline, decide the
+conflict outcome for that data: a latest version may suit a simple preference,
+while user-created work may need both versions preserved or a user choice.
+Do not assume the framework eliminates all product-level conflict decisions.
 
 When the product instead requires synchronization with its own server, use
 the server's contract and introduce a dedicated sync service when needed. If
@@ -1487,10 +1530,11 @@ representations used by lower-level services, not additional authorities for the
 application's current business state. ViewModels expose, format, and temporarily edit that state;
 they do not maintain competing copies that require manual synchronization.
 
-Local editing state may live in the View; ViewModel-owned drafts, selections,
-focus, loading presentation, and transient errors are permitted when needed by
-the screen. A simple unsaved text-field edit stays in View-local state until
-the user saves or cancels. Persisted collections,
+The screen's ViewModel owns editable field values and other screen presentation
+state, including unsaved drafts, selections, loading presentation and transient
+errors. SwiftUI-specific state such as focus may remain in the View. A text-field
+draft is not saved application state: retain it on save failure for retry and
+discard it on cancellation. Persisted collections,
 entitlements, synchronization status, and domain results belong to their feature.
 
 Feature APIs expose state as read-only and provide named commands for mutation.

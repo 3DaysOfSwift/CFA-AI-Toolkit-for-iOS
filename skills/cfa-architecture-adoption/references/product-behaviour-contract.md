@@ -5,6 +5,16 @@ does while changing how it is structured and executed. The contract converts
 scattered evidence into readable product requirements and makes behavioural
 differences visible to developers, reviewers, and the testing team.
 
+Preserve the app's business outcomes and user-facing capabilities, not every
+legacy implementation detail. Moving to CFA and Swift Concurrency is the scope;
+do not seek unrelated modernisation. Migration may require replacing deprecated
+components; minor platform-driven presentation differences
+are acceptable when the intended journey remains intact. Preserve the existing
+design where practical rather than introducing an unrelated redesign. Identify
+and fix confirmed defects within the migration scope, test the intended result,
+and explain the change. Resolve ambiguous or materially different product
+behaviour with the developer instead of guessing.
+
 ## Build the Evidence Inventory
 
 Inspect the live codebase and available product material before changing
@@ -56,8 +66,8 @@ Use one of these evidence statuses:
 - **Inferred:** behaviour is observable, but intent has not been confirmed.
 - **Conflicting:** available sources disagree and a product decision is needed.
 - **Unprotected:** the requirement is known but has no reliable automated test.
-- **Obsolete candidate:** behaviour appears unwanted, but remains preserved
-  until an authorised product decision changes it.
+- **Obsolete candidate:** behaviour appears unwanted; investigate the intended
+  outcome before removing a user-facing capability.
 
 Do not silently resolve conflicting evidence or convert an apparent legacy bug
 into a new requirement. Record the uncertainty and seek the appropriate product
@@ -92,10 +102,13 @@ After each migration pass:
 Classify a difference as exactly one of:
 
 - **Regression:** the replacement violates the preserved requirement.
-- **Intended approved change:** product behaviour was deliberately changed by
+- **Intended product change:** product behaviour was deliberately changed by
   an authorised decision recorded in the contract.
-- **Existing defect exposed:** the migration revealed a pre-existing defect;
-  preserve or correct it only according to an explicit product decision.
+- **Confirmed defect corrected:** a verified defect was fixed within scope;
+  record the evidence, intended outcome, correction and regression test.
+- **Platform-driven presentation change:** a modern or replacement system
+  component differs in minor details while preserving the intended journey;
+  record the difference and verify the interaction.
 - **Environment or flaky evidence:** the difference is caused by the test
   environment or unreliable evidence and includes a recorded investigation.
 - **Unknown:** the cause or intended behaviour has not been established.
@@ -123,7 +136,8 @@ The behavioural migration is complete only when:
 - every in-scope requirement has baseline and post-migration evidence;
 - all previously passing regression tests and replacement tests pass;
 - no difference remains classified as regression or unknown;
-- every intentional behaviour change has explicit approval recorded beside it;
+- confirmed in-scope defect fixes and platform-driven differences have evidence
+  and verification, and materially changed product decisions have authorisation;
   and
 - the required manual regression runs have passed and been recorded.
 

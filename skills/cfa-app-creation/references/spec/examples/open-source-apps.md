@@ -1,4 +1,16 @@
-# Open-source iOS app examples
+# CFA project examples
+
+## Starter apps included in the toolkit
+
+The toolkit repository and full packages include ready-to-open Xcode projects in `starter-apps/`. See the [starter app guide](https://github.com/3DaysOfSwift/CFA-AI-Toolkit-for-iOS/tree/main/starter-apps) for setup, project paths and tests. A separately installed skill may not include the projects; use the full toolkit or repository.
+
+- **Habit Tracker** — habits, daily progress, streaks, SwiftData and Settings.
+- **Habit Tracker Pro** — habits, charts and a StoreKit unlock.
+- **Todays Twenty** — daily practice, saved sessions and day-streak behaviour.
+
+Use these projects to trace a working screen through its ViewModel, Feature and services, as well as AppModel and tests. They are examples to inspect against the current specification, not a guarantee that every implementation is up to date.
+
+## Open-source iOS apps
 
 These real projects illustrate different capabilities and migration contexts. The source links point to specific revisions; the project links open the current repositories. App code can use older naming or differ from current CFA rules. Inspect the linked behaviour and apply the current specification; a link does not certify whole-app conformance.
 

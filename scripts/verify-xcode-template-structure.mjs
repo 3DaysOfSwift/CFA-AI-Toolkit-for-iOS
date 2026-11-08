@@ -57,7 +57,7 @@ export function verifyXcodeTemplateStructure(templateDirectory = defaultTemplate
   if ((appModelSource.match(/\bstatic\s+func\s+live\s*\(/g) ?? []).length !== 1 ||
       /\b(?:ModelContainer|URLSession|startupError)\b/.test(appModelSource) ||
       /\bhasFinishedLaunching\s*:\s*Bool\s*=/.test(appModelSource)) {
-    fail('AppModel must use one live() factory, retain only Features and an explicitly initialised launch guard, and hide infrastructure.');
+    fail('AppModel must use one live() factory, retain Features and an explicitly initialised launch guard, and hide infrastructure. Private app-wide listener task handles are permitted.');
   }
   const appSource = fs.readFileSync(path.join(templateDirectory, 'Source/Application/1 - View/___PACKAGENAME:identifier___App.swift'), 'utf8');
   if (!/didFinishLaunchingWithOptions/.test(appSource) || /\.task\s*\{[^}]*applicationDidFinishLaunching/s.test(appSource)) {

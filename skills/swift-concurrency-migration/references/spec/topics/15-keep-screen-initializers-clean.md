@@ -45,13 +45,22 @@ Each screen owns the sheet, alert, or navigation destination it presents. Do
 not create an application-wide router merely to move local presentation state
 away from the View.
 
-**Deep links and notification destinations.** When an app supports these
+**Deep links and notification destinations.** In a new app that supports these
 entry points, use a dedicated `DeepLinkingFeature` for the shared destination
 handling of incoming links and actions on local and push notifications. It
 interprets and validates each request, owns the pending destinations and uses a
 storage service to persist their safe representations. AppModel exposes the
 Feature. System callbacks forward requests into this same system; do not assume
 that every push notification contains a navigable destination.
+
+Record a request when the app is asked to open a URL or receives a user action
+on a local or push notification. Scheduling a notification or its delivery alone
+does not add it to the pending list. The Settings screen presents the recorded
+pending requests; it is not a separate history of delivered notifications.
+
+During migration, preserve existing deep-link, notification and history
+capabilities; the new-app defaults below do not authorize removing them. Adopt
+this design when appropriate to the requested migration and existing behaviour.
 
 The receiving scene owns navigation, presentation and decisions about leaving
 its current screen. Do not place tab selection, sheets or screen dismissal in
@@ -69,6 +78,10 @@ for the receiving scene; the scene navigates and reports the result. Configure
 the handler with a scene-appropriate lifetime so multiple windows do not share a
 single navigation state. This is the intended responsibility flow; choose the
 concrete handler and registration mechanism to suit the app and test it.
+Either window can open a shared pending request. On successful navigation in
+one window, remove the shared pending item without changing another window's
+navigation. Coordinate concurrent attempts so the same request is not opened
+twice inadvertently.
 
 Protect an unsaved edit or an active payment flow from interruption. If a user
 chooses to continue editing, retain the request across launches and offer it

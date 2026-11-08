@@ -57,6 +57,16 @@ test('flags AppModel dumping-ground state and View-tied launch or storage', asyn
   }
 });
 
+test('does not flag a private AppModel listener task as a non-Feature property', async t => {
+  const root = await fixture(t, {
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel {\n    private var transactionUpdatesTask: Task<Void, Never>?\n    let settingsFeature: SettingsFeature\n    static func live() -> AppModel { AppModel() }\n}',
+    'Application/2 - AppModel/Features/Settings/SettingsFeature.swift': 'final class SettingsFeature {}',
+    'ApplicationTests/FeatureTests/Settings/SettingsFeatureTests.swift': 'struct SettingsFeatureTests {}'
+  });
+  const report = await inspect(root);
+  assert.ok(!report.findings.some(item => item.code === 'app-model-non-feature-state'));
+});
+
 test('flags SwiftData without a manager and direct URLSession calls', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',

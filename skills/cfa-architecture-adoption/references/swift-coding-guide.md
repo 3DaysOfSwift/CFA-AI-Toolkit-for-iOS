@@ -53,13 +53,11 @@ func publish() async {
 // making the new publication visible. The caller checks paid access.
 ```
 
-Views may own local editing state, focus and presentation details. ViewModels
-coordinate screen state and feature APIs; they do not duplicate domain decisions.
-Keep a simple unsaved text-field edit in View-local state when it exists only
-while that editor is open. The View passes the value to its ViewModel when the
-user saves; a failed save keeps the text for retry and Cancel discards it. A
-separate ViewModel or durable draft is appropriate only when the product's
-interaction or lifetime needs justify it.
+ViewModels own screen presentation state, including unsaved text-field values,
+and coordinate feature APIs without duplicating domain decisions. The View binds
+its field to its own ViewModel; a failed save keeps the text for retry and Cancel
+discards it. Focus and other SwiftUI-specific presentation mechanics can remain
+in the View. A durable draft requires a product reason.
 
 **Review:** Would another target have to copy this decision to behave correctly? If so, put it in the owning feature and test it through that feature's public API.
 
@@ -378,6 +376,10 @@ small, replaceable remote snapshot that is loaded and saved as one value, use a
 JSON file cache. Encode and decode the domain value once, whether its source is
 disk or the network. Do not add SwiftData alongside a JSON cache merely to
 store the same downloaded data.
+
+Instant Loading binary snapshots are an advanced opt-in for a sufficiently
+stable format, not a suggestion to make during app creation or migration. Help
+apply them when requested, and safely handle incompatible or corrupt files.
 
 Use SwiftData when the product genuinely needs structured local data: many
 records, querying, filtering, sorting, relationships, incremental edits,

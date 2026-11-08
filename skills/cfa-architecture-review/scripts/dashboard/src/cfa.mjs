@@ -36,7 +36,8 @@ skill from that toolkit before changing the project.
   describe their actual jobs.
 - Keep Views declarative. Feature state and business decisions belong outside
   the View layer.
-- AppModel stores only shared, concrete Features, and one private launch guard.
+- AppModel stores shared, concrete Features, one private launch guard and any
+  private task handles needed to own app-wide listeners.
   Its explicit initializer assigns injected Features; one static live() factory
   constructs production dependencies. Never store a service or UI error there.
 - SwiftData uses SwiftDataManager; URLSession calls use NetworkingManager.
