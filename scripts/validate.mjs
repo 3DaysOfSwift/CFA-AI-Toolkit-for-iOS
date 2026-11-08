@@ -152,6 +152,9 @@ export function validate(base=root,{source=true}={}) {
       if (JSON.stringify(sourceFiles) !== JSON.stringify(bundledFiles)) throw Error(`Bundled dashboard ${dir} files differ. Run npm run sync.`);
       for(const file of sourceFiles) if(hash(path.join(base,'tools/architecture-dashboard',dir,file))!==hash(path.join(base,'skills/cfa-architecture-review/scripts/dashboard',dir,file))) throw Error(`Stale bundled tool: ${file}`);
     }
+    for (const file of ['README.md', 'package.json']) {
+      if (hash(path.join(base, 'tools/architecture-dashboard', file)) !== hash(path.join(base, 'skills/cfa-architecture-review/scripts/dashboard', file))) throw Error(`Stale bundled dashboard ${file}. Run npm run sync.`);
+    }
     if (process.platform === 'darwin') {
       verifyXcodeTemplateStructure(path.join(base, 'templates/Xcode/Project Templates/iOS/Application/CFA App.xctemplate'));
       verifyTemplateOrientations(base);
