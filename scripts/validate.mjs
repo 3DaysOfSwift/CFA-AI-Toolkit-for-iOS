@@ -40,6 +40,7 @@ export function validate(base=root,{source=true}={}) {
     const bundledExamples = files(path.join(base,'skills/swift-concurrency-migration/assets/migration-examples')).filter(isExampleContent).sort();
     if (JSON.stringify(sourceExamples) !== JSON.stringify(bundledExamples)) throw Error('Migration example files differ from the bundled skill. Run npm run sync.');
     for (const file of sourceExamples) if (hash(path.join(base,'examples/migration',file)) !== hash(path.join(base,'skills/swift-concurrency-migration/assets/migration-examples',file))) throw Error(`Stale migration example: ${file}`);
+    if (JSON.stringify(files(path.join(base,'skills/swift-concurrency-migration/scripts/project-analysis')).sort()) !== JSON.stringify([...projectAnalysisFiles].sort())) throw Error('Unexpected or missing migration project analysis files.');
     for (const file of projectAnalysisFiles) if (hash(path.join(base,'tools/architecture-dashboard/src',file)) !== hash(path.join(base,'skills/swift-concurrency-migration/scripts/project-analysis',file))) throw Error(`Stale migration project analysis: ${file}`);
     const portable=json(path.join(base,'plugin.json'));
     if(portable.name!==manifest.name || portable.version!==manifest.version) throw Error('Portable plugin manifest does not match Codex manifest.');
