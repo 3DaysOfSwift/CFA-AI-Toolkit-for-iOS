@@ -197,7 +197,7 @@ export async function inspect(project) {
     const testFile = [...paths].find(file => file.endsWith(`/${testName}`)) ?? null;
     const statePattern = new RegExp(`@State\\s+private\\s+var[ \\t]+viewModel(?:[ \\t]*:[ \\t]*${viewModelName})?[ \\t]*=[ \\t]*${viewModelName}[ \\t]*\\([ \\t]*\\)`);
     const typedStatePattern = new RegExp(`@State\\s+private\\s+var[ \\t]+viewModel[ \\t]*:[ \\t]*${viewModelName}[ \\t]*=[ \\t]*\\.init[ \\t]*\\([ \\t]*\\)`);
-    const ownsViewModel = statePattern.test(members) || typedStatePattern.test(members);
+    let ownsViewModel = statePattern.test(members) || typedStatePattern.test(members);
     const dependencies = [];
     if (viewModel) {
       for (const initializer of members.matchAll(/(?<![.\w])init[?!]?\s*\(/g)) {
@@ -213,6 +213,9 @@ export async function inspect(project) {
         const openingBody = /^\s*(?:(?:async|throws|rethrows)\s*)*\{/.exec(tail);
         if (openingBody) {
           const initializerBody = braceBody(tail, openingBody[0].length - 1);
+          const ownedState = new RegExp(`@State\\s+private\\s+var\\s+viewModel\\s*:\\s*${viewModelName}\\b`).test(members);
+          const ownConstruction = new RegExp(`\\b_viewModel\\s*=\\s*State\\s*\\(\\s*(?:initialValue|wrappedValue)\\s*:\\s*${viewModelName}\\s*\\(`).test(initializerBody);
+          if (parameters.trim() && !/:\s*(?:any\s+)?\w*ViewModel\b/.test(parameters) && ownedState && ownConstruction) ownsViewModel = true;
           if (/\b_?viewModel\s*=/.test(initializerBody)) {
             findings.push(finding('view-model-initializer-construction', 'review', `${name} assigns ViewModel state in init. Verify it constructs its own ViewModel from selected detail data and does not accept an injected ViewModel.`, viewFile, lineOf(view, bodyOffset + initializer.index)));
           }

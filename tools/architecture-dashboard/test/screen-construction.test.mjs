@@ -50,13 +50,14 @@ struct HomeView: View {
 });
 
 test('selected detail data and owned State are reviewed rather than rejected', async t => {
-  const { findings } = await inspectView(t, `struct HomeView: View {
+  const { report, findings } = await inspectView(t, `struct HomeView: View {
     @State private var viewModel: HomeViewModel
     init(launch: LaunchSnapshot) {
       _viewModel = State(initialValue: HomeViewModel(launch: launch))
     }
     var body: some View { Text("Home") }
   }`);
+  assert.equal(report.screens[0].ownsViewModel, true);
   assert.ok(findings.length > 0);
   assert.ok(findings.every(item => item.severity === 'review'));
 });
