@@ -61,7 +61,9 @@ Feature may call the same API. Each asynchronous Feature operation must define
 its policy at the Feature boundary:
 
 - **Share execution:** equivalent calls await one retained in-flight task and
-  receive its outcome. Define equivalence by operation and relevant inputs.
+  receive its outcome. Determine equivalence from the operation, its inputs and
+  the intended product behavior: matching inputs alone do not make separate
+  commands duplicates when each command must take effect.
 - **Queue execution:** when every command must execute, admit calls to an
   explicit asynchronous sequential queue. Finish the whole operation, including
   suspension points, before starting the next admitted command. Each caller

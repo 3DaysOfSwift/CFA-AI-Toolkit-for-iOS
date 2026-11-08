@@ -10,7 +10,7 @@ Valid saves remain in submission order; invalid values are rejected. The CFA Fea
 
 ## Migration
 
-The Feature sequences saves and delegates storage to an actor. Callers now await a Task; a real migration must check the original completion queue and cancellation contract.
+The Feature sequences saves and delegates storage to an actor. Callers await the Feature's async save directly; a real migration must check the original completion queue and cancellation contract.
 
 ## Run and verify
 
@@ -18,4 +18,6 @@ Open and run `Before.playground` and `After.playground`. Each prints `Passed:` a
 
 ## Boundaries
 
-In-memory fixture; no actual disk failure, process restart or adversarial interleaving.
+In-memory fixture; no actual disk failure or process restart. The shared automated
+check also holds the first save open and verifies that admitted saves run in order
+across a failing middle command. It does not cover every possible interleaving.

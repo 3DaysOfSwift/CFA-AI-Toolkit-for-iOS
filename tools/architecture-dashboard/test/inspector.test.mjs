@@ -108,6 +108,21 @@ test('local and preview storage references are not asserted to be production vio
   assert.match(findings.find(item => item.code === 'view-swiftdata-access').message, /previews retain the same CFA boundaries/);
 });
 
+test('reviews direct SwiftData preview and query usage without flagging a normal preview', async t => {
+  const root = await fixture(t, {
+    'Application/1 - View/PreviewSupport.swift': '#Preview { NotesView().modelContainer(container) }',
+    'Application/1 - View/QueryScreen.swift': 'struct QueryScreen: View { @Query var notes: [Note]; var body: some View { Text("Notes") } }',
+    'Application/1 - View/EnvironmentScreen.swift': 'struct EnvironmentScreen: View { @Environment(\\.modelContext) private var context; var body: some View { Text("Notes") } }',
+    'Application/1 - View/SimplePreview.swift': '#Preview { NotesView() }\n// @Query var notes: [Note]\nlet example = ".modelContainer(container)"'
+  });
+  const matches = (await inspect(root)).findings.filter(item => item.code === 'view-swiftdata-access');
+  assert.equal(matches.length, 3);
+  assert.ok(matches.every(item => item.severity === 'review'));
+  assert.ok(matches.some(item => item.file.endsWith('PreviewSupport.swift')));
+  assert.ok(matches.some(item => item.file.endsWith('QueryScreen.swift')));
+  assert.ok(matches.some(item => item.file.endsWith('EnvironmentScreen.swift')));
+});
+
 test('identifies a launch signal scheduled inside a delegate Task without flagging independent work', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',

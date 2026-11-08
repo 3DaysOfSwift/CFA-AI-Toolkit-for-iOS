@@ -4,7 +4,7 @@
 
 **Strength:** Default.
 
-**Guidance:** Retain a named handle per independently managed operation; repeated equivalent actions reuse the existing task.
+**Guidance:** Retain a named handle per independently managed operation; repeated actions may reuse a task when one execution satisfies them all. Do not coalesce commands that must each take effect, even when their inputs match.
 
 **Why:** Task ownership and shared completion stay visible.
 

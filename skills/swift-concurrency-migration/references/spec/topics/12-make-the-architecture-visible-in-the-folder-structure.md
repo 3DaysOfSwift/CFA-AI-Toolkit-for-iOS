@@ -152,9 +152,10 @@ owning Feature or View; put genuinely app-wide extensions beside `AppModel`.
 
 Keep SwiftUI-specific extensions in `1 - View/SwiftUI Extensions`. Extensions
 of UIKit types belong in the View layer, alongside their owner or in a shared
-`UIKit Extensions` folder. Keep related protocols beside the concrete types
-and behaviour they support; do not create a generic `Protocols` folder. A
-shared `UIKit Helpers` folder is appropriate for non-extension helpers used by
+`UIKit Extensions` folder. Group protocols with the responsibility they support;
+for example, storage contracts may live in `User Data Storage/Protocols` as shown
+above. Do not create an app-wide catch-all `Protocols` folder for unrelated
+responsibilities. A shared `UIKit Helpers` folder is appropriate for non-extension helpers used by
 many views without a more specific owner. Cohesive private support declarations
 may remain with the extension they support.
 
@@ -172,7 +173,7 @@ appropriate bundle metadata when that is the source of truth, and keep
 localizable display text in localization resources. Do not hard-code secrets.
 Keep generation paths and related lookup code together.
 Platform protocols follow the same behaviour-first ownership rule; they do not
-belong in a catch-all protocols folder. Never use `4 - Swift Extensions` as a
+belong in an app-wide catch-all protocols folder. Never use `4 - Swift Extensions` as a
 general utilities folder.
 
 During a structural cleanup, inspect each file's declarations and callers,

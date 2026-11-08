@@ -7,11 +7,11 @@ Status: documented basis with editorial analysis; not a founder-approved histori
 
 ## Rule
 
-A Feature independently defines how overlapping calls behave. Equivalent calls may share execution; distinct commands that must all run need sequential whole-operation admission. Other policies require a product reason.
+A Feature independently defines how overlapping calls behave. Requests may share execution when one result satisfies every caller; commands that must each take effect need sequential whole-operation admission, even when their inputs match. Other policies require a product reason.
 
 ## Problem
 
-ViewModel duplicate protection cannot cover another screen or Feature calling the same API. Confusing different inputs with duplicate requests drops work; actor isolation alone does not make a workflow atomic across suspension.
+ViewModel duplicate protection cannot cover another screen or Feature calling the same API. Mistaking required commands for duplicate requests drops work, even if their inputs match; actor isolation alone does not make a workflow atomic across suspension.
 
 ## Documented rationale
 

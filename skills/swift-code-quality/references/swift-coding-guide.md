@@ -32,11 +32,11 @@ Use nonoptional APIs where possible. Iterate dictionary entries rather than forc
 
 ## 2. Shared decisions belong in the model
 
-**Rule:** Keep decisions needed by all targets—including future targets—in the model, not Views or ViewModels.
+**Rule:** Keep reusable business decisions needed by all targets in the model. Coordinate each screen's paid-access check in its ViewModel.
 
 “Model” means the domain layer: features, policies and domain values. It does not mean putting every function in a single model object. Repositories own storage and transport implementation details.
 
-A purchase entitlement, publishing allowance, validation rule, recommendation policy or completion reward must behave identically from an iPhone screen, a future Mac app or another entry point. The feature must enforce it even if the UI also disables a button.
+Publishing allowances, validation rules, recommendation policies and completion rewards belong to the Feature that owns the business behavior, so they are reusable from another interface. For paid capabilities, `PurchasesFeature` owns entitlement state and the screen ViewModel checks it before presenting or calling the capability. Apply that check at every relevant entry point; do not place pricing or purchase checks inside the capability Feature. A server must independently authorize server-protected operations.
 
 ```swift
 // ViewModel: forward intent and present the outcome.
@@ -50,7 +50,7 @@ func publish() async {
 }
 
 // Story feature: enforce the weekly allowance here, then save before
-// making the new publication visible. The caller checks paid access.
+// making the new publication visible.
 ```
 
 ViewModels own screen presentation state, including unsaved text-field values,
@@ -59,7 +59,7 @@ its field to its own ViewModel; a failed save keeps the text for retry and Cance
 discards it. Focus and other SwiftUI-specific presentation mechanics can remain
 in the View. A durable draft requires a product reason.
 
-**Review:** Would another target have to copy this decision to behave correctly? If so, put it in the owning feature and test it through that feature's public API.
+**Review:** Would another target have to copy a business decision to behave correctly? Put that decision in its owning Feature and test its public API. For paid access, instead verify that each entry point checks `PurchasesFeature` before presenting or calling the capability.
 
 ## 3. SwiftUI Views describe the interface
 
@@ -140,9 +140,10 @@ The SwiftUI environment is for app-wide presentation dependencies such as `Theme
 
 ### Inline editing saves directly; dedicated editors may have Save and Cancel
 
-An inline editable row changes the existing value directly. Persist each valid
+An inline editable row lets the user change a value in place. Submit each valid
 edit automatically through its ViewModel and Feature; do not add a separate
-Save button to the row. A dedicated editing screen or sheet may deliberately
+Save button to the row. The Feature publishes confirmed saved state after the
+required write succeeds. A dedicated editing screen or sheet may deliberately
 hold a draft and offer navigation-bar Cancel and Save actions.
 
 Keep text entry responsive during persistence. Serialize writes or coalesce
@@ -343,11 +344,12 @@ When a Task needs one dependency, capture it directly rather than weakly
 capturing `self` only to reach it.
 
 Each CFA Feature operation independently handles overlapping calls: share one
-in-flight execution for equivalent requests, or queue distinct commands for
+in-flight execution for equivalent requests, or queue commands that must each run for
 whole-operation sequential execution. ViewModel suppression cannot protect
 against other callers. Define request identity, each caller's outcome, cleanup
 and cancellation policy; a cancelled waiter must not accidentally cancel work
-needed by others. Do not discard changed inputs as duplicates. Other policies
+needed by others. Do not discard required commands as duplicates, even when
+their inputs match. Other policies
 need an explicit product reason. Actors protect isolated state, but an `await`
 permits reentrancy. Recheck relevant access and request identity after suspension
 before publishing results. Avoid blocking waits and self-awaiting queue cycles.

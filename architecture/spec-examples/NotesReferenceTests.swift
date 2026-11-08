@@ -13,10 +13,11 @@ actor ControlledNotes: NotesRepository {
     func load() async throws -> [Note] { [] }
     func save(_ note: Note) async throws {
         if note.text == "fail" { throw CocoaError(.fileWriteNoPermission) }
-        if note.text == "first" {
+        if note.text == "first" || note.text == "fail after wait" {
             started = true
             firstStarted?.resume(); firstStarted = nil
             await withCheckedContinuation { releaseFirst = $0 }
+            if note.text == "fail after wait" { throw CocoaError(.fileWriteNoPermission) }
         }
         saved.append(note.text)
     }
@@ -64,15 +65,32 @@ actor RetryableNotes: NotesRepository {
         await repository.waitForFirst()
         first.cancel() // A departing caller does not cancel the Feature-owned save.
         let second = Task { try await feature.save("second") }
+        let third = Task { try await feature.save("second") }
         for _ in 0..<10 { await Task.yield() }
         let before = await repository.saved
         precondition(before == ["retry"])
         await repository.release()
         try await first.value
         try await second.value
+        try await third.value
         let saved = await repository.saved
-        precondition(saved == ["retry", "first", "second"])
+        precondition(saved == ["retry", "first", "second", "second"])
         precondition(feature.notes.map(\.text) == saved)
+
+        let failingRepository = ControlledNotes()
+        let failingFeature = NotesFeature(repository: failingRepository)
+        let delayedFailure = Task { try await failingFeature.save("fail after wait") }
+        await failingRepository.waitForFirst()
+        let laterSave = Task { try await failingFeature.save("after failure") }
+        await failingRepository.release()
+        do {
+            try await delayedFailure.value
+            preconditionFailure("The failed save must report its error")
+        } catch is CocoaError {}
+        try await laterSave.value
+        let savedAfterFailure = await failingRepository.saved
+        precondition(savedAfterFailure == ["after failure"])
+        precondition(failingFeature.notes.map(\.text) == savedAfterFailure)
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         defer { try? FileManager.default.removeItem(at: folder) }
         let url = folder.appendingPathComponent("notes.json")

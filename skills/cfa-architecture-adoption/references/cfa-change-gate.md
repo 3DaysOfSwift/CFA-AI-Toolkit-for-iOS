@@ -12,8 +12,11 @@ designs unless the current request authorizes a change.
 Write down the affected route for every screen in scope:
 
 ```text
-Screen View → Screen ViewModel → AppModel.shared feature → provider / storage
+Screen View → Screen ViewModel → Feature → Microservices
 ```
+
+`AppModel.shared` composes and exposes the Features; microservices include
+providers, storage and device API adapters when needed.
 
 For every proposed new or changed type, state: “This type owns …”. Confirm that
 the responsibility is not already owned by an existing type.
@@ -140,9 +143,10 @@ the architecture:
 22. ViewModels retain handles for their created Tasks by default. Equivalent
     repeated actions reuse and await the existing execution, not a duplicate
     task or silent busy return. Each Feature operation independently shares
-    equivalent in-flight work or queues distinct calls sequentially across
-    suspension points. Record input identity, cleanup, cancellation and any
-    product-required exception. Never lose a distinct edit as a duplicate.
+    equivalent in-flight work or queues commands that must each execute
+    sequentially across suspension points. Record input identity, cleanup, cancellation and any
+    product-required exception. Never lose a required edit as a duplicate, even
+    when its input matches another command.
 
 23. The branded Settings About/footer is a new-app default, not a CFA invariant.
     Existing apps receive it only on an explicit request such as “add CFA footer

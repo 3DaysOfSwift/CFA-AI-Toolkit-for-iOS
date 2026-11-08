@@ -361,9 +361,10 @@ owning Feature or View; put genuinely app-wide extensions beside `AppModel`.
 
 Keep SwiftUI-specific extensions in `1 - View/SwiftUI Extensions`. Extensions
 of UIKit types belong in the View layer, alongside their owner or in a shared
-`UIKit Extensions` folder. Keep related protocols beside the concrete types
-and behaviour they support; do not create a generic `Protocols` folder. A
-shared `UIKit Helpers` folder is appropriate for non-extension helpers used by
+`UIKit Extensions` folder. Group protocols with the responsibility they support;
+for example, storage contracts may live in `User Data Storage/Protocols` as shown
+above. Do not create an app-wide catch-all `Protocols` folder for unrelated
+responsibilities. A shared `UIKit Helpers` folder is appropriate for non-extension helpers used by
 many views without a more specific owner. Cohesive private support declarations
 may remain with the extension they support.
 
@@ -381,7 +382,7 @@ appropriate bundle metadata when that is the source of truth, and keep
 localizable display text in localization resources. Do not hard-code secrets.
 Keep generation paths and related lookup code together.
 Platform protocols follow the same behaviour-first ownership rule; they do not
-belong in a catch-all protocols folder. Never use `4 - Swift Extensions` as a
+belong in an app-wide catch-all protocols folder. Never use `4 - Swift Extensions` as a
 general utilities folder.
 
 During a structural cleanup, inspect each file's declarations and callers,
@@ -1275,7 +1276,9 @@ Feature may call the same API. Each asynchronous Feature operation must define
 its policy at the Feature boundary:
 
 - **Share execution:** equivalent calls await one retained in-flight task and
-  receive its outcome. Define equivalence by operation and relevant inputs.
+  receive its outcome. Determine equivalence from the operation, its inputs and
+  the intended product behavior: matching inputs alone do not make separate
+  commands duplicates when each command must take effect.
 - **Queue execution:** when every command must execute, admit calls to an
   explicit asynchronous sequential queue. Finish the whole operation, including
   suspension points, before starting the next admitted command. Each caller
@@ -1639,9 +1642,10 @@ Rules for tests:
 - AppModel tests verify construction and application-wide coordination;
 - async functions are awaited directly in unit tests;
 - task cancellation and race-prevention behaviour receive dedicated tests;
-- repeated equivalent ViewModel actions and Feature calls share one execution
-  and completion; queued commands run in admission order with individual
-  outcomes, including failure/cancellation cleanup and successful later retry;
+- repeated actions and Feature calls share execution and completion when one
+  execution satisfies them all; commands that must each take effect run in
+  admission order with individual outcomes, even when their inputs match.
+  Cover failure/cancellation cleanup and successful later retry;
 - clocks, repositories, and external clients use deterministic test doubles;
 - tests describe observable behaviour, not private implementation details.
 - tests that need AppModel assemble an isolated graph and never alter the shared

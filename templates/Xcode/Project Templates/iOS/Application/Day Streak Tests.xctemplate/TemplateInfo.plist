@@ -19,6 +19,7 @@
 		<string>FeatureTests/DayStreakFeatureTests.swift</string>
 		<string>FeatureTests/PracticeFeatureTests.swift</string>
 		<string>FeatureTests/SettingsFeatureTests.swift</string>
+		<string>PresentationTests/ThemeManagerTests.swift</string>
 		<string>StorageTests/SwiftDataManagerTests.swift</string>
 		<string>Support/TestSupport.swift</string>
 		<string>ViewModelTests/DayStreakViewModelTests.swift</string>
@@ -46,6 +47,11 @@
 		<dict>
 			<key>Path</key>
 			<string>Source/FeatureTests/SettingsFeatureTests.swift</string>
+		</dict>
+		<key>PresentationTests/ThemeManagerTests.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/PresentationTests/ThemeManagerTests.swift</string>
 		</dict>
 		<key>StorageTests/SwiftDataManagerTests.swift</key>
 		<dict>

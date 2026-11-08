@@ -39,7 +39,7 @@ enum NoteError: Error { case emptyText }
 @MainActor @Observable
 final class NotesFeature {
     private let repository: any NotesRepository
-    @ObservationIgnored private var lastSave: (id: UUID, task: Task<Void, Never>)?
+    @ObservationIgnored private var lastSave: (id: UUID, task: Task<Void, Error>)?
     @ObservationIgnored private var loading: (id: UUID, task: Task<[Note], Error>)?
     private var didLoad = false
     private(set) var notes: [Note] = []
@@ -77,13 +77,13 @@ final class NotesFeature {
         let previous = lastSave?.task
         let id = UUID()
         let operation = Task { @MainActor in
-            await previous?.value
+            // A failed earlier save is reported to its caller, but does not block this save.
+            _ = try? await previous?.value
             try await loadIfNeeded()
             try await repository.save(note)
             notes.append(note)
         }
-        let completion = Task { _ = try? await operation.value }
-        lastSave = (id, completion)
+        lastSave = (id, operation)
         defer {
             if lastSave?.id == id { lastSave = nil }
         }

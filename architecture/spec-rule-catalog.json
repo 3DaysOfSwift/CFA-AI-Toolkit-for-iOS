@@ -64,7 +64,7 @@
       "rule": "A detail View may receive a selected immutable snapshot and use it to construct its own State-backed ViewModel in the View initializer.",
       "why": "Each destination can preserve its selection independently.",
       "verify": "Test two independently selected destinations and confirm refresh does not silently replace a displayed snapshot.",
-      "example": "Two launch detail destinations each receive their own selected launch snapshot.",
+      "example": "Next Rocket Launch passes a selected snapshot into its [detail View](https://github.com/3DaysOfSwift/RocketLaunch-iOS-App-Swift-Concurrency/blob/3ecaa30c76428bd8a6f5db8fd5506b6c20b846f7/Swift%20Concurrency%20Project/RocketLaunch/1%20-%20View/Views/Operators/LaunchDetail/LaunchDetailView.swift) and its [ViewModel](https://github.com/3DaysOfSwift/RocketLaunch-iOS-App-Swift-Concurrency/blob/3ecaa30c76428bd8a6f5db8fd5506b6c20b846f7/Swift%20Concurrency%20Project/RocketLaunch/1%20-%20View/Views/Operators/LaunchDetail/LaunchDetailViewModel.swift).",
       "explanationIds": [
         "view-model-ownership"
       ]
@@ -133,7 +133,7 @@
       "rule": "AppModel constructs and exposes concrete Features through an explicit graph and contains no UI navigation or Feature business rules.",
       "why": "The Model has one visible entry point within each process.",
       "verify": "Review live composition, initializer dependencies and isolated test graphs.",
-      "example": "AppModel.live() constructs NotesFeature and its storage dependency for the application graph.",
+      "example": "In [NotesReference.swift](../examples/NotesReference.swift), AppModel.live() constructs NotesFeature and its storage dependency for the application graph.",
       "explanationIds": [
         "appmodel-composition"
       ]
@@ -577,7 +577,7 @@
       "section": "Layered Architecture",
       "applies": "Designing or reviewing application structure",
       "strength": "Required",
-      "rule": "Keep the relationship View \u2192 ViewModel \u2192 Feature \u2192 Microservices; AppModel composes and exposes Features.",
+      "rule": "Keep the relationship View → ViewModel → Feature → Microservices; AppModel composes and exposes Features.",
       "why": "Dependencies follow clear ownership instead of scattered business decisions.",
       "example": "A screen ViewModel asks a schedule Feature, which calls a networking microservice.",
       "verify": "Trace a user operation through each layer and inspect reverse dependencies.",
@@ -634,7 +634,7 @@
       "rule": "Keep structures simple enough to understand while preserving real behaviour and safety.",
       "why": "Unnecessary layers obscure the system and increase maintenance cost.",
       "example": "A small sign-out workflow makes explicit Feature calls instead of adding an event bus.",
-      "verify": "Identify each layer\u2019s concrete responsibility and remove unjustified duplication.",
+      "verify": "Identify each layer’s concrete responsibility and remove unjustified duplication.",
       "explanationIds": [
         "readability"
       ]
@@ -659,7 +659,7 @@
       "strength": "Required",
       "rule": "Check the full prohibited-pattern list and its applicable context.",
       "why": "Known architecture violations should not survive as isolated exceptions.",
-      "example": "A View does not receive another screen\u2019s ViewModel.",
+      "example": "A View does not receive another screen’s ViewModel.",
       "verify": "Search source and target membership, then verify actual usage and tests.",
       "explanationIds": []
     },
@@ -739,7 +739,7 @@
       "section": "Make the Architecture Visible in the Folder Structure",
       "applies": "Adding Swift extensions or domain values",
       "strength": "Required",
-      "rule": "Follow the specification\u2019s placement rules for extensions and keep domain types with their semantic owner.",
+      "rule": "Follow the specification’s placement rules for extensions and keep domain types with their semantic owner.",
       "why": "Related types remain understandable independently of storage representation.",
       "example": "A launch snapshot belongs with the launch capability rather than being defined by its database schema.",
       "verify": "Review extension and type ownership against the full source section.",
@@ -767,7 +767,7 @@
       "section": "Make Concurrency Behaviour Honest and Visible",
       "applies": "A ViewModel creates an unstructured Task",
       "strength": "Default",
-      "rule": "Retain a named handle per independently managed operation; repeated equivalent actions reuse the existing task.",
+      "rule": "Retain a named handle per independently managed operation; repeated actions may reuse a task when one execution satisfies them all. Do not coalesce commands that must each take effect, even when their inputs match.",
       "why": "Task ownership and shared completion stay visible.",
       "example": "Repeated refresh taps return the same active task handle.",
       "verify": "Test repeated taps, completion cleanup, cancellation and replacement.",

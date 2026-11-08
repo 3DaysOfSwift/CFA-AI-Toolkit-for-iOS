@@ -7,7 +7,7 @@ Status: documented basis with editorial analysis; not a founder-approved histori
 
 ## Rule
 
-CFA ViewModels retain named handles for unstructured tasks they create by default. Equivalent repeated actions reuse the existing execution. Structured child work and framework-owned lifetimes retain their own owners.
+CFA ViewModels retain named handles for unstructured tasks they create by default. Choose the overlap policy for each operation: callers may share equivalent in-flight work when one result satisfies them all, while commands that must each take effect are executed in the required order. Structured child work and framework-owned lifetimes retain their own owners.
 
 ## Problem
 
@@ -27,7 +27,7 @@ Unstructured tasks are not inherently wrong. Swift task semantics are separate f
 
 ## Verification
 
-Repeat equivalent actions and assert one execution and shared completion. Test failure, cancellation cleanup and a later retry. Check that stale cleanup cannot erase a replacement handle.
+Test the chosen policy: for shareable work, repeat equivalent requests and check that callers share completion; for commands that must each take effect, check that every command runs in the required order. Test failure, cancellation cleanup and a later retry. Check that stale cleanup cannot erase a replacement handle.
 
 ## Evidence and provenance
 

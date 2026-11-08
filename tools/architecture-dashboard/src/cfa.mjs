@@ -52,11 +52,16 @@ skill from that toolkit before changing the project.
   Its explicit initializer assigns injected Features; one static live() factory
   constructs production dependencies. Never store a service or UI error there.
 - SwiftData uses SwiftDataManager; URLSession calls use NetworkingManager.
-  Features own those collaborators. Signal app launch from an application
-  lifecycle callback, never a View .task.
+  Features own those collaborators. Call the AppModel launch signal directly
+  and synchronously from the application lifecycle callback, never a View .task
+  or a scheduled Task. Features can start their own asynchronous work without
+  delaying the callback for disk or network completion.
 - A Feature-owned shared refresh normally continues when a screen leaves;
   preserve its result for later callers unless a specific product or resource
   requirement calls for another cancellation policy.
+- Share equivalent in-flight requests when appropriate; queue commands that
+  must each complete. Matching inputs alone do not make two required user
+  actions duplicates. Define ownership, cancellation and failure handling.
 - Publish durable user edits as saved only after required persistence succeeds.
   A current server response need not wait for an optional cache write; prevent
   an older cached snapshot from replacing fresher data.

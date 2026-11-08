@@ -80,6 +80,61 @@ test('Notes reference preserves failed drafts and serialises independent saves',
   } finally { fs.rmSync(directory, { recursive: true, force: true }); }
 });
 
+test('Notes reference continues an admitted save after its predecessor fails', { skip: process.platform !== 'darwin', timeout: 120000 }, () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'cfa-notes-queue-'));
+  try {
+    const reference = fs.readFileSync(path.join(root, 'architecture/spec-examples/NotesReference.swift'), 'utf8');
+    // The extension shares the temporary source file solely to observe admission.
+    const harness = `
+actor GatedNotes: NotesRepository {
+    private var started = false
+    private var startWaiter: CheckedContinuation<Void, Never>?
+    private var releaseWaiter: CheckedContinuation<Void, Never>?
+    private(set) var saved: [String] = []
+    func load() async throws -> [Note] { [] }
+    func save(_ note: Note) async throws {
+        if note.text == "first" {
+            started = true
+            startWaiter?.resume(); startWaiter = nil
+            await withCheckedContinuation { releaseWaiter = $0 }
+            throw CocoaError(.fileWriteNoPermission)
+        }
+        saved.append(note.text)
+    }
+    func waitForFirst() async {
+        if started { return }
+        await withCheckedContinuation { startWaiter = $0 }
+    }
+    func release() { releaseWaiter?.resume(); releaseWaiter = nil }
+}
+extension NotesFeature { var auditSaveID: UUID? { lastSave?.id } }
+@main struct Runner {
+    @MainActor static func main() async throws {
+        let repository = GatedNotes()
+        let feature = NotesFeature(repository: repository)
+        let first = Task { try await feature.save("first") }
+        await repository.waitForFirst()
+        let firstID = feature.auditSaveID
+        let second = Task { try await feature.save("second") }
+        while feature.auditSaveID == firstID { await Task.yield() }
+        await repository.release()
+        do { try await first.value; preconditionFailure("first save must fail") }
+        catch is CocoaError {}
+        try await second.value
+        let saved = await repository.saved
+        precondition(saved == ["second"] && feature.notes.map(\\.text) == ["second"])
+    }
+}`;
+    const input = path.join(directory, 'NotesQueue.swift');
+    fs.writeFileSync(input, reference + harness);
+    const executable = path.join(directory, 'notes-queue');
+    const build = spawnSync('xcrun', ['swiftc', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(directory, 'cache'), input, '-o', executable], { encoding: 'utf8', timeout: 90000 });
+    assert.equal(build.status, 0, build.stderr || build.error?.message);
+    const run = spawnSync(executable, [], { encoding: 'utf8', timeout: 15000 });
+    assert.equal(run.status, 0, run.stderr || run.error?.message);
+  } finally { fs.rmSync(directory, { recursive: true, force: true }); }
+});
+
 test('navigation exposes the agreed account, refresh and multi-device boundaries', () => {
   const topics = specTopics(root);
   const account = topics.get('rules/cfa-account-01.md');
@@ -106,6 +161,8 @@ test('published app examples link to pinned source and relevant rule cards', () 
   const index = topics.get('examples/open-source-apps.md');
   assert.match(index, /Trend-iOS-App-Swift-Concurrency-CFA\/blob\/[a-f0-9]{40}\//);
   assert.match(index, /RocketLaunch-iOS-App-Swift-Concurrency\/blob\/[a-f0-9]{40}\//);
+  assert.match(index, /\[Detail View\]\([^\n]*\/LaunchDetailView\.swift\)/);
+  assert.match(index, /\[Detail ViewModel\]\([^\n]*\/LaunchDetailViewModel\.swift\)/);
   assert.match(topics.get('rules/cfa-cache-01.md'), /RocketLaunch-iOS-App-Swift-Concurrency\/blob\/[a-f0-9]{40}\//);
   assert.match(index, /older naming or differ from current CFA rules/);
 });

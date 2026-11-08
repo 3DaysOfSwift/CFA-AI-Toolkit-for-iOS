@@ -54,11 +54,12 @@ state transitions and side effects rather than private implementation details.
 Use injected repositories, clocks, clients and controllable continuations; do
 not use live services, arbitrary sleeps or scheduler luck.
 
-For retained ViewModel tasks, prove repeated equivalent actions share one
-execution and await completion, including failure and retry. Independently test
-each Feature's sharing or sequential-queue policy with multiple callers:
-equivalent requests receive the shared outcome; distinct queued inputs execute
-in admission order and receive their own outcomes. Cover cancellation, cleanup
+For retained ViewModel tasks, prove that repeated actions share one execution
+only when the same result satisfies each action, including failure and retry.
+Independently test each Feature's sharing or sequential-queue policy with multiple callers:
+shareable requests receive the shared outcome; commands that must each take effect
+execute in admission order and receive their own outcomes, even when their inputs
+match. Cover cancellation, cleanup
 and later work after failure without losing or indefinitely suspending waiters.
 
 Build AppModel tests from an isolated dependency graph. Do not call production

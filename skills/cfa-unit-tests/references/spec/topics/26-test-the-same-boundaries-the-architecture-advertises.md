@@ -23,9 +23,10 @@ Rules for tests:
 - AppModel tests verify construction and application-wide coordination;
 - async functions are awaited directly in unit tests;
 - task cancellation and race-prevention behaviour receive dedicated tests;
-- repeated equivalent ViewModel actions and Feature calls share one execution
-  and completion; queued commands run in admission order with individual
-  outcomes, including failure/cancellation cleanup and successful later retry;
+- repeated actions and Feature calls share execution and completion when one
+  execution satisfies them all; commands that must each take effect run in
+  admission order with individual outcomes, even when their inputs match.
+  Cover failure/cancellation cleanup and successful later retry;
 - clocks, repositories, and external clients use deterministic test doubles;
 - tests describe observable behaviour, not private implementation details.
 - tests that need AppModel assemble an isolated graph and never alter the shared

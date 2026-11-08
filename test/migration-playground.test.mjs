@@ -96,3 +96,64 @@ extension LaunchFeature {
     assert.equal(run.status, 0, run.stderr || run.error?.message);
   } finally { fs.rmSync(dir, {recursive:true, force:true}); }
 });
+
+test('Serial Weight Saves preserves admission order across suspension and failure', {skip:process.platform !== 'darwin', timeout:120000}, () => {
+  const page = fs.readFileSync(path.join(root, 'examples/migration/Serial Weight Saves/After.playground/Contents.swift'), 'utf8');
+  const feature = page.slice(page.indexOf('@MainActor @Observable'), page.indexOf('// MARK: - Test fixtures'));
+  assert.match(feature, /func save\(_ weight: Int\) async -> Bool/);
+  const source = `import Foundation
+import Observation
+actor WeightStorage {
+    enum Failure: Error { case invalid }
+    private var started = false
+    private var startWaiter: CheckedContinuation<Void, Never>?
+    private var releaseWaiter: CheckedContinuation<Void, Never>?
+    private(set) var attempts: [Int] = []
+    func save(_ weight: Int) async throws {
+        attempts.append(weight)
+        if weight == 80 {
+            started = true
+            startWaiter?.resume(); startWaiter = nil
+            await withCheckedContinuation { releaseWaiter = $0 }
+        }
+        if weight < 0 { throw Failure.invalid }
+    }
+    func waitForFirst() async {
+        if started { return }
+        await withCheckedContinuation { startWaiter = $0 }
+    }
+    func releaseFirst() { releaseWaiter?.resume(); releaseWaiter = nil }
+}
+${feature}
+extension WeightLogFeature { var testSaveID: UUID? { lastSaveID } }
+@main struct Runner {
+    @MainActor static func main() async {
+        let storage = WeightStorage()
+        let feature = WeightLogFeature(storage: storage)
+        let first = Task { await feature.save(80) }
+        await storage.waitForFirst()
+        let firstID = feature.testSaveID
+        let invalid = Task { await feature.save(-1) }
+        while feature.testSaveID == firstID { await Task.yield() }
+        let secondID = feature.testSaveID
+        let last = Task { await feature.save(82) }
+        while feature.testSaveID == secondID { await Task.yield() }
+        let before = await storage.attempts
+        precondition(before == [80])
+        await storage.releaseFirst()
+        let a = await first.value, b = await invalid.value, c = await last.value
+        let attempts = await storage.attempts
+        precondition(a && !b && c && attempts == [80, -1, 82])
+        precondition(feature.weights == [80, 82] && feature.saveError == nil)
+    }
+}`;
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfa-weight-order-'));
+  try {
+    const input = path.join(dir, 'Example.swift'); fs.writeFileSync(input, source);
+    const executable = path.join(dir, 'example');
+    const build = spawnSync('xcrun', ['swiftc', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(dir, 'cache'), input, '-o', executable], {encoding:'utf8', timeout:90000});
+    assert.equal(build.status, 0, build.stderr || build.error?.message);
+    const run = spawnSync(executable, [], {encoding:'utf8', timeout:15000});
+    assert.equal(run.status, 0, run.stderr || run.error?.message);
+  } finally { fs.rmSync(dir, {recursive:true, force:true}); }
+});

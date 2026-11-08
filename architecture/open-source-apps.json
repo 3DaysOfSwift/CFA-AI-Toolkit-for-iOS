@@ -17,19 +17,22 @@
       "repository": "https://github.com/3DaysOfSwift/RocketLaunch-iOS-App-Swift-Concurrency",
       "revision": "3ecaa30c76428bd8a6f5db8fd5506b6c20b846f7",
       "sourcePath": "Swift Concurrency Project/RocketLaunch/2 - AppModel/Features/Launch Schedule/LaunchScheduleFeature.swift",
+      "additionalSources": [
+        {"label": "Detail View", "path": "Swift Concurrency Project/RocketLaunch/1 - View/Views/Operators/LaunchDetail/LaunchDetailView.swift"},
+        {"label": "Detail ViewModel", "path": "Swift Concurrency Project/RocketLaunch/1 - View/Views/Operators/LaunchDetail/LaunchDetailViewModel.swift"}
+      ],
       "description": "Schedule ownership, provider refresh and optional cache",
       "ruleIds": [
         "CFA-SPEC-CACHE-01",
-        "CFA-SPEC-TASK-01",
-        "CFA-SPEC-TASK-02"
+        "CFA-SPEC-TASK-01"
       ]
     },
     {
       "name": "Cuentiva",
       "repository": "https://github.com/3DaysOfSwift/Cuentiva",
       "revision": "3bf3a9d4b7714182edd6d6778c843e234714db50",
-      "sourcePath": "Cuentiva/2 - AppModel/Features/Library/LibraryManager.swift",
-      "description": "Library operations and search",
+      "sourcePath": "Cuentiva/1 - View/Views/Home/BookstoreViewModel.swift",
+      "description": "Search presentation and stale-result protection",
       "ruleIds": [
         "CFA-SPEC-CONC-02"
       ]
@@ -40,9 +43,7 @@
       "revision": "b737865cedea92d3d85c2b8c0fd3eb7274dcc2a4",
       "sourcePath": "PersonalAPI/2 - AppModel/AppModel.swift",
       "description": "Application composition and Feature access",
-      "ruleIds": [
-        "CFA-SPEC-APP-01"
-      ]
+      "ruleIds": []
     },
     {
       "name": "Amigos",
@@ -50,9 +51,7 @@
       "revision": "96a3878f6218b9d3e811309eb8469f845d3df6f2",
       "sourcePath": "Amigos/2 - AppModel/AppModel.swift",
       "description": "Application composition and conversation capabilities",
-      "ruleIds": [
-        "CFA-SPEC-APP-01"
-      ]
+      "ruleIds": []
     },
     {
       "name": "Verbos",
@@ -70,9 +69,7 @@
       "revision": "edebdcc9495dbe5d75088d161274499bfbfbfb3c",
       "sourcePath": "123 Calc/2 - AppModel/AppModel.swift",
       "description": "Calculator composition",
-      "ruleIds": [
-        "CFA-SPEC-APP-01"
-      ]
+      "ruleIds": []
     },
     {
       "name": "Phone Drive",
@@ -80,9 +77,7 @@
       "revision": "81854fb55bfdbd62381d79c579856fa0f1a5af98",
       "sourcePath": "Phone Drive/2 - AppModel/AppModel.swift",
       "description": "File library and local-sharing composition",
-      "ruleIds": [
-        "CFA-SPEC-APP-01"
-      ]
+      "ruleIds": []
     },
     {
       "name": "Cuentiva: Word Leap",
@@ -90,9 +85,7 @@
       "revision": "ae936234171dd617f7a2affb093d3eca4ea3db84",
       "sourcePath": "CuentivaWordLeap/2 - AppModel/Features/Word Leap/WordLeapFeature.swift",
       "description": "Game capability and retained tasks",
-      "ruleIds": [
-        "CFA-SPEC-TASK-01"
-      ]
+      "ruleIds": []
     },
     {
       "name": "Metro Mate",

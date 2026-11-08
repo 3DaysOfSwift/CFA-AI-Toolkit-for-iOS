@@ -516,8 +516,8 @@ This section is for AI coding assistants (Codex, Claude Code, Cursor and others)
 - Each screen owns a private ViewModel, created inline with `@State` by default. A detail View may initialise its own State-backed ViewModel from selected value data. The ViewModel defaults its narrow Feature dependencies from `AppModel.shared`.
 - Features are concrete `@MainActor` classes named `…Feature`, with no matching protocol. Use `@Observable` when a Feature exposes UI-observed state. Features are never called Managers.
 - Features keep domain data, operation state and errors as separate values. Never use a `LoadState` enum that carries all three.
-- Each Feature defines its overlapping-call policy: equivalent operations normally share their in-flight work, while distinct edits are queued and never dropped. Keep task ownership and completion explicit.
-- AppModel stores `shared`, the concrete Features, one launch Boolean and private task handles for app-wide listeners, and has a single `static func live()`. The app delegate calls `applicationDidFinishLaunching()`.
+- Each Feature defines its overlapping-call policy: share requests when one execution satisfies every caller; queue commands that must each take effect, even if their inputs match. Keep task ownership and completion explicit.
+- AppModel stores `shared`, the concrete Features, one launch Boolean and private task handles for app-wide listeners, and has a single `static func live()`. The app delegate calls `applicationDidFinishLaunching()` directly and synchronously; Features can start their own asynchronous work.
 - `App.body` has a stable root. Database availability never gates the UI. SwiftData goes through `SwiftDataManager`, with a `@ModelActor` for non-trivial persistence work. `URLSession` goes through `NetworkingManager`.
 - Write `@MainActor` explicitly on Features, ViewModels and AppModel, and use actors for shared storage. Never use locks, GCD inside async code, or `@unchecked Sendable` as an escape hatch.
 - Name ViewModel methods for the work they do: `refresh()`, `save()`, `retry()`.
