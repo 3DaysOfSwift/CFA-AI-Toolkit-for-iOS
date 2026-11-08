@@ -13,6 +13,7 @@ final class AppModel {
     let purchasesFeature: PurchasesFeature
     let trendsFeature: TrendsFeature
     private var didFinishLaunching: Bool
+    @ObservationIgnored private var transactionUpdatesTask: Task<Void, Never>?
 
     init(todayFeature: TodayFeature, habitsFeature: HabitsFeature, dayStreakFeature: DayStreakFeature,
          settingsFeature: SettingsFeature, purchasesFeature: PurchasesFeature, trendsFeature: TrendsFeature) {
@@ -39,9 +40,18 @@ final class AppModel {
         )
     }
 
+    deinit { transactionUpdatesTask?.cancel() }
+
     func applicationDidFinishLaunching() {
         guard !didFinishLaunching else { return }
         didFinishLaunching = true
+        let updates = purchasesFeature.transactionUpdates()
+        transactionUpdatesTask = Task { [purchasesFeature] in
+            for await _ in updates {
+                guard !Task.isCancelled else { break }
+                await purchasesFeature.refreshEntitlement()
+            }
+        }
         habitsFeature.startLoading()
         purchasesFeature.startLoading()
     }

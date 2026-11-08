@@ -4,7 +4,7 @@
 
 **Strength:** Required when applicable.
 
-**Guidance:** DeepLinkingFeature owns validated pending requests; the receiving scene owns navigation. Remove a request after successful navigation or explicit dismissal.
+**Guidance:** For new apps, DeepLinkingFeature records requests to open a URL or notification action, not scheduled or merely delivered notifications. The receiving scene owns navigation; either scene can open a shared pending request. Remove it after successful navigation or explicit dismissal. Preserve existing history during migration.
 
 **Why:** The user can keep editing without losing the destination.
 
@@ -12,6 +12,6 @@
 
 [Run the deep-linking example](../examples/README.md).
 
-**Verify:** Test durable restoration, refusal, successful navigation, multiple requests, storage failure and scene isolation.
+**Verify:** Test request reception, durable restoration, refusal, successful navigation, multiple requests, storage failure and scene isolation.
 
 **Full rule, context and examples:** [Keep Screen Initializers Clean](../topics/15-keep-screen-initializers-clean.md). This card is a reading aid; apply the complete canonical section.

@@ -168,6 +168,13 @@ unsaved change, and comfortably tap every control without hitting its neighbour?
 
 Prefer explicit names and sequential steps over clever chains, nested ternaries and unexplained constants. A short function is not automatically clear; a longer function is not automatically complex. Introduce a helper, protocol or type when it owns a cohesive concept or a real dependency boundary—not for each line of code or a hypothetical future framework.
 
+Do not add a constants enum to a new app before it has a use. When a meaningful
+value such as a company website or support address is shared or repeated, define
+it once as a static property on a purpose-named enum; keep Feature-specific
+values with their Feature. Use bundle metadata for app identity when it is the
+source of truth, localization resources for localizable text, and never embed
+secrets in app constants.
+
 Keep one authoritative source of each piece of state. Derive values instead of storing redundant flags unless a measured cache needs them. Keep cache invalidation inputs explicit. Avoid broad rewrites when a small correction addresses the problem.
 
 After changing a code path, check its former callers, helpers, state and tests for code made redundant by that change. During implementation, remove confirmed unused code within the task's scope and update tests to exercise the current behaviour; read-only reviews report findings without changing code. Check target membership, framework callbacks, dynamic entry points and public or externally consumed APIs before treating an apparent absence of references as proof that code is unused; preserve anything whose use is uncertain.

@@ -2,6 +2,18 @@
   "version": 1,
   "rules": [
     {
+      "id": "CFA-SPEC-CONST-01",
+      "title": "Define shared constants when needed",
+      "section": "Make the Architecture Visible in the Folder Structure",
+      "applies": "A meaningful app-wide value is shared or repeated",
+      "strength": "Default",
+      "rule": "Do not create a constants container speculatively; define genuinely shared values once as static properties on a purpose-named enum, keeping Feature-specific values with their owner.",
+      "why": "A single definition avoids inconsistent copies while keeping related code easy to find.",
+      "verify": "Check repeated uses, ownership, bundle metadata, localization and that no secrets are embedded.",
+      "example": "An AppLinks enum holds the shared company website and support email address.",
+      "explanationIds": []
+    },
+    {
       "id": "CFA-SPEC-STRUCT-01",
       "title": "Keep the project structure understandable",
       "section": "Make the Architecture Visible in the Folder Structure",
@@ -156,9 +168,9 @@
       "section": "Keep Screen Initializers Clean",
       "applies": "Handling deep links or notification destinations",
       "strength": "Required when applicable",
-      "rule": "DeepLinkingFeature owns validated pending requests; the receiving scene owns navigation. Remove a request after successful navigation or explicit dismissal.",
+      "rule": "For new apps, DeepLinkingFeature records requests to open a URL or notification action, not scheduled or merely delivered notifications. The receiving scene owns navigation; either scene can open a shared pending request. Remove it after successful navigation or explicit dismissal. Preserve existing history during migration.",
       "why": "The user can keep editing without losing the destination.",
-      "verify": "Test durable restoration, refusal, successful navigation, multiple requests, storage failure and scene isolation.",
+      "verify": "Test request reception, durable restoration, refusal, successful navigation, multiple requests, storage failure and scene isolation.",
       "example": "A launch notification remains pending when a user chooses to keep editing; opening its page removes the request.",
       "explanationIds": []
     },

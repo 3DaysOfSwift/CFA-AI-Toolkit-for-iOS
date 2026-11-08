@@ -189,7 +189,7 @@ export async function inspect(project) {
         if (!exposure) findings.push(finding('unresolved-feature', 'warning', `${viewModelName} references AppModel.shared.${property}, but that property was not found.`, viewModelFile, lineOf(viewModel, match.index)));
         else if (!featureFile) findings.push(finding('feature-source-missing', 'warning', `${featureType} is exposed by AppModel but its source declaration was not found.`, appModelFile, exposure.line));
         if (exposure && featureTypeSuffix.test(featureType)) {
-          for (const local of viewModel.matchAll(/\b(?:let|var)\s+(\w+)\s*:\s*(?:any\s+)?(\w+Feature(?:API)?)\b/g)) {
+          for (const local of viewModel.matchAll(/\b(?:let|var)\s+(\w+)\s*:\s*(?:any\s+)?(\w+Feature(?:API)?)\b(?!\s*\.)/g)) {
             if (featurePropertyName(local[2]) === property && local[1] !== property) {
               findings.push(finding('feature-reference-name', 'warning', `${viewModelName} stores ${featureType} as ${local[1]}; use ${property}.`, viewModelFile, lineOf(viewModel, local.index)));
             }
@@ -202,8 +202,9 @@ export async function inspect(project) {
         }
       }
     }
-    if (!viewModel) findings.push(finding('view-model-missing', 'warning', `${name} has no adjacent ${viewModelName}.`, viewFile, 1));
-    else {
+    const structuralRoot = name === 'ContentView' && /\bTabView\s*\{/.test(body) && !/\b(?:AppModel|\w+Feature)\b/.test(members);
+    if (!viewModel && !structuralRoot) findings.push(finding('view-model-missing', 'warning', `${name} has no adjacent ${viewModelName}.`, viewFile, 1));
+    else if (viewModel) {
       if (!ownsViewModel) findings.push(finding('view-model-ownership', 'review', `${name} does not use the default inline ViewModel pattern. Verify private ownership; a detail View may construct its own State-backed ViewModel from selected value data.`, viewFile, lineOf(view, declaration.index)));
       if (!dependencies.length) findings.push(finding('feature-route-unresolved', 'review', `${viewModelName} has no visible AppModel.shared feature route; inspect whether this screen is presentation-only.`, viewModelFile, 1));
       if (!testFile) findings.push(finding('view-model-tests-missing', 'warning', `No ${testName} was found.`, viewModelFile, 1));

@@ -289,12 +289,12 @@ CFA gives every type of code a clear home:
 The path through one feature is:
 
 ```text
-View → dedicated ViewModel → Feature API → Feature → Repository
+View → dedicated ViewModel → Feature → Microservices
 ```
 
-Here is an illustrative CFA folder map. Every feature has its own View,
-ViewModel and feature code, so a
-developer can follow one feature without searching through unrelated files.
+Here is an illustrative CFA folder map. Each screen has its own ViewModel;
+Features represent capabilities and can serve multiple screens. A screen can
+also use more than one Feature.
 
 ```text
 Application
@@ -511,7 +511,7 @@ This section is for AI coding assistants (Codex, Claude Code, Cursor and others)
 **Rules to keep in every change**
 
 - Path: View → dedicated ViewModel → Feature → Repository. Views never receive ViewModels, Features, AppModel or repositories.
-- Each screen owns a private ViewModel, created inline with `@State`. The ViewModel defaults its narrow Feature dependencies from `AppModel.shared`.
+- Each screen owns a private ViewModel, created inline with `@State` by default. A detail View may initialise its own State-backed ViewModel from selected value data. The ViewModel defaults its narrow Feature dependencies from `AppModel.shared`.
 - Features are concrete `@MainActor @Observable` classes named `…Feature`, with no matching protocol. They are never called Managers.
 - Features keep domain data, operation state and errors as separate values. Never use a `LoadState` enum that carries all three.
 - Overlapping calls share one retained `Task<Void, Never>`, cleared in `defer`. Distinct edits are queued and never dropped.

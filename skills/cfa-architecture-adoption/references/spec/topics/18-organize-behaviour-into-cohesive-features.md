@@ -54,7 +54,8 @@ records and contexts inside the persistence boundary; preserve actor isolation.
 Use a `NetworkingManager` whenever the app makes network requests. It owns
 `URLSession` and wraps every session call; feature-specific API adapters decode
 responses and provide domain-oriented operations. AppModel may construct this
-manager as a local inside `live()`, but stores and exposes only Features.
+manager as a local inside `live()` and pass it to Features; it does not store or
+expose the manager as an AppModel property.
 
 For a new app, start with a simple stateless `NetworkingManager` value type when
 that satisfies the application's session and concurrency requirements. Inject

@@ -5,7 +5,6 @@ import Observation
 @Observable
 final class PurchasesFeature {
     private let store: any PurchaseStore
-    @ObservationIgnored private var updatesTask: Task<Void, Never>?
     private var entitlementRevision = 0
     private(set) var hasTrendsAccess = false
     private(set) var offer: PurchaseOffer?
@@ -16,8 +15,6 @@ final class PurchasesFeature {
     private(set) var notice: String?
 
     init(store: any PurchaseStore) { self.store = store }
-
-    deinit { updatesTask?.cancel() }
 
     @ObservationIgnored private var startupTask: Task<Void, Never>?
 
@@ -30,18 +27,11 @@ final class PurchasesFeature {
     }
 
     func prepare() async {
-        if updatesTask == nil {
-            let updates = store.updates()
-            updatesTask = Task { [weak self] in
-                for await _ in updates {
-                    guard !Task.isCancelled else { break }
-                    await self?.refreshEntitlement()
-                }
-            }
-        }
         await refreshEntitlement()
         await loadOffer()
     }
+
+    func transactionUpdates() -> AsyncStream<Void> { store.updates() }
 
     func loadOffer() async {
         guard !isLoadingOffer else { return }

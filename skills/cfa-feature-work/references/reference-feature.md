@@ -116,9 +116,12 @@ final class NotesFeature {
 final class AppModel {
     static let shared = AppModel.live()
     let notesFeature: NotesFeature
-    private var hasLaunched = false
+    private var hasLaunched: Bool
 
-    init(notesFeature: NotesFeature) { self.notesFeature = notesFeature }
+    init(notesFeature: NotesFeature) {
+        self.notesFeature = notesFeature
+        hasLaunched = false
+    }
     static func live() -> AppModel {
         let directory = URL.applicationSupportDirectory
         return AppModel(notesFeature: NotesFeature(repository: JSONNotesRepository(file: directory.appendingPathComponent("notes.json"))))

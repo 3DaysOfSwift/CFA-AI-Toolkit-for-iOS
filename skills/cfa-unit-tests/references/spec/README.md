@@ -16,6 +16,7 @@ The authoritative source is [cfa-specification.md](../cfa-specification.md). The
 
 ## Structured rule cards
 
+- [CFA-SPEC-CONST-01: Define shared constants when needed](rules/cfa-const-01.md)
 - [CFA-SPEC-STRUCT-01: Keep the project structure understandable](rules/cfa-struct-01.md)
 - [CFA-SPEC-UI-01: Keep business decisions in the Model](rules/cfa-ui-01.md)
 - [CFA-SPEC-UI-02: Each screen owns its ViewModel](rules/cfa-ui-02.md)

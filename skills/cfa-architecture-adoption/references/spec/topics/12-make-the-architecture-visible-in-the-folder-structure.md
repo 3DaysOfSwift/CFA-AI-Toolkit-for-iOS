@@ -162,7 +162,15 @@ A broadly reusable `String` extension belongs in `4 - Swift Extensions`.
 Shared generated or system strings that are not extensions belong with their
 purpose, for example `Shared System Strings` in the View layer for localized
 presentation text. App-wide system constants may live beside `AppModel` in a
-purpose-named folder. Keep generation paths and related lookup code together.
+purpose-named folder. Do not create a constants container speculatively when
+starting an app. When an app-wide value is genuinely shared or repeated, such as
+a company website or support address, define it once in a purpose-named enum
+using static properties, and reuse it to prevent inconsistent copies or typos.
+Keep Feature-specific constants with their owning Feature rather than placing
+everything in one generic container. Read an app name or version from the
+appropriate bundle metadata when that is the source of truth, and keep
+localizable display text in localization resources. Do not hard-code secrets.
+Keep generation paths and related lookup code together.
 Platform protocols follow the same behaviour-first ownership rule; they do not
 belong in a catch-all protocols folder. Never use `4 - Swift Extensions` as a
 general utilities folder.

@@ -67,6 +67,21 @@ test('does not flag a private AppModel listener task as a non-Feature property',
   assert.ok(!report.findings.some(item => item.code === 'app-model-non-feature-state'));
 });
 
+test('does not mistake a structural tab root or nested Feature value for a missing or renamed owner', async t => {
+  const root = await fixture(t, {
+    'Application/1 - View/Views/ContentView.swift': 'struct ContentView: View { var body: some View { TabView { PracticeView() } } }',
+    'Application/1 - View/Views/Practice/PracticeView.swift': 'struct PracticeView: View { @State private var viewModel = PracticeViewModel(); var body: some View { Text("Practice") } }',
+    'Application/1 - View/Views/Practice/PracticeViewModel.swift': 'final class PracticeViewModel { private var retryCommand: PracticeFeature.Command = .refresh; init(practiceFeature: PracticeFeature = AppModel.shared.practiceFeature) {} }',
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() }; let practiceFeature: PracticeFeature }',
+    'Application/2 - AppModel/Features/Practice/PracticeFeature.swift': 'final class PracticeFeature {}',
+    'ApplicationTests/ViewModelTests/PracticeViewModelTests.swift': 'struct PracticeViewModelTests {}',
+    'ApplicationTests/FeatureTests/PracticeFeatureTests.swift': 'struct PracticeFeatureTests {}'
+  });
+  const codes = (await inspect(root)).findings.map(item => item.code);
+  assert.ok(!codes.includes('view-model-missing'));
+  assert.ok(!codes.includes('feature-reference-name'));
+});
+
 test('flags SwiftData without a manager and direct URLSession calls', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',

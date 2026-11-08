@@ -371,7 +371,15 @@ A broadly reusable `String` extension belongs in `4 - Swift Extensions`.
 Shared generated or system strings that are not extensions belong with their
 purpose, for example `Shared System Strings` in the View layer for localized
 presentation text. App-wide system constants may live beside `AppModel` in a
-purpose-named folder. Keep generation paths and related lookup code together.
+purpose-named folder. Do not create a constants container speculatively when
+starting an app. When an app-wide value is genuinely shared or repeated, such as
+a company website or support address, define it once in a purpose-named enum
+using static properties, and reuse it to prevent inconsistent copies or typos.
+Keep Feature-specific constants with their owning Feature rather than placing
+everything in one generic container. Read an app name or version from the
+appropriate bundle metadata when that is the source of truth, and keep
+localizable display text in localization resources. Do not hard-code secrets.
+Keep generation paths and related lookup code together.
 Platform protocols follow the same behaviour-first ownership rule; they do not
 belong in a catch-all protocols folder. Never use `4 - Swift Extensions` as a
 general utilities folder.
@@ -1002,7 +1010,8 @@ records and contexts inside the persistence boundary; preserve actor isolation.
 Use a `NetworkingManager` whenever the app makes network requests. It owns
 `URLSession` and wraps every session call; feature-specific API adapters decode
 responses and provide domain-oriented operations. AppModel may construct this
-manager as a local inside `live()`, but stores and exposes only Features.
+manager as a local inside `live()` and pass it to Features; it does not store or
+expose the manager as an AppModel property.
 
 For a new app, start with a simple stateless `NetworkingManager` value type when
 that satisfies the application's session and concurrency requirements. Inject

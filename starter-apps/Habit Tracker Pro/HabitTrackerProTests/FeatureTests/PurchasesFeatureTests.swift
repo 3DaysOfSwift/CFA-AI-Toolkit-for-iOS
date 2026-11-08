@@ -1,13 +1,26 @@
+import Foundation
 import Testing
 @testable import HabitTrackerPro
 
 @Suite("Trends purchases", .timeLimit(.minutes(1)))
 @MainActor
 struct PurchasesFeatureTests {
-    @Test func transactionUpdatesRefreshAndRevokeAccess() async {
+    @Test func transactionUpdatesRefreshAndRevokeAccess() async throws {
         let store = TestPurchaseStore()
         let feature = PurchasesFeature(store: store)
-        await feature.prepare()
+        let habits = HabitsFeature(repository: InMemoryHabitsRepository())
+        let suiteName = "HabitTrackerPro.PurchaseUpdates.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let model = AppModel(todayFeature: TodayFeature(habitsFeature: habits),
+                             habitsFeature: habits,
+                             dayStreakFeature: DayStreakFeature(habitsFeature: habits),
+                             settingsFeature: SettingsFeature(defaults: defaults),
+                             purchasesFeature: feature,
+                             trendsFeature: TrendsFeature(habitsFeature: habits, purchasesFeature: feature))
+        model.applicationDidFinishLaunching()
+        model.applicationDidFinishLaunching()
+        await store.waitForFinishes(1)
         store.entitled = true
         store.updateContinuation?.yield(())
         await store.waitForFinishes(2)
