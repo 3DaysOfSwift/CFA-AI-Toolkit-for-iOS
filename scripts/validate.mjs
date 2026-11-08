@@ -136,8 +136,11 @@ export function validate(base=root,{source=true}={}) {
   if(source) {
     if(json(path.join(base,'package.json')).version!==manifest.version) throw Error('Version mismatch.');
     for(const name of cfaSkills) if(hash(path.join(base,'architecture/cfa-specification.md'))!==hash(path.join(base,`skills/${name}/references/cfa-specification.md`))) throw Error('Stale architecture copy. Run npm run sync.');
-    for(const dir of ['src','Documentation']) for(const file of files(path.join(base,'tools/architecture-dashboard',dir))) {
-      if(hash(path.join(base,'tools/architecture-dashboard',dir,file))!==hash(path.join(base,'skills/cfa-architecture-review/scripts/dashboard',dir,file))) throw Error(`Stale bundled tool: ${file}`);
+    for(const dir of ['src','Documentation']) {
+      const sourceFiles = files(path.join(base,'tools/architecture-dashboard',dir)).sort();
+      const bundledFiles = files(path.join(base,'skills/cfa-architecture-review/scripts/dashboard',dir)).sort();
+      if (JSON.stringify(sourceFiles) !== JSON.stringify(bundledFiles)) throw Error(`Bundled dashboard ${dir} files differ. Run npm run sync.`);
+      for(const file of sourceFiles) if(hash(path.join(base,'tools/architecture-dashboard',dir,file))!==hash(path.join(base,'skills/cfa-architecture-review/scripts/dashboard',dir,file))) throw Error(`Stale bundled tool: ${file}`);
     }
     if (process.platform === 'darwin') {
       verifyXcodeTemplateStructure(path.join(base, 'templates/Xcode/Project Templates/iOS/Application/CFA App.xctemplate'));
