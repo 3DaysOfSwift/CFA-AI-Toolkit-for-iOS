@@ -12,6 +12,6 @@
 
 **Explanation:** [Two callers. One refresh. No lost edits.](https://www.3daysofswiftconcurrency.com/cfa/explanation/overlapping-requests) · [Cancellation is a policy, not a button](https://www.3daysofswiftconcurrency.com/cfa/explanation/task-cancellation).
 
-**Verify:** Cancel the screen waiter and verify the request and another caller remain correct.
+**Verify:** Cancel the only screen waiter and verify the refresh completes and retains its result; also verify another caller remains correct when one of several waiters leaves.
 
 **Full rule, context and examples:** [Make Concurrency Behaviour Honest and Visible](../topics/20-make-concurrency-behaviour-honest-and-visible.md). This card is a reading aid; apply the complete canonical section.

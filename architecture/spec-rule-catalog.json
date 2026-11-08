@@ -265,7 +265,7 @@
       "strength": "Default",
       "rule": "Continue the shared refresh and retain successful data even when the screen that requested it leaves; later equivalent callers can join.",
       "why": "The user may return and benefit from completed work.",
-      "verify": "Cancel the screen waiter and verify the request and another caller remain correct.",
+      "verify": "Cancel the only screen waiter and verify the refresh completes and retains its result; also verify another caller remains correct when one of several waiters leaves.",
       "example": "A schedule refresh continues after the user leaves the screen and its result is available on return.",
       "explanationIds": [
         "overlapping-requests",
