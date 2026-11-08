@@ -42,7 +42,7 @@ Publishing allowances, validation rules, recommendation policies and completion 
 // ViewModel: forward intent and present the outcome.
 func publish() async {
     do {
-        try await stories.publish(draft)
+        try await storiesFeature.publish(draft)
         message = "Added to your library."
     } catch {
         self.error = error.localizedDescription
