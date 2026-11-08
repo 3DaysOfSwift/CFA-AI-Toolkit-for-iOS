@@ -521,7 +521,7 @@ This section is for AI coding assistants (Codex, Claude Code, Cursor and others)
 - `App.body` has a stable root. Database availability never gates the UI. SwiftData goes through `SwiftDataManager`, with a `@ModelActor` for non-trivial persistence work. `URLSession` goes through `NetworkingManager`.
 - Write `@MainActor` explicitly on Features, ViewModels and AppModel, and use actors for shared storage. Never use locks, GCD inside async code, or `@unchecked Sendable` as an escape hatch.
 - Name ViewModel methods for the work they do: `refresh()`, `save()`, `retry()`.
-- Tests: one suite per ViewModel, plus named `FeatureTests` for each Feature. Use an isolated AppModel graph, never `AppModel.shared`, and no sleeps.
+- Tests: one suite per ViewModel, plus named `FeatureTests` for each Feature. Use an isolated AppModel graph rather than `AppModel.shared`; avoid arbitrary sleeps and scheduler assumptions when coordinating tests.
 - Preserve an established product's design. Themes, footers and branding are defaults for new apps only.
 - Migrate the agreed scope to CFA and Swift Concurrency while preserving behavior; do not describe a feature checkpoint as a completed whole-app migration.
 - A change is complete only when the change gate and the specification's Review Checklist pass, with the build and tests run at the final commit.
