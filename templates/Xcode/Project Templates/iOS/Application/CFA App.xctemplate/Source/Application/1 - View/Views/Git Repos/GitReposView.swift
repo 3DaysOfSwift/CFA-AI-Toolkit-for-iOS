@@ -58,7 +58,7 @@ struct GitReposView: View {
                 Link(repo.fullName, destination: repo.repositoryURL)
                     .font(.headline)
                     .foregroundStyle(palette.primaryText)
-                Text(repo.summary)
+                Text(viewModel.summary(for: repo))
                     .font(.subheadline)
                     .foregroundStyle(palette.secondaryText)
                 Label("\(repo.stars) GitHub stars", systemImage: "star.fill")

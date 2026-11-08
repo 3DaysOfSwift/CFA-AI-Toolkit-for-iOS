@@ -3,11 +3,11 @@ nonisolated struct Repo: Codable, Identifiable, Hashable, Sendable {
     let id: Int
     let fullName: String
     let repositoryURL: URL
-    let summary: String
+    let summary: String?
     let stars: Int
     let updatedAt: Date
 
-    init(id: Int, fullName: String, repositoryURL: URL, summary: String, stars: Int, updatedAt: Date) {
+    init(id: Int, fullName: String, repositoryURL: URL, summary: String?, stars: Int, updatedAt: Date) {
         self.id = id
         self.fullName = fullName
         self.repositoryURL = repositoryURL
@@ -21,7 +21,7 @@ nonisolated struct Repo: Codable, Identifiable, Hashable, Sendable {
             id: response.id,
             fullName: response.fullName,
             repositoryURL: response.repositoryURL,
-            summary: response.description ?? "No repository description.",
+            summary: response.description,
             stars: response.stars,
             updatedAt: response.updatedAt
         )

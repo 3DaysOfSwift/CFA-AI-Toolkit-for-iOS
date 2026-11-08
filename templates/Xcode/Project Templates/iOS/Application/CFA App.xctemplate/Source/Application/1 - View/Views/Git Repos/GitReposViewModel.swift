@@ -18,6 +18,10 @@ final class GitReposViewModel {
         gitReposFeature.isRefreshing
     }
 
+    func summary(for repo: Repo) -> String {
+        repo.summary ?? "No repository description."
+    }
+
     var refreshFailureMessage: String? {
         gitReposFeature.refreshError == nil ? nil : "Could not refresh GitHub repositories. Please try again."
     }

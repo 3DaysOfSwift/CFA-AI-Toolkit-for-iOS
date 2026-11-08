@@ -31,6 +31,7 @@ struct GitReposFeatureTests {
         let feature = GitReposFeature(provider: TestGitReposProvider(result: [response]), cache: TestRepoCache())
         await feature.refresh()
         #expect(feature.repos.map(\.id) == [42])
+        #expect(feature.repos.first?.summary == nil)
         #expect(feature.refreshError == nil)
         #expect(!feature.isRefreshing)
     }
