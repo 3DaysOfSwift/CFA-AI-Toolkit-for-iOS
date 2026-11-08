@@ -80,7 +80,7 @@ test('Notes reference preserves failed drafts and serialises independent saves',
   } finally { fs.rmSync(directory, { recursive: true, force: true }); }
 });
 
-test('Notes reference continues an admitted save after its predecessor fails', { skip: process.platform !== 'darwin', timeout: 120000 }, () => {
+test('Notes reference preserves admitted overlapping saves after a predecessor fails', { skip: process.platform !== 'darwin', timeout: 120000 }, () => {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'cfa-notes-queue-'));
   try {
     const reference = fs.readFileSync(path.join(root, 'architecture/spec-examples/NotesReference.swift'), 'utf8');
@@ -117,12 +117,18 @@ extension NotesFeature { var auditSaveID: UUID? { lastSave?.id } }
         let firstID = feature.auditSaveID
         let second = Task { try await feature.save("second") }
         while feature.auditSaveID == firstID { await Task.yield() }
+        let secondID = feature.auditSaveID
+        let third = Task { try await feature.save("second") }
+        while feature.auditSaveID == secondID { await Task.yield() }
+        let savedWhileBlocked = await repository.saved
+        precondition(savedWhileBlocked.isEmpty)
         await repository.release()
         do { try await first.value; preconditionFailure("first save must fail") }
         catch is CocoaError {}
         try await second.value
+        try await third.value
         let saved = await repository.saved
-        precondition(saved == ["second"] && feature.notes.map(\\.text) == ["second"])
+        precondition(saved == ["second", "second"] && feature.notes.map(\\.text) == saved)
     }
 }`;
     const input = path.join(directory, 'NotesQueue.swift');
