@@ -34,8 +34,10 @@ not permission to ignore the covered behaviour.
 
 ## Translate Evidence into Requirements
 
-Create `MIGRATION_BEHAVIOUR_CONTRACT.md` in the application repository. Give
-each requirement a stable identifier such as `BEH-001` and express it as one
+Create `MIGRATION_BEHAVIOUR_CONTRACT.md` in the private working evidence folder
+outside the application repository and toolkit release source. Place a reviewed
+copy in the application repository only when the developer requests it. Give each
+requirement a stable identifier such as `BEH-001` and express it as one
 plain-English sentence describing an externally observable result.
 
 Prefer:
