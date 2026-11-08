@@ -1475,9 +1475,11 @@ or an equivalent View-tied call to signal application launch. The app delegate
 signals launch at the earliest applicable application lifecycle callback and
 starts the shared system refresh concurrently with UI preparation.
 
-A screen's `.task { await viewModel.refresh() }` is the normal, approved
-choice for that screen's own initial asynchronous work: SwiftUI starts it
-before the View appears. It does not guarantee that storage or network work
+A screen's `.task` is the normal, approved choice for that screen's own initial
+asynchronous work. If `refresh()` returns a Task handle, use
+`.task { await viewModel.refresh().value }` to wait for its result. If `refresh()`
+is itself an `async` method, use `.task { await viewModel.refresh() }` instead.
+SwiftUI starts the screen task before the View appears. It does not guarantee that storage or network work
 finishes before the first frame, so the screen must render an observed loading,
 cached, empty, or error state while the work continues. Use the app lifecycle,
 not a screen `.task`, for a shared refresh that must begin with launch or outlive
