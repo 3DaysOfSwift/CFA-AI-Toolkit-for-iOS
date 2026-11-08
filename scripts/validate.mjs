@@ -139,6 +139,7 @@ export function validate(base=root,{source=true}={}) {
       verifyTemplateOrientations(base);
     }
     execFileSync('python3', [path.join(base, 'scripts/sync-habit-template.py'), '--check'], { stdio: 'pipe' });
+    execFileSync('python3', [path.join(base, 'scripts/sync-day-streak-template.py'), '--check'], { stdio: 'pipe' });
   }
   return manifest;
 }
