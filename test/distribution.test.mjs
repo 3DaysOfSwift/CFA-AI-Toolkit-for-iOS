@@ -166,6 +166,18 @@ test('release validation rejects a stale product behaviour contract', t => {
  assert.throws(()=>validate(source,{source:false}),/Stale product behaviour contract: swift-concurrency-migration/);
 });
 
+test('source validation rejects stale bundled dashboard metadata', t => {
+ const source=path.join(sandbox(t),'source');
+ fs.cpSync(root,source,{recursive:true,filter: file => isReleasePath(path.relative(root,file))});
+ for (const name of ['README.md','package.json']) {
+  const bundled=path.join(source,'skills/cfa-architecture-review/scripts/dashboard',name);
+  const original=fs.readFileSync(bundled);
+  fs.appendFileSync(bundled,'\n');
+  assert.throws(()=>validate(source), new RegExp(`Stale bundled dashboard ${name.replace('.', '\\.')}`));
+  fs.writeFileSync(bundled,original);
+ }
+});
+
 test('portable skills carry the original CFA App icon without needing the source checkout', t => {
  const {dir,source}=release(t);
  const destination=path.join(dir,'customer');
