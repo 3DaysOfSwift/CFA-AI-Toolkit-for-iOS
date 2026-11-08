@@ -147,7 +147,7 @@ export async function inspect(project) {
     for (const callback of source.matchAll(/\bfunc\s+application\s*\([^{}]*\bdidFinishLaunchingWithOptions\b[^{}]*\)\s*(?:->\s*[^\{]+)?\s*\{/g)) {
       const start = callback.index + callback[0].length - 1;
       const body = braceBody(source, start);
-      for (const task of body.matchAll(/\bTask\s*(?:\.\s*detached\s*)?\{/g)) {
+      for (const task of body.matchAll(/\bTask\s*(?:<[^{}\n]*>\s*)?(?:\.\s*detached\s*)?(?:\([^{}]*\)\s*)?\{/g)) {
         const taskBody = braceBody(body, task.index + task[0].length - 1);
         if (/\bapplicationDidFinishLaunching\s*\(/.test(taskBody)) {
           findings.push(finding('scheduled-app-model-launch', 'review', 'The launch callback appears to signal AppModel from a Task. Check whether the app-wide startup signal should be called synchronously; Feature-owned asynchronous work can still start its own tasks.', file, lineOf(source, start + 1 + task.index)));

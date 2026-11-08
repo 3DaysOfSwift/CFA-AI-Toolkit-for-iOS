@@ -136,6 +136,17 @@ test('identifies a launch signal scheduled inside a delegate Task without flaggi
   assert.equal(findings[0].line, 3);
 });
 
+test('identifies priority and explicitly typed Tasks scheduling the launch signal', async t => {
+  const root = await fixture(t, {
+    'Application/PriorityDelegate.swift': 'class Delegate { func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { Task(priority: .high) { AppModel.shared.applicationDidFinishLaunching() }; return true } }',
+    'Application/DetachedDelegate.swift': 'class Delegate { func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { Task.detached(priority: .background) { await AppModel.shared.applicationDidFinishLaunching() }; return true } }',
+    'Application/TypedDelegate.swift': 'class Delegate { func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { Task<Void, Never> { AppModel.shared.applicationDidFinishLaunching() }; return true } }',
+    'Application/DirectDelegate.swift': 'class Delegate { func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { AppModel.shared.applicationDidFinishLaunching(); Task(priority: .high) { await refresh() }; return true } }'
+  });
+  const files = (await inspect(root)).findings.filter(item => item.code === 'scheduled-app-model-launch').map(item => item.file).sort();
+  assert.deepEqual(files, ['Application/DetachedDelegate.swift', 'Application/PriorityDelegate.swift', 'Application/TypedDelegate.swift']);
+});
+
 test('a live factory in an extension is not reported as definitely absent', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel {}',
