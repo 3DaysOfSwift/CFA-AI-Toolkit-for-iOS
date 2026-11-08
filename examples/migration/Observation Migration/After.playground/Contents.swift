@@ -10,12 +10,11 @@ PlaygroundPage.current.needsIndefiniteExecution = true
 @MainActor @Observable
 final class HabitFeature {
     private(set) var completedDays = 0
-    func completeToday() { completedDays += 1 }
+    func recordCompletedDay() { completedDays += 1 }
 }
 
 // MARK: - Test fixtures
-// Test-only notification counter.
-// allows the callbacks to record notifications safely.
+// Test-only counter records observation callbacks safely.
 final class NotificationCount: @unchecked Sendable {
     private let lock = NSLock()
     private var value = 0
@@ -29,13 +28,13 @@ func runExample() {
     let feature = HabitFeature()
     let count = NotificationCount()
     withObservationTracking { _ = feature.completedDays } onChange: { count.record() }
-    feature.completeToday()
-    feature.completeToday()
+    feature.recordCompletedDay()
+    feature.recordCompletedDay()
     precondition(feature.completedDays == 2 && count.read() == 1)
 
     // An observer that needs another notification registers its next read.
     withObservationTracking { _ = feature.completedDays } onChange: { count.record() }
-    feature.completeToday()
+    feature.recordCompletedDay()
     precondition(feature.completedDays == 3 && count.read() == 2)
     print("Passed: Observation tracking is one-shot and can be registered again.")
 }

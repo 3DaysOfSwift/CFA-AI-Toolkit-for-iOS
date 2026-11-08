@@ -9,12 +9,11 @@ PlaygroundPage.current.needsIndefiniteExecution = true
 @MainActor
 final class LegacyHabitModel: ObservableObject {
     @Published private(set) var completedDays = 0
-    func completeToday() { completedDays += 1 }
+    func recordCompletedDay() { completedDays += 1 }
 }
 
 // MARK: - Test fixtures
-// Test-only notification counter.
-// allows the callbacks to record notifications safely.
+// Test-only counter records observation callbacks safely.
 final class NotificationCount: @unchecked Sendable {
     private let lock = NSLock()
     private var value = 0
@@ -28,8 +27,8 @@ func runExample() {
     let model = LegacyHabitModel()
     let count = NotificationCount()
     let subscription = model.objectWillChange.sink { count.record() }
-    model.completeToday()
-    model.completeToday()
+    model.recordCompletedDay()
+    model.recordCompletedDay()
     precondition(model.completedDays == 2 && count.read() == 2)
     withExtendedLifetime(subscription) {}
     print("Passed: Combine publishes both updates.")

@@ -6,7 +6,7 @@ A MainActor ObservableObject publishes changes with Combine.
 
 ## Behaviour to preserve
 
-Both models reach two completed days. Combine notifies twice; one Observation tracking registration notifies once.
+Both models record two completed days through separate calls. Combine notifies twice; one Observation tracking registration notifies once.
 
 ## Migration
 
