@@ -143,6 +143,31 @@ struct PracticeViewModelTests {
         #expect(model.feedback.contains("One point"))
     }
 
+    @Test func returningToAnEarlierDifficultyKeepsTheLastSelection() async throws {
+        let env = TestEnvironment()
+        let name = "TimesThirtyTests.\(UUID())"
+        let defaults = try #require(UserDefaults(suiteName: name))
+        defer { defaults.removePersistentDomain(forName: name) }
+        let model = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
+                                      settingsFeature: SettingsFeature(defaults: defaults))
+        try await env.start()
+        await env.repository.pauseNextSave()
+        let first = model.perform(.difficulty(.gentle))
+        for _ in 0..<10_000 {
+            if await env.repository.isWaiting() { break }
+            await Task.yield()
+        }
+        #expect(await env.repository.isWaiting())
+        let second = model.perform(.difficulty(.challenge))
+        let third = model.perform(.difficulty(.gentle))
+        await env.repository.resumeSave()
+        await first.value
+        await second.value
+        await third.value
+        #expect(model.session?.difficulty == .gentle)
+        #expect(await env.repository.saveCount == 4) // start + three selections
+    }
+
     @Test func successfulRefreshClearsAnEarlierLoadError() async throws {
         let env = TestEnvironment()
         let name = "TimesThirtyTests.\(UUID())"

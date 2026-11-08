@@ -8,7 +8,7 @@ final class PracticeViewModel {
     private let settingsFeature: SettingsFeature
     private(set) var errorMessage: String?
     @ObservationIgnored private var queuedCommandTask: Task<Void, Never>?
-    @ObservationIgnored private var pendingCommandTasks: [PracticeFeature.Command: Task<Void, Never>] = [:]
+    @ObservationIgnored private var lastQueuedCommand: PracticeFeature.Command?
     @ObservationIgnored private var lastCommandID: UUID?
     @ObservationIgnored private var refreshTask: Task<Void, Never>?
     @ObservationIgnored private var automaticAdvanceTask: Task<Void, Never>?
@@ -73,16 +73,16 @@ final class PracticeViewModel {
 
     @discardableResult
     func perform(_ command: PracticeFeature.Command) -> Task<Void, Never> {
-        if let task = pendingCommandTasks[command] { return task }
+        if lastQueuedCommand == command, let queuedCommandTask { return queuedCommandTask }
         let predecessor = queuedCommandTask
         let identifier = UUID()
         let task = Task { @MainActor in
             await predecessor?.value
             defer {
-                pendingCommandTasks[command] = nil
                 if lastCommandID == identifier {
                     queuedCommandTask = nil
                     lastCommandID = nil
+                    lastQueuedCommand = nil
                 }
             }
             errorMessage = nil
@@ -91,7 +91,7 @@ final class PracticeViewModel {
             catch { errorMessage = error.localizedDescription }
         }
         queuedCommandTask = task
-        pendingCommandTasks[command] = task
+        lastQueuedCommand = command
         lastCommandID = identifier
         return task
     }
