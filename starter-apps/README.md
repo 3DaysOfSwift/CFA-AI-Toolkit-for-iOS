@@ -34,5 +34,5 @@ the editable sources of their native templates. Maintain one source, not two:
 
 Use each generation command with `--check` to detect stale template output.
 Do not hand-edit generated template sources. The Xcode template installer installs
-only the three `.xctemplate` folders, not these projects. Both sections remain
-included in toolkit packages; this reorganisation does not add another installer.
+only the three `.xctemplate` folders. Toolkit packages include the starter
+projects separately.
