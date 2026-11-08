@@ -97,6 +97,20 @@ struct GitReposFeatureTests {
         #expect(!feature.isRefreshing)
     }
 
+    @Test func refreshContinuesWhenItsOnlyCallerLeaves() async throws {
+        let url = try #require(URL(string: "https://example.org"))
+        let provider = GatedReposProvider(url: url)
+        let feature = GitReposFeature(provider: provider, cache: TestRepoCache())
+        let caller = Task { @MainActor in await feature.refresh() }
+        await provider.waitForFirstRequest()
+        caller.cancel()
+        await provider.releaseFirstRequest()
+        await caller.value
+        #expect(await provider.calls == 1)
+        #expect(feature.repos.map(\.id) == [1])
+        #expect(!feature.isRefreshing)
+    }
+
     @Test func sharedRefreshAndOptionalCacheStayIndependent() async throws {
         let url = try #require(URL(string: "https://example.org"))
         let provider = GatedReposProvider(url: url)
