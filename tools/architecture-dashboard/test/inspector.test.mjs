@@ -42,6 +42,7 @@ test('reports a missing named feature test file', async t => {
   const report = await inspect(root);
   assert.deepEqual(report.findings.map(item => item.code), ['feature-tests-missing']);
   assert.match(report.findings[0].message, /SettingsFeatureTests.swift/);
+  assert.match(report.findings[0].message, /scanned directory/);
 });
 
 test('does not mistake composition locals for AppModel properties', async t => {
@@ -316,6 +317,7 @@ test('reports missing ownership and tests without pretending to verify semantics
   assert.deepEqual(report.findings.map(item => item.code), [
     'view-model-ownership', 'feature-route-unresolved', 'view-model-tests-missing'
   ]);
+  assert.match(report.findings.find(item => item.code === 'view-model-tests-missing').message, /scanned directory/);
   assert.match(report.method, /Lexical/);
   assert.match(report.limitations.join(' '), /not type-check/);
 });
