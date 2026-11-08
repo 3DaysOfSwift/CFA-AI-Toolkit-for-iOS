@@ -118,8 +118,11 @@ extension NotesFeature { var auditSaveID: UUID? { lastSave?.id } }
         let second = Task { try await feature.save("second") }
         while feature.auditSaveID == firstID { await Task.yield() }
         let secondID = feature.auditSaveID
-        let third = Task { try await feature.save("second") }
+        let third = Task { try await feature.save("third") }
         while feature.auditSaveID == secondID { await Task.yield() }
+        let thirdID = feature.auditSaveID
+        let fourth = Task { try await feature.save("second") }
+        while feature.auditSaveID == thirdID { await Task.yield() }
         let savedWhileBlocked = await repository.saved
         precondition(savedWhileBlocked.isEmpty)
         await repository.release()
@@ -127,8 +130,9 @@ extension NotesFeature { var auditSaveID: UUID? { lastSave?.id } }
         catch is CocoaError {}
         try await second.value
         try await third.value
+        try await fourth.value
         let saved = await repository.saved
-        precondition(saved == ["second", "second"] && feature.notes.map(\\.text) == saved)
+        precondition(saved == ["second", "third", "second"] && feature.notes.map(\\.text) == saved)
     }
 }`;
     const input = path.join(directory, 'NotesQueue.swift');
