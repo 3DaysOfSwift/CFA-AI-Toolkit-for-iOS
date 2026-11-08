@@ -159,6 +159,13 @@ test('release validation rejects a stale bundled reference Feature', t => {
  assert.throws(()=>validate(source,{source:false}),/Stale reference Feature: cfa-app-creation/);
 });
 
+test('release validation rejects a stale product behaviour contract', t => {
+ const {source}=release(t);
+ const contract=path.join(source,'skills/swift-concurrency-migration/references/product-behaviour-contract.md');
+ fs.appendFileSync(contract,'\nOutdated guidance.\n');
+ assert.throws(()=>validate(source,{source:false}),/Stale product behaviour contract: swift-concurrency-migration/);
+});
+
 test('portable skills carry the original CFA App icon without needing the source checkout', t => {
  const {dir,source}=release(t);
  const destination=path.join(dir,'customer');
