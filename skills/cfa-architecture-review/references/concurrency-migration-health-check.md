@@ -457,6 +457,12 @@ For each relevant operation, inspect:
   authentication change that requires checking the actual session state.
 - State authority: which object accepts results and controls mutations? Look for
   independent writers or conflicting cached state, not harmless value snapshots.
+- Detail navigation in CFA: trace the selected immutable snapshot from the list
+  to the destination's own ViewModel. Check two independently identified
+  destinations sharing the same Feature. Refresh the source and omit one
+  selected item. Both destinations should keep their selection and stay open.
+  Where the detail offers explicit refresh, check that it updates only its own
+  display. Assess intentional live updates against the product requirements.
 - Suspension: what assumptions can change during await? Trace validation and
   commit, actor reentrancy, stale results and cleanup of replaced task handles.
 - Optional download caches: when CFA applies, verify that a slow restore does
