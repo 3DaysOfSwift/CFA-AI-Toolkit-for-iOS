@@ -162,6 +162,10 @@ test('reports invalid Swift source instead of scanning replacement characters', 
     {file:'Invalid.swift', reason:'Source is not valid UTF-8'},
     {file:'Null.swift', reason:'Source contains a null byte'}
   ]);
+  await fs.writeFile(path.join(root, 'Invalid.swift'), Buffer.from([0xfe]));
+  const changed = await analyse(root);
+  assert.deepEqual(changed.scope.skipped, report.scope.skipped);
+  assert.notEqual(changed.sourceFingerprint, report.sourceFingerprint);
 });
 
 test('preserves evidence line numbers and comment boundaries for mixed line endings', () => {

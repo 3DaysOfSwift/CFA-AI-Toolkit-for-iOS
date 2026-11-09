@@ -88,7 +88,7 @@ const excluded = new Set(['.git', '.build', '.swiftpm', 'Pods', 'Carthage', 'nod
 export async function analyse(root, { includeTests = false, excludedOutput } = {}) {
   root = await fs.realpath(root);
   if (!(await fs.stat(root)).isDirectory()) throw new Error('Repository path must be a directory.');
-  const files = [], skipped = [], excludedTestDirectories = [], buildDefinitions = [], symbolicLinks = [];
+  const files = [], skipped = [], excludedTestDirectories = [], buildDefinitions = [], symbolicLinks = [], invalidSourceHashes = [];
   const decoder = new TextDecoder('utf-8', {fatal: true, ignoreBOM: true});
   async function walk(directory, scanSwift = true) {
     for (const entry of (await fs.readdir(directory, { withFileTypes: true })).sort((a,b) => a.name.localeCompare(b.name))) {
@@ -125,10 +125,12 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
             source = decoder.decode(bytes);
           } catch {
             skipped.push({file:relative, reason:'Source is not valid UTF-8'});
+            invalidSourceHashes.push([relative, hash]);
             continue;
           }
           if (source.includes('\0')) {
             skipped.push({file:relative, reason:'Source contains a null byte'});
+            invalidSourceHashes.push([relative, hash]);
             continue;
           }
           files.push({ path: relative, hash, lineCount: source.split(/\r\n|\n|\r/).length, ...scanSource(source, relative) });
@@ -141,6 +143,7 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
   if (excludedTestDirectories.length) fingerprint.update(JSON.stringify(excludedTestDirectories));
   if (buildDefinitions.length) fingerprint.update(JSON.stringify(buildDefinitions));
   if (skipped.length) fingerprint.update(JSON.stringify(skipped));
+  if (invalidSourceHashes.length) fingerprint.update(JSON.stringify(invalidSourceHashes));
   if (symbolicLinks.length) fingerprint.update(JSON.stringify(symbolicLinks));
   const sourceFingerprint = fingerprint.digest('hex');
   return { schemaVersion: 3, sourceFingerprint, buildDefinitions: buildDefinitions.map(([file, hash]) => ({path: file, hash})), dashboard: dashboard(files), project: path.basename(root), generatedAt: new Date().toISOString(),
