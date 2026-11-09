@@ -78,6 +78,8 @@ export function nextWork(report, review, limit = 8) {
   const tasks = new Map((review.taskSites || []).map(item => [item.siteId, item]));
   const operations = new Map((review.operations || []).map(item => [item.id, item]));
   const pendingFiles = pendingSourceFiles(report, review);
+  const nextFiles = pendingFiles.slice(0, limit);
+  const nextFilePaths = new Set(nextFiles);
   const pendingTypes = pendingTypeReviews(review);
   const pendingEntries = inventoryCandidates(report).filter(site => !entries.has(site.id));
   const sites = taskCandidates(report);
@@ -112,7 +114,12 @@ export function nextWork(report, review, limit = 8) {
     pendingEntryPoints: pendingEntries.length,
     pendingTaskSites: pendingTasks.length,
     pendingOperations: pendingOperations.length,
-    nextFiles: pendingFiles.slice(0, limit),
+    nextFiles,
+    nextFileReviews: (review.fileReviews || [])
+      .filter(item => nextFilePaths.has(item.file))
+      .map(({file, status, reason, verification, evidence}) => ({
+        file, status, reason, verification, evidence: evidenceLocations(evidence)
+      })),
     nextTypes: pendingTypes.slice(0, limit).map(({name, file, line, status, reason}) => ({name, file, line, status, reason})),
     nextEntryPoints: pendingEntries.slice(0, limit),
     nextTaskSites: pendingTasks.slice(0, limit),

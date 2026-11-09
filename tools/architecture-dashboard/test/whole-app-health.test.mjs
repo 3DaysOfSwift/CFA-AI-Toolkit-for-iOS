@@ -39,6 +39,23 @@ test('coverage requires source files and detected entry points, without individu
   }
 });
 
+test('resuming a pending file review preserves its reason and source locations', () => {
+  const review = complete();
+  review.fileReviews = [{
+    file:'App.swift', status:'investigate', reason:'Trace who starts the listener.',
+    verification:'Read the launch callback.',
+    evidence:[{file:'App.swift', line:2, endLine:2, excerpt:'Fixture source'}]
+  }];
+  const work = nextWork(report, review);
+  assert.deepEqual(work.nextFiles, ['App.swift']);
+  assert.deepEqual(work.nextFileReviews, [{
+    file:'App.swift', status:'investigate', reason:'Trace who starts the listener.',
+    verification:'Read the launch callback.',
+    evidence:[{file:'App.swift', line:2, endLine:2}]
+  }]);
+  assert.deepEqual(nextWork(report, review, 0).nextFileReviews, []);
+});
+
 test('shows target-membership evidence to reconcile when resuming a review', () => {
   const inventory = structuredClone(report);
   Object.assign(inventory.scope, {
