@@ -120,3 +120,21 @@ test('surfaces local Swift package manifests as build definitions and keeps them
   await fs.appendFile(path.join(folder, manifests[1]), '// Changed package configuration\n');
   assert.notEqual((await analyse(root)).sourceFingerprint, before.sourceFingerprint);
 });
+
+test('fingerprints build settings under test-named folders even when Swift sources there are excluded', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cfa-build-settings-'));
+  t.after(() => fs.rm(root, {recursive:true, force:true}));
+  await fs.mkdir(path.join(root, 'AppTests'));
+  await fs.writeFile(path.join(root, 'App.swift'), 'struct App {}');
+  await fs.writeFile(path.join(root, 'AppTests', 'Test.swift'), 'struct Test {}');
+  const configuration = path.join(root, 'AppTests', 'Shared.xcconfig');
+  await fs.writeFile(configuration, 'SWIFT_VERSION = 5.0\n');
+  const before = await analyse(root);
+  assert.deepEqual(before.files.map(file => file.path), ['App.swift']);
+  assert.deepEqual(before.scope.excludedTestDirectories, ['AppTests']);
+  assert.ok(before.scope.buildDefinitionPaths.includes('AppTests/Shared.xcconfig'));
+  await fs.writeFile(configuration, 'SWIFT_VERSION = 6.0\n');
+  const after = await analyse(root);
+  assert.deepEqual(after.files, before.files);
+  assert.notEqual(after.sourceFingerprint, before.sourceFingerprint);
+});

@@ -89,22 +89,23 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
   root = await fs.realpath(root);
   if (!(await fs.stat(root)).isDirectory()) throw new Error('Repository path must be a directory.');
   const files = [], skipped = [], excludedTestDirectories = [], buildDefinitions = [];
-  async function walk(directory) {
+  async function walk(directory, scanSwift = true) {
     for (const entry of (await fs.readdir(directory, { withFileTypes: true })).sort((a,b) => a.name.localeCompare(b.name))) {
       const absolute = path.join(directory, entry.name);
       if (entry.isSymbolicLink()) continue;
       if (entry.isDirectory()) {
         if (excluded.has(entry.name) || entry.name.startsWith('.') || absolute === excludedOutput) continue;
-        if (!includeTests && /(?:^tests?$|Tests?$)/.test(entry.name)) {
+        if (scanSwift && !includeTests && /(?:^tests?$|Tests?$)/.test(entry.name)) {
           excludedTestDirectories.push(path.relative(root, absolute).split(path.sep).join('/'));
+          await walk(absolute, false);
           continue;
         }
-        await walk(absolute);
+        await walk(absolute, scanSwift);
       } else if (entry.isFile() && /(?:\.(?:pbxproj|xcconfig|xcscheme|entitlements)$|Info\.plist$|^(?:contents\.xcworkspacedata|Package\.resolved)$)/.test(entry.name)) {
         const relative = path.relative(root, absolute).split(path.sep).join('/');
         const hash = createHash('sha256').update(await fs.readFile(absolute)).digest('hex');
         buildDefinitions.push([relative, hash]);
-      } else if (entry.isFile() && entry.name.endsWith('.swift')) {
+      } else if (scanSwift && entry.isFile() && entry.name.endsWith('.swift')) {
         const relative = path.relative(root, absolute).split(path.sep).join('/');
         if ((await fs.stat(absolute)).size > 2_000_000) { skipped.push({ file: relative, reason: 'Over 2 MB source limit' }); continue; }
         const source = await fs.readFile(absolute, 'utf8');
