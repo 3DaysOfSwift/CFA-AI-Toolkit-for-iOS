@@ -291,6 +291,10 @@ skill from that toolkit before changing the project.
   the agreed CFA and Swift Concurrency migration and supported platforms.
   Fix confirmed defects within scope, protect the intended behaviour with
   tests, and record any necessary platform-driven differences.
+- Give each ViewModel its own named test file and suite under View model tests.
+  Give each concrete Feature a named API test file under FeatureTests. When
+  adding or moving tests, verify membership in the intended test target and
+  keep test sources out of the production app target. Run the affected tests.
 - Do not call an app CFA merely because it has numbered folders. Trace real
   ownership, AppModel composition, and the focused tests for the changed work.
 

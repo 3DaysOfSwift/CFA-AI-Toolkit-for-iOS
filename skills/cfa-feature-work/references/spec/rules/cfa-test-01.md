@@ -4,7 +4,7 @@
 
 **Strength:** Required.
 
-**Guidance:** Give each ViewModel and concrete Feature its own named test file. Test observable behaviour with isolated dependencies and keep AppModel tests separate from the production shared instance. Await Feature commands directly. Verify that equivalent requests share an outcome and separately admitted commands complete in order with individual outcomes. Cover cancellation, stale results and failure recovery where they affect correctness.
+**Guidance:** Give each ViewModel its own named test file and suite under View model tests. Give each concrete Feature a named API test file under FeatureTests. Test observable behaviour with isolated dependencies and keep AppModel tests separate from the production shared instance. Await Feature commands directly. Verify that equivalent requests share an outcome and separately admitted commands complete in order with individual outcomes. Cover cancellation, stale results and failure recovery where they affect correctness.
 
 **Why:** Tests establish behaviour rather than reproduce implementation details.
 
