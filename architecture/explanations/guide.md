@@ -20,6 +20,8 @@ to the skill directory. With Node.js 20+, run:
     node scripts/explanations.mjs lookup CFA-SPEC-TASK-01
 
 It returns the primary note, classification and verified public links, if any.
+A canonical rule lookup can include additional articles named on its rule card.
+Those links use each article's current publication record in the catalogue.
 When a rule card offers several explanations, use the article that addresses
 the developer's question and confirm its eligibility in the catalogue.
 Existing explanation keys such as `CFA-TASK-01` still work.

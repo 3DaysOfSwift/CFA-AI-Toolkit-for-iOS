@@ -88,6 +88,20 @@ test('lookup deduplicates links and never adds unrelated topics', () => {
   assert.ok(lookup(catalogue, 'readability').links.every(link => link.url !== live.url));
 });
 
+test('rule-specific links reuse publication status and stay scoped to the rule', () => {
+  const catalogue = read();
+  const topic = catalogue.topics.find(item => item.id === 'overlapping-requests');
+  const related = catalogue.topics.find(item => item.id === 'unstructured-tasks');
+  const rule = 'CFA-SPEC-TASK-01';
+  assert.ok(lookup(validate(catalogue), rule).links.some(link => link.url === related.publication.url));
+  assert.ok(lookup(catalogue, topic.id).links.every(link => link.url !== related.publication.url));
+  related.publication = { ...related.publication, status: 'withdrawn', url: null,
+    verifiedOn: null, verificationEvidence: null };
+  assert.deepEqual(lookup(validate(catalogue), rule).links.map(link => link.url), [topic.publication.url]);
+  topic.ruleRelatedTopics[rule] = ['unknown-topic'];
+  assert.throws(() => validate(catalogue), /Invalid related explanation topics/);
+});
+
 test('unpublished and withdrawn resources cannot leak public URLs', () => {
   for (const status of ['planned', 'withdrawn']) {
     assert.throws(() => validatePublication({ ...live, status }), /Unpublished/);
@@ -177,7 +191,7 @@ test('standalone skill helper works after copying only one skill, without reposi
     const result = JSON.parse(output);
     assert.equal(result.id, topic);
     assert.ok(fs.readFileSync(path.join(skill, 'references/explanations', result.note), 'utf8').includes('## Documented rationale'));
-    assert.equal(result.links[0].url, read().topics.find(item => item.id === topic).publication.url);
+    assert.deepEqual(result.links, lookup(validate(read()), key).links);
   }
   assert.throws(() => execFileSync(process.execPath, [path.join(skill, 'scripts/explanations.mjs'), 'audit'],
     { cwd: temp, stdio: 'pipe' }), /Audit requires canonical/);
