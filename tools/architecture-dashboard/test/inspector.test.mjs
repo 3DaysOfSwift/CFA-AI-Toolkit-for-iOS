@@ -446,13 +446,28 @@ test('a SwiftData import in tests is a target-membership review, not an app defe
 test('flags conditional database startup presentation in App.body', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
-    'Application/HabitApp.swift': 'import SwiftUI\nstruct Habit: SwiftUI.App { var body: some SwiftUI.Scene { WindowGroup { if ready { RootTabView().modelContainer(container) } else { ProgressView("Opening") } } } }'
+    'Application/HabitApp.swift': `import SwiftUI
+struct Habit: SwiftUI.App {
+  var body: some SwiftUI.Scene {
+    WindowGroup {
+      #if DEBUG
+      if ready {
+        RootTabView().modelContainer(container)
+      } else {
+        ProgressView("Opening")
+      }
+      #endif
+    }
+  }
+}`
   });
   const findings = (await inspect(root)).findings;
-  const codes = findings.map(item => item.code);
-  assert.ok(codes.includes('conditional-app-body'));
-  assert.ok(codes.includes('app-startup-presentation'));
-  assert.ok(findings.filter(item => ['conditional-app-body', 'app-startup-presentation'].includes(item.code)).every(item => item.severity === 'review'));
+  const conditional = findings.find(item => item.code === 'conditional-app-body');
+  const presentation = findings.find(item => item.code === 'app-startup-presentation');
+  assert.equal(conditional?.severity, 'review');
+  assert.equal(conditional?.line, 6);
+  assert.equal(presentation?.severity, 'review');
+  assert.equal(presentation?.line, 7);
 });
 
 test('flags storage-gated conventional roots as review hints', async t => {

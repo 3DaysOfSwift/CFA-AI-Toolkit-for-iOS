@@ -357,9 +357,12 @@ export async function inspect(project) {
       const members = braceBody(source, start - 1);
       const sceneBody = /\bvar\s+body\s*:\s*some\s+(?:SwiftUI\s*\.\s*)?Scene\s*\{/.exec(members);
       if (sceneBody) {
-        const body = braceBody(members, sceneBody.index + sceneBody[0].length - 1);
-        if (/\b(?:if|switch)\b/.test(body)) findings.push(finding('conditional-app-body', 'review', 'App.body contains a conditional. Check whether it gates root navigation on storage or an unrelated condition.', file, lineOf(source, start + sceneBody.index)));
-        if (/\.modelContainer\s*\(|\b(?:ProgressView|ContentUnavailableView)\s*\(/.test(body)) findings.push(finding('app-startup-presentation', 'review', 'App.body contains storage or loading presentation. Check whether database availability gates the interface; a lexical match alone cannot establish this.', file, lineOf(source, start + sceneBody.index)));
+        const bodyStart = sceneBody.index + sceneBody[0].length;
+        const body = braceBody(members, bodyStart - 1);
+        const conditional = /(?<!#)\b(?:if|switch)\b/.exec(body);
+        const presentation = /\.modelContainer\s*\(|\b(?:ProgressView|ContentUnavailableView)\s*\(/.exec(body);
+        if (conditional) findings.push(finding('conditional-app-body', 'review', 'App.body contains a conditional. Check whether it gates root navigation on storage or an unrelated condition.', file, lineOf(source, start + bodyStart + conditional.index)));
+        if (presentation) findings.push(finding('app-startup-presentation', 'review', 'App.body contains storage or loading presentation. Check whether database availability gates the interface; a lexical match alone cannot establish this.', file, lineOf(source, start + bodyStart + presentation.index)));
       }
     }
     if (!isViewFile) {
