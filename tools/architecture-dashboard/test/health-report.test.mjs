@@ -149,6 +149,17 @@ test('a confirmed problem keeps the verdict red even with a high score', () => {
   assert.match(renderHealthReport({...report, qualitativeOnly:true}), /class="number">×</);
 });
 
+test('an unresolved architecture assessment cannot render a negative conflict verdict', () => {
+  const data = {
+    app:'App', summary:'Summary', verdict:'Review', scope:'App', conclusion:'Conclusion',
+    architecturalConflict:false, criteria:[{title:'Ownership',detail:'Checked',status:'pass'}],
+    operations:[{title:'Save',checks:[{dimension:'clarity',status:'unresolved'}]}]
+  };
+  assert.match(renderHealthReport(data), /Frankenstein architecture detected.*Inconclusive/);
+  data.operations[0].checks[0].status = 'pass';
+  assert.match(renderHealthReport(data), /Frankenstein architecture detected.*No architectural conflicts/);
+});
+
 test('requires a visible problem when the structural verdict reports a conflict', () => {
   const data = {
     app:'App', summary:'Two workflows compete for shared state', verdict:'Needs attention',

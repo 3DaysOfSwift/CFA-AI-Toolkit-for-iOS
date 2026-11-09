@@ -37,8 +37,17 @@ export function renderHealthReport(data, iconData = '') {
   if (hasOperationProblem && !data.criteria.some(criterion => criterion.status === 'problem')) {
     throw Error('Include confirmed operation problems in the report criteria before rendering.');
   }
+  const workflows = data.operations || [];
+  const architectureUnresolved = !workflows.length || workflows.some(operation =>
+    ['investigate', 'unassessed'].includes(checkOutcome(operation.checks || [], 'clarity')) ||
+    operation.unknowns?.length || operation.steps?.some(step => step.relation === 'unknown')
+  );
   const conflictVerdict = typeof data.architecturalConflict === 'boolean'
-    ? `<p class="caption"><strong>Frankenstein architecture detected?</strong> ${data.architecturalConflict ? 'Yes. Architectural conflicts were identified.' : 'No architectural conflicts were identified in the assessed operations.'}</p>`
+    ? `<p class="caption"><strong>Frankenstein architecture detected?</strong> ${data.architecturalConflict
+      ? 'Yes. Architectural conflicts were identified.'
+      : architectureUnresolved
+        ? 'Inconclusive. Architectural evidence is unresolved.'
+        : 'No architectural conflicts were identified in the assessed operations.'}</p>`
     : '';
   const sections = ['pass','concern','problem'].map(status => {
     const rows = data.criteria.filter(c => c.status === status);
