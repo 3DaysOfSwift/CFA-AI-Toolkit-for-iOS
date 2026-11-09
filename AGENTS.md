@@ -19,12 +19,12 @@ lower-level services distinct; their names describe their actual jobs.
 The canonical rules live in `architecture/cfa-specification.md` and
 `architecture/swift-coding-guide.md`.
 
-Keep seven independent workflows: app creation, CFA feature work, architecture
+The toolkit ships eight skills. Keep the seven project workflows distinct: app creation, CFA feature work, architecture
 adoption, Legacy GCD migration, read-only architecture review, iterative CFA
-codebase tidying, and CFA unit tests. Legacy GCD migration adopts CFA while
-preserving product behaviour; it is not a superficial syntax rewrite. The
-dashboard is a tool used by review. Preserve user intent and existing app
-behaviour.
+codebase tidying, and CFA unit tests. Swift Code Quality provides guidance
+across those workflows and follows the active task scope. Legacy GCD migration
+preserves product behaviour while moving the implementation to CFA and Swift
+Concurrency. The dashboard is a tool used by architecture review.
 
 Run `npm test`, `npm run validate`, and `python3 scripts/release.py` for release changes.
 All runtime dependencies must be packaged or stated as prerequisites. Test installation
