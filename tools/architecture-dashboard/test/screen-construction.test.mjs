@@ -9,6 +9,7 @@ const viewPath = 'App/1 - View/Views/Home/HomeView.swift';
 const constructionCodes = new Set([
   'view-model-ownership',
   'screen-initializer-inputs',
+  'view-stored-feature',
   'view-model-initializer-construction'
 ]);
 
@@ -109,6 +110,22 @@ test('distinguishes a Feature API input from a reusable action closure', async t
     ['screen-initializer-inputs', 2, 'review']
   ]);
   assert.match(findings[0].message, /NotesFeatureAPI/);
+});
+
+test('reviews a stored Feature input even when Swift synthesizes the View initializer', async t => {
+  const file = 'App/Presentation/NoteRow.swift';
+  const { findings } = await inspectView(t, '', {
+    [file]: `struct NoteRow: View {
+      let notes: any NotesFeatureAPI
+      let snapshot: NotesFeature.Snapshot
+      let refresh: () -> Void
+      var computed: NotesFeature? { nil }
+      var body: some View { Button("Refresh", action: refresh) }
+    }`
+  });
+  assert.deepEqual(findings.map(item => [item.code, item.file, item.line, item.severity]), [
+    ['view-stored-feature', file, 2, 'review']
+  ]);
 });
 
 test('flags explicit ViewModel inputs in extensions of recognized Views', async t => {

@@ -595,6 +595,11 @@ export async function inspect(project) {
       const body = braceBody(source, start - 1);
       inspectScreenInputs(view[1], body, source, start, file, findings);
       const members = memberSignatures(body);
+      const featureProperty = /\b(?:let|var)\s+`?\w+`?\s*:\s*(?:any\s+)?(?:\w+\s*\.\s*)*(\w+Feature(?:API)?)\b(?!\s*\.)\s*[?!]?/g;
+      for (const match of members.matchAll(featureProperty)) {
+        if (hasComputedAccessor(body.slice(match.index + match[0].length))) continue;
+        findings.push(finding('view-stored-feature', 'review', `${view[1]} appears to store ${match[1]} directly. Verify that Feature access goes through the screen-owned ViewModel.`, file, lineOf(source, start + match.index)));
+      }
       const storedModel = inferredAppModelStorage.exec(members);
       if (storedModel) {
         findings.push(finding('stored-app-model', 'review', 'This View appears to retain AppModel.shared in a stored property. Resolve the required Features through its ViewModel.', file, lineOf(source, start + storedModel.index)));
