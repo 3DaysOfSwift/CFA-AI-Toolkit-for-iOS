@@ -41,7 +41,7 @@ enum NoteError: Error { case emptyText }
 final class NotesFeature {
     private let repository: any NotesRepository
     @ObservationIgnored private var lastSave: (id: UUID, task: Task<Void, Error>)?
-    private var loading: (id: UUID, task: Task<[Note], Error>)?
+    private var loading: Task<Void, Error>?
     var isLoading: Bool { loading != nil }
     private(set) var didLoad = false
     private(set) var notes: [Note] = []
@@ -50,24 +50,19 @@ final class NotesFeature {
 
     func loadIfNeeded() async throws {
         guard !didLoad else { return }
-        let task: Task<[Note], Error>
-        let id: UUID
         if let loading {
-            task = loading.task
-            id = loading.id
-        } else {
-            task = Task { try await repository.load() }
-            id = UUID()
-            loading = (id, task)
+            try await loading.value
+            return
         }
-        do {
-            let loaded = try await task.value
-            if !didLoad { notes = loaded; didLoad = true }
-            if loading?.id == id { loading = nil }
-        } catch {
-            if loading?.id == id { loading = nil }
-            throw error
+
+        // The Feature publishes the result even if every caller leaves.
+        let task = Task {
+            defer { loading = nil }
+            notes = try await repository.load()
+            didLoad = true
         }
+        loading = task
+        try await task.value
     }
 
     // Every admitted save runs after the preceding save, even after a failure.
