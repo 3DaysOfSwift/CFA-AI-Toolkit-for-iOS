@@ -131,19 +131,28 @@ export function renderTaskMap(taskMap) {
 export function inventoryCandidates(report) {
   const candidates = report.files.flatMap(file => file.sites.filter(site => candidateKinds.has(site.kind)));
   const kindMap = {'entry.launchCallback':'launch-callback','entry.button':'button-action','entry.viewTask':'view-task','entry.refreshable':'refresh','entry.main':'main','entry.backgroundHandler':'background-handler','entry.incomingLink':'incoming-link','entry.notificationResponse':'notification-response'};
-  const syntaxEntries = (report.syntax?.items || []).filter(item => kindMap[item.kind]);
-  const remaining = new Set(candidates);
+  const keyFor = (site, kind) => JSON.stringify([site.file, site.line, kind]);
+  const lexicalByLine = new Map();
+  for (const site of candidates) {
+    const key = keyFor(site, site.kind);
+    if (!lexicalByLine.has(key)) lexicalByLine.set(key, []);
+    lexicalByLine.get(key).push(site);
+  }
+  const syntaxEntries = (report.syntax?.items || []).filter(item => Object.hasOwn(kindMap, item.kind));
+  const syntaxCounts = new Map();
+  for (const item of syntaxEntries) {
+    const key = keyFor(item, kindMap[item.kind]);
+    syntaxCounts.set(key, (syntaxCounts.get(key) || 0) + 1);
+  }
   for (const item of syntaxEntries) {
     const kind = kindMap[item.kind];
-    const onSameLine = site => site.file === item.file && site.line === item.line;
-    const lexicalMatches = candidates.filter(site => onSameLine(site) && site.kind === kind && remaining.has(site));
-    const sharesLine = syntaxEntries.some(other =>
-      other !== item && onSameLine(other) && kindMap[other.kind] === kind
-    );
-    const duplicate = lexicalMatches.find(site => site.column === item.column) ??
-      (!sharesLine && lexicalMatches.length === 1 ? lexicalMatches[0] : undefined);
-    if (duplicate) {
-      remaining.delete(duplicate);
+    const key = keyFor(item, kind);
+    const lexicalMatches = lexicalByLine.get(key) || [];
+    const exact = lexicalMatches.findIndex(site => site.column === item.column);
+    const unambiguous = syntaxCounts.get(key) === 1 && lexicalMatches.length === 1;
+    const duplicate = unambiguous ? 0 : exact;
+    if (duplicate >= 0) {
+      lexicalMatches.splice(duplicate, 1);
       continue;
     }
     candidates.push({id:`syntax:${item.file}:${item.line}:${item.column}:${kind}`,kind,file:item.file,line:item.line,column:item.column,label:`SwiftSyntax ${item.kind}`});
