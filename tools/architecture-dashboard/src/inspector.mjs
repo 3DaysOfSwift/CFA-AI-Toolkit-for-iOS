@@ -637,14 +637,21 @@ export async function inspect(project) {
       extendedViews.add(view[1]);
     }
   }
-  for (const source of sources.values()) {
+  for (const [file, source] of sources) {
     for (const app of source.matchAll(appDeclarations)) {
       const appBody = braceBody(source, app.index + app[0].length - 1);
       const scene = sceneBodyPattern.exec(appBody);
       if (!scene) continue;
       const body = braceBody(appBody, scene.index + scene[0].length - 1);
       for (const root of body.matchAll(/\bWindowGroup\s*(?:\([^{}]*\)\s*)?\{\s*(?:\w+\s*\.\s*)*(\w+)\s*\(/g)) {
-        if (viewNames.has(root[1])) rootViewNames.add(root[1]);
+        const name = root[1];
+        if (!viewNames.has(name)) continue;
+        if ((declarationsByName.get(name)?.length ?? 0) > 1) {
+          const index = app.index + app[0].length + scene.index + scene[0].length + root.index;
+          findings.push(finding('scene-root-ambiguous', 'review', `WindowGroup constructs ${name}, which matches multiple declarations. Verify the root View in the active target before assessing navigation.`, file, lineOf(source, index)));
+          continue;
+        }
+        rootViewNames.add(name);
       }
     }
   }
