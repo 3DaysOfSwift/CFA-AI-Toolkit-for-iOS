@@ -589,7 +589,7 @@ export async function inspect(project) {
         sessionNames.add(alias[1]);
       }
     }
-    const requestCall = /\s*\??\.\s*(?:data|bytes|download|upload|dataTask|dataTaskPublisher|downloadTask|uploadTask|webSocketTask|streamTask)\s*\(/;
+    const requestCall = /\s*[?!]?\.\s*(?:data|bytes|download|upload|dataTask|dataTaskPublisher|downloadTask|uploadTask|webSocketTask|streamTask)\s*\(/;
     const requestOnReceiver = new RegExp(String.raw`\b(?:(URLSession\s*\.\s*shared)|(\w+))${requestCall.source}`, 'g');
     const directRequests = [...source.matchAll(requestOnReceiver)]
       .filter(match => (match[1] || sessionNames.has(match[2])) && outsideManager(match));
