@@ -84,7 +84,9 @@ When known paid capabilities fall within the review scope, identify their
 entitlement policy and trace each identifiable entry point to its check. Report
 an established unguarded call or exposure with source evidence; identify paths
 that cannot be resolved as unverified. Do not assume a capability is paid from
-its name, or claim a UI check provides server-side authorisation.
+its name, or claim a UI check provides server-side authorisation. Look for
+behavioural evidence of both locked and entitled outcomes on alternate entry
+points as well as the usual screen.
 For scanner-assisted leads, use the [entitlement review workflow](scripts/dashboard/Documentation/entitlement-review.md).
 The scanner finds candidates, not verified guards or violations; trace them and
 inspect alternative entry points before recording a finding.
