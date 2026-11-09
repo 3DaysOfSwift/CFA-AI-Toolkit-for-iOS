@@ -68,6 +68,12 @@ previous usable snapshot survives. Verify that late restores and writes
 cannot replace fresher data for the same source, while other sources can still
 restore their own snapshots.
 
+When changing store access, apply the
+[database availability rule](references/spec/rules/cfa-launch-02.md) and its
+verification checklist. Keep root navigation available during slow or failed
+opening. Verify Feature-scoped retry and reuse of the working store after a
+fetch failure.
+
 When moving durable storage ownership, preserve the existing store location,
 schema compatibility and saved records. Verify against a disposable store written
 by the previous version with representative synthetic records, including

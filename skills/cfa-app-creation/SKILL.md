@@ -69,10 +69,13 @@ Scheduling and delivery alone do not create pending requests.
 Add a separate notification history or global navigation router only when
 the product requires one.
 
-When persistence is used, apply the specification's mandatory database-availability
-rule: storage never gates the root interface. Exercise initial store-opening
-failure, feature-scoped error/retry, and independent navigation before claiming
-that behaviour is verified. Do not introduce an app-level startup-error screen.
+When persistence is used, apply the
+[database availability rule](references/spec/rules/cfa-launch-02.md). Keep the
+root and unaffected destinations available while the first store open is
+pending or fails. Verify that the affected screen can retry the same request
+at the configured location. Separately fail a fetch after the store opens and
+verify retry reuses that store. Verify actual store opening and navigation
+separately from controlled tests.
 
 If the product requires offline edits or cross-device data, apply the
 [sync rule](references/spec/rules/cfa-sync-01.md). Choose storage and transfer

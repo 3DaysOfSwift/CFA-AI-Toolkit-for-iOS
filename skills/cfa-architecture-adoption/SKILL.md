@@ -75,6 +75,12 @@ Feature updates on supported devices separately from those checks. For an App
 Group widget snapshot, verify the write precedes the reload request and a
 failed write issues no request.
 
+When changing store access, apply the
+[database availability rule](references/spec/rules/cfa-launch-02.md) and its
+verification checklist. Keep root navigation available during slow or failed
+opening. Verify Feature-scoped retry and reuse of the working store after a
+fetch failure.
+
 When moving durable storage ownership, preserve the existing store location,
 schema compatibility and saved records. Verify against a disposable store written
 by the previous version with representative synthetic records, including

@@ -65,6 +65,12 @@ recreate cleared records and that delayed cleanup leaves newer records intact.
 Check cleanup and retained data
 against the product's sign-out contract.
 
+When changing store access, apply the
+[database availability rule](references/spec/rules/cfa-launch-02.md) and its
+verification checklist. Keep root navigation available during slow or failed
+opening. Verify Feature-scoped retry and reuse of the working store after a
+fetch failure.
+
 When changing offline editing or cross-device synchronization, apply the
 [offline editing and sync rule](references/spec/rules/cfa-sync-01.md). Define
 what counts as locally saved and what counts as server-confirmed. For offline
