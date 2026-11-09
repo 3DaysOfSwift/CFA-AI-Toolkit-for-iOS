@@ -1244,6 +1244,20 @@ test('reviews matching ViewModel tests in production source trees', async t => {
   assert.ok(placement.every(item => item.severity === 'review' && /unit-test target/.test(item.message)));
 });
 
+test('reviews production graph references in AppModel tests', async t => {
+  const file = 'AppTests/AppModel tests/LifecycleTests.swift';
+  const root = await fixture(t, {
+    [file]: `struct LifecycleTests {
+      func launch() { AppModel.shared.applicationDidFinishLaunching() }
+      func isolated() { AppModel(notesFeature: testNotes).applicationDidFinishLaunching() }
+      // AppModel.shared is intentionally absent from isolated tests.
+    }`
+  });
+  const {findings} = await inspect(root);
+  assert.deepEqual(findings.filter(item => item.code === 'app-model-test-shared-graph')
+    .map(item => [item.file, item.line, item.severity]), [[file, 2, 'review']]);
+});
+
 test('reviews a Feature test file containing only imports and comments', async t => {
   const file = 'AppTests/FeatureTests/LaunchFeatureTests.swift';
   const root = await fixture(t, {

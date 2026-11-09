@@ -432,6 +432,12 @@ export async function inspect(project) {
       }
     }
   }
+  for (const [file, source] of sources) {
+    if (path.posix.basename(file) !== 'AppModelTests.swift' && !file.split('/').includes('AppModel tests')) continue;
+    for (const reference of source.matchAll(/\bAppModel\s*\.\s*shared\b/g)) {
+      findings.push(finding('app-model-test-shared-graph', 'review', 'This AppModel test references the production shared graph. Verify that it tests construction and coordination with an isolated graph and does not mutate AppModel.shared.', file, lineOf(source, reference.index)));
+    }
+  }
   const checkedFeatureTests = new Set();
   function inspectFeatureTests(type, location, line) {
     if (checkedFeatureTests.has(type)) return;
