@@ -136,11 +136,9 @@ export async function inspect(project) {
     sources.set(file.path, maskSwift(source.replace(/\r(?!\n)/g, '\n')));
   }
   const paths = new Set(sources.keys());
-  const conventionalAppModelFiles = [...paths].filter(file => /(?:^|\/)2 - AppModel\/AppModel\.swift$/.test(file));
-  const appModelFiles = conventionalAppModelFiles.length
-    ? conventionalAppModelFiles
-    : [...paths].filter(file => path.posix.basename(file) === 'AppModel.swift' &&
-      /\bclass\s+AppModel\b[^{}]*\{/.test(sources.get(file)));
+  const conventionalAppModelPath = /(?:^|\/)2 - AppModel\/AppModel\.swift$/;
+  const appModelFiles = [...paths].filter(file => path.posix.basename(file) === 'AppModel.swift' &&
+    /\bclass\s+AppModel\b[^{}]*\{/.test(sources.get(file)));
   const appModelFile = appModelFiles.length === 1 ? appModelFiles[0] : null;
   const appModel = appModelFile ? sources.get(appModelFile) : '';
   const appModelDeclaration = /\bclass\s+AppModel\b[^\{]*\{/.exec(appModel);
@@ -168,7 +166,7 @@ export async function inspect(project) {
 
   const findings = [];
   if (!appModelFiles.length) findings.push(finding('app-model-missing', 'warning', 'No AppModel.swift was found under 2 - AppModel.', null, null));
-  if (appModelFile && !conventionalAppModelFiles.length) {
+  if (appModelFile && !conventionalAppModelPath.test(appModelFile)) {
     findings.push(finding('app-model-placement', 'review', 'AppModel.swift is outside 2 - AppModel. Verify the intended target and source layout.', appModelFile, 1));
   }
   if (appModelFiles.length > 1) {
