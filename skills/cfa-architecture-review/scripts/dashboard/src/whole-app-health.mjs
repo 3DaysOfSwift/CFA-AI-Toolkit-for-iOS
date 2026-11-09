@@ -102,7 +102,8 @@ export function nextWork(report, review, limit = 8) {
     pendingDimensions: pendingDimensions(operation),
     missingTrace: !operation.steps?.length,
     pendingChecks: (operation.checks || [])
-      .filter(check => check.status === 'unresolved' || check.status === 'not-checked')
+      .filter(check => check.status === 'unresolved' || check.status === 'not-checked' ||
+        (check.status === 'not-applicable' && pendingDimensions(operation).includes(check.dimension)))
       .map(({id, title, dimension, status, reason, question, resolveBy, evidence}) => ({
         id, title, dimension, status, reason, question, resolveBy,
         evidence: evidenceLocations(evidence)

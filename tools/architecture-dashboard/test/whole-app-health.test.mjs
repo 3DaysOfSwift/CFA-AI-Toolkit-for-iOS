@@ -413,6 +413,8 @@ test('installed Health Check rescans source, surfaces gaps and rejects stale rev
     await fs.writeFile(reviewPath,JSON.stringify(missingClarity));
     const pendingClarity = await next(project,reviewPath,syntax);
     assert.deepEqual(pendingClarity.nextOperations[0].pendingDimensions,['clarity']);
+    assert.equal(pendingClarity.nextOperations[0].pendingChecks[0].id, 'architectural-clarity');
+    assert.equal(pendingClarity.nextOperations[0].pendingChecks[0].status, 'not-applicable');
     await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/operations have unresolved checks or boundaries/);
     await assert.rejects(fs.access(output));
     const unsupportedAssessment = structuredClone(review);
