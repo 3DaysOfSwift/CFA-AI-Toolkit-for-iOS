@@ -259,6 +259,9 @@ test('completion is not inferred from a build pass or tests at a different commi
   const rerun = f.record.evidence.find(item => item.id === 'after-behaviour-regression');
   rerun.environment = failedRegression.environment;
   f.record.evidence.push(failedRegression);
+  f.record.evidence.push({
+    ...failedRegression, id:'earlier-regression', phase:'during', commit:'c'.repeat(40)
+  });
   f.record.limitations.push('The failed-regression run was resolved by after-behaviour-regression on the affected configuration.');
   f.record.completionGate.manualBehaviourRegressionEvidenceId = failedRegression.id;
   f.write();
@@ -274,6 +277,7 @@ test('completion is not inferred from a build pass or tests at a different commi
   assert.equal(digest.status, 0);
   assert.equal(digest.stdout.trim(), f.record.review.digest);
   assert.match(digest.stderr, /evidence.failed-regression: failed at the final commit/);
+  assert.match(digest.stderr, /evidence.earlier-regression: failed during migration/);
 
   f.record.status = 'draft';
   f.record.repository.afterCommit = null;
