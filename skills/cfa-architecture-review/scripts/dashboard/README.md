@@ -57,7 +57,14 @@ tasks, child-task declarations, framework entry points, await keywords and expli
 MainActor annotations in UI and feature files.
 
 The dashboard includes reviewed UI / Model separation and test-quality ratings.
-Ratings require source-backed classifications, not keyword-count guesses.
+Ratings require source-backed classifications. In any architecture, trace who
+owns each task, whether callers wait for it, and what should happen on
+cancellation before judging the design. A Feature-owned shared refresh can
+legitimately continue after a screen disappears. For a CFA project, record a
+departure from a CFA convention separately from a Swift Concurrency defect.
+For example, a ViewModel-created task with no retained handle merits a CFA
+ownership finding. Establish a consequence, such as an obsolete task
+publishing over a newer result, before calling it a correctness defect.
 Import source-linked journey notes using `--observations observations.json`.
 Each journey shows task identity, context, steps, expandable source evidence and
 explicit unknowns. Sites without notes remain listed.
