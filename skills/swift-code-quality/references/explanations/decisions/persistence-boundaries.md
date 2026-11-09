@@ -45,6 +45,11 @@ Editorial analysis: a shared storage owner needs clear schema and lifetime polic
 
 ## Scope and exceptions
 
+Use JSON by default for replaceable snapshots. Instant Loading binary
+snapshots are an opt-in technique for stable formats. Offer them when the
+developer asks about the technique. Keep JSON as the default when creating
+or migrating an app.
+
 One store is a CFA choice, not a SwiftData limit. Keep each context and managed object within its isolation boundary. The guide reports a macOS investigation; do not claim all iOS versions reproduce it, or that passing tests guarantee framework safety.
 
 ## Verification
