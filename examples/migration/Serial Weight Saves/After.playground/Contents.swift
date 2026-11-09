@@ -9,20 +9,6 @@ protocol WeightSaving: Sendable {
     func save(_ weight: Int) async throws
 }
 
-// Storage owns the saved data; the Feature owns the observable snapshot.
-// This actor represents the storage boundary, not a database implementation.
-actor WeightStorage: WeightSaving {
-    enum SaveError: Error { case invalidWeight }
-    private var savedWeights: [Int] = []
-
-    func save(_ weight: Int) throws {
-        guard weight > 0 else { throw SaveError.invalidWeight }
-        savedWeights.append(weight)
-    }
-
-    func read() -> [Int] { savedWeights }
-}
-
 @MainActor @Observable
 final class WeightLogFeature {
     enum SaveFailure { case storageRejectedWrite }
@@ -65,6 +51,20 @@ final class WeightLogFeature {
 }
 
 // MARK: - Test fixtures
+// In-memory test double for the storage boundary. The Feature publishes
+// its observable snapshot after this dependency confirms a save.
+actor WeightStorage: WeightSaving {
+    enum SaveError: Error { case invalidWeight }
+    private var savedWeights: [Int] = []
+
+    func save(_ weight: Int) throws {
+        guard weight > 0 else { throw SaveError.invalidWeight }
+        savedWeights.append(weight)
+    }
+
+    func read() -> [Int] { savedWeights }
+}
+
 // MARK: - Behaviour check
 @MainActor
 func runExample() async {

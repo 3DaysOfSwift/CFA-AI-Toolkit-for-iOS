@@ -108,7 +108,7 @@ extension LaunchFeature {
 
 test('Serial Weight Saves preserves admitted saves across failure and caller cancellation', {skip:process.platform !== 'darwin', timeout:120000}, () => {
   const page = fs.readFileSync(path.join(root, 'examples/migration/Serial Weight Saves/After.playground/Contents.swift'), 'utf8');
-  const contract = page.slice(page.indexOf('protocol WeightSaving'), page.indexOf('// Storage owns'));
+  const contract = page.slice(page.indexOf('protocol WeightSaving'), page.indexOf('@MainActor @Observable'));
   const feature = page.slice(page.indexOf('@MainActor @Observable'), page.indexOf('// MARK: - Test fixtures'));
   assert.match(feature, /func save\(_ weight: Int\) async -> Bool/);
   const source = `import Foundation
