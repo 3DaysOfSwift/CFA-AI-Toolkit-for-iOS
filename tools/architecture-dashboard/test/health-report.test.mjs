@@ -107,7 +107,13 @@ test('withholds a stable workflow result until its trace and timing outcomes exi
   operation.steps = [{id:'event',relation:'event',title:'Save'}];
   assert.match(renderHealthReport(data), /aria-label="Needs investigation">\?<\/span>Save/);
   operation.scenarios = ['repeat','leave','late-result','failure'].map(id => ({id,status:'not-applicable'}));
-  assert.match(renderHealthReport(data), /aria-label="Stable">✓<\/span>Save/);
+  Object.assign(operation.scenarios[2], {
+    title:'Older result arrives late', outcome:'The operation never suspends.',
+    verification:'Traced the synchronous update.'
+  });
+  const html = renderHealthReport(data);
+  assert.match(html, /aria-label="Stable">✓<\/span>Save/);
+  assert.match(html, /Timing scenarios that don’t apply.*— Older result arrives late.*The operation never suspends/);
 });
 
 test('a confirmed problem keeps the verdict red even with a high score', () => {
