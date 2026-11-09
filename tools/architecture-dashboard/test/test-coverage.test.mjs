@@ -10,3 +10,11 @@ test('coverage uses measured counts for one explicit target, never averaged perc
   assert.equal(importTestCoverage({targets:[{name:'App',coveredLines:0,executableLines:0}]},'App').value,null);
   assert.equal(importTestCoverage({targets:[{name:'App',coveredLines:0,executableLines:8}]},'App').value,0);
 });
+
+test('rounding preserves the distinction between partial and complete coverage', () => {
+  const coverage = coveredLines =>
+    importTestCoverage({ targets: [{ name: 'App', coveredLines, executableLines: 10000 }] }, 'App').value;
+  assert.equal(coverage(1), 0.1);
+  assert.equal(coverage(9999), 99.9);
+  assert.equal(coverage(10000), 100);
+});
