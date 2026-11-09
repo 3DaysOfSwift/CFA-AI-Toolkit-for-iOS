@@ -39,7 +39,7 @@ on 2026-10-27. That permission is not individual technical or historical approva
 
 ## Working example
 
-The full toolkit includes `architecture/spec-examples/NotesReference.swift`, which uses a concrete Feature and a repository boundary. `NotesReferenceTests.swift` checks a failing repository, retry and overlapping saves.
+The full toolkit includes `architecture/spec/examples/NotesReference.swift`. Its concrete `NotesFeature` owns the notes, and its JSON repository is the microservice that persists them. The accompanying `NotesReferenceTests.swift` exercises storage failure, retry and overlapping saves.
 
 ## Publication
 
