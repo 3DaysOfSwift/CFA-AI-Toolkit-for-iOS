@@ -314,6 +314,8 @@ actor HeldNotesLoad: NotesRepository {
         await corruptEditor.retryLoad().value
         precondition(corruptEditor.loadError == nil && corruptFeature.notes == afterOverlap)
         precondition(corruptEditor.text == "Keep this draft")
+        precondition(savingEditor.loadError == nil, "Shared recovery clears the other editor’s load error")
+        precondition(savingEditor.text == "Save after restoration")
         let snapshotBeforeSave = corruptFeature.notes
         let recoveredSave = await savingEditor.save().value
         precondition(recoveredSave && savingEditor.loadError == nil && savingEditor.saveError == nil)

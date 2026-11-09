@@ -29,7 +29,8 @@ This example uses a single repository instance for the file.
 When the JSON file is corrupt, the checks verify that a failed save preserves the file
 and draft. After a valid file is restored, retrying the load through the same
 ViewModel and Feature reloads the saved notes without submitting the draft.
-A separate save then succeeds and clears that editor's load error. A fixed
+Both editors stop showing the load error once their shared Feature recovers.
+The second editor can then save its retained draft. A fixed
 synthetic JSON fixture
 also verifies that an existing note survives opening, appending a note, and
 reopening the store. The checks also hold an earlier published collection and
@@ -95,7 +96,7 @@ final class NotesFeature {
     private let repository: any NotesRepository
     @ObservationIgnored private var lastSave: (id: UUID, task: Task<Void, Error>)?
     @ObservationIgnored private var loading: (id: UUID, task: Task<[Note], Error>)?
-    private var didLoad = false
+    private(set) var didLoad = false
     private(set) var notes: [Note] = []
 
     init(repository: any NotesRepository) { self.repository = repository }
@@ -173,7 +174,12 @@ final class NotesEditorViewModel {
     var text = ""
     private(set) var isSaving = false
     private(set) var saveError: String?
-    private(set) var loadError: String?
+    private var loadFailed = false
+
+    var loadError: String? {
+        guard loadFailed, !notesFeature.didLoad else { return nil }
+        return "Notes could not be loaded. Please try again."
+    }
 
     init(notesFeature: NotesFeature = AppModel.shared.notesFeature) {
         self.notesFeature = notesFeature
@@ -182,9 +188,8 @@ final class NotesEditorViewModel {
     func load() async {
         do {
             try await notesFeature.loadIfNeeded()
-            if !Task.isCancelled { loadError = nil }
         } catch {
-            if !Task.isCancelled { loadError = "Notes could not be loaded. Please try again." }
+            if !Task.isCancelled { loadFailed = true }
         }
     }
 
@@ -214,8 +219,6 @@ final class NotesEditorViewModel {
             defer { self?.isSaving = false; self?.saveTask = nil }
             do {
                 try await notesFeature.save(submittedText)
-                // Saving also confirms that initial restoration succeeded.
-                self?.loadError = nil
                 if let self, text == submittedText {
                     text = ""
                     onSuccess()
