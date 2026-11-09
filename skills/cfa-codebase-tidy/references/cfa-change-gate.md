@@ -318,8 +318,11 @@ do not claim that UI gating replaces server-side authorisation.
   Verify target membership and the behaviours each test actually exercises.
 - Confirm that launch refresh logic is absent from RootTabView and feature
   screens use `.task` for their own initial work—not as a substitute for
-  application launch. Confirm the app delegate starts each shared system
-  refresh at launch without gating or delaying the root UI.
+  application launch. Trace the delegate's direct synchronous call to
+  AppModel and confirm AppModel signals each relevant Feature before the
+  delegate returns. Confirm the Features own their refresh tasks and that
+  pending disk or network work cannot gate the root UI. Verify that a
+  repeated launch callback does not start the work again.
 - When launch and screen refresh can overlap, verify the Feature's policy.
   By default, equivalent callers that need the outcome join the same
   Feature-owned request and receive its result. The synchronous launch signal
