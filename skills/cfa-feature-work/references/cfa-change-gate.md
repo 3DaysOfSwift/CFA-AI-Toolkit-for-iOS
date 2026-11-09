@@ -254,6 +254,10 @@ identifies all of the following:
 - the hybrid implementation review, identifying remaining users of legacy
   mechanisms and dependencies and recording which adapters were removed or
   intentionally retained to preserve behaviour or platform support;
+- the minimum OS for each affected target and compatibility evidence for
+  changed paths at that minimum. Check API availability separately from
+  Swift language mode. Preserve existing deployment support unless the
+  developer approves a change;
 - the final CFA audit across the agreed scope, including the resolution of
   actionable deviations and re-verification after corrections;
 - post-change build and test results at the final commit, plus the relevant
