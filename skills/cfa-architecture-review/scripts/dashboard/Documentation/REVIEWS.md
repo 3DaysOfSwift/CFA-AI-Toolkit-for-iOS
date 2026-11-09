@@ -377,7 +377,9 @@ synchronous action can have a single event step if it completes there. Every ste
 and relation `same-task`, `child-task`, `unstructured-task`, `framework-task`,
 or `unknown`. These are reviewer-authored relationships, not an inferred call
 graph. Cite each task site assigned to an operation in that operation’s workflow
-steps as well as its overall evidence. After confirming the scanner candidate,
+steps as well as its overall evidence. When the cited lines could identify
+more than one task, give each task its own step with the corresponding
+`taskSiteId`. After confirming the scanner candidate,
 use `unstructured-task` for Task and Task.detached, `child-task` for async let
 and task group children, `same-task` for the task group scope itself, and
 `framework-task` for SwiftUI task and refreshable callbacks.

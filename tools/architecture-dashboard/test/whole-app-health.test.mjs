@@ -130,6 +130,24 @@ test('refuses stale entry IDs and unsupported caller links', () => {
   assert.throws(()=>nextWork(report,wrong), /reconciled entry point: launch → App\.swift:2/);
 });
 
+test('one broad workflow step cannot stand in for two distinct tasks', () => {
+  const inventory = structuredClone(report);
+  inventory.syntax = {status:'available',files:['App.swift'],warnings:[],items:[
+    {kind:'concurrency.task',file:'App.swift',line:3,column:5},
+    {kind:'concurrency.task',file:'App.swift',line:4,column:5}
+  ]};
+  const review = complete();
+  const sites = taskCandidates(inventory);
+  const evidence = [{file:'App.swift',line:3,endLine:4}];
+  review.taskSites = sites.map(site => ({siteId:site.id,operationId:'launch'}));
+  review.operations[0].evidence.push(...evidence);
+  const step = {id:'load',parentId:'trigger',relation:'unstructured-task',evidence};
+  review.operations[0].steps.push(step);
+  assert.deepEqual(nextWork(inventory, review).nextTaskSites, sites);
+  step.taskSiteId = sites[0].id;
+  assert.deepEqual(nextWork(inventory, review).nextTaskSites, [sites[1]]);
+});
+
 test('reconciled task sites must be cited in a workflow step', () => {
   const inventory = structuredClone(report);
   inventory.syntax = {status:'available',files:['App.swift'],warnings:[],items:[

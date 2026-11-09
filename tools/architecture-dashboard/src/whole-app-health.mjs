@@ -54,10 +54,11 @@ function hasTaskTrace(operation, site, sites) {
   const sharesLine = sites.some(other =>
     other.id !== site.id && other.file === site.file && other.line === site.line
   );
-  return operation?.steps?.some(step =>
-    (step.taskSiteId === undefined ? !sharesLine : step.taskSiteId === site.id) &&
-    stepCitesTask(step, site)
-  );
+  return operation?.steps?.some(step => {
+    if (!stepCitesTask(step, site)) return false;
+    if (step.taskSiteId !== undefined) return step.taskSiteId === site.id;
+    return !sharesLine && !sites.some(other => other.id !== site.id && stepCitesTask(step, other));
+  });
 }
 
 function invalidTaskLinks(operation, sites, taskEntries) {
