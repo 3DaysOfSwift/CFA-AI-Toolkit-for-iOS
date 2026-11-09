@@ -7,7 +7,8 @@ Status: documented basis with editorial analysis; not a founder-approved histori
 
 ## Rule
 
-A CFA screen owns its dedicated ViewModel in a private property named `viewModel`. It constructs the ViewModel inline by default. A detail View may receive selected value data and construct its State-backed ViewModel in its initializer; ViewModels are never passed into Views. The ViewModel resolves narrow live Features and permits isolated Feature dependencies in tests.
+A CFA screen-level SwiftUI View owns its dedicated ViewModel in a private
+`@State` property named `viewModel`. It constructs the ViewModel inline by default. A detail View may receive selected value data and construct its State-backed ViewModel in its initializer; ViewModels are never passed into Views. The ViewModel resolves narrow live Features and permits isolated Feature dependencies in tests.
 
 ## Problem
 
@@ -25,7 +26,8 @@ Editorial analysis: this sacrifices initializer-based screen injection and makes
 
 ## Scope and exceptions
 
-This is a CFA convention, not a SwiftUI ban on View inputs. Reusable presentation components may receive snapshots, bindings and action closures that report intent to their screen; they do not own the screen’s ViewModel or business rules. Do not replace two independent destinations with one shared selection just to remove parameters; unresolved destination/window identity requires an ownership decision before changing behaviour.
+This is a CFA convention for SwiftUI screens. When a migration retains a UIKit
+screen, trace its actual presentation owner to its Features. Reusable presentation components may receive snapshots, bindings and action closures that report intent to their screen; they do not own the screen’s ViewModel or business rules. Do not replace two independent destinations with one shared selection just to remove parameters; unresolved destination/window identity requires an ownership decision before changing behaviour.
 
 ## Verification
 

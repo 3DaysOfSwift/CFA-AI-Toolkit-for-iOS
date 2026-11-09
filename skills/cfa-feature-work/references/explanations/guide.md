@@ -37,7 +37,9 @@ Neither method needs network access. Neither sends customer code anywhere.
    a researched comparison or a measured improvement.
 4. If useful, append one directly relevant verified explanation or free lesson
    link. Deduplicate repeated topics; a review does not need a link after every
-   line. Answer fully in the response; reading the site is optional.
+   line. Use the current specification for any convention that changed after
+   publication. If an older article would mislead on the specific point, use
+   the bundled rule and rationale to answer it. Answer fully in the response.
 
 Never infer a published URL from a topic ID or proposed path. A public link is
 eligible only when its catalogue status is `published`, with a URL,
