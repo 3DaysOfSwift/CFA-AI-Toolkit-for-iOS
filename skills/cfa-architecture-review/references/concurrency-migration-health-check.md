@@ -151,7 +151,7 @@ source review rather than treating absent indexed calls as proof of absence.
 Reconcile the full production target and file list,
 including sources the lexical scan cannot resolve. Check the directories listed
 under `productionTargets.excludedTestDirectories` in the checklist against
-actual target membership before confirming that they contain only test sources. Record evidence-backed file batches, detected candidate entry points and each meaningful user or system operation using `scripts/dashboard/Documentation/REVIEWS.md`. A shared helper can be reviewed once and linked from multiple operations after checking each caller. Individual type verdicts are optional. Include
+actual target membership before confirming that they contain only test sources. If any such directory contains production Swift, run `prepare` again with `--include-tests` as the last argument. The new draft preserves that inventory scope for subsequent commands. Reconcile test-only files and candidate sites as exclusions with evidence. Record evidence-backed file batches, detected candidate entry points and each meaningful user or system operation using `scripts/dashboard/Documentation/REVIEWS.md`. A shared helper can be reviewed once and linked from multiple operations after checking each caller. Individual type verdicts are optional. Include
 `productionTargets` (an array of reviewed target and local-package names),
 `targetInventoryVerified` (true only after verifying membership), and
 `entryPoints` entries with each candidate `siteId` and either `operationId` or a

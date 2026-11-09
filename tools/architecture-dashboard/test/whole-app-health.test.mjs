@@ -339,3 +339,24 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
     await assert.rejects(finish(project,reviewPath,path.join(base,'stale.html'),undefined,syntax),/fingerprint mismatch/);
   } finally { await fs.rm(base,{recursive:true,force:true}); }
 });
+
+test('retains test-named directories in subsequent scans when explicitly included', async t => {
+  const base = await fs.mkdtemp(path.join(os.tmpdir(), 'whole-health-scope-'));
+  t.after(() => fs.rm(base, {recursive:true,force:true}));
+  const project = path.join(base,'app');
+  const helper = 'NetworkTests/ProductionHelper.swift';
+  await fs.mkdir(path.join(project,'NetworkTests'),{recursive:true});
+  await fs.writeFile(path.join(project,'App.swift'),'struct App {}\n');
+  await fs.writeFile(path.join(project,helper),'struct ProductionHelper {}\n');
+  const syntax = async (_root, {includeTests}) => ({
+    status:'available', files:includeTests ? ['App.swift',helper] : ['App.swift'],
+    items:[], warnings:[]
+  });
+  const output = path.join(base,'inventory');
+  const inventory = await prepare(project,output,syntax,{includeTests:true});
+  assert.deepEqual(inventory.scope.excludedTestDirectories,[]);
+  assert.ok(inventory.files.some(file => file.path === helper));
+  const work = await next(project,path.join(output,'review-draft.json'),syntax);
+  assert.ok(work.nextFiles.includes(helper));
+  assert.ok(!work.gaps.some(gap => gap.includes('different files')));
+});

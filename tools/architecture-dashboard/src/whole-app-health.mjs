@@ -205,7 +205,7 @@ export async function prepare(root, output, syntaxProvider = collectSyntax, opti
     operations: {status:'pending', note:'Discover and trace user actions and system events, including operations the scanner cannot detect.'}
   };
   await fs.writeFile(path.join(output,'checklist.json'),JSON.stringify(checklist,null,2)+'\n',{flag:'wx'});
-  const draft = {schemaVersion:1,sourceFingerprint:report.sourceFingerprint,author:'Health Check reviewer',scope:'Whole application',productionTargets:[],targetInventoryVerified:false,fileReviews:[],fileBatches:[],operationInventory:{scope:'Whole application',method:'Source review and scanner inventory',coverage:'partial'},operations:[],entryPoints:[],taskSites:[]};
+  const draft = {schemaVersion:1,sourceFingerprint:report.sourceFingerprint,author:'Health Check reviewer',includeTests:report.scope.includeTests,scope:'Whole application',productionTargets:[],targetInventoryVerified:false,fileReviews:[],fileBatches:[],operationInventory:{scope:'Whole application',method:'Source review and scanner inventory',coverage:'partial'},operations:[],entryPoints:[],taskSites:[]};
   await fs.writeFile(path.join(output,'review-draft.json'),JSON.stringify(draft,null,2)+'\n',{flag:'wx'});
   const taskMap = {sourceFingerprint:report.sourceFingerprint, status:report.syntax.status,
     note:'Syntax locations and lexical nesting are leads only. Task parentage, ownership and call relationships require source review.',
@@ -256,21 +256,21 @@ function appCheckGaps(review) {
 }
 
 export async function progress(root, input, syntaxProvider = collectSyntax) {
-  const {report} = await currentInventory(root, syntaxProvider);
   const raw = JSON.parse(await fs.readFile(input,'utf8'));
+  const {report} = await currentInventory(root, syntaxProvider, {includeTests:raw.includeTests === true});
   const review = await importReview(report,raw,root);
   return {gaps:[...coverageGaps(report,review), ...appCheckGaps(review)],files:report.files.length,operations:(review.operations || []).length};
 }
 export async function next(root, input, syntaxProvider = collectSyntax) {
-  const {report} = await currentInventory(root, syntaxProvider);
   const raw = JSON.parse(await fs.readFile(input,'utf8'));
+  const {report} = await currentInventory(root, syntaxProvider, {includeTests:raw.includeTests === true});
   const review = await importReview(report,raw,root);
   const work = nextWork(report,review);
   return {...work, gaps:[...work.gaps, ...appCheckGaps(review)]};
 }
 export async function finish(root, input, output, icon, syntaxProvider = collectSyntax) {
-  const {report} = await currentInventory(root, syntaxProvider);
   const raw = JSON.parse(await fs.readFile(input,'utf8'));
+  const {report} = await currentInventory(root, syntaxProvider, {includeTests:raw.includeTests === true});
   const review = await importReview(report,raw,root);
   const gaps = coverageGaps(report,review);
   if (gaps.length) throw Error('Health Check is not complete; no report was generated. Complete the review checklist:\n- ' + gaps.join('\n- '));
@@ -329,9 +329,12 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
 }
 if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
-    const [mode, root, input, output, icon, moduleFlag, moduleName] = process.argv.slice(2);
-    if (mode === 'prepare' && root && input && (!output || (output === '--index-store' && icon && moduleFlag === '--module' && moduleName && process.argv.length === 9))) {
-      const result = await prepare(root,input,collectSyntax,output ? {indexStore:icon,module:moduleName} : {});
+    const args = process.argv.slice(2);
+    const includeTests = args[0] === 'prepare' && args.at(-1) === '--include-tests';
+    if (includeTests) args.pop();
+    const [mode, root, input, output, icon, moduleFlag, moduleName] = args;
+    if (mode === 'prepare' && root && input && (!output || (output === '--index-store' && icon && moduleFlag === '--module' && moduleName && args.length === 7))) {
+      const result = await prepare(root,input,collectSyntax,{includeTests, ...(output ? {indexStore:icon,module:moduleName} : {})});
       console.log(`Inventoried ${result.files.length} Swift files and ${inventoryCandidates(result).length} possible entry points. Review inventory.json before producing the report.`);
       if (output) {
         const analysis = JSON.parse(await fs.readFile(path.join(input,'project-analysis.json'),'utf8'));
@@ -346,6 +349,6 @@ if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.me
     } else if (mode === 'report' && root && input && output) {
       const result = await finish(root,input,output,icon);
       console.log(`Inventoried ${result.files} source files, ${result.operations} recorded operations; ${result.gaps.length} coverage gaps. Report: ${output}`);
-    } else throw Error('Usage: node whole-app-health.mjs prepare <project> <new-inventory-dir> [--index-store <path> --module <name>] | progress <project> <review.json> | next <project> <review.json> | report <project> <review.json> <new-report.html> [app-icon.png]');
+    } else throw Error('Usage: node whole-app-health.mjs prepare <project> <new-inventory-dir> [--index-store <path> --module <name>] [--include-tests] | progress <project> <review.json> | next <project> <review.json> | report <project> <review.json> <new-report.html> [app-icon.png]');
   } catch (error) { console.error(error.message); process.exitCode=1; }
 }

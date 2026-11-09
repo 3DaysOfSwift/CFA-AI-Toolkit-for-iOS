@@ -12,9 +12,9 @@ export async function collectProjectAnalysis(root, options = {}, providers = {})
   if (Boolean(options.indexStore) !== Boolean(options.module)) throw Error('Supply both indexStore and module, or neither.');
   root = await fs.realpath(root);
   const scan = providers.analyse || analyse;
-  const before = await scan(root, {excludedOutput:options.output});
+  const before = await scan(root, {excludedOutput:options.output, includeTests:options.includeTests});
   if (!before.files.length) throw Error('No Swift source files found.');
-  const syntax = await (providers.syntax || collectSyntax)(root);
+  const syntax = await (providers.syntax || collectSyntax)(root, {includeTests:options.includeTests});
   let compilerIndex = {status:'not-requested', calls:[], reason:'No compiler index and module were supplied.'};
   if (options.indexStore) {
     try {
@@ -29,7 +29,7 @@ export async function collectProjectAnalysis(root, options = {}, providers = {})
       compilerIndex = {status:'unavailable', module:options.module, calls:[], reason:String(error.message)};
     }
   }
-  const after = await scan(root, {excludedOutput:options.output});
+  const after = await scan(root, {excludedOutput:options.output, includeTests:options.includeTests});
   if (before.sourceFingerprint !== after.sourceFingerprint) throw Error('Source changed during analysis. Run it again.');
   const sourceFiles = new Set(before.files.map(file => file.path));
   const syntaxFiles = new Set(syntax.files || []);

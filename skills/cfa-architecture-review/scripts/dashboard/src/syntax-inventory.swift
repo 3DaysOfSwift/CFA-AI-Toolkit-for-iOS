@@ -133,7 +133,7 @@ final class SourceInventory: SyntaxVisitor {
     }
 }
 
-func swiftFiles(in root: URL) throws -> [URL] {
+func swiftFiles(in root: URL, includeTests: Bool) throws -> [URL] {
     let excluded: Set<String> = [".git", ".build", ".swiftpm", "Pods", "Carthage", "node_modules", "DerivedData", "build"]
     guard let enumerator = FileManager.default.enumerator(at: root, includingPropertiesForKeys: [.isDirectoryKey, .isSymbolicLinkKey], options: [.skipsHiddenFiles]) else {
         throw NSError(domain: "Inventory", code: 1, userInfo: [NSLocalizedDescriptionKey: "Cannot enumerate project directory"])
@@ -144,16 +144,18 @@ func swiftFiles(in root: URL) throws -> [URL] {
         if values.isSymbolicLink == true { if values.isDirectory == true { enumerator.skipDescendants() }; continue }
         if values.isDirectory == true {
             let name = url.lastPathComponent
-            if excluded.contains(name) || name == "test" || name == "tests" || name.hasSuffix("Test") || name.hasSuffix("Tests") { enumerator.skipDescendants() }
+            let testDirectory = name == "test" || name == "tests" || name.hasSuffix("Test") || name.hasSuffix("Tests")
+            if excluded.contains(name) || (!includeTests && testDirectory) { enumerator.skipDescendants() }
         } else if url.pathExtension == "swift" { files.append(url) }
     }
     return files.sorted { $0.path < $1.path }
 }
 
 do {
-    guard CommandLine.arguments.count == 2 else { throw NSError(domain: "Inventory", code: 2, userInfo: [NSLocalizedDescriptionKey: "Usage: swift-syntax-inventory <project-directory>"]) }
+    let includeTests = CommandLine.arguments.dropFirst(2).first == "--include-tests"
+    guard CommandLine.arguments.count == (includeTests ? 3 : 2) else { throw NSError(domain: "Inventory", code: 2, userInfo: [NSLocalizedDescriptionKey: "Usage: swift-syntax-inventory <project-directory>"]) }
     let root = URL(fileURLWithPath: CommandLine.arguments[1]).standardizedFileURL.resolvingSymlinksInPath()
-    let files = try swiftFiles(in: root)
+    let files = try swiftFiles(in: root, includeTests: includeTests)
     guard !files.isEmpty else { throw NSError(domain: "Inventory", code: 3, userInfo: [NSLocalizedDescriptionKey: "No Swift files found"]) }
     var items: [Item] = []
     var names: [String] = []
