@@ -187,6 +187,9 @@ final class NotesEditorViewModel {
             defer { self?.isSaving = false; self?.saveTask = nil }
             do {
                 try await notesFeature.save(submittedText)
+                if let self, text == submittedText {
+                    text = ""
+                }
                 onSuccess()
                 return true
             } catch NoteError.emptyText {

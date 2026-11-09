@@ -65,7 +65,7 @@ actor RetryableNotes: NotesRepository {
         precondition(replacementEditor.text.isEmpty && feature.notes.isEmpty)
         model.text = "retry"
         let success = await model.save().value
-        precondition(success && feature.notes.map(\.text) == ["retry"])
+        precondition(success && model.text.isEmpty && feature.notes.map(\.text) == ["retry"])
         let first = Task { try await feature.save("first") }
         await repository.waitForFirst()
         first.cancel() // A departing caller does not cancel the Feature-owned save.
