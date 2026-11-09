@@ -27,7 +27,13 @@ The choice is a CFA default informed by Swift reentrancy, not a universal FIFO p
 
 ## Verification
 
-Pause an operation at a controlled suspension point, admit another, then release in adverse order. Verify individual results, persisted order, failure recovery and no stranded waiters.
+For queued commands, hold the first write at a controlled suspension point and
+admit the next command. Verify that its write begins only after the first
+finishes, and that both callers receive their own outcomes even if the first
+fails. The bundled Serial Weight Saves migration example exercises this policy.
+For equivalent requests, hold one provider call open while another caller joins.
+Verify that the provider runs once and both callers can receive its outcome.
+Check that cancellation of one waiter leaves shared work available to the others.
 
 ## Evidence and provenance
 
