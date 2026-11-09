@@ -375,7 +375,6 @@ export async function inspect(project) {
       const swiftDataImport = /\bimport\s+(?:(?:typealias|struct|class|enum|protocol|let|var|func)\s+)?SwiftData\b/.exec(source);
       if (!swiftDataImport) continue;
       findings.push(finding('swiftdata-manager-missing', 'review', 'SwiftData is imported, but no concrete SwiftDataManager declaration was found. Check whether the import belongs to an app target and whether an appropriate storage boundary exists; this scan also includes tests and does not resolve target membership.', file, lineOf(source, swiftDataImport.index)));
-      break;
     }
   }
   for (const [file, source] of sources) {

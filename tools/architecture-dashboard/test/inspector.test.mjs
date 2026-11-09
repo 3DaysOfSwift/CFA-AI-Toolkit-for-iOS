@@ -652,6 +652,17 @@ test('a SwiftData import in tests is a target-membership review, not an app defe
   assert.equal(finding.line, 1);
 });
 
+test('keeps app and test SwiftData imports visible when storage ownership is unresolved', async t => {
+  const root = await fixture(t, {
+    'AAATests/StorageTests.swift': 'import SwiftData',
+    'App/Storage.swift': '\nimport class SwiftData.ModelContainer'
+  });
+  const {findings} = await inspect(root);
+  assert.deepEqual(findings.filter(item => item.code === 'swiftdata-manager-missing')
+    .map(({file, line, severity}) => [file, line, severity]),
+  [['AAATests/StorageTests.swift', 1, 'review'], ['App/Storage.swift', 2, 'review']]);
+});
+
 test('flags conditional database startup presentation in App.body', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
