@@ -591,7 +591,7 @@ test('a Feature exposed in an AppModel extension resolves with a computed-exposu
 
 test('requests review of an AppModel task without assuming its purpose', async t => {
   const root = await fixture(t, {
-    'Application/2 - AppModel/AppModel.swift': 'final class AppModel {\n    private var transactionUpdatesTask: Task<Void, Never>?\n    let settingsFeature: SettingsFeature\n    static func live() -> AppModel { AppModel() }\n}',
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel {\n    private var transactionUpdatesTask: Swift.Optional<_Concurrency.Task<Void, Never>>\n    let settingsFeature: SettingsFeature\n    static func live() -> AppModel { AppModel() }\n}',
     'Application/2 - AppModel/Features/Settings/SettingsFeature.swift': 'final class SettingsFeature {}',
     'ApplicationTests/FeatureTests/Settings/SettingsFeatureTests.swift': 'struct SettingsFeatureTests {}'
   });

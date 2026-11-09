@@ -354,10 +354,19 @@ export async function inspect(project) {
     for (const match of appMembers.matchAll(/(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(private[ \t]+)?(?:(?:private\(set\)|fileprivate|internal|public|package)[ \t]+)?(?:let|var)[ \t]+(\w+)[ \t]*:\s*(?:any\s+)?(?:\w+\s*\.\s*)*(\w+)/gm)) {
       const [, privateModifier, name, type] = match;
       let suffix = appModel.slice(match.index + match[0].length);
+      let optionalTask = false;
       const genericStart = /^\s*</.exec(suffix);
       if (genericStart) {
         const close = closingGenericArguments(suffix, genericStart[0].length - 1);
-        if (close >= 0) suffix = suffix.slice(close + 1);
+        if (close >= 0) {
+          const argument = suffix.slice(genericStart[0].length, close);
+          const taskStart = /^\s*(?:(?:Swift|_Concurrency)\s*\.\s*)?Task\s*</.exec(argument);
+          if (type === 'Optional' && taskStart) {
+            const taskEnd = closingGenericArguments(argument, taskStart[0].length - 1);
+            optionalTask = taskEnd >= 0 && !argument.slice(taskEnd + 1).trim();
+          }
+          suffix = suffix.slice(close + 1);
+        }
       }
       suffix = suffix.replace(/^[?!]/, '');
       const defaultValue = /^[ \t]*=(?!=)/.test(suffix);
@@ -370,7 +379,7 @@ export async function inspect(project) {
         continue;
       }
       // Lexical analysis cannot establish whether this is an app-wide listener.
-      if (type === 'Task' && privateModifier) {
+      if ((type === 'Task' || optionalTask) && privateModifier) {
         findings.push(finding('app-model-task-purpose', 'review', `AppModel retains ${name}; trace whether startup creates one app-wide listener, whether it forwards events to the owning Feature without a screen present, and how it stops or is replaced when required.`, appModelFile, lineOf(appModel, match.index)));
         continue;
       }
