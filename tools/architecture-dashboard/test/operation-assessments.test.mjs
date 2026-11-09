@@ -132,3 +132,16 @@ test('a started timing review stays unresolved until all four scenarios are asse
   operation.scenarios.push(...['leave','late-result','failure'].map(id => ({id,status:'not-applicable'})));
   assert.equal(operationAssessments(review).counts.sound, 1);
 });
+
+test('an unknown task relationship prevents a stable dashboard verdict', () => {
+  const result = operationAssessments({
+    operationInventory:{coverage:'complete'},
+    operations:[{...op, steps:[{
+      id:'callback',title:'Callback',relation:'unknown',detail:'Task owner could not be established.',
+      evidence:[{...op.evidence[0],excerpt:'callback()'}]
+    }]}]
+  });
+  assert.equal(result.counts.investigate, 1);
+  assert.match(result.verdict, /Inconclusive/);
+  assert.match(result.html, /<summary>⚠️ Needs investigation.*Callback: Task owner could not be established/s);
+});
