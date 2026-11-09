@@ -117,8 +117,11 @@ Case records may describe a completed feature checkpoint. A case record that
 describes the migration as complete must pin the resulting commit and link
 evidence for every item in the
 [migration completion gate](cfa-change-gate.md#migration-progress-and-completion-language).
-For example, record the affected targets’ minimum OS versions and link the
-evidence that changed paths support those versions. A passing run on a newer
+Reconcile `completionGate.affectedTargets` with the actual consumers of
+changed code, including extensions and other device targets. Record which
+targets each final-commit build covered in its `targets` array. Link evidence
+for any affected data handoff. Record each target’s minimum OS and link the
+evidence that changed paths support it. A passing run on a newer
 OS alone does not establish that compatibility.
 
 When any gate is missing, use progress language such as “Continuing migration:

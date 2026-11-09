@@ -58,8 +58,10 @@ completed records need this link and a fresh review before they validate. Use
 `hybridReviewEvidenceId` and `finalCfaAuditEvidenceId` for the two review links. Record the regression under
 `completionGate.manualBehaviourRegressionEvidenceId`. If evidence is missing
 or failed, use `partial` and explain the gap. Validation checks the recorded
-links and outcomes. A human reviewer checks the actual behaviour contract and
-its coverage.
+links and outcomes. The reviewer compares the declared affected targets with
+the actual consumers of the changed code, checks the behaviour contract,
+and verifies any affected handoff. A passing build entry for a target does
+not establish that its data handoff worked.
 
 ## Validate and review
 
