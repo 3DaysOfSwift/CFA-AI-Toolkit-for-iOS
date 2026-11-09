@@ -291,6 +291,20 @@ test('reviews direct SwiftData preview and query usage without flagging a normal
   assert.ok(matches.some(item => item.file.endsWith('EnvironmentScreen.swift')));
 });
 
+test('reviews a preview that injects a SwiftData context through the environment', async t => {
+  const file = 'Application/PreviewContent/NotesPreview.swift';
+  const root = await fixture(t, {
+    [file]: [
+      '#Preview {',
+      '  NotesView().environment(\\.modelContext, context)',
+      '}',
+      '#Preview { NotesView().environment(\\.locale, locale) }'
+    ].join('\n')
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'view-swiftdata-access');
+  assert.deepEqual(findings.map(item => [item.file, item.line, item.severity]), [[file, 2, 'review']]);
+});
+
 test('reviews SwiftData access in a SwiftUI View outside the CFA View folder', async t => {
   const root = await fixture(t, {
     'Application/Presentation/Notes.swift': [
