@@ -48,6 +48,9 @@ skill from that toolkit before changing the project.
 - A detail View may receive selected immutable value data and construct its own
   State-backed ViewModel in its initializer. Do not inject or share ViewModels;
   keep each scene's selection in presentation, not in a shared Feature.
+  Keep the selected snapshot and navigation stable when the source list changes.
+  Use explicit refresh where appropriate and adopt live updates when the product
+  calls for them.
 - In a new app with deep links or notification actions, DeepLinkingFeature
   validates opening requests and owns the durable pending list shown in Settings.
   Persist only the safe data needed to identify and present each request.

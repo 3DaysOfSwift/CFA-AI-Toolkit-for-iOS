@@ -39,6 +39,9 @@ the architecture:
    may provide isolated Features.
 3. Preserve independent screen and scene selection in presentation, not shared
    Features. Selected detail data may be passed into the View.
+   Keep an open detail and its selected snapshot stable when the source list
+   changes. Use explicit refresh where appropriate. Live updates depend on
+   the product requirements.
    When a new app supports deep links or notification actions, its
    DeepLinkingFeature validates received opening requests. Persist only the safe
    data needed to identify and present each request before confirming it is kept.
