@@ -374,6 +374,11 @@ do not claim that UI gating replaces server-side authorisation.
   Where a Feature must work across a date change, advance the controlled clock
   on the same instance and verify its next decision. Direct time reads in a
   View are suitable for transient visuals.
+- For preference restoration, exercise a supported saved value, a missing
+  value, and an obsolete value in the recognised format. Check that fallback
+  leaves the old value intact where the product requires it. Test unreadable
+  or corrupt durable storage and failed writes separately and verify that the
+  app exposes the failure.
 - For changes to durable editing, hold the save pending and verify that
   confirmed state stays unchanged. Fail the save and verify the screen
   presents a recoverable error and its ViewModel retains the draft for retry.

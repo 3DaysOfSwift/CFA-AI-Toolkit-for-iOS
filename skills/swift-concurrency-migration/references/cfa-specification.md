@@ -1857,6 +1857,11 @@ Before accepting a change, answer every question:
       value unchanged and the draft available for retry. Check that a successful
       retry publishes the replacement. Cancel an unsaved edit and verify that
       it leaves the confirmed and stored values unchanged.
+    - For non-critical preferences, verify that supported values restore and
+      missing or obsolete values use the product-defined safe fallback.
+      Check that fallback preserves the stored value where required. Exercise
+      unreadable or corrupt durable storage and failed writes separately,
+      and verify that the user sees an honest error.
     - For record-level writes, verify that overlapping edits to different
       records preserve both changes after reopening the store.
     - For changes to existing durable storage, open a disposable store
