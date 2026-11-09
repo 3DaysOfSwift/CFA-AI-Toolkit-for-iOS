@@ -38,12 +38,15 @@ the architecture:
    When a new app supports deep links or notification actions, its
    DeepLinkingFeature records received opening requests. Persist safe pending
    requests before confirming they are kept. Scheduling and delivery alone do
-   not add an item. The receiving scene owns navigation, and concurrent attempts
-   must not open the same request twice. Remove it after successful navigation
-   or explicit dismissal. Declined, cancelled or failed navigation leaves it
-   pending. Navigation succeeds when the destination opens, independently of
-   whether its content has loaded. During migration, preserve existing
-   deep-link, notification and history capabilities.
+   not add an item. Settings shows the shared pending list, which either scene
+   can act on using its own navigation state. Protect unsaved edits and active
+   payment flows. Concurrent attempts must not open the same request twice.
+   Remove a request after successful navigation or explicit dismissal. Declining,
+   cancelling before navigation, or failing to navigate leaves it pending.
+   Navigation succeeds when the destination opens, even if cancellation follows
+   or its content is still loading. A separate history is opt-in for new apps.
+   During migration, preserve existing deep-link, notification and history
+   capabilities.
 4. When the app uses `ThemeManager`, it is a presentation dependency supplied through the
    SwiftUI environment. AppModel and features are not environment
    values.
