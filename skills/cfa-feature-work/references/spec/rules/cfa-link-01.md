@@ -4,7 +4,7 @@
 
 **Strength:** Required when applicable.
 
-**Guidance:** For new apps, DeepLinkingFeature records requests to open a URL or notification action, not scheduled or merely delivered notifications. Persist safe pending requests before confirming they are kept. The receiving scene owns navigation, and either scene can open a shared request. Coordinate competing opens. Remove the request after successful navigation or explicit dismissal. Preserve existing deep-link, notification and history capabilities during migration.
+**Guidance:** For new apps, DeepLinkingFeature records requests to open a URL or notification action, not scheduled or merely delivered notifications. Persist safe pending requests before confirming they are kept. The receiving scene owns navigation, and either scene can open a shared request. Coordinate competing opens. Remove the request after successful navigation or explicit dismissal. Navigation succeeds when the scene opens the destination. Declined, cancelled or failed navigation leaves it pending. The destination loads its own content. Preserve existing deep-link, notification and history capabilities during migration.
 
 **Why:** The user can keep editing without losing the destination.
 

@@ -168,7 +168,7 @@
       "section": "Keep Screen Initializers Clean",
       "applies": "Handling deep links or notification destinations",
       "strength": "Required when applicable",
-      "rule": "For new apps, DeepLinkingFeature records requests to open a URL or notification action, not scheduled or merely delivered notifications. Persist safe pending requests before confirming they are kept. The receiving scene owns navigation, and either scene can open a shared request. Coordinate competing opens. Remove the request after successful navigation or explicit dismissal. Preserve existing deep-link, notification and history capabilities during migration.",
+      "rule": "For new apps, DeepLinkingFeature records requests to open a URL or notification action, not scheduled or merely delivered notifications. Persist safe pending requests before confirming they are kept. The receiving scene owns navigation, and either scene can open a shared request. Coordinate competing opens. Remove the request after successful navigation or explicit dismissal. Navigation succeeds when the scene opens the destination. Declined, cancelled or failed navigation leaves it pending. The destination loads its own content. Preserve existing deep-link, notification and history capabilities during migration.",
       "why": "The user can keep editing without losing the destination.",
       "verify": "Test request reception, durable restoration, refusal, successful navigation, multiple requests, storage failure and scene isolation.",
       "example": "A launch notification remains pending when a user chooses to keep editing; opening its page removes the request.",

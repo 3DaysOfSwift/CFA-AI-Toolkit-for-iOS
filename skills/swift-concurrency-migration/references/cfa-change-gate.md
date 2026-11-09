@@ -40,8 +40,10 @@ the architecture:
    requests before confirming they are kept. Scheduling and delivery alone do
    not add an item. The receiving scene owns navigation, and concurrent attempts
    must not open the same request twice. Remove it after successful navigation
-   or explicit dismissal. During migration, preserve existing deep-link,
-   notification and history capabilities.
+   or explicit dismissal. Declined, cancelled or failed navigation leaves it
+   pending. Navigation succeeds when the destination opens, independently of
+   whether its content has loaded. During migration, preserve existing
+   deep-link, notification and history capabilities.
 4. When the app uses `ThemeManager`, it is a presentation dependency supplied through the
    SwiftUI environment. AppModel and features are not environment
    values.
