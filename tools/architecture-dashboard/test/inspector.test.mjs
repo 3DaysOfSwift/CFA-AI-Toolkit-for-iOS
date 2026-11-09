@@ -149,13 +149,14 @@ test('a launch call in preview code is a review hint, not a production assertion
   assert.equal(findings.filter(item => item.code === 'view-tied-app-launch').length, 2);
 });
 
-test('reports inferred AppModel property defaults without flagging shared or local values', async t => {
+test('reports typed and inferred AppModel property defaults without flagging shared or local values', async t => {
   const file = 'Application/2 - AppModel/AppModel.swift';
   const root = await fixture(t, {
     [file]: `final class AppModel {
       static let shared = live()
       private var hasLaunched = false
       let feedFeature = FeedFeature()
+      public let ordersFeature: OrdersFeature = OrdersFeature()
       static func live() -> AppModel {
         let feature = FeedFeature()
         return AppModel()
@@ -164,7 +165,7 @@ test('reports inferred AppModel property defaults without flagging shared or loc
   });
   const { findings } = await inspect(root);
   assert.deepEqual(findings.filter(item => item.code === 'app-model-default-value')
-    .map(({file, line}) => [file, line]), [[file, 3], [file, 4]]);
+    .map(({file, line}) => [file, line]), [[file, 3], [file, 4], [file, 5]]);
 });
 
 test('does not identify a launch guard by the order of private Boolean properties', async t => {

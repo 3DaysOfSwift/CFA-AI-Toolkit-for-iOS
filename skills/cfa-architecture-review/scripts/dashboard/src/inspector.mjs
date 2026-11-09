@@ -197,7 +197,7 @@ export async function inspect(project) {
     for (const match of appMembers.matchAll(/(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(?:(?:private(?:\(set\))?|fileprivate|internal|public|package)[ \t]+)?(?:let|var)[ \t]+(\w+)[ \t]*=(?!=)/gm)) {
       findings.push(finding('app-model-default-value', 'warning', `AppModel property ${match[1]} has a default value; initialise it in the explicit initializer.`, appModelFile, lineOf(appModel, match.index)));
     }
-    for (const match of appMembers.matchAll(/(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(private[ \t]+)?(?:private\(set\)[ \t]+)?(?:let|var)[ \t]+(\w+)[ \t]*:[ \t]*(?:any[ \t]+)?(?:\w+[ \t]*\.[ \t]*)*(\w+)(?:<[^;\n=]*>)?[?!]?([ \t]*=(?!=))?/gm)) {
+    for (const match of appMembers.matchAll(/(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(private[ \t]+)?(?:(?:private\(set\)|fileprivate|internal|public|package)[ \t]+)?(?:let|var)[ \t]+(\w+)[ \t]*:[ \t]*(?:any[ \t]+)?(?:\w+[ \t]*\.[ \t]*)*(\w+)(?:<[^;\n=]*>)?[?!]?([ \t]*=(?!=))?/gm)) {
       const [, privateModifier, name, type, defaultValue] = match;
       const suffix = appModel.slice(match.index + match[0].length);
       // A getter is not stored state. Property observers still belong to storage.
