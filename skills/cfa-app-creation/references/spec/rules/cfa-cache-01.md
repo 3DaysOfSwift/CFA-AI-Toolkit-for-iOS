@@ -4,7 +4,7 @@
 
 **Strength:** Required when using this cache pattern.
 
-**Guidance:** Start restoration and refresh independently where both are needed. A missing, incompatible or unreadable cache must not block the download. Publish a current response without waiting for the optional cache write. Reject older restores after fresh data arrives, and keep valid in-memory data if refresh fails. Bound cache write retries, preserve an existing good cache on write failure, and prevent older writes from replacing newer snapshots.
+**Guidance:** Start restoration and refresh independently where both are needed. A missing, incompatible or unreadable cache must not block the download. Publish a current response without waiting for the optional cache write. Reject older restores after fresh data arrives, and keep valid in-memory data if refresh fails. Bound cache write retries, preserve an existing good cache on write failure, and prevent older writes from replacing newer snapshots. Claim offline availability only for a saved cache. Durable user edits still require successful persistence before publication as saved.
 
 **Why:** Previously downloaded data can appear quickly without sacrificing fresher server data.
 
