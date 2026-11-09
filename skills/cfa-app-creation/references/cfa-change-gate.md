@@ -339,6 +339,11 @@ do not claim that UI gating replaces server-side authorisation.
   [review checklist](spec/topics/29-review-checklist.md) for the full scope.
 - Confirm that concrete feature types and their AppModel properties retain the
   `Feature` suffix.
+- When a change introduces or duplicates app-wide values, apply the
+  [shared constants rule](spec/rules/cfa-const-01.md). Define repeated shared
+  values once in a purpose-named enum. Keep Feature-specific values with
+  their owner and use bundle metadata and localization resources where
+  they are authoritative. Keep secrets out of app constants.
 - Inspect AppModel's stored properties, initializer, and `live()`; then search
   for `AppModel.shared` stored elsewhere, View-tied launch calls,
   `ModelContainer` outside the storage boundary, and direct `URLSession` calls.
