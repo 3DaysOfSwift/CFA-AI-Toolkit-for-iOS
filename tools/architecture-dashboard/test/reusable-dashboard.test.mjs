@@ -46,6 +46,22 @@ test('overall failure is retained even when every reported test passed',()=>{
  assert.equal(importTestResults({...run,passedTests:3,failedTests:1,result:'Passed'}).outcome,'failed');
 });
 
+test('review evidence can cite fingerprinted configuration and rejects stale bytes', async t => {
+ const app=await fs.mkdtemp(path.join(os.tmpdir(),'cfa-config-evidence-'));
+ t.after(()=>fs.rm(app,{recursive:true,force:true}));
+ const file='App.entitlements';
+ const target=path.join(app,file);
+ await fs.writeFile(target,'<key>com.apple.security.application-groups</key>\n');
+ const report=await analyse(app);
+ const input={schemaVersion:1,sourceFingerprint:report.sourceFingerprint,author:'Reviewer',scope:'App configuration',
+   findings:[{title:'Shared container',status:'pass',description:'Uses an App Group.',check:'Verify signing.',
+     evidence:[{file,line:1,endLine:1}]}]};
+ const review=await importReview(report,input,app);
+ assert.match(review.findings[0].evidence[0].excerpt,/application-groups/);
+ await fs.writeFile(target,'<dict/>\n');
+ await assert.rejects(importReview(report,input,app),/evidence hash mismatch: App.entitlements/);
+});
+
 test('generic CLI imports reviewed ratings and test results without an example generator',async()=>{
  const root=await fs.mkdtemp(path.join(os.tmpdir(),'dashboard-fixture-'));
  try {

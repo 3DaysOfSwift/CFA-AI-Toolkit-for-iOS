@@ -157,7 +157,7 @@ export async function importReview(report,input,root) {
     q.concerns??=[];
   }
   const base=await fs.realpath(root),cache=new Map();
-  const hashes=new Map(report.files.map(f=>[f.path,f.hash]));
+  const hashes=new Map([...report.files, ...(report.buildDefinitions || [])].map(f=>[f.path,f.hash]));
   for(const ref of refs) {
     if(!text(ref.file)||path.isAbsolute(ref.file)||ref.file.split(/[\\/]/).includes('..')) fail('evidence must stay inside repository');
     if(!cache.has(ref.file)) {
@@ -166,9 +166,10 @@ export async function importReview(report,input,root) {
         throw error;
       });
       if(!real.startsWith(base+path.sep)) fail('evidence symlink escapes repository');
-      const source=await fs.readFile(real,'utf8');
+      const bytes=await fs.readFile(real);
       const expected=hashes.get(ref.file)??review.evidenceHashes?.[ref.file];
-      if(!expected||createHash('sha256').update(source).digest('hex')!==expected) fail('evidence hash mismatch: '+ref.file);
+      if(!expected||createHash('sha256').update(bytes).digest('hex')!==expected) fail('evidence hash mismatch: '+ref.file);
+      const source = bytes.toString('utf8');
       const lines = source ? source.split(/\r\n|\n|\r/) : [];
       if (lines.at(-1) === '') lines.pop();
       cache.set(ref.file,lines);
