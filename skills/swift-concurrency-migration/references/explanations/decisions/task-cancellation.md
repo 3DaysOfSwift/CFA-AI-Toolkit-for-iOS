@@ -23,11 +23,14 @@ Editorial analysis: continuing durable work consumes resources after presentatio
 
 ## Scope and exceptions
 
-Swift cancellation signals and CFA policy are different. Check the API's cancellation behaviour; do not assume an external request stopped or a transaction rolled back. A Feature-owned shared refresh normally continues when a screen leaves, even if it was the only caller, so the result remains available for later use. A different policy needs a specific product or resource reason. Shared waiters need a documented ownership policy.
+Swift cancellation signals and CFA policy are different. Check the API's cancellation behaviour; do not assume an external request stopped or a transaction rolled back. A Feature-owned shared refresh normally continues when a screen leaves, even if it was the only caller, so the result remains available for later use. A different policy needs a specific product or resource reason. Later equivalent callers can join the same refresh. If a screen must stop
+waiting promptly, give the waiter a cancellation path. Cancelling the caller
+while it awaits a retained task's value does not itself stop the shared task
+or end the wait.
 
 ## Verification
 
-Cancel before work, during suspension and before publication. Verify durable commits, individual waiter outcomes, stale-result rejection and subsequent retries using controlled dependencies.
+Cancel before work, during suspension and before publication. Verify durable commits, individual waiter outcomes, stale-result rejection and subsequent retries using controlled dependencies. Hold a shared refresh open, cancel its only screen waiter, and verify that the Feature can still publish the result for a later caller. If the design promises a prompt exit for the cancelled waiter, verify it exits before releasing the refresh.
 
 ## Evidence and provenance
 
