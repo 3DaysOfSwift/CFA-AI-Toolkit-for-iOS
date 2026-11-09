@@ -193,9 +193,9 @@ test('a nested snapshot type is not a ViewModel initializer input', async t => {
 
 test('selected detail data and owned State are reviewed rather than rejected', async t => {
   const { report, findings } = await inspectView(t, `struct HomeView: View {
-    @State private var reminders: HomeViewModel
+    @State private var modèle: HomeViewModel
     init(launch: LaunchSnapshot) {
-      _reminders = State(initialValue: HomeViewModel(launch: launch))
+      _modèle = State(initialValue: HomeViewModel(launch: launch))
     }
     var body: some View { Text("Home") }
   }`);
@@ -225,6 +225,7 @@ for (const declaration of [
   '@State private var viewModel = HomeViewModel()',
   '@State private var viewModel: HomeViewModel = HomeViewModel()',
   '@State private var reminders = HomeViewModel()',
+  '@State private var modèle = HomeViewModel()',
   '@State private var `default` = HomeViewModel()',
   '@State private var `viewModel`: HomeViewModel = .init()',
   '@State private var reminders: HomeViewModel = .init()',
@@ -241,7 +242,7 @@ for (const declaration of [
     assert.equal(report.screens[0].ownsViewModel, true);
     assert.deepEqual(findings, []);
     const naming = report.findings.find(item => item.code === 'view-model-property-name');
-    if (/reminders|`default`/.test(declaration)) {
+    if (/reminders|modèle|`default`/.test(declaration)) {
       assert.equal(naming?.severity, 'warning');
       assert.equal(naming?.file, viewPath);
       assert.equal(naming?.line, 2);

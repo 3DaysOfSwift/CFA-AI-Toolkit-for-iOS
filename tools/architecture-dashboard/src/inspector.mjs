@@ -595,13 +595,14 @@ export async function inspect(project) {
     const testFile = testCandidates.length === 1 ? testCandidates[0] : null;
     const viewModelTypePattern = `(?:(?:\\w+\\s*\\.\\s*)*${viewModelName})`;
     const stateTypePattern = `(?:SwiftUI\\s*\\.\\s*)?State`;
-    const propertyNamePattern = '(?:`([A-Za-z_]\\w*)`|([A-Za-z_]\\w*))';
-    const statePattern = new RegExp(`@${stateTypePattern}\\s+private\\s+var\\s+${propertyNamePattern}(?:\\s*:\\s*${viewModelTypePattern})?\\s*=\\s*${viewModelTypePattern}(?:\\s*\\.\\s*init)?\\s*\\(\\s*\\)`);
-    const typedStatePattern = new RegExp(`@${stateTypePattern}\\s+private\\s+var\\s+${propertyNamePattern}\\s*:\\s*${viewModelTypePattern}\\s*=\\s*\\.init\\s*\\(\\s*\\)`);
+    const identifier = '[\\p{L}_][\\p{L}\\p{M}\\p{N}_]*';
+    const propertyNamePattern = '(?:`(' + identifier + ')`|(' + identifier + '))';
+    const statePattern = new RegExp(`@${stateTypePattern}\\s+private\\s+var\\s+${propertyNamePattern}(?:\\s*:\\s*${viewModelTypePattern})?\\s*=\\s*${viewModelTypePattern}(?:\\s*\\.\\s*init)?\\s*\\(\\s*\\)`, 'u');
+    const typedStatePattern = new RegExp(`@${stateTypePattern}\\s+private\\s+var\\s+${propertyNamePattern}\\s*:\\s*${viewModelTypePattern}\\s*=\\s*\\.init\\s*\\(\\s*\\)`, 'u');
     const inlineState = statePattern.exec(members) ?? typedStatePattern.exec(members);
     let ownedState = inlineState && { name: inlineState[1] ?? inlineState[2], index: inlineState.index };
     const typedStateProperties = [...members.matchAll(new RegExp(
-      `@${stateTypePattern}\\s+private\\s+var\\s+${propertyNamePattern}\\s*:\\s*${viewModelTypePattern}\\b`, 'g'
+      `@${stateTypePattern}\\s+private\\s+var\\s+${propertyNamePattern}\\s*:\\s*${viewModelTypePattern}\\b`, 'gu'
     ))].map(match => ({ name: match[1] ?? match[2], index: match.index }));
     const dependencies = [];
     for (const { index, parameters, injectedViewModel, injectedAppModel, possibleModelDependency, initializerBody } of typeInitializers(body)) {
@@ -616,7 +617,7 @@ export async function inspect(project) {
         const statePropertyNames = typedStateProperties.map(property => property.name);
         if (inlineState) statePropertyNames.push(inlineState[1] ?? inlineState[2]);
         const assignsViewModel = statePropertyNames.some(property =>
-          new RegExp(`\\b_?${property}\\s*=(?!=)`).test(initializerBody)
+          new RegExp(`(?<![\\p{L}\\p{M}\\p{N}_])_?${property}\\s*=(?!=)`, 'u').test(initializerBody)
         );
         if (assignsViewModel) {
           findings.push(finding('view-model-initializer-construction', 'review', `${name} assigns ViewModel state in init. Verify it constructs its own ViewModel from a selected immutable snapshot and does not accept an injected ViewModel.`, viewFile, lineOf(view, bodyOffset + index)));
