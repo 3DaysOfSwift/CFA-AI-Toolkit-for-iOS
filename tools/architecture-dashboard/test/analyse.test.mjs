@@ -40,9 +40,12 @@ test('scan excludes test folders and symlinks and does not change input',async()
     await fs.writeFile(path.join(root,'App.swift'),'@main struct Demo: App { Task { } }');
     await fs.writeFile(path.join(root,'AppTests','Test.swift'),'Task { }');
     await fs.symlink(path.join(root,'App.swift'),path.join(root,'Link.swift'));
+    await fs.mkdir(path.join(root,'Contest'));
+    await fs.writeFile(path.join(root,'Contest','ContestFeature.swift'),'struct ContestFeature {}');
     const before=await fs.readFile(path.join(root,'App.swift'),'utf8');
-    const report=await analyse(root);assert.equal(report.scope.fileCount,1);assert.equal(report.files[0].entries.length,1);
-    assert.equal((await analyse(root,{includeTests:true})).scope.fileCount,2);
+    const report=await analyse(root);assert.deepEqual(report.files.map(file => file.path), ['App.swift', 'Contest/ContestFeature.swift']);
+    assert.equal(report.files[0].entries.length,1);
+    assert.equal((await analyse(root,{includeTests:true})).scope.fileCount,3);
     assert.equal(await fs.readFile(path.join(root,'App.swift'),'utf8'),before);
   } finally { await fs.rm(root,{recursive:true,force:true}); }
 });

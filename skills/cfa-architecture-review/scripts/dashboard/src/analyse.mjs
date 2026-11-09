@@ -94,7 +94,7 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
       const absolute = path.join(directory, entry.name);
       if (entry.isSymbolicLink()) continue;
       if (entry.isDirectory()) {
-        if (excluded.has(entry.name) || entry.name.startsWith('.') || (!includeTests && /tests?$/i.test(entry.name)) || absolute === excludedOutput) continue;
+        if (excluded.has(entry.name) || entry.name.startsWith('.') || (!includeTests && (/^[Tt]ests?$/.test(entry.name) || /Tests?$/.test(entry.name))) || absolute === excludedOutput) continue;
         await walk(absolute);
       } else if (entry.isFile() && entry.name.endsWith('.swift')) {
         const relative = path.relative(root, absolute).split(path.sep).join('/');

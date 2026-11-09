@@ -143,8 +143,8 @@ func swiftFiles(in root: URL) throws -> [URL] {
         let values = try url.resourceValues(forKeys: [.isDirectoryKey, .isSymbolicLinkKey])
         if values.isSymbolicLink == true { if values.isDirectory == true { enumerator.skipDescendants() }; continue }
         if values.isDirectory == true {
-            let name = url.lastPathComponent.lowercased()
-            if excluded.contains(url.lastPathComponent) || name.hasSuffix("test") || name.hasSuffix("tests") { enumerator.skipDescendants() }
+            let name = url.lastPathComponent
+            if excluded.contains(name) || name == "test" || name == "tests" || name.hasSuffix("Test") || name.hasSuffix("Tests") { enumerator.skipDescendants() }
         } else if url.pathExtension == "swift" { files.append(url) }
     }
     return files.sorted { $0.path < $1.path }
