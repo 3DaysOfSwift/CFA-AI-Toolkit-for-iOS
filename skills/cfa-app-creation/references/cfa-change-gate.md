@@ -289,9 +289,11 @@ from precedent use; do not reframe it as a completed partial migration.
   screens use `.task` for their own initial work—not as a substitute for
   application launch. Confirm the app delegate starts each shared system
   refresh at launch without gating or delaying the root UI.
-- When launch and screen refresh can overlap, confirm callers await the one
-  Feature-owned in-flight task rather than duplicate the request or silently
-  return; test its success, failure and reset after completion.
+- When launch and screen refresh can overlap, verify the Feature's policy.
+  By default, equivalent callers that need the outcome join the same
+  Feature-owned request and receive its result. The synchronous launch signal
+  may start the request without waiting. Test success, failure and cleanup,
+  and record the reason and tests for any different product policy.
 - Confirm repeated synchronous Button actions follow their intended policy:
   equivalent requests may reuse a ViewModel-owned task when one result satisfies
   every caller; distinct commands that must each take effect are admitted and
