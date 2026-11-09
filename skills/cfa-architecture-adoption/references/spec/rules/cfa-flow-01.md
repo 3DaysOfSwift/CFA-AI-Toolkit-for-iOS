@@ -4,7 +4,7 @@
 
 **Strength:** Required.
 
-**Guidance:** Keep the relationship View → ViewModel → Feature → Microservices; AppModel composes and exposes Features.
+**Guidance:** Keep dependencies directed from View to ViewModel to Feature. A Feature calls internal microservices as needed. AppModel composes and exposes Features.
 
 **Why:** Dependencies follow clear ownership instead of scattered business decisions.
 
@@ -12,6 +12,6 @@
 
 **Explanation:** [Why use a UI and model boundary in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/presentation-boundaries).
 
-**Verify:** Trace a user operation through each layer and inspect reverse dependencies.
+**Verify:** Trace a user operation to its owning Feature and any microservices it uses. Inspect for reverse dependencies.
 
 **Full rule, context and examples:** [Layered Architecture](../topics/11-layered-architecture.md). This card is a reading aid; apply the complete canonical section.

@@ -49,7 +49,8 @@ skill from that toolkit before changing the project.
   during migration and maintenance, and keep explicitly requested visual
   changes within scope. Missing optional themes, branding or a CFA footer
   do not count as architecture findings.
-- Preserve the CFA call path: View → ViewModel → Feature → Microservices (such as providers, storage or device API adapters).
+- Preserve the CFA call path from View to ViewModel to Feature. The Feature
+  calls internal microservices when it needs networking, storage or device APIs.
 - Every screen-level SwiftUI View owns a dedicated ViewModel. Declare it as
   @State private var viewModel and construct it inline by default. Keep View
   and ViewModel initializers and View body construction free of blocking work

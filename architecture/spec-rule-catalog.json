@@ -578,10 +578,10 @@
       "section": "Layered Architecture",
       "applies": "Designing or reviewing application structure",
       "strength": "Required",
-      "rule": "Keep the relationship View → ViewModel → Feature → Microservices; AppModel composes and exposes Features.",
+      "rule": "Keep dependencies directed from View to ViewModel to Feature. A Feature calls internal microservices as needed. AppModel composes and exposes Features.",
       "why": "Dependencies follow clear ownership instead of scattered business decisions.",
       "example": "A screen ViewModel asks a schedule Feature, which calls a networking microservice.",
-      "verify": "Trace a user operation through each layer and inspect reverse dependencies.",
+      "verify": "Trace a user operation to its owning Feature and any microservices it uses. Inspect for reverse dependencies.",
       "explanationIds": [
         "presentation-boundaries"
       ]

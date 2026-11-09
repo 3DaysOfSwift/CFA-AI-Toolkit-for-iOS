@@ -102,7 +102,7 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /Keep this text\./);
   assert.match(content, /Preserve the existing product design\s+during migration and maintenance/);
   assert.match(content, /Missing optional themes, branding or a CFA footer\s+do not count as architecture findings/);
-  assert.match(content, /View → ViewModel → Feature → Microservices/);
+  assert.match(content, /from View to ViewModel to Feature\. The Feature\s+calls internal microservices when it needs networking, storage or device APIs/);
   assert.match(content, /SwiftDataManager owns container and context creation/);
   assert.match(content, /changing shared Model code or\s+services used by an existing target/);
   assert.match(content, /Verify that existing data handoffs still work/);
