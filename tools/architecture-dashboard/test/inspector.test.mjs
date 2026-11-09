@@ -346,6 +346,19 @@ test('identifies priority and explicitly typed Tasks scheduling the launch signa
   assert.deepEqual(files, ['Application/DetachedDelegate.swift', 'Application/ExplicitInitializerDelegate.swift', 'Application/OperationArgumentDelegate.swift', 'Application/PriorityDelegate.swift', 'Application/TypedDelegate.swift']);
 });
 
+test('checks qualified AppModel factory return types and shared initializers', async t => {
+  const file = 'Application/2 - AppModel/AppModel.swift';
+  const source = `final class AppModel {
+    static let shared: Application.AppModel = Application.AppModel.live()
+    static func live() -> Application.AppModel { AppModel() }
+  }`;
+  const root = await fixture(t, {[file]: source});
+  const factoryCodes = ['app-model-live-factory', 'app-model-shared-factory'];
+  assert.ok(!(await inspect(root)).findings.some(item => factoryCodes.includes(item.code)));
+  await fs.writeFile(path.join(root, file), source.replace('Application.AppModel.live()', 'Application.AppModel()'));
+  assert.equal((await inspect(root)).findings.find(item => item.code === 'app-model-shared-factory')?.line, 2);
+});
+
 test('a live factory in an extension is not reported as definitely absent', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel {}',
