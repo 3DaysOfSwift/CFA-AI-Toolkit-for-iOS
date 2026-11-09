@@ -85,7 +85,8 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /draft available for retry if saving fails/);
   assert.match(content, /same account can sign back in before old work finishes, check the\s+session identity/);
   assert.match(content, /missing, incompatible or unreadable cache\s+supplies no restored data/);
-  assert.match(content, /Instant Loading binary snapshots only\s+on request and for a sufficiently stable format/);
+  assert.match(content, /Instant Loading binary snapshots only\s+on request and for a sufficiently stable format with safe decoding/);
+  assert.match(content, /Avoid\s+proposing binary snapshots during app creation or migration/);
   assert.match(content, /publish confirmed changes only after required persistence succeeds/);
   assert.match(content, /Call the AppModel launch signal directly\s+and synchronously from the application lifecycle callback/);
   assert.match(content, /AppModel signals the relevant Features and starts its\s+required app-wide listeners before the callback returns/);

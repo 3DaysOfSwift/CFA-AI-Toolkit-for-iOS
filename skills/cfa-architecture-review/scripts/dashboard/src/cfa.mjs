@@ -191,7 +191,8 @@ skill from that toolkit before changing the project.
   snapshots. Report offline availability only for data that was saved. Use JSON
   by default for a simple cache. A missing, incompatible or unreadable cache
   supplies no restored data. Help apply Instant Loading binary snapshots only
-  on request and for a sufficiently stable format.
+  on request and for a sufficiently stable format with safe decoding. Avoid
+  proposing binary snapshots during app creation or migration.
 - App.body installs a stable root View and presentation modifiers only. Keep
   startup conditionals, database loading and feature error UI out of App and
   out of the root navigation View; feature screens present their own state.
