@@ -115,6 +115,10 @@ test('reconciled task sites must be cited in a workflow step', () => {
   const review = complete();
   const [site] = taskCandidates(inventory);
   review.taskSites = [{siteId:site.id,operationId:'launch'}];
+  assert.throws(() => nextWork(inventory, review), /reconciled task site: launch → App\.swift:3:5/);
+  review.taskSites[0].operationId = 'unknown';
+  assert.throws(() => nextWork(inventory, review), /unknown operation: unknown → App\.swift:3:5/);
+  review.taskSites[0].operationId = 'launch';
   const evidence = [{file:'App.swift',line:3,endLine:3}];
   review.operations[0].evidence.push(...evidence);
   assert.match(coverageGaps(inventory,review).join(' '), /need workflow steps: App.swift:3:5/);
