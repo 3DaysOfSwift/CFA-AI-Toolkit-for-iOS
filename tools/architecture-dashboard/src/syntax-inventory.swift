@@ -37,6 +37,14 @@ final class SourceInventory: SyntaxVisitor {
                           enclosingFunction: functions.last, lexicalTaskParent: tasks.last))
     }
 
+    override func visit(_ node: SourceFileSyntax) -> SyntaxVisitorContinueKind {
+        if file.split(separator: "/").last == "main.swift",
+           let firstStatement = node.statements.first(where: { $0.item.as(DeclSyntax.self) == nil }) {
+            record("entry.main", "main.swift", firstStatement)
+        }
+        return .visitChildren
+    }
+
     private func recordMain(_ name: String, _ node: some SyntaxProtocol, attributes: AttributeListSyntax) {
         if attributes.contains(where: { $0.as(AttributeSyntax.self)?.attributeName.trimmedDescription == "main" }) {
             record("entry.main", name, node)
