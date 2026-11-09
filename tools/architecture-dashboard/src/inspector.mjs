@@ -513,9 +513,21 @@ export async function inspect(project) {
   const viewConformances = /\bextension\s+(\w+)\s*:\s*(?:(?:\w+\s*\.\s*)*\w+\s*,\s*)*(?:SwiftUI\s*\.\s*)?View\b(?!\s*\.)[^{}]*\{/g;
   const rootViewNames = new Set(['ContentView', 'RootTabView', 'RootView']);
   const viewNames = new Set();
+  const extendedViews = new Set();
   for (const source of sources.values()) {
     for (const view of source.matchAll(viewDeclarations)) viewNames.add(view[1]);
-    for (const view of source.matchAll(viewConformances)) viewNames.add(view[1]);
+    for (const view of source.matchAll(viewConformances)) {
+      viewNames.add(view[1]);
+      extendedViews.add(view[1]);
+    }
+  }
+  function declarationsForViews(source) {
+    const direct = [...source.matchAll(viewDeclarations)];
+    if (!extendedViews.size) return direct;
+    const directOffsets = new Set(direct.map(view => view.index));
+    const extended = [...source.matchAll(/\bstruct\s+(\w+)\b[^{}]*\{/g)]
+      .filter(view => extendedViews.has(view[1]) && !directOffsets.has(view.index));
+    return [...direct, ...extended].sort((a, b) => a.index - b.index);
   }
   const swiftDataAccess = /\b(?:ModelContainer|ModelContext)\b|@(?:SwiftData\s*\.\s*)?Query\b|\.(?:modelContainer|`modelContainer`)\s*\(|(?:@(?:SwiftUI\s*\.\s*)?Environment|\.\s*environment)\s*\(\s*\\\s*(?:(?:SwiftUI\s*\.\s*)?EnvironmentValues\s*)?\.\s*modelContext\b/;
   for (const [file, source] of sources) {
@@ -534,7 +546,7 @@ export async function inspect(project) {
         findings.push(finding('preview-feature-access', 'review', 'This preview appears to access a Feature directly. A normal CFA preview constructs the View and uses its usual ViewModel and Feature route.', file, lineOf(source, start + access.index)));
       }
     }
-    for (const view of source.matchAll(viewDeclarations)) {
+    for (const view of declarationsForViews(source)) {
       const start = view.index + view[0].length;
       const body = braceBody(source, start - 1);
       inspectScreenInputs(view[1], body, source, start, file, findings);
@@ -571,7 +583,7 @@ export async function inspect(project) {
       }
     }
     if (!isViewFile) {
-      for (const view of source.matchAll(viewDeclarations)) {
+      for (const view of declarationsForViews(source)) {
         const start = view.index + view[0].length;
         const body = braceBody(source, start - 1);
         inspectLifecycleClosures(body, file, findings, lineOf(source, start));
@@ -594,7 +606,7 @@ export async function inspect(project) {
     }
     // Known root conventions only: this is a review hint, not data-flow analysis.
     // Keep feature-screen conditionals and unrelated adaptive layout out of this check.
-    for (const rootView of source.matchAll(viewDeclarations)) {
+    for (const rootView of declarationsForViews(source)) {
       if (!rootViewNames.has(rootView[1])) continue;
       const bodyOffset = rootView.index + rootView[0].length;
       const rootBody = braceBody(source, bodyOffset - 1);
@@ -618,7 +630,7 @@ export async function inspect(project) {
   for (const viewFile of [...paths].filter(file => screenPath.test(file) && !file.endsWith('/RootTabView.swift')).sort()) {
     const view = sources.get(viewFile);
     const name = screenName(viewFile);
-    const declaration = [...view.matchAll(viewDeclarations)].find(match => match[1] === name);
+    const declaration = declarationsForViews(view).find(match => match[1] === name);
     if (!declaration) continue;
     const bodyOffset = declaration.index + declaration[0].length;
     const body = braceBody(view, bodyOffset - 1);
