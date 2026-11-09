@@ -540,6 +540,12 @@ For each relevant operation, inspect:
   preferences, check the update before publication and treat it as an
   in-memory update. When confirmed persistence is required, look for a
   storage API that reports the write outcome.
+- Durable storage upgrades: when reviewing a storage change, check the
+  previous store location and format against the new open or migration path.
+  Use a disposable store written by the previous implementation with
+  representative synthetic records. Verify the new implementation reopens
+  those records and a failed open or upgrade preserves the original data.
+  Record this evidence separately from tests that start with an empty store.
 - Preference restoration: apply the [safe fallback rule](spec/rules/cfa-pref-01.md)
   in CFA. Check that a supported value is restored and that a missing or
   obsolete non-critical value in a recognised format uses the product's safe
