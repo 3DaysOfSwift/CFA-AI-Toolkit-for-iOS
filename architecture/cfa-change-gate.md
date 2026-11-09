@@ -557,5 +557,6 @@ identifies all of the following:
   agreed structure.
 
 If any item is absent, failed, or only inferred, say **“Continuing migration”**
-and name the missing checkpoint. Record a failed pilot honestly and block it
-from precedent use; do not reframe it as a completed partial migration.
+and name the missing checkpoint. Record failed pilots as blocked evidence and
+exclude them from successful migration precedents. A reviewed failed pilot can
+still document a lesson or serve as a negative example after evidence review.

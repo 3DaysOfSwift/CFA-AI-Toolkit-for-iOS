@@ -255,7 +255,9 @@ during or after migration. Before completion, verify the same scenario on
 the affected target, build configuration and OS at the final commit.
 If a required check is missing or a failure remains unresolved, report the
 work as continuing and name that checkpoint. Record failed pilots as
-blocked evidence and exclude them from migration precedents.
+blocked evidence and exclude them from successful migration precedents. A
+reviewed failed pilot can document a lesson or serve as a negative example
+under the [migration evidence workflow](references/migration-evidence.md#review-before-reuse).
 
 ## Continuation contract
 
