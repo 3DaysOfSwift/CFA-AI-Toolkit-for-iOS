@@ -736,9 +736,7 @@ export async function inspect(project) {
     for (const location of dependencySources) {
       for (const initializer of typeInitializers(location.body)) {
         inspectInitializerTask(viewModelName, initializer, location.source, location.offset, location.file, findings);
-        const service = initializer.types.find(type =>
-          type === 'NetworkingManager' || type === 'SwiftDataManager' || type.endsWith('Repository')
-        );
+        const service = initializer.types.find(type => serviceTypeSuffix.test(type));
         if (service) {
           findings.push(finding('view-model-non-feature-dependency', 'review', `${viewModelName} accepts ${service} in its initializer. Verify that the ViewModel calls a Feature and that the Feature owns the service dependency.`, location.file, lineOf(location.source, location.offset + initializer.index)));
         }
@@ -747,6 +745,11 @@ export async function inspect(project) {
     const viewModelMembers = viewModelDeclaration
       ? viewModel.slice(0, viewModelBodyStart).replace(/[^\n]/g, ' ') + memberSignatures(viewModelBody)
       : '';
+    const storedDependency = /\b(?:let|var)\s+`?\w+`?\s*:\s*(?:(?:any|some)\s+)?(?:\w+\s*\.\s*)*(\w+)\b(?!\s*\.)(?:[ \t]*[?!])?/g;
+    for (const match of viewModelMembers.matchAll(storedDependency)) {
+      if (!serviceTypeSuffix.test(match[1]) || hasComputedAccessor(viewModel.slice(match.index + match[0].length))) continue;
+      findings.push(finding('view-model-non-feature-dependency', 'review', `${viewModelName} appears to store ${match[1]} directly. Verify that the ViewModel calls a Feature and that the Feature owns the service dependency.`, viewModelFile, lineOf(viewModel, match.index)));
+    }
     const typedAppModelStorage = /\b(?:let|var)\s+`?\w+`?\s*:\s*(?:\w+\s*\.\s*)*AppModel\b(?!\s*\.)(?:[ \t]*[?!])?/g;
     const retainedAppModels = [...viewModelMembers.matchAll(typedAppModelStorage)].filter(match =>
       !hasComputedAccessor(viewModel.slice(match.index + match[0].length)));

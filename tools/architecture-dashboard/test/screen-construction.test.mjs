@@ -665,3 +665,17 @@ test('reviews a lower-level service injected directly into a screen ViewModel', 
   assert.deepEqual(report.findings.filter(item => item.code === 'view-model-non-feature-dependency')
     .map(({file, line}) => [file, line]), [[file, 2], [extensionFile, 2]]);
 });
+
+test('reviews stored ViewModel services without an explicit initializer', async t => {
+  const file = viewPath.replace('View.swift', 'ViewModel.swift');
+  const {report} = await inspectView(t, 'struct HomeView: View { @State private var viewModel = HomeViewModel() }', {
+    [file]: `final class HomeViewModel {
+      private let network: App.NetworkingManager = .init()
+      private var computed: NotesRepository? { nil }
+      private var snapshot: NotesRepository.Snapshot?
+      func example() { let local: NetworkingManager = .init() }
+    }`
+  });
+  assert.deepEqual(report.findings.filter(item => item.code === 'view-model-non-feature-dependency')
+    .map(({file, line}) => [file, line]), [[file, 2]]);
+});
