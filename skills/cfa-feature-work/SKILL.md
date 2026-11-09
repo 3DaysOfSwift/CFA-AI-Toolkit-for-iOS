@@ -122,9 +122,10 @@ If the project is already CFA, make the smallest complete vertical change:
    sources, complete one refresh before restoration and verify that cached
    data from other sources remains usable.
    Verify that a failed refresh keeps valid data visible. If cache replacement
-   fails, keep fresh data visible and reopen storage to check the last usable
-   snapshot. Control write order to verify that an older write cannot replace
-   a newer snapshot.
+   fails, verify retries stop within the configured limit and the fresh
+   result stays visible. Reopen storage to check the last usable snapshot and
+   verify that any offline availability refers to saved data. Control write
+   order to verify that an older write cannot replace a newer snapshot.
    For changed asynchronous operations, apply the
    [overlapping-call rule](references/spec/rules/cfa-task-01.md). Share one
    execution when it can satisfy equivalent callers. Queue commands that
