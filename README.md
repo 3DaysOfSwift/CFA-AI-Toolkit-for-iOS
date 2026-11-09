@@ -381,9 +381,11 @@ cfa inspect /path/to/your-xcode-project --json
 
 The inspector looks for conventionally placed SwiftUI screens and maps the
 ViewModels, `AppModel.shared` Feature routes, and named tests it can identify.
-It flags gaps for review. A source scan can miss screens and routes that use
-different layouts or indirect wiring. The CFA Architecture Review skill uses
-the map to guide source inspection and verify findings.
+It distinguishes recognisable navigation-only tab roots from feature screens
+and flags possible Feature access or storage gating in root navigation. Treat
+these findings as review leads. The scan can miss indirect wiring and cannot
+verify Xcode target membership or runtime behaviour. The CFA Architecture
+Review skill uses the map to guide source inspection and verify findings.
 The inspector reports ViewModel ownership and naming separately. A recognized
 private `@State` ViewModel under a different name still counts as screen-owned.
 CFA names that property `viewModel`.
