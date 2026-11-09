@@ -142,11 +142,13 @@ responsiveness.
 When reviewing shared refreshes in a CFA app, apply the
 [shared refresh rule](references/spec/rules/cfa-task-02.md). Trace who owns
 the request and what happens when its only screen leaves. Verify that the
-Feature can still publish the result with no screen waiting, and that a
-later equivalent caller joins an in-flight request. Where prompt exit is
-required, check that the departing screen stops waiting while the request
-is still suspended. Identify any product or resource requirement that
-justifies a different lifetime.
+Feature can still publish the result with no screen waiting. Separately,
+verify that a later equivalent caller joins without starting a duplicate
+request, and that cancelling one of several waiters leaves the others able
+to receive the result. Where prompt exit is required, check that the
+departing screen stops waiting while the request is still suspended.
+Identify any product or resource requirement that justifies a different
+lifetime.
 
 When reviewing an optional download cache, apply the
 [optional snapshot rule](references/spec/rules/cfa-cache-01.md). Trace three

@@ -53,8 +53,10 @@ Record a baseline and a short ledger: observed problem, owner, change, evidence,
 When tidying shared refreshes, apply the
 [shared refresh rule](references/spec/rules/cfa-task-02.md). Unless the product
 has a different policy, verify that the Feature keeps the result even if its
-only screen waiter leaves. Where a screen must exit promptly, verify its wait
-ends before the suspended refresh completes.
+only screen waiter leaves. Verify separately that a later equivalent caller
+joins without a duplicate request and that cancelling one of several waiters
+leaves the others able to receive the result. Where a screen must exit
+promptly, verify its wait ends before the suspended refresh completes.
 
 When moving durable storage ownership, preserve the existing store location,
 schema compatibility and saved records. Verify against a disposable store written
