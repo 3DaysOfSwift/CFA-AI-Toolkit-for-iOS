@@ -43,8 +43,10 @@ or invoking the paid capability. Exercise locked and entitled outcomes for both
 exposure and execution on the relevant routes. For a confirmed unguarded path,
 cite the entry point and the paid call or exposure and describe the consequence.
 Matching source text alone does not resolve the call or establish a guard or
-violation. The compiler index is
-build-specific and its freshness is unverified. Aliases, external code,
+violation. Syntax and index records are matched by source line. If several calls occur on
+one line, verify which enclosing symbol belongs to the paid call before
+following its callers. The compiler index is build-specific and its freshness
+is unverified. Aliases, external code,
 dynamic dispatch and omitted spellings can escape this scan. If the syntax
 inventory is unavailable or a path cannot be resolved, record it as unverified;
 zero matches do not constitute a pass. Enforce protected server actions on the
