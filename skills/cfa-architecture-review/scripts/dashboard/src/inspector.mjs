@@ -450,7 +450,7 @@ export async function inspect(project) {
         const parameters = body.slice(opening + 1, closing);
         const injectedViewModel = /:\s*(?:any\s+)?(?:\w+\s*\.\s*)*\w*ViewModel\b(?!\s*\.)/.test(parameters);
         if (parameters.trim()) {
-          findings.push(finding('screen-initializer-inputs', injectedViewModel ? 'warning' : 'review', injectedViewModel ? `${name} appears to accept a ViewModel; CFA screens construct their own.` : `${name} accepts initializer inputs. Verify that detail inputs are selected value data and no ViewModel is injected.`, viewFile, lineOf(view, bodyOffset + initializer.index)));
+          findings.push(finding('screen-initializer-inputs', injectedViewModel ? 'warning' : 'review', injectedViewModel ? `${name} appears to accept a ViewModel; CFA screens construct their own.` : `${name} accepts initializer inputs. Verify that the detail input is a selected immutable snapshot and no ViewModel is injected.`, viewFile, lineOf(view, bodyOffset + initializer.index)));
         }
         const tail = body.slice(closing + 1);
         const openingBody = /^\s*(?:(?:async|throws|rethrows)\s*)*\{/.exec(tail);
@@ -466,7 +466,7 @@ export async function inspect(project) {
             new RegExp(`\\b_?${property}\\s*=(?!=)`).test(initializerBody)
           );
           if (assignsViewModel) {
-            findings.push(finding('view-model-initializer-construction', 'review', `${name} assigns ViewModel state in init. Verify it constructs its own ViewModel from selected detail data and does not accept an injected ViewModel.`, viewFile, lineOf(view, bodyOffset + initializer.index)));
+            findings.push(finding('view-model-initializer-construction', 'review', `${name} assigns ViewModel state in init. Verify it constructs its own ViewModel from a selected immutable snapshot and does not accept an injected ViewModel.`, viewFile, lineOf(view, bodyOffset + initializer.index)));
           }
         }
       }
@@ -509,7 +509,7 @@ export async function inspect(project) {
     const structuralRoot = name === 'ContentView' && /\bTabView\s*[(\{]/.test(body) && !/\b(?:AppModel|\w+Feature)\b/.test(body);
     if (!viewModel && !structuralRoot) findings.push(finding('view-model-missing', 'review', `${name} has no adjacent ${viewModelName}. Verify whether it is a screen requiring a dedicated ViewModel or a reusable presentation component.`, viewFile, 1));
     else if (viewModel) {
-      if (!ownsViewModel) findings.push(finding('view-model-ownership', 'review', `${name} has no recognized private @State ViewModel storage. Verify that the screen constructs and stores its ViewModel. Detail Views may initialize that stored state from selected value data. A computed property does not satisfy CFA screen ownership.`, viewFile, lineOf(view, declaration.index)));
+      if (!ownsViewModel) findings.push(finding('view-model-ownership', 'review', `${name} has no recognized private @State ViewModel storage. Verify that the screen constructs and stores its ViewModel. Detail Views may initialize that stored state from a selected immutable snapshot. A computed property does not satisfy CFA screen ownership.`, viewFile, lineOf(view, declaration.index)));
       if (!dependencies.length) findings.push(finding('feature-route-unresolved', 'review', `${viewModelName} has no visible AppModel.shared feature route; inspect whether this screen is presentation-only.`, viewModelFile, 1));
       if (testCandidates.length > 1) findings.push(finding('view-model-tests-ambiguous', 'review', `Multiple files match ${testName}: ${testCandidates.join(', ')}. Verify which test target covers this ViewModel.`, viewModelFile, 1));
       if (!testCandidates.length) findings.push(finding('view-model-tests-missing', 'review', `No ${testName} was found in the scanned directory. Check the project root and test target before concluding the test is missing.`, viewModelFile, 1));
