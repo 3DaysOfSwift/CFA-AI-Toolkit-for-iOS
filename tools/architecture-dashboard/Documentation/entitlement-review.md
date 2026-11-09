@@ -57,7 +57,8 @@ status and the count of indexed calls excluded from the scanned source set
 when available. Index freshness and target coverage require separate evidence. Aliases, external code,
 dynamic dispatch and omitted spellings can escape this scan. Read
 `syntaxCoverage`, `syntaxWarnings` and `syntaxReason` before interpreting the
-results. `syntaxExcludedItems` counts findings outside the source inventory
+results. Inspect the files named in `syntaxMissingFiles` directly for paid
+capability entry points. `syntaxExcludedItems` counts findings outside the source inventory
 that were excluded from the analysis, when that count is available. If the parser reports errors, trace the affected files directly and
 keep any unresolved entry point unverified. If the scanner is unavailable,
 trace the known entry points in source. Zero matches still require that

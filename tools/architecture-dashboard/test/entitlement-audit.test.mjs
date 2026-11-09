@@ -29,12 +29,13 @@ test('no matches and missing syntax cannot be reported as a pass',()=>{
 });
 test('preserves parser warnings alongside partial entitlement leads', () => {
   const warnings = ['Parser reported errors in ExportViewModel.swift'];
-  const syntax = {status:'available',coverage:'unverified',warnings,excludedItems:2};
+  const syntax = {status:'available',coverage:'unverified',warnings,excludedItems:2,missingFiles:['Shortcut.swift']};
   const result = auditEntitlements({...analysis,syntax}, {
     capabilities:[{name:'Export',writtenCalls:['exportFeature.export']}]
   });
   assert.deepEqual(result.syntaxWarnings,warnings);
   assert.equal(result.syntaxExcludedItems,2);
+  assert.deepEqual(result.syntaxMissingFiles,['Shortcut.swift']);
   assert.equal(result.syntaxCoverage,'unverified');
   assert.equal(result.capabilities[0].status,'review-required');
 });

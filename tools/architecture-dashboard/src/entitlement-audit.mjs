@@ -36,6 +36,7 @@ export function auditEntitlements(analysis, policy) {
   });
   return {schemaVersion:1, sourceFingerprint:analysis.sourceFingerprint || null, syntaxStatus:analysis.syntax?.status || 'unknown', syntaxCoverage:analysis.syntax?.coverage || 'unverified',
     syntaxWarnings:analysis.syntax?.warnings || [], syntaxReason:analysis.syntax?.reason || null,
+    syntaxMissingFiles:analysis.syntax?.missingFiles ?? [],
     syntaxExcludedItems:analysis.syntax?.excludedItems ?? null,
     indexStatus:analysis.compilerIndex?.status || 'unknown',
     indexModule:analysis.compilerIndex?.module || null, indexReason:analysis.compilerIndex?.reason || null,
