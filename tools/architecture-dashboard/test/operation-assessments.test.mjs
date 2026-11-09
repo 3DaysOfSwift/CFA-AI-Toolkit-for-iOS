@@ -73,6 +73,14 @@ test('individual checks preserve verified strengths and separate CFA deviations'
   const resolved=structuredClone(input);
   resolved.operations[0].checks.find(c=>c.id==='cancellation').status='pass';
   resolved.operations[0].unknowns=[];
+  resolved.operations[0].problemKind='architectural-conflict';
+  resolved.operations[0].scenarios=[{
+    id:'repeat',title:'Repeat',status:'problem',outcome:'A repeat can duplicate a save.',
+    consequence:'The user can see two records.',verification:'Source review',evidence:resolved.operations[0].evidence
+  }];
+  const timingProblem=await importReview(report,resolved,root);
+  assert.doesNotMatch(operationAssessments(timingProblem).verdict, /^Yes/);
+  delete resolved.operations[0].scenarios;
   const good=await importReview(report,resolved,root);
   assert.equal(good.operations[0].correctness,'sound');
   const stableWithDeviation=operationAssessments(good);

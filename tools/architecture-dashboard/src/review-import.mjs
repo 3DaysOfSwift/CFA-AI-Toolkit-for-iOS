@@ -110,6 +110,7 @@ export async function importReview(report,input,root) {
         op.clarity=checkOutcome(op.checks,'clarity');
         const conflicts=op.checks.filter(c=>c.dimension!=='cfa'&&c.status==='fail');
         if(conflicts.length) op.problemKind=conflicts.some(c=>c.problemKind==='architectural-conflict')?'architectural-conflict':'local-defect';
+        else delete op.problemKind;
       }
       for(const field of ['correctness','clarity']) if(!['sound','problem','investigate','unassessed'].includes(op[field])) fail('invalid operation '+field);
       if(!Array.isArray(op.unknowns) || op.unknowns.some(v=>!text(v))) fail('operation unknowns required');
