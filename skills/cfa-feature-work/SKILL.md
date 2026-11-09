@@ -68,8 +68,9 @@ what counts as locally saved and what counts as server-confirmed. For offline
 edits sent to a custom server, save the edit and its pending-sync metadata
 together before reporting local success. Verify that a failed local write
 leaves no edit ready to send. Test recovery after failed sync and restart,
-duplicate-safe retries with the same edit identity, and the agreed conflict
-and rejection outcomes. When replacing the sync implementation, include a
+and duplicate-safe retries with the same edit identity. Include a lost reply
+after the server applies the edit and verify it is applied only once. Test the
+agreed conflict and rejection outcomes. When replacing the sync implementation, include a
 pending edit saved by the previous version. For Apple-managed sync, verify
 capability, account and schema behaviour on supported devices.
 

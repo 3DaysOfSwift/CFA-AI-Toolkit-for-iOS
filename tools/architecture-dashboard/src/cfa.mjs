@@ -297,7 +297,8 @@ skill from that toolkit before changing the project.
   separately. Force a local write failure and verify that it neither reports
   local success nor makes the edit eligible for upload. Fail sync after a
   successful local save, restart, and retry with the same edit identity.
-  Verify that the server applies one logical change. Check the agreed
+  Verify that the server applies one logical change, including when it
+  applied the edit before losing its reply. Check the agreed
   conflict and rejection outcomes. When changing
   existing sync code, verify that the updated app restores and safely retries
   a pending edit persisted by the previous implementation. Verify Apple-managed

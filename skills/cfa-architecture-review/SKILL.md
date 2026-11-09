@@ -161,6 +161,9 @@ success is reported. Look for evidence that a failed local write reports
 neither success nor an edit ready to send. After a successful local write,
 verify that a failed sync and restart preserve the edit and its identity,
 and that retrying with that identity produces one logical server change.
+Look for a test where the server applied the edit but the reply was lost.
+After restart, the same edit identity should recover the outcome without
+reapplying the change.
 When reviewing a replacement sync implementation, use a pending edit saved
 by the previous version to verify recovery and retry. Check conflict and
 rejection outcomes against the product policy. Check real-device evidence
