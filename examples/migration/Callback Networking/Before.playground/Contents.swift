@@ -75,6 +75,10 @@ func runExample() async throws {
 
 // MARK: - Run before example
 Task { @MainActor in
-    do { try await runExample() } catch { print("Example failed: \(error)") }
+    do {
+        try await runExample()
+    } catch {
+        preconditionFailure("Example failed: \(error)")
+    }
     PlaygroundPage.current.finishExecution()
 }
