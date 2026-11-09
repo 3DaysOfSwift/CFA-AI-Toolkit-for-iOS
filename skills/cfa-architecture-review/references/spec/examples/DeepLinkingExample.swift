@@ -236,6 +236,20 @@ private actor DelayedRestoreRepository: PendingRequestRepository {
         precondition(firstSceneDestination == anotherRequest)
         precondition(secondSceneDestination == initialRequest && firstRun.pending.isEmpty)
 
+        // A new opening event can target a destination that was already opened.
+        let repeatedDestination = DestinationRequest(
+            id: "notification-new-event", title: initialRequest.title, launchID: initialRequest.launchID
+        )
+        try await firstRun.receive(repeatedDestination)
+        try await firstRun.receive(initialRequest)
+        precondition(firstRun.pending == [repeatedDestination])
+        try await firstRun.open(id: repeatedDestination.id) { destination in
+            firstSceneDestination = destination
+            return true
+        }
+        precondition(firstSceneDestination == repeatedDestination && firstRun.pending.isEmpty)
+        precondition(secondSceneDestination == initialRequest)
+
         let request = DestinationRequest(id: "notification-deferred", title: "Next launch", launchID: "launch-42")
         try await firstRun.receive(request)
 
