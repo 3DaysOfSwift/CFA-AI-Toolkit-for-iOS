@@ -68,6 +68,11 @@ export function auditEntitlements(analysis, policy) {
     indexModule:analysis.compilerIndex?.module || null, indexReason:analysis.compilerIndex?.reason || null,
     indexFreshness:analysis.compilerIndex?.indexFreshness || 'unverified',
     indexExcludedCalls:analysis.compilerIndex?.excludedCalls ?? null, capabilities,
+    verification:[
+      'Trace paid presentation and execution on the usual screen and alternate entry points, including routes absent from these results.',
+      'Verify the screen ViewModel or the alternate route caller checks current entitlement before use. Test locked and entitled outcomes.',
+      'If entitlement can change while the route is suspended, revoke it during the wait and verify that the resumed route checks again and blocks access.'
+    ],
     limitations:['Exact written-call matches are candidates, not resolved targets, proof of an entitlement check, or proof of a missing check.', 'Aliases, dynamic dispatch, properties, closures, external modules and unlisted spellings can be missed.', 'Direct and upstream indexed callers are possible navigation leads; index freshness and target coverage must be verified.', 'Inspect each entry point and test locked and entitled outcomes. No matches do not imply protection.']};
 }
 

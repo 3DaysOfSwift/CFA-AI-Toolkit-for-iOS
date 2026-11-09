@@ -34,6 +34,7 @@ Run:
 node src/entitlement-audit.mjs --analysis /tmp/project-analysis.json --policy /tmp/paid-capabilities.json --out /tmp/entitlement-review.json
 ```
 
+Follow the report’s `verification` checklist even when it finds zero matches.
 Inspect every candidate. The report lists immediate callers in
 `possibleIndexedCallers` and call sites reached through additional indexed
 hops in `possibleIndexedUpstreamCallers`. An upstream lead can point to a

@@ -46,6 +46,8 @@ test('no matches and missing syntax cannot be reported as a pass',()=>{
   assert.equal(result.capabilities[0].status,'no-matches-unverified');
   assert.equal(result.syntaxStatus,'unavailable');
   assert.equal(result.syntaxReason,'Xcode not selected');
+  assert.ok(result.verification.some(step => step.includes('alternate entry points')));
+  assert.ok(result.verification.some(step => step.includes('resumed route checks again')));
 });
 test('preserves parser warnings alongside partial entitlement leads', () => {
   const warnings = ['Parser reported errors in ExportViewModel.swift'];
