@@ -127,6 +127,11 @@ the architecture:
     reporting local success. Report server confirmation separately. Verify
     pending edits survive failed sync and restart, retries avoid duplicates,
     and conflicting edits and server rejections follow the product policy.
+    If changing an existing sync implementation, start verification with
+    an edit persisted by the previous implementation. Check that the updated
+    app restores its identity and pending metadata and can retry it safely.
+    Verify Apple-managed sync and cross-device conflicts on supported devices
+    when applicable, separately from tests using controlled dependencies.
     When a non-critical preference is missing or obsolete, use its
     product-defined safe fallback. Preserve the old value where appropriate.
     Replace it through an intentional migration or a successful user choice.
