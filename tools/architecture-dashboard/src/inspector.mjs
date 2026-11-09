@@ -256,7 +256,7 @@ export async function inspect(project) {
       }
     }
     for (const {name, file, source, opening} of constructionBodies) {
-      const container = /\b(?:SwiftData\s*\.\s*)?ModelContainer\s*\(/.exec(braceBody(source, opening));
+      const container = /\b(?:SwiftData\s*\.\s*)?ModelContainer\s*(?:\.\s*init\s*)?\(/.exec(braceBody(source, opening));
       if (container) {
         findings.push(finding('app-model-storage-construction', 'review', `${name} references a ModelContainer initializer. Trace whether it opens storage during graph construction. CFA opens the store within the storage owner’s data request.`, file, lineOf(source, opening + 1 + container.index)));
       }

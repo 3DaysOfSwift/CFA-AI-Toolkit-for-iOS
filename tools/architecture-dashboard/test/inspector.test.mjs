@@ -1063,7 +1063,7 @@ test('shows skipped source and unfollowed links in the text inspection', async t
 test('reviews direct container construction in the AppModel factory at its source line', async t => {
   const file = 'Application/2 - AppModel/AppModel.swift';
   const root = await fixture(t, {
-    [file]: 'final class AppModel {\n  static func live() -> AppModel {\n    let store = try SwiftData.ModelContainer(for: Note.self)\n    return AppModel()\n  }\n}',
+    [file]: 'final class AppModel {\n  static func live() -> AppModel {\n    let store = try SwiftData.ModelContainer.init(for: Note.self)\n    return AppModel()\n  }\n}',
     'Application/2 - AppModel/SwiftDataManager.swift': 'actor SwiftDataManager { func open() throws { _ = try ModelContainer(for: Note.self) } }'
   });
   const {findings} = await inspect(root);
