@@ -623,14 +623,19 @@ For each relevant operation, inspect:
 - Offline edits and cross-device sync: apply the
   [sync rule](spec/rules/cfa-sync-01.md) when the product supports these paths.
   For a custom server, trace the edit and pending-sync metadata through one
-  local commit. Check that local success and server confirmation are reported
-  separately. Verify that pending edits survive failure and restart, and that
-  retry after a lost response cannot duplicate the change. For custom and
-  Apple-managed sync, trace what happens when two devices edit the same item
-  offline. Check the product's conflict policy and server rejection handling
-  where applicable. When reviewing a sync implementation change, check that a
-  pending edit persisted by the previous version retains its identity and retry
-  metadata after upgrade. Record device evidence separately from source review.
+  local commit. Fail that commit and verify that the app reports neither local
+  success nor a pending edit eligible for upload. After a successful local save,
+  fail sync, restart and retry with the same edit identity. In a separate case,
+  lose the reply after the server applies the edit and verify retry confirms
+  the original edit without applying it again. Check that local success and
+  server confirmation are reported separately. When reviewing a change to sync,
+  verify that an edit persisted by the previous version retains its identity
+  and retry metadata after upgrade. For both custom and Apple-managed sync,
+  exercise the product's conflict policy with edits to the same item on two
+  offline devices. Verify server rejection where applicable. Verify actual
+  Apple-managed sync on supported devices with the required capabilities,
+  account and schema. Report that evidence separately from source review
+  and controlled tests.
 - Operation results: trace how a caller identifies the record its operation
   created. Comparing a shared collection before and after an await can select
   another caller's insertion, even when persistence itself is serialized.
