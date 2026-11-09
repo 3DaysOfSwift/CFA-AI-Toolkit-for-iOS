@@ -58,12 +58,16 @@ actor PendingRequestStore {
     }
 }
 
+enum PendingRequestError: Error {
+    case operationInProgress
+}
+
 @MainActor @Observable
 final class DeepLinkingFeature {
     private(set) var pending: [DestinationRequest] = []
     @ObservationIgnored private let store: PendingRequestStore
     @ObservationIgnored private var lastPublishedRevision = -1
-    @ObservationIgnored private var opening: Set<String> = []
+    @ObservationIgnored private var activeRequests: Set<String> = []
     @ObservationIgnored private var openedAwaitingRemoval: Set<String> = []
 
     init(store: PendingRequestStore) { self.store = store }
@@ -76,22 +80,28 @@ final class DeepLinkingFeature {
 
     // Explicit dismissal removes the saved request as well as its visible entry.
     func dismiss(id: String) async throws {
-        publish(try await store.remove(id: id))
-        openedAwaitingRemoval.remove(id)
+        guard activeRequests.insert(id).inserted else { throw PendingRequestError.operationInProgress }
+        defer { activeRequests.remove(id) }
+        try await removePending(id: id)
     }
 
     // The scene checks cancellation and returns true only after navigation occurs.
     func open(id: String, inScene navigate: @MainActor (DestinationRequest) async -> Bool) async throws {
-        guard !Task.isCancelled, !opening.contains(id), let request = pending.first(where: { $0.id == id }) else { return }
-        opening.insert(id)
-        defer { opening.remove(id) }
+        guard !Task.isCancelled, !activeRequests.contains(id), let request = pending.first(where: { $0.id == id }) else { return }
+        activeRequests.insert(id)
+        defer { activeRequests.remove(id) }
         if !openedAwaitingRemoval.contains(id) {
             guard await navigate(request) else { return }
             // If the write fails, retry cleanup without navigating again.
             // This marker lasts only for the current process.
             openedAwaitingRemoval.insert(id)
         }
-        try await dismiss(id: id)
+        try await removePending(id: id)
+    }
+
+    private func removePending(id: String) async throws {
+        publish(try await store.remove(id: id))
+        openedAwaitingRemoval.remove(id)
     }
 
     private func publish(_ snapshot: PendingSnapshot) {
@@ -131,6 +141,12 @@ final class DeepLinkingFeature {
             return true
         }
         precondition(!secondSceneOpened && firstRun.pending == [request])
+        do {
+            try await firstRun.dismiss(id: request.id)
+            preconditionFailure("Dismissal must not race an active navigation")
+        } catch PendingRequestError.operationInProgress {
+            precondition(firstRun.pending == [request])
+        }
         releaseNavigation?.resume(returning: false)
         try await firstAttempt.value
         precondition(firstRun.pending == [request])
