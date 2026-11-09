@@ -133,7 +133,8 @@ The review's `presentation` requires `app`, `summary`, `verdict`, `conclusion`
 and a nonempty list of `criteria`. Use the verdict to describe the app’s
 concurrency design. Each criterion has a `title`, `detail`, `status` (`pass`,
 `concern` or `problem`) and source `evidence` ranges (an array of `{file, line, endLine}` objects). The
-importer checks ranges against the scanned source. Convert free-text citations
+importer checks ranges against the scanned source. Map app-level assessments to criteria with
+`appChecks` as described in [Whole-app report criteria](Documentation/REVIEWS.md#whole-app-report-criteria). Convert free-text citations
 in older reviews to file and line ranges before rendering. Include confirmed
 operation, file and type problems among the report criteria. The renderer weights criteria
 equally (1, ½ or 0 respectively) to choose the assessment label. The score

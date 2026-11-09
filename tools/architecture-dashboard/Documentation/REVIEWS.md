@@ -292,3 +292,28 @@ work runs. Include synchronous events and preserve unknown boundaries.
 ## Whole-app Health Check file batches
 
 Record related files once in `fileBatches`: each batch has `title`, `files` (an array of repository-relative Swift paths), `reason` (what was inspected), `verification` and `evidence` (source references including at least one reference in each listed file). The reviewer must actually inspect each file and trace relevant behaviour; evidence validation only checks provenance. A file may appear in only one batch. Existing `fileReviews` are still accepted. Individual `typeReviews` are optional. Reuse shared-service evidence across the operations that call it, after checking each caller's behaviour. Reconcile all detected entry points and task sites and manually discover additional operations before claiming a whole-app review.
+
+## Whole-app report criteria
+
+In `presentation.criteria`, give each visible criterion a `title`, `detail`,
+`status` (`pass`, `concern` or `problem`), and source `evidence` ranges.
+Use `appChecks` to name the app-level questions the criterion actually answers.
+Across all criteria, cover these IDs:
+
+- `deliberate-concurrency`
+- `discoverable-capabilities`
+- `view-model-boundaries`
+- `additional-targets`
+- `actor-design`
+- `state-observation`
+- `launch-performance`
+- `cancellation`
+- `mutable-value-copies`
+
+A criterion can cover several questions when its detail and evidence address
+each one. For launch performance, report the measurement conditions and result
+when available. Otherwise, describe the startup path and state that timing was
+unavailable. The structural-conflict verdict comes from the classified operation
+checks. For an older review, update its findings and add the corresponding
+`appChecks` before regenerating the report. Use `progress` or `next` to list
+missing questions before rendering.
