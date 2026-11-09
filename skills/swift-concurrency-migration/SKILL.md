@@ -149,8 +149,13 @@ Use deliberate passes:
    caller waits for another request's response before starting its own.
    When migrating an existing cache of replaceable downloads, apply the
    [optional snapshot rule](references/spec/rules/cfa-cache-01.md). Verify that
-   a slow restore cannot delay refresh or overwrite fresh data, and that an
-   optional write cannot hold up a successful refresh. Keep required
+   a slow restore cannot delay refresh or overwrite fresh data for the same
+   source. Other sources can still restore usable cached data. Hold the
+   optional write open and verify that fresh data publishes and the caller
+   completes. Reopen the cache after a failed replacement to verify that its
+   previous usable snapshot survived. Check that a delayed older write cannot
+   replace a newer snapshot and that a failed refresh keeps valid displayed
+   data. Keep required
    persistence for user edits on the save path before reporting success.
    Apply the [durable save rule](references/spec/rules/cfa-store-01.md) to
    individual record changes. Preserve explicit import or restore behaviour

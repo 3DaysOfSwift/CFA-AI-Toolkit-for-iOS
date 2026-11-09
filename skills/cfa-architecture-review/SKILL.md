@@ -155,8 +155,10 @@ When reviewing an optional download cache, apply the
 separate points: when refresh can start, when the caller receives its result,
 and when the replacement cache becomes durable. Verify that refresh can start
 with restoration pending and that a caller can receive fresh data with the
-optional write pending. Check whether a late restore can replace fresh data or
-an older write can replace a newer cache. For a failed replacement, verify
+optional write pending. Verify that a late restore cannot replace fresher
+data for the same source and that sources still waiting for refresh can
+restore their own usable data. Check that a failed refresh keeps valid
+in-memory data and that an older write cannot replace a newer cache. For a failed replacement, verify
 that the previous cache remains readable, the fresh response stays usable,
 and any offline-availability claim describes the snapshot actually saved.
 Trace required saves for user edits separately and verify that a failed write
