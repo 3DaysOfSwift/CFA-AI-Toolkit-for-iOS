@@ -324,7 +324,9 @@ skill from that toolkit before changing the project.
   the agreed CFA and Swift Concurrency migration and supported platforms.
   Fix confirmed defects within scope, protect the intended behaviour with
   tests, and record any necessary platform-driven differences. Before handoff,
-  trace remaining legacy and Swift Concurrency paths together. Reconcile
+  trace remaining legacy and Swift Concurrency paths together. Identify
+  remaining callers of legacy dependencies and record which adapters were
+  removed or retained to preserve behaviour or platform support. Reconcile
   temporary file locations, Xcode navigator groups and target membership.
   Audit the agreed migration scope against CFA, correct in-scope discrepancies
   and rerun affected builds and tests after corrections.
