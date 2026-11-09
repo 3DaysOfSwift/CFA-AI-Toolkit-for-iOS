@@ -82,8 +82,10 @@ Confirm refresh starts while restoration is pending and still proceeds when
 the cache is missing, incompatible or unreadable. Verify callers receive
 fresh results while the write is pending. Check that a late restore or
 delayed write cannot replace newer data, that a failed write leaves fresh
-results usable and preserves the last good cache, and that a failed refresh
-retains valid in-memory data.
+results usable and preserves the last good cache. Force repeated write
+failures to verify retries stop within the configured limit and offline
+availability reflects the saved snapshot. A failed refresh retains valid
+in-memory data.
 
 ## Evidence and provenance
 

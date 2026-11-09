@@ -26,7 +26,9 @@ lifecycle. Features own the business decisions.
 The app delegate calls AppModel directly and synchronously so startup is
 signalled during the delegate callback. Before the delegate returns, AppModel
 invokes the relevant Feature startup methods and starts each required app-wide
-listener once. AppModel forwards listener events to the responsible Feature.
+listener once. For an asynchronous listener, AppModel creates and retains its
+task during startup. The task can begin consuming events after the callback
+returns. AppModel forwards listener events to the responsible Feature.
 Screen-only observation follows the screen or ViewModel lifetime.
 
 Each Feature owns its asynchronous refresh and restoration work. The delegate
