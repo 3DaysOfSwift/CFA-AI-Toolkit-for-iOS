@@ -1838,8 +1838,9 @@ Before accepting a change, answer every question:
 22. For account changes in scope, does failed sign-out preserve the session
     when it remains active? Does successful sign-out clear account-specific
     state and storage according to the product contract? Verify that old
-    requests cannot publish into a new session and that partial failures
-    are reconciled against the actual session state.
+    requests cannot publish into a new session, including after signing back
+    in to the same account. Verify that partial failures are reconciled
+    against the actual session state.
 
 23. Does the application delegate call the AppModel launch method directly
     and synchronously? Verify that it initiates startup once and that the root
