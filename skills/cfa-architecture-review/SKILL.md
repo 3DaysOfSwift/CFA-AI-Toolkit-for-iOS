@@ -34,8 +34,13 @@ screen-level SwiftUI Views: a private `viewModel` property with inline `@State` 
 A detail View may construct its own State-backed ViewModel from a selected immutable snapshot
 in its initializer. Never inject or share ViewModels. Keep screen and scene
 selection in presentation and follow the [detail snapshot lifetime rule](references/spec/rules/cfa-ui-03.md)
-when the source data changes. Review-only work
-reports violations; tests inject Features into ViewModels, not ViewModels into Views.
+when the source data changes. When the detail flow is in scope, trace two
+independently identified destinations. Look for evidence that a source
+refresh, including omission of a selected item, leaves both destinations
+open with their own selections. If the detail offers explicit refresh,
+verify that only its display changes. Distinguish source evidence from
+observed navigation behaviour. Tests inject Features into ViewModels and
+each View continues to construct its own ViewModel.
 For existing UIKit screens, trace their actual presentation owners to Features.
 
 Review the requested scope without refactoring the application or changing
