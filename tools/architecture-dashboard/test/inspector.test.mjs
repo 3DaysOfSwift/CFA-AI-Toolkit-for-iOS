@@ -1203,11 +1203,18 @@ test('reviews direct Feature access in a preview while leaving normal previews c
       if enabled { let model = AppModel.shared; use(model) }
       let model = PreviewFixture()
       Text(model.homeFeature.title)
-    }`
+    }
+    #Preview {
+      let feature = Example.HomeFeature.init()
+      HomeView()
+    }
+    #Preview { HomeView(input: LaunchFeature.ID()) }`,
+    'App/2 - AppModel/Features/Home/HomeFeature.swift': 'final class HomeFeature {}',
+    'App/2 - AppModel/Features/Launch/LaunchFeature.swift': 'final class LaunchFeature { struct ID {} }'
   });
   const { findings } = await inspect(root);
   assert.deepEqual(findings.filter(item => item.code === 'preview-feature-access')
-    .map(({file, line}) => [file, line]), [[file, 3], [file, 7]]);
+    .map(({file, line}) => [file, line]), [[file, 3], [file, 7], [file, 15]]);
 });
 
 test('surfaces a stored Feature dependency as coordination to review', async t => {

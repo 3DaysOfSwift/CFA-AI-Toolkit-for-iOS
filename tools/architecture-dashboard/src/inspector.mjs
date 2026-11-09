@@ -649,7 +649,9 @@ export async function inspect(project) {
     for (const preview of source.matchAll(/(?:#Preview\b\s*(?:\([^{}]*?\)\s*)?|\b(?:struct|enum|class|extension)\s+\w+\s*:[^{}]*?\bPreviewProvider\b[^{}]*)\{/g)) {
       const start = preview.index + preview[0].length;
       const previewBody = braceBody(source, start - 1);
-      const access = findFeatureAccess(previewBody);
+      const access = findFeatureAccess(previewBody)
+        ?? [...previewBody.matchAll(/\b(\w+Feature)\s*(?:\.\s*init\s*)?\(/g)]
+          .find(match => concreteFeatures.has(match[1]));
       for (const line of swiftDataLines(previewBody, start)) {
         findings.push(finding('view-swiftdata-access', 'review', 'This preview appears to access SwiftData directly. Preview construction follows the same CFA storage boundary as the app.', file, line));
       }
