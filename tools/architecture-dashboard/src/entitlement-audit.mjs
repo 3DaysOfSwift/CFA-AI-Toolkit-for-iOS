@@ -38,7 +38,9 @@ export function auditEntitlements(analysis, policy) {
     syntaxWarnings:analysis.syntax?.warnings || [], syntaxReason:analysis.syntax?.reason || null,
     syntaxExcludedItems:analysis.syntax?.excludedItems ?? null,
     indexStatus:analysis.compilerIndex?.status || 'unknown',
-    indexModule:analysis.compilerIndex?.module || null, indexReason:analysis.compilerIndex?.reason || null, capabilities,
+    indexModule:analysis.compilerIndex?.module || null, indexReason:analysis.compilerIndex?.reason || null,
+    indexFreshness:analysis.compilerIndex?.indexFreshness || 'unverified',
+    indexExcludedCalls:analysis.compilerIndex?.excludedCalls ?? null, capabilities,
     limitations:['Exact written-call matches are candidates, not resolved targets, proof of an entitlement check, or proof of a missing check.', 'Aliases, dynamic dispatch, properties, closures, external modules and unlisted spellings can be missed.', 'Indexed callers are possible navigation leads; index freshness and target coverage must be verified.', 'Inspect each entry point and test locked and entitled outcomes. No matches do not imply protection.']};
 }
 

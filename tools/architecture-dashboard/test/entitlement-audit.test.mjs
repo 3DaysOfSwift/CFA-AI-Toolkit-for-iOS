@@ -12,12 +12,14 @@ test('paid capability matches are review leads, with possible indexed callers',(
     {caller:'openExport',file:'View.swift',line:8,column:25}
   ]);
   assert.equal(result.sourceFingerprint,'abc');
-  const compilerIndex = {...analysis.compilerIndex, module:'ExampleApp', reason:'Build coverage is unverified.'};
+  const compilerIndex = {...analysis.compilerIndex, module:'ExampleApp', reason:'Build coverage is unverified.', indexFreshness:'unverified', excludedCalls:3};
   const indexed = auditEntitlements({...analysis, compilerIndex}, {
     capabilities:[{name:'Export', writtenCalls:['exportFeature.export']}]
   });
   assert.equal(indexed.indexModule, compilerIndex.module);
   assert.equal(indexed.indexReason, compilerIndex.reason);
+  assert.equal(indexed.indexFreshness, compilerIndex.indexFreshness);
+  assert.equal(indexed.indexExcludedCalls, 3);
 });
 test('no matches and missing syntax cannot be reported as a pass',()=>{
   const result=auditEntitlements({...analysis,syntax:{status:'unavailable',reason:'Xcode not selected'},callCandidates:[]},{capabilities:[{name:'Export',writtenCalls:['exportFeature.export']}]});

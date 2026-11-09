@@ -52,8 +52,9 @@ Matching source text alone does not resolve the call or establish a guard or
 violation. Syntax and index records are matched by source line. If several calls occur on
 one line, verify which enclosing symbol belongs to the paid call before
 following its callers. Check the reported index module and reason against the
-build you intend to review. Index freshness and target coverage require
-separate evidence. Aliases, external code,
+build you intend to review. The report carries the analysis index freshness
+status and the count of indexed calls excluded from the scanned source set
+when available. Index freshness and target coverage require separate evidence. Aliases, external code,
 dynamic dispatch and omitted spellings can escape this scan. Read
 `syntaxCoverage`, `syntaxWarnings` and `syntaxReason` before interpreting the
 results. `syntaxExcludedItems` counts findings outside the source inventory
