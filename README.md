@@ -380,7 +380,10 @@ cfa inspect /path/to/your-xcode-project --json
 ```
 
 The inspector looks for conventionally placed SwiftUI screens and maps the
-ViewModels, `AppModel.shared` Feature routes, and named tests it can identify.
+ViewModels, `AppModel.shared` Feature routes, and candidate test files. It flags
+missing or ambiguous test mappings and looks for the expected ViewModel test
+suite in matching files. Check the test target and what the suite exercises
+before drawing conclusions about coverage.
 It distinguishes recognisable navigation-only tab roots from feature screens
 and flags possible Feature access or storage gating in root navigation. Treat
 these findings as review leads. The scan can miss indirect wiring and cannot

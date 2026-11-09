@@ -93,7 +93,9 @@ For scanner-assisted leads, use the [entitlement review workflow](scripts/dashbo
 The scanner finds candidates, not verified guards or violations; trace them and
 inspect alternative entry points before recording a finding.
 
-For a quick CFA project map, run `node scripts/dashboard/src/cfa.mjs inspect <project-folder>` from this skill's directory (add `--json` for machine-readable output). From elsewhere, use the full path to this skill's script. This read-only inspector lists screen → ViewModel → AppModel feature routes and named test files, plus lexical gaps to investigate. Check its findings against source before calling anything a defect; it does not type-check, run tests, or establish semantic conformance. Do not use its absence of findings as a review verdict. Check the CFA `viewModel` property name separately from ownership. The inspector can recognise an owned ViewModel under another name.
+For a quick CFA project map, run `node scripts/dashboard/src/cfa.mjs inspect <project-folder>` from this skill's directory (add `--json` for machine-readable output). From elsewhere, use the full path to this skill's script. This read-only inspector lists screen → ViewModel → AppModel feature routes and named test files, plus lexical gaps to investigate. For tests, verify the expected suite and
+behaviour in source, confirm the target when names collide, and use actual
+test results as execution evidence. Check its findings against source before calling anything a defect; it does not type-check, run tests, or establish semantic conformance. Do not use its absence of findings as a review verdict. Check the CFA `viewModel` property name separately from ownership. The inspector can recognise an owned ViewModel under another name.
 
 The screen map relies on conventional filenames and adjacent ViewModels.
 Lifecycle closure findings also cover recognizable SwiftUI Views and their
