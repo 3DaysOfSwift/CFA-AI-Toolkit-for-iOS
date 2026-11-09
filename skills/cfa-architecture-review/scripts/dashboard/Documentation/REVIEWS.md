@@ -15,7 +15,7 @@ described in [OBSERVATIONS.md](OBSERVATIONS.md).
   "scope": "Feature commands and their tests; no runtime tracing",
   "findings": [{
     "title": "Can overlapping saves lose an edit?",
-    "status": "Ordering risk — source review",
+    "status": "concern",
     "description": "Explain the actual implementation and consequences.",
     "check": "Describe a focused regression scenario; not an executed test.",
     "evidence": [{"file": "App/SaveFeature.swift", "line": 10, "endLine": 20}]
@@ -401,7 +401,25 @@ Use `verification` to show how the finding was established when the method
 matters. Distinguish source inspection, an executed test, and a runtime
 measurement. Source citations remain required alongside that description.
 Use `appChecks` to name the app-level questions the criterion actually answers.
-Across all criteria, cover these IDs:
+For example, an illustrative cancellation criterion based on source inspection
+could look like this:
+
+```json
+{
+  "title": "Leaving search cancels the screen’s wait",
+  "detail": "The screen’s cancellation handler ends its wait. The shared refresh remains available to other callers.",
+  "status": "pass",
+  "verification": "Traced the screen cancellation handler and Feature task ownership in source.",
+  "evidence": [
+    {"file": "App/SearchViewModel.swift", "line": 48, "endLine": 60},
+    {"file": "App/SearchFeature.swift", "line": 72, "endLine": 94}
+  ],
+  "appChecks": ["cancellation"]
+}
+```
+
+Use the reviewed app’s actual behaviour and source locations. Across all
+criteria, cover these IDs:
 
 - `deliberate-concurrency`
 - `discoverable-capabilities`
