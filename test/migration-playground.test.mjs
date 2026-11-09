@@ -34,7 +34,7 @@ for (const name of examples) for (const [side, version] of [['Before','5'], ['Af
   });
 }
 
-test('MainActor Result returns each queued refresh outcome and publishes the latest result', {skip:process.platform !== 'darwin', timeout:120000}, () => {
+test('MainActor Result returns queued outcomes even when a refresh caller cancels', {skip:process.platform !== 'darwin', timeout:120000}, () => {
   const page = fs.readFileSync(path.join(root, 'examples/migration/MainActor Result/After.playground/Contents.swift'), 'utf8');
   const feature = page.slice(page.indexOf('// AFTER:'), page.indexOf('// MARK: - Test fixtures'));
   assert.match(feature, /final class LaunchFeature/);
@@ -56,6 +56,7 @@ actor LaunchProvider {
             await withCheckedContinuation { releaseWaiter = $0 }
             throw Failure.unavailable
         }
+        try Task.checkCancellation()
         return "Artemis"
     }
     func waitForFirst() async {
@@ -80,6 +81,7 @@ extension LaunchFeature {
         while feature.testRefreshID == firstID { await Task.yield() }
         let callsBeforeRelease = await provider.calls
         precondition(callsBeforeRelease == [false])
+        second.cancel()
         await provider.releaseFirst()
         let firstSucceeded = await first.value
         let secondSucceeded = await second.value
@@ -101,7 +103,7 @@ extension LaunchFeature {
   } finally { fs.rmSync(dir, {recursive:true, force:true}); }
 });
 
-test('Serial Weight Saves preserves admission order across suspension and failure', {skip:process.platform !== 'darwin', timeout:120000}, () => {
+test('Serial Weight Saves preserves admitted saves across failure and caller cancellation', {skip:process.platform !== 'darwin', timeout:120000}, () => {
   const page = fs.readFileSync(path.join(root, 'examples/migration/Serial Weight Saves/After.playground/Contents.swift'), 'utf8');
   const feature = page.slice(page.indexOf('@MainActor @Observable'), page.indexOf('// MARK: - Test fixtures'));
   assert.match(feature, /func save\(_ weight: Int\) async -> Bool/);
@@ -120,6 +122,7 @@ actor WeightStorage {
             startWaiter?.resume(); startWaiter = nil
             await withCheckedContinuation { releaseWaiter = $0 }
         }
+        try Task.checkCancellation()
         if weight < 0 { throw Failure.invalid }
     }
     func waitForFirst() async {
@@ -144,6 +147,7 @@ extension WeightLogFeature { var testSaveID: UUID? { lastSaveID } }
         while feature.testSaveID == secondID { await Task.yield() }
         let before = await storage.attempts
         precondition(before == [80])
+        first.cancel()
         await storage.releaseFirst()
         let a = await first.value, b = await invalid.value, c = await last.value
         let attempts = await storage.attempts

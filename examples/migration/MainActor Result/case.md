@@ -18,4 +18,4 @@ Open and run `Before.playground` and `After.playground`. Each prints `Passed:` a
 
 ## Boundaries
 
-The legacy example does not model failure; cancellation and real network work are outside this case.
+The legacy example only models success. Once admitted, a refresh runs to completion even if its caller is cancelled. The Feature owns the task, and the caller awaits its result. The fixture does not exercise network cancellation or timeouts.

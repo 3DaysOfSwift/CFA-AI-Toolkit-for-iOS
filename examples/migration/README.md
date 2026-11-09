@@ -14,8 +14,9 @@ test instrumentation. The migrated Feature keeps its observable state on
 `MainActor`. In Callback Networking, the unchecked conformance belongs to the
 `URLProtocol` test subclass, which adds no mutable state. In the toolkit source checkout, run the automated
 checks from its root with `node --test test/migration-playground.test.mjs`; the
-test harness compiles each implementation in its declared language mode and
-executes its behaviour check. The installed skill and release package include the
+test harness checks the playground structure on all supported test platforms.
+On macOS with Xcode, it also compiles each implementation in its declared
+language mode and executes its behaviour check. The installed skill and release package include the
 playgrounds but not that test harness; run the playgrounds in Xcode there.
 
 These examples guide a migration; they do not prove another app has the same
