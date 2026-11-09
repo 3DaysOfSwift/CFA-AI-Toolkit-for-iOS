@@ -730,6 +730,9 @@ cancellation arrives afterward, so an opened request is not offered again. The
 destination screen then owns its own data loading, errors and refresh: do not
 wait for content to load before treating navigation as successful.
 
+If an explicit dismissal cannot be saved, report the storage failure and keep
+the request pending so the user can retry.
+
 If navigation succeeds but removing the saved request fails, report the storage
 failure and retry removal without navigating again. In-memory tracking prevents
 another open only while the process is running. If the app exits before removal
@@ -1948,7 +1951,8 @@ Before accepting a change, answer every question:
     Replay the same opening event and verify it does not reopen the destination.
     A distinct event for the same destination remains available. If saving the
     removal fails after navigation, verify that the failure is surfaced and
-    retrying the removal does not navigate again. During migration, verify
+    retrying the removal does not navigate again. Force a dismissal write to fail
+    and verify the request stays pending until a successful retry. During migration, verify
     that existing notification and history capabilities are preserved.
     Verify that an opening request received during restoration survives a
     restart alongside the previously saved requests. If a scene opens a request

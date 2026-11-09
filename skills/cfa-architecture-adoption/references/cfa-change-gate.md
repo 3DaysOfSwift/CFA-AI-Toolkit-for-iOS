@@ -57,7 +57,9 @@ the architecture:
    Navigation succeeds when the destination opens, even if cancellation follows
    or its content is still loading. If saving removal fails after navigation,
    report the storage failure and retry removal without navigating again.
-   Until removal is saved, the request may reappear after restart.
+   If an explicit dismissal cannot be saved, report the failure and leave the
+   request pending for retry. Until removal is saved, the request may reappear
+   after restart.
    A separate history is opt-in for new apps.
    During migration, preserve existing deep-link, notification and history
    capabilities.

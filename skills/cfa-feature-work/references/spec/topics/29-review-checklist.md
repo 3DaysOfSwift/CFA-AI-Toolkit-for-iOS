@@ -156,7 +156,8 @@ Before accepting a change, answer every question:
     Replay the same opening event and verify it does not reopen the destination.
     A distinct event for the same destination remains available. If saving the
     removal fails after navigation, verify that the failure is surfaced and
-    retrying the removal does not navigate again. During migration, verify
+    retrying the removal does not navigate again. Force a dismissal write to fail
+    and verify the request stays pending until a successful retry. During migration, verify
     that existing notification and history capabilities are preserved.
     Verify that an opening request received during restoration survives a
     restart alongside the previously saved requests. If a scene opens a request

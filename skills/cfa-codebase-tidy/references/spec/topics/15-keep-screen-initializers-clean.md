@@ -75,6 +75,9 @@ cancellation arrives afterward, so an opened request is not offered again. The
 destination screen then owns its own data loading, errors and refresh: do not
 wait for content to load before treating navigation as successful.
 
+If an explicit dismissal cannot be saved, report the storage failure and keep
+the request pending so the user can retry.
+
 If navigation succeeds but removing the saved request fails, report the storage
 failure and retry removal without navigating again. In-memory tracking prevents
 another open only while the process is running. If the app exits before removal

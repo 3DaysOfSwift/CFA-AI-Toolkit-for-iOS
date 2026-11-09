@@ -106,7 +106,9 @@ skill from that toolkit before changing the project.
   when navigation is declined, cancelled before it opens, or fails. Cancellation
   after navigation still counts as an open. If removal fails after navigation,
   report the storage error and retry removal without navigating again. The
-  request can reappear after restart until removal is saved. The destination owns its content loading. Add a
+  request can reappear after restart until removal is saved. If an explicit
+  dismissal cannot be saved, report the error and keep the request pending for
+  retry. The destination owns its content loading. Add a
   separate notification history or global navigation router only when the
   product requires one. Preserve existing deep-link, notification and history
   behaviour during migration.
