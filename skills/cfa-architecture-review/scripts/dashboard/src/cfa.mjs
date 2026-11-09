@@ -63,7 +63,7 @@ skill from that toolkit before changing the project.
   must each complete. Matching inputs alone do not make two required user
   actions duplicates. Define ownership, cancellation and failure handling.
 - Publish durable user edits as saved only after required persistence succeeds.
-  A current server response need not wait for an optional cache write; prevent
+  A current server response does not wait for an optional cache write; prevent
   an older cached snapshot from replacing fresher data.
 - App.body installs a stable root View and presentation modifiers only. Keep
   startup conditionals, database loading and feature error UI out of App and
