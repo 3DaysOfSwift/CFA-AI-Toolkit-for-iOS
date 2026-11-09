@@ -63,6 +63,22 @@ test('flags a module-qualified ViewModel initializer input', async t => {
   assert.match(input.message, /appears to accept a ViewModel/);
 });
 
+test('flags ViewModel injection even when its declaration is in another folder', async t => {
+  const { findings } = await inspectView(t, `struct HomeView: View {
+    @State private var viewModel: SharedViewModel
+    init(model: SharedViewModel) {
+      _viewModel = State(initialValue: model)
+    }
+    var body: some View { Text("Home") }
+  }`, {
+    'App/1 - View/Views/Home/HomeViewModel.swift': '',
+    'App/Presentation/SharedViewModel.swift': 'final class SharedViewModel {}'
+  });
+  const input = findings.find(item => item.code === 'screen-initializer-inputs');
+  assert.equal(input?.severity, 'warning');
+  assert.equal(input?.line, 3);
+});
+
 test('maps a conventionally located screen with qualified View conformance', async t => {
   const {report} = await inspectView(t, `struct HomeView: SwiftUI.View {
     @State private var viewModel = HomeViewModel()

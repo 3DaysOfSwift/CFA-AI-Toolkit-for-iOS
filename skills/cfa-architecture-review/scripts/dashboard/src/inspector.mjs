@@ -442,34 +442,34 @@ export async function inspect(project) {
       `@${stateTypePattern}\\s+private\\s+var\\s+([A-Za-z_]\\w*)\\s*:\\s*${viewModelTypePattern}\\b`, 'g'
     ))].map(match => ({ name: match[1], index: match.index }));
     const dependencies = [];
-    if (viewModel) {
-      for (const initializer of members.matchAll(/(?<![.\w])init[?!]?\s*\(/g)) {
-        const opening = initializer.index + initializer[0].length - 1;
-        const closing = closingParenthesis(body, opening);
-        if (closing < 0) continue;
-        const parameters = body.slice(opening + 1, closing);
-        const injectedViewModel = /:\s*(?:any\s+)?(?:\w+\s*\.\s*)*\w*ViewModel\b(?!\s*\.)/.test(parameters);
-        if (parameters.trim()) {
-          findings.push(finding('screen-initializer-inputs', injectedViewModel ? 'warning' : 'review', injectedViewModel ? `${name} appears to accept a ViewModel; CFA screens construct their own.` : `${name} accepts initializer inputs. Verify that the detail input is a selected immutable snapshot and no ViewModel is injected.`, viewFile, lineOf(view, bodyOffset + initializer.index)));
-        }
-        const tail = body.slice(closing + 1);
-        const openingBody = /^\s*(?:(?:async|throws|rethrows)\s*)*\{/.exec(tail);
-        if (openingBody) {
-          const initializerBody = braceBody(tail, openingBody[0].length - 1);
-          const ownConstruction = typedStateProperties.find(({name: property}) => new RegExp(
-            `\\b_${property}\\s*=\\s*${stateTypePattern}(?:\\s*<\\s*${viewModelTypePattern}\\s*>)?\\s*\\(\\s*(?:initialValue|wrappedValue)\\s*:\\s*(?:${viewModelTypePattern}(?:\\s*\\.\\s*init)?|\\.init)\\s*\\(`
-          ).test(initializerBody));
-          if (parameters.trim() && !injectedViewModel && ownConstruction) ownedState ??= ownConstruction;
-          const statePropertyNames = typedStateProperties.map(property => property.name);
-          if (inlineState) statePropertyNames.push(inlineState[1]);
-          const assignsViewModel = statePropertyNames.some(property =>
-            new RegExp(`\\b_?${property}\\s*=(?!=)`).test(initializerBody)
-          );
-          if (assignsViewModel) {
-            findings.push(finding('view-model-initializer-construction', 'review', `${name} assigns ViewModel state in init. Verify it constructs its own ViewModel from a selected immutable snapshot and does not accept an injected ViewModel.`, viewFile, lineOf(view, bodyOffset + initializer.index)));
-          }
+    for (const initializer of members.matchAll(/(?<![.\w])init[?!]?\s*\(/g)) {
+      const opening = initializer.index + initializer[0].length - 1;
+      const closing = closingParenthesis(body, opening);
+      if (closing < 0) continue;
+      const parameters = body.slice(opening + 1, closing);
+      const injectedViewModel = /:\s*(?:any\s+)?(?:\w+\s*\.\s*)*\w*ViewModel\b(?!\s*\.)/.test(parameters);
+      if (injectedViewModel || (parameters.trim() && viewModel)) {
+        findings.push(finding('screen-initializer-inputs', injectedViewModel ? 'warning' : 'review', injectedViewModel ? `${name} appears to accept a ViewModel; CFA screens construct their own.` : `${name} accepts initializer inputs. Verify that the detail input is a selected immutable snapshot and no ViewModel is injected.`, viewFile, lineOf(view, bodyOffset + initializer.index)));
+      }
+      const tail = body.slice(closing + 1);
+      const openingBody = /^\s*(?:(?:async|throws|rethrows)\s*)*\{/.exec(tail);
+      if (openingBody) {
+        const initializerBody = braceBody(tail, openingBody[0].length - 1);
+        const ownConstruction = typedStateProperties.find(({name: property}) => new RegExp(
+          `\\b_${property}\\s*=\\s*${stateTypePattern}(?:\\s*<\\s*${viewModelTypePattern}\\s*>)?\\s*\\(\\s*(?:initialValue|wrappedValue)\\s*:\\s*(?:${viewModelTypePattern}(?:\\s*\\.\\s*init)?|\\.init)\\s*\\(`
+        ).test(initializerBody));
+        if (parameters.trim() && !injectedViewModel && ownConstruction) ownedState ??= ownConstruction;
+        const statePropertyNames = typedStateProperties.map(property => property.name);
+        if (inlineState) statePropertyNames.push(inlineState[1]);
+        const assignsViewModel = statePropertyNames.some(property =>
+          new RegExp(`\\b_?${property}\\s*=(?!=)`).test(initializerBody)
+        );
+        if (assignsViewModel) {
+          findings.push(finding('view-model-initializer-construction', 'review', `${name} assigns ViewModel state in init. Verify it constructs its own ViewModel from a selected immutable snapshot and does not accept an injected ViewModel.`, viewFile, lineOf(view, bodyOffset + initializer.index)));
         }
       }
+    }
+    if (viewModel) {
       for (const match of viewModel.matchAll(/\bAppModel\s*\.\s*shared\s*\.\s*(\w+)/g)) {
         const property = match[1];
         const exposure = appProperties.get(property);
