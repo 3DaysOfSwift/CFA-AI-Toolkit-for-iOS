@@ -13,8 +13,8 @@ export async function collectSyntax(root, {includeTests = false} = {}) {
   if (process.platform !== 'darwin') return {status:'unavailable', reason:'SwiftSyntax inventory requires macOS and Xcode.'};
   const temporary = await fs.mkdtemp(path.join(os.tmpdir(), 'cfa-syntax-'));
   try {
-    const developer = (await run('xcode-select', ['-p'])).stdout.trim();
-    const host = path.join(developer,'Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host');
+    const compiler = (await run('xcrun', ['--find', 'swiftc'])).stdout.trim();
+    const host = path.resolve(path.dirname(compiler), '../lib/swift/host');
     const executable = path.join(temporary,'inventory');
     await run('xcrun',['swiftc','-module-cache-path',path.join(temporary,'cache'),'-I',host,'-L',host,'-Xlinker','-rpath','-Xlinker',host,path.join(here,'syntax-inventory.swift'),'-o',executable],{timeout:120000,maxBuffer:1024*1024});
     const result = await run(executable,includeTests ? [root,'--include-tests'] : [root],{timeout:120000,maxBuffer:100*1024*1024});
