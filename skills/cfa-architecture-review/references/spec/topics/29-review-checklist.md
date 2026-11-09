@@ -9,7 +9,9 @@ Before accepting a change, answer every question:
 4. Can every View be created without receiving a ViewModel, AppModel, Feature,
    or repository, and do screen Views avoid receiving another screen’s actions?
    Reusable presentation components may receive action closures.
-5. Does every business decision live in a feature or lower Model layer?
+5. Is each business decision owned by its Feature? Can supporting Model
+   helpers perform calculations or infrastructure work without becoming a
+   competing authority for that decision or its state?
 6. Would an Apple Watch app be able to reuse the decision without copying UI
    code?
 7. Does each ViewModel depend on the smallest coherent set of concrete
