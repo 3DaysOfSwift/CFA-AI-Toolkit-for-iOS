@@ -10,6 +10,6 @@
 
 **Example:** After successful sign-out, UserProfileFeature asks OrdersFeature and FavouritesFeature to clear account data.
 
-**Verify:** Test failed and successful sign-out, account switch, in-flight requests and partial authentication outcomes.
+**Verify:** Trace sign-out, account switching and external session expiry. Test intact sessions after failed sign-out, cleanup after success, partial authentication outcomes, and late publication from old requests. Check retained data against the product’s sign-out contract.
 
 **Full rule, context and examples:** [Define Features by Business Capability, Not by Screen or Tab](../topics/16-define-features-by-business-capability-not-by-screen-or-tab.md). This card is a reading aid; apply the complete canonical section.
