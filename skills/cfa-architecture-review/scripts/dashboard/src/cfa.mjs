@@ -186,7 +186,11 @@ skill from that toolkit before changing the project.
 - Route URLSession calls through NetworkingManager. In new apps, start with a
   stateless value type when it meets the session and concurrency requirements.
   Keep independent requests able to progress in parallel unless an explicit
-  policy limits them. AppModel.live() can compose shared services locally and
+  policy limits them. When changing networking, hold one response open and
+  verify that an independent request reaches the transport before it completes.
+  Keep domain-specific adapters with the Feature that naturally owns them.
+  Move broadly applicable services to a shared location when no Feature
+  naturally owns them. AppModel.live() can compose shared services locally and
   inject them into Features or their providers.
 - Call the AppModel launch signal directly
   and synchronously from the application lifecycle callback, never a View .task
