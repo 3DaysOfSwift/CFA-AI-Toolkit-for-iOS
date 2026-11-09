@@ -130,7 +130,9 @@ skill from that toolkit before changing the project.
   cancels editing, and publish confirmed changes only after required persistence succeeds.
 - When a value is genuinely shared across the app, define it once as a static
   property on a purpose-named enum. Add it when several callers use the same
-  app-wide concept. Equal literals can still represent separate concepts.
+  app-wide concept, such as a company website shared through AppLinks.
+  Start a new app without a constants enum until such a value is needed.
+  Equal literals can still represent separate concepts.
   App-wide system constants may live in a purpose-named folder beside
   AppModel. Keep Feature-specific values with their Feature. Use authoritative
   bundle metadata for app identity and localization resources for translatable

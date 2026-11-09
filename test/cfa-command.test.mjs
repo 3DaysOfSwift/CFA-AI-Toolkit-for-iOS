@@ -114,6 +114,7 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /default Feature dependency comes\s+from AppModel\.shared/);
   assert.match(content, /A changed input does not\s+automatically replace its State-backed ViewModel/);
   assert.match(content, /genuinely shared across the app, define it once as a static\s+property on a purpose-named enum/);
+  assert.match(content, /Start a new app without a constants enum until such a value is needed/);
   assert.match(content, /snapshot structs use let properties and immutable contents/);
   assert.match(content, /nested values and collection elements for references that can change\s+in place/);
   assert.match(content, /read observable Feature state through the ViewModel/);
