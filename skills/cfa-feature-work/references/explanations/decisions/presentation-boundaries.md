@@ -34,7 +34,9 @@ data or an item disappears from a refreshed list. A missing list item alone
 does not establish deletion.
 
 Prefer an explicit refresh button or pull-to-refresh when that meets the
-product's needs. Features own authoritative application data; the screen's
+product's needs. For pull-to-refresh, await the operation or its returned
+task handle so the indicator stays active while the screen waits. Features
+own authoritative application data. The screen's
 ViewModel owns its displayed snapshot and presentation-specific selection.
 Keep tab and scene contexts out of shared Features. Add automatic adoption of
 new snapshots only when the product requires it, rather than as a default

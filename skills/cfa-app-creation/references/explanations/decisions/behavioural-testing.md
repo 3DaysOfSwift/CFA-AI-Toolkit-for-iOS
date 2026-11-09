@@ -27,7 +27,11 @@ One named suite is an organization convention, not coverage proof. A stored Date
 
 ## Verification
 
-Exercise success, error, retry, cancellation and overlap where applicable. Bound blocked waits, release barriers in cleanup, and report passed, failed, skipped and not-run checks separately.
+Exercise success, error, retry, cancellation and overlap where applicable.
+Test current state and event delivery separately. If a consumer must process
+every event, deliver repeated equal values and verify both are handled in
+order. Check cancellation independently of the final displayed value.
+Bound blocked waits, release barriers in cleanup, and report passed, failed, skipped and not-run checks separately.
 
 ## Evidence and provenance
 
