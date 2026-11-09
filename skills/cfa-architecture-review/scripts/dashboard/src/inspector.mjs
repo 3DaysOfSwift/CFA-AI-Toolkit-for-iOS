@@ -769,12 +769,16 @@ export async function inspect(project) {
         const code = isFeature ? 'view-stored-feature' : 'view-stored-model-dependency';
         findings.push(finding(code, 'review', `${view[1]} appears to store ${type} directly. Verify that Feature access goes through the screen-owned ViewModel.`, file, lineOf(source, start + index)));
       }
-      const viewModelInput = /(?:^|(?<=;))[ \t]*(?:@(?:SwiftUI\s*\.\s*)?(State|StateObject|ObservedObject|Bindable)\s+)?(?:(private|fileprivate|internal|package|public)\s+)?(let|var)\s+`?[\p{L}_][\p{L}\p{M}\p{N}_]*`?\s*(?::\s*(?:\w+\s*\.\s*)*(\w+ViewModel)\b(?!\s*\.)(?:[ \t]*[?!])?|=\s*(?:\w+\s*\.\s*)*(\w+ViewModel)(?:\s*\.\s*init)?(?=\s*\())/gmu;
+      const viewModelInput = /(?:^|(?<=;))[ \t]*(?:@(?:SwiftUI\s*\.\s*)?(State|StateObject|ObservedObject|Bindable)\s+)?(?:(private|fileprivate|internal|package|public)\s+)?(?:(static)\s+)?(let|var)\s+`?[\p{L}_][\p{L}\p{M}\p{N}_]*`?\s*(?::\s*(?:\w+\s*\.\s*)*(\w+ViewModel)\b(?!\s*\.)(?:[ \t]*[?!])?|=\s*(?:\w+\s*\.\s*)*(\w+ViewModel)(?:\s*\.\s*init)?(?=\s*\())/gmu;
       for (const match of members.matchAll(viewModelInput)) {
-        const [declaration, wrapper, access, binding, explicitType, inferredType] = match;
+        const [declaration, wrapper, access, typeStorage, binding, explicitType, inferredType] = match;
         if (wrapper === 'State' || wrapper === 'StateObject') continue;
         const suffix = body.slice(match.index + declaration.length);
         if (hasComputedAccessor(suffix)) continue;
+        if (typeStorage) {
+          findings.push(finding('view-model-static-storage', 'review', `${view[1]} appears to share a ViewModel through static storage. Verify that each screen constructs and owns its own ViewModel.`, file, lineOf(source, start + match.index)));
+          continue;
+        }
         const hasDefault = inferredType || /^\s*=/.test(suffix);
         if (hasDefault && (binding === 'let' || access === 'private' || access === 'fileprivate')) continue;
         findings.push(finding('view-model-input-storage', 'review', `${view[1]} declares ${explicitType ?? inferredType} storage that may be set by its initializer. Trace its initialization to check whether another View supplies the ViewModel.`, file, lineOf(source, start + match.index)));

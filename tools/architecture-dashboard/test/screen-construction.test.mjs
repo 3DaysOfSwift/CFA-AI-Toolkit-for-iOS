@@ -731,3 +731,14 @@ test('reviews a defaulted mutable memberwise ViewModel input', async t => {
   assert.deepEqual(report.findings.filter(item => item.code === 'view-model-input-storage')
     .map(({file, line}) => [file, line]), [[file, 2], [file, 3]]);
 });
+
+test('reviews shared ViewModel storage on the View type', async t => {
+  const {report} = await inspectView(t, `struct HomeView: View {
+    private static let sharedModel = HomeViewModel()
+    static var computed: HomeViewModel { HomeViewModel() }
+    var body: some View { Text("Home") }
+  }`);
+  assert.deepEqual(report.findings.filter(item => item.code === 'view-model-static-storage')
+    .map(({line}) => line), [2]);
+  assert.ok(!report.findings.some(item => item.code === 'view-model-input-storage'));
+});
