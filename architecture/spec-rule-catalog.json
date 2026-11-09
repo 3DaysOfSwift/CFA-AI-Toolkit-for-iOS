@@ -519,10 +519,10 @@
       "section": "Keep Time and Other Volatile Dependencies Injectable",
       "applies": "Business decisions depend on time or another changing external value",
       "strength": "Required when applicable",
-      "rule": "Supply volatile dependencies in a controllable form rather than hiding them in business decisions.",
+      "rule": "Inject a clock or date function when a business decision depends on the current time. Read it when the Feature makes the decision so production time continues advancing. Keep date boundaries and comparisons in the Feature. Views can read current time for transient visual presentation. Apply the same approach to randomness, identifiers, locale-sensitive rules and external clients when tests need control.",
       "why": "Time-dependent behaviour can be reproduced in tests.",
       "example": "A countdown decision uses an injected clock.",
-      "verify": "Test boundary dates and time zones using controlled inputs.",
+      "verify": "Test relevant date boundaries and time zones with controlled inputs. If the same Feature instance must work across a date change, advance the clock and verify that its next decision uses the new time.",
       "explanationIds": [
         "behavioural-testing"
       ]
