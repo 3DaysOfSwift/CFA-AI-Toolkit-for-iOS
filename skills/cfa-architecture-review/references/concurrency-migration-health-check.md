@@ -112,7 +112,9 @@ layout alone does not prove concurrency correctness or runtime performance.
 
 ## Produce the Health Check report
 
-Run the packaged scanner on the current checkout before each Health Check:
+Run the packaged scanner on the current checkout before each Health Check.
+Run these commands from the architecture review skill directory, or use the
+full path to its bundled script from another directory:
 
 ```
 node scripts/dashboard/src/whole-app-health.mjs prepare <project-root> <new-inventory-directory>
