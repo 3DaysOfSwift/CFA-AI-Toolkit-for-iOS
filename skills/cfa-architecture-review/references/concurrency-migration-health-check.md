@@ -135,7 +135,7 @@ node scripts/dashboard/src/whole-app-health.mjs prepare <project-root> <new-inve
 Read `inventory.json`, `checklist.json` and `task-map.json`; record source-backed judgments incrementally in the generated `review-draft.json`. Run `node scripts/dashboard/src/whole-app-health.mjs next <project-root> <review-draft.json>` after each batch to list concrete pending files, entry points and task sites. Continue reviewing related operations and reusing shared-path evidence; do not stop after saving a checkpoint. The command does not itself inspect or assess the code. Use the checklist to cover source files, candidate entry points and task sites through meaningful operation batches and justified exclusions. Verify production target membership and add manually discovered operations. Continue until all applicable items are reconciled. SwiftSyntax records source locations,
 enclosing functions and lexical nesting of explicit tasks. Lexical nesting is not
 task parentage: nested `Task {}` creates independent unstructured work. Group
-children and SwiftUI tasks need their own ownership review. Follow callers and
+children, `async let` children and SwiftUI tasks need their own ownership review. Follow callers and
 the compiler index where available; record each source-supported relationship in
 the operation steps and each unresolved relationship as unknown. Never invent a
 complete tree from syntax alone.
@@ -169,7 +169,7 @@ After review, run:
 node scripts/dashboard/src/whole-app-health.mjs report <project-root> <review.json> <project-root>/reports/health-check/<new-report.html> [app-icon.png]
 ```
 
-The tool reruns SwiftSyntax and rescans and checks the source fingerprint, evidence ranges, file/type
+The tool reruns SwiftSyntax and rescans and checks the source fingerprint, evidence ranges, source file
 coverage and candidate reconciliation before generating the report. Missing
 reviews, unresolved operations, skipped files or unverified target membership
 prevent report generation. Use the command’s diagnostics to continue the checklist;

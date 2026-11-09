@@ -9,7 +9,7 @@ import {collectSyntax} from './syntax-evidence.mjs';
 import {collectProjectAnalysis} from './project-analysis.mjs';
 
 const candidateKinds = new Set(['launch-callback', 'button-action', 'view-task', 'refresh']);
-const taskKinds = new Set(['concurrency.task','concurrency.detached','concurrency.taskGroup','concurrency.groupChild','entry.viewTask','entry.refreshable']);
+const taskKinds = new Set(['concurrency.task','concurrency.detached','concurrency.taskGroup','concurrency.groupChild','concurrency.asyncLet','entry.viewTask','entry.refreshable']);
 export function taskCandidates(report) {
   return (report.syntax?.items || []).filter(item=>taskKinds.has(item.kind)).map(item=>({...item,id:`syntax-task:${item.file}:${item.line}:${item.column}:${item.kind}`}));
 }
@@ -54,7 +54,7 @@ export function nextWork(report, review, limit = 8) {
 }
 export function renderTaskMap(taskMap) {
   const esc=value=>String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
-  const labels={'concurrency.task':'Unstructured task','concurrency.detached':'Detached task','concurrency.taskGroup':'Task group','concurrency.groupChild':'Possible group child','entry.viewTask':'Possible SwiftUI task','entry.refreshable':'Possible SwiftUI refresh'};
+  const labels={'concurrency.task':'Unstructured task','concurrency.detached':'Detached task','concurrency.taskGroup':'Task group','concurrency.groupChild':'Possible group child','concurrency.asyncLet':'Async let child','entry.viewTask':'Possible SwiftUI task','entry.refreshable':'Possible SwiftUI refresh'};
   const rows=taskMap.sites.map(site=>`<li><strong>${esc(labels[site.kind] || site.kind)}</strong> · ${esc(site.file)}:${site.line}:${site.column}<br><span>${site.enclosingFunction ? `Function: ${esc(site.enclosingFunction)}` : 'Enclosing function not identified'}${site.lexicalTaskParent ? ` · Written inside task at ${esc(site.lexicalTaskParent)}` : ''}</span></li>`).join('');
   return `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Task sites</title><style>body{font:16px/1.6 system-ui;background:#111214;color:#f2f3f4;max-width:900px;margin:50px auto;padding:0 24px}h1{font-size:2.4rem}p,span{color:#bac4c8}li{padding:14px 0;border-bottom:1px solid #373b3f;overflow-wrap:anywhere}</style><h1>Task sites</h1><p>${esc(taskMap.note)}</p><p>${taskMap.sites.length} sites · SwiftSyntax ${esc(taskMap.status)}</p><ul>${rows}</ul></html>`;
 }

@@ -79,6 +79,13 @@ final class SourceInventory: SyntaxVisitor {
     override func visitPost(_ node: FunctionDeclSyntax) { functions.removeLast() }
     override func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind { record("initializer", "init", node); functions.append("init"); return .visitChildren }
     override func visitPost(_ node: InitializerDeclSyntax) { functions.removeLast() }
+    override func visit(_ node: VariableDeclSyntax) -> SyntaxVisitorContinueKind {
+        if node.bindingSpecifier.tokenKind == .keyword(.let),
+           let modifier = node.modifiers.first(where: { $0.name.tokenKind == .keyword(.async) }) {
+            record("concurrency.asyncLet", "async let", modifier)
+        }
+        return .visitChildren
+    }
     override func visit(_ node: AwaitExprSyntax) -> SyntaxVisitorContinueKind { record("concurrency.await", "await", node); return .visitChildren }
     override func visit(_ node: FunctionCallExprSyntax) -> SyntaxVisitorContinueKind {
         let called = node.calledExpression.trimmedDescription

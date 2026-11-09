@@ -68,7 +68,8 @@ test('syntax entry points join the inventory without duplicating lexical finding
     {kind:'entry.backgroundHandler',file:'App.swift',line:3,column:1},
     {kind:'entry.incomingLink',file:'App.swift',line:3,column:2},
     {kind:'entry.notificationResponse',file:'App.swift',line:3,column:3},
-    {kind:'concurrency.task',file:'App.swift',line:3,column:1}
+    {kind:'concurrency.task',file:'App.swift',line:3,column:1},
+    {kind:'concurrency.asyncLet',file:'App.swift',line:3,column:4}
   ]};
   const candidates=inventoryCandidates(combined);
   assert.equal(candidates.length,5);
@@ -88,7 +89,8 @@ test('syntax entry points join the inventory without duplicating lexical finding
   review.operations[0].evidence[0].endLine = 3;
   assert.deepEqual(nextWork(combined,review).nextEntryPoints,[]);
   assert.match(coverageGaps(combined,complete()).join(' '),/entry points/);
-  assert.equal(taskCandidates(combined).length,1);
+  assert.equal(taskCandidates(combined).length,2);
+  assert.ok(nextWork(combined,review).nextTaskSites.some(site => site.kind === 'concurrency.asyncLet'));
   assert.match(coverageGaps(combined,complete()).join(' '),/task sites/);
 });
 
