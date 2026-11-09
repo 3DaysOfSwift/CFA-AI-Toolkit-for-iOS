@@ -87,11 +87,14 @@ Use deliberate passes:
    that entitled users retain access. Preserve existing server-side enforcement.
    When migrating account-scoped work, apply the
    [account lifecycle rule](references/spec/rules/cfa-account-01.md). Preserve
-   the existing cleanup and retention contract. Verify that a failed
-   sign-out before the session ends preserves account data, and exercise a
-   late result from the old session after a successful sign-out or switch.
-   If the same account can sign back in before earlier work finishes, verify
-   that the old session cannot publish into the new one.
+   the existing cleanup and retention contract. Trace sign-out, account
+   switching and any external session expiry before removing legacy observers.
+   Verify that failed sign-out preserves account data when the session stays
+   active, and exercise a late result after sign-out, switching or expiry
+   where supported. Check that the expiry signal still reaches its owner when
+   the account screen is absent. If the same account can sign back in before
+   earlier work finishes, verify that the old session cannot publish into
+   the new one.
 2. Move one complete feature at a time into CFA. Give each screen-level SwiftUI View a
    dedicated ViewModel; reusable presentation components do not automatically need
    one. Move testable feature decisions into its Feature,
