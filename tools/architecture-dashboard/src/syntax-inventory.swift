@@ -91,7 +91,7 @@ final class SourceInventory: SyntaxVisitor {
         let called = node.calledExpression.trimmedDescription
         // A written call is a candidate, not a resolved callee or proof of execution.
         record("call.expression", called, node)
-        switch called {
+        switch taskSpelling(node.calledExpression) {
         case "Task", "Task.init": record("concurrency.task", called, node); tasks.append(taskLocation(node))
         case "Task.detached": record("concurrency.detached", called, node); tasks.append(taskLocation(node))
         case "withTaskGroup", "withThrowingTaskGroup", "withDiscardingTaskGroup", "withThrowingDiscardingTaskGroup":
@@ -113,7 +113,19 @@ final class SourceInventory: SyntaxVisitor {
         return .visitChildren
     }
     override func visitPost(_ node: FunctionCallExprSyntax) {
-        if ["Task", "Task.init", "Task.detached"].contains(node.calledExpression.trimmedDescription) { tasks.removeLast() }
+        if ["Task", "Task.init", "Task.detached"].contains(taskSpelling(node.calledExpression)) { tasks.removeLast() }
+    }
+
+    private func taskSpelling(_ expression: ExprSyntax) -> String {
+        if let specialization = expression.as(GenericSpecializationExprSyntax.self) {
+            return taskSpelling(specialization.expression)
+        }
+        if let member = expression.as(MemberAccessExprSyntax.self),
+           let base = member.base,
+           taskSpelling(base) == "Task" {
+            return "Task." + member.declName.baseName.text
+        }
+        return expression.trimmedDescription
     }
     private func taskLocation(_ node: FunctionCallExprSyntax) -> String {
         let location = converter.location(for: node.positionAfterSkippingLeadingTrivia)
