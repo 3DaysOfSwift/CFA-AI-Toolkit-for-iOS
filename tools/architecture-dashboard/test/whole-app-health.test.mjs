@@ -8,7 +8,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 const report = {scope:{skipped:[]}, files:[{path:'App.swift',declarations:[{type:'struct',name:'App',line:1}],sites:[{id:'entry',kind:'launch-callback',file:'App.swift',line:2}]}]};
-const complete = () => ({productionTargets:['App'],targetInventoryVerified:true, fileReviews:[{file:'App.swift',status:'sound'}],typeReviews:[{file:'App.swift',line:1,kind:'struct',name:'App',status:'sound'}],operationInventory:{coverage:'complete'},operations:[{id:'launch',checks:[{status:'pass'}],unknowns:[],evidence:[{file:'App.swift',line:2,endLine:2}]}],entryPoints:[{siteId:'entry',operationId:'launch'}]});
+const complete = () => ({productionTargets:['App'],targetInventoryVerified:true, fileReviews:[{file:'App.swift',status:'sound'}],typeReviews:[{file:'App.swift',line:1,kind:'struct',name:'App',status:'sound'}],operationInventory:{coverage:'complete'},operations:[{id:'launch',checks:[{status:'pass'}],scenarios:['repeat','leave','late-result','failure'].map(id=>({id,status:'not-applicable'})),unknowns:[],evidence:[{file:'App.swift',line:2,endLine:2}]}],entryPoints:[{siteId:'entry',operationId:'launch'}]});
 
 test('next work resumes from recorded evidence and retains the completion gate', () => {
   const pending=complete(); pending.fileReviews=[]; pending.entryPoints=[];
@@ -30,8 +30,8 @@ test('coverage requires source files and detected entry points, without individu
   assert.deepEqual(coverageGaps(report,batched),[]);
 });
 
-test('new reviews require an outcome for each timing scenario', () => {
-  const review=complete(); review.behaviourScenariosRequired=true;
+test('whole-app reviews require timing outcomes even if an old input disables the flag', () => {
+  const review=complete(); review.behaviourScenariosRequired=false; review.operations[0].scenarios=[];
   assert.match(coverageGaps(report,review).join(' '),/timing-scenario/);
   review.operations[0].scenarios=['repeat','leave','late-result','failure'].map(id=>({id,status:'not-applicable'}));
   assert.deepEqual(coverageGaps(report,review),[]);

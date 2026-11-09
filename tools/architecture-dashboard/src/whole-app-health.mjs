@@ -77,11 +77,9 @@ export function coverageGaps(report, review) {
   if (!operations.length) gaps.push('No application operations have been reviewed.');
   const openOperations = operations.filter(op => !op.checks?.length || op.checks.some(c => ['unresolved','not-checked'].includes(c.status)) || op.unknowns?.length);
   if (openOperations.length) gaps.push(`${openOperations.length} operations have unresolved checks or boundaries.`);
-  if (review.behaviourScenariosRequired === true) {
-    const required = ['repeat','leave','late-result','failure'];
-    const incomplete = operations.filter(op => required.some(id => !op.scenarios?.some(s => s.id === id && s.status !== 'unresolved')));
-    if (incomplete.length) gaps.push(`${incomplete.length} operations need timing-scenario assessments.`);
-  }
+  const required = ['repeat','leave','late-result','failure'];
+  const incomplete = operations.filter(op => required.some(id => !op.scenarios?.some(s => s.id === id && s.status !== 'unresolved')));
+  if (incomplete.length) gaps.push(`${incomplete.length} operations need timing-scenario assessments.`);
   const entries = new Map();
   for (const entry of review.entryPoints || []) {
     if (!entry.siteId || entries.has(entry.siteId)) throw Error('Entry-point reconciliation needs unique site IDs.');
@@ -140,7 +138,7 @@ export async function prepare(root, output, syntaxProvider = collectSyntax, opti
     operations: {status:'pending', note:'Discover and trace user actions and system events, including operations the scanner cannot detect.'}
   };
   await fs.writeFile(path.join(output,'checklist.json'),JSON.stringify(checklist,null,2)+'\n',{flag:'wx'});
-  const draft = {schemaVersion:1,sourceFingerprint:report.sourceFingerprint,author:'Health Check reviewer',scope:'Whole application',behaviourScenariosRequired:true,productionTargets:[],targetInventoryVerified:false,fileReviews:[],fileBatches:[],operationInventory:{scope:'Whole application',method:'Source review and scanner inventory',coverage:'partial'},operations:[],entryPoints:[],taskSites:[]};
+  const draft = {schemaVersion:1,sourceFingerprint:report.sourceFingerprint,author:'Health Check reviewer',scope:'Whole application',productionTargets:[],targetInventoryVerified:false,fileReviews:[],fileBatches:[],operationInventory:{scope:'Whole application',method:'Source review and scanner inventory',coverage:'partial'},operations:[],entryPoints:[],taskSites:[]};
   await fs.writeFile(path.join(output,'review-draft.json'),JSON.stringify(draft,null,2)+'\n',{flag:'wx'});
   const taskMap = {sourceFingerprint:report.sourceFingerprint, status:report.syntax.status,
     note:'Syntax locations and lexical nesting are leads only. Task parentage, ownership and call relationships require source review.',
