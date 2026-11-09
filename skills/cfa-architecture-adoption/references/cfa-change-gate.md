@@ -232,9 +232,13 @@ the architecture:
     dedicated ViewModel; several screens may use the same Feature. Give each
     Feature a real responsibility and named tests, with one authoritative owner
     for shared business state. Do not invent a Feature to match a tab count.
-    Features own authoritative application state on the main actor. Distinguish
-    service-internal request tracking, caches and storage machinery from that
-    business authority; do not promote all stateful helpers into AppModel.
+    Features explicitly use MainActor and own authoritative application state.
+    Microservices keep internal request tracking, caches and storage machinery
+    under suitable isolation. Trace networking, persistence and expensive
+    processing through the service using the target's Swift language mode,
+    default isolation and relevant SDK annotations. An async declaration alone
+    does not establish where work executes. Keep framework-required MainActor
+    calls in a narrow adapter and measure responsiveness when timing matters.
     When account changes affect other Features, coordinate the real workflow
     explicitly. Trace sign-out, account switching and external session expiry
     when supported. Verify that external expiry reaches its owner with the
