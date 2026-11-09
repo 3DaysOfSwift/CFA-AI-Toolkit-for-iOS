@@ -811,8 +811,8 @@ export async function inspect(project) {
         const body = braceBody(members, bodyStart - 1);
         const conditional = /(?<!#)\b(?:if|switch)\b/.exec(body);
         const presentation = swiftDataAccess.exec(body) ?? /\b(?:ProgressView|ContentUnavailableView)\s*\(/.exec(body);
-        if (conditional) findings.push(finding('conditional-app-body', 'review', 'App.body contains a conditional. Check whether it gates root navigation on storage or an unrelated condition.', file, lineOf(source, start + bodyStart + conditional.index)));
-        if (presentation) findings.push(finding('app-startup-presentation', 'review', 'App.body contains storage or loading presentation. Check whether database availability gates the interface; a lexical match alone cannot establish this.', file, lineOf(source, start + bodyStart + presentation.index)));
+        if (conditional) findings.push(finding('conditional-app-body', 'review', 'App.body contains a conditional. Check whether root navigation stays available while Features start, load, or fail.', file, lineOf(source, start + bodyStart + conditional.index)));
+        if (presentation) findings.push(finding('app-startup-presentation', 'review', 'App.body contains storage or loading presentation. Trace whether it blocks root navigation and whether the affected screen can own that presentation.', file, lineOf(source, start + bodyStart + presentation.index)));
       }
     }
     function swiftDataLines(scope, offset) {

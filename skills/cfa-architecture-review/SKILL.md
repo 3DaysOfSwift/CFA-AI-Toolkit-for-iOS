@@ -215,6 +215,14 @@ If a screen can refresh data that launch already requested, trace both paths
 to the Feature’s overlap policy. Under the default policy, equivalent requests
 share one execution and the screen can await its outcome.
 
+Apply the [structural launch rule](references/spec/rules/cfa-launch-03.md)
+to each scene. Check that `App.body` installs a stable root and that root
+navigation remains available while Features load or fail. For
+`conditional-app-body` and `root-startup-gate` findings, follow the condition
+and both outcomes. A layout branch can preserve navigation, while a startup
+branch that replaces the root with a spinner moves loading presentation out
+of the owning screen and its ViewModel.
+
 For a suspected startup storage gate, apply the
 [database availability rule](references/spec/rules/cfa-launch-02.md). Trace
 from AppModel construction and root presentation to the first store-opening
