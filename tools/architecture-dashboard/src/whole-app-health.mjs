@@ -111,8 +111,14 @@ export function nextWork(report, review, limit = 8) {
 export function renderTaskMap(taskMap) {
   const esc=value=>String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
   const labels={'concurrency.task':'Unstructured task','concurrency.detached':'Detached task','concurrency.taskGroup':'Task group','concurrency.groupChild':'Possible group child','concurrency.asyncLet':'Async let child','entry.viewTask':'Possible SwiftUI task','entry.refreshable':'Possible SwiftUI refresh'};
+  const parserNotes = [
+    taskMap.reason,
+    ...(taskMap.warnings || []),
+    taskMap.excludedItems ? `Parser findings outside the source inventory: ${taskMap.excludedItems}.` : null
+  ].filter(Boolean);
+  const diagnostics = parserNotes.map(note => `<p>${esc(note)}</p>`).join('');
   const rows=taskMap.sites.map(site=>`<li><strong>${esc(labels[site.kind] || site.kind)}</strong> · ${esc(site.file)}:${site.line}:${site.column}<br><span>${site.enclosingFunction ? `Function: ${esc(site.enclosingFunction)}` : 'Enclosing function not identified'}${site.lexicalTaskParent ? ` · Written inside task at ${esc(site.lexicalTaskParent)}` : ''}</span></li>`).join('');
-  return `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Task sites</title><style>body{font:16px/1.6 system-ui;background:#111214;color:#f2f3f4;max-width:900px;margin:50px auto;padding:0 24px}h1{font-size:2.4rem}p,span{color:#bac4c8}li{padding:14px 0;border-bottom:1px solid #373b3f;overflow-wrap:anywhere}</style><h1>Task sites</h1><p>${esc(taskMap.note)}</p><p>${taskMap.sites.length} sites · SwiftSyntax ${esc(taskMap.status)}</p><ul>${rows}</ul></html>`;
+  return `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Task sites</title><style>body{font:16px/1.6 system-ui;background:#111214;color:#f2f3f4;max-width:900px;margin:50px auto;padding:0 24px}h1{font-size:2.4rem}p,span{color:#bac4c8}li{padding:14px 0;border-bottom:1px solid #373b3f;overflow-wrap:anywhere}</style><h1>Task sites</h1><p>${esc(taskMap.note)}</p><p>${taskMap.sites.length} sites · SwiftSyntax ${esc(taskMap.status)} · file coverage ${esc(taskMap.coverage ?? 'unverified')}</p>${diagnostics}<ul>${rows}</ul></html>`;
 }
 export function inventoryCandidates(report) {
   const candidates = report.files.flatMap(file => file.sites.filter(site => candidateKinds.has(site.kind)));
@@ -236,7 +242,8 @@ export async function prepare(root, output, syntaxProvider = collectSyntax, opti
   await fs.writeFile(path.join(output,'checklist.json'),JSON.stringify(checklist,null,2)+'\n',{flag:'wx'});
   const draft = {schemaVersion:1,sourceFingerprint:report.sourceFingerprint,author:'Health Check reviewer',includeTests:report.scope.includeTests,scope:'Whole application',productionTargets:[],targetInventoryVerified:false,fileReviews:[],fileBatches:[],operationInventory:{scope:'Whole application',method:'Source review and scanner inventory',coverage:'partial'},operations:[],entryPoints:[],taskSites:[]};
   await fs.writeFile(path.join(output,'review-draft.json'),JSON.stringify(draft,null,2)+'\n',{flag:'wx'});
-  const taskMap = {sourceFingerprint:report.sourceFingerprint, status:report.syntax.status,
+  const {status, coverage, reason, warnings, excludedItems} = report.syntax;
+  const taskMap = {sourceFingerprint:report.sourceFingerprint, status, coverage, reason, warnings, excludedItems,
     note:'Syntax locations and lexical nesting are leads only. Task parentage, ownership and call relationships require source review.',
     sites:taskCandidates(report)};
   await fs.writeFile(path.join(output,'task-map.json'),JSON.stringify(taskMap,null,2)+'\n',{flag:'wx'});

@@ -259,7 +259,9 @@ test('installed Health Check rescans source, surfaces gaps and rejects stale rev
     await fs.writeFile(buildSettings, initialSettings);
     const syntax=async()=>({status:'available',files:['App.swift','Value.swift'],items:[],warnings:[]});
     const inventory=await prepare(project,path.join(base,'inventory'),syntax);
-    assert.match(await fs.readFile(path.join(base,'inventory','task-map.html'),'utf8'),/Task sites/);
+    const taskMap = await fs.readFile(path.join(base,'inventory','task-map.html'),'utf8');
+    assert.match(taskMap,/Task sites/);
+    assert.match(taskMap,/SwiftSyntax available · file coverage matching/);
     const draftPath=path.join(base,'inventory','review-draft.json');
     const pending=await progress(project,draftPath,syntax);
     assert.ok(pending.gaps.some(gap=>gap.includes('Swift files')));
