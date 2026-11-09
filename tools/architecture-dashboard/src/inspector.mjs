@@ -692,7 +692,7 @@ export async function inspect(project) {
       }
       if (initializerBody !== null) {
         const ownConstruction = typedStateProperties.find(({name: property}) => new RegExp(
-          `(?<![\\p{L}\\p{M}\\p{N}_])_${property}\\s*=\\s*${stateTypePattern}(?:\\s*<\\s*${viewModelTypePattern}\\s*>)?\\s*\\(\\s*(?:initialValue|wrappedValue)\\s*:\\s*(?:${viewModelTypePattern}(?:\\s*\\.\\s*init)?|\\.init)\\s*\\(`, 'u'
+          `(?<![.\\p{L}\\p{M}\\p{N}_])(?:self\\s*\\.\\s*)?_${property}\\s*=\\s*${stateTypePattern}(?:\\s*<\\s*${viewModelTypePattern}\\s*>)?\\s*\\(\\s*(?:initialValue|wrappedValue)\\s*:\\s*(?:${viewModelTypePattern}(?:\\s*\\.\\s*init)?|\\.init)\\s*\\(`, 'u'
         ).test(initializerBody));
         if (parameters.trim() && !injectedViewModel && ownConstruction) ownedState ??= ownConstruction;
         const statePropertyNames = typedStateProperties.map(property => property.name);

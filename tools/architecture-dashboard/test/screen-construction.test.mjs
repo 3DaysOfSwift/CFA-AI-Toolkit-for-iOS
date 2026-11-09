@@ -530,3 +530,16 @@ test('recognizes detail ViewModel ownership when the initializer is in an extens
   assert.equal(report.screens[0].ownsViewModel, true);
   assert.equal(report.findings.find(item => item.code === 'view-model-initializer-construction')?.file, file);
 });
+
+test('an initializer assignment to another instance does not establish screen ownership', async t => {
+  const {report} = await inspectView(t, `struct HomeView: View {
+    @State private var viewModel: HomeViewModel
+    init(snapshot: HomeSnapshot) {
+      self = Self.preview
+      var other = self
+      other._viewModel = State(initialValue: HomeViewModel(snapshot: snapshot))
+    }
+    var body: some View { Text("Home") }
+  }`);
+  assert.equal(report.screens[0].ownsViewModel, false);
+});
