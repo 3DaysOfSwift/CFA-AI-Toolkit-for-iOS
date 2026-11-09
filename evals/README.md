@@ -4,9 +4,10 @@ These small fixtures preserve behaviour that the Toolkit must maintain as its
 skills evolve. They are not application templates and are not copied into a
 developer's Xcode project.
 
-Run `npm run evals` to check that the flat-app fixture and its expected-outcome
-file contain the required markers. This is a structural check; it does not run
-an AI or verify its response, and it does not evaluate the other fixtures.
+Run `npm run evals` to check required markers in the flat-app, migration
+handoff, product-design and explanation fixtures. This structural check
+verifies the fixture files. Run the cases in an installed host to verify
+responses.
 
 Before a CFA release, give each applicable fixture and its ordinary-language
 request to an installed AI host. Compare the response with the expected outcome.

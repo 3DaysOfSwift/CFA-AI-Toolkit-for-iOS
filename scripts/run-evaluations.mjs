@@ -20,13 +20,24 @@ export function runEvaluations(base = root) {
   for (const expression of [/CFA\s+Architecture\s+Adoption/, /wallet feature/, /dedicated ViewModel/, /AppModel/]) {
     if (!expression.test(expected)) throw Error(`Flat-app expected outcome is missing: ${expression}`);
   }
+  const manualFixtures = [
+    ['migration-handoff.md', /^## Synthetic checkpoint$/m, /^## Expected outcome$/m],
+    ['product-design-scope/expected.md', /^## 1\. New product, first request$/m, /^## Evaluation rubric$/m],
+    ['explanations.md', /^\| Prompt \/ context \| Expected behaviour \| Failure \|$/m]
+  ];
+  for (const [file, ...markers] of manualFixtures) {
+    const fixture = requireText(path.join(base, 'evals', file), 'manual evaluation fixture');
+    for (const marker of markers) {
+      if (!marker.test(fixture)) throw Error(`Evaluation fixture ${file} is missing: ${marker}`);
+    }
+  }
   return true;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
   try {
     runEvaluations();
-    console.log('Flat-app evaluation fixture contains its required markers.');
+    console.log('CFA evaluation fixtures contain their required markers. Installed-host evaluations are manual.');
   } catch (error) {
     console.error(error.message);
     process.exitCode = 1;
