@@ -192,7 +192,7 @@
       "section": "Organize Behaviour into Cohesive Features",
       "applies": "Designing network services",
       "strength": "Required unless a documented policy limits concurrency",
-      "rule": "Prefer a simple stateless NetworkingManager when suitable; do not assume an actor serializes an entire suspended request.",
+      "rule": "Wrap URLSession calls in a NetworkingManager and let independent requests progress in parallel unless a documented policy limits them. For new apps, prefer a stateless value type when suitable. An actor may protect shared request state without serializing entire suspended requests.",
       "why": "Avoid accidental bottlenecks and data races.",
       "verify": "Test overlapping requests and inspect isolation, request limits and URLSession configuration.",
       "example": "Independent launch providers initiate requests without waiting for another provider to finish.",

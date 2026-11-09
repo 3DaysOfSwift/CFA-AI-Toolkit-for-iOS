@@ -4,7 +4,7 @@
 
 **Strength:** Required unless a documented policy limits concurrency.
 
-**Guidance:** Prefer a simple stateless NetworkingManager when suitable; do not assume an actor serializes an entire suspended request.
+**Guidance:** Wrap URLSession calls in a NetworkingManager and let independent requests progress in parallel unless a documented policy limits them. For new apps, prefer a stateless value type when suitable. An actor may protect shared request state without serializing entire suspended requests.
 
 **Why:** Avoid accidental bottlenecks and data races.
 
