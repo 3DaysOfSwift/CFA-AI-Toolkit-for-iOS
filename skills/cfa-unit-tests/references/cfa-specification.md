@@ -721,6 +721,12 @@ cancellation arrives afterward, so an opened request is not offered again. The
 destination screen then owns its own data loading, errors and refresh: do not
 wait for content to load before treating navigation as successful.
 
+If navigation succeeds but removing the saved request fails, report the storage
+failure and retry removal without navigating again. In-memory tracking prevents
+another open only while the process is running. If the app exits before removal
+is saved, the request can reappear unless the product uses a durable mechanism
+to record completion.
+
 For example, when a user selects a pending item in Settings, its ViewModel
 asks `DeepLinkingFeature` to open that request. The Feature invokes the handler
 for the receiving scene; the scene navigates and reports the result. Configure
