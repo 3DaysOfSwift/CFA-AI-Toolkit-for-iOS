@@ -195,3 +195,17 @@ test('an unrelated property named viewModel does not imply ViewModel state assig
   assert.equal(report.screens[0].ownsViewModel, true);
   assert.deepEqual(findings, []);
 });
+
+test('recognizes typed State construction with a contextual detail ViewModel initializer', async t => {
+  const { report, findings } = await inspectView(t, `struct HomeView: View {
+    @State private var viewModel: HomeViewModel
+    init(launch: LaunchSnapshot) {
+      self._viewModel = State<HomeViewModel>(wrappedValue: .init(launch: launch))
+    }
+    var body: some View { Text("Home") }
+  }`);
+  assert.equal(report.screens[0].ownsViewModel, true);
+  assert.deepEqual(findings.map(item => item.code), [
+    'screen-initializer-inputs', 'view-model-initializer-construction'
+  ]);
+});
