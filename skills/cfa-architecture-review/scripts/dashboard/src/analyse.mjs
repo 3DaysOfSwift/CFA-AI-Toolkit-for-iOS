@@ -108,7 +108,9 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
         const relative = path.relative(root, absolute).split(path.sep).join('/');
         if ((await fs.stat(absolute)).size > 2_000_000) { skipped.push({ file: relative, reason: 'Over 2 MB source limit' }); continue; }
         const source = await fs.readFile(absolute, 'utf8');
-        files.push({ path: relative, hash: createHash('sha256').update(source).digest('hex'), lineCount: source.split('\n').length, ...scanSource(source, relative) });
+        const hash = createHash('sha256').update(source).digest('hex');
+        if (/^Package(?:@swift-\d+(?:\.\d+)*)?\.swift$/.test(entry.name)) buildDefinitions.push([relative, hash]);
+        files.push({ path: relative, hash, lineCount: source.split('\n').length, ...scanSource(source, relative) });
       }
     }
   }

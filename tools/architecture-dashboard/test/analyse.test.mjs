@@ -101,3 +101,22 @@ test('changing app capability or lifecycle configuration invalidates source revi
     assert.ok(after.scope.buildDefinitionPaths.includes(file));
   }
 });
+
+test('surfaces local Swift package manifests as build definitions and keeps them in the source inventory', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cfa-package-definition-'));
+  t.after(() => fs.rm(root, {recursive:true, force:true}));
+  const folder = path.join(root, 'LocalPackage');
+  await fs.mkdir(folder);
+  const manifests = ['Package.swift', 'Package@swift-6.0.swift'];
+  for (const name of manifests) await fs.writeFile(path.join(folder, name), 'import PackageDescription\n');
+  const before = await analyse(root);
+  for (const name of manifests) {
+    const relative = 'LocalPackage/' + name;
+    const file = before.files.find(file => file.path === relative);
+    const definition = before.buildDefinitions.find(file => file.path === relative);
+    assert.ok(before.scope.buildDefinitionPaths.includes(relative));
+    assert.equal(definition.hash, file.hash);
+  }
+  await fs.appendFile(path.join(folder, manifests[1]), '// Changed package configuration\n');
+  assert.notEqual((await analyse(root)).sourceFingerprint, before.sourceFingerprint);
+});
