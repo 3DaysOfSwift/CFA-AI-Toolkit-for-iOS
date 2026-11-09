@@ -113,8 +113,11 @@ skill from that toolkit before changing the project.
   One static live() factory constructs production dependencies for
   AppModel.shared. Keep services and UI errors out of its stored properties.
 - AppModel starts each needed app-wide listener once and forwards events to
-  the responsible Feature. The Feature interprets events and owns the resulting
-  state. Screen-only observation follows the screen's lifetime.
+  the responsible Feature. Define how asynchronous listeners stop or are
+  replaced when needed, including in isolated tests. A listener intended to
+  run for the app's lifetime may run until termination. The Feature interprets
+  events and owns the resulting state. Screen-only observation follows the
+  screen's lifetime.
 - Features own their background capabilities. During synchronous launch,
   AppModel can ask each Feature to register its permitted BGTaskScheduler
   identifiers once. Schedule work separately and honour expiration,
