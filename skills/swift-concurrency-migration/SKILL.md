@@ -74,6 +74,12 @@ Use deliberate passes:
    redesign. Do not inventory against new-app styling or branding defaults;
    their absence is not a migration gap. Resolve ambiguous or materially changed
    product behaviour with the developer.
+   When routing is in scope, inventory existing URL opens, local and push
+   notification actions, and any pending list or history. Apply the
+   [deep-link rule](references/spec/rules/cfa-link-01.md) to preserve those
+   capabilities. Verify the same destinations and existing deferred-open
+   and history behaviour after migration. Apply the new-app pending design
+   only where it fits the agreed scope and preserves the existing behaviour.
 2. Move one complete feature at a time into CFA. Give each screen-level SwiftUI View a
    dedicated ViewModel; reusable presentation components do not automatically need
    one. Move testable feature decisions into its Feature,
