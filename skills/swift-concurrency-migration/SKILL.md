@@ -94,7 +94,13 @@ Use deliberate passes:
    dedicated ViewModel; reusable presentation components do not automatically need
    one. Move testable feature decisions into its Feature,
    place shared dependency construction in AppModel and keep persistence behind
-   repositories. AppModel's single `static live()` constructs dependencies;
+   repositories. Where presentation observes live persistence objects, trace
+   existing edits and refresh behaviour before changing the boundary. Publish
+   [immutable domain snapshots](references/spec/rules/cfa-snapshot-01.md) from
+   the owning Feature and route edits through its commands. Verify that a
+   failed save leaves the confirmed snapshot unchanged and that a successful
+   save publishes a replacement.
+   AppModel's single `static live()` constructs dependencies;
    its stored properties include Features, the launch guard and any app-wide
    listener handles required by the specification. Use
    `SwiftDataManager` for SwiftData and `NetworkingManager` for `URLSession`;
