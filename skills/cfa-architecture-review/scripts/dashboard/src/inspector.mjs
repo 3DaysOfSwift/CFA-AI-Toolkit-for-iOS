@@ -763,7 +763,7 @@ export async function inspect(project) {
       .filter(view => extendedViews.has(view[1]) && !directOffsets.has(view.index));
     return [...direct, ...extended].sort((a, b) => a.index - b.index);
   }
-  const swiftDataAccess = /\b(?:ModelContainer|ModelContext)\b|@(?:SwiftData\s*\.\s*)?Query\b|\.(?:modelContainer|`modelContainer`)\s*\(|(?:@(?:SwiftUI\s*\.\s*)?Environment|\.\s*environment)\s*\(\s*\\\s*(?:(?:SwiftUI\s*\.\s*)?EnvironmentValues\s*)?\.\s*modelContext\b/;
+  const swiftDataAccess = /\b(?:ModelContainer|ModelContext)\b|@(?:SwiftData\s*\.\s*)?Query\b|\.\s*(?:modelContainer|`modelContainer`)\s*\(|\.\s*(?:modelContext\b|`modelContext`)|(?:@(?:SwiftUI\s*\.\s*)?Environment|\.\s*environment)\s*\(\s*\\\s*(?:(?:SwiftUI\s*\.\s*)?EnvironmentValues\s*)?\.\s*modelContext\b/;
   for (const [file, source] of sources) {
     const isViewFile = /(?:^|\/)1 - View\//.test(file);
     const previewRanges = [];

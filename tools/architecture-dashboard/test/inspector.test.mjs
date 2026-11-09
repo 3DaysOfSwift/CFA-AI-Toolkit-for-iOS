@@ -474,6 +474,22 @@ test('reviews a preview that injects a SwiftData context through the environment
   assert.deepEqual(findings.map(item => [item.file, item.line, item.severity]), [[file, 2, 'review'], [file, 3, 'review']]);
 });
 
+test('reviews a preview reaching the context through a model instance', async t => {
+  const file = 'Application/PreviewContent/NotesPreview.swift';
+  const root = await fixture(t, {
+    [file]: [
+      '#Preview {',
+      '  let context = note.modelContext',
+      '  NotesView(). /* storage setup */ modelContainer(container)',
+      '}',
+      '#Preview { NotesView() }'
+    ].join('\n'),
+    'Application/Storage/NotesStore.swift': 'actor NotesStore { func context(for note: Note) { _ = note.modelContext } }'
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'view-swiftdata-access');
+  assert.deepEqual(findings.map(item => [item.file, item.line, item.severity]), [[file, 2, 'review'], [file, 3, 'review']]);
+});
+
 test('reviews SwiftData access in a SwiftUI View outside the CFA View folder', async t => {
   const root = await fixture(t, {
     'Application/Presentation/Notes.swift': [
