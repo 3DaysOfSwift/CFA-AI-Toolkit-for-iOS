@@ -120,7 +120,7 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
   const sourceFingerprint = fingerprint.digest('hex');
   return { schemaVersion: 3, sourceFingerprint, dashboard: dashboard(files), project: path.basename(root), generatedAt: new Date().toISOString(),
     method: 'Lexical source inventory — not compiler-resolved or runtime-observed',
-    scope: { includeTests, fileCount: files.length, skipped, excludedTestDirectories, targetMembership: 'Not resolved; inactive compilation branches may be included' },
+    scope: { includeTests, fileCount: files.length, skipped, excludedTestDirectories, buildDefinitionPaths: buildDefinitions.map(([file]) => file), targetMembership: 'Not resolved; inactive compilation branches may be included' },
     limitations: [
       'Matches are source matches: similarly named custom APIs may match; wrappers and unusual syntax may be missed.',
       'String interpolation bodies and Swift regex literals are not fully parsed. Source offsets use UTF-16 code units.',

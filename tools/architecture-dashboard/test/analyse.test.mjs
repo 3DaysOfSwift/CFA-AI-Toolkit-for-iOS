@@ -98,5 +98,6 @@ test('changing app capability or lifecycle configuration invalidates source revi
     const after = await analyse(root);
     assert.deepEqual(after.files, before.files);
     assert.notEqual(after.sourceFingerprint, before.sourceFingerprint, file);
+    assert.ok(after.scope.buildDefinitionPaths.includes(file));
   }
 });

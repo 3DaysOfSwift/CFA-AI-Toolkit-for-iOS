@@ -192,8 +192,12 @@ an explicit discovery method and all identified entry points, including rows
 that remain unassessed. Missing or incomplete assessments produce an inconclusive
 overall result. A local defect alone does not establish an architectural conflict.
 Regenerate the analysis and refresh the review after changes to scanned Swift
-files or local build definitions, including target membership changes. An
-exported HTML file is a dated snapshot.
+files or local build definitions, including target membership changes. The
+inventory lists fingerprinted build and capability files under
+`scope.buildDefinitionPaths`. The whole-app checklist lists the same paths
+under `productionTargets`. Use these paths as leads when verifying target
+membership and effective build settings. An exported HTML file is a dated
+snapshot.
 
 Use one operation for each meaningful action with a distinct behavioural path;
 shared code can be cited by several operations after each caller is checked. Set

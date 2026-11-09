@@ -194,7 +194,11 @@ export async function prepare(root, output, syntaxProvider = collectSyntax, opti
   const checklist = {
     sourceFingerprint: report.sourceFingerprint,
     note: 'Review each item against its source and record evidence in the review input. Scanner candidates are leads; verify target membership and discover additional entry points manually.',
-    productionTargets: {status:'pending', targets:[], excludedTestDirectories: report.scope.excludedTestDirectories},
+    productionTargets: {
+      status:'pending', targets:[],
+      excludedTestDirectories: report.scope.excludedTestDirectories,
+      buildDefinitionPaths: report.scope.buildDefinitionPaths
+    },
     files: report.files.map(file=>({file:file.path,status:'pending'})),
     entryPoints: inventoryCandidates(report).map(site=>({siteId:site.id,file:site.file,line:site.line,kind:site.kind,status:'pending'})),
     taskSites: taskCandidates(report).map(site=>({siteId:site.id,file:site.file,line:site.line,kind:site.kind,status:'pending'})),
