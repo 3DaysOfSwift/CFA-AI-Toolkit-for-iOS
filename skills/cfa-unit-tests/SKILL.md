@@ -115,7 +115,9 @@ leaves the request pending and that navigation consumes it even if cancellation
 follows. Simulate a failed removal after navigation, then retry the write and
 verify that the handler is called only once. Exercise competing scenes and
 an open racing an explicit dismissal of the same request. Assert the outcomes
-against the pending list and both scenes’ navigation state. Suspend restoration,
+against the pending list and both scenes’ navigation state. While one scene
+is deciding, open a different pending request in another scene and verify
+that the first request stays pending. Suspend restoration,
 receive a new request, then finish restoring an older pending list. Reopen
 from storage and verify that both the restored and new requests survived.
 

@@ -89,8 +89,9 @@ single navigation state. This is the intended responsibility flow; choose the
 concrete handler and registration mechanism to suit the app and test it.
 Either window can open a shared pending request. On successful navigation in
 one window, remove the shared pending item without changing another window's
-navigation. Coordinate concurrent attempts so the same request is not opened
-twice inadvertently.
+navigation. Coordinate concurrent attempts by request identity so each request
+opens at most once. A scene waiting on one request must leave a different
+pending request available to another scene.
 
 Protect an unsaved edit or an active payment flow from interruption. If a user
 chooses to continue editing, retain the request across launches and offer it

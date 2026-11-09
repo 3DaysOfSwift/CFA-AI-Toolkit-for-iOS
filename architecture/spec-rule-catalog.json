@@ -496,7 +496,7 @@
       "rule": "Route each destination through a scene-appropriate handler without putting scene navigation state inside DeepLinkingFeature.",
       "why": "A link should not unexpectedly redirect another window.",
       "example": "A Settings screen asks the Feature to open its pending item in the receiving scene.",
-      "verify": "Verify that either scene can open a pending request and that simultaneous attempts navigate only once. A successful open removes the shared item while preserving the other scene’s navigation. Declined navigation or an unavailable scene leaves the request pending.",
+      "verify": "Verify that either scene can open a pending request and that simultaneous attempts on the same request navigate only once. Hold one scene’s navigation decision open and verify another scene can open a different request without consuming the first. A successful open removes the shared item while preserving the other scene’s navigation. Declined navigation or an unavailable scene leaves the request pending.",
       "explanationIds": []
     },
     {
