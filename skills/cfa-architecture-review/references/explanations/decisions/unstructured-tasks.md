@@ -42,11 +42,15 @@ an alternative, prove a performance improvement, or certify a migration outcome.
 Matthew Thomas authorised this documented-rationale/editorial-analysis distinction
 on 2026-10-27. That permission is not individual technical or historical approval.
 
-## Open question
+## Working example
 
-Check how the public worked example presents both lifetimes. The bundled Notes
-reference shows a SwiftUI lifecycle task awaiting a ViewModel load handle that
-also serves the Retry action, with shared loading owned by the Feature.
+In the bundled Notes reference, the SwiftUI lifecycle task awaits
+`viewModel.load()` directly. The Retry button calls `retryLoad()`, which
+retains a ViewModel task so repeated taps can reuse it. Both paths call
+`NotesFeature.loadIfNeeded()`, where the Feature owns and shares the
+repository load. If SwiftUI cancels the lifecycle task, the Feature can
+still publish the loaded notes, and the ViewModel skips updating that
+cancelled caller's error presentation.
 
 ## Publication
 
