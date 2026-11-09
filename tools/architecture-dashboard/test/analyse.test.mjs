@@ -149,3 +149,17 @@ test('fingerprints build settings under test-named folders even when Swift sourc
   await fs.appendFile(manifest, '// Changed package target membership\n');
   assert.notEqual((await analyse(root)).sourceFingerprint, after.sourceFingerprint);
 });
+
+test('reports invalid Swift source instead of scanning replacement characters', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cfa-source-encoding-'));
+  t.after(() => fs.rm(root, {recursive:true, force:true}));
+  await fs.writeFile(path.join(root, 'App.swift'), 'struct App {}');
+  await fs.writeFile(path.join(root, 'Invalid.swift'), Buffer.from([0xff]));
+  await fs.writeFile(path.join(root, 'Null.swift'), Buffer.from([0]));
+  const report = await analyse(root);
+  assert.deepEqual(report.files.map(file => file.path), ['App.swift']);
+  assert.deepEqual(report.scope.skipped, [
+    {file:'Invalid.swift', reason:'Source is not valid UTF-8'},
+    {file:'Null.swift', reason:'Source contains a null byte'}
+  ]);
+});

@@ -89,6 +89,7 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
   root = await fs.realpath(root);
   if (!(await fs.stat(root)).isDirectory()) throw new Error('Repository path must be a directory.');
   const files = [], skipped = [], excludedTestDirectories = [], buildDefinitions = [], symbolicLinks = [];
+  const decoder = new TextDecoder('utf-8', {fatal: true, ignoreBOM: true});
   async function walk(directory, scanSwift = true) {
     for (const entry of (await fs.readdir(directory, { withFileTypes: true })).sort((a,b) => a.name.localeCompare(b.name))) {
       const absolute = path.join(directory, entry.name);
@@ -119,7 +120,17 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
         const hash = createHash('sha256').update(bytes).digest('hex');
         if (buildDefinition) buildDefinitions.push([relative, hash]);
         if (swiftSource) {
-          const source = bytes.toString('utf8');
+          let source;
+          try {
+            source = decoder.decode(bytes);
+          } catch {
+            skipped.push({file:relative, reason:'Source is not valid UTF-8'});
+            continue;
+          }
+          if (source.includes('\0')) {
+            skipped.push({file:relative, reason:'Source contains a null byte'});
+            continue;
+          }
           files.push({ path: relative, hash, lineCount: source.split('\n').length, ...scanSource(source, relative) });
         }
       }

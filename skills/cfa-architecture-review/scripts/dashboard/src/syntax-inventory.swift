@@ -166,8 +166,12 @@ do {
             throw NSError(domain: "Inventory", code: 4, userInfo: [NSLocalizedDescriptionKey: "Source file is outside the project directory"])
         }
         let relative = String(resolved.path.dropFirst(root.path.count + 1))
+        guard let source = try? String(contentsOf: url, encoding: .utf8),
+              !source.utf8.contains(0) else {
+            warnings.append("Could not read \(relative) as UTF-8 Swift source")
+            continue
+        }
         names.append(relative)
-        let source = try String(contentsOf: url, encoding: .utf8)
         let tree = Parser.parse(source: source)
         if tree.hasError { warnings.append("Parser reported errors in \(relative)") }
         let visitor = SourceInventory(file: relative, tree: tree)
