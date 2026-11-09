@@ -779,3 +779,16 @@ test('reviews ViewModel injection from the app scene', async t => {
   assert.deepEqual(report.findings.filter(item => item.code === 'view-model-environment-provider')
     .map(item => [item.file, item.line]), [[file, 3]]);
 });
+
+test('reviews ViewModel environment injection in a separate View extension', async t => {
+  const file = 'App/Presentation/HomeView+Body.swift';
+  const {report} = await inspectView(t, 'struct HomeView: View {}', {
+    [file]: `extension HomeView {
+      var body: some View {
+        DetailsView().environment(DetailsViewModel())
+      }
+    }`
+  });
+  assert.deepEqual(report.findings.filter(item => item.code === 'view-model-environment-provider')
+    .map(item => [item.file, item.line]), [[file, 3]]);
+});

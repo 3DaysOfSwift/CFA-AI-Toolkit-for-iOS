@@ -1057,6 +1057,7 @@ export async function inspect(project) {
     if (!viewNames.has(name)) continue;
     for (const {file, source, offset, body} of extensions) {
       inspectScreenInputs(name, body, source, offset, file, findings);
+      inspectEnvironmentProviders(name, body, file, source, offset);
       if (rootViewNames.has(name)) {
         inspectRootNavigation(body, file, source, offset);
         continue;
