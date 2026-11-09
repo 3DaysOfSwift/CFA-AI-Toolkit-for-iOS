@@ -280,8 +280,11 @@ do not claim that UI gating replaces server-side authorisation.
   and keeps dependencies free of cycles.
 - Inventory screen initializers and call sites. Verify private ViewModel
   ownership and the `viewModel` property name separately. Allow selected-value
-  detail initialization and reject ViewModel injection or shared screen and
-  scene navigation selection in Features. For a changed detail flow, open
+  detail initialization. Screen initializers must not receive a ViewModel,
+  AppModel, a Feature, a repository or an ancestor's navigation command.
+  Check that View and ViewModel initialization and View body construction
+  avoid blocking I/O, slow work and asynchronous side effects. Keep screen
+  and scene navigation selection in presentation. For a changed detail flow, open
   distinct snapshots in two independently identified destinations. Refresh
   the source list, including a response that omits a selected item, and
   verify both destinations stay open with their own selections. If a detail
