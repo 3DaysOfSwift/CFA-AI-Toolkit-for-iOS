@@ -766,3 +766,16 @@ test('points to a ViewModel constructed for environment injection', async t => {
   assert.deepEqual(report.findings.filter(item => item.code === 'view-model-environment-provider')
     .map(({line}) => line), [4, 5]);
 });
+
+test('reviews ViewModel injection from the app scene', async t => {
+  const file = 'App/ExampleApp.swift';
+  const {report} = await inspectView(t, '', {
+    [file]: `struct ExampleApp: App {
+      var body: some Scene {
+        WindowGroup { HomeView().environment(HomeViewModel()) }
+      }
+    }`
+  });
+  assert.deepEqual(report.findings.filter(item => item.code === 'view-model-environment-provider')
+    .map(item => [item.file, item.line]), [[file, 3]]);
+});

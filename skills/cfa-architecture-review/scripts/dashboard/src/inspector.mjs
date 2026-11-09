@@ -682,6 +682,12 @@ export async function inspect(project) {
   const rootViewNames = new Set(['ContentView', 'RootTabView', 'RootView']);
   const rootStorageGate = /(?<!#)\b(?:if|guard|switch)\s+[^{};]*\b\w*(?:container|database|storeReady|storageReady|startupError|launchError)\w*\b/i;
   const rootStartupGate = /(?<!#)\b(?:if|guard|switch)\s+[^{};]*\b\w*(?:isStartingUp|isLaunching|isInitializing|hasLaunched|hasFinishedLaunching|startupPhase|launchPhase|startupState|launchState|startupReady|launchReady)\w*\b/i;
+  function inspectEnvironmentProviders(owner, body, file, source, offset) {
+    const suppliedViewModel = /\.\s*(?:environment|environmentObject)\s*\(\s*(?:\w+\s*\.\s*)*(\w+ViewModel)(?:\s*\.\s*init)?\s*\(/g;
+    for (const match of body.matchAll(suppliedViewModel)) {
+      findings.push(finding('view-model-environment-provider', 'review', `${owner} appears to put ${match[1]} in the environment. Trace its consumers and verify each screen owns its own ViewModel.`, file, lineOf(source, offset + match.index)));
+    }
+  }
   function inspectRootNavigation(body, file, source, offset) {
     const featureAccess = findFeatureAccess(body);
     if (featureAccess) {
@@ -769,10 +775,7 @@ export async function inspect(project) {
         const code = isFeature ? 'view-stored-feature' : 'view-stored-model-dependency';
         findings.push(finding(code, 'review', `${view[1]} appears to store ${type} directly. Verify that Feature access goes through the screen-owned ViewModel.`, file, lineOf(source, start + index)));
       }
-      const suppliedViewModel = /\.\s*(?:environment|environmentObject)\s*\(\s*(?:\w+\s*\.\s*)*(\w+ViewModel)(?:\s*\.\s*init)?\s*\(/g;
-      for (const match of body.matchAll(suppliedViewModel)) {
-        findings.push(finding('view-model-environment-provider', 'review', `${view[1]} appears to put ${match[1]} in the environment. Trace its consumers and verify each screen owns its own ViewModel.`, file, lineOf(source, start + match.index)));
-      }
+      inspectEnvironmentProviders(view[1], body, file, source, start);
       const environmentViewModel = /@(?:SwiftUI\s*\.\s*)?(?:Environment\s*\([^()]*\)|EnvironmentObject)\s+(?:(?:private|fileprivate|internal|package|public)\s+)?var\s+`?[\p{L}_][\p{L}\p{M}\p{N}_]*`?\s*:\s*(?:\w+\s*\.\s*)*(\w+ViewModel)\b(?!\s*\.)/gu;
       for (const match of members.matchAll(environmentViewModel)) {
         findings.push(finding('view-model-environment-input', 'review', `${view[1]} appears to receive ${match[1]} through the environment. Verify that the screen constructs and owns its own ViewModel.`, file, lineOf(source, start + match.index)));
@@ -827,6 +830,7 @@ export async function inspect(project) {
       if (sceneBody) {
         const bodyStart = sceneBody.index + sceneBody[0].length;
         const body = braceBody(members, bodyStart - 1);
+        inspectEnvironmentProviders('App.body', body, file, source, start + bodyStart);
         const conditional = /(?<!#)\b(?:if|switch)\b/.exec(body);
         const presentation = swiftDataAccess.exec(body) ?? /\b(?:ProgressView|ContentUnavailableView)\s*\(/.exec(body);
         if (conditional) findings.push(finding('conditional-app-body', 'review', 'App.body contains a conditional. Check whether root navigation stays available while Features start, load, or fail.', file, lineOf(source, start + bodyStart + conditional.index)));
