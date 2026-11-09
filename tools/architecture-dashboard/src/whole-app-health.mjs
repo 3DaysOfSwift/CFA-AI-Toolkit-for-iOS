@@ -13,13 +13,19 @@ const taskKinds = new Set(['concurrency.task','concurrency.detached','concurrenc
 export function taskCandidates(report) {
   return (report.syntax?.items || []).filter(item=>taskKinds.has(item.kind)).map(item=>({...item,id:`syntax-task:${item.file}:${item.line}:${item.column}:${item.kind}`}));
 }
+function pendingSourceFiles(report, review) {
+  const batched = new Set((review.fileBatches || []).flatMap(batch => batch.files || []));
+  const statuses = new Map((review.fileReviews || []).map(item => [item.file, item.status]));
+  return report.files.filter(({path}) => {
+    const status = statuses.get(path);
+    return status ? status === 'unassessed' || status === 'investigate' : !batched.has(path);
+  }).map(file => file.path);
+}
 // Describe the next concrete review work without treating inventory as evidence.
 export function nextWork(report, review, limit = 8) {
-  const reviewed = new Set((review.fileBatches || []).flatMap(batch => batch.files || []));
-  for (const item of review.fileReviews || []) if (item.status !== 'unassessed') reviewed.add(item.file);
   const entries = new Set((review.entryPoints || []).map(item => item.siteId));
   const tasks = new Set((review.taskSites || []).map(item => item.siteId));
-  const pendingFiles = report.files.filter(file => !reviewed.has(file.path)).map(file => file.path);
+  const pendingFiles = pendingSourceFiles(report, review);
   const pendingEntries = inventoryCandidates(report).filter(site => !entries.has(site.id));
   const pendingTasks = taskCandidates(report).filter(site => !tasks.has(site.id));
   return {
@@ -67,11 +73,9 @@ export function coverageGaps(report, review) {
     const syntaxFiles = new Set(report.syntax.files);
     if ([...scannerFiles].some(file=>!syntaxFiles.has(file)) || [...syntaxFiles].some(file=>!scannerFiles.has(file))) gaps.push('The SwiftSyntax and source inventories cover different files.');
   }
-  const fileReviews = new Map((review.fileReviews || []).map(item => [item.file, item]));
-  const batchFiles = new Set((review.fileBatches || []).flatMap(batch => batch.files || []));
-  const missingFiles = report.files.filter(file => !batchFiles.has(file.path) && (!fileReviews.has(file.path) || fileReviews.get(file.path).status === 'unassessed'));
-  if (missingFiles.length) gaps.push(`${missingFiles.length} Swift files still need review: ${missingFiles.map(file => file.path).join(', ')}.`);
-  if ((review.fileReviews || []).some(item => item.status === 'investigate') || (review.typeReviews || []).some(item => item.status === 'investigate')) gaps.push('Some recorded file or type findings still need investigation.');
+  const missingFiles = pendingSourceFiles(report, review);
+  if (missingFiles.length) gaps.push(`${missingFiles.length} Swift files still need review: ${missingFiles.join(', ')}.`);
+  if ((review.typeReviews || []).some(item => item.status === 'investigate')) gaps.push('Some recorded type findings still need investigation.');
   const operations = review.operations || [];
   if (review.operationInventory?.coverage !== 'complete') gaps.push('The operation inventory has not been reconciled with the application entry points.');
   if (!operations.length) gaps.push('No application operations have been reviewed.');

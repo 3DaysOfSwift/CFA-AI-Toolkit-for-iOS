@@ -28,6 +28,11 @@ test('coverage requires source files and detected entry points, without individu
   assert.match(gaps,/Swift files/); assert.doesNotMatch(gaps,/types/); assert.match(gaps,/entry points/);
   const batched=complete(); batched.fileReviews=[]; batched.typeReviews=[]; batched.fileBatches=[{files:['App.swift']}];
   assert.deepEqual(coverageGaps(report,batched),[]);
+  for (const status of ['unassessed','investigate']) {
+    batched.fileReviews=[{file:'App.swift',status}];
+    assert.deepEqual(nextWork(report,batched).nextFiles,['App.swift']);
+    assert.match(coverageGaps(report,batched).join(' '),/Swift files still need review: App.swift/);
+  }
 });
 
 test('whole-app reviews require timing outcomes even if an old input disables the flag', () => {
