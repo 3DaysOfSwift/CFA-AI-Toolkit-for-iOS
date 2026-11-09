@@ -12,6 +12,6 @@
 
 **Explanation:** [Why use screen-owned ViewModels in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/view-model-ownership).
 
-**Verify:** Test two independently selected destinations and confirm refresh does not silently replace a displayed snapshot.
+**Verify:** Open different snapshots in two independently identified destinations. Refresh the source list and verify neither destination silently changes or closes, including when an item is omitted. If the detail offers explicit refresh, verify that it updates only its own display.
 
 **Full rule, context and examples:** [Give Every Unique Screen Its Own ViewModel](../topics/14-give-every-unique-screen-its-own-viewmodel.md). This card is a reading aid; apply the complete canonical section.
