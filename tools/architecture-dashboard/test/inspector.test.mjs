@@ -268,7 +268,7 @@ test('local and preview storage references are not asserted to be production vio
 
 test('reviews direct SwiftData preview and query usage without flagging a normal preview', async t => {
   const root = await fixture(t, {
-    'Application/1 - View/PreviewSupport.swift': 'import SwiftUI\n#Preview { NotesView().modelContainer(container) }',
+    'Application/1 - View/PreviewSupport.swift': 'import SwiftUI\n#Preview { NotesView().`modelContainer`(container) }',
     'Application/PreviewContent/NotesPreview.swift': '#Preview { NotesView().modelContainer(container) }',
     'Application/PreviewContent/LegacyPreview.swift': 'struct LegacyPreview: PreviewProvider { static var previews: some View { NotesView().modelContainer(container) } }',
     'Application/PreviewContent/SafeLegacyPreview.swift': 'struct SafeLegacyPreview: PreviewProvider { static var previews: some View { NotesView() } }',
