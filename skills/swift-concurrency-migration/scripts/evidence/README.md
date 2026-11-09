@@ -64,7 +64,9 @@ records that lack the link or target coverage before validating them again. Use
 When removing an adapter or dependency, record the consumer scenarios as
 `before` evidence at `repository.beforeCommit` and record the same scenarios
 rerun as `after` evidence at `repository.afterCommit`. List the affected
-targets on the evidence and cite both sets of IDs in the hybrid review.
+targets on the evidence and cite both sets of IDs in the hybrid review. If
+a consumer needs every event, verify repeated equal values, delivery order
+and cancellation separately from the latest state shown by the UI.
 The reviewer compares the scenarios and outcomes across revisions.
 The final CFA audit gives each applicable requirement a verdict backed by
 evidence at the final commit. Explain inapplicability and the effect of agreed

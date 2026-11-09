@@ -42,7 +42,9 @@ Record actual delivery on supported hardware separately from handler tests.
 For the final migration record, describe the hybrid paths reviewed and the
 reasons for retaining any legacy mechanisms. For each removed adapter or
 dependency, link the baseline behaviour and the same scenarios rerun on each
-affected target. Link the final CFA audit and
+affected target. Where a consumer needs every event, record separate checks
+for repeated equal values, delivery order and cancellation. A latest-state UI
+check alone cannot establish those guarantees. Link the final CFA audit and
 hybrid review at the final commit. In the CFA audit, give each applicable
 requirement an evidence-backed verdict. Explain inapplicability and the effect
 of agreed exceptions. Record the corrections and repeated checks. An applicable
