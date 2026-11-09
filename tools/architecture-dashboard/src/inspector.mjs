@@ -114,7 +114,7 @@ function* typeInitializers(body) {
     const openingBody = /^\s*(?:(?:async|throws|rethrows)\s*)*\{/.exec(tail);
     const bodyStart = openingBody ? closing + 1 + openingBody[0].length : null;
     const initializerBody = bodyStart === null ? null : braceBody(body, bodyStart - 1);
-    yield { index: initializer.index, parameters, injectedViewModel, injectedAppModel, possibleModelDependency, initializerBody, bodyStart };
+    yield { index: initializer.index, parameters, types, injectedViewModel, injectedAppModel, possibleModelDependency, initializerBody, bodyStart };
   }
 }
 
@@ -706,6 +706,12 @@ export async function inspect(project) {
     const viewModelBody = viewModelDeclaration ? braceBody(viewModel, viewModelBodyStart - 1) : '';
     for (const initializer of typeInitializers(viewModelBody)) {
       inspectInitializerTask(viewModelName, initializer, viewModel, viewModelBodyStart, viewModelFile, findings);
+      const service = initializer.types.find(type =>
+        type === 'NetworkingManager' || type === 'SwiftDataManager' || type.endsWith('Repository')
+      );
+      if (service) {
+        findings.push(finding('view-model-non-feature-dependency', 'review', `${viewModelName} accepts ${service} in its initializer. Verify that the ViewModel calls a Feature and that the Feature owns the service dependency.`, viewModelFile, lineOf(viewModel, viewModelBodyStart + initializer.index)));
+      }
     }
     const viewModelMembers = viewModelDeclaration
       ? viewModel.slice(0, viewModelBodyStart).replace(/[^\n]/g, ' ') + memberSignatures(viewModelBody)

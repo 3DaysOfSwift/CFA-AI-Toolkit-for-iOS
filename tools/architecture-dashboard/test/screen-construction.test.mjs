@@ -594,3 +594,12 @@ test('resolves dependencies from the screen ViewModel and its extensions', async
   const service = report.findings.find(item => item.code === 'view-model-non-feature-dependency');
   assert.deepEqual([service?.file, service?.line], [extensionFile, 3]);
 });
+
+test('reviews a lower-level service injected directly into a screen ViewModel', async t => {
+  const file = viewPath.replace('View.swift', 'ViewModel.swift');
+  const {report} = await inspectView(t, 'struct HomeView: View { @State private var viewModel = HomeViewModel() }', {
+    [file]: 'final class HomeViewModel {\n init(repository: any NotesRepository) {}\n init(notesFeature: NotesFeature) {}\n}'
+  });
+  assert.deepEqual(report.findings.filter(item => item.code === 'view-model-non-feature-dependency')
+    .map(({file, line}) => [file, line]), [[file, 2]]);
+});
