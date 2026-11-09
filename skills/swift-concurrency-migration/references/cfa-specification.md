@@ -1806,7 +1806,11 @@ Before accepting a change, answer every question:
     entire object graph first?
 15. Was every new abstraction earned by a concrete responsibility?
 16. Does each piece of shared state have one authoritative owner and mutate only
-    through named feature commands?
+    through named feature commands? For shared state displayed on a screen,
+    trace the observable read from the View through its ViewModel to the
+    owning Feature. Verify that a confirmed change updates a screen that
+    displays live state. For an intentionally stable detail snapshot, verify
+    its explicit refresh policy instead.
 17. Can every meaningful Task lifetime—durable, replaceable, presentational, or
     long-lived—be explained and managed appropriately? For a shared refresh
     that should survive navigation, verify that it completes and retains its
