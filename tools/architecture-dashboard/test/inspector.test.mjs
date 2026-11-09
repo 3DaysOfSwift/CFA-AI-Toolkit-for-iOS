@@ -233,7 +233,9 @@ test('a Feature exposed in an extension remains an unresolved review, not a miss
     'Application/2 - AppModel/Features/Chat/ChatFeature.swift': 'final class ChatFeature {}',
     'ApplicationTests/ViewModelTests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}'
   });
-  const finding = (await inspect(root)).findings.find(item => item.code === 'unresolved-feature');
+  const { findings } = await inspect(root);
+  assert.ok(findings.some(item => item.code === 'app-model-shared-factory'));
+  const finding = findings.find(item => item.code === 'unresolved-feature');
   assert.equal(finding.severity, 'review');
   assert.match(finding.message, /Check extensions, inferred types and target membership/);
 });

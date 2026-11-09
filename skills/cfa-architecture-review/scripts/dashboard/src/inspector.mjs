@@ -99,6 +99,13 @@ export async function inspect(project) {
   if (appModelFile) {
     const liveFactories = [...appMembers.matchAll(/\bstatic\s+func\s+live\s*\(/g)];
     if (liveFactories.length !== 1) findings.push(finding('app-model-live-factory', 'review', `Found ${liveFactories.length} static live() declarations directly inside AppModel. Verify the single production factory, including extensions and active compilation conditions.`, appModelFile, 1));
+    const sharedInitializer = /\bstatic\s+let\s+shared\s*(?::\s*AppModel\s*)?=/.exec(appMembers);
+    if (sharedInitializer) {
+      const initializer = appModel.slice(sharedInitializer.index + sharedInitializer[0].length);
+      if (!/^\s*(?:(?:AppModel|Self)\s*\.\s*)?live\s*\(\s*\)/.test(initializer)) {
+        findings.push(finding('app-model-shared-factory', 'review', 'AppModel.shared does not visibly call live(). Trace its initializer and verify the production graph comes from the single live factory.', appModelFile, lineOf(appModel, sharedInitializer.index)));
+      }
+    }
     for (const match of appMembers.matchAll(/(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(private[ \t]+)?(?:private\(set\)[ \t]+)?(?:let|var)[ \t]+(\w+)[ \t]*:[ \t]*(?:any[ \t]+)?(\w+)(?:<[^;\n=]*>)?[?!]?([ \t]*=(?!=))?/gm)) {
       const [, privateModifier, name, type, defaultValue] = match;
       const suffix = appModel.slice(match.index + match[0].length);
