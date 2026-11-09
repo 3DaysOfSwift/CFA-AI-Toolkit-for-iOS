@@ -528,8 +528,12 @@ export async function inspect(project) {
       inspectScreenInputs(view[1], body, source, start, file, findings);
       for (const match of memberSignatures(body).matchAll(/\b(?:let|var)\s+(\w+)\s*(?::\s*(?:Swift\s*\.\s*)?Task\s*<|(=\s*(?:Swift\s*\.\s*)?Task\b))/g)) {
         const suffix = body.slice(match.index + match[0].length);
-        if (match[2] && !/^\s*[<.{(]/.test(suffix)) continue;
-        if (!match[2]) {
+        if (match[2]) {
+          const genericStart = /^\s*</.exec(suffix);
+          const close = genericStart ? closingGenericArguments(suffix, genericStart[0].length - 1) : -1;
+          const call = suffix.slice(close + 1);
+          if (!/^\s*(?:\.\s*(?:init|detached)\s*)?[({]/.test(call)) continue;
+        } else {
           const close = closingGenericArguments(body, match.index + match[0].length - 1);
           if (close >= 0 && hasComputedAccessor(body.slice(close + 1).replace(/^\s*[?!]/, ''))) continue;
         }
