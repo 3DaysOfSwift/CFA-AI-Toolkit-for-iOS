@@ -4,7 +4,7 @@
 
 **Strength:** Permitted exception.
 
-**Guidance:** A detail View may receive a selected immutable snapshot and use it to construct its own State-backed ViewModel in the View initializer. The snapshot is initial input for that destination identity. Keep selection in presentation and preserve the displayed snapshot and navigation when the source list changes. Use explicit refresh where appropriate. Live updates are a product choice.
+**Guidance:** A detail View may receive a selected immutable snapshot and use it to construct its own State-backed ViewModel in the View initializer. The snapshot is initial input for that destination identity. A changed input does not automatically replace its State-backed ViewModel. Keep each scene’s selection in its presentation, while the Feature owns the authoritative data. Preserve the displayed snapshot and navigation when the source list changes. Use explicit refresh where appropriate. Live updates are a product choice.
 
 **Why:** Each destination can preserve its selection independently.
 
@@ -12,6 +12,6 @@
 
 **Explanation:** [Why use screen-owned ViewModels in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/view-model-ownership) · [Why use a UI and model boundary in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/presentation-boundaries).
 
-**Verify:** Open different snapshots in two independently identified destinations. Refresh the source list and verify neither destination silently changes or closes, including when an item is omitted. If the detail offers explicit refresh, verify that it updates only its own display.
+**Verify:** Open different snapshots in two independently identified destinations. Rebuild a detail View with changed input and the same identity and verify that its existing ViewModel retains its selection. Refresh the source list and verify neither destination silently changes or closes, including when an item is omitted. If the detail offers explicit refresh, verify that it updates only its own display.
 
 **Full rule, context and examples:** [Give Every Unique Screen Its Own ViewModel](../topics/14-give-every-unique-screen-its-own-viewmodel.md). This card is a reading aid; apply the complete canonical section.
