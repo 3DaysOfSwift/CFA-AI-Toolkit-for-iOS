@@ -363,10 +363,11 @@ error delivery and the rule that an old request must not overwrite a new result.
 
 The Legacy GCD migration skill first records that existing behaviour. It then
 migrates the agreed scope to CFA and Swift Concurrency with clear feature
-boundaries. A verified feature checkpoint is progress, not proof that the agreed
-migration is complete. Builds, tests and manual regression testing check that
-the migrated app preserves its intended behaviour; justified retained boundaries
-are recorded.
+boundaries. Before handoff, it checks file placement and target membership,
+reviews any remaining legacy mechanisms, and corrects issues within the agreed
+scope. Completion requires builds, tests and manual behaviour checks at the
+final revision, plus a human review of the resulting project structure. See the
+[migration completion criteria](architecture/cfa-change-gate.md#migration-progress-and-completion-language).
 
 ## CFA Inspector
 
