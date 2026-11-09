@@ -109,7 +109,7 @@ export async function inspect(project) {
     }
     if (featureTypeSuffix.test(property.type) && !property.type.endsWith('API')) {
       const testName = `${property.type}Tests.swift`;
-      if (![...paths].some(file => file.includes('/FeatureTests/') && file.endsWith(`/${testName}`))) {
+      if (![...paths].some(file => file.split('/').includes('FeatureTests') && path.posix.basename(file) === testName)) {
         findings.push(finding('feature-tests-missing', 'review', `No ${testName} was found under FeatureTests in the scanned directory. Check the project root and test target before concluding the test is missing.`, appModelFile, property.line));
       }
     }
@@ -217,7 +217,7 @@ export async function inspect(project) {
       ? viewModel.slice(0, viewModelBodyStart).replace(/[^\n]/g, ' ') + memberSignatures(braceBody(viewModel, viewModelBodyStart - 1))
       : '';
     const testName = `${viewModelName}Tests.swift`;
-    const testFile = [...paths].find(file => file.endsWith(`/${testName}`)) ?? null;
+    const testFile = [...paths].find(file => path.posix.basename(file) === testName) ?? null;
     const statePattern = new RegExp(`@State\\s+private\\s+var\\s+([A-Za-z_]\\w*)(?:\\s*:\\s*${viewModelName})?\\s*=\\s*${viewModelName}\\s*\\(\\s*\\)`);
     const typedStatePattern = new RegExp(`@State\\s+private\\s+var\\s+([A-Za-z_]\\w*)\\s*:\\s*${viewModelName}\\s*=\\s*\\.init\\s*\\(\\s*\\)`);
     const inlineState = statePattern.exec(members) ?? typedStatePattern.exec(members);

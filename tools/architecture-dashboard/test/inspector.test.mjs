@@ -61,6 +61,9 @@ test('reports test search scope when tests are beside the scanned app folder', a
   assert.ok(scoped.every(item => item.severity === 'review'));
   assert.ok(scoped.every(item => /scanned directory/.test(item.message)));
   assert.equal((await inspect(root)).findings.filter(isMissingTest).length, 0);
+  await fs.rename(path.join(root, 'ApplicationTests/FeatureTests'), path.join(root, 'FeatureTests'));
+  await fs.rename(path.join(root, 'ApplicationTests/ViewModelTests/ChatViewModelTests.swift'), path.join(root, 'ChatViewModelTests.swift'));
+  assert.equal((await inspect(root)).findings.filter(isMissingTest).length, 0);
 });
 
 test('does not mistake composition locals for AppModel properties', async t => {
