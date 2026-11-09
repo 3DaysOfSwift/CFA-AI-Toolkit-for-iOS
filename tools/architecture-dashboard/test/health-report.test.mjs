@@ -80,6 +80,8 @@ test('requires a visible finding for confirmed operation problems', () => {
   data.operations[0].checks[0].dimension = 'cfa';
   data.operations[0].checks[0].title = 'Screen task ownership';
   const cfaReport = renderHealthReport(data);
+  assert.match(cfaReport, /Refresh <small>· CFA deviation<\/small><\/summary>/);
+  assert.doesNotMatch(cfaReport, /aria-label="Problem"/);
   assert.match(cfaReport, /<h3>CFA alignment<\/h3>.*Screen task ownership/);
   assert.doesNotMatch(cfaReport, /<h3>Behaviour checks<\/h3>/);
   data.operations[0].scenarios = [{status:'problem'}];
