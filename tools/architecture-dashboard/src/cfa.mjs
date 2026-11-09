@@ -120,10 +120,11 @@ skill from that toolkit before changing the project.
 - For sign-out, account switching or external session expiry, let the owning
   Feature coordinate explicit cleanup calls. Trace each supported entry point
   and reconcile the outcome with the actual session. Preserve the session and
-  its data when sign-out fails before ending the session. Once the session
-  ends, keep the app signed out and report any cleanup failure accurately.
-  Clear affected Feature state and check the account or session generation
-  before publishing in-flight results.
+  its data when sign-out fails before ending the session. Clear the ended
+  session's Feature state and report cleanup failures accurately. A cleanup
+  failure after sign-out does not restore the session. During a switch, keep
+  the previous session's data out of the new session. Check the account or
+  session generation before publishing in-flight results.
   If the same account can sign back in before old work finishes, check the
   session identity even when the earlier task was cancelled.
   If sign-out promises a fresh-install experience, clear account-specific
@@ -143,6 +144,8 @@ skill from that toolkit before changing the project.
   events and owns the resulting state. Screen-only observation follows the
   screen's lifetime. Verify that repeated startup signals leave one listener
   and that events still reach the Feature with no relevant screen open.
+  If replacement is supported, verify the old listener stops forwarding and
+  its cleanup leaves the replacement running. Stop isolated listeners after tests.
 - Features own their background capabilities. During synchronous launch,
   AppModel can ask each Feature to register its permitted BGTaskScheduler
   identifiers once. Schedule work separately and route app-level callbacks
