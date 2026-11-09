@@ -66,6 +66,17 @@ function closingParenthesis(source, opening) {
   return -1;
 }
 
+function closingGenericArguments(source, opening) {
+  let depth = 1;
+  for (let index = opening + 1; index < source.length; index++) {
+    const token = source[index];
+    if (token === '<') depth++;
+    if (token === '>' && source[index - 1] !== '-' && --depth === 0) return index;
+    if (';{}='.includes(token)) break;
+  }
+  return -1;
+}
+
 // Inspect the first top-level colon in each parameter, skipping labels in
 // default calls and closure signatures.
 function initializerParameterTypes(parameters) {
@@ -518,8 +529,10 @@ export async function inspect(project) {
       for (const match of memberSignatures(body).matchAll(/\b(?:let|var)\s+(\w+)\s*(?::\s*(?:Swift\s*\.\s*)?Task\s*<|(=\s*(?:Swift\s*\.\s*)?Task\b))/g)) {
         const suffix = body.slice(match.index + match[0].length);
         if (match[2] && !/^\s*[<.{(]/.test(suffix)) continue;
-        const typedArguments = !match[2] && /^[^;{}=\n\r]+>\s*[?!]?/.exec(suffix);
-        if (typedArguments && hasComputedAccessor(suffix.slice(typedArguments[0].length))) continue;
+        if (!match[2]) {
+          const close = closingGenericArguments(body, match.index + match[0].length - 1);
+          if (close >= 0 && hasComputedAccessor(body.slice(close + 1).replace(/^\s*[?!]/, ''))) continue;
+        }
         findings.push(finding('screen-task-handle', 'review', `${view[1]} declares ${match[1]} with a possible Task handle. If it stores the handle, move task ownership to the ViewModel.`, file, lineOf(source, start + match.index)));
       }
       if (isViewFile && rootViewNames.has(view[1])) continue;
