@@ -8,7 +8,7 @@
 
 **Why:** Views can update without creating competing domain state.
 
-**Example:** A View reads an observable Feature value and updates when that value changes.
+**Example:** A screen reads its ViewModel's computed property, which reads observable Feature state; the screen updates when that state changes.
 
 **Verify:** Trace the observed property from its Feature owner to the displayed View.
 

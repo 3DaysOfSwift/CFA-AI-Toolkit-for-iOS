@@ -305,7 +305,7 @@
       "rule": "Expose observable Feature state while retaining a single owner; observation alone does not synchronize independent devices or processes.",
       "why": "Views can update without creating competing domain state.",
       "verify": "Trace the observed property from its Feature owner to the displayed View.",
-      "example": "A View reads an observable Feature value and updates when that value changes.",
+      "example": "A screen reads its ViewModel's computed property, which reads observable Feature state; the screen updates when that state changes.",
       "explanationIds": []
     },
     {
