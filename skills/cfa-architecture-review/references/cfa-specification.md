@@ -1201,7 +1201,9 @@ as part of creating or migrating a project.
 When the product needs both restoration and a fresh request, start them
 independently rather than delaying the request for the optional cache. Publish
 restored data only if a newer authoritative response has not already superseded
-it. A missing, incompatible or unreadable optional snapshot must not block the
+it. When several sources own independent slices of a snapshot, compare freshness
+for the same slice. A fresh response for one source should not discard usable
+cached data for a different source. A missing, incompatible or unreadable optional snapshot must not block the
 normal download; retain any existing valid in-memory data on refresh failure.
 Choose caching and freshness behaviour according to the product's requirements.
 

@@ -166,7 +166,9 @@ draft and can retry. Separately, cancel an unsaved edit and verify that the
 draft is discarded without changing the stored or confirmed values.
 For optional download caches, independently control disk
 and network completion. Verify that a slow restore leaves refresh free to
-start and a late restore cannot replace fresh data. Hold a cache write pending
+start and a late restore cannot replace fresh data. For independent sources,
+refresh one before restoration finishes. Verify that its fresh data survives
+and that a different source can still restore its cached data. Hold a cache write pending
 and verify both publication and caller completion before releasing it. Verify
 that a failed write leaves the refresh result usable. When replacing a usable cache fails,
 reopen the cache to verify the previous snapshot survives, and verify that
