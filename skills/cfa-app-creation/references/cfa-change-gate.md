@@ -142,8 +142,11 @@ the architecture:
     API availability and lifecycle requirements. Each process has its own
     AppModel and Feature instances. Transfer immutable snapshots through an
     appropriate platform mechanism and refresh observable state at the receiving
-    Feature. Save a widget's shared snapshot before requesting a timeline reload.
-    Test missing, delayed and stale data on supported devices.
+    Feature. If the iPhone app shares an App Group snapshot with a widget,
+    the app writes it successfully before requesting a timeline reload.
+    WidgetKit controls reload timing. Send the Watch a separate snapshot copy
+    through a suitable transfer mechanism. Test missing, unreadable, delayed
+    and stale data on supported devices.
 15. SwiftData access goes through `SwiftDataManager`; every `URLSession` call
     goes through `NetworkingManager`. Features own those lower-level
     collaborators. Keep domain-specific services beside their owning Feature
