@@ -60,6 +60,10 @@ test('review evidence can cite fingerprinted configuration and rejects stale byt
  assert.match(review.findings[0].evidence[0].excerpt,/application-groups/);
  await fs.writeFile(target,'<dict/>\n');
  await assert.rejects(importReview(report,input,app),/evidence hash mismatch: App.entitlements/);
+ await fs.writeFile(target,Buffer.from('bplist00\x00'));
+ const binaryReport=await analyse(app);
+ await assert.rejects(importReview(binaryReport,{...input,sourceFingerprint:binaryReport.sourceFingerprint},app),
+   /line evidence requires UTF-8 text: App.entitlements/);
 });
 
 test('generic CLI imports reviewed ratings and test results without an example generator',async()=>{

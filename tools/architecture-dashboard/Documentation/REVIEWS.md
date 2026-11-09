@@ -196,7 +196,9 @@ files or local build definitions, including target membership changes. The
 inventory lists fingerprinted build and capability files under
 `scope.buildDefinitionPaths`. The whole-app checklist lists the same paths
 under `productionTargets`. Use these paths as leads when verifying target
-membership and effective build settings. An exported HTML file is a dated
+membership and effective build settings. Cite line ranges from UTF-8 text files.
+Binary configuration remains part of the fingerprint and can be inspected
+separately. An exported HTML file is a dated
 snapshot.
 
 Use one operation for each meaningful action with a distinct behavioural path;

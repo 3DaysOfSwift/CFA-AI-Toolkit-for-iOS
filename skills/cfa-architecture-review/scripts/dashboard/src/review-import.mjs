@@ -158,6 +158,7 @@ export async function importReview(report,input,root) {
   }
   const base=await fs.realpath(root),cache=new Map();
   const hashes=new Map([...report.files, ...(report.buildDefinitions || [])].map(f=>[f.path,f.hash]));
+  const decoder = new TextDecoder('utf-8', {fatal: true, ignoreBOM: true});
   for(const ref of refs) {
     if(!text(ref.file)||path.isAbsolute(ref.file)||ref.file.split(/[\\/]/).includes('..')) fail('evidence must stay inside repository');
     if(!cache.has(ref.file)) {
@@ -169,7 +170,13 @@ export async function importReview(report,input,root) {
       const bytes=await fs.readFile(real);
       const expected=hashes.get(ref.file)??review.evidenceHashes?.[ref.file];
       if(!expected||createHash('sha256').update(bytes).digest('hex')!==expected) fail('evidence hash mismatch: '+ref.file);
-      const source = bytes.toString('utf8');
+      if (bytes.includes(0) || bytes.subarray(0, 8).toString('ascii') === 'bplist00') {
+        fail('line evidence requires UTF-8 text: '+ref.file);
+      }
+      const source = (() => {
+        try { return decoder.decode(bytes); }
+        catch { fail('line evidence requires UTF-8 text: '+ref.file); }
+      })();
       const lines = source ? source.split(/\r\n|\n|\r/) : [];
       if (lines.at(-1) === '') lines.pop();
       cache.set(ref.file,lines);
