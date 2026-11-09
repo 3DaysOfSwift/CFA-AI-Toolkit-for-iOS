@@ -40,9 +40,11 @@ naming warning. CFA uses `viewModel` for the screen’s ViewModel property.
 
 Use the findings to verify source, target membership, and Xcode navigator
 placement. An intentional package boundary can explain a different physical
-location. A matching filename identifies a candidate test file. Placement and
-duplicate-name findings use physical paths. Check the Xcode navigator group,
-test target membership and the behaviour each test exercises. The command
+location. A matching filename identifies a candidate test file. The inspector
+flags comment-only Feature test files and ViewModel files without a recognised
+named suite. Placement and duplicate-name findings use physical paths. Confirm
+the Xcode navigator group and test target membership, then inspect what the
+tests exercise and run the relevant tests. The command
 reads source and prints its findings without modifying the inspected project.
 
 For a root-navigation finding, follow the scene to the View installed in the

@@ -23,7 +23,9 @@ Editorial analysis: controllable clocks and barriers require deliberate setup an
 
 ## Scope and exceptions
 
-One named suite is an organization convention, not coverage proof. A stored Date is not an advancing clock. Explicitly scoped UI tests remain valid; no finite passing suite proves all race conditions absent.
+A named test file helps developers find the checks. Verify its membership in
+the intended test target, inspect the behaviour it exercises and run it before
+reporting coverage. A stored Date is not an advancing clock. Explicitly scoped UI tests remain valid; no finite passing suite proves all race conditions absent.
 
 ## Verification
 
