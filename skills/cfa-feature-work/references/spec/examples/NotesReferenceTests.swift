@@ -232,7 +232,7 @@ actor HeldNotesLoad: NotesRepository {
         async let saveFirst: Void = disk.save(firstNote)
         async let saveSecond: Void = disk.save(secondNote)
         _ = try await (saveFirst, saveSecond)
-        let afterOverlap = try await disk.load()
+        let afterOverlap = try await JSONNotesRepository(file: url).load()
         precondition(afterOverlap.first == item)
         precondition(Set(afterOverlap.dropFirst().map(\.id)) == Set([firstNote.id, secondNote.id]))
         precondition(afterOverlap.count == 3)

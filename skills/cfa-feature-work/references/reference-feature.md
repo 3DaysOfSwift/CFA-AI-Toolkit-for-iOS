@@ -17,6 +17,11 @@ save still completes when its predecessor fails, and each caller receives
 its own outcome. The checks also verify that two callers share one load
 and one caller's cancellation leaves the other able to receive the result.
 Saving during initial restoration preserves both the restored and new notes.
+The repository accepts one new note at a time. It reads the current file and
+atomically rewrites it within one actor turn, so callers never submit their
+own copy of the collection. The checks reopen the file after overlapping
+inserts and verify that both new notes and the existing note survived.
+This example uses a single repository instance for the file.
 When the JSON file is corrupt, the checks verify that a failed save preserves the file
 and draft. After a valid file is restored, retrying through the same Feature
 reloads the saved notes and keeps the draft. A fixed synthetic JSON fixture
