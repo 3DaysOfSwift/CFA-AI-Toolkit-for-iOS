@@ -135,12 +135,15 @@ final class NotesEditorViewModel {
         }
     }
 
-    func retryLoad() {
-        guard loadTask == nil else { return }
-        loadTask = Task {
+    @discardableResult
+    func retryLoad() -> Task<Void, Never> {
+        if let loadTask { return loadTask }
+        let task = Task {
             defer { loadTask = nil }
             await load()
         }
+        loadTask = task
+        return task
     }
 
     @discardableResult

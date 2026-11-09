@@ -24,7 +24,7 @@ actor ControlledNotes: NotesRepository {
 }
 
 actor RetryableNotes: NotesRepository {
-    private var attempts = 0
+    private(set) var attempts = 0
     let note = Note(id: UUID(), text: "Previously saved")
     func load() async throws -> [Note] {
         attempts += 1
@@ -41,7 +41,12 @@ actor RetryableNotes: NotesRepository {
         let retryModel = NotesEditorViewModel(notesFeature: retryFeature)
         await retryModel.load()
         precondition(retryModel.loadError != nil && retryFeature.notes.isEmpty)
-        await retryModel.load()
+        let firstRetry = retryModel.retryLoad()
+        let repeatedRetry = retryModel.retryLoad()
+        await firstRetry.value
+        await repeatedRetry.value
+        let attempts = await retryRepository.attempts
+        precondition(attempts == 2)
         precondition(retryModel.loadError == nil && retryFeature.notes.map(\.text) == ["Previously saved"])
 
         let repository = ControlledNotes()
