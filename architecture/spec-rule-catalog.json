@@ -76,9 +76,9 @@
       "section": "Keep Screen Initializers Clean",
       "applies": "Creating screens and editing saved values",
       "strength": "Required with product-specific behaviour",
-      "rule": "Keep blocking I/O, slow work and asynchronous side effects out of View initializers; a detail View may construct its own ViewModel from selected value data. The screen ViewModel owns unsaved text-field values until a save succeeds or the user cancels; retain the draft after a failed save.",
+      "rule": "Keep blocking I/O, slow work and asynchronous side effects out of View initializers; a detail View may construct its own ViewModel from a selected immutable snapshot. Keep editable text in the screen ViewModel as a separate draft. Submit proposed edits to the responsible Feature. Retain the draft after a failed save and discard it when the user cancels editing.",
       "why": "Screen creation remains predictable and cancelled edits do not change authoritative state.",
-      "verify": "Inspect initialization and test failed saves, retry and cancellation.",
+      "verify": "Inspect View initialization for side effects. Fail a save and verify that the editor keeps the draft and the Feature keeps its last confirmed value. Verify that retry publishes the saved replacement only after persistence succeeds. Cancel an unsaved edit and verify it is discarded without a write.",
       "example": "An unsaved weight field remains on screen after a failed save and is discarded by Cancel.",
       "explanationIds": [
         "honest-errors-and-editing"
