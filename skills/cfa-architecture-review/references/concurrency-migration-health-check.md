@@ -463,6 +463,16 @@ For each relevant operation, inspect:
   selected item. Both destinations should keep their selection and stay open.
   Where the detail offers explicit refresh, check that it updates only its own
   display. Assess intentional live updates against the product requirements.
+- Deep links and notification actions in CFA: apply the
+  [pending destination rule](spec/rules/cfa-link-01.md) within the app's product
+  scope. Trace the request from receipt through validation, durable admission
+  and scene navigation. Check a request arriving during restoration and two
+  scenes trying to open the same item. Verify refusal or cancellation before
+  navigation preserves the request, and an opened destination counts as success
+  independently of its content loading. If removal fails after navigation,
+  trace a retry that saves the removal without opening the destination again.
+  Check what remains pending after restart and whether the other scene's
+  navigation stays independent.
 - Suspension: what assumptions can change during await? Trace validation and
   commit, actor reentrancy, stale results and cleanup of replaced task handles.
 - Optional download caches: when CFA applies, verify that a slow restore does
