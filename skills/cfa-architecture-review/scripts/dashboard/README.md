@@ -200,9 +200,10 @@ or feature conventions. Review evidence before proposing refactoring.
 
 ## Development
 
-```sh
-node --test
-```
+From `tools/architecture-dashboard` in the toolkit source checkout, run
+`npm test`. The installed skill includes the dashboard but not its development
+test suite. Running `node --test` there can mistake renderer modules named
+`test-*.mjs` for tests; it does not validate the dashboard.
 
 The analyser and renderer are separate modules. Report data has a schema version
 so future semantic analysis can improve without coupling it to the webpage.

@@ -62,6 +62,10 @@ test('standalone release carries scanner dependencies and scans outside the sour
  for(const resource of ['references/cfa-specification.md','references/product-behaviour-contract.md','agents/openai.yaml','LICENSE']) assert.ok(fs.existsSync(path.join(tidy,resource)));
  assert.equal(hash(path.join(tidy,'references/cfa-specification.md')),hash(path.join(root,'architecture/cfa-specification.md')));
  const cli=path.join(destination,'.agents/skills/cfa-architecture-review/scripts/dashboard/src/cli.mjs');
+ const installedDashboard=path.dirname(path.dirname(cli));
+ const missingTests=spawnSync('npm',['test'],{cwd:installedDashboard,encoding:'utf8'});
+ assert.notEqual(missingTests.status,0,'An installed dashboard without tests must not report a passing suite');
+ assert.match(missingTests.stderr,/tests are available in the toolkit source checkout/i);
  const fixture=path.join(dir,'unrelated-app');fs.mkdirSync(fixture);
  fs.writeFileSync(path.join(fixture,'Feature.swift'),'actor Feature { func refresh() async { await Task.yield() } }');
  const report=path.join(dir,'report');
