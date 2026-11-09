@@ -57,6 +57,17 @@ function closingParenthesis(source, opening) {
   return -1;
 }
 
+function* viewInitializers(body) {
+  for (const initializer of memberSignatures(body).matchAll(/(?<![.\w])init[?!]?\s*\(/g)) {
+    const opening = initializer.index + initializer[0].length - 1;
+    const closing = closingParenthesis(body, opening);
+    if (closing < 0) continue;
+    const parameters = body.slice(opening + 1, closing);
+    const injectedViewModel = /:\s*(?:any\s+)?(?:\w+\s*\.\s*)*\w*ViewModel\b(?!\s*\.)/.test(parameters);
+    yield { index: initializer.index, closing, parameters, injectedViewModel };
+  }
+}
+
 function labeledClosureOffset(argumentsText, label) {
   let depth = 0;
   let argumentStart = 0;
@@ -345,9 +356,15 @@ export async function inspect(project) {
       }
     }
     for (const view of source.matchAll(viewDeclarations)) {
-      if (isViewFile && rootViewNames.has(view[1])) continue;
       const start = view.index + view[0].length;
-      const access = findFeatureAccess(braceBody(source, start - 1));
+      const body = braceBody(source, start - 1);
+      for (const initializer of viewInitializers(body)) {
+        if (initializer.injectedViewModel) {
+          findings.push(finding('screen-initializer-inputs', 'warning', `${view[1]} appears to accept a ViewModel; CFA screens construct their own.`, file, lineOf(source, start + initializer.index)));
+        }
+      }
+      if (isViewFile && rootViewNames.has(view[1])) continue;
+      const access = findFeatureAccess(body);
       if (access) {
         findings.push(finding('view-feature-access', 'review', 'This View appears to access a Feature directly. Trace the call and route intent and state through the owning screen and ViewModel.', file, lineOf(source, start + access.index)));
       }
@@ -442,14 +459,9 @@ export async function inspect(project) {
       `@${stateTypePattern}\\s+private\\s+var\\s+([A-Za-z_]\\w*)\\s*:\\s*${viewModelTypePattern}\\b`, 'g'
     ))].map(match => ({ name: match[1], index: match.index }));
     const dependencies = [];
-    for (const initializer of members.matchAll(/(?<![.\w])init[?!]?\s*\(/g)) {
-      const opening = initializer.index + initializer[0].length - 1;
-      const closing = closingParenthesis(body, opening);
-      if (closing < 0) continue;
-      const parameters = body.slice(opening + 1, closing);
-      const injectedViewModel = /:\s*(?:any\s+)?(?:\w+\s*\.\s*)*\w*ViewModel\b(?!\s*\.)/.test(parameters);
-      if (injectedViewModel || (parameters.trim() && viewModel)) {
-        findings.push(finding('screen-initializer-inputs', injectedViewModel ? 'warning' : 'review', injectedViewModel ? `${name} appears to accept a ViewModel; CFA screens construct their own.` : `${name} accepts initializer inputs. Verify that the detail input is a selected immutable snapshot and no ViewModel is injected.`, viewFile, lineOf(view, bodyOffset + initializer.index)));
+    for (const { index, closing, parameters, injectedViewModel } of viewInitializers(body)) {
+      if (!injectedViewModel && parameters.trim() && viewModel) {
+        findings.push(finding('screen-initializer-inputs', 'review', `${name} accepts initializer inputs. Verify that the detail input is a selected immutable snapshot and no ViewModel is injected.`, viewFile, lineOf(view, bodyOffset + index)));
       }
       const tail = body.slice(closing + 1);
       const openingBody = /^\s*(?:(?:async|throws|rethrows)\s*)*\{/.exec(tail);
@@ -465,7 +477,7 @@ export async function inspect(project) {
           new RegExp(`\\b_?${property}\\s*=(?!=)`).test(initializerBody)
         );
         if (assignsViewModel) {
-          findings.push(finding('view-model-initializer-construction', 'review', `${name} assigns ViewModel state in init. Verify it constructs its own ViewModel from a selected immutable snapshot and does not accept an injected ViewModel.`, viewFile, lineOf(view, bodyOffset + initializer.index)));
+          findings.push(finding('view-model-initializer-construction', 'review', `${name} assigns ViewModel state in init. Verify it constructs its own ViewModel from a selected immutable snapshot and does not accept an injected ViewModel.`, viewFile, lineOf(view, bodyOffset + index)));
         }
       }
     }

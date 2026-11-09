@@ -79,6 +79,20 @@ test('flags ViewModel injection even when its declaration is in another folder',
   assert.equal(input?.line, 3);
 });
 
+test('flags initializer injection in a flat project layout', async t => {
+  const file = 'App/Detail.swift';
+  const { findings } = await inspectView(t, '', {
+    [file]: `struct Detail: SwiftUI.View {
+      init(model: DetailViewModel) {}
+      var body: some View { Text("Detail") }
+    }`
+  });
+  const finding = findings.find(item => item.code === 'screen-initializer-inputs');
+  assert.equal(finding?.file, file);
+  assert.equal(finding?.line, 2);
+  assert.equal(finding?.severity, 'warning');
+});
+
 test('maps a conventionally located screen with qualified View conformance', async t => {
   const {report} = await inspectView(t, `struct HomeView: SwiftUI.View {
     @State private var viewModel = HomeViewModel()
@@ -199,7 +213,9 @@ test('comments, strings, nested types and sibling Views cannot establish screen 
     init(viewModel: HomeViewModel) {}
     var body: some View { Text("Other") }
   }`);
-  assert.deepEqual(findings.map(item => item.code), ['view-model-ownership']);
+  assert.deepEqual(findings.map(item => item.code), ['screen-initializer-inputs', 'view-model-ownership']);
+  assert.match(findings[0].message, /^OtherView /);
+  assert.equal(findings[0].line, 12);
 });
 
 test('allows a stateless graph snapshot initializer inside a compliant screen file', async t => {
