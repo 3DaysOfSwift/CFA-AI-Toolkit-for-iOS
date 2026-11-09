@@ -244,7 +244,10 @@ Application
 ├── Assets.xcassets
 └── ApplicationTests
     ├── View model tests
-    └── AppModel tests
+    ├── AppModel tests
+    └── FeatureTests
+        └── Feature Name
+            └── FeatureNameFeatureTests.swift
 ```
 
 The Xcode navigator must communicate the design without requiring a developer
