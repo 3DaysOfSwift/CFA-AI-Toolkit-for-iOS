@@ -103,8 +103,10 @@ test('generic CLI imports reviewed ratings and test results without an example g
    await fs.writeFile(path.join(root,'review.json'),JSON.stringify(input));
    await fs.writeFile(path.join(root,'notes.json'),JSON.stringify(observations));
    await fs.writeFile(path.join(root,'run.json'),JSON.stringify(run));
+   const coverage = path.join(root, 'coverage.json');
+   await fs.writeFile(coverage, JSON.stringify({targets: [{name: 'Sample', coveredLines: 3, executableLines: 4}]}));
    const out=path.join(root,'out');
-   execFileSync(process.execPath,[fileURLToPath(new URL('../src/cli.mjs',import.meta.url)),app,'--review',path.join(root,'review.json'),'--observations',path.join(root,'notes.json'),'--test-results',path.join(root,'run.json'),'--project-name','Sample iOS App','--out',out]);
+   execFileSync(process.execPath,[fileURLToPath(new URL('../src/cli.mjs',import.meta.url)),app,'--review',path.join(root,'review.json'),'--observations',path.join(root,'notes.json'),'--test-results',path.join(root,'run.json'),'--coverage',coverage,'--coverage-target','Sample','--project-name','Sample iOS App','--out',out]);
    const html=await fs.readFile(path.join(out,'report.html'),'utf8');
    assert.ok(!html.includes('Trend'));
    const nodes=new Map();let id=0;
@@ -113,6 +115,8 @@ test('generic CLI imports reviewed ratings and test results without an example g
    vm.runInNewContext(html.match(/<script>([\s\S]*?)<\/script>/)[1],{document});
    assert.match(node('separation-gauge').innerHTML,/100%/);
    assert.match(node('separation-gauge').afterChild.innerHTML, /Not verified against this source scan<\/p><details>/);
+   const coveragePanel = [...nodes.values()].find(item => item.innerHTML.includes('<h3>Test coverage</h3>'));
+   assert.match(coveragePanel?.innerHTML, /Not verified against this source scan<\/p><details>/);
    assert.match(node('separation-gauge').afterChild.innerHTML,/9999 \/ 10000/);
    assert.match(node('separation-gauge').afterChild.innerHTML,/99\.9% passed/);
    assert.match(node('dashboard').innerHTML,/100 \/ 100/);
