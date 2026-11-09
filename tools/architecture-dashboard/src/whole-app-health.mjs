@@ -60,6 +60,14 @@ function hasTaskTrace(operation, site, sites) {
   );
 }
 
+function invalidTaskLinks(operation, sites, taskEntries) {
+  return (operation.steps || []).filter(step => {
+    if (step.taskSiteId === undefined) return false;
+    const site = sites.find(item => item.id === step.taskSiteId);
+    return !site || taskEntries.get(site.id)?.operationId !== operation.id || !stepCitesTask(step, site);
+  });
+}
+
 const pendingTypeReviews = review => (review.typeReviews || [])
   .filter(item => item.status === 'investigate' || item.status === 'unassessed');
 
@@ -106,8 +114,10 @@ export function nextWork(report, review, limit = 8) {
     unresolvedTimingScenarios: (operation.scenarios || [])
       .filter(scenario => scenario.status === 'unresolved')
       .map(({id, title, outcome, verification, evidence}) => ({id, title, outcome, verification, evidence: evidenceLocations(evidence)})),
+    invalidTaskLinks: invalidTaskLinks(operation, sites, tasks)
+      .map(({id, taskSiteId, relation, evidence}) => ({id, taskSiteId, relation, evidence: evidenceLocations(evidence)})),
     missingTimingScenarios: missingTimingScenarios(operation)
-  })).filter(operation => operation.openChecks || operation.missingTrace || operation.missingTimingScenarios.length);
+  })).filter(operation => operation.openChecks || operation.missingTrace || operation.missingTimingScenarios.length || operation.invalidTaskLinks.length);
   return {
     pendingFiles: pendingFiles.length,
     pendingTypes: pendingTypes.length,
@@ -258,12 +268,8 @@ export function coverageGaps(report, review) {
     taskEntries.set(entry.siteId,entry);
   }
   for (const operation of operations) {
-    for (const step of operation.steps || []) {
-      if (step.taskSiteId === undefined) continue;
-      const site = tasks.find(item => item.id === step.taskSiteId);
-      if (!site || taskEntries.get(site.id)?.operationId !== operation.id || !stepCitesTask(step, site)) {
-        gaps.push(`Workflow step ${operation.id}/${step.id} must cite its reconciled task site.`);
-      }
+    for (const step of invalidTaskLinks(operation, tasks, taskEntries)) {
+      gaps.push(`Workflow step ${operation.id}/${step.id} must cite its reconciled task site.`);
     }
   }
   if (untracedTasks.length) gaps.push(`Reconciled task sites need workflow steps: ${untracedTasks.join(', ')}.`);

@@ -169,6 +169,11 @@ test('reconciled task sites must be cited in a workflow step', () => {
     id:'stale-link',parentId:'trigger',relation:'unstructured-task',taskSiteId:'stale',evidence
   });
   assert.match(coverageGaps(inventory,review).join(' '), /launch\/stale-link must cite its reconciled task site/);
+  const work = nextWork(inventory, review);
+  assert.equal(work.pendingOperations, 1);
+  assert.deepEqual(work.nextOperations[0].invalidTaskLinks, [{
+    id:'stale-link', taskSiteId:'stale', relation:'unstructured-task', evidence
+  }]);
 });
 
 test('rejects blank or non-text Health Check headings', () => {
