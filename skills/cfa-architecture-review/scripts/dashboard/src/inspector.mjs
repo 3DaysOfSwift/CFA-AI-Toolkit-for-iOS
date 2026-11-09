@@ -960,9 +960,9 @@ export async function inspect(project) {
     const typedStateProperties = [...members.matchAll(new RegExp(
       `@${stateTypePattern}\\s+private\\s+var\\s+${propertyNamePattern}\\s*:\\s*${viewModelTypePattern}\\b`, 'gu'
     ))].map(match => ({ name: match[1] ?? match[2], index: match.index }));
-    function stateAssignmentTarget(property, backingOnly = false) {
-      const name = backingOnly ? `_${property}` : `_?${property}`;
-      return String.raw`(?<![\p{L}\p{M}\p{N}_\x60])(?<!\.\s*)(?:self\s*\.\s*)?(?:\x60${name}\x60|${name})\s*=`;
+    function stateAssignmentTarget(name, explicitSelf = false) {
+      const receiver = explicitSelf ? String.raw`self\s*\.\s*` : String.raw`(?:self\s*\.\s*)?`;
+      return String.raw`(?<![\p{L}\p{M}\p{N}_\x60])(?<!\.\s*)${receiver}(?:\x60${name}\x60|${name})\s*=`;
     }
     const dependencies = [];
     const initializerLocations = [
@@ -977,14 +977,17 @@ export async function inspect(project) {
         findings.push(finding('screen-initializer-inputs', 'review', `${name} accepts initializer inputs. Check that a detail screen receives selected immutable data and constructs its own ViewModel. Check for injected Features, repositories, service closures and actions owned by another screen. Reusable presentation components may receive action closures.`, location.file, lineOf(location.source, location.offset + index)));
       }
       if (initializerBody !== null) {
-        const ownConstruction = typedStateProperties.find(({name: property}) => new RegExp(
-          `${stateAssignmentTarget(property, true)}\\s*${stateTypePattern}(?:\\s*<\\s*${viewModelTypePattern}\\s*>)?\\s*\\(\\s*(?:initialValue|wrappedValue)\\s*:\\s*(?:${viewModelTypePattern}(?:\\s*\\.\\s*init)?|\\.init)\\s*\\(`, 'u'
-        ).test(initializerBody));
+        const modelConstructor = `(?:${viewModelTypePattern}(?:\\s*\\.\\s*init)?|\\.init)\\s*\\(`;
+        const ownConstruction = typedStateProperties.find(({name: property}) => {
+          const backingAssignment = `${stateAssignmentTarget(`_${property}`)}\\s*${stateTypePattern}(?:\\s*<\\s*${viewModelTypePattern}\\s*>)?\\s*\\(\\s*(?:initialValue|wrappedValue)\\s*:\\s*`;
+          const wrappedAssignment = `${stateAssignmentTarget(property, true)}\\s*`;
+          return new RegExp(`(?:${backingAssignment}|${wrappedAssignment})${modelConstructor}`, 'u').test(initializerBody);
+        });
         if (parameters.trim() && !injectedViewModel && ownConstruction) ownedState ??= ownConstruction;
         const statePropertyNames = typedStateProperties.map(property => property.name);
         if (inlineState) statePropertyNames.push(inlineState[1] ?? inlineState[2]);
         const assignsViewModel = statePropertyNames.some(property =>
-          new RegExp(`${stateAssignmentTarget(property)}(?!=)`, 'u').test(initializerBody)
+          new RegExp(`${stateAssignmentTarget(`_?${property}`)}(?!=)`, 'u').test(initializerBody)
         );
         if (assignsViewModel) {
           findings.push(finding('view-model-initializer-construction', 'review', `${name} assigns ViewModel state in init. Verify it constructs its own ViewModel from a selected immutable snapshot and does not accept an injected ViewModel.`, location.file, lineOf(location.source, location.offset + index)));
