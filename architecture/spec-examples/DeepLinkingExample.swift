@@ -232,6 +232,15 @@ final class DeepLinkingFeature {
         try await afterDismissal.restore()
         precondition(afterDismissal.pending == [retained])
 
+        // An opening callback can arrive before startup restores pending requests.
+        let coldStart = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
+        let incoming = DestinationRequest(id: "notification-cold-start", title: "New launch", launchID: "launch-45")
+        try await coldStart.receive(incoming)
+        precondition(coldStart.pending == [retained, incoming])
+        let restoredAfterIncoming = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
+        try await restoredAfterIncoming.restore()
+        precondition(restoredAfterIncoming.pending == [retained, incoming])
+
         // Navigation can succeed while durable removal fails. Retry the write
         // in this process without asking another scene to navigate again.
         let retryFolder = folder.appendingPathComponent("removal-retry")
