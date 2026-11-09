@@ -606,8 +606,8 @@ export async function inspect(project) {
     const stateTypePattern = `(?:SwiftUI\\s*\\.\\s*)?State`;
     const identifier = '[\\p{L}_][\\p{L}\\p{M}\\p{N}_]*';
     const propertyNamePattern = '(?:`(' + identifier + ')`|(' + identifier + '))';
-    const statePattern = new RegExp(`@${stateTypePattern}\\s+private\\s+var\\s+${propertyNamePattern}(?:\\s*:\\s*${viewModelTypePattern})?\\s*=\\s*${viewModelTypePattern}(?:\\s*\\.\\s*init)?\\s*\\(\\s*\\)`, 'u');
-    const typedStatePattern = new RegExp(`@${stateTypePattern}\\s+private\\s+var\\s+${propertyNamePattern}\\s*:\\s*${viewModelTypePattern}\\s*=\\s*\\.init\\s*\\(\\s*\\)`, 'u');
+    const statePattern = new RegExp(`@${stateTypePattern}\\s+private\\s+var\\s+${propertyNamePattern}(?:\\s*:\\s*${viewModelTypePattern})?\\s*=\\s*${viewModelTypePattern}(?:\\s*\\.\\s*init)?\\s*\\(\\s*\\)(?!\\s*\\.)`, 'u');
+    const typedStatePattern = new RegExp(`@${stateTypePattern}\\s+private\\s+var\\s+${propertyNamePattern}\\s*:\\s*${viewModelTypePattern}\\s*=\\s*\\.init\\s*\\(\\s*\\)(?!\\s*\\.)`, 'u');
     const inlineState = statePattern.exec(members) ?? typedStatePattern.exec(members);
     let ownedState = inlineState && { name: inlineState[1] ?? inlineState[2], index: inlineState.index };
     const typedStateProperties = [...members.matchAll(new RegExp(
