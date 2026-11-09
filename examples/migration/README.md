@@ -8,8 +8,11 @@ macOS. The Swift 5 setting models legacy code; it does not require an old compil
 Each case contains a `case.md` describing its starting point, behaviour contract,
 changes, limitations and expected result. The implementation and the runnable
 behaviour check have separate `MARK` headings. The run section is playground
-lifecycle code, not app architecture. Fixtures simulate storage or network data and
-are not production services. In the toolkit source checkout, run the automated
+lifecycle code. Fixtures simulate storage, networking or observation for the
+behaviour checks. In the Observation example, the locked callback counter is
+test instrumentation. The migrated Feature keeps its observable state on
+`MainActor`. In Callback Networking, the unchecked conformance belongs to the
+`URLProtocol` test subclass, which adds no mutable state. In the toolkit source checkout, run the automated
 checks from its root with `node --test test/migration-playground.test.mjs`; the
 test harness compiles each implementation in its declared language mode and
 executes its behaviour check. The installed skill and release package include the
