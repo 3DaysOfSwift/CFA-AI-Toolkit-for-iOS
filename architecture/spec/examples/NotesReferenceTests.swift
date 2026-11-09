@@ -123,6 +123,16 @@ actor RetryableNotes: NotesRepository {
         try await disk.save(item)
         let restored = try JSONDecoder().decode([Note].self, from: Data(contentsOf: url))
         precondition(restored == [item])
+
+        let firstNote = Note(id: UUID(), text: "First concurrent save")
+        let secondNote = Note(id: UUID(), text: "Second concurrent save")
+        async let saveFirst: Void = disk.save(firstNote)
+        async let saveSecond: Void = disk.save(secondNote)
+        _ = try await (saveFirst, saveSecond)
+        let afterOverlap = try await disk.load()
+        precondition(afterOverlap.first == item)
+        precondition(Set(afterOverlap.dropFirst().map(\.id)) == Set([firstNote.id, secondNote.id]))
+        precondition(afterOverlap.count == 3)
         print("Notes reference: failed save, retry, ordered overlap and JSON storage passed")
     }
 }
