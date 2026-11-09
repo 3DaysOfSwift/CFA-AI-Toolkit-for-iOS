@@ -163,7 +163,7 @@ test('locates possible work started by a SwiftUI initializer', async t => {
   const { report } = await inspectView(t, `struct HomeView: View {
     @State private var viewModel = HomeViewModel()
     init() {
-      Task { await load() }
+      Task<Void, Never> { await load() }
     }
     var body: some View { Text("Home").task { await load() } }
   }`);

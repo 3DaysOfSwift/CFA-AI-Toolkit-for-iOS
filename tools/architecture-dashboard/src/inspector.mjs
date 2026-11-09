@@ -118,7 +118,7 @@ function* typeInitializers(body) {
 }
 
 function inspectInitializerTask(name, initializer, source, start, file, findings) {
-  const task = initializer.initializerBody && /\bTask\s*(?:\.\s*(?:detached|init)\s*)?(?:\([^{}]*\)\s*)?\{/.exec(initializer.initializerBody);
+  const task = initializer.initializerBody && /\bTask\s*(?:<[^{};]*>\s*)?(?:\.\s*(?:detached|init)\s*)?(?:\([^{}]*\)\s*)?\{/.exec(initializer.initializerBody);
   if (task) {
     findings.push(finding('screen-initializer-task', 'review', `${name}'s initializer contains a Task. Trace whether construction starts work or only defines a closure for later use.`, file, lineOf(source, start + initializer.bodyStart + task.index)));
   }
@@ -662,7 +662,7 @@ export async function inspect(project) {
     const dependencies = [];
     for (const { index, parameters, injectedViewModel, injectedAppModel, possibleModelDependency, initializerBody } of typeInitializers(body)) {
       if (!injectedViewModel && !injectedAppModel && !possibleModelDependency && parameters.trim() && viewModel) {
-        findings.push(finding('screen-initializer-inputs', 'review', `${name} accepts initializer inputs. Check that a detail screen receives selected immutable data and constructs its own ViewModel. Check for injected Features, repositories and navigation actions owned by another screen.`, viewFile, lineOf(view, bodyOffset + index)));
+        findings.push(finding('screen-initializer-inputs', 'review', `${name} accepts initializer inputs. Check that a detail screen receives selected immutable data and constructs its own ViewModel. Check for injected Features, repositories, service closures and actions owned by another screen. Reusable presentation components may receive action closures.`, viewFile, lineOf(view, bodyOffset + index)));
       }
       if (initializerBody !== null) {
         const ownConstruction = typedStateProperties.find(({name: property}) => new RegExp(
