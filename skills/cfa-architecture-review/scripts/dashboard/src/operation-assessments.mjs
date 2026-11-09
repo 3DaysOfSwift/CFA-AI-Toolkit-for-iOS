@@ -76,7 +76,9 @@ export function operationAssessments(review) {
     ? '❌ '+correctnessProblems+' operation'+(correctnessProblems===1?' has':'s have')+' a confirmed correctness problem.'
     : !operations.length ? '➖ No operations assessed yet.'
     : correctnessOpen ? '⚠️ Correctness is unresolved for '+correctnessOpen+' operation'+(correctnessOpen===1?'.':'s.')
-    : '✅ Correctness checks passed for all '+operations.length+' assessed operations.';
+    : operations.every(op => op.checks?.some(check => check.dimension === 'correctness' && check.status === 'pass'))
+      ? '✅ Correctness checks passed for all '+operations.length+' assessed operations.'
+      : '✅ No correctness problems were recorded in the '+operations.length+' assessed operations.';
   const field=(name,value)=>'<p><strong>'+name+':</strong> '+esc(value)+'</p>';
   const rows=[...operations].sort((a,b)=>priority[operationStatus(a)]-priority[operationStatus(b)]).map(op=>{
     const status=operationStatus(op);

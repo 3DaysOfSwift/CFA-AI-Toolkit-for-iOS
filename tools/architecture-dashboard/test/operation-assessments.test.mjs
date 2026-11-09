@@ -94,6 +94,7 @@ test('individual checks preserve verified strengths and separate CFA deviations'
   assert.match(stableWithDeviation.verdict,/No architectural conflicts/);
   assert.equal(stableWithDeviation.counts.sound,1);
   assert.equal(stableWithDeviation.counts.problem,0);
+  assert.match(stableWithDeviation.html, /Correctness checks passed for all 1 assessed operations/);
   assert.match(stableWithDeviation.html,/CFA · Feature naming: Does not follow CFA naming/);
   for(const mutate of [c=>delete c.question,c=>delete c.resolveBy]) {
    const invalid=structuredClone(input);mutate(invalid.operations[0].checks.find(c=>c.id==='cancellation'));
@@ -112,7 +113,7 @@ test('individual checks preserve verified strengths and separate CFA deviations'
  });
  test('verified scoped correctness is distinct from inventory completeness',()=>{
   const result=operationAssessments({operationInventory:{coverage:'partial'},operations:[op]});
-  assert.match(result.html,/Correctness checks passed for all 1 assessed operations/);
+  assert.match(result.html,/No correctness problems were recorded in the 1 assessed operations/);
   assert.match(result.html,/not a whole-app pass/);
   const mixed=operationAssessments({operations:[{...op,clarity:'investigate',unknowns:['Where is the lifetime policy documented?']}]});
   assert.match(mixed.html,/Concurrency correctness: ✅ Stable · Architectural clarity: ⚠️ Needs investigation/);
