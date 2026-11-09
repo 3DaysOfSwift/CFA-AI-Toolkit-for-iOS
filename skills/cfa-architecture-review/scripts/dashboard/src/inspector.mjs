@@ -93,7 +93,9 @@ function initializerParameterTypes(parameters) {
     else if (')]}'.includes(token)) depth--;
     else if (depth === 0 && token === ',') foundType = false;
     else if (depth === 0 && token === ':' && !foundType) {
-      const type = /^\s*(?:(?:any|some)\s+)?((?:\w+\s*\.\s*)*\w+)/.exec(parameters.slice(index + 1));
+      const parameter = parameters.slice(index + 1);
+      const type = /^\s*\(\s*any\s+((?:\w+\s*\.\s*)*\w+)\s*\)\s*\?/.exec(parameter)
+        ?? /^\s*(?:(?:any|some)\s+)?((?:\w+\s*\.\s*)*\w+)/.exec(parameter);
       if (type) types.push(type[1].split('.').at(-1).trim());
       foundType = true;
     }

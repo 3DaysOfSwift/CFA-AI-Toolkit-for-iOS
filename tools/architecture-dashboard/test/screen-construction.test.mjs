@@ -205,7 +205,7 @@ test('reviews possible model dependencies in a flat View initializer', async t =
   const { findings } = await inspectView(t, '', {
     [file]: `struct Detail: View {
       init(schedule: LaunchFeature) {}
-      init(repository: any MyApp.LaunchRepository, network: NetworkingManager) {}
+      init(repository: (any MyApp.LaunchRepository)?, network: NetworkingManager) {}
       init(snapshot: LaunchFeature.Snapshot) {}
       init(snapshot: LaunchSnapshot = makeSnapshot(feature: LaunchFeature())) {}
       init(action: (feature: LaunchFeature) -> Void) {}
