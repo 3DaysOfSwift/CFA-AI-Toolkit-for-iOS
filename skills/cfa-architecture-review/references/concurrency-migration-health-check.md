@@ -201,7 +201,10 @@ dependencies when behaviour cannot be judged in isolation. Do not create a separ
 For every operation, complete the four source-backed timing scenarios defined in
 `scripts/dashboard/Documentation/REVIEWS.md`: repeated triggers, caller departure,
 older results arriving late and failure. Mark irrelevant scenarios not applicable
-with a reason. Explain actual outcomes, ownership and consequences; distinguish
+with a reason the reader can understand. The report preserves these reasons
+in a collapsed section within the workflow and counts only applicable checks
+toward its concurrency result. Explain actual outcomes, ownership and
+consequences. Distinguish
 source reasoning from tests that were actually run. Newly prepared reviews require
 these assessments before the final report can be generated.
 

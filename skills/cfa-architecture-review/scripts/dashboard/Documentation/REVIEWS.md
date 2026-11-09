@@ -260,7 +260,9 @@ Trace repeated triggers, navigation or caller departure, older results arriving
 late, and failures through the actual state and task owners. Record the observed
 policy, test or reproduction separately from source-only reasoning. The report
 shows the operation's behavioural checks and applicable scenarios with their
-evidence; the tool validates provenance and completeness, not their truth.
+evidence. The workflow also has a collapsible section for inapplicable
+timing scenarios and their reasons. They do not count as passes. The tool
+validates provenance and completeness; the reviewer verifies the conclusions.
 
 Unresolved checks require `question` and `resolveBy`: the specific unanswered
 question and the evidence or test needed. Failed checks require `consequence`
