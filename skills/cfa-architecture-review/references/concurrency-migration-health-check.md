@@ -84,6 +84,12 @@ results in the report, rather than presenting scanner counts as findings.
    including identity, snapshots, actor boundaries, subscriptions and cleanup.
    Consider the product's intended freshness policy; a deliberately stable detail
    snapshot is not a defect merely because it does not update automatically.
+   For an app-wide listener, trace startup, repeated startup signals, event
+   forwarding and cancellation or replacement. Check that required events
+   still reach the app with the relevant screen absent. In CFA, AppModel owns
+   the listener and forwards events to the responsible Feature, which interprets
+   them and owns the resulting state. Trace screen-only observation separately
+   against the screen's lifetime.
 8. **Launch performance:** Trace startup and its loading signals, then measure
    launch using available tooling when feasible. State the measurement definition,
    device or simulator, build configuration, cold or warm conditions, sample count
