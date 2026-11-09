@@ -15,7 +15,13 @@ for (const name of examples) for (const [side, version] of [['Before','5'], ['Af
     const page = fs.readFileSync(path.join(folder, 'Contents.swift'), 'utf8');
     assert.match(fs.readFileSync(path.join(folder, 'contents.xcplayground'), 'utf8'), new RegExp(`swift-version=["']${version}["']`));
     assert.ok(fs.existsSync(path.join(root, 'examples/migration', name, 'case.md')));
-    assert.equal(page.split(marker).length, 2);
+    const sections = page.split(marker);
+    assert.equal(sections.length, 2);
+    const [example, launcher] = sections;
+    assert.match(example, /^import PlaygroundSupport$/m);
+    assert.match(example, /^PlaygroundPage\.current\.needsIndefiniteExecution = true$/m);
+    assert.match(launcher, /^\s*Task \{ @MainActor in\b/);
+    assert.match(launcher, /\brunExample\(\)[\s\S]*PlaygroundPage\.current\.finishExecution\(\)/);
   });
   test(`${name}: ${side} runs its Swift ${version} behaviour check`, {skip:process.platform !== 'darwin', timeout:120000}, () => {
     const page = fs.readFileSync(path.join(folder, 'Contents.swift'), 'utf8');
