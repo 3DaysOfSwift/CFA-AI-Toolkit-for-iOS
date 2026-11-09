@@ -250,6 +250,13 @@ use `not-applicable` and explain why. Keep the check in the review record.
 A correctness or clarity dimension with no applicable checks remains
 unassessed and cannot close a whole-app review.
 
+For `actor-isolation`, trace where the substantial work executes and where
+the result is published. Record the relevant target's Swift language mode,
+default isolation and SDK annotations when they affect the result. A type
+name, an actor count or an async declaration alone does not establish the
+execution boundary. When a responsiveness conclusion depends on timing,
+record a measurement separately from the source trace.
+
 ### Timing scenarios
 
 Every new whole-app report requires timing assessments. For each operation,
