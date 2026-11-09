@@ -575,6 +575,22 @@ test('reviews synchronous launch reads without attributing Task work to the call
   assert.deepEqual(findings.map(item => [item.file, item.line, item.severity]), [[file, 3, 'review'], [file, 4, 'review']]);
 });
 
+test('reviews synchronous file opens before the launch callback returns', async t => {
+  const file = 'Application/AppDelegate.swift';
+  const root = await fixture(t, {
+    [file]: `class AppDelegate {
+      func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        _ = try? Foundation.FileHandle(forReadingFrom: cacheURL)
+        _ = try? FileHandle.init(forUpdating: logURL)
+        Task { _ = try? FileHandle(forWritingTo: logURL) }
+        return true
+      }
+    }`
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'blocking-app-launch-io');
+  assert.deepEqual(findings.map(item => [item.file, item.line, item.severity]), [[file, 3, 'review'], [file, 4, 'review']]);
+});
+
 test('reviews direct synchronous reads in AppModel construction and startup', async t => {
   const model = 'App/2 - AppModel/AppModel.swift';
   const startup = 'App/2 - AppModel/AppModel+Startup.swift';

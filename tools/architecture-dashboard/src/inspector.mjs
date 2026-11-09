@@ -64,10 +64,10 @@ function memberSignatures(body) {
   }).join('');
 }
 
-function inspectSynchronousLaunchReads(name, file, source, opening, findings) {
+function inspectSynchronousLaunchIO(name, file, source, opening, findings) {
   const body = memberSignatures(braceBody(source, opening));
-  for (const read of body.matchAll(/\b(?:(?:Data|String)\s*(?:\.\s*init\s*)?\(\s*contentsOf|FileManager\s*\.\s*default\s*\.\s*contents\s*\(\s*atPath)\s*:/g)) {
-    findings.push(finding('blocking-app-launch-io', 'review', `${name} appears to read data synchronously. Verify the call and its input. CFA signals Features during launch and lets their asynchronous work complete independently.`, file, lineOf(source, opening + 1 + read.index)));
+  for (const read of body.matchAll(/\b(?:(?:Data|String)\s*(?:\.\s*init\s*)?\(\s*contentsOf|FileHandle\s*(?:\.\s*init\s*)?\(\s*(?:forReadingFrom|forWritingTo|forUpdating|forReadingAtPath|forWritingAtPath|forUpdatingAtPath)|FileManager\s*\.\s*default\s*\.\s*contents\s*\(\s*atPath)\s*:/g)) {
+    findings.push(finding('blocking-app-launch-io', 'review', `${name} appears to perform synchronous I/O. Verify the call and its input. CFA signals Features during launch and lets their asynchronous work complete independently.`, file, lineOf(source, opening + 1 + read.index)));
   }
 }
 
@@ -314,7 +314,7 @@ export async function inspect(project) {
       for (const launch of members.matchAll(/\bfunc\s+applicationDidFinishLaunching\s*\(\s*\)(?:\s*->\s*(?:Swift\s*\.\s*)?Void)?/g)) {
         const end = start + launch.index + launch[0].length;
         const body = /^\s*\{/.exec(source.slice(end));
-        if (body) inspectSynchronousLaunchReads('AppModel.applicationDidFinishLaunching()', file, source, end + body[0].length - 1, findings);
+        if (body) inspectSynchronousLaunchIO('AppModel.applicationDidFinishLaunching()', file, source, end + body[0].length - 1, findings);
       }
       for (const initializer of members.matchAll(/(?<![.\w])init[?!]?\s*\(/g)) {
         const closing = closingParenthesis(source, start + initializer.index + initializer[0].length - 1);
@@ -324,7 +324,7 @@ export async function inspect(project) {
       }
     }
     for (const {name, file, source, opening} of constructionBodies) {
-      inspectSynchronousLaunchReads(name, file, source, opening, findings);
+      inspectSynchronousLaunchIO(name, file, source, opening, findings);
       const container = /\b(?:SwiftData\s*\.\s*)?ModelContainer\s*(?:\.\s*init\s*)?\(/.exec(braceBody(source, opening));
       if (container) {
         findings.push(finding('app-model-storage-construction', 'review', `${name} references a ModelContainer initializer. Trace whether it opens storage during graph construction. CFA opens the store within the storage owner’s data request.`, file, lineOf(source, opening + 1 + container.index)));
@@ -638,7 +638,7 @@ export async function inspect(project) {
     for (const callback of source.matchAll(/\bfunc\s+application\s*\(\s*_(?:\s+\w+)?\s*:\s*(?:UIKit\s*\.\s*)?UIApplication\s*,\s*didFinishLaunchingWithOptions\s*(?:\w+\s*)?:[^{}]*?\)\s*->\s*(?:Swift\s*\.\s*)?Bool\s*\{/g)) {
       const start = callback.index + callback[0].length - 1;
       const body = braceBody(source, start);
-      inspectSynchronousLaunchReads('The launch callback', file, source, start, findings);
+      inspectSynchronousLaunchIO('The launch callback', file, source, start, findings);
       for (const scheduled of body.matchAll(/\b(?:Task\s*(?:<[^{}]*>\s*)?(?:\.\s*(?:init|detached)\s*)?|DispatchQueue\s*(?:\.\s*(?:main|global\s*\([^{}()]*\))|\([^{}()]*\))\s*\.\s*async(?:After)?\b\s*|OperationQueue\s*(?:\.\s*main|\(\s*\))\s*\.\s*addOperation\b\s*|(?<![.\w])(?<queue>\w+)\s*\.\s*(?<method>asyncAfter|async|addOperation)\b\s*)(?:\([^{}]*\)\s*|\([^{}]*?\b(?:operation|execute)\s*:\s*)?\{/g)) {
         const {queue, method} = scheduled.groups;
         const queueType = method === 'addOperation' ? 'OperationQueue' : 'DispatchQueue';
