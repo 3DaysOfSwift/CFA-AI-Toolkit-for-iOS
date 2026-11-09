@@ -353,7 +353,7 @@ export async function inspect(project) {
     const testFile = testCandidates.length === 1 ? testCandidates[0] : null;
     const viewModelTypePattern = `(?:(?:\\w+\\s*\\.\\s*)*${viewModelName})`;
     const stateTypePattern = `(?:SwiftUI\\s*\\.\\s*)?State`;
-    const statePattern = new RegExp(`@${stateTypePattern}\\s+private\\s+var\\s+([A-Za-z_]\\w*)(?:\\s*:\\s*${viewModelTypePattern})?\\s*=\\s*${viewModelTypePattern}\\s*\\(\\s*\\)`);
+    const statePattern = new RegExp(`@${stateTypePattern}\\s+private\\s+var\\s+([A-Za-z_]\\w*)(?:\\s*:\\s*${viewModelTypePattern})?\\s*=\\s*${viewModelTypePattern}(?:\\s*\\.\\s*init)?\\s*\\(\\s*\\)`);
     const typedStatePattern = new RegExp(`@${stateTypePattern}\\s+private\\s+var\\s+([A-Za-z_]\\w*)\\s*:\\s*${viewModelTypePattern}\\s*=\\s*\\.init\\s*\\(\\s*\\)`);
     const inlineState = statePattern.exec(members) ?? typedStatePattern.exec(members);
     let ownedState = inlineState && { name: inlineState[1], index: inlineState.index };
@@ -376,7 +376,7 @@ export async function inspect(project) {
         if (openingBody) {
           const initializerBody = braceBody(tail, openingBody[0].length - 1);
           const ownConstruction = typedStateProperties.find(({name: property}) => new RegExp(
-            `\\b_${property}\\s*=\\s*${stateTypePattern}(?:\\s*<\\s*${viewModelTypePattern}\\s*>)?\\s*\\(\\s*(?:initialValue|wrappedValue)\\s*:\\s*(?:${viewModelTypePattern}|\\.init)\\s*\\(`
+            `\\b_${property}\\s*=\\s*${stateTypePattern}(?:\\s*<\\s*${viewModelTypePattern}\\s*>)?\\s*\\(\\s*(?:initialValue|wrappedValue)\\s*:\\s*(?:${viewModelTypePattern}(?:\\s*\\.\\s*init)?|\\.init)\\s*\\(`
           ).test(initializerBody));
           if (parameters.trim() && !injectedViewModel && ownConstruction) ownedState ??= ownConstruction;
           const statePropertyNames = typedStateProperties.map(property => property.name);

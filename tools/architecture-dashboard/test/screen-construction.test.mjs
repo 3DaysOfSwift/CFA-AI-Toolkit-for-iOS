@@ -100,6 +100,7 @@ for (const declaration of [
   '@State private var reminders: HomeViewModel = .init()',
   '@State private var reminders: MyApp.HomeViewModel = MyApp.HomeViewModel()',
   '@SwiftUI.State private var viewModel = HomeViewModel()',
+  '@State private var viewModel = MyApp.HomeViewModel.init()',
   '@State private var viewModel =\n HomeViewModel()'
 ]) {
   test('accepts private inline no-argument ownership: ' + declaration, async t => {
@@ -217,6 +218,20 @@ test('recognizes typed State construction with a contextual detail ViewModel ini
     @SwiftUI.State private var viewModel: MyApp.HomeViewModel
     init(launch: LaunchSnapshot) {
       self._viewModel = SwiftUI.State<MyApp.HomeViewModel>(wrappedValue: .init(launch: launch))
+    }
+    var body: some View { Text("Home") }
+  }`);
+  assert.equal(report.screens[0].ownsViewModel, true);
+  assert.deepEqual(findings.map(item => item.code), [
+    'screen-initializer-inputs', 'view-model-initializer-construction'
+  ]);
+});
+
+test('recognizes a named detail ViewModel initializer call', async t => {
+  const { report, findings } = await inspectView(t, `struct HomeView: View {
+    @State private var viewModel: HomeViewModel
+    init(launch: LaunchSnapshot) {
+      _viewModel = State<HomeViewModel>(initialValue: HomeViewModel.init(launch: launch))
     }
     var body: some View { Text("Home") }
   }`);
