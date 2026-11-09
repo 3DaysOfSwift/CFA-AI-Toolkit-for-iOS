@@ -311,8 +311,9 @@ export async function inspect(project) {
       if (featureAccess) {
         findings.push(finding('root-feature-access', 'review', 'Root navigation appears to access a Feature directly. Keep refresh and Feature state presentation in the owning screen and its ViewModel.', file, lineOf(source, bodyOffset + featureAccess.index)));
       }
-      if (/\b(?:if|guard|switch)\s+[^\{;\n]*\b\w*(?:container|database|storeReady|storageReady|startupError|launchError)\w*\b/i.test(rootBody)) {
-        findings.push(finding('root-storage-gate', 'review', 'Root navigation may gate the interface on storage availability. Open storage within a Feature data request and present its error in the feature screen, never a root wrapper or app-wide blocking overlay.', file, lineOf(source, rootView.index)));
+      const gate = /\b(?:if|guard|switch)\s+[^\{;\n]*\b\w*(?:container|database|storeReady|storageReady|startupError|launchError)\w*\b/i.exec(rootBody);
+      if (gate) {
+        findings.push(finding('root-storage-gate', 'review', 'Root navigation may gate the interface on storage availability. Open storage within a Feature data request and present its error in the feature screen, never a root wrapper or app-wide blocking overlay.', file, lineOf(source, bodyOffset + gate.index)));
       }
     }
     for (const task of source.matchAll(/\.\s*(task\b\s*([({])|refreshable\b\s*\{)/g)) {

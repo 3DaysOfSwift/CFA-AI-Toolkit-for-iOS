@@ -406,15 +406,15 @@ test('flags conditional database startup presentation in App.body', async t => {
 
 test('flags storage-gated conventional roots as review hints', async t => {
   const root = await fixture(t, {
-    'Application/1 - View/ContentView.swift': 'struct ContentView: View { var body: some View { if let container = storage.container { RootTabView() } else { ProgressView() } } }',
+    'Application/1 - View/ContentView.swift': 'struct ContentView: View {\n var body: some View {\n if let container = storage.container { RootTabView() } else { ProgressView() } } }',
     'Application/1 - View/RootTabView.swift': 'struct RootTabView: View { var body: some View { switch databaseState { case .ready: Tabs(); default: ProgressView() } } }',
     'Application/1 - View/RootView.swift': 'struct RootView: View { var body: some View { if isStoreReady { Tabs() } else { ErrorView() } } }'
   });
   const report = await inspect(root);
   const gates = report.findings.filter(item => item.code === 'root-storage-gate');
   assert.equal(gates.length, 3);
-  assert.ok(gates.every(item => item.severity === 'review' && item.line === 1));
-  assert.ok(gates.some(item => item.file.endsWith('ContentView.swift')));
+  assert.ok(gates.every(item => item.severity === 'review'));
+  assert.equal(gates.find(item => item.file.endsWith('ContentView.swift'))?.line, 3);
   assert.match(report.limitations.join(' '), /blocking overlays require manual/);
 });
 
