@@ -78,12 +78,19 @@ test('requires a visible finding for confirmed operation problems', () => {
   };
   assert.throws(() => renderHealthReport(data), /Include confirmed operation problems/);
   data.operations[0].checks[0].dimension = 'cfa';
-  data.operations[0].checks[0].title = 'Screen task ownership';
+  Object.assign(data.operations[0].checks[0], {
+    title:'Screen task ownership',
+    problemKind:'cfa-deviation',
+    reason:'The screen retains its own task handle.',
+    verification:'Inspected the screen declaration.',
+    evidence:[{file:'Views/HomeView.swift',line:12,endLine:14}]
+  });
   const cfaReport = renderHealthReport(data);
   assert.match(cfaReport, /Refresh <small>· CFA deviation<\/small><\/summary>/);
   assert.doesNotMatch(cfaReport, /aria-label="Problem"/);
   assert.match(cfaReport, /<h3>CFA alignment<\/h3>.*Screen task ownership/);
   assert.doesNotMatch(cfaReport, /<h3>Behaviour checks<\/h3>/);
+  assert.match(cfaReport, /Screen task ownership.*Inspected the screen declaration.*Evidence: Views\/HomeView\.swift:12–14/);
   data.operations[0].scenarios = [{status:'problem'}];
   assert.throws(() => renderHealthReport(data), /Include confirmed operation problems/);
   data.criteria.push({title:'Refresh ordering', detail:'A stale result can replace the latest result.', status:'problem'});
