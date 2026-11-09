@@ -366,9 +366,12 @@ do not claim that UI gating replaces server-side authorisation.
   UI checks that did not run.
 - For changes to durable editing, hold the save pending and verify that
   confirmed state stays unchanged. Fail the save and verify the screen
-  ViewModel retains the draft for retry. Verify a successful retry publishes
-  the confirmed replacement. Separately, cancel an unsaved edit and verify
-  that the draft is discarded and the stored and confirmed values are unchanged.
+  presents a recoverable error and its ViewModel retains the draft for retry.
+  Retain the published snapshot in a reader across a successful retry. Verify
+  the owning Feature publishes a replacement and the reader's earlier snapshot
+  stays unchanged, including its nested values. Separately, cancel an unsaved
+  edit and verify that the draft is discarded and the stored and confirmed
+  values are unchanged.
 - For optional download caches, verify refresh starts while restoration is
   pending, or when the cache is missing, incompatible or unreadable. Hold the
   cache write pending and verify the Feature publishes fresh data and releases
