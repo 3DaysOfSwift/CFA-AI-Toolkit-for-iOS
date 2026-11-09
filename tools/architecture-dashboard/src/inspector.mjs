@@ -625,7 +625,7 @@ export async function inspect(project) {
     }
     const gate = rootStorageGate.exec(body);
     if (gate) {
-      findings.push(finding('root-storage-gate', 'review', 'Root navigation may gate the interface on storage availability. Open storage within a Feature data request and present its error in the feature screen, never a root wrapper or app-wide blocking overlay.', file, lineOf(source, offset + gate.index)));
+      findings.push(finding('root-storage-gate', 'review', 'A root View branches on a possible storage condition. Trace whether it hides navigation or only presents a screen-local error. Open storage within a Feature data request and keep unaffected destinations accessible.', file, lineOf(source, offset + gate.index)));
     }
   }
   const viewNames = new Set();
@@ -643,7 +643,7 @@ export async function inspect(project) {
       const scene = sceneBodyPattern.exec(appBody);
       if (!scene) continue;
       const body = braceBody(appBody, scene.index + scene[0].length - 1);
-      for (const root of body.matchAll(/\bWindowGroup\s*(?:\([^{}]*\)\s*)?\{\s*(\w+)\s*\(/g)) {
+      for (const root of body.matchAll(/\bWindowGroup\s*(?:\([^{}]*\)\s*)?\{\s*(?:\w+\s*\.\s*)*(\w+)\s*\(/g)) {
         if (viewNames.has(root[1])) rootViewNames.add(root[1]);
       }
     }

@@ -887,7 +887,7 @@ test('flags storage-gated conventional roots as review hints', async t => {
 test('reviews a custom root directly constructed by the app scene', async t => {
   const file = 'Application/Navigation/WorkspaceShell.swift';
   const root = await fixture(t, {
-    'Application/ExampleApp.swift': 'struct ExampleApp: App { var body: some Scene { WindowGroup { WorkspaceShell() } } }',
+    'Application/ExampleApp.swift': 'struct ExampleApp: App { var body: some Scene { SwiftUI.WindowGroup { Example.WorkspaceShell() } } }',
     [file]: `struct WorkspaceShell: View {
       var body: some View {
         if storageReady { Tabs() } else { ProgressView() }
