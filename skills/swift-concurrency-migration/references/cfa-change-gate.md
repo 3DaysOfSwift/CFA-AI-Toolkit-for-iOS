@@ -194,8 +194,10 @@ the architecture:
     response open and verify that a second independent request reaches
     the transport before releasing the first.
 16. The app delegate calls `AppModel.shared.applicationDidFinishLaunching()`
-    directly and synchronously. Features may start asynchronous work without
-    making the callback await disk or network completion.
+    directly and synchronously. AppModel signals the relevant Features and
+    starts required app-wide listeners before the callback returns. Verify that
+    repeated launch signals do not start that work again. Features may start
+    asynchronous work without making the callback await disk or network completion.
     Keep synchronous startup work brief. Task creation order does not establish
     disk or network start order. Measure launch and first-frame timing
     separately from Feature readiness.
