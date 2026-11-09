@@ -153,6 +153,7 @@ test('completion is not inferred from a build pass or tests at a different commi
     afterEvidence('after-navigator', 'manual'),
     afterEvidence('after-feature-inventory', 'source'),
     afterEvidence('after-primitive-inventory', 'source'),
+    afterEvidence('after-behaviour-regression', 'manual'),
     afterEvidence('after-architecture-review', 'manual')
   );
   f.record.completionGate = {
@@ -161,8 +162,13 @@ test('completion is not inferred from a build pass or tests at a different commi
     primitiveInventoryEvidenceId: 'after-primitive-inventory',
     buildEvidenceId: 'after-build',
     testEvidenceId: 'after-test',
+    manualBehaviourRegressionEvidenceId: 'after-behaviour-regression',
     manualArchitectureReviewEvidenceId: 'after-architecture-review'
   };
+  f.record.evidence.find(item => item.id === 'after-behaviour-regression').outcome = 'not-run';
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.startsWith('completionGate.manualBehaviourRegressionEvidenceId')));
+  f.record.evidence.find(item => item.id === 'after-behaviour-regression').outcome = 'passed';
   f.seal();
   assert.equal(inspectRecord(f.file).valid, true);
 });

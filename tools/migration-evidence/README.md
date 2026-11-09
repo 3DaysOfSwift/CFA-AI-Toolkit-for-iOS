@@ -90,3 +90,8 @@ approved-case catalogue, cross-record checks (unique IDs, supersession and
 repository-level holdout isolation), release manifests and baseline-versus-case
 evaluation are subsequent increments. Neither this helper nor the migration
 skill currently claims to retrieve approved precedents automatically.
+
+A completed record must link passed manual behaviour regression evidence at the
+final commit using `completionGate.manualBehaviourRegressionEvidenceId`. The
+manual architecture review has its own field. If regression was not run or did
+not pass, record the migration as partial and describe the missing evidence.

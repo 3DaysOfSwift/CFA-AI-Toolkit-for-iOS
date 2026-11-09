@@ -174,6 +174,7 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
         ['primitiveInventoryEvidenceId', ['source', 'diff']],
         ['buildEvidenceId', ['build']],
         ['testEvidenceId', ['test']],
+        ['manualBehaviourRegressionEvidenceId', ['manual']],
         ['manualArchitectureReviewEvidenceId', ['manual']]
       ];
       for (const [field, kinds] of requiredEvidence) {

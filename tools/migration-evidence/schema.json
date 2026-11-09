@@ -89,13 +89,14 @@
     }},
     "completionGate": {
       "type": ["object", "null"], "additionalProperties": false,
-      "required": ["navigatorEvidenceId", "featureInventoryEvidenceId", "primitiveInventoryEvidenceId", "buildEvidenceId", "testEvidenceId", "manualArchitectureReviewEvidenceId"],
+      "required": ["navigatorEvidenceId", "featureInventoryEvidenceId", "primitiveInventoryEvidenceId", "buildEvidenceId", "testEvidenceId", "manualBehaviourRegressionEvidenceId", "manualArchitectureReviewEvidenceId"],
       "properties": {
         "navigatorEvidenceId": {"$ref": "#/$defs/identifier"},
         "featureInventoryEvidenceId": {"$ref": "#/$defs/identifier"},
         "primitiveInventoryEvidenceId": {"$ref": "#/$defs/identifier"},
         "buildEvidenceId": {"$ref": "#/$defs/identifier"},
         "testEvidenceId": {"$ref": "#/$defs/identifier"},
+        "manualBehaviourRegressionEvidenceId": {"$ref": "#/$defs/identifier"},
         "manualArchitectureReviewEvidenceId": {"$ref": "#/$defs/identifier"}
       }
     },
