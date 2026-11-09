@@ -7,6 +7,11 @@ inventory, reviewed judgments and runtime evidence.
 The canonical specification is `architecture/cfa-specification.md`. Tool source is
 `tools/architecture-dashboard`. Never edit their generated skill copies directly.
 Run `npm run sync`, `npm run validate` and `npm test` before proposing a change.
+
+For an audit scoped to guidance, skills, examples and tooling, run
+`node scripts/validate.mjs --skip-xcode-projects`. It checks source and bundled
+copies while skipping starter app and Xcode template checks. Use the full
+validation and test commands for release verification.
 The bundled dependency copies are committed so a source checkout remains complete;
 validation detects drift.
 
