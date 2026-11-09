@@ -277,6 +277,11 @@ skill from that toolkit before changing the project.
   in admission order, including across awaits, and return each caller's own
   outcome. Matching inputs alone do not make commands duplicates. Define how
   failure and cancellation affect queued work and when to clear task handles.
+  Document the product reason for a different overlap policy. To verify
+  ordered commands, hold the first one open and submit further commands,
+  including identical inputs that must each take effect. Check their admission
+  order and individual outcomes, and verify a failure leaves later work able
+  to finish.
 - PurchasesFeature owns entitlement state. Screen ViewModels check current
   entitlement before presenting or calling a paid capability. Identify paid
   capabilities from the product requirements and entitlement policy. Trace
