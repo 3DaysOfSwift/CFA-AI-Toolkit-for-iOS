@@ -461,10 +461,12 @@ boundary. This is our architecture convention, not a limitation of SwiftData.
   A separate context does not require a separate persistent store.
 - For a production feature that performs meaningful database work, make its
   persistence implementation a `@ModelActor`. The model actor owns its
-  `ModelContext` and serializes fetch, insert, delete, and save work away from
-  the Main Actor. CFA Features remain `@MainActor`, including Features
-  without a current screen. They await the model actor and publish immutable
-  domain values. SwiftData `@Model` instances stay inside the storage boundary.
+  `ModelContext` and serializes access to it. Verify where the model actor
+  and context are created and where expensive database work executes.
+  Keep that work off MainActor. CFA Features remain `@MainActor`, including
+  Features without a current screen. They await the model actor and publish
+  immutable Sendable domain values. SwiftData `@Model` instances stay inside
+  the storage boundary.
 - A small UI-owned context may remain on `@MainActor` only when its work is
   demonstrably short and it deliberately serves UI-managed models. Do not use
   that convenience as the default for a commercial feature with a growing data
