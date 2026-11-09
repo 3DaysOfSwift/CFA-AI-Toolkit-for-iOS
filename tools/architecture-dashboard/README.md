@@ -114,7 +114,8 @@ The scanner cannot establish target membership or discover every event by itself
 The review's `presentation` requires `app`, `summary`, `verdict`, `conclusion`
 and a nonempty list of `criteria`. Use the verdict to describe the app’s
 concurrency design. Each criterion has a `title`, `detail`, `status` (`pass`,
-`concern` or `problem`) and optional `evidence`. The renderer weights criteria
+`concern` or `problem`) and non-empty source `evidence` text. Include confirmed
+operation problems among the report criteria. The renderer weights criteria
 equally (1, ½ or 0 respectively) to choose the assessment label. The score
 reaches 100% only when every reviewed criterion passes. Set `qualitativeOnly`
 to show the Result without a percentage. Coverage comes from the whole-app

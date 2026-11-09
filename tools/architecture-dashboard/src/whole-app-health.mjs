@@ -186,6 +186,9 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
   if (gaps.length) throw Error('Health Check is not complete; no report was generated. Complete the review checklist:\n- ' + gaps.join('\n- '));
   const presentation = review.presentation;
   if (!presentation?.app || !presentation.summary || !presentation.verdict?.trim() || !presentation.conclusion || !Array.isArray(presentation.criteria) || !presentation.criteria.length) throw Error('Provide presentation app, summary, verdict, conclusion and criteria.');
+  if (presentation.criteria.some(criterion => typeof criterion?.evidence !== 'string' || !criterion.evidence.trim())) {
+    throw Error('Each whole-app presentation criterion needs source evidence.');
+  }
   const data = {...presentation, scope:review.scope};
   data.operations = (review.operations || []).map(op=>({group:op.group,title:op.title,path:op.path,stateOwner:op.stateOwner,taskOwner:op.taskOwner,isolation:op.isolation,reason:op.reason,unknowns:op.unknowns,steps:op.steps,checks:op.checks,scenarios:op.scenarios}));
   data.coverageGaps = gaps;
