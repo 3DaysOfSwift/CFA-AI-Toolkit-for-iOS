@@ -1950,7 +1950,8 @@ Before accepting a change, answer every question:
     write and verify that it reports failure without admitting an edit for upload.
     Verify that the edit and pending metadata are saved together, survive failed
     sync and restart, and retry with the same edit identity to produce one logical
-    server change. When replacing an existing implementation, verify recovery and
+    server change. Simulate a server that applies the edit but loses its reply.
+    After restart, verify retry confirms the original edit without applying it again. When replacing an existing implementation, verify recovery and
     retry of an edit saved by the previous version. Exercise conflict and rejection
     outcomes where applicable. Verify Apple-managed sync, including conflicting
     offline edits, on supported devices with the required capabilities, account

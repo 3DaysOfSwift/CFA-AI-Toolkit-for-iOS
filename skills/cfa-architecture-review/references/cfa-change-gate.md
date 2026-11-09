@@ -143,7 +143,9 @@ the architecture:
     local write failure and verify the app reports the failure without
     publishing local success or admitting a pending edit for upload. Verify
     pending edits survive failed sync and restart. Retry with the same edit
-    identity and verify one logical server change. Check that conflicting
+    identity and verify one logical server change. Include a lost reply after
+    server acceptance and verify that retry does not apply the edit twice.
+    Check that conflicting
     edits and server rejections follow the product policy.
     If changing an existing sync implementation, start verification with
     an edit persisted by the previous implementation. Check that the updated

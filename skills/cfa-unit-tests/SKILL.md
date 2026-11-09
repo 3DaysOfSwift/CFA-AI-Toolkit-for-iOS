@@ -180,7 +180,9 @@ verify that neither local success nor a sendable pending edit is published.
 After a successful local write, fail sync, reconstruct the Feature from
 storage, and verify that the edit and its pending metadata survive together.
 Retry with the same edit identity and verify that it produces one logical
-server change. Exercise the product's conflict and rejection outcomes and
+server change. Separately, let the server fixture apply the edit and drop its
+reply. Reconstruct the Feature and verify that retry confirms the same edit
+without applying it again. Exercise the product's conflict and rejection outcomes and
 verify that server confirmation is shown only after acceptance. For
 Apple-managed sync, verify the actual handoff and conflicting offline edits
 on supported devices separately from the unit tests.
