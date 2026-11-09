@@ -275,6 +275,25 @@ test('reviews a production factory without an AppModel.shared property', async t
   assert.ok(!(await inspect(root)).findings.some(missingShared));
 });
 
+test('reviews competing conditional shared graphs and checks each initializer', async t => {
+  const file = 'Application/2 - AppModel/AppModel.swift';
+  const root = await fixture(t, {
+    [file]: `final class AppModel {
+      #if DEBUG
+      static let shared = live()
+      #else
+      static let shared = AppModel()
+      #endif
+      static func live() -> AppModel { AppModel() }
+    }`
+  });
+  const {findings} = await inspect(root);
+  const ambiguity = findings.find(item => item.code === 'app-model-shared-ambiguous');
+  assert.equal(ambiguity?.severity, 'review');
+  assert.ok(ambiguity?.message.includes(`${file}:3, ${file}:5`));
+  assert.equal(findings.find(item => item.code === 'app-model-shared-factory')?.line, 5);
+});
+
 test('checks static AppModel storage in an extension at its source location', async t => {
   const file = 'Application/2 - AppModel/AppModel+Graph.swift';
   const root = await fixture(t, {
