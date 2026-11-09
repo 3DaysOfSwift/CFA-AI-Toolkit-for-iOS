@@ -112,15 +112,16 @@ skill from that toolkit before changing the project.
 - For sign-out, account switching or external session expiry, let the owning
   Feature coordinate explicit cleanup calls. Trace each supported entry point
   and reconcile the outcome with the actual session. Preserve the session and
-  its data when sign-out fails before ending the session. Clear account-specific
-  Feature state after successful sign-out and
-  check the account or session generation before publishing in-flight results.
+  its data when sign-out fails before ending the session. Once the session
+  ends, keep the app signed out and report any cleanup failure accurately.
+  Clear affected Feature state and check the account or session generation
+  before publishing in-flight results.
   If the same account can sign back in before old work finishes, check the
   session identity even when the earlier task was cancelled.
   If sign-out promises a fresh-install experience, clear account-specific
   memory, caches and locally stored files. Preserve independent purchases and
   user-owned documents. Handle unsynchronised work according to the product
-  contract and report cleanup failures accurately.
+  contract.
 - AppModel exposes concrete Features and keeps a private launch guard and the
   private task handles needed for app-wide listeners. Its initializer assigns
   the supplied Features, sets the guard to false and sets the handles to nil.
