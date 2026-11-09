@@ -227,6 +227,11 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
     await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/invalid evidence lines: App.swift:3–3/);
     review.presentation.criteria[0].evidence = [{file:'App.swift',line:1,endLine:2}];
     await fs.writeFile(reviewPath,JSON.stringify(review));
+    const missingClarity = structuredClone(review);
+    missingClarity.operations[0].checks.find(check => check.id === 'architectural-clarity').status = 'not-applicable';
+    await fs.writeFile(reviewPath,JSON.stringify(missingClarity));
+    await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/operations have unresolved checks or boundaries/);
+    await assert.rejects(fs.access(output));
     const sourceProblem = structuredClone(review);
     sourceProblem.fileReviews = [{
       file:'Value.swift',status:'problem',reason:'Confirmed issue',verification:'Source inspection',

@@ -24,6 +24,7 @@ function pendingSourceFiles(report, review) {
 }
 const hasOpenChecks = operation => !operation.checks?.length ||
   operation.checks.some(check => ['unresolved', 'not-checked'].includes(check.status)) ||
+  [operation.correctness, operation.clarity].some(status => status === 'unassessed' || status === 'investigate') ||
   Boolean(operation.unknowns?.length) ||
   Boolean(operation.steps?.some(step => step.relation === 'unknown'));
 
