@@ -241,6 +241,10 @@ test('unavailable or inconsistent parser evidence does not become a pass', () =>
     'Missing from SwiftSyntax: App.swift.',
     'Missing from lexical inventory: Other.swift.'
   ]);
+  mismatch.syntax = {status:'available',files:['App.swift'],items:[],excludedItems:2};
+  assert.deepEqual(coverageGaps(mismatch,complete()), [
+    'SwiftSyntax returned 2 findings outside the source inventory. Reconcile the scan scope before generating a report.'
+  ]);
 });
 
 test('installed Health Check rescans source, surfaces gaps and rejects stale review', async () => {

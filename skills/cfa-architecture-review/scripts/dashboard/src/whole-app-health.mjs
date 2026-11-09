@@ -146,6 +146,9 @@ export function coverageGaps(report, review) {
   }
   if (report.syntax?.status === 'unavailable') gaps.push(report.syntax.reason);
   for (const warning of report.syntax?.warnings ?? []) gaps.push(`SwiftSyntax warning: ${warning}`);
+  if (report.syntax?.excludedItems > 0) {
+    gaps.push(`SwiftSyntax returned ${report.syntax.excludedItems} findings outside the source inventory. Reconcile the scan scope before generating a report.`);
+  }
   if (report.syntax?.status === 'available') {
     const scannerFiles = new Set(report.files.map(file=>file.path));
     const syntaxFiles = new Set(report.syntax.files);
