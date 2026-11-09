@@ -4,7 +4,7 @@
 
 **Strength:** Default.
 
-**Guidance:** Do not create a constants container speculatively; define genuinely shared values once as static properties on a purpose-named enum, keeping Feature-specific values with their owner.
+**Guidance:** Define genuinely shared constants once as static properties on a purpose-named enum when they are needed. Keep Feature-specific values with their owner. Read app identity from bundle metadata when it is authoritative and use localization resources for translatable text. Keep secrets out of app constants.
 
 **Why:** A single definition avoids inconsistent copies while keeping related code easy to find.
 
