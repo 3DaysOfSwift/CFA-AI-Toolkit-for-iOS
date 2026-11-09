@@ -138,10 +138,11 @@ skill from that toolkit before changing the project.
   AppModel can ask each Feature to register its permitted BGTaskScheduler
   identifiers once. Schedule work separately and route app-level callbacks
   through AppModel to the owning Feature. Cancel work on expiration and
-  complete the system callback exactly once, even if expiration races normal
-  completion. Work may outlive a screen, but continuing after iOS backgrounds
-  the app requires an appropriate system mechanism. Verify actual background
-  execution on a supported device.
+  verify that success, failure and expiration each complete the system
+  callback exactly once, including when expiration races completion. Work
+  may outlive a screen, but continuing after iOS backgrounds the app requires
+  a system mechanism. Record actual background delivery on a supported device
+  separately from controlled handler tests.
 - For additional device or extension targets, verify that each target includes
   the shared Model and only its own Views and ViewModels. Each process has its
   own AppModel and Feature instances. For an App Group widget snapshot, request

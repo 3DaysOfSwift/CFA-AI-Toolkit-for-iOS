@@ -154,8 +154,9 @@ the architecture:
     BGTaskScheduler, register each permitted identifier once before launch
     finishes and schedule requests separately. Route app-level callbacks through
     AppModel. Verify that expiration cancels work and that success, failure
-    and expiration each complete the system callback exactly once. Verify actual
-    background execution on a supported device.
+    and expiration each complete the system callback exactly once. Exercise
+    expiration racing completion. Record actual background delivery on a
+    supported device separately from controlled handler tests.
     Keep unrelated background capabilities with their owning Features. A Feature
     can keep work running after its screen closes. Continuing after the app
     itself enters the background requires an appropriate system mechanism.
