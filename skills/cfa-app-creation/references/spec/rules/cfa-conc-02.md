@@ -8,9 +8,7 @@
 
 **Why:** Actor isolation does not make an entire async workflow atomic.
 
-**Example:** An earlier search cannot overwrite a newer query result.
-
-**Open-source code:** [Cuentiva](https://github.com/3DaysOfSwift/Cuentiva/blob/3bf3a9d4b7714182edd6d6778c843e234714db50/Cuentiva/1%20-%20View/Views/Home/BookstoreViewModel.swift). Inspect the specific behaviour; these projects may also contain older conventions.
+**Example:** In the bundled Habit Tracker Pro starter, PurchasesFeature checks its entitlement revision so an older read cannot overwrite a newer result.
 
 **Explanation:** [Why use actors and Sendable values in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/isolation-and-sendable).
 

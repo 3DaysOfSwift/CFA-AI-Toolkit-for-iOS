@@ -452,7 +452,7 @@
       "strength": "Required",
       "rule": "Treat await as a possible suspension and check that the operation is still entitled to publish its result.",
       "why": "Actor isolation does not make an entire async workflow atomic.",
-      "example": "An earlier search cannot overwrite a newer query result.",
+      "example": "In the bundled Habit Tracker Pro starter, PurchasesFeature checks its entitlement revision so an older read cannot overwrite a newer result.",
       "verify": "Force out-of-order results and cancellation in controlled tests.",
       "explanationIds": [
         "isolation-and-sendable"
