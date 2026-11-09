@@ -88,8 +88,9 @@ Use the exact target name from the exported JSON. The gauge uses that target's
 covered executable lines divided by executable lines, not an average of file
 percentages or counts of test methods. A missing report omits the coverage card,
 never fabricating 0%. The imported run may be older than the source; alignment is
-explicitly unverified. No uncovered lines are attributed to current code from
-this aggregate import. Test execution coverage does not establish assertion or
+shown as unverified beside the coverage counts. This aggregate import
+reports the selected target’s counts without attributing uncovered lines to
+the current source. Test execution coverage does not establish assertion or
 business-outcome coverage.
 
 ## Source alignment and journey coverage

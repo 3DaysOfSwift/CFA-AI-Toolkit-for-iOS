@@ -132,10 +132,12 @@ xcrun xcresulttool get test-results summary --path /path/to/Tests.xcresult > sum
 
 Supply that file with `--test-results`. Required fields are nonnegative integer
 `passedTests`, `failedTests`, `skippedTests`, `totalTestCount`, plus numeric Unix
-`startTime`. Counts must sum to total. The gauge uses passed / total including
-skips; zero total has no percentage. Source alignment is explicitly unverified.
-Pass rate is not code coverage. Import xccov separately when available; absent
-coverage is omitted, never substituted with a pass percentage.
+`startTime` in the supported date range. Counts must sum to the total. The
+gauge divides passed tests by the total, including skips. An empty run has no
+percentage, and an all-skipped run is labelled separately. An overall Xcode
+failure remains visible even if every reported test passed. The panel shows
+that alignment with the scanned source is unverified. Import xccov separately
+to see measured line coverage.
 
 ## Supported scope
 
