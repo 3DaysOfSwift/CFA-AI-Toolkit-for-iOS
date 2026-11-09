@@ -4,7 +4,7 @@
 
 **Strength:** Required when applicable.
 
-**Guidance:** Features own their domain work and may register handlers synchronously during app startup; route system callbacks and satisfy expiration and completion contracts.
+**Guidance:** Each Feature owns its background capability. During synchronous startup, AppModel can ask the Feature to register its handlers. Register each permitted BGTaskScheduler identifier once before launch finishes and schedule work separately. Route app-level callbacks through AppModel to the responsible Feature and honour expiration and completion. Use a supported system mechanism for background runtime.
 
 **Why:** System lifecycle handling stays separate from feature behaviour.
 
