@@ -75,8 +75,11 @@ skill from that toolkit before changing the project.
   cleanup calls. Preserve the session and its data when sign-out fails before
   ending the session. Reconcile partial authentication changes with the actual
   session. Clear account-specific Feature state after successful sign-out and
-  guard publication against results from the old session. Apply the product's
-  retention policy to locally saved data.
+  check the account or session generation before publishing in-flight results.
+  If sign-out promises a fresh-install experience, clear account-specific
+  memory, caches and locally stored files. Preserve independent purchases and
+  user-owned documents. Handle unsynchronised work according to the product
+  contract and report cleanup failures accurately.
 - AppModel exposes concrete Features and keeps a private launch guard and the
   private task handles needed for app-wide listeners. Its initializer assigns
   the supplied Features, sets the guard to false and sets the handles to nil.
