@@ -15,10 +15,11 @@ final class LaunchFeature {
     enum RefreshFailure { case providerFailed }
 
     @ObservationIgnored private let provider: any LaunchProviding
-    @ObservationIgnored private var refreshTask: Task<Bool, Never>?
+    private var refreshTask: Task<Bool, Never>?
     @ObservationIgnored private var refreshID: UUID?
     private(set) var name = "No launch loaded"
     private(set) var refreshFailure: RefreshFailure?
+    var isRefreshing: Bool { refreshTask != nil }
     init(provider: any LaunchProviding) { self.provider = provider }
 
     // The fixture publishes every simulated outcome in admission order.
@@ -66,7 +67,8 @@ func runExample() async {
     let loaded = await feature.refresh(available: true)
     precondition(loaded && feature.name == "Artemis")
     let failedRefreshSucceeded = await feature.refresh(available: false)
-    precondition(!failedRefreshSucceeded && feature.name == "Artemis" && feature.refreshFailure == .providerFailed)
+    precondition(!failedRefreshSucceeded && !feature.isRefreshing)
+    precondition(feature.name == "Artemis" && feature.refreshFailure == .providerFailed)
     let retried = await feature.refresh(available: true)
     precondition(retried && feature.name == "Artemis" && feature.refreshFailure == nil)
     print("Passed: MainActor publication, failure retention and retry.")

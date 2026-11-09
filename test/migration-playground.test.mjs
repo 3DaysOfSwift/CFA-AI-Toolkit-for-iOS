@@ -74,21 +74,24 @@ extension LaunchFeature {
     @MainActor static func main() async {
         let provider = ControlledLaunchProvider()
         let feature = LaunchFeature(provider: provider)
+        let initiallyLoaded = await feature.refresh(available: true)
+        precondition(initiallyLoaded && !feature.isRefreshing)
         let first = Task { await feature.refresh(available: false) }
         await provider.waitForFirst()
+        precondition(feature.isRefreshing && feature.name == "Artemis")
         let firstID = feature.testRefreshID
         let second = Task { await feature.refresh(available: true) }
         while feature.testRefreshID == firstID { await Task.yield() }
         let callsBeforeRelease = await provider.calls
-        precondition(callsBeforeRelease == [false])
+        precondition(callsBeforeRelease == [true, false])
         second.cancel()
         await provider.releaseFirst()
         let firstSucceeded = await first.value
         let secondSucceeded = await second.value
         precondition(!firstSucceeded && secondSucceeded)
         let calls = await provider.calls
-        precondition(calls == [false, true])
-        precondition(feature.name == "Artemis" && feature.refreshFailure == nil)
+        precondition(calls == [true, false, true])
+        precondition(feature.name == "Artemis" && !feature.isRefreshing && feature.refreshFailure == nil)
     }
 }
 `;
