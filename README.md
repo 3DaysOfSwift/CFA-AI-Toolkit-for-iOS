@@ -452,17 +452,18 @@ It links findings back to the source code so you can inspect the evidence.
 It cannot prove that an app has no race conditions. An AI reviewer must inspect
 the relevant source, and the app still needs builds, tests and manual checks.
 
-## Apps made with CFA
+## CFA apps and migration examples
 
-These open-source iOS projects show CFA in use:
+Explore CFA in these open-source iOS projects and examine a real app as a
+potential migration example:
 
 - [Cuentiva](https://github.com/3DaysOfSwift/Cuentiva)
 - [Personal API iOS App](https://github.com/3DaysOfSwift/Personal-API-iOS-App-Swift-Concurrency-CFA)
 - [Trend iOS App](https://github.com/3DaysOfSwift/Trend-iOS-App-Swift-Concurrency-CFA)
 - [RocketLaunch iOS App](https://github.com/3DaysOfSwift/RocketLaunch-iOS-App-Swift-Concurrency)
-- [Metro Mate iOS](https://github.com/3DaysOfSwift/metro-mate-ios), an open-source app migrated with CFA and Swift Concurrency.
+- [Metro Mate iOS](https://github.com/3DaysOfSwift/metro-mate-ios), an open-source metronome with audio and timing behaviour to explore during migration.
 
-See [Apps Made with CFA](docs/APPS-MADE-WITH-CFA.md) to learn what each project
+See [CFA apps and migration examples](docs/APPS-MADE-WITH-CFA.md) to learn what each project
 demonstrates.
 
 ## Migration evidence (opt-in)
