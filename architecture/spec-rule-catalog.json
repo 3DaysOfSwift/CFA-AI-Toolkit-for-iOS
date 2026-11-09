@@ -92,7 +92,7 @@
       "rule": "Features represent business capabilities and own authoritative application state; do not generate a Feature simply for each screen.",
       "why": "A Feature can serve multiple screens or targets.",
       "verify": "Map actual capabilities and state owners; check that screens consume the Features they need.",
-      "example": "A Settings screen can use SettingsFeature and UserProfileFeature without creating a Feature just for the screen.",
+      "example": "In the bundled Habit Tracker, HabitsFeature owns saved habits as a capability that multiple screens can use.",
       "explanationIds": [
         "feature-ownership",
         "concrete-features"

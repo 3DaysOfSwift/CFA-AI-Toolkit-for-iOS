@@ -19,7 +19,7 @@ These real projects illustrate different capabilities and migration contexts. Th
 - **[Cuentiva](https://github.com/3DaysOfSwift/Cuentiva)** — Reading and language learning.
 - **[Personal API](https://github.com/3DaysOfSwift/Personal-API-iOS-App-Swift-Concurrency-CFA)** — Personal knowledge and conversations.
 - **[Amigos](https://github.com/3DaysOfSwift/Amigos)** — Spanish conversation practice.
-- **[Verbos](https://github.com/3DaysOfSwift/Verbos)** — Today capability and its state. [View source](https://github.com/3DaysOfSwift/Verbos/blob/27ae6fe4f9f3e6b10355b09d0f05480d21e51e0a/Verbos/2%20-%20AppModel/Features/Today/TodayFeature.swift).
+- **[Verbos](https://github.com/3DaysOfSwift/Verbos)** — Spanish verb practice.
 - **[123 Calc](https://github.com/3DaysOfSwift/123-Calc)** — Calculator.
 - **[Phone Drive](https://github.com/3DaysOfSwift/Phone-Drive)** — File library and local sharing.
 - **[Cuentiva: Word Leap](https://github.com/3DaysOfSwift/Cuentiva-2-Word-Leap)** — Game capability and retained tasks. [View source](https://github.com/3DaysOfSwift/Cuentiva-2-Word-Leap/blob/ae936234171dd617f7a2affb093d3eca4ea3db84/CuentivaWordLeap/2%20-%20AppModel/Features/Word%20Leap/WordLeapFeature.swift).

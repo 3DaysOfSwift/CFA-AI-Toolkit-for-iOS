@@ -48,12 +48,8 @@
     {
       "name": "Verbos",
       "repository": "https://github.com/3DaysOfSwift/Verbos",
-      "revision": "27ae6fe4f9f3e6b10355b09d0f05480d21e51e0a",
-      "sourcePath": "Verbos/2 - AppModel/Features/Today/TodayFeature.swift",
-      "description": "Today capability and its state",
-      "ruleIds": [
-        "CFA-SPEC-FEATURE-01"
-      ]
+      "description": "Spanish verb practice",
+      "ruleIds": []
     },
     {
       "name": "123 Calc",
