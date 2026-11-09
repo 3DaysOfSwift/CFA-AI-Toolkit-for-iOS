@@ -2,7 +2,7 @@
 
 ## Starter apps included in the toolkit
 
-The toolkit repository and full packages include ready-to-open Xcode projects in `starter-apps/`. See the [starter app guide](https://github.com/3DaysOfSwift/CFA-AI-Toolkit-for-iOS/tree/main/starter-apps) for setup, project paths and tests. A separately installed skill may not include the projects; use the full toolkit or repository.
+The toolkit repository and full packages include ready-to-open Xcode projects in `starter-apps/`. See the [starter app guide](https://github.com/3DaysOfSwiftConcurrency/CFA-AI-Toolkit-for-iOS/tree/main/starter-apps) for setup, project paths and tests. A separately installed skill may not include the projects; use the full toolkit or repository.
 
 - **Habit Tracker** — habits, daily progress, streaks, SwiftData and Settings.
 - **Habit Tracker Pro** — habits, charts and a StoreKit unlock.

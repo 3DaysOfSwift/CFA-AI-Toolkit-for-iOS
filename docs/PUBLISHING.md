@@ -55,7 +55,7 @@ need Python 3. Compatible Codex installation requires `codex plugin add` support
    Review its assets and notes before publishing it. The draft workflow must exist
    on the default branch before it can be dispatched.
 
-The configured repository is `3DaysOfSwift/CFA-AI-Toolkit-for-iOS`. Building a
+The configured repository is `3DaysOfSwiftConcurrency/CFA-AI-Toolkit-for-iOS`. Building a
 local package or draft does not publish a new release; a maintainer must review
 and publish it.
 

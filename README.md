@@ -1,5 +1,5 @@
 <p align="left">
-  <a href="https://github.com/3DaysOfSwift/CFA-AI-Toolkit-for-iOS">
+  <a href="https://github.com/3DaysOfSwiftConcurrency/CFA-AI-Toolkit-for-iOS">
     <img src="readme-images/CFA-Toolkit-AppIcon.png" width="320" alt="CFA AI Toolkit for iOS icon">
   </a>
 </p>
@@ -67,11 +67,11 @@ and produces a more professional Xcode project from the first feature onward.
 
 The plugin is listed as **CFA AI Toolkit for iOS** (`ios-app-development-cfa`)
 so its purpose is clear in an installed plugin list. The GitHub repository is
-**[CFA AI Toolkit for iOS](https://github.com/3DaysOfSwift/CFA-AI-Toolkit-for-iOS)**;
+**[CFA AI Toolkit for iOS](https://github.com/3DaysOfSwiftConcurrency/CFA-AI-Toolkit-for-iOS)**;
 Cooperative Feature Architecture remains the name of the architecture.
 
 <p align="left">
-  <a href="https://github.com/3DaysOfSwift/CFA-AI-Toolkit-for-iOS">
+  <a href="https://github.com/3DaysOfSwiftConcurrency/CFA-AI-Toolkit-for-iOS">
     <img src="readme-images/3DaysOfSwiftConcurrency-h512.png" width="320" alt="3DaysOfSwiftConcurrency.com logo">
   </a>
 </p>
@@ -173,7 +173,7 @@ conversation and paste this message:
 
 ```text
 I have installed CFA AI Toolkit for iOS from
-https://github.com/3DaysOfSwift/CFA-AI-Toolkit-for-iOS.
+https://github.com/3DaysOfSwiftConcurrency/CFA-AI-Toolkit-for-iOS.
 Do you have access to create and maintain iOS projects with CFA?
 ```
 
@@ -558,7 +558,7 @@ understand the structure the AI skills create and maintain. These articles from
 ## Copyright and permission
 
 <p align="left">
-  <a href="https://github.com/3DaysOfSwift/CFA-AI-Toolkit-for-iOS">
+  <a href="https://github.com/3DaysOfSwiftConcurrency/CFA-AI-Toolkit-for-iOS">
     <img src="readme-images/3DaysOfSwiftConcurrency-h512.png" width="320" alt="3DaysOfSwiftConcurrency.com logo">
   </a>
 </p>

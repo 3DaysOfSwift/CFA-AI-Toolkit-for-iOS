@@ -140,7 +140,7 @@ Open a **new conversation** after installation and ask the agent:
 
 ```text
 I have just installed CFA AI Toolkit for iOS from
-https://github.com/3DaysOfSwift/CFA-AI-Toolkit-for-iOS.
+https://github.com/3DaysOfSwiftConcurrency/CFA-AI-Toolkit-for-iOS.
 Did it work? Do you have access to create and maintain iOS projects with CFA?
 ```
 

@@ -45,7 +45,7 @@ on 2026-10-27. That permission is not individual technical or historical approva
 
 ## Runnable examples
 
-The migration playgrounds use Swift 5 language mode for their legacy examples and Swift 6 for the migrated examples; they target macOS. Their [guide](https://github.com/3DaysOfSwift/CFA-AI-Toolkit-for-iOS/tree/main/examples/migration) describes the settings and test command. Verify the actual project’s toolchain and deployment target separately.
+The migration playgrounds use Swift 5 language mode for their legacy examples and Swift 6 for the migrated examples; they target macOS. Their [guide](https://github.com/3DaysOfSwiftConcurrency/CFA-AI-Toolkit-for-iOS/tree/main/examples/migration) describes the settings and test command. Verify the actual project’s toolchain and deployment target separately.
 
 ## Publication
 
