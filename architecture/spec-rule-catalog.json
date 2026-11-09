@@ -220,9 +220,9 @@
       "section": "Keep Persistence Behind Repository Contracts",
       "applies": "Caching replaceable server data",
       "strength": "Required when using this cache pattern",
-      "rule": "Start restoration and refresh independently where both are needed. A missing, incompatible or unreadable cache must not block the download. Publish a current response without waiting for the optional cache write. Reject older restores after fresh data arrives, and keep valid in-memory data if refresh fails.",
+      "rule": "Start restoration and refresh independently where both are needed. A missing, incompatible or unreadable cache must not block the download. Publish a current response without waiting for the optional cache write. Reject older restores after fresh data arrives, and keep valid in-memory data if refresh fails. Bound cache write retries, preserve an existing good cache on write failure, and prevent older writes from replacing newer snapshots.",
       "why": "Previously downloaded data can appear quickly without sacrificing fresher server data.",
-      "verify": "Verify refresh starts with a missing, incompatible or slow cache. Verify that cache write failure leaves fresh results usable, late restoration cannot replace them, and refresh failure retains valid in-memory data.",
+      "verify": "Verify refresh starts with a missing, incompatible or slow cache. Verify that cache write failure leaves fresh results usable, late restoration cannot replace them, and refresh failure retains valid in-memory data. Verify that failed replacements retain the previous cache and delayed writes cannot replace a newer snapshot.",
       "example": "In the bundled CFA App template, GitReposFeature publishes a fresh response before its optional cache write completes and rejects an older cache restore.",
       "explanationIds": [
         "persistence-boundaries"
