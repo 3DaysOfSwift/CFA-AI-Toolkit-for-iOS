@@ -421,6 +421,19 @@ test('flags a linked test rerun with a different command for review', t => {
   assert.ok(!inspectRecord(f.file).warnings.includes(warning));
 });
 
+test('a review must cover evidence recorded after its original date', t => {
+  const f = reviewedFixture(t);
+  const evidence = f.record.evidence.find(item => item.id === 'after-test');
+  evidence.recordedAt = '2026-10-26';
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.includes(
+    'evidence.after-test.recordedAt: evidence added after review requires renewed review.'
+  ));
+  f.record.review.reviewedAt = evidence.recordedAt;
+  f.seal();
+  assert.equal(inspectRecord(f.file).valid, true);
+});
+
 test('review fingerprint catches edited record, case study and local evidence', t => {
   const f = reviewedFixture(t);
   assert.equal(inspectRecord(f.file).valid, true);

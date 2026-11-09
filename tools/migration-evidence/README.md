@@ -129,6 +129,8 @@ Workflow: draft → reviewed → approved, or superseded. Review is a human proc
 not a CLI action. Set the reviewer metadata and desired status after actual
 review, run digest, and copy the printed fingerprint into review.digest. A change
 to any record field or referenced local content invalidates that fingerprint.
+Evidence recorded after the review date requires a renewed review before
+a new fingerprint can be accepted.
 The digest command is read-only and does not approve anything. Record.json key
 ordering and whitespace do not affect the fingerprint. Local evidence bytes do.
 Failed migrations can be approved as lessons when their failures and limits are

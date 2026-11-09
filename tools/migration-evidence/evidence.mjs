@@ -182,6 +182,11 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
       }
     }
     if (record.review.reviewedAt && record.review.reviewedAt < record.createdAt) errors.push('reviewedAt: cannot precede creation');
+    for (const item of record.evidence) {
+      if (record.review.reviewedAt && item.recordedAt > record.review.reviewedAt) {
+        errors.push(`evidence.${item.id}.recordedAt: evidence added after review requires renewed review.`);
+      }
+    }
     if (record.result !== 'completed' || record.evidence.some(item => ['failed', 'not-run'].includes(item.outcome))) {
       if (!record.limitations.length) errors.push('limitations: explain incomplete work, failed or unexecuted checks');
     }
