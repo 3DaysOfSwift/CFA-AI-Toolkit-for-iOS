@@ -215,9 +215,15 @@ export async function inspect(project) {
   const appMembers = appModelDeclaration
     ? appModel.slice(0, appModelBodyStart).replace(/[^\n]/g, ' ') + memberSignatures(braceBody(appModel, appModelBodyStart - 1))
     : '';
+  const findings = [];
+  const propertyCandidates = new Map();
+  function recordProperty(name, property) {
+    if (!propertyCandidates.has(name)) propertyCandidates.set(name, []);
+    propertyCandidates.get(name).push(property);
+  }
   const appProperties = new Map();
   for (const match of appMembers.matchAll(/\b(?:let|var)\s+(\w+)\s*:\s*(?:any\s+)?(?:\w+\s*\.\s*)*(\w+)/g)) {
-    appProperties.set(match[1], {
+    recordProperty(match[1], {
       file: appModelFile,
       type: match[2],
       line: lineOf(appModel, match.index),
@@ -226,7 +232,6 @@ export async function inspect(project) {
   }
 
   if (appModelDeclaration) {
-    const extensionProperties = new Map();
     for (const [file, source] of sources) {
       for (const extension of source.matchAll(/\bextension\s+AppModel\b(?!\s*\.)[^{}]*\{/g)) {
         const offset = extension.index + extension[0].length;
@@ -235,12 +240,18 @@ export async function inspect(project) {
           if (!hasComputedAccessor(body.slice(match.index + match[0].length))) continue;
           const [, name, type] = match;
           const property = {file, type, line: lineOf(source, offset + match.index), computed: true};
-          extensionProperties.set(name, extensionProperties.has(name) ? null : property);
+          recordProperty(name, property);
         }
       }
     }
-    for (const [name, property] of extensionProperties) {
-      if (property && !appProperties.has(name)) appProperties.set(name, property);
+  }
+  for (const [name, candidates] of propertyCandidates) {
+    const [first] = candidates;
+    if (candidates.length === 1) {
+      appProperties.set(name, first);
+    } else {
+      const locations = candidates.map(({file, line}) => `${file}:${line}`).join(', ');
+      findings.push(finding('app-model-property-ambiguous', 'review', `AppModel.${name} has multiple candidate declarations: ${locations}. Verify the active target and compilation conditions before resolving this property.`, first.file, first.line));
     }
   }
 
@@ -252,7 +263,6 @@ export async function inspect(project) {
     }
   }
 
-  const findings = [];
   if (!appModelCandidates.length) findings.push(finding('app-model-missing', 'warning', 'No AppModel class was found in the scanned source.', null, null));
   if (appModelFile && !conventionalAppModelPath.test(appModelFile)) {
     findings.push(finding('app-model-placement', 'review', 'AppModel is outside the conventional 2 - AppModel/AppModel.swift path. Verify the intended target and source layout.', appModelFile, lineOf(appModel, appModelDeclaration.index)));

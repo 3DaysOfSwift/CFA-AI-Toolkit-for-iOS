@@ -1184,3 +1184,19 @@ test('reports unresolved Feature source without requiring a screen reference', a
   const {findings} = await inspect(root);
   assert.deepEqual(findings.filter(item => item.code === 'feature-source-missing').map(item => [item.file, item.line]), [[file, 2]]);
 });
+
+test('does not resolve competing AppModel exposures to one Feature', async t => {
+  const file = 'Application/2 - AppModel/AppModel.swift';
+  const extensionFile = 'Application/2 - AppModel/AppModel+Chat.swift';
+  const root = await fixture(t, {
+    [file]: 'final class AppModel {\n#if INTERNAL\n let chatFeature: ChatFeature\n#endif\n}',
+    [extensionFile]: '#if !INTERNAL\nextension AppModel { var chatFeature: ChatFeature { ChatFeature() } }\n#endif',
+    'Application/1 - View/Views/Chat/ChatView.swift': 'struct ChatView: View { @State private var viewModel = ChatViewModel() }',
+    'Application/1 - View/Views/Chat/ChatViewModel.swift': 'final class ChatViewModel { let chatFeature = AppModel.shared.chatFeature }'
+  });
+  const report = await inspect(root);
+  const ambiguity = report.findings.find(item => item.code === 'app-model-property-ambiguous');
+  assert.ok(ambiguity.message.includes(file + ':3'));
+  assert.ok(ambiguity.message.includes(extensionFile + ':2'));
+  assert.equal(report.screens[0].dependencies[0].featureType, null);
+});
