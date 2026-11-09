@@ -40,7 +40,7 @@ export function maskSwift(source) {
 
 const rules = [
   ['launch-callback', 'Possible application lifecycle callback', /\bfunc\s+application\s*\([^{}]*?\bdidFinishLaunchingWithOptions\b/g],
-  ['button-action', 'Possible button entry point', /\bButton\s*(?:\([^{}\n]*\))?\s*\{/g],
+  ['button-action', 'Possible button entry point', /\b(SwiftUI\s*\.\s*)?Button\s*(?:\([^{}\n]*\))?\s*\{/g],
   ['await', 'Possible suspension point', /\bawait\b/g],
   ['main-actor', 'Explicit MainActor annotation', /@MainActor\b/g],
   ['task', 'Unstructured task', /\bTask\s*(?:<[^;{}]+?>)?\s*(?:\.\s*init\s*)?(?:\([^;{}]*?\)\s*|\([^;{}]*?\boperation\s*:\s*)?\{/g],
@@ -74,7 +74,9 @@ export function scanSource(source, file) {
       if (kind==='task' && /(?:(?:->|:)\s*(?:sending\s+)?|\b(?:struct|class|enum|actor|protocol|extension)\s+)(?:Swift\s*\.\s*)?$/.test(masked.slice(0,match.index))) continue;
       // SwiftSyntax locates these modifiers at their member name, after the dot.
       const offset = kind === 'view-task' || kind === 'refresh' ? match[0].search(/\w/) : 0;
-      sites.push({ id: `${file}:${match.index}:${kind}`, kind, label, ...evidence(match.index + offset) });
+      // Keep existing button IDs anchored at Button, even when the source location includes SwiftUI.
+      const idIndex = match.index + (kind === 'button-action' ? (match[1]?.length ?? 0) : 0);
+      sites.push({ id: `${file}:${idIndex}:${kind}`, kind, label, ...evidence(match.index + offset) });
     }
   }
   const declarations = [];

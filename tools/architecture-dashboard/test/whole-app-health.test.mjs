@@ -267,6 +267,18 @@ test('matches same-line parser entry points to the right lexical column', () => 
   assert.equal(candidates[0].id, 'lexical-second');
 });
 
+test('reconciles qualified SwiftUI buttons without changing their lexical IDs', () => {
+  const file = 'View.swift';
+  const source = 'SwiftUI.Button("One") {}; Button("Two") {}';
+  const lexical = scanSource(source, file);
+  const items = [1, source.lastIndexOf('Button') + 1].map(column => ({
+    kind:'entry.button', file, line:1, column
+  }));
+  const candidates = inventoryCandidates({files:[lexical], syntax:{items}});
+  assert.deepEqual(candidates.map(site => site.column), items.map(site => site.column));
+  assert.equal(candidates[0].id, `${file}:${source.indexOf('Button')}:button-action`);
+});
+
 test('deduplicates multiple SwiftUI modifiers on one line by member location', () => {
   const file = 'View.swift';
   const source = 'content.task {}.task {}.refreshable {}.refreshable {}';
