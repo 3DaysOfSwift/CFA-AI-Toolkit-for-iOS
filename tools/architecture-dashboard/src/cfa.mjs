@@ -83,12 +83,13 @@ skill from that toolkit before changing the project.
   and user actions on local or push notifications.
   Scheduling or delivery alone does not create a pending item. The receiving
   scene owns navigation and protects unsaved edits and active payments. Any
-  scene can retry a pending request. Coordinate attempts to avoid opening it
-  twice, and persist removal after actual navigation or explicit dismissal.
-  Leave requests pending when navigation is declined, cancelled before it opens,
-  or fails. If removal fails after navigation, report the storage error and
-  retry removal without navigating again. The request can reappear after restart
-  until removal is saved. The destination owns its content loading. Add a
+  scene can open a shared pending request without changing another scene’s
+  navigation. Coordinate attempts so only one scene opens the request. Persist
+  removal after actual navigation or explicit dismissal. Leave requests pending
+  when navigation is declined, cancelled before it opens, or fails. Cancellation
+  after navigation still counts as an open. If removal fails after navigation,
+  report the storage error and retry removal without navigating again. The
+  request can reappear after restart until removal is saved. The destination owns its content loading. Add a
   separate notification history or global navigation router only when the
   product requires one. Preserve existing deep-link, notification and history
   behaviour during migration.
