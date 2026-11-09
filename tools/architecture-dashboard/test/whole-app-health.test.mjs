@@ -39,6 +39,22 @@ test('coverage requires source files and detected entry points, without individu
   }
 });
 
+test('shows target-membership evidence to reconcile when resuming a review', () => {
+  const inventory = structuredClone(report);
+  Object.assign(inventory.scope, {
+    buildDefinitionPaths: ['App.xcodeproj/project.pbxproj'],
+    excludedTestDirectories: ['AppTests'],
+    symbolicLinkPaths: ['SharedSource']
+  });
+  const pending = {...complete(), targetInventoryVerified: false};
+  assert.deepEqual(nextWork(inventory, pending).targetReview, {
+    buildDefinitionPaths: ['App.xcodeproj/project.pbxproj'],
+    excludedTestDirectories: ['AppTests'],
+    symbolicLinkPaths: ['SharedSource']
+  });
+  assert.equal(nextWork(inventory, complete()).targetReview, undefined);
+});
+
 test('identifies skipped files and reasons in the next review checkpoint', () => {
   const inventory = structuredClone(report);
   inventory.scope.skipped.push({file:'Generated/Large.swift', reason:'Over 2 MB source limit'});

@@ -92,6 +92,13 @@ export function nextWork(report, review, limit = 8) {
     nextEntryPoints: pendingEntries.slice(0, limit),
     nextTaskSites: pendingTasks.slice(0, limit),
     nextOperations: pendingOperations.slice(0, limit),
+    ...(review.targetInventoryVerified === true ? {} : {
+      targetReview: {
+        buildDefinitionPaths: report.scope.buildDefinitionPaths ?? [],
+        excludedTestDirectories: report.scope.excludedTestDirectories ?? [],
+        symbolicLinkPaths: report.scope.symbolicLinkPaths ?? []
+      }
+    }),
     gaps: coverageGaps(report, review)
   };
 }
