@@ -601,6 +601,22 @@ test('reviews requests through an injected URLSession outside NetworkingManager'
     .map(({file, line, severity}) => [file, line, severity]), [['Provider.swift', 2, 'review']]);
 });
 
+test('points to the URLSession request when the same file also configures a session', async t => {
+  const root = await fixture(t, {
+    'Provider.swift': `struct Provider {
+      let session: URLSession = URLSession(configuration: .ephemeral)
+      func load() async throws { _ = try await session.data(from: url) }
+    }`,
+    'SharedProvider.swift': `struct SharedProvider {
+      let configured = URLSession(configuration: .ephemeral)
+      func load() async throws { _ = try await URLSession.shared.data(from: url) }
+    }`
+  });
+  const {findings} = await inspect(root);
+  assert.deepEqual(findings.filter(item => item.code === 'direct-url-session')
+    .map(({file, line}) => [file, line]), [['Provider.swift', 3], ['SharedProvider.swift', 3]]);
+});
+
 test('flags SwiftData without a manager and direct URLSession calls', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
