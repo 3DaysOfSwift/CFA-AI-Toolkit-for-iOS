@@ -46,8 +46,11 @@ Use deliberate passes:
    operation and callback; record protected state, ordering, lifetime, error
    delivery, cancellation and callback-execution requirements. Create a product
    behaviour contract from tests, source and manual journeys.
-   For a project-wide baseline, run the bundled shared analysis:
-   `node scripts/project-analysis/project-analysis.mjs <project-root> --out <new-analysis.json>`.
+   For a project-wide baseline, run the bundled shared analysis. From this
+   skill's directory, use
+   `node scripts/project-analysis/project-analysis.mjs <project-root> --out <new-analysis.json>`;
+   from another directory, use the full path to this skill's script. Supply the
+   Xcode project root and output path explicitly.
    When an existing compiler index and its module are available, add
    `--index-store <path> --module <module>`. Treat syntax calls as candidates and
    indexed calls as build-specific evidence with unverified freshness; inspect
