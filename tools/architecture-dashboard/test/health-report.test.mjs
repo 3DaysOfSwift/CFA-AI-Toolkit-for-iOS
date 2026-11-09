@@ -98,3 +98,13 @@ test('withholds a stable workflow result until its trace and timing outcomes exi
   operation.scenarios = ['repeat','leave','late-result','failure'].map(id => ({id,status:'not-applicable'}));
   assert.match(renderHealthReport(data), /aria-label="Stable">✓<\/span>Save/);
 });
+
+test('a confirmed problem keeps the verdict red even with a high score', () => {
+  const criteria = ['Ownership', 'Isolation', 'Cancellation', 'Persistence'].map(title => ({
+    title, detail:'Checked', status:'pass'
+  }));
+  criteria.push({title:'Refresh ordering', detail:'A stale response can overwrite newer data.', status:'problem'});
+  const report = {app:'App', summary:'Summary', verdict:'Refresh ordering needs attention.', scope:'App', conclusion:'Conclusion', criteria};
+  assert.match(renderHealthReport(report), /class="number">80%<.*class="stamp negative">Needs attention</s);
+  assert.match(renderHealthReport({...report, qualitativeOnly:true}), /class="number">×</);
+});

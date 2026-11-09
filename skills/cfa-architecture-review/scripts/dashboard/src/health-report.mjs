@@ -45,8 +45,10 @@ export function renderHealthReport(data, iconData = '') {
     const title = {pass:'What is working well',concern:'Worth a closer look',problem:'Problems to address'}[status];
     return `<section><h2>${title}</h2>${rows.map(c => `<article class="finding"><span class="indicator ${status}" aria-label="${status}">${{pass:'✓',concern:'!',problem:'×'}[status]}</span><div><h3>${escape(c.title)}</h3><p>${escape(c.detail)}</p>${c.evidence ? `<p class="evidence">Evidence: ${escape(evidenceText(c.evidence))}</p>` : ''}</div></article>`).join('')}</section>`;
   }).join('');
-  const stamp = score === 100 ? 'Strong concurrency design' : score >= 75 ? 'Good foundation' : 'Needs attention';
-  const stampClass = score >= 75 ? 'positive' : 'negative';
+  const hasConfirmedProblem = data.criteria.some(criterion => criterion.status === 'problem');
+  const needsAttention = hasConfirmedProblem || score < 75;
+  const stamp = needsAttention ? 'Needs attention' : score === 100 ? 'Strong concurrency design' : 'Good foundation';
+  const stampClass = needsAttention ? 'negative' : 'positive';
   const resultMark = stampClass === 'positive' ? '✓' : '×';
   // The conclusion uses a consistent tick; individual findings keep their own status.
   const conclusionStatus = 'pass';

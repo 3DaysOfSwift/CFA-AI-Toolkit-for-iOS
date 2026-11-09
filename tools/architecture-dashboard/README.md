@@ -137,7 +137,8 @@ importer checks ranges against the scanned source. Convert free-text citations
 in older reviews to file and line ranges before rendering. Include confirmed
 operation, file and type problems among the report criteria. The renderer weights criteria
 equally (1, ½ or 0 respectively) to choose the assessment label. The score
-reaches 100% only when every reviewed criterion passes. Set `qualitativeOnly`
+reaches 100% only when every reviewed criterion passes. A confirmed problem
+keeps the Result marked as needing attention even if the score is high. Set `qualitativeOnly`
 to show the Result without a percentage. Coverage comes from the whole-app
 review workflow. Runtime claims need their own evidence, regardless of the score.
 
