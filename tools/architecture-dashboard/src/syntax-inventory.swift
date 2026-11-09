@@ -63,6 +63,16 @@ final class SourceInventory: SyntaxVisitor {
            }) {
             record("entry.notificationResponse", node.name.text, node)
         }
+        let labels = node.signature.parameterClause.parameters.map { $0.firstName.text }
+        switch (node.name.text, labels) {
+        case ("application", ["_", "open", "options"]),
+             ("application", ["_", "continue", "restorationHandler"]),
+             ("scene", ["_", "openURLContexts"]),
+             ("scene", ["_", "continue"]):
+            record("entry.incomingLink", node.name.text, node)
+        default:
+            break
+        }
         functions.append(node.name.text)
         return .visitChildren
     }
