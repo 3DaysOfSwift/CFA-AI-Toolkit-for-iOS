@@ -45,6 +45,9 @@ the architecture:
    When a new app supports deep links or notification actions, its
    DeepLinkingFeature validates received opening requests. Persist only the safe
    data needed to identify and present each request before confirming it is kept.
+   If the saved list is unreadable, report the failure and preserve the file.
+   Resume accepting durable requests once the list can be read or the
+   product’s explicit recovery flow has resolved the failure.
    Handle expired or unavailable destinations clearly. Scheduling and delivery alone do
    not add an item. Settings shows the shared pending list, which either scene
    can act on using its own navigation state. Protect unsaved edits and active
