@@ -73,6 +73,14 @@ export async function inspect(project) {
     appProperties.set(match[1], { type: match[2], line: lineOf(appModel, match.index) });
   }
 
+  const declarationsByName = new Map();
+  for (const file of inventory.files) {
+    for (const declaration of file.declarations) {
+      if (!declarationsByName.has(declaration.name)) declarationsByName.set(declaration.name, []);
+      declarationsByName.get(declaration.name).push({file: file.path, declaration});
+    }
+  }
+
   const findings = [];
   if (!appModelFile) findings.push(finding('app-model-missing', 'warning', 'No AppModel.swift was found under 2 - AppModel.', null, null));
   if (appModelFile) {
@@ -95,8 +103,9 @@ export async function inspect(project) {
     }
   }
   for (const [name, property] of appProperties) {
-    const featureSource = inventory.files.find(file => file.declarations.some(declaration => declaration.name === property.type));
-    const declarationFile = featureSource?.path;
+    const candidates = declarationsByName.get(property.type) || [];
+    const source = candidates.length === 1 ? candidates[0] : null;
+    const declarationFile = source?.file;
     const isFeature = featureTypeSuffix.test(property.type) || /(?:^|\/)Features\/[^/]+\//.test(declarationFile ?? '');
     if (!isFeature) continue;
     if (!featureTypeSuffix.test(property.type)) {
@@ -109,10 +118,10 @@ export async function inspect(project) {
       findings.push(finding('feature-property-name', 'warning', `${name} should use the same domain name as ${property.type}, ending in Feature${featureTypeSuffix.test(property.type) ? ` (${expected})` : ''}.`, appModelFile, property.line));
     }
     if (featureTypeSuffix.test(property.type) && !property.type.endsWith('API')) {
-      const declaration = featureSource?.declarations.find(item => item.name === property.type && item.type === 'class');
+      const declaration = source?.declaration;
       const featureFolder = path.posix.join(path.posix.dirname(appModelFile), 'Features');
       const relative = declarationFile && path.posix.relative(featureFolder, declarationFile);
-      if (declaration && (relative.startsWith('../') || !relative.includes('/'))) {
+      if (declaration?.type === 'class' && (relative.startsWith('../') || !relative.includes('/'))) {
         findings.push(finding('feature-placement', 'review', `${property.type} is outside a named subfolder of ${featureFolder}. Verify the intended package and target placement before moving it.`, declarationFile, declaration.line));
       }
       const testName = `${property.type}Tests.swift`;
@@ -263,14 +272,14 @@ export async function inspect(project) {
         const property = match[1];
         const exposure = appProperties.get(property);
         const featureType = exposure?.type ?? null;
-        const featureFile = featureType
-          ? inventory.files.find(file => file.declarations.some(declaration => declaration.name === featureType))?.path ?? null
-          : null;
+        const candidates = declarationsByName.get(featureType) || [];
+        const featureFile = candidates.length === 1 ? candidates[0].file : null;
         const featureSource = featureFile ? sources.get(featureFile) : '';
         const collaborators = [...featureSource.matchAll(/\b(?:private\s+)?let\s+\w+\s*:\s*(?:any\s+)?(\w+(?:Repository|Provider|Responding|Client|Store|Service))\b/g)]
           .map(item => item[1]);
         dependencies.push({ property, featureType, featureFile, collaborators: [...new Set(collaborators)], line: lineOf(viewModel, match.index) });
         if (!exposure) findings.push(finding('unresolved-feature', 'review', `${viewModelName} references AppModel.shared.${property}, but the inspector could not resolve it in the primary AppModel declaration. Check extensions, inferred types and target membership.`, viewModelFile, lineOf(viewModel, match.index)));
+        else if (candidates.length > 1) findings.push(finding('feature-source-ambiguous', 'review', `${featureType} has multiple declarations. Verify which declaration belongs to the active target before assessing placement or collaborators.`, viewModelFile, lineOf(viewModel, match.index)));
         else if (!featureFile) findings.push(finding('feature-source-missing', 'review', `${featureType} is exposed by AppModel, but the inspector could not locate its declaration. Check aliases, generated code and target membership.`, appModelFile, exposure.line));
         if (exposure && featureTypeSuffix.test(featureType)) {
           for (const local of viewModelMembers.matchAll(/\b(?:let|var)\s+(\w+)\s*:\s*(?:any\s+)?(\w+Feature(?:API)?)\b(?!\s*\.)/g)) {

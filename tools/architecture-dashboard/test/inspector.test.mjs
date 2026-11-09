@@ -32,6 +32,13 @@ test('maps a complete screen to AppModel, feature, collaborator and named tests'
   assert.equal(report.screens[0].dependencies[0].featureType, 'ChatsFeature');
   assert.deepEqual(report.screens[0].dependencies[0].collaborators, ['ChatsRepository']);
   assert.match(renderInspection(report), /ChatViewModel → chatsFeature/);
+  await fs.writeFile(path.join(root, 'ApplicationTests/ChatsFeature.swift'), 'final class ChatsFeature {}');
+  const ambiguous = await inspect(root);
+  assert.equal(ambiguous.screens[0].dependencies[0].featureFile, null);
+  assert.deepEqual(ambiguous.screens[0].dependencies[0].collaborators, []);
+  assert.ok(ambiguous.findings.some(item => item.code === 'feature-source-ambiguous'));
+  assert.ok(!ambiguous.findings.some(item => item.code === 'feature-placement'));
+
 });
 
 test('reviews Feature placement outside the AppModel feature folders', async t => {
