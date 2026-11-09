@@ -142,7 +142,13 @@ required behaviour and is available on the supported platforms. Use a checked
 continuation when a callback bridge is needed. Prove that every execution path resumes the
 continuation exactly once, including success, failure, cancellation, and early
 exit paths. A continuation is a bridge to an existing callback lifetime; it
-must not invent different cancellation or ordering behaviour.
+must not invent different cancellation or ordering behaviour. Where the bridge
+supports cancellation, exercise cancellation before callback registration,
+cancellation while the operation is pending, and a callback arriving after
+cancellation wins. Verify one result reaches the awaiting caller and the
+underlying operation is cancelled when its API and ownership policy permit
+it. A checked continuation alone neither propagates cancellation nor chooses
+which outcome wins the race.
 
 **Completion gate:** Tests at the existing business-logic boundary prove the migrated
 implementation independently of SwiftUI; every legacy primitive is resolved in
