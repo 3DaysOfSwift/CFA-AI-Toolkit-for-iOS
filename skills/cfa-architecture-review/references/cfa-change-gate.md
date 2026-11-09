@@ -120,6 +120,12 @@ the architecture:
     newer data. Report offline availability only for a saved cache.
     Use JSON by default. Offer Instant Loading binary snapshots only on request
     for a sufficiently stable format with safe rejection of incompatible data.
+    Apply the [offline editing and sync rule](spec/rules/cfa-sync-01.md) when
+    the product requires synchronization. For offline edits sent to a custom
+    server, save the edit and its pending-sync metadata together before
+    reporting local success. Report server confirmation separately. Verify
+    pending edits survive failed sync and restart, retries avoid duplicates,
+    and conflicting edits and server rejections follow the product policy.
     When a non-critical preference is missing or obsolete, use its
     product-defined safe fallback. Preserve the old value where appropriate.
     Replace it through an intentional migration or a successful user choice.

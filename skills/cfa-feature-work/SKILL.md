@@ -56,6 +56,14 @@ After a session change, check the active account or session generation before
 publishing results from in-flight requests. Verify cleanup and retained data
 against the product's sign-out contract.
 
+When changing offline editing or cross-device synchronization, apply the
+[offline editing and sync rule](references/spec/rules/cfa-sync-01.md). Define
+what counts as locally saved and what counts as server-confirmed. For offline
+edits sent to a custom server, save the edit and its pending-sync metadata
+together. Verify recovery after failure and restart, duplicate-safe retries,
+and the agreed conflict and rejection outcomes. For Apple-managed sync,
+verify capability, account and schema behaviour on supported devices.
+
 When adding or changing a widget or another device target, apply the
 [multi-device rule](references/spec/rules/cfa-device-01.md). Reuse the owning
 Feature and shared Model source. Include only the target's own presentation
