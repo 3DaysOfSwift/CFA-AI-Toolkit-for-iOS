@@ -17,6 +17,8 @@ actor ControlledNotes: NotesRepository {
             started = true
             firstStarted?.resume(); firstStarted = nil
             await withCheckedContinuation { releaseFirst = $0 }
+            // A cancelled save task would stop a cooperative repository here.
+            try Task.checkCancellation()
             if note.text == "fail after wait" { throw CocoaError(.fileWriteNoPermission) }
         }
         saved.append(note.text)
