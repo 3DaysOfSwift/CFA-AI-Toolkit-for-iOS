@@ -416,7 +416,10 @@ operations enforce authorisation independently.
   requests leave the pending list and its stored snapshot intact. Force the initial save to fail
   and verify that the failure is reported and the request is never presented as
   saved. Admit a request while restoration is suspended and verify that both
-  the restored and new requests survive restart. With an unreadable list,
+  the restored and new requests survive restart. Separately, open a request
+  while an older restoration result is suspended. Verify that the delayed
+  result leaves the opened request removed and other requests available,
+  including after reopening the store. With an unreadable list,
   verify that receiving a new request reports the read error and preserves the
   original file. Restore readable data and verify that retry keeps both the
   recovered and incoming requests. Verify that declining or

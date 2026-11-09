@@ -119,7 +119,10 @@ against the pending list and both scenes’ navigation state. While one scene
 is deciding, open a different pending request in another scene and verify
 that the first request stays pending. Suspend restoration,
 receive a new request, then finish restoring an older pending list. Reopen
-from storage and verify that both the restored and new requests survived.
+from storage and verify that both the restored and new requests survived. In
+a separate case, open a request while an older restoration result is held.
+Release the result and verify that the opened item stays removed and the
+other requests remain available, including after reopening the store.
 
 For apps that exchange snapshots with a widget or another device target, apply
 the [multi-device rule](references/spec/rules/cfa-device-01.md). With controlled
