@@ -73,8 +73,10 @@ Use plain-English actions, with source symbols available as secondary detail.
   task. Creation and awaiting a handle do not establish structured parenthood.
 - Separate handle ownership, task lifetime, actor isolation and physical threads.
   Do not draw a dedicated thread for every actor or claim each resumed segment
-  returns to the same thread. Check language settings and annotations when
-  determining async-function isolation; mark uncertainty instead of guessing.
+  returns to the same thread. Record the selected target and build
+  configuration with the effective Swift language mode, default isolation
+  and relevant SDK annotations when they affect an isolation finding.
+  Mark isolation as unresolved when the available evidence cannot establish it.
 - Cancellation is cooperative. Show who requests it, where it is checked, and
   what happens afterward. A dropped handle or an awaited unstructured task does
   not imply cancellation propagation. Distinguish SwiftUI lifecycle cancellation

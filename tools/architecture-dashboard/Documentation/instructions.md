@@ -26,7 +26,8 @@ inspect the actual implementations and trace important features from their entry
 points through completion. Identify task creation, structured child tasks,
 potential suspension points, actor isolation, handle ownership, cancellation,
 and operation ordering. Distinguish UI coordination from feature work on
-MainActor. Investigate layer bypasses against the project's declared architecture,
+MainActor. Record the target, build configuration and effective Swift
+settings behind isolation findings. Investigate layer bypasses against the project's declared architecture,
 not an assumed universal architecture.
 
 Separate verified source facts, suspected risks, unknowns and runtime observations.
