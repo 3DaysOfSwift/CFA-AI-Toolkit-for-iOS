@@ -113,8 +113,10 @@ the architecture:
     service, container, loading/error presentation state, or defaulted Feature
     property belongs in AppModel. AppModel starts and owns app-wide listeners
     and forwards events to the responsible Feature, which interprets them.
-    Feature-owned background capabilities register their own handlers when
-    needed; route system callbacks to them and honor expiration and completion.
+    Feature-owned background capabilities register their own handlers. For
+    BGTaskScheduler, register each permitted identifier once before launch
+    finishes and schedule requests separately. Route app-level callbacks through
+    AppModel and honour expiration, cancellation and system completion.
     For additional device or extension targets, include the appropriate shared
     Model source and target-specific presentation. Each process has its own
     AppModel and Feature instances; synchronize data through an appropriate

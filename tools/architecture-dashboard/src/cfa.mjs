@@ -55,8 +55,9 @@ skill from that toolkit before changing the project.
 - AppModel stores shared, concrete Features, one private launch guard and any
   private task handles needed to own app-wide listeners.
   AppModel starts those listeners and forwards events to the responsible Feature.
-  Features own their background capabilities and register handlers when needed;
-  honor system callback, expiration and completion requirements.
+  Features own their background capabilities. For BGTaskScheduler, register
+  each permitted identifier once before launch finishes and schedule requests
+  separately. Honour expiration, cancellation and system completion.
   Its explicit initializer assigns injected Features, sets the launch guard to
   false, and sets listener task handles to nil. One static live() factory
   constructs production dependencies for AppModel.shared. Never store a service
