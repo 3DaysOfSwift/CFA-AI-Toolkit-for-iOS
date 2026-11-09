@@ -116,7 +116,7 @@ architecture from a lesson is a separate, deliberate review.
 Case records may describe a completed feature checkpoint, but an agent must not
 call the **migration** complete without a completion gate. The final scenario
 record must pin the resulting commit and link passed evidence at that commit
-for the final Xcode navigator map, full scoped
+for the before/after Xcode navigator map, full scoped
 feature inventory, scoped legacy-primitive inventory, hybrid implementation
 review, final CFA audit, post-change build, test, manual behaviour regression
 and human architecture review.

@@ -45,10 +45,10 @@ Before/after build and test entries include their command, environment, commit,
 date, outcome and evidence reference. A check not run still has a planned command
 and a note explaining why. Commands are text: the helper never executes them.
 A `completed` record requires a pinned `repository.afterCommit` and passed
-evidence at that revision for every completion gate entry. Link the navigator
-map from manual Xcode inspection, Feature and legacy primitive inventories,
-hybrid review, final CFA audit,
-build, tests, manual behaviour regression and human architecture review. Use
+evidence at that revision for every completion gate entry. Link the before/after
+navigator map from manual Xcode inspection, Feature and legacy primitive
+inventories, hybrid review, final CFA audit, build, tests, manual behaviour
+regression and human architecture review. Use
 `hybridReviewEvidenceId` and `finalCfaAuditEvidenceId` for the two review links. Record the regression under
 `completionGate.manualBehaviourRegressionEvidenceId`. If evidence is missing
 or failed, use `partial` and explain the gap. Validation checks the recorded
