@@ -465,10 +465,10 @@
       "section": "Make Concurrency Behaviour Honest and Visible",
       "applies": "Designing task lifetime",
       "strength": "Required",
-      "rule": "Define cancellation at the operation boundary; cancel obsolete presentation work while preserving independent shared and durable work.",
+      "rule": "Define cancellation at the operation boundary. Cancel superseded presentation work and screen-only work that has no value after departure. Preserve independent shared and durable work according to its ownership policy. Check cancellation before expensive work and again before publishing, and keep obsolete results from overwriting current state.",
       "why": "Leaving one screen should not accidentally abandon work needed elsewhere.",
       "example": "A superseded search stops while a shared refresh continues.",
-      "verify": "Test a cancelled waiter, a later caller and stale completion.",
+      "verify": "Cancel a screen waiter while shared work remains active and verify that a later caller can still use the outcome. Complete an obsolete presentation request after its replacement and verify it cannot publish over the current result.",
       "explanationIds": [
         "task-cancellation"
       ]
