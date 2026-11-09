@@ -170,7 +170,7 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
       errors.push('result: completed requires a completionGate; otherwise use partial');
     } else {
       const requiredEvidence = [
-        ['navigatorEvidenceId', ['manual', 'diff']],
+        ['navigatorEvidenceId', ['manual']],
         ['featureInventoryEvidenceId', ['source', 'diff']],
         ['primitiveInventoryEvidenceId', ['source', 'diff']],
         ['hybridReviewEvidenceId', ['source', 'diff', 'manual']],

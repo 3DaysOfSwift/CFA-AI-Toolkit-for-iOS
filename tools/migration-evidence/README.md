@@ -46,7 +46,8 @@ date, outcome and evidence reference. A check not run still has a planned comman
 and a note explaining why. Commands are text: the helper never executes them.
 A `completed` record requires a pinned `repository.afterCommit` and passed
 evidence at that revision for every completion gate entry. Link the navigator
-map, Feature and legacy primitive inventories, hybrid review, final CFA audit,
+map from manual Xcode inspection, Feature and legacy primitive inventories,
+hybrid review, final CFA audit,
 build, tests, manual behaviour regression and human architecture review. Use
 `hybridReviewEvidenceId` and `finalCfaAuditEvidenceId` for the two review links. Record the regression under
 `completionGate.manualBehaviourRegressionEvidenceId`. If evidence is missing

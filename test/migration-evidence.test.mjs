@@ -169,6 +169,12 @@ test('completion is not inferred from a build pass or tests at a different commi
     manualBehaviourRegressionEvidenceId: 'after-behaviour-regression',
     manualArchitectureReviewEvidenceId: 'after-architecture-review'
   };
+  const navigator = f.record.evidence.find(item => item.id === 'after-navigator');
+  navigator.kind = 'diff';
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.startsWith('completionGate.navigatorEvidenceId')));
+  navigator.kind = 'manual';
+
   f.record.evidence.find(item => item.id === 'after-behaviour-regression').outcome = 'not-run';
   f.write();
   assert.ok(inspectRecord(f.file).errors.some(error => error.startsWith('completionGate.manualBehaviourRegressionEvidenceId')));
