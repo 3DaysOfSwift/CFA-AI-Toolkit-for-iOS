@@ -5,7 +5,8 @@ ViewModel, Feature and JSON persistence service. The screen ViewModel owns the
 unsaved text. The Feature queues admitted saves in order, persists each note
 before publication, and continues owned work when a caller stops waiting. A
 failed save leaves the editor open with its text available for retry. Cancel
-closes the editor without saving; the buttons are disabled during a save.
+closes the editor without saving. During a save, the editor disables text
+entry, Save, Cancel and interactive sheet dismissal.
 
 The code below is also available as [NotesReference.swift](spec/examples/NotesReference.swift).
 The accompanying [executable checks](spec/examples/NotesReferenceTests.swift)
@@ -207,6 +208,7 @@ struct NotesEditorView: View {
             Button("Cancel", role: .cancel) { dismiss() }
                 .disabled(viewModel.isSaving)
         }
+        .interactiveDismissDisabled(viewModel.isSaving)
         .task { await viewModel.load().value }
     }
 }

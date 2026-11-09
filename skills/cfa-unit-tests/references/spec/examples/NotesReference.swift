@@ -180,6 +180,7 @@ struct NotesEditorView: View {
             Button("Cancel", role: .cancel) { dismiss() }
                 .disabled(viewModel.isSaving)
         }
+        .interactiveDismissDisabled(viewModel.isSaving)
         .task { await viewModel.load().value }
     }
 }
