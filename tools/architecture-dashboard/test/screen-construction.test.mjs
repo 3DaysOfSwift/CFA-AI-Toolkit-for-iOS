@@ -58,6 +58,7 @@ test('selected detail data and owned State are reviewed rather than rejected', a
     var body: some View { Text("Home") }
   }`);
   assert.equal(report.screens[0].ownsViewModel, true);
+  assert.equal(report.findings.find(item => item.code === 'view-model-property-name')?.line, 2);
   assert.ok(findings.length > 0);
   assert.ok(findings.every(item => item.severity === 'review'));
 });
@@ -91,6 +92,8 @@ for (const declaration of [
     }`);
     assert.equal(report.screens[0].ownsViewModel, true);
     assert.deepEqual(findings, []);
+    const naming = report.findings.find(item => item.code === 'view-model-property-name');
+    assert.equal(naming?.line, declaration.includes('reminders') ? 2 : undefined);
   });
 }
 

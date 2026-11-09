@@ -208,12 +208,13 @@ export async function inspect(project) {
       : '';
     const testName = `${viewModelName}Tests.swift`;
     const testFile = [...paths].find(file => file.endsWith(`/${testName}`)) ?? null;
-    const statePattern = new RegExp(`@State\\s+private\\s+var\\s+[A-Za-z_]\\w*(?:\\s*:\\s*${viewModelName})?\\s*=\\s*${viewModelName}\\s*\\(\\s*\\)`);
-    const typedStatePattern = new RegExp(`@State\\s+private\\s+var\\s+[A-Za-z_]\\w*\\s*:\\s*${viewModelName}\\s*=\\s*\\.init\\s*\\(\\s*\\)`);
-    let ownsViewModel = statePattern.test(members) || typedStatePattern.test(members);
+    const statePattern = new RegExp(`@State\\s+private\\s+var\\s+([A-Za-z_]\\w*)(?:\\s*:\\s*${viewModelName})?\\s*=\\s*${viewModelName}\\s*\\(\\s*\\)`);
+    const typedStatePattern = new RegExp(`@State\\s+private\\s+var\\s+([A-Za-z_]\\w*)\\s*:\\s*${viewModelName}\\s*=\\s*\\.init\\s*\\(\\s*\\)`);
+    const inlineState = statePattern.exec(members) ?? typedStatePattern.exec(members);
+    let ownedState = inlineState && { name: inlineState[1], index: inlineState.index };
     const typedStateProperties = [...members.matchAll(new RegExp(
       `@State\\s+private\\s+var\\s+([A-Za-z_]\\w*)\\s*:\\s*${viewModelName}\\b`, 'g'
-    ))].map(match => match[1]);
+    ))].map(match => ({ name: match[1], index: match.index }));
     const dependencies = [];
     if (viewModel) {
       for (const initializer of members.matchAll(/(?<![.\w])init[?!]?\s*\(/g)) {
@@ -229,11 +230,11 @@ export async function inspect(project) {
         const openingBody = /^\s*(?:(?:async|throws|rethrows)\s*)*\{/.exec(tail);
         if (openingBody) {
           const initializerBody = braceBody(tail, openingBody[0].length - 1);
-          const ownConstruction = typedStateProperties.some(property => new RegExp(
+          const ownConstruction = typedStateProperties.find(({name: property}) => new RegExp(
             `\\b_${property}\\s*=\\s*State\\s*\\(\\s*(?:initialValue|wrappedValue)\\s*:\\s*${viewModelName}\\s*\\(`
           ).test(initializerBody));
-          if (parameters.trim() && !/:\s*(?:any\s+)?\w*ViewModel\b/.test(parameters) && ownConstruction) ownsViewModel = true;
-          const assignsViewModel = ['viewModel', ...typedStateProperties].some(property =>
+          if (parameters.trim() && !/:\s*(?:any\s+)?\w*ViewModel\b/.test(parameters) && ownConstruction) ownedState ??= ownConstruction;
+          const assignsViewModel = ['viewModel', ...typedStateProperties.map(property => property.name)].some(property =>
             new RegExp(`\\b_?${property}\\s*=`).test(initializerBody)
           );
           if (assignsViewModel) {
@@ -273,6 +274,10 @@ export async function inspect(project) {
           }
         }
       }
+    }
+    const ownsViewModel = Boolean(ownedState);
+    if (ownedState && ownedState.name !== 'viewModel') {
+      findings.push(finding('view-model-property-name', 'warning', `${name} owns its ViewModel as ${ownedState.name}; CFA names the property viewModel.`, viewFile, lineOf(view, bodyOffset + ownedState.index)));
     }
     const structuralRoot = name === 'ContentView' && /\bTabView\s*\{/.test(body) && !/\b(?:AppModel|\w+Feature)\b/.test(members);
     if (!viewModel && !structuralRoot) findings.push(finding('view-model-missing', 'review', `${name} has no adjacent ${viewModelName}. Verify whether it is a screen requiring a dedicated ViewModel or a reusable presentation component.`, viewFile, 1));
