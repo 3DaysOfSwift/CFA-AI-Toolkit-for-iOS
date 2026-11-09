@@ -610,6 +610,7 @@ test('reviews a View storing an inferred AppModel alias without confusing locals
     [file]: `struct ModelAliasView: View {
       private let feature = AppModel.shared.notesFeature
       private let graph = AppModel.shared
+      private let otherGraph = App.AppModel.shared
       var body: some View { Text(graph.notesFeature.title) }
     }
     struct LocalAliasView: View {
@@ -620,7 +621,7 @@ test('reviews a View storing an inferred AppModel alias without confusing locals
     }`
   });
   assert.deepEqual(report.findings.filter(item => item.code === 'stored-app-model').map(item => [item.file, item.line]),
-    [[file, 3]]);
+    [[file, 3], [file, 4]]);
 });
 
 test('reviews typed and inferred AppModel storage in a screen ViewModel', async t => {

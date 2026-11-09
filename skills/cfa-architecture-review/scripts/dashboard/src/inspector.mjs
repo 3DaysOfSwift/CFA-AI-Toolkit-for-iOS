@@ -48,7 +48,7 @@ function braceBody(source, openingBrace) {
 }
 
 const identifier = '[\\p{L}_][\\p{L}\\p{M}\\p{N}_]*';
-const inferredAppModelStorage = /\b(?:let|var)\s+\w+\s*=\s*(?:\w+\s*\.\s*)*AppModel\s*\.\s*shared\b(?!\s*[.?![(])/;
+const inferredAppModelStorage = /\b(?:let|var)\s+\w+\s*=\s*(?:\w+\s*\.\s*)*AppModel\s*\.\s*shared\b(?!\s*[.?![(])/g;
 const propertyNamePattern = '(?:`(' + identifier + ')`|(' + identifier + '))';
 
 // Keep only direct member signatures. Mask method/nested-type bodies without
@@ -623,8 +623,7 @@ export async function inspect(project) {
         if (hasComputedAccessor(suffix) || /^\s*=/.test(suffix)) continue;
         findings.push(finding('view-model-input-storage', 'review', `${view[1]} declares ${type} storage without an inline value. Trace its initialization to check whether another View supplies the ViewModel.`, file, lineOf(source, start + match.index)));
       }
-      const storedModel = inferredAppModelStorage.exec(members);
-      if (storedModel) {
+      for (const storedModel of members.matchAll(inferredAppModelStorage)) {
         findings.push(finding('stored-app-model', 'review', 'This View appears to retain AppModel.shared in a stored property. Resolve the required Features through its ViewModel.', file, lineOf(source, start + storedModel.index)));
       }
 
@@ -761,8 +760,7 @@ export async function inspect(project) {
       if (!serviceTypeSuffix.test(member.type)) continue;
       findings.push(finding('view-model-non-feature-dependency', 'review', `${viewModelName} appears to store ${member.type} directly. Verify that the ViewModel calls a Feature and that the Feature owns the service dependency.`, viewModelFile, lineOf(viewModel, member.index)));
     }
-    const inferredModel = inferredAppModelStorage.exec(viewModelMembers);
-    if (inferredModel) retainedAppModels.push(inferredModel);
+    retainedAppModels.push(...viewModelMembers.matchAll(inferredAppModelStorage));
     for (const match of retainedAppModels) {
       const line = lineOf(viewModel, match.index);
       const existing = findings.findIndex(item => item.code === 'stored-app-model' && item.file === viewModelFile && item.line === line);
