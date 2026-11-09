@@ -41,7 +41,8 @@ described in [OBSERVATIONS.md](OBSERVATIONS.md).
 }
 ```
 
-`findings` and `testQuality` are optional. `scenarios` must have unique titles
+`findings` and `testQuality` are optional. Use `status: "problem"` for a confirmed
+finding in a whole-app Health Check and include it in the report criteria. `scenarios` must have unique titles
 and status `identified` or `not-identified`. Read assertions before assigning
 identified, and cite them. Not-identified requires a test search and a documented
 scope; cite the feature behaviour needing protection. `concerns` defaults to an

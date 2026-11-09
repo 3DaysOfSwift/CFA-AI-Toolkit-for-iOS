@@ -145,7 +145,16 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
       evidence:[{file:'Value.swift',line:1,endLine:1}]
     }];
     await fs.writeFile(reviewPath,JSON.stringify(sourceProblem));
-    await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/Include confirmed file or type problems/);
+    await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/Include confirmed source problems/);
+    await assert.rejects(fs.access(output));
+    await fs.writeFile(reviewPath,JSON.stringify(review));
+    const generalProblem = structuredClone(review);
+    generalProblem.findings = [{
+      title:'Confirmed issue',status:'problem',description:'A late result can replace current state.',
+      check:'Repeat the action with reversed completion order.',evidence:[{file:'Value.swift',line:1,endLine:1}]
+    }];
+    await fs.writeFile(reviewPath,JSON.stringify(generalProblem));
+    await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/Include confirmed source problems/);
     await assert.rejects(fs.access(output));
     await fs.writeFile(reviewPath,JSON.stringify(review));
     const result=await finish(project,reviewPath,output,undefined,syntax);
