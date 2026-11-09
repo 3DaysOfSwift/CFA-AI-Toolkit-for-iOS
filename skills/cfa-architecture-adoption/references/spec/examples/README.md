@@ -2,7 +2,7 @@
 
 ## Notes reference feature
 
-[NotesReference.swift](NotesReference.swift) demonstrates a screen View, its ViewModel, a Feature, JSON persistence and AppModel composition. [NotesReferenceTests.swift](NotesReferenceTests.swift) exercises load and save failure recovery, ordered overlapping saves, JSON persistence and a fresh editor. From this directory on macOS with Xcode and Swift 6, run:
+[NotesReference.swift](NotesReference.swift) demonstrates a screen View, its ViewModel, a Feature, JSON persistence and AppModel composition. [NotesReferenceTests.swift](NotesReferenceTests.swift) exercises load and save failure recovery, publication after persistence, repeated Save taps, ordered independent saves, JSON persistence and fresh editor state. From this directory on macOS with Xcode and Swift 6, run:
 
 `xcrun swiftc -swift-version 6 -parse-as-library NotesReference.swift NotesReferenceTests.swift -o /tmp/cfa-notes-tests && /tmp/cfa-notes-tests`
 

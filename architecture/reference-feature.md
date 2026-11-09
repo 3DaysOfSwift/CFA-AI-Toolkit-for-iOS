@@ -11,8 +11,9 @@ entry, Save, Cancel and interactive sheet dismissal.
 
 The code below is also available as [NotesReference.swift](spec/examples/NotesReference.swift).
 The accompanying [executable checks](spec/examples/NotesReferenceTests.swift)
-cover failed persistence, retry, ordered overlapping saves, JSON storage and a
-fresh editor. Run them on macOS with Xcode and Swift 6:
+verify failure recovery, publication after persistence, repeated Save taps,
+ordered independent saves, JSON storage and fresh editor state. Run them on
+macOS with Xcode and Swift 6:
 
 ```sh
 xcrun swiftc -swift-version 6 -parse-as-library NotesReference.swift NotesReferenceTests.swift -o /tmp/cfa-notes-tests
