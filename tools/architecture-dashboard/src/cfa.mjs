@@ -183,6 +183,14 @@ skill from that toolkit before changing the project.
   processing use an appropriate service isolation boundary off MainActor by
   default. Keep framework-required MainActor calls in a narrow adapter.
   A separate type or async declaration alone does not move work off MainActor.
+- Keep Views and their adjacent ViewModels under 1 - View and keep AppModel,
+  Features and their microservices under 2 - AppModel. Name folders for the
+  responsibilities they contain. Put independently reusable Views in their own
+  files and keep private implementation details beside their owner. When
+  moving files, verify target membership, resource lookup and affected builds.
+- Reserve 4 - Swift Extensions for broadly reusable Swift standard library and
+  Foundation extensions. Keep SwiftUI and UIKit extensions in the View layer.
+  Keep purpose-specific extensions and protocols with their owners.
 - Keep domain values with the Feature that defines their meaning, even if
   they are Codable or persisted. Keep storage-only records inside persistence
   and transport-only payloads inside the provider or adapter that maps them.
