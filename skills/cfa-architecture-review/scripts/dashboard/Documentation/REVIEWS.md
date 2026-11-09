@@ -369,8 +369,10 @@ Across all criteria, cover these IDs:
 
 A criterion can cover several questions when its detail and evidence address
 each one. For launch performance, report the measurement conditions and result
-when available. Otherwise, describe the startup path and state that timing was
-unavailable. When reviewing CFA conformance, also record whether AppModel
+when available. Identify the device or simulator, build configuration, cold
+or warm launch, and what the measurement ends at. Report first-frame timing
+separately from disk restoration or Feature refresh completion. Otherwise,
+describe the startup path and state that timing was unavailable. When reviewing CFA conformance, also record whether AppModel
 signals Feature startup and starts required app-wide listeners before the
 launch callback returns. Trace duplicate prevention and delivery to the owning
 Feature with no relevant screen visible. Record those checks independently of
