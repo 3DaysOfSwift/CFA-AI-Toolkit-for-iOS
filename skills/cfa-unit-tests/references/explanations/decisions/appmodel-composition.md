@@ -7,7 +7,11 @@ Status: documented basis with editorial analysis; not a founder-approved histori
 
 ## Rule
 
-AppModel.shared exposes one production Feature graph. Its explicit initializer receives Features; live() constructs dependencies. Tests build separate graphs and do not mutate the production singleton.
+`AppModel.shared` exposes one production Feature graph per running process.
+The single `live()` factory constructs production dependencies. The explicit
+initializer assigns the supplied Features, sets the launch guard to `false`,
+and sets any app-wide listener task handles to `nil`. Tests supply isolated
+Features to that initializer.
 
 ## Problem
 
@@ -27,7 +31,7 @@ A singleton is not a concurrency mechanism. Isolation protects mutable state. Do
 
 ## Verification
 
-Trace live wiring, ensure dependencies are required by the explicit initializer, and run tests against independent graphs. Check that adding a second scene does not silently open another store. For app-wide listeners, verify that AppModel owns the task lifetime and forwards events to the Feature.
+Trace live wiring, ensure dependencies are required by the explicit initializer, and run tests against independent graphs. Check that scenes in the same process share the graph. A widget or Watch app running in a separate process has its own graph and uses the product’s data-sharing mechanism. For app-wide listeners, verify that AppModel owns the task lifetime and forwards events to the Feature.
 
 ## Evidence and provenance
 
