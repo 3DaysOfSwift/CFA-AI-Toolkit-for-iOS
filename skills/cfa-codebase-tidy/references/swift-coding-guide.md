@@ -422,8 +422,11 @@ store the same downloaded data.
 
 When both restoration and refresh are needed, start them independently. A
 missing, incompatible or unreadable cache yields no restored data. The normal
-refresh path owns the download and can start before restoration finishes. Apply restored data only if a fresher response has not already been
-accepted. Keep valid in-memory data when a refresh fails.
+refresh path owns the download and can start before restoration finishes.
+Apply restored data only if a fresher response for the same source has not
+already been accepted. When several sources refresh independently, continue
+restoring usable snapshots for the sources that still need them. Keep valid
+in-memory data when a refresh fails.
 
 Instant Loading binary snapshots are an advanced opt-in for a sufficiently
 stable format, not a suggestion to make during app creation or migration. Help
