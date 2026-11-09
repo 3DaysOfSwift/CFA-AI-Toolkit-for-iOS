@@ -1143,6 +1143,21 @@ struct Habit: SwiftUI.App {
   assert.equal(presentation?.line, 7);
 });
 
+test('reviews early return from App.body as a possible startup gate', async t => {
+  const file = 'Application/ExampleApp.swift';
+  const root = await fixture(t, {
+    [file]: `struct ExampleApp: App {
+      var body: some Scene {
+        guard startupReady else { return WindowGroup { RootView(blocked: true) } }
+        return WindowGroup { RootView(blocked: false) }
+      }
+    }`
+  });
+  const {findings} = await inspect(root);
+  const gates = findings.filter(item => item.code === 'conditional-app-body');
+  assert.deepEqual(gates.map(item => [item.file, item.line, item.severity]), [[file, 3, 'review']]);
+});
+
 test('reviews a direct ModelContainer reference in a structural App body', async t => {
   const file = 'Application/HabitApp.swift';
   const root = await fixture(t, {

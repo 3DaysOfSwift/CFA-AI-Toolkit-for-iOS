@@ -864,7 +864,7 @@ export async function inspect(project) {
       for (const bodyStart of sceneBodyStarts(members, signatures)) {
         const body = braceBody(members, bodyStart - 1);
         inspectEnvironmentProviders('App.body', body, file, source, start + bodyStart, members);
-        const conditional = /(?<!#)\b(?:if|switch)\b/.exec(body);
+        const conditional = /(?<!#)\b(?:if|guard|switch)\b/.exec(body);
         const presentation = swiftDataAccess.exec(body) ?? /\b(?:ProgressView|ContentUnavailableView)\s*\(/.exec(body);
         if (conditional) findings.push(finding('conditional-app-body', 'review', 'App.body contains a conditional. Check whether root navigation stays available while Features start, load, or fail.', file, lineOf(source, start + bodyStart + conditional.index)));
         if (presentation) findings.push(finding('app-startup-presentation', 'review', 'App.body contains storage or loading presentation. Trace whether it blocks root navigation and whether the affected screen can own that presentation.', file, lineOf(source, start + bodyStart + presentation.index)));
