@@ -146,7 +146,7 @@ export async function inspect(project) {
     ? appModel.slice(0, appModelBodyStart).replace(/[^\n]/g, ' ') + memberSignatures(braceBody(appModel, appModelBodyStart - 1))
     : '';
   const appProperties = new Map();
-  for (const match of appMembers.matchAll(/\b(?:let|var)\s+(\w+)\s*:\s*(?:any\s+)?(\w+)/g)) {
+  for (const match of appMembers.matchAll(/\b(?:let|var)\s+(\w+)\s*:\s*(?:any\s+)?(?:\w+\s*\.\s*)*(\w+)/g)) {
     appProperties.set(match[1], {
       type: match[2],
       line: lineOf(appModel, match.index),
@@ -194,7 +194,7 @@ export async function inspect(project) {
         findings.push(finding('app-model-shared-factory', 'review', 'AppModel.shared does not visibly call live(). Trace its initializer and verify the production graph comes from the single live factory.', appModelFile, lineOf(appModel, sharedInitializer.index)));
       }
     }
-    for (const match of appMembers.matchAll(/(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(private[ \t]+)?(?:private\(set\)[ \t]+)?(?:let|var)[ \t]+(\w+)[ \t]*:[ \t]*(?:any[ \t]+)?(?:Swift\s*\.\s*|_Concurrency\s*\.\s*(?=Task\b))?(\w+)(?:<[^;\n=]*>)?[?!]?([ \t]*=(?!=))?/gm)) {
+    for (const match of appMembers.matchAll(/(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(private[ \t]+)?(?:private\(set\)[ \t]+)?(?:let|var)[ \t]+(\w+)[ \t]*:[ \t]*(?:any[ \t]+)?(?:\w+[ \t]*\.[ \t]*)*(\w+)(?:<[^;\n=]*>)?[?!]?([ \t]*=(?!=))?/gm)) {
       const [, privateModifier, name, type, defaultValue] = match;
       const suffix = appModel.slice(match.index + match[0].length);
       // A getter is not stored state. Property observers still belong to storage.

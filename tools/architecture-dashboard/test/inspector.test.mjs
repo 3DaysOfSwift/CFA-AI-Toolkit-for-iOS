@@ -59,13 +59,15 @@ test('leaves AppModel routes unresolved when multiple app roots are scanned', as
   assert.ok(!report.findings.some(item => item.code === 'app-model-missing'));
 });
 
-test('reviews Feature placement outside the AppModel feature folders', async t => {
+test('reviews Feature placement for a qualified Feature outside the AppModel feature folders', async t => {
   const featureFile = 'Packages/Feed/Sources/Features/Feed/FeedFeature.swift';
   const root = await fixture(t, {
-    'App/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() }; let feedFeature: FeedFeature }',
+    'App/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() }; let feedFeature: FeedModule.FeedFeature }',
     [featureFile]: 'import Foundation\nfinal class FeedFeature {}'
   });
-  const finding = (await inspect(root)).findings.find(item => item.code === 'feature-placement');
+  const { findings } = await inspect(root);
+  assert.ok(!findings.some(item => item.code === 'app-model-non-feature-state'));
+  const finding = findings.find(item => item.code === 'feature-placement');
   assert.deepEqual([finding?.file, finding?.line, finding?.severity], [featureFile, 2, 'review']);
 });
 
