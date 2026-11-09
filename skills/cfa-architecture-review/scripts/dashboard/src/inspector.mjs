@@ -137,11 +137,13 @@ export async function inspect(project) {
   }
   const paths = new Set(sources.keys());
   const conventionalAppModelPath = /(?:^|\/)2 - AppModel\/AppModel\.swift$/;
-  const appModelFiles = [...paths].filter(file => path.posix.basename(file) === 'AppModel.swift' &&
-    /\bclass\s+AppModel\b[^{}]*\{/.test(sources.get(file)));
-  const appModelFile = appModelFiles.length === 1 ? appModelFiles[0] : null;
+  const appModelCandidates = [...sources].flatMap(([file, source]) =>
+    [...source.matchAll(/\bclass\s+AppModel\b[^{}]*\{/g)].map(declaration => ({file, declaration}))
+  );
+  const candidate = appModelCandidates.length === 1 ? appModelCandidates[0] : null;
+  const appModelFile = candidate?.file ?? null;
   const appModel = appModelFile ? sources.get(appModelFile) : '';
-  const appModelDeclaration = /\bclass\s+AppModel\b[^\{]*\{/.exec(appModel);
+  const appModelDeclaration = candidate?.declaration;
   const appModelBodyStart = appModelDeclaration ? appModelDeclaration.index + appModelDeclaration[0].length : 0;
   // Keep original offsets while excluding unrelated types and method-local values.
   const appMembers = appModelDeclaration
@@ -165,12 +167,12 @@ export async function inspect(project) {
   }
 
   const findings = [];
-  if (!appModelFiles.length) findings.push(finding('app-model-missing', 'warning', 'No AppModel.swift was found under 2 - AppModel.', null, null));
+  if (!appModelCandidates.length) findings.push(finding('app-model-missing', 'warning', 'No AppModel class was found in the scanned source.', null, null));
   if (appModelFile && !conventionalAppModelPath.test(appModelFile)) {
-    findings.push(finding('app-model-placement', 'review', 'AppModel.swift is outside 2 - AppModel. Verify the intended target and source layout.', appModelFile, 1));
+    findings.push(finding('app-model-placement', 'review', 'AppModel is outside the conventional 2 - AppModel/AppModel.swift path. Verify the intended target and source layout.', appModelFile, lineOf(appModel, appModelDeclaration.index)));
   }
-  if (appModelFiles.length > 1) {
-    findings.push(finding('app-model-ambiguous', 'review', `Multiple AppModel files were found: ${appModelFiles.join(', ')}. Verify target membership or inspect one app directory at a time before attributing Feature routes.`, null, null));
+  if (appModelCandidates.length > 1) {
+    findings.push(finding('app-model-ambiguous', 'review', `Multiple AppModel declarations were found: ${appModelCandidates.map(({file, declaration}) => `${file}:${lineOf(sources.get(file), declaration.index)}`).join(', ')}. Verify target membership or inspect one app directory at a time before attributing Feature routes.`, null, null));
   }
   if (appModelFile) {
     const liveFactories = [...appMembers.matchAll(/\bstatic\s+func\s+live\s*\(\s*\)\s*->\s*(?:\w+\s*\.\s*)*AppModel\b/g)]

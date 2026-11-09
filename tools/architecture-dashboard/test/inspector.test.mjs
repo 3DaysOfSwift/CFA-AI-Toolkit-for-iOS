@@ -59,17 +59,17 @@ test('leaves AppModel routes unresolved when multiple app roots are scanned', as
   assert.ok(!report.findings.some(item => item.code === 'app-model-missing'));
 });
 
-test('does not prefer a conventional AppModel over a second flat candidate', async t => {
+test('does not prefer a conventional AppModel over a candidate in a differently named file', async t => {
   const root = await fixture(t, {
     'First/2 - AppModel/AppModel.swift': 'final class AppModel { let feedFeature: FeedFeature }',
-    'Second/AppModel.swift': 'final class AppModel { let feedFeature: OtherFeature }',
+    'Second/Composition.swift': 'final class AppModel { let feedFeature: OtherFeature }',
     'Second/1 - View/Views/Feed/FeedView.swift': 'struct FeedView: View { @State private var viewModel = FeedViewModel() }',
     'Second/1 - View/Views/Feed/FeedViewModel.swift': 'final class FeedViewModel { let feedFeature = AppModel.shared.feedFeature }'
   });
   const report = await inspect(root);
   assert.equal(report.appModelFile, null);
   assert.equal(report.screens[0].dependencies[0].featureType, null);
-  assert.match(report.findings.find(item => item.code === 'app-model-ambiguous')?.message, /Second\/AppModel\.swift/);
+  assert.match(report.findings.find(item => item.code === 'app-model-ambiguous')?.message, /Second\/Composition\.swift:1/);
 });
 
 test('reviews Feature placement for a qualified Feature outside the AppModel feature folders', async t => {
@@ -862,7 +862,7 @@ test('reviews direct container construction in the AppModel factory at its sourc
 });
 
 test('reviews storage construction in a flat AppModel without treating placement as conventional', async t => {
-  const file = 'Application/AppModel.swift';
+  const file = 'Application/Composition.swift';
   const root = await fixture(t, {
     [file]: 'final class AppModel {\n  static func live() -> AppModel {\n    _ = try ModelContainer(for: Note.self)\n    return AppModel()\n  }\n}'
   });
