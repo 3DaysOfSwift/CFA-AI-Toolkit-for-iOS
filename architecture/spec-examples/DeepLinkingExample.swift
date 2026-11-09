@@ -302,10 +302,22 @@ private actor DelayedRestoreRepository: PendingRequestRepository {
         let nextRun = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
         try await nextRun.restore()
         precondition(nextRun.pending == [request])
-        try await nextRun.open(id: request.id) { destination in
-            precondition(destination.launchID == "launch-42")
-            return true // The scene opened the page.
+        var sceneIsAvailable = false
+        var openedDestination: DestinationRequest?
+        let navigate: @MainActor (DestinationRequest) async -> Bool = { destination in
+            guard sceneIsAvailable else { return false }
+            openedDestination = destination
+            return true
         }
+        try await nextRun.open(id: request.id, inScene: navigate)
+        precondition(openedDestination == nil && nextRun.pending == [request])
+        let restoredWhileUnavailable = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
+        try await restoredWhileUnavailable.restore()
+        precondition(restoredWhileUnavailable.pending == [request])
+
+        sceneIsAvailable = true
+        try await nextRun.open(id: request.id, inScene: navigate)
+        precondition(openedDestination == request)
         precondition(nextRun.pending.isEmpty)
         let lastRun = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
         try await lastRun.restore()

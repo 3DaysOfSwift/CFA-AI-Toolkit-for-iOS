@@ -417,6 +417,8 @@ operations enforce authorisation independently.
   original file. Restore readable data and verify that retry keeps both the
   recovered and incoming requests. Verify that declining or
   cancelling before navigation leaves a saved request available after restart.
+  Simulate an unavailable scene and verify the request survives reopening the
+  store and can be opened when a scene becomes available.
   Cancel after the destination opens and verify that it still counts as opened
   and the pending item is removed. Verify either scene can open a shared
   request, simultaneous attempts on that request navigate only once, and the
