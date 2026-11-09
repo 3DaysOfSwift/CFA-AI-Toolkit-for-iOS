@@ -524,8 +524,16 @@ export async function inspect(project) {
         sessionNames.add(alias[1]);
       }
     }
-    const directRequests = [...source.matchAll(/\b(?:(URLSession\s*\.\s*shared)|(\w+))\s*\??\.\s*(?:data|bytes|download|upload|dataTask|dataTaskPublisher|downloadTask|uploadTask|webSocketTask|streamTask)\s*\(/g)]
+    const requestCall = /\s*\??\.\s*(?:data|bytes|download|upload|dataTask|dataTaskPublisher|downloadTask|uploadTask|webSocketTask|streamTask)\s*\(/;
+    const requestOnReceiver = new RegExp(String.raw`\b(?:(URLSession\s*\.\s*shared)|(\w+))${requestCall.source}`, 'g');
+    const directRequests = [...source.matchAll(requestOnReceiver)]
       .filter(match => (match[1] || sessionNames.has(match[2])) && outsideManager(match));
+    for (const constructor of source.matchAll(/\bURLSession\s*\(/g)) {
+      if (!outsideManager(constructor)) continue;
+      const closing = closingParenthesis(source, constructor.index + constructor[0].length - 1);
+      if (closing >= 0 && source.slice(closing + 1).search(requestCall) === 0) directRequests.push(constructor);
+    }
+    directRequests.sort((a, b) => a.index - b.index);
     for (const request of directRequests) {
       findings.push(finding('direct-url-session', 'review', 'Possible URLSession request outside NetworkingManager. Verify the receiver type and production target membership before reporting a bypass.', file, lineOf(source, request.index)));
     }

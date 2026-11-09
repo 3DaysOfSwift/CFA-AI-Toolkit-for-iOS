@@ -738,6 +738,12 @@ test('points to the URLSession request when the same file also configures a sess
       let session: URLSession = URLSession(configuration: .ephemeral)
       func load() async throws { _ = try await session.data(from: url) }
     }`,
+    'ChainedProvider.swift': `struct ChainedProvider {
+      let configured = URLSession(configuration: .ephemeral)
+      func load() async throws {
+        _ = try await URLSession(configuration: makeConfiguration()).data(from: url)
+      }
+    }`,
     'ConfiguredProvider.swift': `struct ConfiguredProvider {
       let session = Foundation.URLSession(configuration: .ephemeral)
       func load() async throws { _ = try await session.data(from: url) }
@@ -754,7 +760,7 @@ test('points to the URLSession request when the same file also configures a sess
   });
   const {findings} = await inspect(root);
   assert.deepEqual(findings.filter(item => item.code === 'direct-url-session')
-    .map(({file, line}) => [file, line]), [['ConfiguredProvider.swift', 3], ['InferredProvider.swift', 3], ['Provider.swift', 3], ['SharedProvider.swift', 3], ['SharedProvider.swift', 4]]);
+    .map(({file, line}) => [file, line]), [['ChainedProvider.swift', 4], ['ConfiguredProvider.swift', 3], ['InferredProvider.swift', 3], ['Provider.swift', 3], ['SharedProvider.swift', 3], ['SharedProvider.swift', 4]]);
 });
 
 test('flags SwiftData without a manager and direct URLSession calls', async t => {
