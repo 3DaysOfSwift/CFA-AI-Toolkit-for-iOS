@@ -267,6 +267,16 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
         (problem.title || problem.name || problem.file));
     }
   }
+  for (const concern of (review.findings || []).filter(finding => finding.status === 'concern')) {
+    const covered = presentation.criteria.some(criterion =>
+      ['concern', 'problem'].includes(criterion.status) && concern.evidence.some(ref =>
+        criterion.evidence.some(visible =>
+          visible.file === ref.file && visible.line <= ref.endLine && ref.line <= visible.endLine
+        )
+      )
+    );
+    if (!covered) throw Error('Include source concerns in the report criteria before rendering: ' + concern.title);
+  }
   const data = {...presentation, scope:review.scope};
   data.operations = (review.operations || []).map(op=>({group:op.group,title:op.title,path:op.path,stateOwner:op.stateOwner,taskOwner:op.taskOwner,isolation:op.isolation,reason:op.reason,unknowns:op.unknowns,steps:op.steps,checks:op.checks,scenarios:op.scenarios}));
   data.coverageGaps = gaps;

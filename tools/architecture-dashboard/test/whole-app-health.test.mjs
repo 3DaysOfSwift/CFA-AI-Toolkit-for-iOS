@@ -250,6 +250,11 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
     });
     await fs.writeFile(reviewPath,JSON.stringify(generalProblem));
     await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/Include confirmed source problems.*Confirmed issue/);
+    const omittedConcern = structuredClone(generalProblem);
+    omittedConcern.findings[0].status = 'concern';
+    await fs.writeFile(reviewPath,JSON.stringify(omittedConcern));
+    await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/Include source concerns.*Confirmed issue/);
+    await assert.rejects(fs.access(output));
     const invalidStatus = structuredClone(generalProblem);
     invalidStatus.findings[0].status = 'Problem';
     await fs.writeFile(reviewPath,JSON.stringify(invalidStatus));

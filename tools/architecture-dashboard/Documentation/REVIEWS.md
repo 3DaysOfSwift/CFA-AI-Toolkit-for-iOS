@@ -46,7 +46,8 @@ Use `problem` for a confirmed defect. Each report criterion needs at least one
 structured evidence reference with a file and line range. Each confirmed source problem, including
 individual file or type issues, failed operation correctness or clarity checks,
 and timing-scenario problems, must share a source location with a visible problem
-criterion. Workflow rows show a concurrency result from their behaviour checks
+criterion. Source findings marked `concern` must also share a location with a
+visible concern or problem criterion. Workflow rows show a concurrency result from their behaviour checks
 and timing scenarios. CFA-only deviations stay in the expanded CFA alignment
 section. The location check cannot establish that the prose describes
 the same issue. `scenarios` must have unique titles
