@@ -166,6 +166,14 @@ actor RetryableNotes: NotesRepository {
         precondition(!corruptSave && corruptEditor.saveError != nil)
         precondition(corruptEditor.text == "Keep this draft" && corruptFeature.notes.isEmpty)
         precondition(remainingBytes == corruptBytes, "A failed read must not overwrite saved bytes")
+        await corruptEditor.load()
+        precondition(corruptEditor.loadError != nil && corruptFeature.notes.isEmpty)
+
+        // Restore the known good file, then retry through the same screen and Feature.
+        try JSONEncoder().encode(afterOverlap).write(to: url, options: .atomic)
+        await corruptEditor.retryLoad().value
+        precondition(corruptEditor.loadError == nil && corruptFeature.notes == afterOverlap)
+        precondition(corruptEditor.text == "Keep this draft")
         print("Notes reference: failed save, retry, ordered overlap and JSON storage passed")
     }
 }
