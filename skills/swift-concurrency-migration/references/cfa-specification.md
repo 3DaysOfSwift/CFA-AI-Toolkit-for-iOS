@@ -1791,6 +1791,9 @@ Before accepting a change, answer every question:
    supported device.
 9. Is persistence accessed through repository protocols, and are other
    external-system details handled by appropriate microservices?
+   For independent network requests, hold the first response open in a
+   controlled transport and verify that a second request reaches the transport
+   before the first finishes, unless a documented policy limits concurrency.
 10. Are async operations directly testable? Does each unstructured task have
     an explicit owner and a retained handle when needed? Do structured children
     and framework-owned lifecycle tasks stay with their existing owners, with
