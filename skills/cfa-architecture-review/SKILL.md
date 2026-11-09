@@ -41,6 +41,12 @@ accessibility/functional problems separately from design preferences.
 
 For CFA conformance, read the [CFA specification](references/cfa-specification.md), [CFA change gate](references/cfa-change-gate.md) and inspect actual source and live wiring. Trace screen state, business decisions, authoritative feature state, AppModel construction and repository boundaries. Report findings with source locations, consequences and actionable recommendations. Distinguish intentional departures from defects. Do not require a type named AppModel when reviewing another architecture.
 
+For a whole-app CFA conformance audit, apply the complete [review checklist](references/spec/topics/29-review-checklist.md)
+to the actual source and live wiring. Record evidence for each applicable
+requirement and a reason for each inapplicable one. Keep unresolved behaviour
+unverified. For a focused review, report the scoped findings without issuing a
+whole-app conformance verdict.
+
 Trace published snapshots from their authoritative owner to their consumers.
 Check stored properties and nested references for mutation, and follow writes
 through persistence to publication. A local draft or mutable value alone does
