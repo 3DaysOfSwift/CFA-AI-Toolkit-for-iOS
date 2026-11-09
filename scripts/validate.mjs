@@ -8,7 +8,7 @@ import { files, hash, isReleasePath, json } from './files.mjs';
 import { verifyXcodeTemplateStructure } from './verify-xcode-template-structure.mjs';
 import { verifyTemplateOrientations } from './verify-ios-orientations.mjs';
 import { specTopics } from './spec-topics.mjs';
-export function validate(base=root,{source=true}={}) {
+export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
   const expectedTopics = specTopics(base);
   for (const folder of ['architecture/spec', ...cfaSkills.map(name => `skills/${name}/references/spec`)]) {
     const directory = path.join(base, folder);
@@ -114,7 +114,7 @@ export function validate(base=root,{source=true}={}) {
           png.readUInt32BE(16) !== 1024 || png.readUInt32BE(20) !== 1024) {
         throw Error(`Invalid 1024px starter app icon: ${name}`);
       }
-      if (source) {
+      if (source && checkXcodeProjects) {
         for (const file of ['Contents.json', 'CFA-App-Icon.png']) {
           if (hash(path.join(iconSet, file)) !== hash(path.join(base, starterIcon, file))) {
             throw Error(`Stale starter app icon: ${name}. Run npm run sync.`);
@@ -162,6 +162,8 @@ export function validate(base=root,{source=true}={}) {
     for (const file of ['README.md', 'package.json']) {
       if (hash(path.join(base, 'tools/architecture-dashboard', file)) !== hash(path.join(base, 'skills/cfa-architecture-review/scripts/dashboard', file))) throw Error(`Stale bundled dashboard ${file}. Run npm run sync.`);
     }
+  }
+  if (source && checkXcodeProjects) {
     if (process.platform === 'darwin') {
       verifyXcodeTemplateStructure(path.join(base, 'templates/Xcode/Project Templates/iOS/Application/CFA App.xctemplate'));
       verifyTemplateOrientations(base);
@@ -172,6 +174,15 @@ export function validate(base=root,{source=true}={}) {
   return manifest;
 }
 if(process.argv[1] && import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href) {
-  try {validate();console.log('CFA source, references, manifests and dependency copies validated.');}
+  try {
+    const args = process.argv.slice(2);
+    if (args.length && (args.length !== 1 || args[0] !== '--skip-xcode-projects')) {
+      throw Error('Usage: node scripts/validate.mjs [--skip-xcode-projects]');
+    }
+    const checkXcodeProjects = args.length === 0;
+    validate(root, {checkXcodeProjects});
+    console.log('CFA source, references, manifests and dependency copies validated.');
+    if (!checkXcodeProjects) console.log('Starter app and Xcode template checks skipped.');
+  }
   catch(error){console.error(error.message);process.exitCode=1;}
 }
