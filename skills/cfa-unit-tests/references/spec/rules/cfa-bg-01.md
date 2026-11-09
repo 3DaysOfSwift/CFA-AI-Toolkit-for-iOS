@@ -4,7 +4,7 @@
 
 **Strength:** Required when applicable.
 
-**Guidance:** Each Feature owns its background capability. During synchronous startup, AppModel can ask the Feature to register its handlers. Register each permitted BGTaskScheduler identifier once before launch finishes and schedule work separately. Route app-level callbacks through AppModel to the responsible Feature and honour expiration, cancellation and system completion. Feature-owned work may outlive a screen. To continue after iOS backgrounds the app, use a supported system mechanism. An ordinary Swift Task grants no background runtime.
+**Guidance:** Keep background work with the Feature that owns the business capability. Unrelated work stays with its respective owners. During synchronous startup, AppModel can ask each Feature to register its handlers. Register each permitted BGTaskScheduler identifier once before launch finishes. Schedule work separately and let the system decide when eligible work runs. Route app-level callbacks through AppModel to the responsible Feature and honour expiration, cancellation and system completion. Feature-owned work may outlive a screen. Continuing after iOS backgrounds the app requires a supported system mechanism, such as a background URLSession for eligible transfers. Background push delivery is best effort. An ordinary Swift Task grants no background runtime.
 
 **Why:** System lifecycle handling stays separate from feature behaviour.
 
