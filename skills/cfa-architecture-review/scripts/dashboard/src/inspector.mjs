@@ -149,7 +149,7 @@ export async function inspect(project) {
       const body = braceBody(source, start);
       for (const task of body.matchAll(/\bTask\s*(?:<[^{}\n]*>\s*)?(?:\.\s*detached\s*)?(?:\([^{}]*\)\s*)?\{/g)) {
         const taskBody = braceBody(body, task.index + task[0].length - 1);
-        if (/\bapplicationDidFinishLaunching\s*\(/.test(taskBody)) {
+        if (/(?<!\bfunc\s+)\bapplicationDidFinishLaunching\s*\(/.test(taskBody)) {
           findings.push(finding('scheduled-app-model-launch', 'review', 'The launch callback appears to signal AppModel from a Task. Check whether the app-wide startup signal should be called synchronously; Feature-owned asynchronous work can still start its own tasks.', file, lineOf(source, start + 1 + task.index)));
         }
       }
@@ -182,7 +182,7 @@ export async function inspect(project) {
         if (!closure) continue;
         opening = closing + closure[0].length;
       }
-      if (/\bapplicationDidFinishLaunching\s*\(/.test(braceBody(source, opening))) {
+      if (/(?<!\bfunc\s+)\bapplicationDidFinishLaunching\s*\(/.test(braceBody(source, opening))) {
         findings.push(finding('view-tied-app-launch', 'review', 'A View-layer .task appears to call applicationDidFinishLaunching. Check whether this is production launch behavior rather than a preview or test, and use the app lifecycle callback for the shared launch signal.', file, lineOf(source, task.index)));
       }
     }

@@ -97,13 +97,16 @@ test('a launch call in preview code is a review hint, not a production assertion
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
     'Application/1 - View/PreviewSupport.swift': '#Preview { DemoView().task { AppModel.shared.applicationDidFinishLaunching() } }',
-    'Application/1 - View/StartupView.swift': 'struct StartupView: View {\n var body: some View {\n Text("Startup").task(id: phase.key()) { if enabled { prepare() }; AppModel.shared.applicationDidFinishLaunching() }\n }\n}'
+    'Application/1 - View/StartupView.swift': 'struct StartupView: View {\n var body: some View {\n Text("Startup").task(id: phase.key()) { if enabled { prepare() }; AppModel.shared.applicationDidFinishLaunching() }\n }\n}',
+    'Application/1 - View/LocalHelper.swift': 'struct LocalHelper: View { var body: some View { Text("Hi").task { func applicationDidFinishLaunching() {} } } }'
   });
-  const finding = (await inspect(root)).findings.find(item => item.code === 'view-tied-app-launch');
+  const {findings} = await inspect(root);
+  const finding = findings.find(item => item.code === 'view-tied-app-launch');
   assert.equal(finding.severity, 'review');
   assert.match(finding.message, /preview or test/);
-  const startupFinding = (await inspect(root)).findings.find(item => item.code === 'view-tied-app-launch' && item.file.endsWith('/StartupView.swift'));
+  const startupFinding = findings.find(item => item.code === 'view-tied-app-launch' && item.file.endsWith('/StartupView.swift'));
   assert.equal(startupFinding?.line, 3);
+  assert.equal(findings.filter(item => item.code === 'view-tied-app-launch').length, 2);
 });
 
 test('does not identify a launch guard by the order of private Boolean properties', async t => {
