@@ -17,6 +17,10 @@
         {
           "label": "Detail ViewModel",
           "path": "Swift Concurrency Project/RocketLaunch/1 - View/Views/Operators/LaunchDetail/LaunchDetailViewModel.swift"
+        },
+        {
+          "label": "Immutable launch snapshot",
+          "path": "Swift Concurrency Project/RocketLaunch/2 - AppModel/Features/Launch Schedule/RocketLaunchDataTypes.swift"
         }
       ],
       "description": "Selected launch snapshots and detail presentation",
