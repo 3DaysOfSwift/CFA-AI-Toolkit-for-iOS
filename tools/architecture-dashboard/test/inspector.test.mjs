@@ -97,6 +97,18 @@ test('reviews an actor exposed as a Feature while leaving its worker alone', asy
     .map(({file, line, severity}) => [file, line, severity]), [[file, 1, 'review']]);
 });
 
+test('reviews explicit nonisolated Feature declarations without inferring default isolation', async t => {
+  const file = 'Application/2 - AppModel/Features/Settings/SettingsFeature.swift';
+  const root = await fixture(t, {
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { let settingsFeature: SettingsFeature }',
+    [file]: 'nonisolated final\nclass SettingsFeature {}'
+  });
+  const finding = (await inspect(root)).findings.find(item => item.code === 'feature-isolation');
+  assert.deepEqual([finding?.file, finding?.line, finding?.severity], [file, 2, 'review']);
+  await fs.writeFile(path.join(root, file), 'final class SettingsFeature {}');
+  assert.ok(!(await inspect(root)).findings.some(item => item.code === 'feature-isolation'));
+});
+
 test('reports a missing named feature test file', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static let shared = live(); static func live() -> AppModel { AppModel() }; let settingsFeature: SettingsFeature }',

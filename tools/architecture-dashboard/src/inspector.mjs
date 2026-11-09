@@ -461,6 +461,14 @@ export async function inspect(project) {
       if (declaration?.type === 'actor') {
         findings.push(finding('feature-isolation', 'review', `${property.type} is an actor exposed by AppModel. Verify its role. CFA Feature owners explicitly use MainActor, and worker actors belong behind the Feature boundary.`, declarationFile, declaration.line));
       }
+      if (declaration?.type === 'class') {
+        const featureSource = sources.get(declarationFile);
+        const explicitlyNonisolated = [...featureSource.matchAll(/\bnonisolated\s+(?:(?:final|public|internal|private|fileprivate|package|open)\s+)*class\s+(\w+)/g)]
+          .some(match => match[1] === property.type && lineOf(featureSource, match.index + match[0].lastIndexOf('class')) === declaration.line);
+        if (explicitlyNonisolated) {
+          findings.push(finding('feature-isolation', 'review', `${property.type} is exposed by AppModel and declares nonisolated. Verify its role and effective isolation. CFA Feature owners use MainActor.`, declarationFile, declaration.line));
+        }
+      }
       const featureFolder = path.posix.join(path.posix.dirname(appModelFile), 'Features');
       const relative = declarationFile && path.posix.relative(featureFolder, declarationFile);
       if (declaration?.type === 'class' && (relative.startsWith('../') || !relative.includes('/'))) {
