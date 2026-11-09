@@ -94,7 +94,9 @@ Verify that refusal or cancellation before navigation
 leaves the request pending and that navigation consumes it even if cancellation
 follows. Simulate a failed removal after navigation, then retry the write and
 verify that the handler is called only once. Exercise competing scenes and
-restoration without losing unrelated pending requests.
+an open racing an explicit dismissal of the same request. Assert the outcomes
+against the pending list and the scene’s navigation state. Verify restoration
+without losing unrelated pending requests.
 
 For account changes, hold an old account's request open, switch accounts or
 sign out, then complete the old request. Verify that its data is never

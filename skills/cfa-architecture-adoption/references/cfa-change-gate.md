@@ -339,8 +339,10 @@ from precedent use; do not reframe it as a completed partial migration.
 - For changes to the pending deep-link flow, force the initial save to fail
   and verify that the failure is reported and the request is never presented as
   saved. Verify that declining navigation leaves a saved request available
-  after restart. Exercise competing opens from
-  two scenes and verify that only one navigates. Force a removal write to fail
+  after restart. Exercise competing opens from two scenes and verify that
+  only one navigates. Race an open against dismissal of the same request and
+  verify that the outcomes agree with the pending list and navigation state.
+  Force a removal write to fail
   after navigation, then verify that the error is reported and retrying the
   write removes the item without reopening the destination. Use the
   [review checklist](spec/topics/29-review-checklist.md) for the full scope.
