@@ -111,7 +111,12 @@ Use deliberate passes:
    [immutable domain snapshots](references/spec/rules/cfa-snapshot-01.md) from
    the owning Feature and route edits through its commands. Verify that a
    failed save leaves the confirmed snapshot unchanged and that a successful
-   save publishes a replacement.
+   save publishes a replacement. Before replacing a publisher, callback or
+   persistence observer, record which screens update and what triggers the
+   update. After migration, trace the [observable read](references/spec/rules/cfa-obs-01.md)
+   from the owning Feature through the presentation owner to the screen.
+   Verify that a confirmed change still updates live screens and that detail
+   snapshots retain their existing refresh behaviour.
    AppModel's single `static live()` constructs dependencies;
    its stored properties include Features, the launch guard and any app-wide
    listener handles required by the specification. Use
