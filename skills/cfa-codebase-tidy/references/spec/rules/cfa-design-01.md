@@ -4,7 +4,7 @@
 
 **Strength:** Required.
 
-**Guidance:** Preserve business outcomes and capabilities while migrating to CFA and Swift Concurrency; fix confirmed in-scope defects and allow necessary minor platform-driven presentation differences without seeking unrelated modernisation.
+**Guidance:** Preserve business outcomes, user-facing capabilities, meaningful interactions and stored data while migrating to CFA and Swift Concurrency. Fix confirmed in-scope defects and allow necessary minor platform-driven presentation differences. Keep unrelated upgrades outside the migration scope.
 
 **Why:** Migration changes how the app works internally without silently removing what users rely on.
 
@@ -12,6 +12,6 @@
 
 **Explanation:** [Why use behaviour-preserving migration in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/preserve-product-behaviour).
 
-**Verify:** Compare the requested journey and business outcomes; test defect fixes and document material platform-driven differences.
+**Verify:** Compare the migrated journeys and business outcomes with the baseline. Exercise applicable failure and retry paths, verify that existing stored data survives, test confirmed defect fixes and document material platform-driven differences.
 
 **Full rule, context and examples:** [Architecture versus product design](../topics/05-architecture-versus-product-design.md). This card is a reading aid; apply the complete canonical section.

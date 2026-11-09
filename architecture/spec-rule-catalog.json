@@ -341,9 +341,9 @@
       "section": "Architecture versus product design",
       "applies": "Migrating an existing app to CFA and Swift Concurrency",
       "strength": "Required",
-      "rule": "Preserve business outcomes and capabilities while migrating to CFA and Swift Concurrency; fix confirmed in-scope defects and allow necessary minor platform-driven presentation differences without seeking unrelated modernisation.",
+      "rule": "Preserve business outcomes, user-facing capabilities, meaningful interactions and stored data while migrating to CFA and Swift Concurrency. Fix confirmed in-scope defects and allow necessary minor platform-driven presentation differences. Keep unrelated upgrades outside the migration scope.",
       "why": "Migration changes how the app works internally without silently removing what users rely on.",
-      "verify": "Compare the requested journey and business outcomes; test defect fixes and document material platform-driven differences.",
+      "verify": "Compare the migrated journeys and business outcomes with the baseline. Exercise applicable failure and retry paths, verify that existing stored data survives, test confirmed defect fixes and document material platform-driven differences.",
       "example": "A migration retains the purchase flow, corrects an in-scope verified defect, and accepts a minor tab bar appearance change required by the platform.",
       "explanationIds": [
         "preserve-product-behaviour"
