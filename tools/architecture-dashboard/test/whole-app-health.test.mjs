@@ -242,6 +242,10 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
     assert.deepEqual(pendingClarity.nextOperations[0].pendingDimensions,['clarity']);
     await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/operations have unresolved checks or boundaries/);
     await assert.rejects(fs.access(output));
+    const unsupportedAssessment = structuredClone(review);
+    delete unsupportedAssessment.presentation.criteria[0].evidence;
+    await fs.writeFile(reviewPath,JSON.stringify(unsupportedAssessment));
+    assert.match((await next(project,reviewPath,syntax)).gaps.join(' '), /App-level assessments still needed:.*launch-performance/);
     const sourceProblem = structuredClone(review);
     sourceProblem.fileReviews = [{
       file:'Value.swift',status:'problem',reason:'Confirmed issue',verification:'Source inspection',

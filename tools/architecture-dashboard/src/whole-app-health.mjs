@@ -231,12 +231,16 @@ async function appIcon(root) {
 }
 function pendingAppChecks(review) {
   const appChecks = new Set();
-  for (const criterion of (review.presentation?.criteria || [])) {
-    if (criterion.appChecks === undefined) continue;
+  const criteria = review.presentation?.criteria ?? [];
+  if (!Array.isArray(criteria)) throw Error('Provide presentation.criteria as a list of findings.');
+  for (const criterion of criteria) {
+    if (criterion?.appChecks === undefined) continue;
     if (!Array.isArray(criterion.appChecks) || criterion.appChecks.some(id => !appCheckIDs.includes(id))) {
       throw Error('Use recognised app-level check IDs in criterion.appChecks.');
     }
-    criterion.appChecks.forEach(id => appChecks.add(id));
+    if (Array.isArray(criterion.evidence) && criterion.evidence.length) {
+      criterion.appChecks.forEach(id => appChecks.add(id));
+    }
   }
   return appCheckIDs.filter(id => !appChecks.has(id));
 }
