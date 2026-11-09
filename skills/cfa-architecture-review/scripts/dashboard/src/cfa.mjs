@@ -29,7 +29,8 @@ product is CFA AI Toolkit for iOS. Match each request to the relevant installed
 skill from that toolkit before changing the project.
 
 - Preserve the CFA call path: View → ViewModel → Feature → Microservices (such as providers, storage or device API adapters).
-- Every screen has a dedicated ViewModel. A concrete feature owner uses the
+- Every screen owns a dedicated ViewModel in a property named viewModel.
+  A concrete feature owner uses the
   Feature suffix; its AppModel property, ViewModel dependency and initializer
   label use the matching lower-camel-case Feature name. Use concrete features
   directly; do not add matching FeatureAPI protocols. Lower-level services keep names that

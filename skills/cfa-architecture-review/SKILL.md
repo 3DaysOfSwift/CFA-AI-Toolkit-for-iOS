@@ -28,7 +28,7 @@ Use that workflow's checkpoint and completion check: builds, tests and simulator
 launches do not complete the assessment; finish with its scoped verdict and report.
 
 Apply the specification's screen-construction invariant within a CFA conformance review's requested
-scope: private ViewModel ownership with inline `@State` construction by default.
+scope: a private `viewModel` property with inline `@State` construction by default.
 A detail View may construct its own State-backed ViewModel from selected value data
 in its initializer. Never inject or share ViewModels; keep screen and scene navigation selections
 out of Features. Review-only work

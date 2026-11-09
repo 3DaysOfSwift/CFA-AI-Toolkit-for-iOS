@@ -4,7 +4,7 @@
 
 **Strength:** Required.
 
-**Guidance:** A screen creates and retains its own private ViewModel; do not pass or share ViewModels between Views.
+**Guidance:** A screen creates and retains its own private ViewModel in a property named `viewModel`. Do not pass or share ViewModels between Views.
 
 **Why:** Presentation state remains local to the screen.
 
