@@ -445,12 +445,15 @@ For each relevant operation, inspect:
   and pagination. Who decides whether to deduplicate, replace, queue or combine?
 - Lifetime: navigation away, observation ending, sign-out and account changes.
   Work may intentionally outlive a screen; establish its owner and purpose.
-- Background work: trace the system registration, scheduling request, delivery
-  callback and owning operation. For BGTaskScheduler, verify that each permitted
-  identifier is registered once before launch returns. Follow expiration through
-  cancellation and completion, and check that normal completion and expiration
-  cannot both report completion for the same delivery. Distinguish source evidence
-  from device evidence about whether the system actually delivers the work.
+- Background work: trace registration, scheduling, system delivery and the
+  owning operation separately. For BGTaskScheduler, verify that each identifier
+  is permitted and registered once before launch returns. In CFA, follow the
+  app-level callback through AppModel to the owning Feature. Verify that
+  success, failure and expiration each complete the system callback exactly
+  once, including when expiration races with completion. Trace cancellation
+  from expiration to the work it owns. Check the system mechanism that permits
+  execution after backgrounding and report on-device delivery evidence
+  separately from source review.
 - Account transitions: trace a request started in one session that completes
   after sign-out or after a different account signs in. Locate the account
   or session-generation check at publication, or establish how the design
