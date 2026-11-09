@@ -1,3 +1,4 @@
+import {createHash} from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { analyse, maskSwift, scanSource } from './analyse.mjs';
@@ -62,7 +63,11 @@ export async function inspect(project) {
   const inventory = await analyse(root, { includeTests: true });
   const sources = new Map();
   for (const file of inventory.files) {
-    sources.set(file.path, maskSwift(await fs.readFile(path.join(root, file.path), 'utf8')));
+    const source = await fs.readFile(path.join(root, file.path), 'utf8');
+    if (createHash('sha256').update(source).digest('hex') !== file.hash) {
+      throw Error(`Source changed during inspection: ${file.path}. Run the inspector again.`);
+    }
+    sources.set(file.path, maskSwift(source));
   }
   const paths = new Set(sources.keys());
   const appModelFiles = [...paths].filter(file => /(?:^|\/)2 - AppModel\/AppModel\.swift$/.test(file));

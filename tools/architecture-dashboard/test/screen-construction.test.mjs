@@ -234,3 +234,19 @@ test('reviews independent Tasks inside SwiftUI refresh callbacks', async t => {
   assert.deepEqual(findings.map(item => item.line), [6]);
   assert.match(findings[0].message, /\.refreshable/);
 });
+
+test('rejects a screen changed between inventory and inspection', async t => {
+  const readFile = fs.readFile;
+  let screenReads = 0;
+  t.mock.method(fs, 'readFile', async (file, ...options) => {
+    const contents = await readFile(file, ...options);
+    if (String(file).endsWith(viewPath) && ++screenReads === 2) {
+      return contents.replace('HomeViewModel()', 'OtherViewModel()');
+    }
+    return contents;
+  });
+  await assert.rejects(inspectView(t, `struct HomeView: View {
+    @State private var viewModel = HomeViewModel()
+    var body: some View { Text("Home") }
+  }`), /Source changed during inspection: .*HomeView\.swift/);
+});
