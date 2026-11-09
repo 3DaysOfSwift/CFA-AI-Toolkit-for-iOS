@@ -510,10 +510,12 @@ export async function inspect(project) {
     }
   }
   const viewDeclarations = /\bstruct\s+(\w+)(?:\s*<[^{}]+>)?\s*:\s*(?:(?:\w+\s*\.\s*)*\w+\s*,\s*)*(?:SwiftUI\s*\.\s*)?View\b(?!\s*\.)[^{}]*\{/g;
+  const viewConformances = /\bextension\s+(\w+)\s*:\s*(?:(?:\w+\s*\.\s*)*\w+\s*,\s*)*(?:SwiftUI\s*\.\s*)?View\b(?!\s*\.)[^{}]*\{/g;
   const rootViewNames = new Set(['ContentView', 'RootTabView', 'RootView']);
   const viewNames = new Set();
   for (const source of sources.values()) {
     for (const view of source.matchAll(viewDeclarations)) viewNames.add(view[1]);
+    for (const view of source.matchAll(viewConformances)) viewNames.add(view[1]);
   }
   const swiftDataAccess = /\b(?:ModelContainer|ModelContext)\b|@(?:SwiftData\s*\.\s*)?Query\b|\.(?:modelContainer|`modelContainer`)\s*\(|(?:@(?:SwiftUI\s*\.\s*)?Environment|\.\s*environment)\s*\(\s*\\\s*(?:(?:SwiftUI\s*\.\s*)?EnvironmentValues\s*)?\.\s*modelContext\b/;
   for (const [file, source] of sources) {

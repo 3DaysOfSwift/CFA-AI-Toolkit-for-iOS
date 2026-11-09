@@ -509,3 +509,14 @@ test('reviews direct Feature access in an extension of a scanned screen', async 
   const findings = report.findings.filter(item => item.code === 'view-feature-access');
   assert.deepEqual(findings.map(({file, line}) => [file, line]), [[extensionFile, 2]]);
 });
+
+test('reviews Feature access when a View declares its conformance in an extension', async t => {
+  const extensionFile = 'App/Presentation/HomeView+Body.swift';
+  const {report} = await inspectView(t, 'struct HomeView {}', {
+    [extensionFile]: 'extension HomeView: SwiftUI.View { var body: some View { Text(AppModel.shared.homeFeature.title) } }',
+    'App/Presentation/HomeView+Actions.swift': 'extension HomeView { func refresh() async { await AppModel.shared.homeFeature.refresh() } }',
+    'App/2 - AppModel/AppModel.swift': 'final class AppModel { let homeFeature: HomeFeature }'
+  });
+  assert.deepEqual(report.findings.filter(item => item.code === 'view-feature-access').map(item => item.file).sort(),
+    ['App/Presentation/HomeView+Actions.swift', extensionFile]);
+});
