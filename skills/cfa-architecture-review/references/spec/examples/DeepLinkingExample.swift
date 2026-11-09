@@ -99,8 +99,8 @@ final class DeepLinkingFeature {
 
     // The scene checks cancellation and returns true only after navigation occurs.
     func open(id: String, inScene navigate: @MainActor (DestinationRequest) async -> Bool) async throws {
-        guard !Task.isCancelled, !activeRequests.contains(id), let request = pending.first(where: { $0.id == id }) else { return }
-        activeRequests.insert(id)
+        guard !Task.isCancelled, let request = pending.first(where: { $0.id == id }) else { return }
+        guard activeRequests.insert(id).inserted else { throw PendingRequestError.operationInProgress }
         defer { activeRequests.remove(id) }
         if !openedAwaitingRemoval.contains(id) {
             guard await navigate(request) else { return }
@@ -148,11 +148,15 @@ final class DeepLinkingFeature {
         }
         while releaseNavigation == nil { await Task.yield() }
         var secondSceneOpened = false
-        try await firstRun.open(id: initialRequest.id) { _ in
-            secondSceneOpened = true
-            return true
+        do {
+            try await firstRun.open(id: initialRequest.id) { _ in
+                secondSceneOpened = true
+                return true
+            }
+            preconditionFailure("The second scene must receive a busy outcome")
+        } catch PendingRequestError.operationInProgress {
+            precondition(!secondSceneOpened && firstRun.pending == [initialRequest])
         }
-        precondition(!secondSceneOpened && firstRun.pending == [initialRequest])
         do {
             try await firstRun.dismiss(id: initialRequest.id)
             preconditionFailure("Dismissal must not race an active navigation")
