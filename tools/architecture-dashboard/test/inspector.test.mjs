@@ -1486,6 +1486,20 @@ test('reviews AppModel composition in previews outside the View folder', async t
   ]);
 });
 
+test('reviews ViewModel injection in previews', async t => {
+  const file = 'App/PreviewContent/HomePreview.swift';
+  const root = await fixture(t, {
+    [file]: `#Preview { HomeView() }
+    #Preview { HomeView().environment(HomeViewModel()) }
+    struct HomePreview: PreviewProvider {
+      static var previews: some View { HomeView().environmentObject(HomeViewModel()) }
+    }`
+  });
+  const { findings } = await inspect(root);
+  assert.deepEqual(findings.filter(item => item.code === 'view-model-environment-provider')
+    .map(item => [item.file, item.line]), [[file, 2], [file, 4]]);
+});
+
 test('reviews a preview passing the shared graph without accessing a Feature', async t => {
   const file = 'App/PreviewContent/HomePreview.swift';
   const root = await fixture(t, {

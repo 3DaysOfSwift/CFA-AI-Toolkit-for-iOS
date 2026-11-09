@@ -746,6 +746,7 @@ export async function inspect(project) {
     for (const preview of source.matchAll(/(?:#Preview\b\s*(?:\([^{}]*?\)\s*)?|\b(?:struct|enum|class|extension)\s+\w+\s*:[^{}]*?\bPreviewProvider\b[^{}]*)\{/g)) {
       const start = preview.index + preview[0].length;
       const previewBody = braceBody(source, start - 1);
+      inspectEnvironmentProviders('This preview', previewBody, file, source, start);
       const access = findFeatureAccess(previewBody);
       const composition = /\bAppModel\s*(?:\.\s*(?:live|init)\s*)?\(/.exec(previewBody);
       if (composition) {
