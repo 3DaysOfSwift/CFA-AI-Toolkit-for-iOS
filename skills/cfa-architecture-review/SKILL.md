@@ -41,6 +41,13 @@ accessibility/functional problems separately from design preferences.
 
 For CFA conformance, read the [CFA specification](references/cfa-specification.md), [CFA change gate](references/cfa-change-gate.md) and inspect actual source and live wiring. Trace screen state, business decisions, authoritative feature state, AppModel construction and repository boundaries. Report findings with source locations, consequences and actionable recommendations. Distinguish intentional departures from defects. Do not require a type named AppModel when reviewing another architecture.
 
+Trace published snapshots from their authoritative owner to their consumers.
+Check stored properties and nested references for mutation, and follow writes
+through persistence to publication. A local draft or mutable value alone does
+not establish a synchronization defect. For a concurrency finding, identify
+the competing copy or mutation path and how it can diverge. For CFA conformance,
+check the published snapshot's immutability separately.
+
 When known paid capabilities fall within the review scope, identify their
 entitlement policy and trace each identifiable entry point to its check. Report
 an established unguarded call or exposure with source evidence; identify paths
