@@ -20,6 +20,12 @@ Save `analysis-ledger.md` beside the generated report. Record:
   by truncated outputs. Mark genuinely generated/vendor code separately with
   the reason and the integration contracts inspected; never exclude difficult
   application code to make the review complete.
+  The default dashboard scan excludes conventionally named test directories.
+  Account for tests from target membership and read them separately, or use
+  `--include-tests` to inventory them and keep test sites separate from
+  production counts in the review. When citing tests omitted from the report
+  scan, record their exact file hashes in `evidenceHashes` as described in
+  [the review input format](../scripts/dashboard/Documentation/REVIEWS.md).
 - Every feature entry point and its reachable implementation: Views, ViewModels,
   managers, repositories, services, actors, extensions, app intents, lifecycle
   callbacks, notifications and relevant synchronous work outside explicit Tasks.
