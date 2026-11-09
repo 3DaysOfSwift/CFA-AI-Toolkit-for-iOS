@@ -87,6 +87,9 @@ Use deliberate passes:
    capabilities. Verify the same destinations and existing deferred-open
    and history behaviour after migration. Apply the new-app pending design
    only where it fits the agreed scope and preserves the existing behaviour.
+   If the app already supports multiple windows, verify that opening a link
+   still targets the intended scene without redirecting the others. For CFA
+   pending requests, apply the [scene navigation rule](references/spec/rules/cfa-link-02.md).
    When migration changes a paid capability or one of its entry points, apply
    the [paid capability rule](references/spec/rules/cfa-pay-01.md). Trace access
    before and after migration, including routes that bypass the usual screen.

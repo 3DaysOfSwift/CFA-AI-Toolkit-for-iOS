@@ -260,13 +260,15 @@ Record actual background execution only when supported by device evidence.
 
 When reviewing deep links or notification actions, apply the
 [deep-link rule](references/spec/rules/cfa-link-01.md). Trace URL opens and
-user actions on local and push notifications through DeepLinkingFeature to
-the receiving scene. Verify that scheduling or delivery alone leaves the
-pending list unchanged. Trace event identity through retries. Repeated
-callbacks for one opening event must not reopen it, and distinct events for
-the same destination must remain separate.
+user actions on local and push notifications from the app callback to the
+receiving scene. For an existing implementation, record how it handles
+deferral, retries and notification history so a migration can preserve them.
 
-Where the app uses the pending-request design, check that invalid requests
+Where the app uses CFA's pending-request design, trace those callbacks
+through DeepLinkingFeature. Verify that scheduling or delivery alone leaves
+the pending list unchanged. Trace event identity through retries. Repeated
+callbacks for one opening event must not reopen it, and distinct events for
+the same destination must remain separate. Check that invalid requests
 leave the visible list and saved snapshot intact. A valid request becomes
 visible only after saving. Verify that a failed save reaches the caller
 without publishing the request. With an unreadable list, verify that the read
@@ -276,9 +278,12 @@ across restart. Also trace reception during restoration and verify that an
 older restore cannot resurrect an opened item or remove unrelated entries.
 
 Verify that refusal, cancellation before opening, and a failed or unavailable
-scene leave the request pending. Either scene can open a pending request
-without changing another scene's destination. Competing opens navigate once,
-and dismissal must not race an active open of the same request. Check that
+scene leave the request pending. For multi-window apps, apply the
+[scene navigation rule](references/spec/rules/cfa-link-02.md). Verify that
+either scene can open a pending request without changing another scene's
+destination. While one scene is deciding, verify that another can open a
+different request. Competing opens of the same request navigate once, and
+dismissal must not race an active open of that request. Check that
 successful navigation counts even when cancellation follows or content is
 still loading. If saving the removal fails after navigation, verify that retry
 removes the request without navigating again. For a failed explicit dismissal,
