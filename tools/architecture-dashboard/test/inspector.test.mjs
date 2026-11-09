@@ -349,6 +349,9 @@ test('does not identify a launch guard by the order of private Boolean propertie
   });
   const findings = (await inspect(root)).findings;
   const booleans = findings.filter(item => item.code === 'app-model-boolean-purpose');
+  const extra = findings.find(item => item.code === 'app-model-extra-boolean-state');
+  assert.equal(extra?.severity, 'review');
+  assert.match(extra?.message, /unrelatedFlag \(line 2\).*didFinishLaunching \(line 3\)/);
   assert.equal(booleans.length, 2);
   assert.ok(booleans.every(item => item.severity === 'review'));
   assert.ok(!findings.some(item => item.code === 'app-model-non-feature-state' && /didFinishLaunching/.test(item.message)));

@@ -360,6 +360,7 @@ export async function inspect(project) {
           (declarations.length !== 1 || isFeatureCandidate(type, declarations[0].file))) continue;
       findings.push(finding('app-model-non-feature-state', 'review', `AppModel appears to store ${match[1]} from ${type} construction. Verify the inferred type and keep services and presentation state outside AppModel storage.`, appModelFile, line));
     }
+    const booleanLocations = [];
     for (const match of appMembers.matchAll(/(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(private[ \t]+)?(?:(?:private\(set\)|fileprivate|internal|public|package)[ \t]+)?(?:let|var)[ \t]+(\w+)[ \t]*:\s*(?:any\s+)?(?:\w+\s*\.\s*)*(\w+)/gm)) {
       const [, privateModifier, name, type] = match;
       let suffix = appModel.slice(match.index + match[0].length);
@@ -384,6 +385,7 @@ export async function inspect(project) {
       if (defaultValue) findings.push(finding('app-model-default-value', 'warning', `AppModel property ${name} has a default value; initialise it in the explicit initializer.`, appModelFile, lineOf(appModel, match.index)));
       if (type === 'Bool' && privateModifier) {
         // A declaration's order and type do not establish its purpose.
+        booleanLocations.push(`${name} (line ${lineOf(appModel, match.index)})`);
         findings.push(finding('app-model-boolean-purpose', 'review', `AppModel declares private Bool ${name}; verify whether it is the launch guard and whether its initialization and use follow the AppModel rules.`, appModelFile, lineOf(appModel, match.index)));
         continue;
       }
@@ -395,6 +397,9 @@ export async function inspect(project) {
       const declarations = declarationsByName.get(type) || [];
       const declarationFile = declarations.length === 1 ? declarations[0].file : undefined;
       if (!isFeatureCandidate(type, declarationFile)) findings.push(finding('app-model-non-feature-state', 'warning', `AppModel stores ${name}: ${type}; check that it is a Feature, launch guard or private app-wide listener handle.`, appModelFile, lineOf(appModel, match.index)));
+    }
+    if (booleanLocations.length > 1) {
+      findings.push(finding('app-model-extra-boolean-state', 'review', `AppModel declares multiple private Boolean properties: ${booleanLocations.join(', ')}. CFA permits one launch guard. Check active compilation conditions and move unrelated state to its owner.`, appModelFile, lineOf(appModel, appModelDeclaration.index)));
     }
   }
   const checkedFeatureTests = new Set();
