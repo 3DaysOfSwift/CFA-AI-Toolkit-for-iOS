@@ -1768,9 +1768,12 @@ Before accepting a change, answer every question:
    Features needed by its screen?
 8. Does AppModel assemble and expose Features, own app-wide listener tasks,
    and limit coordination to genuinely application-wide responsibilities?
+   Verify repeated startup signals start each listener once and that it forwards
+   events to the owning Feature even when no relevant screen is visible.
    For system background work, does the responsible Feature register each
    permitted handler once during launch and schedule requests separately?
-   Verify cancellation and system completion on expiration and exercise
+   Verify that success, failure and expiration each complete the system
+   callback once, and that expiration cancels the work as required. Exercise
    background execution on a supported device.
 9. Is persistence accessed through repository protocols, and are other
    external-system details handled by appropriate microservices?
