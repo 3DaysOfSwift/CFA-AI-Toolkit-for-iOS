@@ -20,6 +20,7 @@ const cfaSkillNames = [
 ];
 // Keep this legacy ownership marker stable so upgrades recognise existing guidance.
 const guidanceMarker = '<!-- CFA Toolkit project guidance -->';
+const outdatedAppModelGuidance = 'AppModel stores only shared, concrete Features, and one private launch guard.';
 const outdatedFeatureGuidance = 'managers use the Manager suffix';
 const projectGuidance = `${guidanceMarker}
 # CFA project guidance
@@ -147,8 +148,12 @@ function doctor(projectArgument) {
   if (guidance.length > 0) {
     console.log(`PASS CFA project guidance: ${guidance.join(', ')}`);
     for (const file of guidance) {
-      if (fs.readFileSync(file, 'utf8').includes(outdatedFeatureGuidance)) {
+      const content = fs.readFileSync(file, 'utf8');
+      if (content.includes(outdatedFeatureGuidance)) {
         console.log(`WARN outdated feature naming guidance in ${file}; update the CFA guidance block to use concrete *Feature types and matching *Feature properties.`);
+      }
+      if (content.includes(outdatedAppModelGuidance)) {
+        console.log(`WARN outdated AppModel guidance in ${file}; update the CFA guidance block to allow private task handles for app-wide listeners.`);
       }
     }
   } else {
@@ -188,15 +193,19 @@ function enableProject(values) {
           ? claudeFile
           : codexFile;
 
-  if (fs.existsSync(guidanceFile) && fs.readFileSync(guidanceFile, 'utf8').includes(guidanceMarker)) {
+  const existingGuidance = fs.existsSync(guidanceFile) ? fs.readFileSync(guidanceFile, 'utf8') : '';
+  if (existingGuidance.includes(guidanceMarker)) {
     console.log(`CFA project guidance is already enabled: ${guidanceFile}`);
-    if (fs.readFileSync(guidanceFile, 'utf8').includes(outdatedFeatureGuidance)) {
+    if (existingGuidance.includes(outdatedFeatureGuidance)) {
       console.log('The existing guidance still uses the old Manager rule. Edit only the CFA guidance block; the command will not overwrite project instructions.');
+    }
+    if (existingGuidance.includes(outdatedAppModelGuidance)) {
+      console.log('The existing AppModel guidance should allow private task handles for app-wide listeners. Edit only the CFA guidance block.');
     }
     return;
   }
 
-  const prefix = fs.existsSync(guidanceFile) && fs.readFileSync(guidanceFile, 'utf8').trim().length > 0 ? '\n\n' : '';
+  const prefix = existingGuidance.trim().length > 0 ? '\n\n' : '';
   fs.appendFileSync(guidanceFile, `${prefix}${projectGuidance}`);
   console.log(`Enabled CFA project guidance: ${guidanceFile}`);
 }

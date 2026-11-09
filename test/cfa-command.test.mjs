@@ -84,12 +84,12 @@ test('enable-project can create Claude guidance when explicitly requested', (t) 
   assert.equal(fs.existsSync(path.join(project, 'AGENTS.md')), false);
 });
 
-test('doctor warns about previously installed Manager naming guidance without changing it', (t) => {
+test('doctor warns about previously installed Manager naming and AppModel guidance without changing it', (t) => {
   const { directory, command } = installedCommand(t);
   const project = path.join(directory, 'project');
   fs.mkdirSync(project);
   const agents = path.join(project, 'AGENTS.md');
-  const original = '<!-- CFA Toolkit project guidance -->\nAppModel properties exposing feature managers use the Manager suffix.\n';
+  const original = '<!-- CFA Toolkit project guidance -->\nAppModel properties exposing feature managers use the Manager suffix.\n- AppModel stores only shared, concrete Features, and one private launch guard.\n';
   fs.writeFileSync(agents, original);
 
   const doctor = spawnSync(command, ['doctor', project], { encoding: 'utf8' });
@@ -97,6 +97,8 @@ test('doctor warns about previously installed Manager naming guidance without ch
 
   assert.equal(doctor.status, 0, doctor.stderr);
   assert.match(doctor.stdout, /outdated feature naming guidance/);
+  assert.match(doctor.stdout, /outdated AppModel guidance.*app-wide listeners/);
+  assert.match(repeated.stdout, /existing AppModel guidance.*app-wide listeners/);
   assert.match(repeated.stdout, /will not overwrite project instructions/);
   assert.equal(fs.readFileSync(agents, 'utf8'), original);
 });
