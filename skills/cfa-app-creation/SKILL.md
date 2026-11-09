@@ -71,6 +71,16 @@ rule: storage never gates the root interface. Exercise initial store-opening
 failure, feature-scoped error/retry, and independent navigation before claiming
 that behaviour is verified. Do not introduce an app-level startup-error screen.
 
+If the product requires offline edits or cross-device data, apply the
+[sync rule](references/spec/rules/cfa-sync-01.md). Choose storage and transfer
+according to the target capabilities and the product's data contract. Agree
+on what local success means, what requires server confirmation, and how
+conflicts or rejections appear to the user. For custom-server offline edits,
+save the edit and its pending-sync metadata together before reporting local
+success. Verify failed sync, restart, and duplicate-safe retry. For
+Apple-managed sync, verify the account, schema and conflicting offline
+edits on supported devices. Add synchronization only for a product need.
+
 ## Test targets
 
 Start with the app target and its unit-test target. Add product targets such
