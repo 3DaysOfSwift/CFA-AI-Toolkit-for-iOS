@@ -36,7 +36,10 @@ test('maps a complete screen to AppModel, feature, collaborator and named tests'
   const ambiguous = await inspect(root);
   assert.equal(ambiguous.screens[0].dependencies[0].featureFile, null);
   assert.deepEqual(ambiguous.screens[0].dependencies[0].collaborators, []);
-  assert.ok(ambiguous.findings.some(item => item.code === 'feature-source-ambiguous'));
+  const ambiguity = ambiguous.findings.filter(item => item.code === 'feature-source-ambiguous');
+  assert.deepEqual(ambiguity.map(item => item.file), ['Application/2 - AppModel/AppModel.swift']);
+  await fs.unlink(path.join(root, 'Application/1 - View/Views/Chat/ChatViewModel.swift'));
+  assert.ok((await inspect(root)).findings.some(item => item.code === 'feature-source-ambiguous'));
   assert.ok(!ambiguous.findings.some(item => item.code === 'feature-placement'));
 
 });
