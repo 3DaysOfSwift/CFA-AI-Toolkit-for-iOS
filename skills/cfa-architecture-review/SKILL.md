@@ -134,6 +134,14 @@ creation and expensive operations. A deliberately UI-owned context still
 keeps its records inside the storage boundary and requires evidence that its
 work stays short.
 
+For published API and persistence snapshots, apply the
+[immutable snapshot rule](references/spec/rules/cfa-snapshot-01.md). Identify
+the values the Feature actually publishes, then check their stored properties
+and nested collection elements. A `let` reference can still expose mutable
+state. Trace durable edits from the draft through the owning Feature and
+check that a confirmed write publishes a replacement while a previously
+held snapshot remains unchanged.
+
 Apply the [Feature isolation rule](references/spec/rules/cfa-conc-01.md)
 even when a Feature has no current screen. Check its effective MainActor
 isolation in each affected target, accounting for the Swift language mode,

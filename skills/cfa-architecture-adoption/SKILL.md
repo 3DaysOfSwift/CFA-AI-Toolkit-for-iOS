@@ -75,6 +75,12 @@ Feature updates on supported devices separately from those checks. For an App
 Group widget snapshot, verify the write precedes the reload request and a
 failed write issues no request.
 
+When moving ownership of published API or persistence values, apply the
+[immutable snapshot rule](references/spec/rules/cfa-snapshot-01.md). Check
+nested values for mutable references and keep editable drafts separate.
+Verify that successful durable writes publish replacements without changing
+snapshots already held by callers.
+
 When changing store access, apply the
 [database availability rule](references/spec/rules/cfa-launch-02.md) and its
 verification checklist. Keep root navigation available during slow or failed
