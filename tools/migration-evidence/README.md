@@ -44,7 +44,8 @@ Use scope.constraints or the case study for selection rationale and applicabilit
 Before/after build and test entries include their command, environment, commit,
 date, outcome and evidence reference. For completion, list every affected
 target in `completionGate.affectedTargets` and identify the targets covered by
-each build in its `targets` array. Several records may cover the list. Older
+each build in its `targets` array. Several records may cover the list. The build
+linked by `buildEvidenceId` cannot name only unrelated targets. Older
 completed records need target names and renewed review. A check not run still has a planned command
 and a note explaining why. Commands are text: the helper never executes them.
 A `completed` record requires a pinned `repository.afterCommit` and passed

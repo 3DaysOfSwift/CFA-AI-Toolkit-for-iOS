@@ -222,6 +222,14 @@ test('completion is not inferred from a build pass or tests at a different commi
   f.write();
   assert.ok(inspectRecord(f.file).errors.some(error => error.includes('missing passed build at afterCommit for Widget')));
   widgetBuild.commit = f.record.repository.afterCommit;
+  const unrelatedBuild = {...widgetBuild, id: 'unrelated-build', targets: ['Unrelated']};
+  f.record.evidence.push(unrelatedBuild);
+  f.record.completionGate.buildEvidenceId = unrelatedBuild.id;
+  f.write();
+  const unrelatedResult = inspectRecord(f.file);
+  assert.ok(unrelatedResult.errors.includes('completionGate.buildEvidenceId: unrelated-build names only unrelated targets.'));
+  assert.ok(!unrelatedResult.errors.some(error => error.includes('missing passed build at afterCommit')));
+  f.record.completionGate.buildEvidenceId = 'after-build';
   delete f.record.completionGate.dataHandoffEvidenceIds;
   f.record.status = 'draft';
   f.write();
