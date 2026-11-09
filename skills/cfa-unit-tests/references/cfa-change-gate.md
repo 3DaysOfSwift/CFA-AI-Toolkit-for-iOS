@@ -302,10 +302,12 @@ do not claim that UI gating replaces server-side authorisation.
   appropriate task's value.
 - Read the App `body`: it must install a stable root without branching on
   storage, loading, or errors. Do not merely move that branch into RootTabView.
-- For persistence changes, fail the initial store open and verify the root stays
-  visible, the affected feature shows its request error, and Settings or another
-  independent screen remains reachable. Verify successful retry and retained
-  data after failed refresh. Report any storage/UI checks that did not run.
+- For persistence changes, hold the initial store open pending and verify that
+  the root appears and Settings or another independent screen is reachable
+  while it waits. Fail the open and verify that independent navigation still
+  works and the affected Feature presents a recoverable request error. Verify
+  successful retry and retained data after failed refresh. Report any
+  storage or UI checks that did not run.
 - For optional download caches, verify refresh starts while restoration is
   pending and returns fresh data while the cache write is pending. A failed
   refresh preserves valid displayed data. A late restore or delayed write

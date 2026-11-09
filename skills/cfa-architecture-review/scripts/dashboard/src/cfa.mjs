@@ -202,7 +202,8 @@ skill from that toolkit before changing the project.
   or blocking overlays. Open storage lazily within a Feature's data request;
   opening failures follow that request through Feature, ViewModel and screen,
   never an app-level launch error. Retry the request without discarding data.
-  Verify initial open failure leaves the root and independent navigation usable.
+  Verify that the root appears and independent navigation works while the
+  initial open is pending and after it fails.
 - During migration, preserve business behaviour, user-facing capabilities,
   stored data and meaningful interactions. Limit implementation changes to
   the agreed CFA and Swift Concurrency migration and supported platforms.
