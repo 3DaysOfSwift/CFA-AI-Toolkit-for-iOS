@@ -13,8 +13,9 @@ Features own authoritative application state. A persisted record, implementation
 
 Persist user edits and other durable commands before reporting them as saved. On failure, keep the existing state, retain the editable draft and report the error for retry. Loading and error presentation may update separately.
 
-An optional local cache of a successful remote response is different: show the
-current response without waiting for the cache. Try the cache write with a
+An optional local cache of a successful remote response can be saved
+independently. Show the current response and complete the refresh for its
+callers while the cache write is pending. Try the cache write with a
 bounded retry, preserve any previous good cache on failure, and do not imply the
 new data is available offline unless it was saved. Keep writes ordered so an
 older snapshot cannot replace a newer one.

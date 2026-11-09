@@ -177,7 +177,8 @@ skill from that toolkit before changing the project.
   saved value only through an intentional migration or a successful user choice.
   Report unreadable or corrupt durable storage and failed durable writes as errors.
 - Start remote refresh and optional cache restoration independently when both
-  are needed. Publish current server data without waiting for the cache write.
+  are needed. Publish current server data and complete the refresh for its
+  callers without waiting for the cache write.
   Keep valid in-memory data if refresh fails, and prevent older restores from
   replacing fresher data. Bound cache-write retries, preserve the last usable
   cache if replacement fails, and prevent older writes from replacing newer
