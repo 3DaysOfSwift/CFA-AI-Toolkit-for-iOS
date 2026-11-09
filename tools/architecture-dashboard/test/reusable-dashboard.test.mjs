@@ -35,6 +35,7 @@ test('test summary rejects inconsistent counts and keeps zero total distinct',()
  assert.equal(importTestResults(run).totalTestCount,5);
  assert.throws(()=>importTestResults({...run,totalTestCount:4}),/sum/);
  assert.throws(()=>importTestResults({...run,passedTests:-1}),/count/);
+ assert.throws(()=>importTestResults({...run,startTime:9e12}),/timestamp/);
  assert.equal(importTestResults({passedTests:0,failedTests:0,skippedTests:0,totalTestCount:0,startTime:1}).totalTestCount,0);
 });
 

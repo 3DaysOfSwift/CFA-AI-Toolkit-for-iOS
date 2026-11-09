@@ -3,7 +3,7 @@ export function importTestResults(input) {
     if(!Number.isSafeInteger(input?.[key]) || input[key]<0) throw Error('Invalid Xcode test count: '+key);
   }
   if(input.passedTests+input.failedTests+input.skippedTests!==input.totalTestCount) throw Error('Xcode test counts do not sum to total');
-  if(!Number.isFinite(input.startTime) || input.startTime<0) throw Error('Invalid Xcode test run timestamp');
+  if(!Number.isFinite(input.startTime) || input.startTime<0 || !Number.isFinite(new Date(input.startTime * 1000).getTime())) throw Error('Invalid Xcode test run timestamp');
   if(input.result!==undefined && (typeof input.result!=='string' || !input.result.trim())) throw Error('Invalid Xcode run result');
   const result = input.result ?? 'Not supplied';
   const outcome = input.failedTests > 0 || result === 'Failed' ? 'failed'
