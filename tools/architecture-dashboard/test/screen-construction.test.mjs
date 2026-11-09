@@ -63,6 +63,15 @@ test('flags a module-qualified ViewModel initializer input', async t => {
   assert.match(input.message, /appears to accept a ViewModel/);
 });
 
+test('maps a conventionally located screen with qualified View conformance', async t => {
+  const {report} = await inspectView(t, `struct HomeView: SwiftUI.View {
+    @State private var viewModel = HomeViewModel()
+    var body: some View { Text("Home") }
+  }`);
+  assert.equal(report.screens[0]?.name, 'HomeView');
+  assert.equal(report.screens[0]?.ownsViewModel, true);
+});
+
 test('a nested snapshot type is not a ViewModel initializer input', async t => {
   const {report, findings} = await inspectView(t, `struct HomeView: View {
     @State private var viewModel: HomeViewModel

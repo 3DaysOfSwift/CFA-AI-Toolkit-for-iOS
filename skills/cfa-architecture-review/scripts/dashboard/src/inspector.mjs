@@ -405,7 +405,7 @@ export async function inspect(project) {
   for (const viewFile of [...paths].filter(file => screenPath.test(file) && !file.endsWith('/RootTabView.swift')).sort()) {
     const view = sources.get(viewFile);
     const name = screenName(viewFile);
-    const declaration = new RegExp(`\\bstruct\\s+${name}\\s*:\\s*View\\b[^\\{]*\\{`).exec(view);
+    const declaration = [...view.matchAll(viewDeclarations)].find(match => match[1] === name);
     if (!declaration) continue;
     const bodyOffset = declaration.index + declaration[0].length;
     const body = braceBody(view, bodyOffset - 1);
