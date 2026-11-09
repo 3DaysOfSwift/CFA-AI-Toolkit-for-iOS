@@ -107,13 +107,13 @@ checks. If coverage is unresolved, the command lists the remaining checks in
 the terminal. Use `next` to resume the review before generating the report.
 The scanner cannot establish target membership or discover every event by itself.
 
-The review's `presentation` contains `app`, `summary`, `conclusion` and
-`criteria`. Each criterion has a `title`, `detail`, `status` (`pass`, `concern`
-or `problem`) and optional `evidence`. The score equally weights reviewed
-criteria (1, ½ or 0 respectively). It is an approximate summary of the chosen
-criteria, not a scanner verdict or proof of whole-app coverage. Describe the
-scope accurately so readers understand what the score represents. The internal
-report renderer is not a substitute for the whole-app review workflow.
+The review's `presentation` requires `app`, `summary`, `verdict`, `conclusion`
+and a nonempty list of `criteria`. Use the verdict to describe the app’s
+concurrency design. Each criterion has a `title`, `detail`, `status` (`pass`,
+`concern` or `problem`) and optional `evidence`. The renderer weights criteria
+equally (1, ½ or 0 respectively) to choose the assessment label. Set
+`qualitativeOnly` to show the Result without a percentage. Coverage checks
+come from the whole-app review workflow.
 
 ### Experimental compiler-index map
 
