@@ -77,9 +77,10 @@ skill from that toolkit before changing the project.
   the View layer. Reusable presentation components may receive action closures
   that forward intent to their owning screen and its ViewModel. Keep service
   closures and other screens' ViewModel actions out of screen inputs.
-- Published domain snapshots use immutable properties and contents, without
-  mutable reference state that undermines them; replace them after confirmed
-  changes. The screen ViewModel owns temporary unsaved editor values. Keep the
+- Published domain snapshot structs use let properties and immutable contents.
+  Check nested values and collection elements for references that can change
+  in place. Publish a replacement snapshot after a confirmed change.
+  The screen ViewModel owns temporary unsaved editor values. Keep the
   draft available for retry if saving fails. Discard it when the user cancels
   editing, and publish confirmed changes only after required persistence succeeds.
 - Start with independent Features; compose them only for a genuine business
