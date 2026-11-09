@@ -111,6 +111,14 @@ access and the [persistence rules](references/spec/topics/19-keep-persistence-be
 to SwiftData access. A manager declaration identifies a candidate boundary.
 Confirm that the relevant requests actually go through it.
 
+Apply the [Feature isolation rule](references/spec/rules/cfa-conc-01.md)
+even when a Feature has no current screen. Check its effective MainActor
+isolation in each affected target, accounting for annotations and default
+isolation. Follow expensive synchronous work into the service and check its
+effective isolation too. An async signature or separate type is insufficient
+evidence that the work leaves MainActor. Separate source findings from measured
+responsiveness.
+
 When reviewing an optional download cache, apply the
 [optional snapshot rule](references/spec/rules/cfa-cache-01.md). Trace three
 separate points: when refresh can start, when the caller receives its result,
