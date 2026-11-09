@@ -486,6 +486,13 @@ evidence with the relevant findings; do not imply unreviewed code was assessed.
 The `presentation.verdict` field is required and supplies this card text; do not
 copy the review scope or a procedural summary into it.
 
+Keep CFA-only deviations in the CFA alignment checks. Use the overall card
+and its criteria to assess Swift Concurrency and architectural clarity. A
+confirmed defect keeps the Result at **Needs attention** even when the
+numerical score is high. Use the separate Frankenstein verdict to identify
+an evidenced architectural conflict. A local defect alone does not establish
+that verdict.
+
 
 Immediately after the overall verdict, show concise assessment rows with a leading
 status symbol and written label. The reader must be able to distinguish what works,
