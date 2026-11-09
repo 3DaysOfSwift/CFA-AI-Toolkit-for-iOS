@@ -207,8 +207,10 @@ receives its own events. Control teardown explicitly instead of using sleeps.
 For system background work, use a controlled scheduler to verify that launch
 registers each applicable handler once and that scheduling happens separately.
 Drive the handler through success, failure and expiration. Verify that the
-owning Feature handles cancellation and completes the system callback once.
-Confirm actual background execution on a supported device.
+owning Feature cancels the work on expiration. Hold the work at completion
+and deliver expiration before releasing it. Verify that the race still
+completes the system callback exactly once. Confirm actual background
+execution on a supported device separately from the controlled tests.
 
 Give each production ViewModel a matching
 test file and test what its View can observe: loading/ready/error states,

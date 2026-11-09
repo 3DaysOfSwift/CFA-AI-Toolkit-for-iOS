@@ -293,7 +293,7 @@
       "strength": "Required when applicable",
       "rule": "Each Feature owns its background capability. During synchronous startup, AppModel can ask the Feature to register its handlers. Register each permitted BGTaskScheduler identifier once before launch finishes and schedule work separately. Route app-level callbacks through AppModel to the responsible Feature and honour expiration, cancellation and system completion. Feature-owned work may outlive a screen. To continue after iOS backgrounds the app, use a supported system mechanism. An ordinary Swift Task grants no background runtime.",
       "why": "System lifecycle handling stays separate from feature behaviour.",
-      "verify": "Verify permitted task identifiers and once-only launch registration. Check that scheduling is separate and that success, failure and expiration each complete the system callback once. Verify actual background execution on a supported device.",
+      "verify": "Verify permitted task identifiers and once-only launch registration. Check that scheduling is separate and expiration cancels owned work. Exercise expiration racing normal completion and verify the system callback completes exactly once. Record actual background execution on a supported device separately from controlled tests.",
       "example": "AppModel asks a Feature to register an eligible system background handler during launch.",
       "explanationIds": []
     },
