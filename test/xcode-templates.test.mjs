@@ -235,6 +235,7 @@ test('CFA App includes a separate unit-test template component', {skip: process.
   const testFiles = ['AppModelTests/AppModelTests.swift', 'FeatureTests/GitReposFeatureTests.swift', 'FeatureTests/SettingsFeatureTests.swift', 'NetworkingTests/NetworkingManagerTests.swift', 'ViewModelTests/GitReposViewModelTests.swift', 'ViewModelTests/SettingsViewModelTests.swift', 'ViewModelTests/RootTabViewModelTests.swift', 'Support/TestDependencies.swift'];
   for (const file of testFiles) {
     assert.ok(testInfo.Nodes.includes(file), `Missing test source ${file}`);
+    assert.ok(!info.Nodes.includes(file), `Test component source must not be an app node: ${file}`);
     assert.ok(fs.existsSync(path.join(component, testInfo.Definitions[file].Path)));
   }
   assert.equal(info.Targets.filter(target => target.ProductType === 'com.apple.product-type.bundle.ui-testing').length, 0);
