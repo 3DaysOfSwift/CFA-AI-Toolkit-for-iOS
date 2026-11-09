@@ -73,6 +73,36 @@ function labeledClosureOffset(argumentsText, label) {
   return -1;
 }
 
+function inspectLifecycleClosures(source, file, findings, firstLine = 1) {
+  for (const task of source.matchAll(/\.\s*(task|refreshable)\b\s*([({])/g)) {
+    let opening = task.index + task[0].length - 1;
+    if (task[2] === '(') {
+      const closing = closingParenthesis(source, opening);
+      if (closing < 0) continue;
+      const argumentsText = source.slice(opening + 1, closing);
+      const label = task[1] === 'task' ? 'operation' : 'action';
+      const inlineClosure = labeledClosureOffset(argumentsText, label);
+      if (inlineClosure >= 0) {
+        opening += inlineClosure + 1;
+      } else {
+        const trailingClosure = /^\s*\{/.exec(source.slice(closing + 1));
+        if (!trailingClosure) continue;
+        opening = closing + trailingClosure[0].length;
+      }
+    }
+    const modifier = `.${task[1]}`;
+    const lifecycleBody = braceBody(source, opening);
+    const bodyStartLine = firstLine + lineOf(source, opening + 1) - 1;
+    for (const site of scanSource(lifecycleBody, file).sites) {
+      if (site.kind !== 'task' && site.kind !== 'detached') continue;
+      findings.push(finding('task-inside-view-lifecycle', 'review', `A SwiftUI ${modifier} body appears to create an independent Task. Trace its lifetime and cancellation. In CFA, await lifecycle-bound work directly, let the ViewModel own independent screen work, and let the Feature own shared operations that may outlive the screen.`, file, bodyStartLine + site.line - 1));
+    }
+    if (/(?<!\bfunc\s+)\bapplicationDidFinishLaunching\s*\(/.test(lifecycleBody)) {
+      findings.push(finding('view-tied-app-launch', 'review', `A View-layer ${modifier} appears to call applicationDidFinishLaunching. Check whether this is production launch behavior rather than a preview or test, and use the app lifecycle callback for the shared launch signal.`, file, firstLine + lineOf(source, task.index) - 1));
+    }
+  }
+}
+
 /** A lexical route inventory, not a Swift compiler or proof of CFA conformance. */
 export async function inspect(project) {
   const root = await fs.realpath(project);
@@ -311,7 +341,9 @@ export async function inspect(project) {
     if (!isViewFile) {
       for (const view of source.matchAll(/\bstruct\s+\w+(?:\s*<[^{}]+>)?\s*:\s*(?:SwiftUI\s*\.\s*)?View\b[^{}]*\{/g)) {
         const start = view.index + view[0].length;
-        const storage = swiftDataAccess.exec(braceBody(source, start - 1));
+        const body = braceBody(source, start - 1);
+        inspectLifecycleClosures(body, file, findings, lineOf(source, start));
+        const storage = swiftDataAccess.exec(body);
         if (storage) {
           findings.push(finding('view-swiftdata-access', 'review', 'This SwiftUI View appears to access SwiftData directly. Verify that storage is reached through its ViewModel and Feature.', file, lineOf(source, start + storage.index)));
         }
@@ -340,33 +372,7 @@ export async function inspect(project) {
         findings.push(finding('root-storage-gate', 'review', 'Root navigation may gate the interface on storage availability. Open storage within a Feature data request and present its error in the feature screen, never a root wrapper or app-wide blocking overlay.', file, lineOf(source, bodyOffset + gate.index)));
       }
     }
-    for (const task of source.matchAll(/\.\s*(task|refreshable)\b\s*([({])/g)) {
-      let opening = task.index + task[0].length - 1;
-      if (task[2] === '(') {
-        const closing = closingParenthesis(source, opening);
-        if (closing < 0) continue;
-        const argumentsText = source.slice(opening + 1, closing);
-        const label = task[1] === 'task' ? 'operation' : 'action';
-        const inlineClosure = labeledClosureOffset(argumentsText, label);
-        if (inlineClosure >= 0) {
-          opening += inlineClosure + 1;
-        } else {
-          const trailingClosure = /^\s*\{/.exec(source.slice(closing + 1));
-          if (!trailingClosure) continue;
-          opening = closing + trailingClosure[0].length;
-        }
-      }
-      const modifier = `.${task[1]}`;
-      const lifecycleBody = braceBody(source, opening);
-      const bodyStartLine = lineOf(source, opening + 1);
-      for (const site of scanSource(lifecycleBody, file).sites) {
-        if (site.kind !== 'task' && site.kind !== 'detached') continue;
-        findings.push(finding('task-inside-view-lifecycle', 'review', `A SwiftUI ${modifier} body appears to create an independent Task. Trace its lifetime and cancellation. In CFA, await lifecycle-bound work directly, let the ViewModel own independent screen work, and let the Feature own shared operations that may outlive the screen.`, file, bodyStartLine + site.line - 1));
-      }
-      if (/(?<!\bfunc\s+)\bapplicationDidFinishLaunching\s*\(/.test(lifecycleBody)) {
-        findings.push(finding('view-tied-app-launch', 'review', `A View-layer ${modifier} appears to call applicationDidFinishLaunching. Check whether this is production launch behavior rather than a preview or test, and use the app lifecycle callback for the shared launch signal.`, file, lineOf(source, task.index)));
-      }
-    }
+    inspectLifecycleClosures(source, file, findings);
     if (/\b(?:let|var)\s+\w+\s*:\s*AppModel\b/.test(source)) findings.push(finding('stored-app-model', 'review', 'An AppModel-typed declaration appears in the View layer. Check whether a View or ViewModel retains it; this lexical match may be a local value or preview.', file, 1));
     const storageAccess = swiftDataAccess.exec(source);
     if (storageAccess) {

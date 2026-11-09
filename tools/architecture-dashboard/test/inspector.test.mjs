@@ -209,6 +209,25 @@ test('reviews SwiftData access in a SwiftUI View outside the CFA View folder', a
   ]);
 });
 
+test('reviews lifecycle tasks in a SwiftUI View outside the CFA View folder', async t => {
+  const file = 'Application/Presentation/Notes.swift';
+  const root = await fixture(t, {
+    [file]: `struct NotesView: SwiftUI.View {
+      var body: some View {
+        Text("Notes").task {
+          Task { await viewModel.refresh() }
+        }
+      }
+    }
+    struct Worker {
+      func run() { client.task { Task {} } }
+    }`
+  });
+  const { findings } = await inspect(root);
+  assert.deepEqual(findings.filter(item => item.code === 'task-inside-view-lifecycle')
+    .map(({file, line, severity}) => [file, line, severity]), [[file, 4, 'review']]);
+});
+
 test('identifies a launch signal scheduled inside a delegate Task or dispatch queue without flagging independent work', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
