@@ -24,7 +24,8 @@ the responsibility is not already owned by an existing type.
 Preserve these CFA invariants unless the developer explicitly asks to change
 the architecture:
 
-1. Each screen owns a private dedicated ViewModel, constructed inline by default.
+1. Each screen owns a dedicated ViewModel in a private property named `viewModel`.
+   Construct it inline by default.
    A detail View may construct its own State-backed ViewModel in its initializer
    from selected value data. Never pass in or share a ViewModel.
 2. ViewModels default narrow Feature dependencies from AppModel.shared; tests
@@ -210,7 +211,8 @@ from precedent use; do not reframe it as a completed partial migration.
   points towards extracting business behaviour into the model. Keep presentation
   coordination in the presentation layer; dependency count alone is not a defect.
 - Inventory screen initializers and call sites. Verify private ViewModel
-  ownership, allow selected-value detail initialization, and reject ViewModel
+  ownership and the `viewModel` property name separately. Allow selected-value
+  detail initialization and reject ViewModel
   injection or shared screen and scene navigation selection in Features.
   Preserve independent destinations.
 - Compare visuals and interactions with the baseline. Do not introduce
