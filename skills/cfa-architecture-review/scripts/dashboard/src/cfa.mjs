@@ -41,6 +41,11 @@ skill from that toolkit before changing the project.
 - A detail View may receive selected immutable value data and construct its own
   State-backed ViewModel in its initializer. Do not inject or share ViewModels;
   keep each scene's selection in presentation, not in a shared Feature.
+- In a new app with deep links or notification actions, DeepLinkingFeature
+  validates received opening requests and owns their durable pending list.
+  The receiving scene owns navigation. Keep declined or failed requests pending
+  and remove them after the destination opens or the user dismisses the request.
+  Preserve existing link and notification history behaviour during migration.
 - A normal preview constructs the View and follows the same ownership and
   storage boundaries. Keep SwiftData containers and contexts out of previews.
 - Keep Views declarative. Feature state and business decisions belong outside
