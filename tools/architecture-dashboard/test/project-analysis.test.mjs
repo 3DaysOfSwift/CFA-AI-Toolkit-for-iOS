@@ -24,6 +24,7 @@ test('combines syntax and index evidence without treating calls as runtime trace
     assert.equal(result.callCandidates[0].possibleIndexMatches[0].callee,'refresh');
     assert.match(result.limitations.join(' '),/Same-line index matches are candidates/);
     assert.match(result.limitations.join(' '),/not proof of runtime/);
+    assert.match(result.limitations.join(' '), /default actor isolation from the selected target and build configuration/);
   } finally { await fs.rm(root,{recursive:true,force:true}); }
 });
 

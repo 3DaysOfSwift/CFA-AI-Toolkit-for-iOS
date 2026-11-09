@@ -57,6 +57,7 @@ export async function collectProjectAnalysis(root, options = {}, providers = {})
     limitations:['Syntax calls and lexical task nesting are not resolved relationships or runtime parentage.',
       'Same-line index matches are candidates only; multiple calls and macros can make them ambiguous.',
       'Compiler-index calls reflect an unverified build configuration and are not proof of runtime dispatch.',
+      'Build definition hashes identify scanned files. Determine effective Swift language mode and default actor isolation from the selected target and build configuration.',
       'Target membership, dynamic callbacks, task ownership and behaviour require source review.']};
   return {inventory:before, analysis};
 }
