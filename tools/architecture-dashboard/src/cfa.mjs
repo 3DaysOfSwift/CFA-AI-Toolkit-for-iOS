@@ -166,7 +166,9 @@ skill from that toolkit before changing the project.
   replacing fresher data. Bound cache-write retries, preserve the last usable
   cache if replacement fails, and prevent older writes from replacing newer
   snapshots. Report offline availability only for data that was saved. Use JSON
-  by default for a simple cache. Help apply binary snapshots only on request.
+  by default for a simple cache. A missing, incompatible or unreadable cache
+  supplies no restored data. Help apply Instant Loading binary snapshots only
+  on request and for a sufficiently stable format.
 - App.body installs a stable root View and presentation modifiers only. Keep
   startup conditionals, database loading and feature error UI out of App and
   out of the root navigation View; feature screens present their own state.
