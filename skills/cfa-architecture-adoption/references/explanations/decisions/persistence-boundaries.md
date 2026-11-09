@@ -46,9 +46,10 @@ Editorial analysis: a shared storage owner needs clear schema and lifetime polic
 ## Scope and exceptions
 
 Use JSON by default for replaceable snapshots. Instant Loading binary
-snapshots are an opt-in technique for stable formats. Offer them when the
-developer asks about the technique. Keep JSON as the default when creating
-or migrating an app.
+snapshots are an opt-in technique for stable formats. Their decoder must
+safely reject incompatible or corrupt data. Offer them when the developer
+asks about the technique. Keep JSON as the default when creating or migrating
+an app.
 
 One store is a CFA choice, not a SwiftData limit. Keep each context and managed object within its isolation boundary. The guide reports a macOS investigation; do not claim all iOS versions reproduce it, or that passing tests guarantee framework safety.
 
@@ -57,10 +58,12 @@ One store is a CFA choice, not a SwiftData limit. Keep each context and managed 
 Exercise fresh directory preparation, concurrent first requests, isolated test stores, failed saves, reopening and retry. Verify record updates preserve unrelated records. Record runtime/toolchain and preserve shipped paths and schema.
 
 For optional caches, hold restoration and writes independently in tests.
-Confirm refresh starts while restoration is pending and callers receive fresh
-results while the write is pending. Verify a late restore or delayed write
-cannot replace newer data, and a failed replacement preserves the last good
-cache.
+Confirm refresh starts while restoration is pending and still proceeds when
+the cache is missing, incompatible or unreadable. Verify callers receive
+fresh results while the write is pending. Check that a late restore or
+delayed write cannot replace newer data, that a failed write leaves fresh
+results usable and preserves the last good cache, and that a failed refresh
+retains valid in-memory data.
 
 ## Evidence and provenance
 
