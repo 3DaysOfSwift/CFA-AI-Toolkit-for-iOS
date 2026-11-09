@@ -195,6 +195,8 @@ skill from that toolkit before changing the project.
   Feature so the product can change which capabilities it charges for.
   Protected server operations enforce their own access policy.
 - Publish durable user edits as saved only after required persistence succeeds.
+  Persist individual changes by stable record identity. Reserve whole-dataset
+  replacement for explicit operations with their own integrity rules.
   For simple preferences, update UserDefaults before publishing the value. Its
   setter confirms the in-memory update only. Use a storage API that reports
   write outcomes when the product requires confirmed persistence.

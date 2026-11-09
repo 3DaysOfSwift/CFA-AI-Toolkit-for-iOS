@@ -112,6 +112,8 @@ the architecture:
     for genuinely structured, queryable, growing, or relational local data.
     Do not persist the same snapshot through both a database and a file cache.
     Publish durable user edits as saved only after required persistence succeeds.
+    Persist individual changes by stable record identity. Reserve whole-dataset
+    replacement for explicit operations with their own integrity rules.
     For simple preferences, update `UserDefaults` before publishing the value.
     Its setter confirms the in-memory update only. Use a storage API that
     reports the write outcome when the product requires confirmed persistence.
@@ -361,6 +363,8 @@ do not claim that UI gating replaces server-side authorisation.
 - Confirm that storage work does not leak SwiftData `@Model` objects across an
   actor boundary, and that a `@ModelActor` is used where database work is not
   deliberately small and UI-owned.
+- For changed record-level writes, overlap edits to different records and
+  verify that both changes survive reopening the store.
 - If a change affects durable storage, reopen a disposable store created
   by the prior version with representative synthetic records. Verify that its
   location and saved records remain
