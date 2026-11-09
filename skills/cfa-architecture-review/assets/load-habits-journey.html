@@ -12,7 +12,6 @@
     <div class="phase" data-phase="3"><span class="dot b-dot">4</span><div>Read the saved habits<div class="text-small text-muted">SwiftData · local store</div></div></div>
     <div class="phase" data-phase="4"><span class="dot b-dot">5</span><div>Build the habit values<div class="text-small text-muted">HabitRepository · convert and sort saved data</div></div></div>
     <div class="phase" data-phase="5"><span class="dot b-dot">6</span><div>Publish the loaded data<div class="text-small text-muted">MainActor · update habits and clear any load error</div></div></div>
-    <div class="finished"><span class="dot a-dot"></span>Startup has returned</div>
     <div class="phase" data-phase="6"><span class="dot b-dot">7</span><div>Finish queued work and reload<div class="text-small text-muted">Clear the operation and reload task handles</div></div></div>
   </div>
   <div class="viz-controls">
@@ -28,9 +27,8 @@
 #habits-journey .heading{font-weight:500;padding-bottom:16px}
 #habits-journey .heading.a{grid-column:1}#habits-journey .heading.b{grid-column:2}
 #habits-journey .launch{grid-column:1;grid-row:2;align-self:center}
-#habits-journey .waiting{grid-column:1;grid-row:3/8;display:flex;flex-direction:column;justify-content:center;gap:12px;border-left:2px dashed var(--border);padding-left:12px}
+#habits-journey .waiting{grid-column:1;grid-row:3;align-self:start;display:flex;flex-direction:column;gap:8px;border-left:2px solid var(--border);padding:8px 0 8px 12px}
 #habits-journey .waiting>span{font-weight:500}
-#habits-journey .finished{grid-column:1;grid-row:8;align-self:center}
 #habits-journey .phase{grid-column:2;display:flex;align-items:center;gap:12px;min-height:76px;position:relative;padding:8px 0;opacity:.6}
 #habits-journey .phase:before{content:"";position:absolute;top:0;bottom:0;left:15px;width:1px;background:var(--border);z-index:0}
 #habits-journey .phase[data-phase="0"]:before{top:50%}#habits-journey .phase[data-phase="6"]:before{bottom:50%}
