@@ -83,6 +83,13 @@ test('individual checks preserve verified strengths and separate CFA deviations'
   delete resolved.operations[0].scenarios;
   const good=await importReview(report,resolved,root);
   assert.equal(good.operations[0].correctness,'sound');
+  const inapplicable = structuredClone(resolved);
+  for (const check of inapplicable.operations[0].checks) {
+   if (check.dimension !== 'cfa') check.status = 'not-applicable';
+  }
+  const skipped = await importReview(report, inapplicable, root);
+  assert.equal(skipped.operations[0].correctness, 'unassessed');
+  assert.equal(skipped.operations[0].clarity, 'unassessed');
   const stableWithDeviation=operationAssessments(good);
   assert.match(stableWithDeviation.verdict,/No architectural conflicts/);
   assert.equal(stableWithDeviation.counts.sound,1);

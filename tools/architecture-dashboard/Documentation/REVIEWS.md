@@ -242,7 +242,9 @@ to the property inspected; it does not claim runtime testing.
 Include these correctness check IDs: `state-ownership`, `actor-isolation`,
 `task-lifetime`, `repeated-requests`, `cancellation`, and `errors`. Include
 `architectural-clarity` in the clarity dimension. For an irrelevant check,
-use `not-applicable` and explain why, rather than omitting it or awarding a pass.
+use `not-applicable` and explain why. Keep the check in the review record.
+A correctness or clarity dimension with no applicable checks remains
+unassessed and cannot close a whole-app review.
 
 ### Timing scenarios
 
