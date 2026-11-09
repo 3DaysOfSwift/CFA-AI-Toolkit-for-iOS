@@ -1,6 +1,6 @@
 ---
 name: swift-concurrency-migration
-description: Legacy GCD migration: migrate GCD, OperationQueue and callback-based iOS apps to Cooperative Feature Architecture and Swift Concurrency while preserving product behaviour. Use when a developer requests migration of a legacy iOS codebase to CFA and Swift Concurrency; not for general modernisation or a small isolated API conversion.
+description: "Legacy GCD migration: migrate GCD, OperationQueue and callback-based iOS apps to Cooperative Feature Architecture and Swift Concurrency while preserving product behaviour. Use when a developer requests migration of a legacy iOS codebase to CFA and Swift Concurrency; not for general modernisation or a small isolated API conversion."
 ---
 
 # Legacy GCD migration
