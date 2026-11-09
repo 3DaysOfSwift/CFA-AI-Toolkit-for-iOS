@@ -167,6 +167,17 @@ final class DeepLinkingFeature {
         try await firstRun.receive(initialRequest)
         precondition(firstRun.pending.isEmpty) // A repeated callback cannot reopen the completed event.
 
+        // Opening a different item in one scene leaves the other scene's route intact.
+        let anotherRequest = DestinationRequest(id: "notification-2", title: "Another launch", launchID: "launch-43")
+        try await firstRun.receive(anotherRequest)
+        var firstSceneDestination: DestinationRequest?
+        try await firstRun.open(id: anotherRequest.id) { destination in
+            firstSceneDestination = destination
+            return true
+        }
+        precondition(firstSceneDestination == anotherRequest)
+        precondition(secondSceneDestination == initialRequest && firstRun.pending.isEmpty)
+
         let request = DestinationRequest(id: "notification-deferred", title: "Next launch", launchID: "launch-42")
         try await firstRun.receive(request)
 
