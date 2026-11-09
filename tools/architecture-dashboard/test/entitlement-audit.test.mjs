@@ -14,9 +14,20 @@ test('paid capability matches are review leads, with possible indexed callers',(
   assert.equal(result.sourceFingerprint,'abc');
 });
 test('no matches and missing syntax cannot be reported as a pass',()=>{
-  const result=auditEntitlements({...analysis,syntax:{status:'unavailable'},callCandidates:[]},{capabilities:[{name:'Export',writtenCalls:['exportFeature.export']}]});
+  const result=auditEntitlements({...analysis,syntax:{status:'unavailable',reason:'Xcode not selected'},callCandidates:[]},{capabilities:[{name:'Export',writtenCalls:['exportFeature.export']}]});
   assert.equal(result.capabilities[0].status,'no-matches-unverified');
   assert.equal(result.syntaxStatus,'unavailable');
+  assert.equal(result.syntaxReason,'Xcode not selected');
+});
+test('preserves parser warnings alongside partial entitlement leads', () => {
+  const warnings = ['Parser reported errors in ExportViewModel.swift'];
+  const syntax = {status:'available',coverage:'unverified',warnings};
+  const result = auditEntitlements({...analysis,syntax}, {
+    capabilities:[{name:'Export',writtenCalls:['exportFeature.export']}]
+  });
+  assert.deepEqual(result.syntaxWarnings,warnings);
+  assert.equal(result.syntaxCoverage,'unverified');
+  assert.equal(result.capabilities[0].status,'review-required');
 });
 test('requires explicit nonempty capability names and call spellings',()=>{
   assert.throws(()=>auditEntitlements(analysis,{capabilities:[]}));
