@@ -142,9 +142,14 @@ When offline edits or cross-device sync are in scope, apply the
 [sync rule](references/spec/rules/cfa-sync-01.md). Trace local persistence,
 pending sync and server confirmation separately. For a custom server, verify
 that the edit and its pending-sync metadata are saved together before local
-success is reported. Review failed sync, restart, retries, and the product's
-conflict and rejection policy. Check real-device evidence separately for
-Apple-managed sync and concurrent offline edits across devices.
+success is reported. Look for evidence that a failed local write reports
+neither success nor an edit ready to send. After a successful local write,
+verify that a failed sync and restart preserve the edit and its identity,
+and that retrying with that identity produces one logical server change.
+When reviewing a replacement sync implementation, use a pending edit saved
+by the previous version to verify recovery and retry. Check conflict and
+rejection outcomes against the product policy. Check real-device evidence
+separately for Apple-managed sync and concurrent offline edits across devices.
 
 For a suspected startup storage gate, apply the
 [database availability rule](references/spec/rules/cfa-launch-02.md). Trace
