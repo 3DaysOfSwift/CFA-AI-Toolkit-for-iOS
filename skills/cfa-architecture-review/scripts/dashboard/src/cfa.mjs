@@ -28,6 +28,8 @@ const outdatedScreenGuidance = 'Every screen owns a dedicated ViewModel. Declare
 const screenGuidanceUpdate = 'Apply private @State ViewModel ownership to SwiftUI screens and trace the actual presentation owner for UIKit migrations.';
 const outdatedDeepLinkGuidance = 'remove it on actual navigation or explicit dismissal';
 const deepLinkGuidanceUpdate = 'Explain how to retry a failed pending-request removal without navigating again.';
+const outdatedSharedWaitGuidance = 'A departing screen may stop waiting while the Feature keeps refreshing.';
+const sharedWaitGuidanceUpdate = 'For a prompt exit, cancel the screen’s wait independently of the Feature’s shared refresh.';
 const projectGuidance = `${guidanceMarker}
 # CFA project guidance
 
@@ -247,6 +249,9 @@ function doctor(projectArgument) {
       if (content.includes(outdatedDeepLinkGuidance)) {
         console.log(`WARN outdated deep-link guidance in ${file}. ${deepLinkGuidanceUpdate}`);
       }
+      if (content.includes(outdatedSharedWaitGuidance)) {
+        console.log(`WARN outdated shared-refresh guidance in ${file}. ${sharedWaitGuidanceUpdate}`);
+      }
       if (content.includes(outdatedAppModelGuidance)) {
         console.log(`WARN outdated AppModel guidance in ${file}; update the CFA guidance block to allow private task handles for app-wide listeners.`);
       }
@@ -302,6 +307,9 @@ function enableProject(values) {
     }
     if (existingGuidance.includes(outdatedDeepLinkGuidance)) {
       console.log(`Update the existing CFA deep-link guidance block. ${deepLinkGuidanceUpdate}`);
+    }
+    if (existingGuidance.includes(outdatedSharedWaitGuidance)) {
+      console.log(`Update the existing CFA shared-refresh guidance block. ${sharedWaitGuidanceUpdate}`);
     }
     if (existingGuidance.includes(outdatedAppModelGuidance)) {
       console.log('The existing AppModel guidance should allow private task handles for app-wide listeners. Edit only the CFA guidance block.');

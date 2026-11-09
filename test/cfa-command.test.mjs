@@ -92,7 +92,7 @@ test('doctor warns about previously installed CFA guidance without changing it',
   const project = path.join(directory, 'project');
   fs.mkdirSync(project);
   const agents = path.join(project, 'AGENTS.md');
-  const original = '<!-- CFA Toolkit project guidance -->\nAppModel properties exposing feature managers use the Manager suffix.\n- AppModel stores only shared, concrete Features, and one private launch guard.\n- SwiftData uses SwiftDataManager; URLSession calls use NetworkingManager.\n- Every screen owns a dedicated ViewModel. Declare it as @State private var\n  viewModel and construct it inline by default.\n  twice, and remove it on actual navigation or explicit dismissal. Leave\n';
+  const original = '<!-- CFA Toolkit project guidance -->\nAppModel properties exposing feature managers use the Manager suffix.\n- AppModel stores only shared, concrete Features, and one private launch guard.\n- SwiftData uses SwiftDataManager; URLSession calls use NetworkingManager.\n- Every screen owns a dedicated ViewModel. Declare it as @State private var\n  viewModel and construct it inline by default.\n  twice, and remove it on actual navigation or explicit dismissal. Leave\n  A departing screen may stop waiting while the Feature keeps refreshing.\n';
   fs.writeFileSync(agents, original);
 
   const doctor = spawnSync(command, ['doctor', project], { encoding: 'utf8' });
@@ -107,6 +107,8 @@ test('doctor warns about previously installed CFA guidance without changing it',
   assert.match(repeated.stdout, /existing CFA service guidance.*independent network requests/);
   assert.match(doctor.stdout, /outdated deep-link guidance.*without navigating again/);
   assert.match(repeated.stdout, /existing CFA deep-link guidance.*without navigating again/);
+  assert.match(doctor.stdout, /outdated shared-refresh guidance.*cancel the screen’s wait independently/);
+  assert.match(repeated.stdout, /existing CFA shared-refresh guidance.*cancel the screen’s wait independently/);
   assert.match(repeated.stdout, /existing AppModel guidance.*app-wide listeners/);
   assert.match(repeated.stdout, /will not overwrite project instructions/);
   assert.equal(fs.readFileSync(agents, 'utf8'), original);
