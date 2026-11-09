@@ -95,6 +95,10 @@ behaviour. Observation is available on iOS 17 and later; it is not a drop-in
 replacement for reactive stream operators. Choose a mechanism supported by the
 project's deployment targets and consumers, and keep Combine or an existing
 reactive framework where its capabilities or integrations are still required.
+For a consumer that processes each event, verify the event contract separately
+from UI freshness. Send two equal-valued events and check that both are
+processed in order when the contract requires it. Verify cancellation and
+any required delivery or buffering behaviour before removing the adapter.
 Using a framework alongside Swift Concurrency is not, by itself, a defect.
 
 Implement safe, in-scope cleanup when the migration request authorizes it;

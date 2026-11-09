@@ -423,7 +423,9 @@ identifies all of the following:
   retained with a reason;
 - the hybrid implementation review, identifying remaining users of legacy
   mechanisms and dependencies and recording which adapters were removed or
-  intentionally retained to preserve behaviour or platform support;
+  intentionally retained to preserve behaviour or platform support. Where a
+  consumer needs every event, verify repeated values, ordering and cancellation
+  separately from the latest UI state;
 - the minimum OS for each affected target and compatibility evidence for
   changed paths at that minimum. Check API availability separately from
   Swift language mode. Preserve existing deployment support unless the
