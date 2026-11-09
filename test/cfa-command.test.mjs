@@ -100,7 +100,7 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.equal((content.match(/CFA Toolkit project guidance/g) ?? []).length, 1);
   assert.match(repeated.stdout, /already enabled/);
   assert.match(doctor.stdout, /INFO CFA project guidance found/);
-  assert.doesNotMatch(doctor.stdout, /outdated startup guidance|differs from the installed toolkit/);
+  assert.doesNotMatch(doctor.stdout, /outdated (?:startup|screen ownership) guidance|differs from the installed toolkit/);
 });
 
 test('enable-project can create Claude guidance when explicitly requested', (t) => {

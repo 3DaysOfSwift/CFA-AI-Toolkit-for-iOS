@@ -28,6 +28,7 @@ const outdatedServiceGuidance = 'SwiftData uses SwiftDataManager; URLSession cal
 const serviceGuidanceUpdate = 'Clarify SwiftDataManager ownership and keep independent network requests able to progress in parallel.';
 const outdatedScreenGuidance = 'Every screen owns a dedicated ViewModel. Declare it as @State private var';
 const previousInlineScreenGuidance = /@State private var viewModel and construct it inline by default\. Keep View/;
+const detailScreenGuidance = 'A detail View may receive selected immutable value data';
 const screenGuidanceUpdate = 'Apply private @State ViewModel ownership to SwiftUI screens, allow detail Views to construct their own ViewModel from an immutable snapshot, and trace the actual presentation owner for UIKit migrations.';
 const outdatedDeepLinkGuidance = 'remove it on actual navigation or explicit dismissal';
 const outdatedPendingSaveGuidance = 'Persist only the safe data needed to identify and present each request.';
@@ -45,11 +46,8 @@ skill from that toolkit before changing the project.
 
 - Preserve the CFA call path: View → ViewModel → Feature → Microservices (such as providers, storage or device API adapters).
 - Every screen-level SwiftUI View owns a dedicated ViewModel. Declare it as
-  @State private var viewModel and construct it inline by default. A detail
-  View may accept a selected immutable snapshot and use it to construct its own
-  private State-backed ViewModel in its initializer. Reusable presentation Views
-  may receive display values, bindings and action closures. Keep View and
-  ViewModel initializers and View body construction free of blocking work
+  @State private var viewModel and construct it inline by default. Keep View
+  and ViewModel initializers and View body construction free of blocking work
   and asynchronous side effects. Use SwiftUI's .task for initial work tied to
   the screen's lifetime. The first frame may appear before that work completes.
   In .refreshable, await the refresh method or its returned task handle's
@@ -102,8 +100,9 @@ skill from that toolkit before changing the project.
 - A normal preview constructs the View and follows the same ownership and
   storage boundaries. Keep SwiftData containers and contexts out of previews.
 - Keep Views declarative. Feature state and business decisions belong outside
-  the View layer. Reusable presentation components may receive action closures
-  that forward intent to their owning screen and its ViewModel. Keep service
+  the View layer. Reusable presentation components may receive display values,
+  bindings and action closures that forward intent to their owning screen and
+  its ViewModel. Keep service
   closures and other screens' ViewModel actions out of screen inputs.
 - Published domain snapshot structs use let properties and immutable contents.
   Check nested values and collection elements for references that can change
@@ -394,7 +393,7 @@ function doctor(projectArgument) {
       if (content.includes(outdatedServiceGuidance)) {
         console.log(`WARN outdated service guidance in ${file}. ${serviceGuidanceUpdate}`);
       }
-      if (content.includes(outdatedScreenGuidance) || previousInlineScreenGuidance.test(content)) {
+      if (content.includes(outdatedScreenGuidance) || (previousInlineScreenGuidance.test(content) && !content.includes(detailScreenGuidance))) {
         console.log(`WARN outdated screen ownership guidance in ${file}. ${screenGuidanceUpdate}`);
       }
       if (content.includes(outdatedDeepLinkGuidance) || content.includes(outdatedPendingSaveGuidance)) {
@@ -463,7 +462,7 @@ function enableProject(values) {
     if (block.includes(outdatedServiceGuidance)) {
       console.log(`Update the existing CFA service guidance block. ${serviceGuidanceUpdate}`);
     }
-    if (block.includes(outdatedScreenGuidance) || previousInlineScreenGuidance.test(block)) {
+    if (block.includes(outdatedScreenGuidance) || (previousInlineScreenGuidance.test(block) && !block.includes(detailScreenGuidance))) {
       console.log(`Update the existing CFA screen ownership guidance block. ${screenGuidanceUpdate}`);
     }
     if (block.includes(outdatedDeepLinkGuidance) || block.includes(outdatedPendingSaveGuidance)) {
