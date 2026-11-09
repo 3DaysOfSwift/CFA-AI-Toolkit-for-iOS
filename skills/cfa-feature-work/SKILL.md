@@ -141,6 +141,10 @@ If the project is already CFA, make the smallest complete vertical change:
    by default. Keep framework-required MainActor work in a narrow adapter.
    Check the actual isolation and compiler settings when moving work into
    an async helper.
+   Apply the [Feature API rule](references/spec/rules/cfa-api-01.md) when
+   adding or changing commands. Read the resulting call sites. They should
+   express a domain operation, such as saving a weight entry, without reaching
+   into the Feature’s storage service or navigating its implementation state.
    Apply the [immutable snapshot rule](references/spec/rules/cfa-snapshot-01.md)
    when exposing API or persistence data. Use `let` properties with immutable
    contents. Check nested values and collection elements for mutable reference
