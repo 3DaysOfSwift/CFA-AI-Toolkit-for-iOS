@@ -598,6 +598,19 @@ test('recognizes detail ViewModel ownership when the initializer is in an extens
   assert.equal(report.findings.find(item => item.code === 'view-model-initializer-construction')?.file, file);
 });
 
+test('recognizes escaped detail ViewModel backing storage and reports naming separately', async t => {
+  const {report} = await inspectView(t, `struct HomeView: View {
+    @State private var \`default\`: HomeViewModel
+    init(snapshot: HomeSnapshot) {
+      self.\`_default\` = State(wrappedValue: HomeViewModel(snapshot: snapshot))
+    }
+    var body: some View { Text("Home") }
+  }`);
+  assert.equal(report.screens[0].ownsViewModel, true);
+  assert.equal(report.findings.find(item => item.code === 'view-model-property-name')?.line, 2);
+  assert.equal(report.findings.find(item => item.code === 'view-model-initializer-construction')?.line, 3);
+});
+
 test('an initializer assignment to another instance does not establish screen ownership', async t => {
   const {report} = await inspectView(t, `struct HomeView: View {
     @State private var viewModel: HomeViewModel

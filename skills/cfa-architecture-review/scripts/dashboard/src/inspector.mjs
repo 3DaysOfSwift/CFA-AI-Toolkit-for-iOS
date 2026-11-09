@@ -922,6 +922,10 @@ export async function inspect(project) {
     const typedStateProperties = [...members.matchAll(new RegExp(
       `@${stateTypePattern}\\s+private\\s+var\\s+${propertyNamePattern}\\s*:\\s*${viewModelTypePattern}\\b`, 'gu'
     ))].map(match => ({ name: match[1] ?? match[2], index: match.index }));
+    function stateAssignmentTarget(property, backingOnly = false) {
+      const name = backingOnly ? `_${property}` : `_?${property}`;
+      return String.raw`(?<![.\p{L}\p{M}\p{N}_\x60])(?:self\s*\.\s*)?(?:\x60${name}\x60|${name})\s*=`;
+    }
     const dependencies = [];
     const initializerLocations = [
       {file: viewFile, source: view, offset: bodyOffset, body},
@@ -936,13 +940,13 @@ export async function inspect(project) {
       }
       if (initializerBody !== null) {
         const ownConstruction = typedStateProperties.find(({name: property}) => new RegExp(
-          `(?<![.\\p{L}\\p{M}\\p{N}_])(?:self\\s*\\.\\s*)?_${property}\\s*=\\s*${stateTypePattern}(?:\\s*<\\s*${viewModelTypePattern}\\s*>)?\\s*\\(\\s*(?:initialValue|wrappedValue)\\s*:\\s*(?:${viewModelTypePattern}(?:\\s*\\.\\s*init)?|\\.init)\\s*\\(`, 'u'
+          `${stateAssignmentTarget(property, true)}\\s*${stateTypePattern}(?:\\s*<\\s*${viewModelTypePattern}\\s*>)?\\s*\\(\\s*(?:initialValue|wrappedValue)\\s*:\\s*(?:${viewModelTypePattern}(?:\\s*\\.\\s*init)?|\\.init)\\s*\\(`, 'u'
         ).test(initializerBody));
         if (parameters.trim() && !injectedViewModel && ownConstruction) ownedState ??= ownConstruction;
         const statePropertyNames = typedStateProperties.map(property => property.name);
         if (inlineState) statePropertyNames.push(inlineState[1] ?? inlineState[2]);
         const assignsViewModel = statePropertyNames.some(property =>
-          new RegExp(`(?<![.\\p{L}\\p{M}\\p{N}_])(?:self\\s*\\.\\s*)?_?${property}\\s*=(?!=)`, 'u').test(initializerBody)
+          new RegExp(`${stateAssignmentTarget(property)}(?!=)`, 'u').test(initializerBody)
         );
         if (assignsViewModel) {
           findings.push(finding('view-model-initializer-construction', 'review', `${name} assigns ViewModel state in init. Verify it constructs its own ViewModel from a selected immutable snapshot and does not accept an injected ViewModel.`, location.file, lineOf(location.source, location.offset + index)));
