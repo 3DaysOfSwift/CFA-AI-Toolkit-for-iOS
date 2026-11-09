@@ -75,8 +75,10 @@ skill from that toolkit before changing the project.
   own guard and verify both locked and entitled outcomes. Server operations
   enforce their own access policy.
 - Publish durable user edits as saved only after required persistence succeeds.
-  A current server response does not wait for an optional cache write; prevent
-  an older cached snapshot from replacing fresher data.
+- Start remote refresh and optional cache restoration independently when both
+  are needed. Publish current server data without waiting for the cache write.
+  Keep valid in-memory data if refresh fails, and prevent older cached data
+  from replacing a fresher response. Use JSON by default for a simple cache.
 - App.body installs a stable root View and presentation modifiers only. Keep
   startup conditionals, database loading and feature error UI out of App and
   out of the root navigation View; feature screens present their own state.
