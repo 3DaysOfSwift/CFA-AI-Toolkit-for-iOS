@@ -121,6 +121,11 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
     if (item.outcome !== 'passed' || failed?.outcome !== 'failed' ||
         item.kind !== failed.kind || item.recordedAt < failed.recordedAt) {
       errors.push(`evidence.${item.id}.rerunOf: link an earlier failed check of the same kind from a passing rerun.`);
+    } else if (failed.targets?.length && item.targets?.length) {
+      const missing = failed.targets.filter(target => !item.targets.includes(target));
+      if (missing.length) {
+        errors.push(`evidence.${item.id}.rerunOf: rerun omits targets from ${failed.id}: ${missing.join(', ')}.`);
+      }
     }
   }
   for (const correction of record.humanCorrections.items) {
