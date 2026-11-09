@@ -900,18 +900,20 @@ test('reviews a custom root directly constructed by the app scene', async t => {
     .map(item => [item.file, item.line]), [[file, 3]]);
 });
 
-test('leaves competing custom scene roots for target-aware review', async t => {
-  const app = 'Application/ExampleApp.swift';
-  const root = await fixture(t, {
-    [app]: 'struct ExampleApp: App { var body: some Scene {\n WindowGroup { WorkspaceShell() } } }',
-    'Application/WorkspaceShell.swift': 'struct WorkspaceShell: View { var body: some View { Tabs() } }',
-    'OtherTarget/WorkspaceShell.swift': 'struct WorkspaceShell: View { var body: some View { if storageReady { AccountDetails() } } }'
+for (const name of ['WorkspaceShell', 'ContentView']) {
+  test(`leaves competing ${name} scene roots for target-aware review`, async t => {
+    const app = 'Application/ExampleApp.swift';
+    const root = await fixture(t, {
+      [app]: `struct ExampleApp: App { var body: some Scene {\n WindowGroup { ${name}() } } }`,
+      [`Application/${name}.swift`]: `struct ${name}: View { var body: some View { Tabs() } }`,
+      [`OtherTarget/${name}.swift`]: `struct ${name}: View { var body: some View { if storageReady { AccountDetails() } } }`
+    });
+    const { findings } = await inspect(root);
+    assert.ok(!findings.some(item => item.code === 'root-storage-gate'));
+    assert.deepEqual(findings.filter(item => item.code === 'scene-root-ambiguous')
+      .map(item => [item.file, item.line]), [[app, 2]]);
   });
-  const { findings } = await inspect(root);
-  assert.ok(!findings.some(item => item.code === 'root-storage-gate'));
-  assert.deepEqual(findings.filter(item => item.code === 'scene-root-ambiguous')
-    .map(item => [item.file, item.line]), [[app, 2]]);
-});
+}
 
 test('allows feature-scoped errors and unrelated root layout without storage-gate findings', async t => {
   const root = await fixture(t, {

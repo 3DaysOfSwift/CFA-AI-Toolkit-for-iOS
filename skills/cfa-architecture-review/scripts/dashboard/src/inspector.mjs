@@ -647,6 +647,7 @@ export async function inspect(project) {
         const name = root[1];
         if (!viewNames.has(name)) continue;
         if ((declarationsByName.get(name)?.length ?? 0) > 1) {
+          rootViewNames.delete(name);
           const index = app.index + app[0].length + scene.index + scene[0].length + root.index;
           findings.push(finding('scene-root-ambiguous', 'review', `WindowGroup constructs ${name}, which matches multiple declarations. Verify the root View in the active target before assessing navigation.`, file, lineOf(source, index)));
           continue;
