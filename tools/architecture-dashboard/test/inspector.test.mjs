@@ -608,3 +608,16 @@ test('reviews direct Feature access in root tab navigation', async t => {
   assert.equal(report.screens[0].structuralRoot, false);
   assert.equal(report.findings.find(item => item.code === 'root-feature-access')?.line, 3);
 });
+
+test('reviews direct Feature access in a preview while leaving normal previews clear', async t => {
+  const file = 'App/1 - View/Preview.swift';
+  const root = await fixture(t, {
+    [file]: `#Preview { HomeView() }
+    #Preview("Direct access") {
+      Text(AppModel.shared.homeFeature.title)
+    }`
+  });
+  const { findings } = await inspect(root);
+  assert.deepEqual(findings.filter(item => item.code === 'preview-feature-access')
+    .map(({file, line}) => [file, line]), [[file, 3]]);
+});
