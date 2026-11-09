@@ -28,10 +28,16 @@ node src/cfa.mjs inspect /path/to/your-ios-repository --json
 ```
 
 It identifies screen/ViewModel pairs, visible `AppModel.shared` feature routes,
-feature collaborators, and named ViewModel tests. The JSON inspection schema is
-version 2 and names route fields `featureType` and `featureFile`. Findings are
-lexical leads to check in source; zero findings is not a conformance verdict. This command does
-not write a report or alter the inspected project.
+Feature collaborators, named ViewModel and Feature tests, and possible departures
+from the CFA folder map. The JSON inspection schema is version 2. Its route
+fields `featureType` and `featureFile` distinguish a written type name from a
+located declaration. Scan one app directory at a time if the repository contains
+multiple AppModel files.
+
+Use the findings to verify source, target membership, and Xcode navigator
+placement. An intentional package boundary can explain a different physical
+location. A matching test filename identifies a candidate test file. The command
+reads source and prints its findings without modifying the inspected project.
 
 ```sh
 node src/cli.mjs /path/to/your-ios-repository --out reports/first-review
