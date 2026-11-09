@@ -5,10 +5,9 @@ support several screens and device experiences, or have no dedicated screen.
 Features own meaningful application capabilities and their authoritative business
 state; screens and tabs do not determine the number of Features.
 
-For a real implementation of a Feature owning domain state, inspect
-[Trend's WeightLogFeature](https://github.com/3DaysOfSwift/Trend-iOS-App-Swift-Concurrency-CFA/blob/2a747bc222535e9fda01ed722e9c2c103fb98905/Trend/2%20-%20AppModel/Features/WeightLog/WeightLogFeature.swift).
-The linked project illustrates this specific responsibility; assess its other
-architectural choices separately against the current specification.
+For a working example, inspect `HabitsFeature` in the bundled Habit Tracker
+starter app. It owns saved habits and is used by both `HabitsViewModel` and
+`AddHabitViewModel`, giving those screens access to the same capability.
 
 During creation or migration, main screens are useful clues for discovering
 capabilities, not a requirement to create one Feature per screen or tab. Record

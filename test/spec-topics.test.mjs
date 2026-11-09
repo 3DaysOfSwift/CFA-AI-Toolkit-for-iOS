@@ -183,6 +183,9 @@ test('published app examples link to pinned source and relevant rule cards', () 
   assert.match(topics.get('rules/cfa-store-01.md'), /bundled Habit Tracker/);
   assert.match(topics.get('rules/cfa-feature-01.md'), /bundled Habit Tracker.*HabitsFeature/);
   assert.doesNotMatch(topics.get('rules/cfa-feature-01.md'), /Verbos\/blob\//);
+  const capabilities = topics.get('topics/16-define-features-by-business-capability-not-by-screen-or-tab.md');
+  assert.match(capabilities, /`HabitsFeature` in the bundled Habit Tracker/);
+  assert.doesNotMatch(capabilities, /Trend-iOS-App-Swift-Concurrency-CFA\/blob\/[^\s)]*WeightLogFeature/);
   assert.doesNotMatch(topics.get('rules/cfa-state-01.md'), /Trend-iOS-App-Swift-Concurrency-CFA\/blob\//);
   assert.doesNotMatch(topics.get('rules/cfa-store-01.md'), /Trend-iOS-App-Swift-Concurrency-CFA\/blob\//);
   assert.match(index, /older naming or differ from current CFA rules/);
