@@ -848,7 +848,12 @@ and external session expiry. Before publishing an in-flight result, verify that
 its account or session is still current, even if cancellation was requested.
 When earlier work can overlap a new sign-in to the same account, compare a
 session generation or equivalent session identity because both sessions have
-the same account ID.
+the same account ID. Apply the same session boundary to account-scoped storage
+effects. A late request must not recreate cleared data, and delayed cleanup must
+not delete data written by a newer session. Where these operations can overlap,
+coordinate writes and cleanup at the storage boundary or isolate their storage
+by session. Verify the stored data after the late work finishes as well as the
+Feature's visible state.
 
 During migration, inspect whether an existing account-change event system can
 be simplified into explicit calls. Before removing observers, verify that the

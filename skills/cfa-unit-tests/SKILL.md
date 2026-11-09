@@ -128,6 +128,9 @@ For account changes, hold an old account's request open, switch accounts or
 sign out, then complete the old request. Verify that its data is never
 published after sign-out or into the new session. Where the same account can
 sign in again before its earlier request completes, test that sequence too.
+For account-scoped storage, verify a late write cannot recreate cleared data
+and delayed cleanup cannot delete new-session data. Inspect persisted records
+after releasing the delayed work, as well as the Feature's visible state.
 If a session can expire externally, drive that event while account work is
 pending and verify the Feature reconciles the session and rejects the old result.
 Exercise successful cleanup, sign-out
