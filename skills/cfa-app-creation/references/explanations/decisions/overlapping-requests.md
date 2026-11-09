@@ -18,7 +18,10 @@ ViewModel duplicate protection cannot cover another screen or Feature calling th
 The specification places overlap policy at the shared capability boundary and distinguishes equivalence from queue admission. Each caller that continues waiting receives the outcome of the work it
 requested. By default, a Feature-owned refresh continues when the last
 screen stops waiting. The Feature can retain a successful result or let a
-later equivalent caller join the in-flight request.
+later equivalent caller join the in-flight request. Awaiting the shared Task’s
+value does not end the wait when the caller is cancelled. If a screen needs
+to return promptly, give its wait a cancellation path that leaves the
+Feature-owned refresh running.
 
 ## Trade-offs and alternatives
 

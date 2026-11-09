@@ -96,7 +96,9 @@ the architecture:
    retained handle after completion without letting older work clear newer work.
    A shared Feature refresh normally continues when a screen leaves, even if
    that screen was its only caller; keep the result for later use. A different
-   cancellation policy needs a specific product or resource reason.
+   cancellation policy needs a specific product or resource reason. Awaiting
+   the shared handle does not end the wait on caller cancellation. If the
+   screen needs to return promptly, cancel its wait independently.
    A ViewModel retains a handle for each independently managed button action;
    equivalent repeated actions reuse that handle, which async callers can await.
 10. A production SwiftData repository with non-trivial reads, writes, imports
