@@ -352,7 +352,8 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
     assert.match(html,/App\.swift:1–2/);
     assert.doesNotMatch(html,/What still needs checking/);
     await fs.writeFile(path.join(project,'App.swift'),'struct Changed {}\n');
-    await assert.rejects(finish(project,reviewPath,path.join(base,'stale.html'),undefined,syntax),/fingerprint mismatch/);
+    const mustNotParse = async () => assert.fail('Stale evidence should be rejected before running SwiftSyntax');
+    await assert.rejects(finish(project,reviewPath,path.join(base,'stale.html'),undefined,mustNotParse),/fingerprint mismatch/);
   } finally { await fs.rm(base,{recursive:true,force:true}); }
 });
 

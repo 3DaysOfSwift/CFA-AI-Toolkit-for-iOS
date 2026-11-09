@@ -13,6 +13,9 @@ export async function collectProjectAnalysis(root, options = {}, providers = {})
   root = await fs.realpath(root);
   const scan = providers.analyse || analyse;
   const before = await scan(root, {excludedOutput:options.output, includeTests:options.includeTests});
+  if (options.expectedSourceFingerprint !== undefined && before.sourceFingerprint !== options.expectedSourceFingerprint) {
+    throw Error('Health Check source fingerprint mismatch. Prepare a fresh inventory and recheck changed evidence.');
+  }
   if (!before.files.length) throw Error('No Swift source files found.');
   const syntax = await (providers.syntax || collectSyntax)(root, {includeTests:options.includeTests});
   let compilerIndex = {status:'not-requested', calls:[], reason:'No compiler index and module were supplied.'};
