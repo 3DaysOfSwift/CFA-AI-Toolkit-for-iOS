@@ -346,8 +346,12 @@ export async function inspect(project) {
         const start = match.index + match[0].length;
         return {start, end: start + braceBody(source, start - 1).length};
       });
-    const directAccess = [...source.matchAll(/\bURLSession\s*[.(]/g)]
-      .find(match => !managerBodies.some(({start, end}) => match.index >= start && match.index < end));
+    const outsideManager = match => !managerBodies.some(({start, end}) => match.index >= start && match.index < end);
+    const sessionNames = new Set([...source.matchAll(/\b(\w+)\s*:\s*(?:Foundation(?:Networking)?\s*\.\s*)?URLSession\b(?!\s*\.)/g)]
+      .map(match => match[1]));
+    const directAccess = [...source.matchAll(/\bURLSession\s*[.(]/g)].find(outsideManager)
+      ?? [...source.matchAll(/\b(\w+)\s*\??\.\s*(?:data|bytes|download|upload|dataTask|downloadTask|uploadTask|webSocketTask|streamTask)\s*\(/g)]
+        .find(match => sessionNames.has(match[1]) && outsideManager(match));
     if (directAccess) {
       findings.push(finding('direct-url-session', 'review', 'URLSession appears outside NetworkingManager. Check whether this is a production network request that should use a NetworkingManager; shared configuration or instances are needed only when appropriate.', file, lineOf(source, directAccess.index)));
     }

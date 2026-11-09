@@ -497,6 +497,17 @@ test('asks whether a View without a ViewModel is a screen or reusable component'
   assert.match(finding.message, /screen requiring a dedicated ViewModel or a reusable presentation component/);
 });
 
+test('reviews requests through an injected URLSession outside NetworkingManager', async t => {
+  const root = await fixture(t, {
+    'Provider.swift': 'struct Provider { let transport: Foundation.URLSession\n func load() async throws { _ = try await transport.data(from: url) } }',
+    'Manager.swift': 'struct NetworkingManager { let transport: URLSession\n func load() async throws { _ = try await transport.data(from: url) } }',
+    'Configuration.swift': 'struct Configuration { let transport: URLSession }'
+  });
+  const {findings} = await inspect(root);
+  assert.deepEqual(findings.filter(item => item.code === 'direct-url-session')
+    .map(({file, line, severity}) => [file, line, severity]), [['Provider.swift', 2, 'review']]);
+});
+
 test('flags SwiftData without a manager and direct URLSession calls', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
