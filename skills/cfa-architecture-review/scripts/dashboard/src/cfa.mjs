@@ -49,8 +49,10 @@ skill from that toolkit before changing the project.
   State-backed ViewModel in its initializer. Do not inject or share ViewModels;
   keep each scene's selection in presentation, not in a shared Feature.
 - In a new app with deep links or notification actions, DeepLinkingFeature
-  validates opening requests and owns their durable pending list in Settings.
-  Record incoming URLs and user actions on local or push notifications.
+  validates opening requests and owns the durable pending list shown in Settings.
+  Persist only the safe data needed to identify and present each request.
+  Handle expired or unavailable destinations clearly. Record incoming URLs
+  and user actions on local or push notifications.
   Scheduling or delivery alone does not create a pending item. The receiving
   scene owns navigation and protects unsaved edits and active payments. Any
   scene can retry a pending request. Coordinate attempts to avoid opening it

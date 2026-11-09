@@ -40,8 +40,9 @@ the architecture:
 3. Preserve independent screen and scene selection in presentation, not shared
    Features. Selected detail data may be passed into the View.
    When a new app supports deep links or notification actions, its
-   DeepLinkingFeature records received opening requests. Persist safe pending
-   requests before confirming they are kept. Scheduling and delivery alone do
+   DeepLinkingFeature validates received opening requests. Persist only the safe
+   data needed to identify and present each request before confirming it is kept.
+   Handle expired or unavailable destinations clearly. Scheduling and delivery alone do
    not add an item. Settings shows the shared pending list, which either scene
    can act on using its own navigation state. Protect unsaved edits and active
    payment flows. Concurrent attempts must not open the same request twice.
