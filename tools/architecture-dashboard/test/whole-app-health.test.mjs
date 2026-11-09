@@ -60,6 +60,19 @@ test('unknown operations and target membership cannot yield a pass score', () =>
   assert.match(html,/50%/); assert.match(html,/Needs attention/);
 });
 
+test('an unresolved task relationship keeps an operation pending', () => {
+  const review = complete();
+  review.operations[0].steps = [
+    { id: 'trigger', relation: 'event' },
+    { id: 'work', parentId: 'trigger', relation: 'unknown' }
+  ];
+  const work = nextWork(report, review);
+  assert.match(work.gaps.join(' '), /1 operations have unresolved checks or boundaries/);
+  assert.equal(work.nextOperations[0].id, 'launch');
+  review.operations[0].steps[1].relation = 'same-task';
+  assert.deepEqual(nextWork(report, review).gaps, []);
+});
+
 test('syntax entry points join the inventory without duplicating lexical findings', () => {
   const combined=structuredClone(report);
   combined.syntax={status:'available',files:['App.swift'],warnings:[],items:[

@@ -23,7 +23,8 @@ function pendingSourceFiles(report, review) {
 }
 const hasOpenChecks = operation => !operation.checks?.length ||
   operation.checks.some(check => ['unresolved', 'not-checked'].includes(check.status)) ||
-  Boolean(operation.unknowns?.length);
+  Boolean(operation.unknowns?.length) ||
+  Boolean(operation.steps?.some(step => step.relation === 'unknown'));
 const missingTimingScenarios = operation => ['repeat', 'leave', 'late-result', 'failure']
   .filter(id => !operation.scenarios?.some(scenario => scenario.id === id && scenario.status !== 'unresolved'));
 
