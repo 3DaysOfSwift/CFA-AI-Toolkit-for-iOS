@@ -66,8 +66,8 @@ function memberSignatures(body) {
 
 function inspectSynchronousLaunchReads(name, file, source, opening, findings) {
   const body = memberSignatures(braceBody(source, opening));
-  for (const read of body.matchAll(/\b(?:Data|String)\s*(?:\.\s*init\s*)?\(\s*contentsOf\s*:/g)) {
-    findings.push(finding('blocking-app-launch-io', 'review', `${name} appears to read data synchronously. Verify the initializer and its input. CFA signals Features during launch and lets their asynchronous work complete independently.`, file, lineOf(source, opening + 1 + read.index)));
+  for (const read of body.matchAll(/\b(?:(?:Data|String)\s*(?:\.\s*init\s*)?\(\s*contentsOf|FileManager\s*\.\s*default\s*\.\s*contents\s*\(\s*atPath)\s*:/g)) {
+    findings.push(finding('blocking-app-launch-io', 'review', `${name} appears to read data synchronously. Verify the call and its input. CFA signals Features during launch and lets their asynchronous work complete independently.`, file, lineOf(source, opening + 1 + read.index)));
   }
 }
 

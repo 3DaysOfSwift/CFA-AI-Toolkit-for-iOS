@@ -550,13 +550,14 @@ test('reviews synchronous launch reads without attributing Task work to the call
     [file]: `class AppDelegate {
       func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool {
         _ = try? Foundation.Data(contentsOf: cacheURL)
+        _ = FileManager.default.contents(atPath: cachePath)
         Task { _ = try? String(contentsOf: otherURL, encoding: .utf8) }
         return true
       }
     }`
   });
   const findings = (await inspect(root)).findings.filter(item => item.code === 'blocking-app-launch-io');
-  assert.deepEqual(findings.map(item => [item.file, item.line, item.severity]), [[file, 3, 'review']]);
+  assert.deepEqual(findings.map(item => [item.file, item.line, item.severity]), [[file, 3, 'review'], [file, 4, 'review']]);
 });
 
 test('reviews direct synchronous reads in AppModel construction and startup', async t => {
