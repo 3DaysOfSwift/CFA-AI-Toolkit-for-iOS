@@ -68,7 +68,10 @@ export function nextWork(report, review, limit = 8) {
     missingTrace: !operation.steps?.length,
     pendingChecks: (operation.checks || [])
       .filter(check => check.status === 'unresolved' || check.status === 'not-checked')
-      .map(({id, status, question, resolveBy}) => ({id, status, question, resolveBy})),
+      .map(({id, title, dimension, status, reason, question, resolveBy, evidence}) => ({
+        id, title, dimension, status, reason, question, resolveBy,
+        evidence: (evidence || []).map(({file, line, endLine}) => ({file, line, endLine}))
+      })),
     unknowns: operation.unknowns || [],
     unresolvedSteps: (operation.steps || [])
       .filter(step => step.relation === 'unknown')

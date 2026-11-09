@@ -133,6 +133,21 @@ test('a CFA-only deviation leaves the operation concurrency result stable', () =
   assert.match(html, /CFA alignment.*× Naming differs from CFA/s);
 });
 
+test('a pending review checkpoint retains the open check and its source locations', () => {
+  const review = complete();
+  const check = {
+    id: 'paid-entry', title: 'Paid entry point', dimension: 'cfa', status: 'unresolved',
+    reason: 'A shortcut reaches the operation.', question: 'Does the shortcut check entitlement?',
+    resolveBy: 'Trace the shortcut handler.',
+    evidence: [{file: 'App.swift', line: 1, endLine: 1, excerpt: 'App'}]
+  };
+  review.operations[0].checks = [check];
+  const checkpoint = nextWork(report, review).nextOperations[0];
+  assert.deepEqual(checkpoint.pendingChecks, [{
+    ...check, evidence: [{file: 'App.swift', line: 1, endLine: 1}]
+  }]);
+});
+
 test('an unresolved task relationship keeps an operation pending', () => {
   const review = complete();
   review.operations[0].steps = [
