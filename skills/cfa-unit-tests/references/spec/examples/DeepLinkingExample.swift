@@ -43,6 +43,7 @@ actor PendingRequestStore: PendingRequestRepository {
     }
 
     func remove(id: String) throws -> PendingSnapshot {
+        try Task.checkCancellation()
         try loadIfNeeded()
         let remaining = requests.filter { $0.id != id }
         guard remaining.count != requests.count else { return try snapshot() }
@@ -116,7 +117,10 @@ final class DeepLinkingFeature {
             // This marker lasts only for the current process.
             openedAwaitingRemoval.insert(id)
         }
-        try await removePending(id: id)
+        // Navigation is already committed. Keep cleanup alive if the scene
+        // task is cancelled, and keep this request reserved until cleanup ends.
+        let cleanup = Task { try await removePending(id: id) }
+        try await cleanup.value
     }
 
     private func removePending(id: String) async throws {
