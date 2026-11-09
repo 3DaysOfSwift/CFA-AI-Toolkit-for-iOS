@@ -43,14 +43,17 @@ test('scan excludes test folders and symlinks and does not change input',async()
     await fs.mkdir(path.join(root,'Contest'));
     await fs.writeFile(path.join(root,'Contest','ContestFeature.swift'),'struct ContestFeature {}');
     const before=await fs.readFile(path.join(root,'App.swift'),'utf8');
-    const report=await analyse(root);assert.deepEqual(report.files.map(file => file.path), ['App.swift', 'Contest/ContestFeature.swift']);
+    await fs.mkdir(path.join(root,'reports'));
+    await fs.writeFile(path.join(root,'reports','ReportFeature.swift'),'struct ReportFeature {}');
+    const report = await analyse(root);
+    assert.deepEqual(report.files.map(file => file.path), ['App.swift', 'Contest/ContestFeature.swift', 'reports/ReportFeature.swift']);
     assert.equal(report.files[0].entries.length,1);
     assert.deepEqual(report.scope.excludedTestDirectories, ['AppTests']);
     await fs.mkdir(path.join(root, 'ExtraTests'));
     const expanded = await analyse(root);
     assert.deepEqual(expanded.files, report.files);
     assert.notEqual(expanded.sourceFingerprint, report.sourceFingerprint);
-    assert.equal((await analyse(root,{includeTests:true})).scope.fileCount,3);
+    assert.equal((await analyse(root,{includeTests:true})).scope.fileCount,4);
     assert.equal(await fs.readFile(path.join(root,'App.swift'),'utf8'),before);
   } finally { await fs.rm(root,{recursive:true,force:true}); }
 });

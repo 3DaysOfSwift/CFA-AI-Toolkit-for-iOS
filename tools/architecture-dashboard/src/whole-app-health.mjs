@@ -141,14 +141,14 @@ export function coverageGaps(report, review) {
   if (missingTasks.length) gaps.push(`${missingTasks.length} detected task sites still need reconciliation.`);
   return gaps;
 }
-async function currentInventory(root, excludedOutput, syntaxProvider = collectSyntax, options = {}) {
-  const {inventory:report,analysis} = await collectProjectAnalysis(root, {...options,output:excludedOutput}, {syntax:syntaxProvider});
+async function currentInventory(root, syntaxProvider = collectSyntax, options = {}) {
+  const {inventory:report,analysis} = await collectProjectAnalysis(root, options, {syntax:syntaxProvider});
   report.syntax = analysis.syntax;
   report.syntax.sourceFingerprint = report.sourceFingerprint;
   return {report,analysis};
 }
 export async function prepare(root, output, syntaxProvider = collectSyntax, options = {}) {
-  const {report,analysis} = await currentInventory(root, path.resolve(output), syntaxProvider, options);
+  const {report,analysis} = await currentInventory(root, syntaxProvider, options);
   if (!report.files.length) throw Error('No Swift source files found.');
   await fs.mkdir(output, {recursive:false});
   await fs.writeFile(path.join(output,'inventory.json'), JSON.stringify(report,null,2)+'\n', {flag:'wx'});
@@ -192,19 +192,19 @@ async function appIcon(root) {
   } catch { return null; }
 }
 export async function progress(root, input, syntaxProvider = collectSyntax) {
-  const {report} = await currentInventory(root, path.dirname(path.resolve(input)), syntaxProvider);
+  const {report} = await currentInventory(root, syntaxProvider);
   const raw = JSON.parse(await fs.readFile(input,'utf8'));
   const review = await importReview(report,raw,root);
   return {gaps:coverageGaps(report,review),files:report.files.length,operations:(review.operations || []).length};
 }
 export async function next(root, input, syntaxProvider = collectSyntax) {
-  const {report} = await currentInventory(root, path.dirname(path.resolve(input)), syntaxProvider);
+  const {report} = await currentInventory(root, syntaxProvider);
   const raw = JSON.parse(await fs.readFile(input,'utf8'));
   const review = await importReview(report,raw,root);
   return nextWork(report,review);
 }
 export async function finish(root, input, output, icon, syntaxProvider = collectSyntax) {
-  const {report} = await currentInventory(root, path.dirname(path.resolve(output)), syntaxProvider);
+  const {report} = await currentInventory(root, syntaxProvider);
   const raw = JSON.parse(await fs.readFile(input,'utf8'));
   const review = await importReview(report,raw,root);
   const gaps = coverageGaps(report,review);

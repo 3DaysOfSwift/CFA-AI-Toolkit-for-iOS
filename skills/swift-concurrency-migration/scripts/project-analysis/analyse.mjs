@@ -84,7 +84,7 @@ export function scanSource(source, file) {
   return { sites: sites.sort((a,b) => a.line-b.line), declarations, entries, usesSwiftConcurrency };
 }
 
-const excluded = new Set(['.git', '.build', '.swiftpm', 'Pods', 'Carthage', 'node_modules', 'DerivedData', 'build', 'reports']);
+const excluded = new Set(['.git', '.build', '.swiftpm', 'Pods', 'Carthage', 'node_modules', 'DerivedData', 'build']);
 export async function analyse(root, { includeTests = false, excludedOutput } = {}) {
   root = await fs.realpath(root);
   if (!(await fs.stat(root)).isDirectory()) throw new Error('Repository path must be a directory.');

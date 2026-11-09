@@ -134,7 +134,7 @@ final class SourceInventory: SyntaxVisitor {
 }
 
 func swiftFiles(in root: URL) throws -> [URL] {
-    let excluded: Set<String> = [".git", ".build", ".swiftpm", "Pods", "Carthage", "node_modules", "DerivedData", "build", "reports"]
+    let excluded: Set<String> = [".git", ".build", ".swiftpm", "Pods", "Carthage", "node_modules", "DerivedData", "build"]
     guard let enumerator = FileManager.default.enumerator(at: root, includingPropertiesForKeys: [.isDirectoryKey, .isSymbolicLinkKey], options: [.skipsHiddenFiles]) else {
         throw NSError(domain: "Inventory", code: 1, userInfo: [NSLocalizedDescriptionKey: "Cannot enumerate project directory"])
     }
