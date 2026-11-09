@@ -173,6 +173,12 @@ leaves it in storage. Exercise unreadable or corrupt durable storage and
 failed writes separately, and verify that the Feature reports the error
 without publishing a successful save.
 
+For simple preferences backed by `UserDefaults`, use isolated defaults and
+verify that the value is updated before the Feature publishes it. A read-back
+in the same process verifies the in-memory value. If the product requires
+confirmed disk writes, test success and failure through the storage API that
+reports that outcome.
+
 Build AppModel tests from an isolated dependency graph. Do not call production
 `AppModel.shared` from a unit test. When AppModel owns app-wide listeners,
 supply a controlled event source and observe the receiving Feature. Verify
