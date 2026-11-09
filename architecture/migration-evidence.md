@@ -136,9 +136,11 @@ the conformance verdict. An unresolved applicable requirement keeps the audit
 open. The validator checks the audit link, revision and recorded outcome. The
 reviewer checks the audit’s coverage and evidence. Record the human architecture
 review and its outcome explicitly, even when it shares an evidence document
-with the navigator inspection, final audit or manual behaviour regression. Failed runs during or after migration
-are flagged for review. Verify that a passing rerun at the final commit covers the same
-scenario, target, build configuration and OS before accepting completion.
+with the navigator inspection, final audit or manual behaviour regression.
+Keep failed runs from during or after migration in the record. Link a
+passing rerun at the final commit to the failed evidence ID with `rerunOf`.
+Verify that the rerun covers the same scenario, target, build configuration
+and OS before accepting completion.
 
 When any gate is missing, use progress language such as “Continuing migration:
 verify the Xcode navigator map.” Never convert a baseline pass, source parse or

@@ -47,6 +47,9 @@ record the producing and receiving targets and the verification environment.
 If a test ran on
 a newer OS, record its actual version and provide separate evidence that the
 changed path works on the minimum supported OS.
+Keep failed runs and record the matching passing rerun at the final commit.
+Use `rerunOf` on the passing evidence entry and explain how the scenario,
+target, build configuration and OS match the failed run.
 Use the scoped feature record for earlier checkpoints.
 
 ## Transferable lesson
