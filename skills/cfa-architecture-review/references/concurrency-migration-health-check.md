@@ -501,6 +501,15 @@ For each relevant operation, inspect:
   preferences, check the update before publication and treat it as an
   in-memory update. When confirmed persistence is required, look for a
   storage API that reports the write outcome.
+- Offline edits and cross-device sync: apply the
+  [sync rule](spec/rules/cfa-sync-01.md) when the product supports these paths.
+  For a custom server, trace the edit and pending-sync metadata through one
+  local commit. Check that local success and server confirmation are reported
+  separately. Verify that pending edits survive failure and restart, and that
+  retry after a lost response cannot duplicate the change. For custom and
+  Apple-managed sync, trace what happens when two devices edit the same item
+  offline. Check the product's conflict policy and server rejection handling
+  where applicable. Record device evidence separately from source review.
 - Operation results: trace how a caller identifies the record its operation
   created. Comparing a shared collection before and after an await can select
   another caller's insertion, even when persistence itself is serialized.
