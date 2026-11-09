@@ -93,6 +93,22 @@ test('flags initializer injection in a flat project layout', async t => {
   assert.equal(finding?.severity, 'warning');
 });
 
+test('flags explicit ViewModel inputs in extensions of recognized Views', async t => {
+  const file = 'App/Detail+Init.swift';
+  const { findings } = await inspectView(t, '', {
+    'App/Detail.swift': 'struct Detail: View { var body: some View { Text("Detail") } }',
+    [file]: `extension Detail {
+      init(model: DetailViewModel) { self.init() }
+    }
+    extension Worker {
+      init(model: DetailViewModel) { self.init() }
+    }`
+  });
+  assert.deepEqual(findings.map(item => [item.code, item.file, item.line]), [
+    ['screen-initializer-inputs', file, 2]
+  ]);
+});
+
 test('maps a conventionally located screen with qualified View conformance', async t => {
   const {report} = await inspectView(t, `struct HomeView: SwiftUI.View {
     @State private var viewModel = HomeViewModel()

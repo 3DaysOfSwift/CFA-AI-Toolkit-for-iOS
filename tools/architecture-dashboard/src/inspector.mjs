@@ -68,6 +68,14 @@ function* viewInitializers(body) {
   }
 }
 
+function inspectViewModelInputs(name, body, source, start, file, findings) {
+  for (const initializer of viewInitializers(body)) {
+    if (initializer.injectedViewModel) {
+      findings.push(finding('screen-initializer-inputs', 'warning', `${name} appears to accept a ViewModel; CFA screens construct their own.`, file, lineOf(source, start + initializer.index)));
+    }
+  }
+}
+
 function labeledClosureOffset(argumentsText, label) {
   let depth = 0;
   let argumentStart = 0;
@@ -358,11 +366,7 @@ export async function inspect(project) {
     for (const view of source.matchAll(viewDeclarations)) {
       const start = view.index + view[0].length;
       const body = braceBody(source, start - 1);
-      for (const initializer of viewInitializers(body)) {
-        if (initializer.injectedViewModel) {
-          findings.push(finding('screen-initializer-inputs', 'warning', `${view[1]} appears to accept a ViewModel; CFA screens construct their own.`, file, lineOf(source, start + initializer.index)));
-        }
-      }
+      inspectViewModelInputs(view[1], body, source, start, file, findings);
       if (isViewFile && rootViewNames.has(view[1])) continue;
       const access = findFeatureAccess(body);
       if (access) {
@@ -534,6 +538,7 @@ export async function inspect(project) {
       if (!viewNames.has(extension[1])) continue;
       const start = extension.index + extension[0].length;
       const body = braceBody(source, start - 1);
+      inspectViewModelInputs(extension[1], body, source, start, file, findings);
       const access = findFeatureAccess(body);
       if (access) {
         findings.push(finding('view-feature-access', 'review', 'This View extension appears to access a Feature directly. Trace the call and route it through the owning ViewModel.', file, lineOf(source, start + access.index)));
@@ -553,7 +558,7 @@ export async function inspect(project) {
     limitations: [
       'This does not type-check Swift or resolve target membership, protocols, runtime behaviour, or test results.',
       'Unusual declarations, macros, generated code, and custom composition routes may be missed.',
-      'Screen-construction checks use conventionally named screen files and adjacent ViewModels; extension initializers, implicit memberwise inputs, aliases and actual call sites still need manual review.',
+      'Screen ownership mapping uses conventionally named screen files and adjacent ViewModels. Explicit initializer input checks include recognized View extensions. Implicit memberwise inputs, aliases and actual call sites still need manual review.',
       'Root storage-gate detection uses conventional root names and storage identifiers; aliases, helper functions, and blocking overlays require manual failure-path review.',
       'A visible route is not proof that business rules, concurrency, persistence, or UI behaviour are correct.'
     ]
