@@ -540,6 +540,12 @@ For each relevant operation, inspect:
   preferences, check the update before publication and treat it as an
   in-memory update. When confirmed persistence is required, look for a
   storage API that reports the write outcome.
+- Record-level persistence: trace creates, updates and deletes to the
+  repository's write boundary. If a caller submits an entire collection,
+  check whether that collection could be stale. Exercise two edits to
+  different records from the same starting snapshot and verify that both
+  changes persist. Include a delete racing an unrelated update. Use the
+  storage result to verify the final records after reopening.
 - Durable storage upgrades: when reviewing a storage change, check the
   previous store location and format against the new open or migration path.
   Use a disposable store written by the previous implementation with
