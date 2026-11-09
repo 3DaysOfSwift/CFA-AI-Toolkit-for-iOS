@@ -161,8 +161,11 @@ results in the report, rather than presenting scanner counts as findings.
     and consequence with source evidence. Distinguish an intentional local editing
     draft or stable display snapshot from a second purported source of truth. A
     `var` property alone does not establish a synchronization bug. When checking
-    CFA conformance, also assess published snapshots against CFA's immutable-value
-    convention and report a deviation separately from a demonstrated defect.
+    CFA conformance, apply the [immutable snapshot rule](spec/rules/cfa-snapshot-01.md).
+    Check that published snapshots use `let` properties and that nested values
+    and collection elements contain no references that can mutate in place.
+    At an isolation boundary, verify that storage returns immutable, Sendable
+    domain values. Report a CFA deviation separately from a demonstrated defect.
 
 Keep Swift Concurrency correctness, general architecture and optional CFA-specific
 conformance distinct. An app can have a deliberate non-CFA design, and a CFA
@@ -591,8 +594,9 @@ For each relevant operation, inspect:
   save is pending, the screen ViewModel holds the draft and the Feature still
   exposes the confirmed value to other consumers. If the write fails, verify
   that the editor retains the input for retry and that other consumers still
-  see the confirmed value. Retry and verify that publication follows a
-  successful write. Cancel an unsaved edit and verify that it discards the
+  see the confirmed value. Keep an earlier snapshot in a reader, then retry.
+  Verify that the Feature publishes a replacement after the write succeeds
+  and the earlier snapshot still contains its original values. Cancel an unsaved edit and verify that it discards the
   draft without changing the Feature or storage. For simple UserDefaults
   preferences, check the update before publication and treat it as an
   in-memory update. When confirmed persistence is required, look for a
