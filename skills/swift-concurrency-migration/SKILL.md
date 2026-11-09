@@ -121,7 +121,7 @@ Use deliberate passes:
 
 Keep migrated operations directly awaitable. Use structured child tasks for work owned by a calling operation; give independent tasks explicit lifetime and cancellation owners. Bridge callbacks only when an appropriate native async API is unavailable, accounting for exactly-once completion and cancellation races.
 
-Verify language mode, concurrency checking, default isolation and relevant SDK annotations instead of assuming async means off-main. Do not hide diagnostics with unjustified unchecked annotations. Preserve required ordering across suspension points and prevent obsolete results from overwriting newer state.
+Verify language mode, concurrency checking, default isolation and relevant SDK annotations instead of assuming async means off-main. Record the minimum OS version of each affected target. Preserve supported deployment targets unless the developer approves a change. If an API is unavailable at the existing minimum, use a compatible implementation, or explain the specific compatibility decision required before changing it. The Swift 6 migration playgrounds demonstrate their selected language mode. Choose language mode and API availability separately for the project. Do not hide diagnostics with unjustified unchecked annotations. Preserve required ordering across suspension points and prevent obsolete results from overwriting newer state.
 
 Completion requires an updated primitive inventory, relevant build/tests and
 evidence that behaviour was preserved. Record remaining legacy mechanisms and
