@@ -464,6 +464,14 @@ For each relevant operation, inspect:
   not hold the caller open or turn a successful refresh into a failure. Trace
   overlapping cache writes to check that an older write cannot replace a newer
   snapshot and that a failed replacement leaves the previous cache usable.
+  Check that retries are bounded, a failed refresh keeps valid in-memory data,
+  and the app only claims offline availability for data actually saved.
+- Required saves: trace the user edit through the storage result to publication.
+  If the write fails, verify that the previously confirmed value and the
+  user's retryable draft both remain available. For simple UserDefaults
+  preferences, check the update before publication and treat it as an
+  in-memory update. When confirmed persistence is required, look for a
+  storage API that reports the write outcome.
 - Operation results: trace how a caller identifies the record its operation
   created. Comparing a shared collection before and after an await can select
   another caller's insertion, even when persistence itself is serialized.
