@@ -196,7 +196,13 @@ files or local build definitions, including target membership changes. The
 inventory lists fingerprinted build and capability files under
 `scope.buildDefinitionPaths`. The whole-app checklist lists the same paths
 under `productionTargets`. Use these paths as leads when verifying target
-membership and effective build settings. Cite line ranges from UTF-8 text files.
+membership and effective build settings. In the app-level `additional-targets`
+assessment, record which shipping targets and local packages were checked,
+how source membership was confirmed, and why any test or support sources were
+excluded. Cite the build definitions that establish membership where they are
+available as UTF-8 text. The `targetInventoryVerified` flag records the
+reviewer's confirmation. The report command validates the record and source
+fingerprint, so confirm effective membership independently of that flag.
 Binary configuration remains part of the fingerprint and can be inspected
 separately. An exported HTML file is a dated
 snapshot.
