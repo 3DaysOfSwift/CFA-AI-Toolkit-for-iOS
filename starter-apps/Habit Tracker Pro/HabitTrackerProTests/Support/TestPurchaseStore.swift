@@ -21,6 +21,7 @@ final class TestPurchaseStore: PurchaseStore {
     private var finishWaiter: CheckedContinuation<Void, Never>?
     private var expectedFinishCount = 0
     var updateContinuation: AsyncStream<Void>.Continuation?
+    var onUpdateTermination: (@Sendable (AsyncStream<Void>.Continuation.Termination) -> Void)?
     var entitlementGate: CheckedContinuation<Bool, Never>?
     var holdsNextEntitlement = false
     private var entitlementStarted = false
@@ -53,7 +54,11 @@ final class TestPurchaseStore: PurchaseStore {
     func restore() async throws { restoreCount += 1; entitled = restoredAccess }
     func updates() -> AsyncStream<Void> {
         updateSubscriptionCount += 1
-        return AsyncStream { updateContinuation = $0 }
+        let onTermination = onUpdateTermination
+        return AsyncStream {
+            updateContinuation = $0
+            $0.onTermination = onTermination
+        }
     }
     func finishTransactions() async {
         finishCount += 1

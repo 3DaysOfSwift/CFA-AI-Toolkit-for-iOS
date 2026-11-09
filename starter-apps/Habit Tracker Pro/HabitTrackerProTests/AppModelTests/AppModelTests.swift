@@ -6,6 +6,32 @@ import Testing
 @Suite("AppModel composition")
 @MainActor
 struct AppModelTests {
+    @Test("Releasing an isolated AppModel cancels its transaction listener", .timeLimit(.minutes(1)))
+    func releasingModelCancelsListener() async throws {
+        let suiteName = "HabitTrackerPro.ListenerTests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let store = TestPurchaseStore()
+        let termination = AsyncStream<Bool>.makeStream()
+        store.onUpdateTermination = { reason in
+            termination.continuation.yield(reason == .cancelled)
+            termination.continuation.finish()
+        }
+        let habits = HabitsFeature(repository: InMemoryHabitsRepository())
+        var model: AppModel? = AppModel(
+            todayFeature: TodayFeature(habitsFeature: habits), habitsFeature: habits,
+            dayStreakFeature: DayStreakFeature(habitsFeature: habits),
+            settingsFeature: SettingsFeature(defaults: defaults),
+            purchasesFeature: PurchasesFeature(store: store),
+            trendsFeature: TrendsFeature(habitsFeature: habits)
+        )
+        model?.applicationDidFinishLaunching()
+        #expect(store.updateSubscriptionCount == 1)
+        model = nil
+        var iterator = termination.stream.makeAsyncIterator()
+        #expect(await iterator.next() == true)
+    }
+
     @Test("Five tab Features use one authoritative habit collection")
     func tabFeaturesShareHabits() async throws {
         let suiteName = "HabitTrackerPro.AppModelTests.\(UUID().uuidString)"
