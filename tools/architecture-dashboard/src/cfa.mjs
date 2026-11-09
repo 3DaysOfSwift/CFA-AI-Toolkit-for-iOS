@@ -81,6 +81,8 @@ skill from that toolkit before changing the project.
   it to the visible pending list or confirming it was kept. Surface an initial
   save failure and leave the pending list unchanged. If a request arrives
   during restoration, preserve both the saved requests and the new request.
+  If the saved list is unreadable, report the error and preserve the file.
+  Verify that a retry after recovery saves the new request alongside existing ones.
   Handle expired or unavailable destinations clearly. Record incoming URLs
   and user actions on local or push notifications.
   Scheduling or delivery alone does not create a pending item. The receiving

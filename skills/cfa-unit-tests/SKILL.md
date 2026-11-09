@@ -107,6 +107,9 @@ Drive scene outcomes through a controlled handler. Exercise invalid input
 before navigation and verify that the pending list and its stored snapshot
 remain intact. Force the initial save to fail and verify that the caller
 receives the error and the pending list does not publish an unsaved request.
+With an unreadable saved list, verify the read error reaches the caller and
+the original bytes are preserved. After restoring readable data, retry the
+request and reopen the store to verify both entries survive.
 Verify that refusal or cancellation before navigation
 leaves the request pending and that navigation consumes it even if cancellation
 follows. Simulate a failed removal after navigation, then retry the write and

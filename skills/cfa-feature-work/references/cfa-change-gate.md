@@ -412,7 +412,10 @@ operations enforce authorisation independently.
   requests leave the pending list and its stored snapshot intact. Force the initial save to fail
   and verify that the failure is reported and the request is never presented as
   saved. Admit a request while restoration is suspended and verify that both
-  the restored and new requests survive restart. Verify that declining or
+  the restored and new requests survive restart. With an unreadable list,
+  verify that receiving a new request reports the read error and preserves the
+  original file. Restore readable data and verify that retry keeps both the
+  recovered and incoming requests. Verify that declining or
   cancelling before navigation leaves a saved request available after restart.
   Cancel after the destination opens and verify that it still counts as opened
   and the pending item is removed. Verify either scene can open a shared
