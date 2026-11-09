@@ -107,9 +107,10 @@ skill from that toolkit before changing the project.
 - Published domain snapshot structs use let properties and immutable contents.
   Check nested values and collection elements for references that can change
   in place. Publish a replacement snapshot after a confirmed change.
-  The screen ViewModel owns temporary unsaved editor values. Keep the
-  draft available for retry if saving fails. Discard it when the user cancels
-  editing, and publish confirmed changes only after required persistence succeeds.
+  The screen ViewModel owns temporary unsaved editor values. If a durable save
+  fails, keep the draft available for retry, preserve previously confirmed state
+  and present a recoverable error on the screen. Discard the draft when the user
+  cancels editing, and publish confirmed changes only after required persistence succeeds.
 - When a value is genuinely shared across the app, define it once as a static
   property on a purpose-named enum. Add it when several callers use the same
   app-wide concept. Equal literals can still represent separate concepts.

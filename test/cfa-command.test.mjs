@@ -83,7 +83,7 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /snapshot structs use let properties and immutable contents/);
   assert.match(content, /nested values and collection elements for references that can change\s+in place/);
   assert.match(content, /read observable Feature state through the ViewModel/);
-  assert.match(content, /draft available for retry if saving fails/);
+  assert.match(content, /draft available for retry, preserve previously confirmed state\s+and present a recoverable error/);
   assert.match(content, /Save the safe data needed to identify and present each request before adding\s+it to the visible pending list/);
   assert.match(content, /Surface an initial\s+save failure and leave the pending list unchanged/);
   assert.match(content, /during restoration, preserve both the saved requests and the new request/);
