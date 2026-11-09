@@ -19,7 +19,12 @@ Constructing unrelated graphs in different scenes can create conflicting owners 
 
 ## Documented rationale
 
-The specification explicitly chooses shared production composition to keep scenes connected to the same underlying state. It limits AppModel to Features and lifecycle coordination so composition does not become business logic. The app delegate calls AppModel directly and synchronously at startup. AppModel signals Features and starts its app-wide listeners. It forwards each listener event to the responsible Feature, which owns the business response.
+The specification explicitly chooses shared production composition to keep scenes connected to the same underlying state. It limits AppModel to Features and lifecycle coordination so composition does not become business logic. The app delegate calls AppModel directly and synchronously at startup. Before
+the delegate returns, AppModel invokes the Feature startup methods and starts
+its app-wide listeners. Features own the asynchronous refresh and restoration
+work. Disk and network work can finish after the delegate returns, and task
+creation order alone gives no guarantee about when either begins. AppModel
+forwards listener events to the Feature responsible for the business response.
 
 ## Trade-offs and alternatives
 
