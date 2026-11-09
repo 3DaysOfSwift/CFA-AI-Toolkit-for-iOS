@@ -52,8 +52,10 @@ When changing sign-out, account switching or session expiry, apply the
 [account lifecycle rule](references/spec/rules/cfa-account-01.md). Trace which
 Features own account data and coordinate their cleanup through explicit calls.
 If sign-out fails before the session ends, preserve that session and its data.
-After a session change, check the active account or session generation before
-publishing results from in-flight requests. If the same account can sign in
+Reconcile partial authentication failures with the actual session. If the
+session ended and cleanup fails, keep the app signed out and surface the
+cleanup error. After a session change, check the active account or session
+generation before publishing in-flight results, even after requesting cancellation. If the same account can sign in
 again while earlier work is pending, use session identity and verify that the
 old result cannot reach the new session. Verify cleanup and retained data
 against the product's sign-out contract.
