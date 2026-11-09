@@ -8,10 +8,10 @@
 
 **Why:** Task ownership and shared completion stay visible.
 
-**Example:** Repeated refresh taps return the same active task handle.
+**Example:** Repeated refresh taps return the same active ViewModel task handle. An async caller awaits its value when it needs completion. The Feature still coordinates equivalent requests from other screens.
 
 **Explanation:** [Unstructured tasks need an owner—not a ban](https://www.3daysofswiftconcurrency.com/cfa/explanation/unstructured-tasks) · [Two callers. One refresh. No lost edits.](https://www.3daysofswiftconcurrency.com/cfa/explanation/overlapping-requests).
 
-**Verify:** Test repeated taps, completion cleanup, cancellation and replacement.
+**Verify:** Verify equivalent callers share one execution and observe its completion. Test cleanup after success, failure and cancellation, including that an obsolete task cannot clear a replacement handle.
 
 **Full rule, context and examples:** [Make Concurrency Behaviour Honest and Visible](../topics/20-make-concurrency-behaviour-honest-and-visible.md). This card is a reading aid; apply the complete canonical section.

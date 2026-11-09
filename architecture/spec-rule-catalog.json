@@ -770,8 +770,8 @@
       "strength": "Default",
       "rule": "Retain a named handle for each independently managed unstructured operation the ViewModel creates. Reuse the active handle for equivalent actions when one execution satisfies each caller. Commands that must each take effect keep their own outcomes. Clear the handle after publishing the outcome on success, failure or cancellation. Framework-owned lifecycle tasks and structured children keep their existing owners.",
       "why": "Task ownership and shared completion stay visible.",
-      "example": "Repeated refresh taps return the same active task handle.",
-      "verify": "Test repeated taps, completion cleanup, cancellation and replacement.",
+      "example": "Repeated refresh taps return the same active ViewModel task handle. An async caller awaits its value when it needs completion. The Feature still coordinates equivalent requests from other screens.",
+      "verify": "Verify equivalent callers share one execution and observe its completion. Test cleanup after success, failure and cancellation, including that an obsolete task cannot clear a replacement handle.",
       "explanationIds": [
         "unstructured-tasks",
         "overlapping-requests"
