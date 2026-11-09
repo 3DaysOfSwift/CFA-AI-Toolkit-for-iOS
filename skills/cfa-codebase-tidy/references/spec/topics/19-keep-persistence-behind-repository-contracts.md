@@ -43,10 +43,11 @@ the data. Preserve an existing good cache when a replacement fails and prevent
 older writes from overwriting newer snapshots. This exception does not apply to
 user edits, purchases, reminders, or other changes that require a durable save.
 
-For a real schedule Feature using cached provider data, inspect
-[Next Rocket Launch's LaunchScheduleFeature](https://github.com/3DaysOfSwift/RocketLaunch-iOS-App-Swift-Concurrency/blob/3ecaa30c76428bd8a6f5db8fd5506b6c20b846f7/Swift%20Concurrency%20Project/RocketLaunch/2%20-%20AppModel/Features/Launch%20Schedule/LaunchScheduleFeature.swift).
-Treat the linked implementation as a source to examine, not as proof that its
-entire project conforms to every current rule.
+For a working example, inspect `GitReposFeature` in the CFA App Xcode project
+template included with the full toolkit. It starts refresh and cache restoration
+independently, retains fresh results, and writes the optional cache separately.
+Its accompanying `GitReposFeatureTests` exercises shared refresh and cache
+failure behaviour.
 
 For replaceable server data, a saved snapshot can provide a fast initial display
 and limited offline access without introducing offline editing or a sync engine.

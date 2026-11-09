@@ -176,6 +176,9 @@ test('published app examples link to pinned source and relevant rule cards', () 
   assert.equal((index.match(/LaunchDetailView\.swift\)/g) ?? []).length, 1);
   assert.match(topics.get('rules/cfa-cache-01.md'), /bundled CFA App template.*GitReposFeature/);
   assert.doesNotMatch(topics.get('rules/cfa-cache-01.md'), /RocketLaunch-iOS-App-Swift-Concurrency\/blob\//);
+  const persistence = topics.get('topics/19-keep-persistence-behind-repository-contracts.md');
+  assert.match(persistence, /`GitReposFeature` in the CFA App Xcode project/);
+  assert.doesNotMatch(persistence, /RocketLaunch-iOS-App-Swift-Concurrency\/blob\/[^\s)]*LaunchScheduleFeature/);
   assert.match(topics.get('rules/cfa-state-01.md'), /bundled Habit Tracker/);
   assert.match(topics.get('rules/cfa-store-01.md'), /bundled Habit Tracker/);
   assert.match(topics.get('rules/cfa-feature-01.md'), /bundled Habit Tracker.*HabitsFeature/);
