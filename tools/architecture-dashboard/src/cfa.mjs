@@ -198,8 +198,11 @@ skill from that toolkit before changing the project.
   for each target while reusing the same business rules. For an App Group
   widget snapshot, request a timeline reload only after a successful write.
   Verify that a failed write issues no request. WidgetKit controls reload timing.
-  Send the Watch a separate snapshot through a suitable transfer, such as
-  Watch Connectivity. Build each affected target and check API availability
+  Share immutable snapshots sized for what the receiving presentation needs.
+  A Watch on another device cannot read the iPhone’s App Group container.
+  Send it a separate snapshot through a suitable transfer, such as Watch
+  Connectivity. Observation publishes changes within each process after
+  transfer or synchronization delivers the data. Build each affected target and check API availability
   and lifecycle requirements. Verify that existing data handoffs still work.
   Separately verify the handoff on supported
   devices, including how receiving Features refresh their state and handle

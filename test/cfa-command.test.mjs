@@ -105,6 +105,7 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /from View to ViewModel to Feature\. The Feature\s+calls internal microservices when it needs networking, storage or device APIs/);
   assert.match(content, /SwiftDataManager owns container and context creation/);
   assert.match(content, /changing shared Model code or\s+services used by an existing target/);
+  assert.match(content, /A Watch on another device cannot read the iPhone’s App Group container/);
   assert.match(content, /Verify that existing data handoffs still work/);
   assert.match(content, /Route URLSession requests through NetworkingManager/);
   assert.match(content, /Composition code may\s+configure and inject the session/);
