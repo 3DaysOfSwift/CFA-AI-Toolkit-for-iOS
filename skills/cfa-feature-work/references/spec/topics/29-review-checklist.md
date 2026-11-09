@@ -56,7 +56,11 @@ Before accepting a change, answer every question:
     no Task handles stored by a View?
 11. Has required concurrency behaviour been preserved rather than simplified
     away?
-12. Are time-dependent business rules deterministic in tests?
+12. Does the Feature read an injected clock when it makes a time-dependent
+    business decision? Test relevant date boundaries and time zones. When a
+    Feature instance must work across a date change, advance the controlled
+    clock and verify that its next decision uses the new time. Views can
+    read time directly for transient visual presentation.
 13. Does every ViewModel have its own named test file and focused suite under
     View model tests, and does each concrete Feature have a named API test
     file under FeatureTests? Verify that test files belong to the intended
