@@ -122,8 +122,10 @@ skill from that toolkit before changing the project.
 - Keep Views declarative. Feature state and business decisions belong outside
   the View layer. Reusable presentation components may receive display values,
   bindings and action closures that forward intent to their owning screen and
-  its ViewModel. Keep service
-  closures and other screens' ViewModel actions out of screen inputs.
+  its ViewModel. For example, a RefreshButton can forward a tap to the
+  owning screen's ViewModel. Verify that the component holds no ViewModel
+  and calls no Feature or service directly. Keep service closures and other
+  screens' ViewModel actions out of screen inputs.
 - Published domain snapshot structs use let properties and immutable contents.
   Check nested values and collection elements for references that can change
   in place. Publish a replacement snapshot after a confirmed change.

@@ -112,6 +112,7 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /Keep response validation and decoding\s+with each Feature-specific API adapter/);
   assert.match(content, /In new apps, start with a stateless\s+value type/);
   assert.match(content, /independent requests able to progress in parallel/);
+  assert.match(content, /component holds no ViewModel\s+and calls no Feature or service directly/);
   assert.match(content, /#Preview \{ NotesEditorView\(\) \}/);
   assert.match(content, /default Feature dependency comes\s+from AppModel\.shared/);
   assert.match(content, /Omission from a refreshed list does not establish deletion/);
