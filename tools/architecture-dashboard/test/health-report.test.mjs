@@ -34,6 +34,14 @@ test('supports a qualitative assessment without a percentage', () => {
   assert.match(html, /<div class="caption">Result<\/div>/);
   assert.match(html, /Strong concurrency design/);
   assert.doesNotMatch(html, />100%<|>Health score</);
+  assert.match(html, /class="number">✓</);
+  const needsAttention = renderHealthReport({
+    app:'App', summary:'Summary', verdict:'Shared writes can race.', scope:'App',
+    conclusion:'Conclusion', qualitativeOnly:true,
+    criteria:[{title:'Ordering', detail:'Overlapping writes can lose updates.', status:'problem'}]
+  });
+  assert.match(needsAttention, /class="number">×</);
+  assert.match(needsAttention, /Needs attention/);
 });
 
 
