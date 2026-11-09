@@ -379,6 +379,27 @@ export async function inspect(project) {
       if (!isFeatureCandidate(type, declarationFile)) findings.push(finding('app-model-non-feature-state', 'warning', `AppModel stores ${name}: ${type}; check that it is a Feature, launch guard or private app-wide listener handle.`, appModelFile, lineOf(appModel, match.index)));
     }
   }
+  const checkedFeatureTests = new Set();
+  function inspectFeatureTests(type, location, line) {
+    if (checkedFeatureTests.has(type)) return;
+    checkedFeatureTests.add(type);
+    const testName = `${type}Tests.swift`;
+    const namedTests = [...paths].filter(file => path.posix.basename(file) === testName);
+    for (const file of namedTests) {
+      const inProduction = productionSourceTree.test(file);
+      if (inProduction || !file.split('/').includes('FeatureTests')) {
+        const location = inProduction ? 'in a production source tree' : 'outside a FeatureTests folder';
+        findings.push(finding('feature-test-placement', 'review', `${testName} appears ${location}. Verify that it belongs to the unit-test target and its FeatureTests group.`, file, 1));
+      }
+    }
+    if (namedTests.length > 1) {
+      findings.push(finding('feature-tests-ambiguous', 'review', `Multiple files match ${testName}: ${namedTests.join(', ')}. Verify which test target covers this Feature.`, location, line));
+    }
+    if (!namedTests.length) {
+      findings.push(finding('feature-tests-missing', 'review', `No ${testName} was found in the scanned directory. Check the project root and test target before concluding the test is missing.`, location, line));
+    }
+  }
+
   const featureProperties = new Set();
   for (const [name, property] of appProperties) {
     const candidates = declarationsByName.get(property.type) || [];
@@ -420,22 +441,15 @@ export async function inspect(project) {
       if (declaration?.type === 'class' && (relative.startsWith('../') || !relative.includes('/'))) {
         findings.push(finding('feature-placement', 'review', `${property.type} is outside a named subfolder of ${featureFolder}. Verify the intended package and target placement before moving it.`, declarationFile, declaration.line));
       }
-      const testName = `${property.type}Tests.swift`;
-      const namedTests = [...paths].filter(file => path.posix.basename(file) === testName);
-      for (const file of namedTests) {
-        const inProduction = productionSourceTree.test(file);
-        if (inProduction || !file.split('/').includes('FeatureTests')) {
-          const location = inProduction ? 'in a production source tree' : 'outside a FeatureTests folder';
-          findings.push(finding('feature-test-placement', 'review', `${testName} appears ${location}. Verify that it belongs to the unit-test target and its FeatureTests group.`, file, 1));
-        }
-      }
-      if (namedTests.length > 1) {
-        findings.push(finding('feature-tests-ambiguous', 'review', `Multiple files match ${testName}: ${namedTests.join(', ')}. Verify which test target covers this Feature.`, property.file, property.line));
-      }
-      if (!namedTests.length) {
-        findings.push(finding('feature-tests-missing', 'review', `No ${testName} was found in the scanned directory. Check the project root and test target before concluding the test is missing.`, property.file, property.line));
-      }
+      inspectFeatureTests(property.type, property.file, property.line);
     }
+  }
+
+  for (const [type, candidates] of declarationsByName) {
+    if (!type.endsWith('Feature')) continue;
+    const owner = candidates.find(({file, declaration}) =>
+      declaration.type === 'class' && /(?:^|\/)2 - AppModel\/Features\//.test(file));
+    if (owner) inspectFeatureTests(type, owner.file, owner.declaration.line);
   }
 
   // A stored dependency is evidence of a potential workflow, not a violation.

@@ -109,6 +109,17 @@ test('reports a missing named feature test file', async t => {
   assert.match(report.findings[0].message, /scanned directory/);
 });
 
+test('reviews missing tests for a concrete Feature without direct AppModel exposure', async t => {
+  const file = 'App/2 - AppModel/Features/Checkout/CheckoutFeature.swift';
+  const root = await fixture(t, {
+    [file]: 'final class CheckoutFeature {}',
+    'App/2 - AppModel/Features/Checkout/CheckoutStore.swift': 'actor CheckoutStore {}'
+  });
+  const {findings} = await inspect(root);
+  assert.deepEqual(findings.filter(item => item.code === 'feature-tests-missing')
+    .map(item => [item.file, item.line]), [[file, 1]]);
+});
+
 test('reviews Feature tests placed within a production source tree', async t => {
   const file = 'Application/2 - AppModel/FeatureTests/SettingsFeatureTests.swift';
   const root = await fixture(t, {
@@ -159,7 +170,8 @@ test('does not mistake composition locals for AppModel properties', async t => {
   });
   const report = await inspect(root);
   assert.ok(report.findings.some(item => item.code === 'unresolved-feature'));
-  assert.ok(!report.findings.some(item => item.code === 'feature-tests-missing'));
+  const missingTests = report.findings.filter(item => item.code === 'feature-tests-missing');
+  assert.deepEqual(missingTests.map(item => item.file), ['Application/2 - AppModel/Features/Chat/ChatFeature.swift']);
   assert.equal(report.screens[0].dependencies[0].featureType, null);
 });
 
