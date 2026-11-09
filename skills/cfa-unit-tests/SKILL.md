@@ -195,7 +195,8 @@ Build AppModel tests from an isolated dependency graph. Do not call production
 supply a controlled event source and observe the receiving Feature. Verify
 repeated startup signals start each listener once and that events reach the
 Feature without a screen. Where cancellation or replacement is supported,
-exercise it and shut down isolated listeners during test cleanup.
+verify that the old listener stops forwarding and its cleanup leaves the
+replacement running. Shut down isolated listeners during test cleanup.
 
 For a changed observer-backed stream that supports resubscription, hold the
 old registration's teardown pending and register its replacement. Deliver a

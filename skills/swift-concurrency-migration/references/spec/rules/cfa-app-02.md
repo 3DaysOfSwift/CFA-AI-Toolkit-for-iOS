@@ -10,6 +10,6 @@
 
 **Example:** AppModel owns an app-wide purchase event listener and forwards updates to PurchasesFeature.
 
-**Verify:** Test repeated startup signals, event forwarding with the relevant screen absent, cancellation or replacement when needed, and isolated test lifetimes.
+**Verify:** Drive a controlled event source after repeated startup signals. Verify one listener forwards each event to the responsible Feature with no relevant screen mounted. Where cancellation or replacement is supported, verify the old listener stops forwarding and cleanup cannot stop the replacement. Shut down isolated listeners during test cleanup.
 
 **Full rule, context and examples:** [Use AppModel as the Composition Root and Feature Facade](../topics/17-use-appmodel-as-the-composition-root-and-feature-facade.md). This card is a reading aid; apply the complete canonical section.

@@ -147,7 +147,7 @@
       "strength": "Required when applicable",
       "rule": "When the app needs an event regardless of which screen is visible, AppModel starts its listener once, retains its task handle when asynchronous, and forwards events to the responsible Feature. Define cancellation or replacement when the listener needs it. The Feature interprets events and owns the resulting state. Screen-only observation follows the lifetime of its screen or ViewModel.",
       "why": "Lifetime follows the scope that requires the event.",
-      "verify": "Test repeated startup signals, event forwarding with the relevant screen absent, cancellation or replacement when needed, and isolated test lifetimes.",
+      "verify": "Drive a controlled event source after repeated startup signals. Verify one listener forwards each event to the responsible Feature with no relevant screen mounted. Where cancellation or replacement is supported, verify the old listener stops forwarding and cleanup cannot stop the replacement. Shut down isolated listeners during test cleanup.",
       "example": "AppModel owns an app-wide purchase event listener and forwards updates to PurchasesFeature.",
       "explanationIds": []
     },
