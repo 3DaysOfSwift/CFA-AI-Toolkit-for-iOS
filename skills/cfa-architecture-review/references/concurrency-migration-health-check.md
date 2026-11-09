@@ -190,6 +190,13 @@ Never infer a complete app assessment from a matching count or scanner output.
 
 ## Review operations in batches
 
+For shared refreshes in a CFA app, apply the
+[shared refresh rule](spec/rules/cfa-task-02.md). Verify the task owner and
+trace the last screen leaving, another waiter remaining and a later caller
+joining or reading the result. If a screen requires prompt cancellation,
+verify that its wait can end while the Feature's task continues. For non-CFA
+apps, assess the intended lifetime and its effects using the app's own policy.
+
 Inventory every in-scope production Swift file, including files without type declarations. Group related screens and shared services into meaningful operations; inspect their files and reuse shared-path evidence after checking each caller. Record each inspected file in an evidence-backed batch. Review state ownership,
 isolation, task lifetime, overlapping work, cancellation, error handling and
 observable results where applicable. A synchronous file is not a failure. Record

@@ -256,6 +256,14 @@ applicable when appropriate; do not invent an issue or runtime result. Unresolve
 or missing scenarios block a new whole-app report until assessed. When resuming an older review, add missing scenario assessments before
 generating a new whole-app report. Any existing flag is ignored.
 
+For a shared refresh, distinguish the caller's wait from the operation's
+lifetime in the `leave` scenario. Trace what happens when the only screen
+leaves, when another caller is still waiting, and when a later caller returns.
+For CFA, continued Feature-owned work is the default. Check separately whether
+a screen that needs a prompt exit can end its wait before the refresh finishes.
+For other architectures, judge the observed behaviour against the app's
+ownership and cancellation policy.
+
 Trace repeated triggers, navigation or caller departure, older results arriving
 late, and failures through the actual state and task owners. Record the observed
 policy, test or reproduction separately from source-only reasoning. The report
