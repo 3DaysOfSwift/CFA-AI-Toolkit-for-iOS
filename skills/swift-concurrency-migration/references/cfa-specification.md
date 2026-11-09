@@ -1277,9 +1277,15 @@ func refresh() -> Task<Void, Never> {
 }
 ```
 
-Clear the stored task after publishing its outcome, on success, failure and
-cancellation, so a later request can start again. Cleanup from an obsolete
-execution must not clear a newer handle. Task tracking and cancellation are
+The example keeps the handle until its task exits, including when the task
+is cancelled. Repeated calls cannot replace that handle while cleanup is
+pending, so unconditional cleanup is safe here. If an operation can install
+a replacement before the old task exits, associate each task with an identity
+and clear the handle only if that identity still matches. After handling
+success, failure or cancellation, clear the current handle so a later request
+can start again.
+
+Task tracking and cancellation are
 screen behaviour and must not accumulate in the View. The ViewModel still
 exposes clear intent methods, and the Feature owns the underlying business
 workflow and shared request policy. Framework-owned View `.task` and structured
