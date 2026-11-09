@@ -28,7 +28,9 @@ ViewModel and Feature reloads the saved notes without submitting the draft.
 A separate save then succeeds and clears that editor's load error. A fixed
 synthetic JSON fixture
 also verifies that an existing note survives opening, appending a note, and
-reopening the store. For a shipped app, use a disposable store written by the
+reopening the store. The checks also hold an earlier published collection and
+verify that it stays unchanged when the Feature publishes the updated notes.
+For a shipped app, use a disposable store written by the
 actual previous implementation to verify an upgrade. Run the checks on macOS
 with Xcode and Swift 6:
 

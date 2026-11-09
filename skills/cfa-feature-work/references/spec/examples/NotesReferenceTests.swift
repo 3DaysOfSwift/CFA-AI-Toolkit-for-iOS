@@ -273,6 +273,8 @@ actor HeldNotesLoad: NotesRepository {
         let existingNotes = existingFeature.notes
         precondition(existingNotes.map(\.text) == ["Existing note"])
         try await existingFeature.save("Added note")
+        precondition(existingNotes.map(\.text) == ["Existing note"])
+        precondition(existingFeature.notes.map(\.text) == ["Existing note", "Added note"])
         let reopenedNotes = try await JSONNotesRepository(file: existingStore).load()
         precondition(reopenedNotes.first == existingNotes.first)
         precondition(reopenedNotes.map(\.text) == ["Existing note", "Added note"])
