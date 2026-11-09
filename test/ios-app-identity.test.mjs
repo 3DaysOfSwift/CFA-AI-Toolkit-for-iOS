@@ -26,6 +26,10 @@ test('rejects unresolved bundle and template placeholders', () => {
   bundlePlaceholder.CFBundleIdentifier = '$(PRODUCT_BUNDLE_IDENTIFIER)';
   assert.throws(() => verifyAppIdentity(bundlePlaceholder), /placeholder/);
 
+  const versionPlaceholder = validInfo();
+  versionPlaceholder.CFBundleShortVersionString = '${MARKETING_VERSION}';
+  assert.throws(() => verifyAppIdentity(versionPlaceholder), /placeholder/);
+
   const displayNamePlaceholder = validInfo();
   displayNamePlaceholder.CFBundleDisplayName = '___PROJECTNAME___';
   assert.throws(() => verifyAppIdentity(displayNamePlaceholder), /placeholder/);

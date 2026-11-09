@@ -12,7 +12,7 @@ function requiredString(info, key, displayName) {
   if (typeof value !== 'string' || !value.trim()) {
     throw Error(`Missing ${displayName} (${key}) in the built app Info.plist.`);
   }
-  if (value.includes('$(') || value.includes('___') || value.includes('YOUR_')) {
+  if (value.includes('$(') || value.includes('${') || value.includes('___') || value.includes('YOUR_')) {
     throw Error(`${displayName} (${key}) is still a build or template placeholder: ${value}`);
   }
   return value;
