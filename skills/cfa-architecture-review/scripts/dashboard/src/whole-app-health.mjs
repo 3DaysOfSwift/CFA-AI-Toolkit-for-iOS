@@ -323,7 +323,7 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
     .flatMap(criterion => criterion.evidence);
   for (const problem of [...sourceProblems, ...operationProblems]) {
     const covered = problem.evidence.some(ref => visibleEvidence.some(visible =>
-      visible.file === ref.file && visible.line <= ref.endLine && ref.line <= visible.endLine
+      visible.file === ref.file && visible.line <= ref.line && visible.endLine >= ref.endLine
     ));
     if (!covered) {
       throw Error('Include confirmed source problems in the report criteria before rendering: ' +
@@ -334,7 +334,7 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
     const covered = presentation.criteria.some(criterion =>
       ['concern', 'problem'].includes(criterion.status) && concern.evidence.some(ref =>
         criterion.evidence.some(visible =>
-          visible.file === ref.file && visible.line <= ref.endLine && ref.line <= visible.endLine
+          visible.file === ref.file && visible.line <= ref.line && visible.endLine >= ref.endLine
         )
       )
     );
