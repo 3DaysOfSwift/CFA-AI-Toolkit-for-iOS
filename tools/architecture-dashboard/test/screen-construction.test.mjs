@@ -269,8 +269,9 @@ test('reviews direct Feature access in an extension of a scanned screen', async 
     var body: some View { Text("Home") }
   }`, {
     [extensionFile]: `extension HomeView {
-      func refresh() async { await AppModel.shared.homeFeature.refresh() }
-    }`
+      func refresh() async { await AppModel.shared.home.refresh() }
+    }`,
+    'App/2 - AppModel/AppModel.swift': 'final class AppModel { let home: HomeFeature }'
   });
   const findings = report.findings.filter(item => item.code === 'view-feature-access');
   assert.deepEqual(findings.map(({file, line}) => [file, line]), [[extensionFile, 2]]);

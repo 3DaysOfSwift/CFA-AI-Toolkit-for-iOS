@@ -133,12 +133,14 @@ export async function inspect(project) {
       if (!featureTypeSuffix.test(type) && !isLegacyFeature) findings.push(finding('app-model-non-feature-state', 'warning', `AppModel stores ${name}: ${type}; check that it is a Feature, launch guard or private app-wide listener handle.`, appModelFile, lineOf(appModel, match.index)));
     }
   }
+  const featureProperties = new Set();
   for (const [name, property] of appProperties) {
     const candidates = declarationsByName.get(property.type) || [];
     const source = candidates.length === 1 ? candidates[0] : null;
     const declarationFile = source?.file;
     const isFeature = featureTypeSuffix.test(property.type) || /(?:^|\/)Features\/[^/]+\//.test(declarationFile ?? '');
     if (!isFeature) continue;
+    featureProperties.add(name);
     if (property.computed) {
       findings.push(finding('feature-computed-exposure', 'review', `AppModel exposes ${name} through a computed property. Trace it to the concrete Feature retained by the live graph and check that access does not construct a competing instance.`, appModelFile, property.line));
     }
@@ -185,6 +187,11 @@ export async function inspect(project) {
         findings.push(finding('matching-feature-protocol', 'review', `${match[1]} has a matching ${feature} declaration. Verify whether the app can use the concrete Feature and substitute its lower-level collaborators.`, file, lineOf(source, match.index)));
       }
     }
+  }
+
+  function findFeatureAccess(source) {
+    return [...source.matchAll(/\bAppModel\s*\.\s*shared\s*\.\s*(\w+)/g)]
+      .find(match => match[1].endsWith('Feature') || featureProperties.has(match[1]));
   }
 
   const screens = [];
@@ -241,7 +248,7 @@ export async function inspect(project) {
     for (const rootView of source.matchAll(/\bstruct\s+(?:ContentView|RootTabView|RootView)\s*:\s*View\b[^\{]*\{/g)) {
       const bodyOffset = rootView.index + rootView[0].length;
       const rootBody = braceBody(source, bodyOffset - 1);
-      const featureAccess = /\bAppModel\s*\.\s*shared\s*\.\s*\w+Feature\b/.exec(rootBody);
+      const featureAccess = findFeatureAccess(rootBody);
       if (featureAccess) {
         findings.push(finding('root-feature-access', 'review', 'Root navigation appears to access a Feature directly. Keep refresh and Feature state presentation in the owning screen and its ViewModel.', file, lineOf(source, bodyOffset + featureAccess.index)));
       }
@@ -282,7 +289,7 @@ export async function inspect(project) {
     if (!declaration) continue;
     const bodyOffset = declaration.index + declaration[0].length;
     const body = braceBody(view, bodyOffset - 1);
-    const featureAccess = /\bAppModel\s*\.\s*shared\s*\.\s*\w+Feature\b/.exec(body);
+    const featureAccess = findFeatureAccess(body);
     if (featureAccess && name !== 'ContentView' && name !== 'RootView') {
       findings.push(finding('view-feature-access', 'review', 'This View appears to access a Feature directly. Trace the call and route screen intent and state through the owning ViewModel.', viewFile, lineOf(view, bodyOffset + featureAccess.index)));
     }
@@ -392,7 +399,7 @@ export async function inspect(project) {
       if (!screenNames.has(extension[1])) continue;
       const start = extension.index + extension[0].length;
       const body = braceBody(source, start - 1);
-      const access = /\bAppModel\s*\.\s*shared\s*\.\s*\w+Feature\b/.exec(body);
+      const access = findFeatureAccess(body);
       if (access) {
         findings.push(finding('view-feature-access', 'review', 'This screen extension appears to access a Feature directly. Trace the call and route it through the owning ViewModel.', file, lineOf(source, start + access.index)));
       }
