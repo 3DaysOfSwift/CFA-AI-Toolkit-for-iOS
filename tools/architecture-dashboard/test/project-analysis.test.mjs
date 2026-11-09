@@ -1,12 +1,39 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {analyseProject} from '../src/project-analysis.mjs';
+import {collectSyntax} from '../src/syntax-evidence.mjs';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
 const inventory = () => ({sourceFingerprint:'abc',scope:{skipped:[]},files:[{path:'App.swift',hash:'hash'}],buildDefinitions:[{path:'App.entitlements',hash:'config-hash'}]});
 const syntax = async () => ({status:'available',files:['App.swift'],items:[{kind:'call.expression',name:'refresh',file:'App.swift',line:2}],warnings:[]});
+
+test('compiled SwiftSyntax scanner inventories startup candidates', {
+  skip: process.platform !== 'darwin', timeout: 150_000
+}, async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cfa-startup-inventory-'));
+  t.after(() => fs.rm(root, {recursive:true, force:true}));
+  await fs.writeFile(path.join(root, 'main.swift'), 'import Foundation\nprint("start")\nprint("finish")\n');
+  await fs.writeFile(path.join(root, 'App.swift'), [
+    '@available(*, deprecated, message: "Use @main") struct Old {}',
+    '@main enum App { static func main() async {} }',
+    'class Delegate {',
+    '  @MainActor',
+    '  public func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { true }',
+    '  func application(_ app: UIApplication, options didFinishLaunchingWithOptions: Bool) -> Bool { true }',
+    '}'
+  ].join('\n'));
+
+  const inventory = await collectSyntax(root);
+  assert.equal(inventory.status, 'available', inventory.reason);
+  assert.deepEqual(inventory.items.filter(item => item.kind.startsWith('entry.'))
+    .map(({kind, name, file, line, column}) => [kind, name, file, line, column]), [
+    ['entry.main', 'App', 'App.swift', 2, 1],
+    ['entry.launchCallback', 'application', 'App.swift', 5, 10],
+    ['entry.main', 'main.swift', 'main.swift', 2, 1]
+  ]);
+});
 
 test('combines syntax and index evidence without treating calls as runtime traces', async () => {
   const root=await fs.mkdtemp(path.join(os.tmpdir(),'project-analysis-test-'));
