@@ -100,6 +100,16 @@ existing runtime evidence or exercise a safe failure path within the agreed
 review scope. A mock fetch can verify Feature recovery, while a real
 store-opening and navigation check is needed to establish the launch outcome.
 
+For an event needed regardless of which screen is visible, apply the
+[app-wide listener rule](references/spec/rules/cfa-app-02.md). Trace from
+the app lifecycle callback to AppModel's listener startup and retained
+task handle, then follow an event to the Feature that interprets it and
+owns the resulting state. Check repeated startup and delivery with no
+screen mounted. Where the listener supports cancellation or replacement,
+trace that path too. For screen-only observation, check the screen or
+ViewModel lifetime instead. Record which behaviour is supported by source
+and which was exercised by tests.
+
 For a dashboard or detailed concurrency analysis, read the [dashboard workflow](references/dashboard-workflow.md). The bundled tool is at `scripts/dashboard/src/cli.mjs` relative to this skill; it requires Node.js 20+. It inventories source patterns, not semantic correctness. Only use its concurrency dashboard when the selected scope contains Swift Concurrency. If the app uses only GCD, continue a manual ownership and concurrency review; mark the dashboard unavailable rather than refusing the review or inventing zero scores.
 
 A focused CFA review does not require an app-wide dashboard or numerical ratings. A requested full dashboard requires the complete source-evidence workflow. Do not infer testing evidence from source inspection or claim race freedom from a score.
