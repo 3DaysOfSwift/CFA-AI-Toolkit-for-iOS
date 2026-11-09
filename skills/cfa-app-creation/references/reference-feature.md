@@ -14,8 +14,10 @@ The accompanying [executable checks](spec/examples/NotesReferenceTests.swift)
 verify failure recovery, publication after persistence, repeated Save taps,
 ordered independent saves, JSON storage and fresh editor state. A queued
 save still completes when its predecessor fails, and each caller receives
-its own outcome. When the
-JSON file is corrupt, the checks verify that a failed save preserves the file
+its own outcome. The checks also verify that two callers share one load
+and one caller's cancellation leaves the other able to receive the result.
+Saving during initial restoration preserves both the restored and new notes.
+When the JSON file is corrupt, the checks verify that a failed save preserves the file
 and draft. After a valid file is restored, retrying through the same Feature
 reloads the saved notes and keeps the draft. Run the checks on macOS with
 Xcode and Swift 6:
