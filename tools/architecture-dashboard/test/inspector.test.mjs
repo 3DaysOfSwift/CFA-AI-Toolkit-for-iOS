@@ -376,6 +376,23 @@ test('identifies a launch signal scheduled inside a delegate Task or dispatch qu
   assert.match(findings[1].message, /through DispatchQueue\.async/);
 });
 
+test('reviews a launch signal deferred through mutable local aliases', async t => {
+  const file = 'Application/AppDelegate.swift';
+  const root = await fixture(t, {
+    [file]: `class AppDelegate {
+      func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool {
+        var startupQueue: DispatchQueue = .main
+        var model = AppModel.shared
+        startupQueue.async { model.applicationDidFinishLaunching() }
+        return true
+      }
+    }`
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'scheduled-app-model-launch');
+  assert.deepEqual(findings.map(item => [item.file, item.line]), [[file, 5]]);
+  assert.match(findings[0].message, /DispatchQueue\.async/);
+});
+
 test('identifies a launch signal deferred by DispatchQueue.asyncAfter', async t => {
   const root = await fixture(t, {
     'Application/AppDelegate.swift': `class Delegate {

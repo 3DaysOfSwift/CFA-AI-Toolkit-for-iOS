@@ -525,13 +525,13 @@ export async function inspect(project) {
         if (queue) {
           const localDeclarations = memberSignatures(body.slice(0, scheduled.index));
           const queueDeclaration = new RegExp(
-            '\\blet\\s+' + queue + '\\s*(?::\\s*' + queueType + '\\s*=|=\\s*' + queueType + '\\s*[.(])'
+            '\\b(?:let|var)\\s+' + queue + '\\s*(?::\\s*' + queueType + '\\s*=|=\\s*' + queueType + '\\s*[.(])'
           );
           if (!queueDeclaration.test(localDeclarations)) continue;
         }
         const scheduledBody = braceBody(body, scheduled.index + scheduled[0].length - 1);
         const precedingSource = body.slice(0, scheduled.index) + '\n' + scheduledBody;
-        const aliases = [...precedingSource.matchAll(/\blet\s+(\w+)(?:\s*:\s*AppModel)?\s*=\s*AppModel\s*\.\s*shared\b(?!\s*\.)/g)]
+        const aliases = [...precedingSource.matchAll(/\b(?:let|var)\s+(\w+)(?:\s*:\s*AppModel)?\s*=\s*AppModel\s*\.\s*shared\b(?!\s*\.)/g)]
           .map(match => match[1]);
         const captures = /^\s*(?:@MainActor\s+)?\[([^\]]*)\]/.exec(scheduledBody);
         if (captures) {
