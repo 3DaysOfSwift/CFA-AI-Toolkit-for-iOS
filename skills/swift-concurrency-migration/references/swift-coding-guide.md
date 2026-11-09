@@ -148,6 +148,12 @@ The ViewModel task awaits the Feature command; the Feature task coalesces the
 shared operation across launch and screens. Clear each handle at its own owner
 when its work completes.
 
+In `.refreshable`, await the ViewModel's async refresh directly or await
+`viewModel.refresh().value` when it returns a Task handle. This keeps the
+indicator tied to the screen's wait for the refresh. If the screen needs to
+stop waiting promptly on cancellation, end that wait independently while
+the Feature retains the shared refresh.
+
 Follow the active architecture's dependency route. In CFA, use the SwiftUI environment for app-wide presentation dependencies such as `ThemeManager`, locale-aware formatting or accessibility configuration; do not place `AppModel` or Features there. A CFA View owns its ViewModel and that ViewModel defaults its narrow live Feature dependency from `AppModel.shared`; do not replace that route with screen-initializer plumbing. Other architectures may use the environment differently.
 
 **Review:** When a screen has initial work tied to its lifetime, does it start that work using `.task` without assuming the work finishes before the screen appears? Does the app lifecycle begin shared system refresh early without blocking the root UI? A reader should see what the screen displays and which intents it forwards without tracing storage calls, bundle/system reads, formatting work, business rules, or multi-step tasks in its body. Does the ViewModel receive only the narrow Feature dependencies it needs, each with its live default? A screen can present several independent business capabilities. For a growing ViewModel, ask whether it is arranging existing capabilities for this screen or implementing a new business capability itself; only the latter points towards extracting business behaviour into the model.
