@@ -9,14 +9,14 @@ how the same ownership rules appear in working application code.
 | --- | --- | --- |
 | Cuentiva | Created using CFA | [Open Cuentiva](https://github.com/3DaysOfSwift/Cuentiva) |
 | Personal API iOS App | Created using CFA and Swift Concurrency | [Open Personal API iOS App](https://github.com/3DaysOfSwift/Personal-API-iOS-App-Swift-Concurrency-CFA) |
-| Trend iOS App | Created using CFA and Swift Concurrency; a broad reference for feature ownership and the AppModel composition root | [Open Trend](https://github.com/3DaysOfSwift/Trend-iOS-App-Swift-Concurrency-CFA) |
+| Trend iOS App | Created using CFA and Swift Concurrency; its weight log illustrates feature-owned data | [Open Trend](https://github.com/3DaysOfSwift/Trend-iOS-App-Swift-Concurrency-CFA) |
 | RocketLaunch iOS App | Created using CFA and Swift Concurrency | [Open RocketLaunch](https://github.com/3DaysOfSwift/RocketLaunch-iOS-App-Swift-Concurrency) |
 | Metro Mate iOS | An open-source application migrated into CFA and Swift Concurrency | [Open Metro Mate](https://github.com/3DaysOfSwift/metro-mate-ios) |
 
 ## How to use these projects
 
-- **Starting a new app:** use CFA App Creation, then compare a small complete
-  feature with the same boundaries in one of the reference projects.
+- **Starting a new app:** use CFA App Creation and the bundled starter apps for current AppModel,
+  ViewModel and Feature examples.
 - **Adding a feature:** follow the existing app's feature owner, repository,
   ViewModel and AppModel wiring rather than placing business rules in a View.
   The toolkit names new concrete owners `*Feature`; these older projects may
