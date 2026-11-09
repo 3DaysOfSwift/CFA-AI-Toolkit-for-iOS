@@ -67,13 +67,18 @@ test('deep-link example persists a deferred request and completes after navigati
   } finally { fs.rmSync(directory, { recursive: true, force: true }); }
 });
 
+test('Notes reference documentation shows the executable Swift source', () => {
+  const source = fs.readFileSync(path.join(root, 'architecture/spec-examples/NotesReference.swift'), 'utf8');
+  const reference = fs.readFileSync(path.join(root, 'architecture/reference-feature.md'), 'utf8');
+  const code = /^```swift\n([\s\S]*?)^```$/m.exec(reference);
+  assert.equal(code?.[1], source, 'Reference code must match the tested source');
+});
+
 test('Notes reference preserves failed drafts and serialises independent saves', { skip: process.platform !== 'darwin', timeout: 120000 }, () => {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'cfa-notes-example-'));
   try {
     const source = path.join(root, 'architecture/spec-examples/NotesReference.swift');
     const tests = path.join(root, 'architecture/spec-examples/NotesReferenceTests.swift');
-    const reference = fs.readFileSync(path.join(root, 'architecture/reference-feature.md'), 'utf8');
-    assert.ok(reference.includes(fs.readFileSync(source, 'utf8')), 'Reference code must match the tested source');
     const executable = path.join(directory, 'notes');
     const build = spawnSync('xcrun', ['swiftc', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(directory, 'cache'), source, tests, '-o', executable], { encoding: 'utf8', timeout: 90000 });
     assert.equal(build.status, 0, build.stderr || build.error?.message);
