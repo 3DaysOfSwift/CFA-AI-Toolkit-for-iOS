@@ -61,6 +61,9 @@ skill from that toolkit before changing the project.
   mechanism when a migration must support an older deployment target.
   For live data, read observable Feature state through the ViewModel so
   confirmed changes reach the View without a manually synchronized copy.
+  Preserve the event API or its delivery contract when a consumer needs
+  every event. Verify repeated values, ordering and cancellation separately
+  from the latest state the UI displays.
 - A detail View may receive selected immutable value data and construct its own
   State-backed ViewModel in its initializer. Do not inject or share ViewModels;
   keep each scene's selection in presentation, not in a shared Feature. The
