@@ -39,10 +39,12 @@ and trace the actual entry point and entitlement check. Review presentation
 separately: a screen can expose paid data or controls without making a call
 listed in the policy. Trace alternate screens and other callers, including
 deep links, notification actions, and additional targets when they reach the
-capability. Check that the
-ViewModel reads current entitlement from `PurchasesFeature` before presenting
-or invoking the paid capability. Exercise locked and entitled outcomes for both
-exposure and execution on the relevant routes. Keep pricing and entitlement
+capability. For screen routes, check that the ViewModel reads current
+entitlement from `PurchasesFeature` before presenting or invoking the paid
+capability. For an entry point that bypasses the screen, trace the check in
+that route's caller before it invokes the capability. A check on a different
+route gives no evidence that this caller is guarded. Exercise locked and
+entitled outcomes for both exposure and execution where applicable. Keep pricing and entitlement
 checks outside the capability Feature so its behaviour can be reused when the
 pricing policy changes. For a confirmed unguarded path,
 cite the entry point and the paid call or exposure and describe the consequence.
