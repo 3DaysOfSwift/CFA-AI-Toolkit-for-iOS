@@ -22,7 +22,7 @@ TodayView(viewModel: rootViewModel.today)
 TodayView(onAdd: rootViewModel.addEntry)
 ```
 
-A detail destination may receive selected value data and construct its own
+A detail destination may receive a selected immutable snapshot and construct its own
 ViewModel. The Feature owns authoritative data; screen and scene selection
 remain presentation concerns. Preserve independent navigation and existing
 product behaviour. A reusable presentation component may receive display data,

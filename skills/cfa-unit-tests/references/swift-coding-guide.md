@@ -64,7 +64,7 @@ in the View. A durable draft requires a product reason.
 ## 3. SwiftUI Views describe the interface
 
 **CFA-specific ownership:** Screens construct and own a private ViewModel,
-inline by default. A detail View may accept selected value data and use it to
+inline by default. A detail View may accept a selected immutable snapshot and use it to
 construct its own State-backed ViewModel in its initializer. Never pass a
 ViewModel into a View. Keep construction cheap and side-effect-free; State
 ownership does not promise that initialization expressions execute only once.
@@ -87,7 +87,7 @@ shared feature state to the owning Feature. Bindings, simple conditional
 rendering, and short layout-local values that directly describe the rendered
 interface remain declarative View code.
 
-A ViewModel may accept selected value data for its detail screen and defaults
+A ViewModel may accept a selected immutable snapshot for its detail screen and defaults
 its narrow Feature dependencies from AppModel.shared. Tests may provide
 isolated Features. Screen selection remains presentation state.
 

@@ -24,7 +24,7 @@ acquire a Feature or ViewModel, or implement business rules.
 
 **CFA screen ownership:** A screen owns its dedicated private ViewModel.
 Name the screen’s ViewModel property `viewModel`. By default, construct it inline: `@State private var viewModel = HomeViewModel()`.
-A detail screen may receive selected value data and initialise its own private
+A detail screen may receive a selected immutable snapshot and initialise its own private
 State-backed ViewModel in its View initializer using that value. Store the
 ViewModel in `@State`. Keep it private to the screen and construct it there.
 A computed ViewModel property, a shared ViewModel and a ViewModel supplied by
@@ -177,7 +177,7 @@ through every SwiftUI initializer.
 
 This is mandatory for CFA application screens. Before delivery, verify all three:
 
-1. Every screen owns a private dedicated ViewModel, constructed inline by default. A detail View may initialise its own State-backed ViewModel from selected value data in its initializer.
+1. Every screen owns a private dedicated ViewModel, constructed inline by default. A detail View may initialise its own State-backed ViewModel from a selected immutable snapshot in its initializer.
 2. Each ViewModel initializer defaults its narrow live feature dependencies from `AppModel.shared` while allowing tests to supply isolated replacements.
 3. Never pass a ViewModel into a View. Selected value data is permitted for detail destinations; preserve independent destination identity.
 

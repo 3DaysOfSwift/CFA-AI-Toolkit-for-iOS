@@ -30,7 +30,7 @@ the architecture:
 1. Each screen-level SwiftUI View owns a dedicated ViewModel in private `@State`
    named `viewModel`.
    Construct it at the declaration by default. A detail View may initialize
-   its stored ViewModel from selected value data. A computed property or a
+   its stored ViewModel from a selected immutable snapshot. A computed property or a
    ViewModel passed in or shared by another View violates screen ownership.
    Previews use the same ownership and storage boundaries. A normal preview
    constructs the View, which creates its ViewModel and resolves its Feature
@@ -102,7 +102,7 @@ the architecture:
     belong to the adjacent ViewModel; business, persistence, and shared state
     belong to the owning Feature.
 12. A ViewModel initializer defaults its narrow Feature dependencies from
-    `AppModel.shared`. A detail ViewModel may also receive selected value data;
+    `AppModel.shared`. A detail ViewModel may also receive a selected immutable snapshot;
     avoid unrelated convenience parameters.
 13. Each local data responsibility uses the simplest single persistence route.
     A replaceable remote snapshot normally uses one JSON cache; SwiftData is reserved

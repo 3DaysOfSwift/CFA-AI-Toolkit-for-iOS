@@ -8,7 +8,7 @@ Status: documented basis with editorial analysis; not a founder-approved histori
 ## Rule
 
 A CFA screen-level SwiftUI View owns its dedicated ViewModel in a private
-`@State` property named `viewModel`. It constructs the ViewModel inline by default. A detail View may receive selected value data and construct its State-backed ViewModel in its initializer; ViewModels are never passed into Views. The ViewModel resolves narrow live Features and permits isolated Feature dependencies in tests.
+`@State` property named `viewModel`. It constructs the ViewModel inline by default. A detail View may receive a selected immutable snapshot and construct its State-backed ViewModel in its initializer; ViewModels are never passed into Views. The ViewModel resolves narrow live Features and permits isolated Feature dependencies in tests.
 
 ## Problem
 
