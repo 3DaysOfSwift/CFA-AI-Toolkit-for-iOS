@@ -783,7 +783,7 @@
       "section": "Use Application Launch as an Opportunity to Refresh Features",
       "applies": "Launching when persistence is slow or unavailable",
       "strength": "Required",
-      "rule": "Install stable root navigation independently of store availability. Initializers and AppModel.live() assemble dependencies. The storage owner opens the store lazily on a Feature request. The affected screen presents errors and retries through its ViewModel and Feature.",
+      "rule": "Install stable root navigation independently of store availability. Initializers and AppModel.live() assemble dependencies. The storage owner opens the store lazily on a Feature request and prepares the configured parent directory before opening a file-backed store. The affected screen presents directory or opening errors and retries through its ViewModel and Feature. Preserve the configured store and existing data.",
       "why": "Users can access unaffected capabilities and see honest loading or failure states.",
       "example": "The root screen appears while a Feature restores local data.",
       "verify": "Hold store opening pending, then fail it. Verify the root stays visible, an unaffected destination remains accessible, and the affected screen explains the failure and can retry successfully without replacing the root or losing saved data. Verify actual store opening and UI behaviour separately from controlled tests.",

@@ -198,8 +198,10 @@ the architecture:
     manages navigation only; feature screens present their own state.
 18. Database availability never gates the interface, including root wrappers
     and app-wide blocking overlays. Construct the root independently of storage;
-    open storage lazily inside a Feature's data request. Opening failures follow
-    the request's error path through Feature → ViewModel → feature screen,
+    open storage lazily inside a Feature's data request. Before opening a
+    file-backed store, its owner prepares the parent directory at the configured
+    store URL. Directory and opening failures follow the request's error path
+    through Feature → ViewModel → feature screen,
     never a launch/startup error. Retry the domain request, preserve saved data,
     and keep independent navigation usable.
 19. ViewModel methods name the work they perform, not the UI gesture or
@@ -334,8 +336,11 @@ do not claim that UI gating replaces server-side authorisation.
   the root appears and Settings or another independent screen is reachable
   while it waits. Fail the open and verify that independent navigation still
   works and the affected Feature presents a recoverable request error. Verify
-  successful retry and retained data after failed refresh. Report any
-  storage or UI checks that did not run.
+  successful retry and retained data after failed refresh. For a file-backed
+  store, test first use with a missing parent directory and a failure to create
+  it. Verify retry uses the configured store and that the failure neither
+  removes existing data nor substitutes another store. Report any storage or
+  UI checks that did not run.
 - For changes to durable editing, hold the save pending and verify that
   confirmed state stays unchanged. Fail the save and verify the screen
   ViewModel retains the draft for retry. Verify a successful retry publishes

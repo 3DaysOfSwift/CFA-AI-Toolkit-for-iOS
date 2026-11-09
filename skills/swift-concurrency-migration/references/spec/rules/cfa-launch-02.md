@@ -4,7 +4,7 @@
 
 **Strength:** Required.
 
-**Guidance:** Install stable root navigation independently of store availability. Initializers and AppModel.live() assemble dependencies. The storage owner opens the store lazily on a Feature request. The affected screen presents errors and retries through its ViewModel and Feature.
+**Guidance:** Install stable root navigation independently of store availability. Initializers and AppModel.live() assemble dependencies. The storage owner opens the store lazily on a Feature request and prepares the configured parent directory before opening a file-backed store. The affected screen presents directory or opening errors and retries through its ViewModel and Feature. Preserve the configured store and existing data.
 
 **Why:** Users can access unaffected capabilities and see honest loading or failure states.
 
