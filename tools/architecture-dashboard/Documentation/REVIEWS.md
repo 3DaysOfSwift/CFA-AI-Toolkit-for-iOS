@@ -272,12 +272,14 @@ evidence. The workflow also has a collapsible section for inapplicable
 timing scenarios and their reasons. They do not count as passes. The tool
 validates provenance and completeness; the reviewer verifies the conclusions.
 
-Unresolved checks require `question` and `resolveBy`: the specific unanswered
-question and the evidence or test needed. Failed checks require `consequence`
-and `problemKind` (`local-defect` or `architectural-conflict`). CFA failures use
-`cfa-deviation` and stay in the `cfa` dimension. They do not affect concurrency
-or architectural-clarity verdicts. Describe actual failure scenarios in reasons,
-not merely the category of finding.
+Use `unresolved` when the review has a specific unanswered question. Supply
+`question` and `resolveBy` with the evidence or test needed. Use `not-checked`
+for an applicable check the reviewer has yet to assess. Use `not-applicable`
+only when the reason explains why the check does not apply.
+A failed check needs a concrete `consequence` and a `problemKind`. Use
+`local-defect` or `architectural-conflict` for correctness or clarity failures,
+and `cfa-deviation` for failures in the `cfa` dimension. CFA-only failures leave
+concurrency and architectural-clarity verdicts independent.
 
 The importer derives operation correctness and clarity from these checks. An
 unresolved check preserves all other verified passes; row summaries show their
