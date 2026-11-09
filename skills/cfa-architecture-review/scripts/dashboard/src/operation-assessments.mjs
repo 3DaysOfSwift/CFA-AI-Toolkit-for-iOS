@@ -1,5 +1,8 @@
 export const missingTimingScenarios = operation => ['repeat', 'leave', 'late-result', 'failure']
-  .filter(id => !operation.scenarios?.some(scenario => scenario.id === id && scenario.status !== 'unresolved'));
+  .filter(id => {
+    const matches = operation.scenarios?.filter(scenario => scenario.id === id) ?? [];
+    return matches.length !== 1 || !['pass', 'problem', 'not-applicable'].includes(matches[0].status);
+  });
 
 const esc = v => String(v ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const labels={sound:'✅ Stable',problem:'❌ Problem',investigate:'⚠️ Needs investigation',unassessed:'➖ Not assessed'};

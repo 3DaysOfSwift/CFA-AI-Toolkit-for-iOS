@@ -155,6 +155,11 @@ test('withholds a stable workflow result until its trace and timing outcomes exi
   const html = renderHealthReport(data);
   assert.match(html, /aria-label="Stable">✓<\/span>Save/);
   assert.match(html, /Timing scenarios that don’t apply.*— Older result arrives late.*The operation never suspends/);
+  operation.scenarios.push({id:'late-result',status:'unresolved'});
+  assert.match(renderHealthReport(data), /aria-label="Needs investigation">\?<\/span>Save/);
+  operation.scenarios.pop();
+  operation.scenarios[2].status = 'not-checked';
+  assert.match(renderHealthReport(data), /aria-label="Needs investigation">\?<\/span>Save/);
 });
 
 test('a confirmed problem keeps the verdict red even with a high score', () => {
