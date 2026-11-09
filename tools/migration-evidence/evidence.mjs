@@ -174,6 +174,7 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
         ['featureInventoryEvidenceId', ['source', 'diff']],
         ['primitiveInventoryEvidenceId', ['source', 'diff']],
         ['hybridReviewEvidenceId', ['source', 'diff', 'manual']],
+        ['deploymentCompatibilityEvidenceId', ['source', 'build', 'test', 'manual']],
         ['finalCfaAuditEvidenceId', ['source', 'diff', 'manual']],
         ['buildEvidenceId', ['build']],
         ['testEvidenceId', ['test']],

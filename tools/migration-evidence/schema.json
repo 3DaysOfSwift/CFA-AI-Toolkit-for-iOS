@@ -89,12 +89,13 @@
     }},
     "completionGate": {
       "type": ["object", "null"], "additionalProperties": false,
-      "required": ["navigatorEvidenceId", "featureInventoryEvidenceId", "primitiveInventoryEvidenceId", "hybridReviewEvidenceId", "finalCfaAuditEvidenceId", "buildEvidenceId", "testEvidenceId", "manualBehaviourRegressionEvidenceId", "manualArchitectureReviewEvidenceId"],
+      "required": ["navigatorEvidenceId", "featureInventoryEvidenceId", "primitiveInventoryEvidenceId", "hybridReviewEvidenceId", "deploymentCompatibilityEvidenceId", "finalCfaAuditEvidenceId", "buildEvidenceId", "testEvidenceId", "manualBehaviourRegressionEvidenceId", "manualArchitectureReviewEvidenceId"],
       "properties": {
         "navigatorEvidenceId": {"$ref": "#/$defs/identifier"},
         "featureInventoryEvidenceId": {"$ref": "#/$defs/identifier"},
         "primitiveInventoryEvidenceId": {"$ref": "#/$defs/identifier"},
         "hybridReviewEvidenceId": {"$ref": "#/$defs/identifier"},
+        "deploymentCompatibilityEvidenceId": {"$ref": "#/$defs/identifier"},
         "finalCfaAuditEvidenceId": {"$ref": "#/$defs/identifier"},
         "buildEvidenceId": {"$ref": "#/$defs/identifier"},
         "testEvidenceId": {"$ref": "#/$defs/identifier"},

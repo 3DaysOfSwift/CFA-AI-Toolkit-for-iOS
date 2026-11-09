@@ -155,6 +155,7 @@ test('completion is not inferred from a build pass or tests at a different commi
     afterEvidence('after-feature-inventory', 'source'),
     afterEvidence('after-primitive-inventory', 'source'),
     afterEvidence('after-hybrid-review', 'source'),
+    afterEvidence('after-deployment-compatibility', 'manual'),
     afterEvidence('after-cfa-audit', 'source'),
     afterEvidence('after-behaviour-regression', 'manual'),
     afterEvidence('after-architecture-review', 'manual')
@@ -164,6 +165,7 @@ test('completion is not inferred from a build pass or tests at a different commi
     featureInventoryEvidenceId: 'after-feature-inventory',
     primitiveInventoryEvidenceId: 'after-primitive-inventory',
     hybridReviewEvidenceId: 'after-hybrid-review',
+    deploymentCompatibilityEvidenceId: 'after-deployment-compatibility',
     finalCfaAuditEvidenceId: 'after-cfa-audit',
     buildEvidenceId: 'after-build',
     testEvidenceId: 'after-test',
@@ -180,7 +182,12 @@ test('completion is not inferred from a build pass or tests at a different commi
   f.write();
   assert.ok(inspectRecord(f.file).errors.some(error => error.startsWith('completionGate.manualBehaviourRegressionEvidenceId')));
   f.record.evidence.find(item => item.id === 'after-behaviour-regression').outcome = 'passed';
-  for (const field of ['hybridReviewEvidenceId', 'finalCfaAuditEvidenceId']) {
+  delete f.record.completionGate.deploymentCompatibilityEvidenceId;
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.includes('deploymentCompatibilityEvidenceId')));
+  f.record.completionGate.deploymentCompatibilityEvidenceId = 'after-deployment-compatibility';
+
+  for (const field of ['hybridReviewEvidenceId', 'deploymentCompatibilityEvidenceId', 'finalCfaAuditEvidenceId']) {
     const item = f.record.evidence.find(candidate => candidate.id === f.record.completionGate[field]);
     item.commit = f.record.repository.beforeCommit;
     f.write();

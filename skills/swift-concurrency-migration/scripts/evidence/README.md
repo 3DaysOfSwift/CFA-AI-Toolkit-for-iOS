@@ -47,8 +47,11 @@ and a note explaining why. Commands are text: the helper never executes them.
 A `completed` record requires a pinned `repository.afterCommit` and passed
 evidence at that revision for every completion gate entry. Link the before/after
 navigator map from manual Xcode inspection, Feature and legacy primitive
-inventories, hybrid review, final CFA audit, build, tests, manual behaviour
+inventories, hybrid review, deployment compatibility, final CFA audit, build, tests, manual behaviour
 regression and human architecture review. Use
+`completionGate.deploymentCompatibilityEvidenceId` to link the minimum OS of
+each affected target and the evidence that changed paths support it. Older
+completed records need this link and a fresh review before they validate. Use
 `hybridReviewEvidenceId` and `finalCfaAuditEvidenceId` for the two review links. Record the regression under
 `completionGate.manualBehaviourRegressionEvidenceId`. If evidence is missing
 or failed, use `partial` and explain the gap. Validation checks the recorded
