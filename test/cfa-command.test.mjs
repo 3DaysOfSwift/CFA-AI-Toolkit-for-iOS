@@ -134,6 +134,7 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /Call the AppModel launch signal directly\s+and synchronously from the application lifecycle callback/);
   assert.match(content, /AppModel signals the relevant Features and starts its\s+required app-wide listeners before the callback returns/);
   assert.match(content, /SwiftUI Views never store task handles, including in @State/);
+  assert.match(content, /use task identity to reject stale results and clear the handle only when\s+that identity still matches/);
   assert.match(content, /ViewModel\s+owns explicitly created screen tasks and retains their named handles/);
   assert.match(content, /even\s+if it was the only caller\. Later equivalent callers can join/);
   assert.match(content, /remaining callers of legacy dependencies and record which adapters were\s+removed or retained to preserve behaviour or platform support/);
