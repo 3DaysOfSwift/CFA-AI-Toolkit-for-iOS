@@ -89,11 +89,13 @@ Read the warnings from both `validate` and `digest`. For a failed run during
 or after migration, keep the failure record and link a passing rerun at the
 final commit for the same scenario, target, build configuration and OS.
 Explain how the rerun resolves the failure. Check that minimum-OS evidence
-lists every affected target. If evidence is shared with another checkpoint,
-confirm that it explicitly records the human architecture review and its
-outcome. The validator checks evidence links and reports warnings. The
-reviewer resolves them and keeps the migration partial while any required
-check remains unverified.
+lists every affected target. Navigator and human architecture reviews can
+cover the whole project without a target list. When they name targets, the
+validator rejects a list containing only unrelated targets. If evidence is
+shared with another checkpoint, record the human architecture review and
+its outcome separately within that evidence. Resolve warnings during review
+and keep the migration partial while any required check remains unverified,
+even when the record passes validation.
 
 ## Validate and review
 

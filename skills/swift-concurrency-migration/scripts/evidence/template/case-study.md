@@ -34,7 +34,9 @@ affected target. Link the final CFA audit and
 hybrid review at the final commit. In the CFA audit, give each applicable
 requirement an evidence-backed verdict. Explain inapplicability and the effect
 of agreed exceptions. Record the corrections and repeated checks. An applicable
-requirement with missing evidence keeps the audit open. In `record.json`, list every
+requirement with missing evidence keeps the audit open. Record the human
+architecture review outcome explicitly, including when it shares a document
+with the navigator inspection, final CFA audit or manual regression. In `record.json`, list every
 affected target in `completionGate.affectedTargets` and name the targets
 covered by each build in its `targets` array. Include affected extensions and
 device targets, and link each changed data handoff in
