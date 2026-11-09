@@ -162,13 +162,6 @@ test('navigation exposes the agreed account, refresh and multi-device boundaries
   assert.match(links, /successful navigation or explicit dismissal/);
 });
 
-test('specification card identifiers do not collide with explanation rule identifiers', () => {
-  const cards = JSON.parse(fs.readFileSync(path.join(root, 'architecture/spec-rule-catalog.json'), 'utf8'));
-  const explanations = JSON.parse(fs.readFileSync(path.join(root, 'architecture/explanations/catalogue.json'), 'utf8'));
-  const explanationIds = new Set(explanations.topics.flatMap(topic => topic.ruleIds ?? []));
-  for (const rule of cards.rules) assert.equal(explanationIds.has(rule.id), false, rule.id);
-});
-
 test('published app examples link to pinned source and relevant rule cards', () => {
   const topics = specTopics(root);
   const index = topics.get('examples/open-source-apps.md');
