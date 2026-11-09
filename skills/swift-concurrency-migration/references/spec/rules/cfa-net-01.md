@@ -12,6 +12,6 @@
 
 **Explanation:** [Why use actors and Sendable values in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/isolation-and-sendable).
 
-**Verify:** Test overlapping requests and inspect isolation, request limits and URLSession configuration.
+**Verify:** Hold the first response open in a controlled transport and verify that an independent request reaches the transport before the first finishes. Check isolation, request limits and URLSession configuration. Measure suspected bottlenecks before changing the design.
 
 **Full rule, context and examples:** [Organize Behaviour into Cohesive Features](../topics/18-organize-behaviour-into-cohesive-features.md). This card is a reading aid; apply the complete canonical section.
