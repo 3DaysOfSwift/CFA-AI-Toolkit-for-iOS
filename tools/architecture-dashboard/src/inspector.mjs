@@ -173,7 +173,19 @@ export async function inspect(project) {
         findings.push(finding('root-storage-gate', 'review', 'Root navigation may gate the interface on storage availability. Open storage within a Feature data request and present its error in the feature screen, never a root wrapper or app-wide blocking overlay.', file, lineOf(source, rootView.index)));
       }
     }
-    if (/\.task\s*\{[^}]*applicationDidFinishLaunching\s*\(/s.test(source)) findings.push(finding('view-tied-app-launch', 'review', 'A View-layer .task appears to call applicationDidFinishLaunching. Check whether this is production launch behavior rather than a preview or test, and use the app lifecycle callback for the shared launch signal.', file, 1));
+    for (const task of source.matchAll(/\.task\b\s*([({])/g)) {
+      let opening = task.index + task[0].length - 1;
+      if (task[1] === '(') {
+        const closing = closingParenthesis(source, opening);
+        if (closing < 0) continue;
+        const closure = /^\s*\{/.exec(source.slice(closing + 1));
+        if (!closure) continue;
+        opening = closing + closure[0].length;
+      }
+      if (/\bapplicationDidFinishLaunching\s*\(/.test(braceBody(source, opening))) {
+        findings.push(finding('view-tied-app-launch', 'review', 'A View-layer .task appears to call applicationDidFinishLaunching. Check whether this is production launch behavior rather than a preview or test, and use the app lifecycle callback for the shared launch signal.', file, lineOf(source, task.index)));
+      }
+    }
     if (/\b(?:let|var)\s+\w+\s*:\s*AppModel\b/.test(source)) findings.push(finding('stored-app-model', 'review', 'An AppModel-typed declaration appears in the View layer. Check whether a View or ViewModel retains it; this lexical match may be a local value or preview.', file, 1));
     if (/\b(?:ModelContainer|ModelContext)\b|@Query\b|\.modelContainer\s*\(|@Environment\s*\(\s*\\\s*\.\s*modelContext\b/.test(source)) findings.push(finding('view-swiftdata-access', 'review', 'SwiftData storage access may appear in a View-layer file. Check whether a View or preview accesses storage directly; previews retain the same CFA boundaries. A lexical match alone does not establish how the value is used.', file, 1));
   }

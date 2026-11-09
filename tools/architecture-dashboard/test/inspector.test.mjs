@@ -96,11 +96,14 @@ test('flags AppModel dumping-ground state and View-tied launch or storage', asyn
 test('a launch call in preview code is a review hint, not a production assertion', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
-    'Application/1 - View/PreviewSupport.swift': '#Preview { DemoView().task { AppModel.shared.applicationDidFinishLaunching() } }'
+    'Application/1 - View/PreviewSupport.swift': '#Preview { DemoView().task { AppModel.shared.applicationDidFinishLaunching() } }',
+    'Application/1 - View/StartupView.swift': 'struct StartupView: View {\n var body: some View {\n Text("Startup").task(id: phase.key()) { if enabled { prepare() }; AppModel.shared.applicationDidFinishLaunching() }\n }\n}'
   });
   const finding = (await inspect(root)).findings.find(item => item.code === 'view-tied-app-launch');
   assert.equal(finding.severity, 'review');
   assert.match(finding.message, /preview or test/);
+  const startupFinding = (await inspect(root)).findings.find(item => item.code === 'view-tied-app-launch' && item.file.endsWith('/StartupView.swift'));
+  assert.equal(startupFinding?.line, 3);
 });
 
 test('does not identify a launch guard by the order of private Boolean properties', async t => {
