@@ -646,14 +646,13 @@ export async function inspect(project) {
       findings.push(finding('view-swiftdata-access', 'review', 'SwiftData storage access may appear in a View-layer file. Check whether a View, ViewModel or preview accesses storage directly; previews retain the same CFA boundaries. A lexical match alone does not establish how the value is used.', file, lineOf(source, storageAccess.index)));
     }
   }
-  const viewExtensions = new Map();
+  const extensionsByName = new Map();
   for (const [file, source] of sources) {
     for (const extension of source.matchAll(/\bextension\s+(\w+)\b(?!\s*\.)[^{}]*\{/g)) {
       const name = extension[1];
-      if (!viewNames.has(name)) continue;
       const offset = extension.index + extension[0].length;
-      if (!viewExtensions.has(name)) viewExtensions.set(name, []);
-      viewExtensions.get(name).push({file, source, offset, body: braceBody(source, offset - 1)});
+      if (!extensionsByName.has(name)) extensionsByName.set(name, []);
+      extensionsByName.get(name).push({file, source, offset, body: braceBody(source, offset - 1)});
     }
   }
   for (const viewFile of [...paths].filter(file => screenPath.test(file) && !file.endsWith('/RootTabView.swift')).sort()) {
@@ -696,7 +695,7 @@ export async function inspect(project) {
     const dependencies = [];
     const initializerLocations = [
       {file: viewFile, source: view, offset: bodyOffset, body},
-      ...(viewExtensions.get(name) ?? [])
+      ...(extensionsByName.get(name) ?? [])
     ];
     const initializers = initializerLocations.flatMap(location =>
       [...typeInitializers(location.body)].map(initializer => ({...initializer, location}))
@@ -721,8 +720,15 @@ export async function inspect(project) {
       }
     }
     if (viewModel) {
-      for (const match of viewModelBody.matchAll(/\bAppModel\s*\.\s*shared\s*\.\s*(\w+)/g)) {
-        const property = match[1];
+      const dependencySources = [
+        {file: viewModelFile, source: viewModel, offset: viewModelBodyStart, body: viewModelBody},
+        ...(extensionsByName.get(viewModelName) ?? [])
+      ];
+      const references = dependencySources.flatMap(location =>
+        [...location.body.matchAll(/\bAppModel\s*\.\s*shared\s*\.\s*(\w+)/g)]
+          .map(match => ({property: match[1], file: location.file, line: lineOf(location.source, location.offset + match.index)}))
+      );
+      for (const {property, file, line} of references) {
         const exposure = appProperties.get(property);
         const featureType = exposure?.type ?? null;
         const candidates = declarationsByName.get(featureType) || [];
@@ -730,8 +736,8 @@ export async function inspect(project) {
         const featureSource = featureFile ? sources.get(featureFile) : '';
         const collaborators = [...featureSource.matchAll(/\b(?:private\s+)?let\s+\w+\s*:\s*(?:any\s+)?(\w+(?:Repository|Provider|Responding|Client|Store|Service))\b/g)]
           .map(item => item[1]);
-        dependencies.push({ property, featureType, featureFile, collaborators: [...new Set(collaborators)], line: lineOf(viewModel, viewModelBodyStart + match.index) });
-        if (!exposure) findings.push(finding('unresolved-feature', 'review', `${viewModelName} references AppModel.shared.${property}, but the inspector could not resolve it in the primary AppModel declaration. Check extensions, inferred types and target membership.`, viewModelFile, lineOf(viewModel, viewModelBodyStart + match.index)));
+        dependencies.push({ property, featureType, featureFile, collaborators: [...new Set(collaborators)], sourceFile: file, line });
+        if (!exposure) findings.push(finding('unresolved-feature', 'review', `${viewModelName} references AppModel.shared.${property}, but the inspector could not resolve it in the primary AppModel declaration. Check extensions, inferred types and target membership.`, file, line));
         else if (!candidates.length) findings.push(finding('feature-source-missing', 'review', `${featureType} is exposed by AppModel, but the inspector could not locate its declaration. Check aliases, generated code and target membership.`, appModelFile, exposure.line));
         if (exposure && featureTypeSuffix.test(featureType)) {
           for (const local of viewModelMembers.matchAll(/\b(?:let|var)\s+(\w+)\s*:\s*(?:any\s+)?(\w+Feature(?:API)?)\b(?!\s*\.)/g)) {
@@ -771,7 +777,8 @@ export async function inspect(project) {
     screens.push({ name, viewFile, viewModelFile: viewModel ? viewModelFile : null, ownsViewModel, structuralRoot, testFile, testCandidates, dependencies });
   }
 
-  for (const [name, extensions] of viewExtensions) {
+  for (const [name, extensions] of extensionsByName) {
+    if (!viewNames.has(name)) continue;
     for (const {file, source, offset, body} of extensions) {
       inspectScreenInputs(name, body, source, offset, file, findings);
       const access = findFeatureAccess(body);

@@ -579,11 +579,16 @@ test('reviews inferred AppModel storage in a screen ViewModel', async t => {
     [[file, 3]]);
 });
 
-test('resolves dependencies only from the screen ViewModel declaration', async t => {
+test('resolves dependencies from the screen ViewModel and its extensions', async t => {
   const file = viewPath.replace('View.swift', 'ViewModel.swift');
+  const extensionFile = 'App/Presentation/HomeViewModel+History.swift';
   const {report} = await inspectView(t, 'struct HomeView: View { @State private var viewModel = HomeViewModel(); var body: some View { Text("Home") } }', {
     [file]: 'final class HomeViewModel { let home = AppModel.shared.homeFeature }\nfinal class OtherViewModel { let settings = AppModel.shared.settingsFeature }',
-    'App/2 - AppModel/AppModel.swift': 'final class AppModel { let homeFeature: HomeFeature; let settingsFeature: SettingsFeature }'
+    [extensionFile]: 'extension HomeViewModel {\n func showHistory() { AppModel.shared.historyFeature.load() }\n}',
+    'App/2 - AppModel/AppModel.swift': 'final class AppModel { let homeFeature: HomeFeature; let settingsFeature: SettingsFeature; let historyFeature: HistoryFeature }'
   });
-  assert.deepEqual(report.screens[0].dependencies.map(dependency => dependency.property), ['homeFeature']);
+  assert.deepEqual(report.screens[0].dependencies.map(({property, sourceFile, line}) => [property, sourceFile, line]), [
+    ['homeFeature', file, 1],
+    ['historyFeature', extensionFile, 2]
+  ]);
 });
