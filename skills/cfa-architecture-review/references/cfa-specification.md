@@ -1787,6 +1787,11 @@ Before accepting a change, answer every question:
       Can a late restore overwrite fresher data, or a failed refresh discard
       valid data? Both should be prevented.
 20. Are domain types stored with the feature that owns their meaning?
+21. For each paid capability in scope, does every identified entry point check
+    current entitlement before presenting or invoking it? Have locked and
+    entitled outcomes been tested, including alternate entry points? Record
+    unresolved paths as unverified. Verify server-side authorisation separately
+    where the operation is protected by the server.
 
 Every applicable answer must be yes. Marking a question not applicable requires
 a short explanation. Otherwise, the change is not architecturally complete.
