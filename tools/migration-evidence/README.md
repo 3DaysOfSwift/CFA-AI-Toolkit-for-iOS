@@ -88,7 +88,8 @@ The validator cannot infer that relationship from test target names.
 Read the warnings from both `validate` and `digest`. For a failed run during
 or after migration, keep the failure record and link a passing rerun at the
 final commit for the same scenario, target, build configuration and OS.
-Explain how the rerun resolves the failure. Check that minimum-OS evidence
+Set the passing evidence entry’s optional `rerunOf` to the failed evidence
+ID. Explain how the rerun resolves the failure. Check that minimum-OS evidence
 lists every affected target. Navigator and human architecture reviews can
 cover the whole project without a target list. When they name targets, the
 validator rejects a list containing only unrelated targets. If evidence is

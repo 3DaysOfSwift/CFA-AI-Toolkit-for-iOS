@@ -115,6 +115,14 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
       if (item.outcome === 'observed') errors.push(`evidence.${item.id}: use passed, failed or not-run for builds/tests`);
     }
   }
+  for (const item of record.evidence) {
+    if (!item.rerunOf) continue;
+    const failed = record.evidence.find(candidate => candidate.id === item.rerunOf);
+    if (item.outcome !== 'passed' || failed?.outcome !== 'failed' ||
+        item.kind !== failed.kind || item.recordedAt < failed.recordedAt) {
+      errors.push(`evidence.${item.id}.rerunOf: link an earlier failed check of the same kind from a passing rerun.`);
+    }
+  }
   for (const correction of record.humanCorrections.items) {
     for (const id of correction.evidenceIds) if (!ids.has(id)) errors.push(`humanCorrections: unknown evidence ID ${id}`);
   }
@@ -167,7 +175,11 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
       if (item.phase === 'before' || item.outcome !== 'failed') continue;
       const timing = item.commit && item.commit === record.repository.afterCommit
         ? 'at the final commit' : 'during migration';
-      warnings.push(`evidence.${item.id}: failed ${timing}; verify a passing rerun at the final commit covers the same scenario, target, build configuration and OS before accepting completion.`);
+      const rerun = record.evidence.find(candidate => candidate.rerunOf === item.id &&
+        candidate.kind === item.kind && candidate.outcome === 'passed' &&
+        candidate.phase === 'after' && candidate.commit === record.repository.afterCommit);
+      const check = rerun ? `verify linked rerun ${rerun.id}` : 'identify a passing rerun';
+      warnings.push(`evidence.${item.id}: failed ${timing}; ${check} at the final commit for the same scenario, target, build configuration and OS before accepting completion.`);
     }
     if (!record.repository.afterCommit) errors.push('result: completed requires a pinned afterCommit');
     for (const kind of ['build', 'test']) if (!record.evidence.some(item => item.kind === kind && item.phase === 'after' && item.outcome === 'passed' && item.commit === record.repository.afterCommit)) errors.push(`result: completed requires a passed after ${kind} at afterCommit; otherwise use partial`);

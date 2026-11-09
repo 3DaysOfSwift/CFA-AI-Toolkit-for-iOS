@@ -77,6 +77,7 @@
       "properties": {
         "id": {"$ref": "#/$defs/identifier"},
         "kind": {"enum": ["source", "diff", "build", "test", "manual", "correction", "license"]},
+        "rerunOf": {"$ref": "#/$defs/identifier"},
         "targets": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/text"}},
         "phase": {"enum": ["before", "after", "during"]},
         "reference": {"$ref": "#/$defs/text"},

@@ -320,11 +320,15 @@ test('completion is not inferred from a build pass or tests at a different commi
     error.includes('completionGate.manualBehaviourRegressionEvidenceId: after-behaviour-regression names only unrelated targets')
   ));
   rerun.targets = ['App', 'Widget'];
+  rerun.rerunOf = 'after-build';
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.includes('after-behaviour-regression.rerunOf')));
+  rerun.rerunOf = failedRegression.id;
   f.seal();
   assert.equal(inspectRecord(f.file).valid, true);
   assert.ok(!inspectRecord(f.file).warnings.some(warning => warning.includes('list the affected targets exercised by the manual regression')));
   assert.ok(inspectRecord(f.file).warnings.some(warning =>
-    warning.includes('evidence.failed-regression: failed at the final commit')
+    warning.includes('evidence.failed-regression: failed at the final commit; verify linked rerun after-behaviour-regression')
   ));
   const cli = path.join(root, 'tools/migration-evidence/evidence.mjs');
   const digest = spawnSync(process.execPath, [cli, 'digest', f.file], {encoding:'utf8'});
