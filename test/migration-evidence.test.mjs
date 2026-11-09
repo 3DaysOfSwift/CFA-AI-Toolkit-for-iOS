@@ -189,6 +189,17 @@ test('completion is not inferred from a build pass or tests at a different commi
   f.write();
   assert.ok(inspectRecord(f.file).errors.some(error => error.includes('deploymentCompatibilityEvidenceId')));
   f.record.completionGate.deploymentCompatibilityEvidenceId = 'after-deployment-compatibility';
+  const compatibility = f.record.evidence.find(item => item.id === 'after-deployment-compatibility');
+  compatibility.targets = ['App'];
+  f.write();
+  assert.ok(inspectRecord(f.file).warnings.some(warning =>
+    warning.includes('minimum-OS evidence does not list affected targets: Widget')
+  ));
+  compatibility.targets.push('Widget');
+  f.write();
+  assert.ok(!inspectRecord(f.file).warnings.some(warning =>
+    warning.includes('minimum-OS evidence does not list affected targets')
+  ));
 
   for (const field of ['hybridReviewEvidenceId', 'deploymentCompatibilityEvidenceId', 'finalCfaAuditEvidenceId']) {
     const item = f.record.evidence.find(candidate => candidate.id === f.record.completionGate[field]);

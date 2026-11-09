@@ -124,8 +124,9 @@ for each affected data handoff in `completionGate.dataHandoffEvidenceIds`.
 Identify the producer and receiver in the evidence item's `targets` and
 record the device or test configuration in `environment`. A build alone
 cannot verify the handoff.
-Use an empty list only after confirming no handoff is affected. Record each target’s minimum OS and link the
-evidence that changed paths support it. A passing run on a newer
+Use an empty list only after confirming no handoff is affected. Record each
+target’s minimum OS and link the evidence that changed paths support it. List
+the covered targets on the deployment compatibility evidence entry. A passing run on a newer
 OS alone does not establish that compatibility.
 
 In the audit linked by `completionGate.finalCfaAuditEvidenceId`, record the

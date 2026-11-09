@@ -216,6 +216,11 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
         const item = record.evidence.find(candidate => candidate.id === gate[field]);
         if (!item || !kinds.includes(item.kind) || item.phase !== 'after' || item.outcome !== 'passed' || item.commit !== record.repository.afterCommit) {
           errors.push(`completionGate.${field}: requires passed after evidence at afterCommit with kind ${kinds.join(' or ')}`);
+        } else if (field === 'deploymentCompatibilityEvidenceId') {
+          const missing = gate.affectedTargets.filter(target => !item.targets?.includes(target));
+          if (missing.length) {
+            warnings.push(`evidence.${item.id}: minimum-OS evidence does not list affected targets: ${missing.join(', ')}. Verify compatibility for each target at its own minimum OS.`);
+          }
         }
       }
     }
