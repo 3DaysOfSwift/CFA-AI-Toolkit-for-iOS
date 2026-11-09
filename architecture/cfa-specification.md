@@ -1797,8 +1797,10 @@ Before accepting a change, answer every question:
       required persistence succeeds, leaving the draft available on failure?
     - For replaceable downloads, can refresh proceed independently of cache
       restoration and complete without waiting for an optional cache write?
-      Can a late restore overwrite fresher data, or a failed refresh discard
-      valid data? Both should be prevented.
+      Verify that a late restore or delayed write cannot replace fresher data,
+      that a failed refresh keeps valid displayed data, and that a failed cache
+      write preserves the last usable cache without claiming the new data is
+      available offline.
 20. Are domain types stored with the feature that owns their meaning?
 21. For each paid capability in scope, does every identified entry point check
     current entitlement before presenting or invoking it? Have locked and
