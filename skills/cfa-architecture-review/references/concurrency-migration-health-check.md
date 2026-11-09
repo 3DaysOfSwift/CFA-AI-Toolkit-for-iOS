@@ -377,6 +377,13 @@ For each relevant operation, inspect:
   independent writers or conflicting cached state, not harmless value snapshots.
 - Suspension: what assumptions can change during await? Trace validation and
   commit, actor reentrancy, stale results and cleanup of replaced task handles.
+- Optional download caches: when CFA applies, verify that a slow restore does
+  not delay the remote request and that a restore arriving after a successful
+  download cannot replace fresh data. Follow refresh through the caller's
+  completion as well as publication. A pending or failed optional write must
+  not hold the caller open or turn a successful refresh into a failure. Trace
+  overlapping cache writes to check that an older write cannot replace a newer
+  snapshot and that a failed replacement leaves the previous cache usable.
 - Operation results: trace how a caller identifies the record its operation
   created. Comparing a shared collection before and after an await can select
   another caller's insertion, even when persistence itself is serialized.
