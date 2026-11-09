@@ -233,6 +233,8 @@ skill from that toolkit before changing the project.
   their own asynchronous work without delaying the callback for disk or network
   completion. Verify that repeated callbacks leave Feature startup signals
   and app-wide listeners unduplicated.
+  If a screen requests the same refresh while launch work is in flight,
+  verify that equivalent requests share one execution by default.
   Keep synchronous startup work brief. Task creation order gives no guarantee
   about when disk or network work begins. Measure launch and first-frame
   timing separately from completion of Feature work.

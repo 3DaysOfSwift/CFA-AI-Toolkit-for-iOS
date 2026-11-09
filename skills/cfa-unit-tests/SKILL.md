@@ -221,6 +221,10 @@ launch twice with controlled Feature dependencies. Verify the first call
 initiates the required work while disk or network responses remain held, and
 that the second call starts no duplicate work. Trace delegate wiring and
 measure first-frame timing separately from this AppModel test.
+If launch and screen refresh can overlap, hold the launch-started request
+open and request the same data from the screen. Under CFA’s default policy,
+verify that the screen receives the shared result and that only one request
+reaches the service. Exercise failure and verify a subsequent retry can start.
 
 When AppModel owns app-wide listeners,
 supply a controlled event source and observe the receiving Feature. Verify

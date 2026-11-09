@@ -190,6 +190,9 @@ which Feature and listener start calls occur before the callback returns.
 Distinguish a deferred launch signal from asynchronous work started by its
 owning Feature. Verify repeated callbacks do not duplicate startup. Use
 runtime evidence for first-frame timing and when I/O actually starts.
+If a screen can refresh data that launch already requested, trace both paths
+to the Feature’s overlap policy. Under the default policy, equivalent requests
+share one execution and the screen can await its outcome.
 
 For a suspected startup storage gate, apply the
 [database availability rule](references/spec/rules/cfa-launch-02.md). Trace
