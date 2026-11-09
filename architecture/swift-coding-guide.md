@@ -319,7 +319,7 @@ feature protocol?
 
 A thin starter project must still be honest. `SettingsFeature` owns persisted user preferences. In CFA, its screen still has a dedicated ViewModel: the ViewModel owns the declarative screen boundary and presentation formatting, while the feature owns the preference state and mutation.
 
-When an active architecture explicitly requires a named boundary, its contract takes precedence over this generic rule. In CFA, every screen-level SwiftUI View has its own ViewModel and reaches its Features through that ViewModel. Keep this boundary even when the ViewModel is small. For an existing UIKit screen in a migration, trace the actual presentation owner to its Features within the agreed UI scope.
+When an active architecture explicitly requires a named boundary, its contract takes precedence over this generic rule. In CFA, every screen-level SwiftUI View keeps its dedicated ViewModel in a private `@State` property named `viewModel` and reaches its Features through that ViewModel. When reviewing existing code, assess ownership separately from the property name. Keep this boundary even when the ViewModel is small. For an existing UIKit screen in a migration, trace the actual presentation owner to its Features within the agreed UI scope.
 
 **Review:** For every added type, write one sentence beginning “This type owns…” If that sentence is vague, duplicates an existing owner, or only describes forwarding, remove the type or merge the responsibility into its existing owner.
 
