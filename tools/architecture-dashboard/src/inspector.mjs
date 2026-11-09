@@ -248,8 +248,22 @@ export async function inspect(project) {
       }
     }
   }
+  const swiftDataAccess = /\b(?:ModelContainer|ModelContext)\b|@Query\b|\.modelContainer\s*\(|@Environment\s*\(\s*\\\s*\.\s*modelContext\b/;
   for (const [file, source] of sources) {
-    if (!/(?:^|\/)1 - View\//.test(file)) continue;
+    const isViewFile = /(?:^|\/)1 - View\//.test(file);
+    for (const preview of source.matchAll(/#Preview\b\s*(?:\([^{}]*?\)\s*)?\{/g)) {
+      const start = preview.index + preview[0].length;
+      const previewBody = braceBody(source, start - 1);
+      const access = findFeatureAccess(previewBody);
+      const storage = !isViewFile && swiftDataAccess.exec(previewBody);
+      if (storage) {
+        findings.push(finding('view-swiftdata-access', 'review', 'This preview appears to access SwiftData directly. Preview construction follows the same CFA storage boundary as the app.', file, lineOf(source, start + storage.index)));
+      }
+      if (access) {
+        findings.push(finding('preview-feature-access', 'review', 'This preview appears to access a Feature directly. A normal CFA preview constructs the View and uses its usual ViewModel and Feature route.', file, lineOf(source, start + access.index)));
+      }
+    }
+    if (!isViewFile) continue;
     if (/\bstruct\s+\w+App\s*:\s*App\b/.test(source)) {
       const sceneBody = /\bvar\s+body\s*:\s*some\s+Scene\s*\{/.exec(source);
       if (sceneBody) {
@@ -292,14 +306,7 @@ export async function inspect(project) {
       }
     }
     if (/\b(?:let|var)\s+\w+\s*:\s*AppModel\b/.test(source)) findings.push(finding('stored-app-model', 'review', 'An AppModel-typed declaration appears in the View layer. Check whether a View or ViewModel retains it; this lexical match may be a local value or preview.', file, 1));
-    for (const preview of source.matchAll(/#Preview\b\s*(?:\([^{}]*?\)\s*)?\{/g)) {
-      const start = preview.index + preview[0].length;
-      const access = findFeatureAccess(braceBody(source, start - 1));
-      if (access) {
-        findings.push(finding('preview-feature-access', 'review', 'This preview appears to access a Feature directly. A normal CFA preview constructs the View and uses its usual ViewModel and Feature route.', file, lineOf(source, start + access.index)));
-      }
-    }
-    const storageAccess = /\b(?:ModelContainer|ModelContext)\b|@Query\b|\.modelContainer\s*\(|@Environment\s*\(\s*\\\s*\.\s*modelContext\b/.exec(source);
+    const storageAccess = swiftDataAccess.exec(source);
     if (storageAccess) {
       findings.push(finding('view-swiftdata-access', 'review', 'SwiftData storage access may appear in a View-layer file. Check whether a View, ViewModel or preview accesses storage directly; previews retain the same CFA boundaries. A lexical match alone does not establish how the value is used.', file, lineOf(source, storageAccess.index)));
     }
