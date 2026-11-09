@@ -753,6 +753,7 @@ test('reviews Feature coordination in a flat source layout', async t => {
       private let orders: OrdersFeature
       private let favourites = AccountDomain.FavouritesFeature()
       private let key = OrdersFeature.OrderID()
+      private let title = OrdersFeature().title
       func clear() { let local = OrdersFeature() }
     }`
   });

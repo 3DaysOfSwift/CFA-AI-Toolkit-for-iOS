@@ -263,8 +263,13 @@ export async function inspect(project) {
       const body = braceBody(source, bodyStart - 1);
       const members = memberSignatures(body);
       for (const property of members.matchAll(/(?:^|(?<=;))[ \t]*(?:(?:private(?:\(set\))?|fileprivate|internal|public)\s+)?(?:let|var)\s+(\w+)\s*(?::\s*((?:\w+\s*\.\s*)*\w+Feature\b(?:\s*[?!])?)(?!\s*[.?!])|=\s*((?:\w+\s*\.\s*)*\w+Feature)\b(?:\s*\.\s*init)?\s*\()/gm)) {
-        if (hasComputedAccessor(body.slice(property.index + property[0].length))) continue;
+        const end = property.index + property[0].length;
         const [, name, declaredType, constructedType] = property;
+        if (declaredType && hasComputedAccessor(body.slice(end))) continue;
+        if (constructedType) {
+          const close = closingParenthesis(body, end - 1);
+          if (close < 0 || /^\s*(?:[.\[]|as[?!]?\b)/.test(body.slice(close + 1))) continue;
+        }
         const dependency = declaredType ?? constructedType;
         findings.push(finding('feature-coordination', 'review', `${declaration[1]} stores ${name}: ${dependency}. Trace the workflow and verify that coordination serves a business capability, preserves one owner per state and introduces no dependency cycle.`, file, lineOf(source, bodyStart + property.index)));
       }
