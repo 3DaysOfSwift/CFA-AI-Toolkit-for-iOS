@@ -93,12 +93,16 @@ the architecture:
     for genuinely structured, queryable, growing, or relational local data.
     Do not persist the same snapshot through both a database and a file cache.
     Publish durable user edits as saved only after required persistence succeeds.
-    A current server response does not wait for an optional cache write: publish
-    it, attempt caching independently, and prevent older cached data replacing it.
+    When both restoration and refresh are needed, start them independently.
+    A missing, incompatible or unreadable optional cache must leave the download
+    free to proceed. Publish current server data promptly, attempt caching
+    independently, and prevent an older restore from replacing fresh results.
+    Use JSON by default. Offer Instant Loading binary snapshots only on request
+    for a sufficiently stable format with safe rejection of incompatible data.
     When a non-critical preference is missing or obsolete, use its
-    product-defined safe fallback. Treat unreadable or corrupt storage and
-    failed writes as errors. A fallback must never imply that user records
-    loaded or saved successfully.
+    product-defined safe fallback. Treat unreadable or corrupt durable storage
+    and failed durable writes as errors. A fallback must never imply that user
+    records loaded or saved successfully.
 14. AppModel stores `shared`, concrete Features, one private launch Boolean,
     and private task handles needed to own app-wide listeners. Its explicit
     initializer assigns injected Features, sets the launch guard to false and
