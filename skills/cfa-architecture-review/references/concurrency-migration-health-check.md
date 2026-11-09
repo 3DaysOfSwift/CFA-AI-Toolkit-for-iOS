@@ -98,8 +98,12 @@ results in the report, rather than presenting scanner counts as findings.
    controlled overlapping-request test or profiling where practical.
 7. **State observation:** Trace how a screen receives current state and updates,
    including identity, snapshots, actor boundaries, subscriptions and cleanup.
-   Consider the product's intended freshness policy; a deliberately stable detail
-   snapshot is not a defect merely because it does not update automatically.
+   For CFA live data, follow the property read by the View through its ViewModel
+   to the observable Feature that owns it. Check whether a confirmed Feature
+   change reaches an already open screen without recreating it. Investigate
+   stored presentation copies that can go stale, while respecting intentionally
+   stable detail snapshots and unsaved drafts. Apply the
+   [authoritative observation rule](spec/rules/cfa-obs-01.md).
    For an app-wide listener, trace startup, repeated startup signals, event
    forwarding and cancellation or replacement. Check that required events
    still reach the app with the relevant screen absent. In CFA, AppModel owns
