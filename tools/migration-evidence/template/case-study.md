@@ -46,13 +46,23 @@ the baseline. Record controlled success, failure, expiration and expiration
 racing completion. Verify cancellation and exactly-once system completion.
 Record actual delivery on supported hardware separately from handler tests.
 
-For the final migration record, describe the hybrid paths reviewed and the
-reasons for retaining any legacy mechanisms. For each removed adapter or
-dependency, link the baseline behaviour and the same scenarios rerun on each
-affected target. Where a consumer needs every event, record separate checks
-for repeated equal values, delivery order, cancellation and any buffering
-guarantees the consumer relies on. A latest-state UI
-check alone cannot establish those guarantees. Link the final CFA audit and
+## Hybrid implementation review
+
+Describe the hybrid paths reviewed and the reasons for retaining any legacy
+mechanisms. For every removed adapter or dependency, compare the same
+consumer scenarios on each affected target. Use evidence IDs pinned to the
+baseline and final commits.
+
+| Removed adapter or dependency | Consumer and target | Behaviour requirement and scenario | Baseline evidence ID | Final evidence ID and outcome |
+| --- | --- | --- | --- | --- |
+
+Where a consumer needs every event, record separate checks for repeated equal
+values, delivery order, cancellation and any buffering guarantees the consumer
+relies on. A latest-state UI check alone cannot establish those guarantees.
+
+## Final CFA audit and target verification
+
+Link the final CFA audit and
 hybrid review at the final commit. In the CFA audit, give each applicable
 requirement an evidence-backed verdict. Explain inapplicability and the effect
 of agreed exceptions. Record the corrections and repeated checks. An applicable
