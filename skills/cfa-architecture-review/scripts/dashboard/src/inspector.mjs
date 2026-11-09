@@ -94,7 +94,7 @@ function* typeInitializers(body) {
     const types = initializerParameterTypes(parameters);
     const injectedViewModel = types.some(type => type.endsWith('ViewModel'));
     const injectedAppModel = types.includes('AppModel');
-    const possibleModelDependency = types.find(type => /\w+(?:Feature|Repository)$/.test(type));
+    const possibleModelDependency = types.find(type => featureTypeSuffix.test(type) || type.endsWith('Repository'));
     const tail = body.slice(closing + 1);
     const openingBody = /^\s*(?:(?:async|throws|rethrows)\s*)*\{/.exec(tail);
     const bodyStart = openingBody ? closing + 1 + openingBody[0].length : null;

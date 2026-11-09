@@ -93,6 +93,24 @@ test('flags initializer injection in a flat project layout', async t => {
   assert.equal(finding?.severity, 'warning');
 });
 
+test('distinguishes a Feature API input from a reusable action closure', async t => {
+  const { findings } = await inspectView(t, '', {
+    'App/Presentation/Notes.swift': `struct NotesView: View {
+      init(notesFeature: any NotesFeatureAPI) {}
+      var body: some View { Text("Notes") }
+    }
+    struct RefreshButton: View {
+      let action: () -> Void
+      init(action: @escaping () -> Void) { self.action = action }
+      var body: some View { Button("Refresh", action: action) }
+    }`
+  });
+  assert.deepEqual(findings.map(({code, line, severity}) => [code, line, severity]), [
+    ['screen-initializer-inputs', 2, 'review']
+  ]);
+  assert.match(findings[0].message, /NotesFeatureAPI/);
+});
+
 test('flags explicit ViewModel inputs in extensions of recognized Views', async t => {
   const file = 'App/Detail+Init.swift';
   const { findings } = await inspectView(t, '', {
