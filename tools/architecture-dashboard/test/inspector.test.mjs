@@ -583,3 +583,14 @@ test('an optional AppModel result does not satisfy the production factory check'
   const { findings } = await inspect(root);
   assert.match(findings.find(item => item.code === 'app-model-live-factory')?.message, /Found 0/);
 });
+
+test('recognizes service filenames directly under the scan root', async t => {
+  const root = await fixture(t, {
+    'SwiftDataManager.swift': 'import SwiftData\nstruct SwiftDataManager {}',
+    'NetworkingManager.swift': 'struct NetworkingManager { let session = URLSession.shared }',
+    'Client.swift': 'struct Client { let session = URLSession.shared }'
+  });
+  const {findings} = await inspect(root);
+  assert.ok(!findings.some(item => item.code === 'swiftdata-manager-missing'));
+  assert.deepEqual(findings.filter(item => item.code === 'direct-url-session').map(item => item.file), ['Client.swift']);
+});

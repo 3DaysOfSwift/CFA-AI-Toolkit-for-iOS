@@ -189,11 +189,11 @@ export async function inspect(project) {
 
   const screens = [];
   const usesSwiftData = [...sources].some(([file, source]) => file.endsWith('.swift') && /\bimport\s+SwiftData\b/.test(source));
-  if (usesSwiftData && ![...paths].some(file => file.endsWith('/SwiftDataManager.swift'))) {
+  if (usesSwiftData && ![...paths].some(file => path.posix.basename(file) === 'SwiftDataManager.swift')) {
     findings.push(finding('swiftdata-manager-missing', 'review', 'SwiftData is imported, but no SwiftDataManager.swift was found. Check whether the import belongs to an app target and whether an appropriate storage boundary exists; this scan also includes tests and does not resolve target membership.', null, null));
   }
   for (const [file, source] of sources) {
-    if (!file.endsWith('.swift') || file.endsWith('/NetworkingManager.swift')) continue;
+    if (!file.endsWith('.swift') || path.posix.basename(file) === 'NetworkingManager.swift') continue;
     if (/\bURLSession\s*\.|\bURLSession\s*\(/.test(source)) {
       findings.push(finding('direct-url-session', 'review', 'URLSession appears outside NetworkingManager. Check whether this is a production network request that should use a NetworkingManager; shared configuration or instances are needed only when appropriate.', file, 1));
     }
