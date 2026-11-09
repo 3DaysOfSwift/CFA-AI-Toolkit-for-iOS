@@ -99,6 +99,7 @@ actor GatedNotes: NotesRepository {
     private var startWaiter: CheckedContinuation<Void, Never>?
     private var releaseWaiter: CheckedContinuation<Void, Never>?
     private(set) var saved: [String] = []
+    private var releaseSecond: CheckedContinuation<Void, Never>?
     func load() async throws -> [Note] { [] }
     func save(_ note: Note) async throws {
         if note.text == "first" {
@@ -107,6 +108,9 @@ actor GatedNotes: NotesRepository {
             await withCheckedContinuation { releaseWaiter = $0 }
             throw CocoaError(.fileWriteNoPermission)
         }
+        if note.text == "second", saved.isEmpty {
+            await withCheckedContinuation { releaseSecond = $0 }
+        }
         saved.append(note.text)
     }
     func waitForFirst() async {
@@ -114,6 +118,10 @@ actor GatedNotes: NotesRepository {
         await withCheckedContinuation { startWaiter = $0 }
     }
     func release() { releaseWaiter?.resume(); releaseWaiter = nil }
+    func finishSecond() async {
+        while releaseSecond == nil { await Task.yield() }
+        releaseSecond?.resume(); releaseSecond = nil
+    }
 }
 extension NotesFeature { var auditSaveID: UUID? { lastSave?.id } }
 @main struct Runner {
@@ -131,14 +139,18 @@ extension NotesFeature { var auditSaveID: UUID? { lastSave?.id } }
         let thirdID = feature.auditSaveID
         let fourth = Task { try await feature.save("second") }
         while feature.auditSaveID == thirdID { await Task.yield() }
+        let fourthID = feature.auditSaveID
         let savedWhileBlocked = await repository.saved
         precondition(savedWhileBlocked.isEmpty)
         await repository.release()
         do { try await first.value; preconditionFailure("first save must fail") }
         catch is CocoaError {}
+        precondition(feature.auditSaveID == fourthID, "An older save must not clear the current queue tail")
+        await repository.finishSecond()
         try await second.value
         try await third.value
         try await fourth.value
+        precondition(feature.auditSaveID == nil)
         let saved = await repository.saved
         precondition(saved == ["second", "third", "second"] && feature.notes.map(\\.text) == saved)
     }
