@@ -58,7 +58,10 @@
       "classification": "cfa-choice",
       "ruleIds": [
         "CFA-READ-01",
-        "CFA-READ-02"
+        "CFA-READ-02",
+        "CFA-SPEC-API-01",
+        "CFA-SPEC-MAINT-01",
+        "CFA-SPEC-MAINT-02"
       ],
       "note": "decisions/readability.md",
       "rationaleStatus": "documented-basis-editorial-analysis",
@@ -130,7 +133,12 @@
       "classification": "cfa-choice",
       "ruleIds": [
         "CFA-UI-01",
-        "CFA-STATE-01"
+        "CFA-STATE-01",
+        "CFA-SPEC-FLOW-01",
+        "CFA-SPEC-FLOW-02",
+        "CFA-SPEC-UI-01",
+        "CFA-SPEC-UI-05",
+        "CFA-SPEC-UI-06"
       ],
       "note": "decisions/presentation-boundaries.md",
       "rationaleStatus": "documented-basis-editorial-analysis",
@@ -198,7 +206,11 @@
       "classification": "cfa-choice",
       "ruleIds": [
         "CFA-SCREEN-01",
-        "CFA-SCREEN-02"
+        "CFA-SCREEN-02",
+        "CFA-SPEC-APP-03",
+        "CFA-SPEC-UI-02",
+        "CFA-SPEC-UI-03",
+        "CFA-SPEC-UI-07"
       ],
       "note": "decisions/view-model-ownership.md",
       "rationaleStatus": "documented-basis-editorial-analysis",
@@ -259,7 +271,8 @@
       "ruleIds": [
         "CFA-GRAPH-01",
         "CFA-GRAPH-02",
-        "CFA-SPEC-LAUNCH-01"
+        "CFA-SPEC-LAUNCH-01",
+        "CFA-SPEC-APP-01"
       ],
       "note": "decisions/appmodel-composition.md",
       "rationaleStatus": "documented-basis-editorial-analysis",
@@ -303,7 +316,10 @@
       "classification": "cfa-choice",
       "ruleIds": [
         "CFA-FEATURE-01",
-        "CFA-FEATURE-02"
+        "CFA-FEATURE-02",
+        "CFA-SPEC-FEATURE-01",
+        "CFA-SPEC-FEATURE-02",
+        "CFA-SPEC-STATE-01"
       ],
       "note": "decisions/feature-ownership.md",
       "rationaleStatus": "documented-basis-editorial-analysis",
@@ -403,7 +419,10 @@
       "ruleIds": [
         "CFA-STORE-01",
         "CFA-STORE-02",
-        "CFA-STORE-03"
+        "CFA-STORE-03",
+        "CFA-SPEC-CACHE-01",
+        "CFA-SPEC-STORE-01",
+        "CFA-SPEC-SYNC-01"
       ],
       "note": "decisions/persistence-boundaries.md",
       "rationaleStatus": "documented-basis-editorial-analysis",
@@ -464,7 +483,8 @@
       "ruleIds": [
         "CFA-LAUNCH-01",
         "CFA-ERROR-01",
-        "CFA-SPEC-LAUNCH-02"
+        "CFA-SPEC-LAUNCH-02",
+        "CFA-SPEC-PREF-01"
       ],
       "note": "decisions/storage-failures.md",
       "rationaleStatus": "documented-basis-editorial-analysis",
@@ -524,7 +544,8 @@
       "classification": "mixed",
       "ruleIds": [
         "CFA-TASK-01",
-        "CFA-TASK-02"
+        "CFA-TASK-02",
+        "CFA-SPEC-TASK-03"
       ],
       "note": "decisions/unstructured-tasks.md",
       "rationaleStatus": "documented-basis-editorial-analysis",
@@ -575,7 +596,8 @@
       "title": "Cancellation is a policy, not a button",
       "classification": "mixed",
       "ruleIds": [
-        "CFA-CANCEL-01"
+        "CFA-CANCEL-01",
+        "CFA-SPEC-CONC-03"
       ],
       "note": "decisions/task-cancellation.md",
       "rationaleStatus": "documented-basis-editorial-analysis",
@@ -620,7 +642,8 @@
       "ruleIds": [
         "CFA-OVERLAP-01",
         "CFA-OVERLAP-02",
-        "CFA-SPEC-TASK-01"
+        "CFA-SPEC-TASK-01",
+        "CFA-SPEC-TASK-02"
       ],
       "note": "decisions/overlapping-requests.md",
       "rationaleStatus": "documented-basis-editorial-analysis",
@@ -664,7 +687,10 @@
       "classification": "mixed",
       "ruleIds": [
         "CFA-ISOLATION-01",
-        "CFA-SENDABLE-01"
+        "CFA-SENDABLE-01",
+        "CFA-SPEC-CONC-01",
+        "CFA-SPEC-CONC-02",
+        "CFA-SPEC-NET-01"
       ],
       "note": "decisions/isolation-and-sendable.md",
       "rationaleStatus": "documented-basis-editorial-analysis",
@@ -712,7 +738,10 @@
       "classification": "mixed",
       "ruleIds": [
         "CFA-TEST-01",
-        "CFA-TIME-01"
+        "CFA-TIME-01",
+        "CFA-SPEC-TEST-01",
+        "CFA-SPEC-TEST-02",
+        "CFA-SPEC-TIME-01"
       ],
       "note": "decisions/behavioural-testing.md",
       "rationaleStatus": "documented-basis-editorial-analysis",
@@ -768,7 +797,8 @@
       "classification": "cfa-choice",
       "ruleIds": [
         "CFA-SCOPE-01",
-        "CFA-SCOPE-02"
+        "CFA-SCOPE-02",
+        "CFA-SPEC-DESIGN-01"
       ],
       "note": "decisions/preserve-product-behaviour.md",
       "rationaleStatus": "documented-basis-editorial-analysis",
@@ -820,7 +850,13 @@
       "classification": "cfa-choice",
       "ruleIds": [
         "CFA-PROJECT-01",
-        "CFA-PROJECT-02"
+        "CFA-PROJECT-02",
+        "CFA-SPEC-STRUCT-01",
+        "CFA-SPEC-STRUCT-02",
+        "CFA-SPEC-STRUCT-03",
+        "CFA-SPEC-STRUCT-04",
+        "CFA-SPEC-STRUCT-06",
+        "CFA-SPEC-STRUCT-07"
       ],
       "note": "decisions/project-structure.md",
       "rationaleStatus": "documented-basis-editorial-analysis",
@@ -883,7 +919,8 @@
       "title": "Defaults help a new app; they do not own its design",
       "classification": "new-app-default",
       "ruleIds": [
-        "CFA-DESIGN-01"
+        "CFA-DESIGN-01",
+        "CFA-SPEC-STRUCT-05"
       ],
       "note": "decisions/new-app-design.md",
       "rationaleStatus": "documented-basis-editorial-analysis",
@@ -955,7 +992,10 @@
       "classification": "cfa-choice",
       "ruleIds": [
         "CFA-EDIT-01",
-        "CFA-ERROR-02"
+        "CFA-ERROR-02",
+        "CFA-SPEC-ERROR-01",
+        "CFA-SPEC-OBS-02",
+        "CFA-SPEC-UI-04"
       ],
       "note": "decisions/honest-errors-and-editing.md",
       "rationaleStatus": "documented-basis-editorial-analysis",

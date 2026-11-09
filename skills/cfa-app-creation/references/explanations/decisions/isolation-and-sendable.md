@@ -1,7 +1,7 @@
 # Isolation does not replace an operation policy
 
 Topic: `isolation-and-sendable`  
-Rules: `CFA-ISOLATION-01`, `CFA-SENDABLE-01`  
+Rules: `CFA-ISOLATION-01`, `CFA-SENDABLE-01`, `CFA-SPEC-CONC-01`, `CFA-SPEC-CONC-02`, `CFA-SPEC-NET-01`\
 Classification: mixed  
 Status: documented basis with editorial analysis; not a founder-approved historical decision record.
 

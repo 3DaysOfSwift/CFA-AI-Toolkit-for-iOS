@@ -1,7 +1,7 @@
 # One production graph, isolated test graphs
 
 Topic: `appmodel-composition`  
-Rules: `CFA-GRAPH-01`, `CFA-GRAPH-02`, `CFA-SPEC-LAUNCH-01`\
+Rules: `CFA-GRAPH-01`, `CFA-GRAPH-02`, `CFA-SPEC-LAUNCH-01`, `CFA-SPEC-APP-01`\
 Classification: cfa-choice  
 Status: documented basis with editorial analysis; not a founder-approved historical decision record.
 

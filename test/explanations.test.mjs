@@ -32,6 +32,20 @@ test('all inventoried canonical sections are associated or explicitly excluded',
   assert.ok(result.priorities.every(row => row.observedOccurrences === null));
 });
 
+test('canonical rule cards with explanation links resolve to a linked catalogue topic', () => {
+  const catalogue = validate(read());
+  const rules = path.join(sourceRoot, 'spec/rules');
+  for (const file of fs.readdirSync(rules).filter(name => name.endsWith('.md'))) {
+    const card = fs.readFileSync(path.join(rules, file), 'utf8');
+    const explanation = card.split('\n').find(line => line.startsWith('**Explanation:**'));
+    if (!explanation) continue;
+    const [, rule] = /^# (CFA-SPEC-[A-Z]+-\d{2}):/.exec(card);
+    const result = lookup(catalogue, rule);
+    assert.ok(result.links.length > 0, rule);
+    assert.ok(explanation.includes(`(${result.links[0].url})`), rule);
+  }
+});
+
 test('rule lookup returns relevant local rationale without inventing planned URLs', () => {
   const catalogue = read();
   catalogue.topics.find(topic => topic.id === 'unstructured-tasks').publication = {

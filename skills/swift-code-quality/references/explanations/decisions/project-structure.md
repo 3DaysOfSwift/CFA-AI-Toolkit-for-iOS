@@ -1,7 +1,7 @@
 # Make ownership visible in the project
 
 Topic: `project-structure`  
-Rules: `CFA-PROJECT-01`, `CFA-PROJECT-02`  
+Rules: `CFA-PROJECT-01`, `CFA-PROJECT-02`, `CFA-SPEC-STRUCT-01`, `CFA-SPEC-STRUCT-02`, `CFA-SPEC-STRUCT-03`, `CFA-SPEC-STRUCT-04`, `CFA-SPEC-STRUCT-06`, `CFA-SPEC-STRUCT-07`\
 Classification: cfa-choice  
 Status: documented basis with editorial analysis; not a founder-approved historical decision record.
 

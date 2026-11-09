@@ -1,7 +1,7 @@
 # Test the promises, not the folder names
 
 Topic: `behavioural-testing`  
-Rules: `CFA-TEST-01`, `CFA-TIME-01`  
+Rules: `CFA-TEST-01`, `CFA-TIME-01`, `CFA-SPEC-TEST-01`, `CFA-SPEC-TEST-02`, `CFA-SPEC-TIME-01`\
 Classification: mixed  
 Status: documented basis with editorial analysis; not a founder-approved historical decision record.
 

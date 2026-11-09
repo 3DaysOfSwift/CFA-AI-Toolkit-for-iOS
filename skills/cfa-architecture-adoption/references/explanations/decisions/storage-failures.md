@@ -1,7 +1,7 @@
 # A database failure must not replace the application
 
 Topic: `storage-failures`  
-Rules: `CFA-LAUNCH-01`, `CFA-ERROR-01`, `CFA-SPEC-LAUNCH-02`\
+Rules: `CFA-LAUNCH-01`, `CFA-ERROR-01`, `CFA-SPEC-LAUNCH-02`, `CFA-SPEC-PREF-01`\
 Classification: cfa-choice  
 Status: documented basis with editorial analysis; not a founder-approved historical decision record.
 

@@ -1,7 +1,7 @@
 # Features follow responsibilities, not just tabs
 
 Topic: `feature-ownership`  
-Rules: `CFA-FEATURE-01`, `CFA-FEATURE-02`  
+Rules: `CFA-FEATURE-01`, `CFA-FEATURE-02`, `CFA-SPEC-FEATURE-01`, `CFA-SPEC-FEATURE-02`, `CFA-SPEC-STATE-01`\
 Classification: cfa-choice  
 Status: Feature definition, state ownership, screen/Feature relationship and extraction criterion confirmed by Matthew Thomas on 2026-10-29; other trade-offs remain editorial analysis.
 

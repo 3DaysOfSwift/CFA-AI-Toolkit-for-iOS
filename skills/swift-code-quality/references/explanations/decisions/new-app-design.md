@@ -1,7 +1,7 @@
 # Defaults help a new app; they do not own its design
 
 Topic: `new-app-design`  
-Rules: `CFA-DESIGN-01`  
+Rules: `CFA-DESIGN-01`, `CFA-SPEC-STRUCT-05`\
 Classification: new-app-default  
 Status: documented basis with editorial analysis; not a founder-approved historical decision record.
 
