@@ -128,6 +128,10 @@ skill from that toolkit before changing the project.
   which capabilities it charges for. Protected server operations enforce their
   own access policy.
 - Publish durable user edits as saved only after required persistence succeeds.
+- Use the product-defined fallback for a missing or obsolete non-critical
+  preference, such as system appearance for a retired theme. Replace an old
+  saved value only through an intentional migration or a successful user choice.
+  Report unreadable or corrupt durable storage and failed durable writes as errors.
 - Start remote refresh and optional cache restoration independently when both
   are needed. Publish current server data without waiting for the cache write.
   Keep valid in-memory data if refresh fails, and prevent older restores from

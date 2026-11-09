@@ -118,8 +118,9 @@ the architecture:
     Use JSON by default. Offer Instant Loading binary snapshots only on request
     for a sufficiently stable format with safe rejection of incompatible data.
     When a non-critical preference is missing or obsolete, use its
-    product-defined safe fallback. Treat unreadable or corrupt durable storage
-    and failed durable writes as errors. A fallback must never imply that user
+    product-defined safe fallback. Preserve the old value where appropriate.
+    Replace it through an intentional migration or a successful user choice.
+    Treat unreadable or corrupt durable storage and failed durable writes as errors. A fallback must never imply that user
     records loaded or saved successfully.
 14. AppModel stores `shared`, concrete Features, one private launch Boolean,
     and private task handles needed to own app-wide listeners. Its explicit
