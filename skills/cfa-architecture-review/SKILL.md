@@ -183,6 +183,14 @@ by the previous version to verify recovery and retry. Check conflict and
 rejection outcomes against the product policy. Check real-device evidence
 separately for Apple-managed sync and concurrent offline edits across devices.
 
+When reviewing CFA startup, apply the
+[synchronous launch rule](references/spec/rules/cfa-launch-01.md). Follow the
+delegate callback through helpers to the AppModel launch signal, then trace
+which Feature and listener start calls occur before the callback returns.
+Distinguish a deferred launch signal from asynchronous work started by its
+owning Feature. Verify repeated callbacks do not duplicate startup. Use
+runtime evidence for first-frame timing and when I/O actually starts.
+
 For a suspected startup storage gate, apply the
 [database availability rule](references/spec/rules/cfa-launch-02.md). Trace
 from AppModel construction and root presentation to the first store-opening
