@@ -521,8 +521,13 @@ For each relevant operation, inspect:
   Check that retries are bounded, a failed refresh keeps valid in-memory data,
   and the app only claims offline availability for data actually saved.
 - Required saves: trace the user edit through the storage result to publication.
-  If the write fails, verify that the previously confirmed value and the
-  user's retryable draft both remain available. For simple UserDefaults
+  In CFA, apply the [editor draft rule](spec/rules/cfa-obs-02.md). While a
+  save is pending, the screen ViewModel holds the draft and the Feature still
+  exposes the confirmed value to other consumers. If the write fails, verify
+  that the editor retains the input for retry and that other consumers still
+  see the confirmed value. Retry and verify that publication follows a
+  successful write. Cancel an unsaved edit and verify that it discards the
+  draft without changing the Feature or storage. For simple UserDefaults
   preferences, check the update before publication and treat it as an
   in-memory update. When confirmed persistence is required, look for a
   storage API that reports the write outcome.
