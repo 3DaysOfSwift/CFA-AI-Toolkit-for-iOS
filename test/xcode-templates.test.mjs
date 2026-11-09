@@ -208,6 +208,12 @@ test('CFA App verifier rejects launch signals inside priority or detached tasks'
     assert.notEqual(result.status, 0, task);
     assert.match(result.stderr, /launch method directly/, task);
   }
+  fs.writeFileSync(app, original.replace(signal, `Task { if true { print("ready") }; ${signal} }`));
+  const nested = spawnSync('node', [path.join(root, 'scripts/verify-xcode-template-structure.mjs'), copy], {encoding: 'utf8'});
+  assert.notEqual(nested.status, 0, 'nested block before launch');
+  fs.writeFileSync(app, original.replace(signal, `Task { print("independent work") }; ${signal}`));
+  const independent = spawnSync('node', [path.join(root, 'scripts/verify-xcode-template-structure.mjs'), copy], {encoding: 'utf8'});
+  assert.equal(independent.status, 0, independent.stderr);
 });
 
 test('CFA App includes a separate unit-test template component', {skip: process.platform !== 'darwin'}, () => {

@@ -35,6 +35,23 @@ function checkEntry(info, templateDirectory, { id, sourcePath, group }) {
   if (!fs.existsSync(path.join(templateDirectory, sourcePath))) fail(`missing source file ${sourcePath}`);
 }
 
+// This is a lexical check for the known template, not a Swift parser.
+function schedulesLaunch(source) {
+  const tasks = /\bTask\s*(?:<[^{}\n]*>\s*)?(?:\.\s*detached\s*)?(?:\([^{}]*\)\s*)?\{/g;
+  for (const match of source.matchAll(tasks)) {
+    const start = match.index + match[0].length;
+    let depth = 1;
+    let end = start;
+    while (end < source.length && depth > 0) {
+      if (source[end] === '{') depth++;
+      else if (source[end] === '}') depth--;
+      end++;
+    }
+    if (/\bapplicationDidFinishLaunching\s*\(/.test(source.slice(start, end - 1))) return true;
+  }
+  return false;
+}
+
 export function verifyXcodeTemplateStructure(templateDirectory = defaultTemplate) {
   const info = readTemplateInfo(templateDirectory);
   checkEntry(info, templateDirectory, {
@@ -64,7 +81,7 @@ export function verifyXcodeTemplateStructure(templateDirectory = defaultTemplate
     fail('Application launch must be signalled from the app delegate, not a View .task.');
   }
   if (!/AppModel\.shared\.applicationDidFinishLaunching\(\)/.test(appSource) ||
-      /\bTask\s*(?:<[^{}\n]*>\s*)?(?:\.\s*detached\s*)?(?:\([^{}]*\)\s*)?\{[^}]*applicationDidFinishLaunching/s.test(appSource) ||
+      schedulesLaunch(appSource) ||
       !/func\s+applicationDidFinishLaunching\(\)\s*\{/.test(appModelSource)) {
     fail('The app delegate must call the synchronous AppModel launch method directly.');
   }
