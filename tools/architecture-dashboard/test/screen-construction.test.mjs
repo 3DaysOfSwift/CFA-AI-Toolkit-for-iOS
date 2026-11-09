@@ -63,6 +63,18 @@ test('flags a module-qualified ViewModel initializer input', async t => {
   assert.match(input.message, /appears to accept a ViewModel/);
 });
 
+test('a nested snapshot type is not a ViewModel initializer input', async t => {
+  const {report, findings} = await inspectView(t, `struct HomeView: View {
+    @State private var viewModel: HomeViewModel
+    init(snapshot: HomeViewModel.Snapshot) {
+      _viewModel = State(initialValue: HomeViewModel(snapshot: snapshot))
+    }
+    var body: some View { Text("Home") }
+  }`);
+  assert.equal(report.screens[0].ownsViewModel, true);
+  assert.equal(findings.find(item => item.code === 'screen-initializer-inputs')?.severity, 'review');
+});
+
 test('selected detail data and owned State are reviewed rather than rejected', async t => {
   const { report, findings } = await inspectView(t, `struct HomeView: View {
     @State private var reminders: HomeViewModel

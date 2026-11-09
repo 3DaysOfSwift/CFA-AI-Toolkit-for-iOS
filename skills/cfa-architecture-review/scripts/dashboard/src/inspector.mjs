@@ -441,7 +441,7 @@ export async function inspect(project) {
         const closing = closingParenthesis(body, opening);
         if (closing < 0) continue;
         const parameters = body.slice(opening + 1, closing);
-        const injectedViewModel = /:\s*(?:any\s+)?(?:\w+\s*\.\s*)*\w*ViewModel\b/.test(parameters);
+        const injectedViewModel = /:\s*(?:any\s+)?(?:\w+\s*\.\s*)*\w*ViewModel\b(?!\s*\.)/.test(parameters);
         if (parameters.trim()) {
           findings.push(finding('screen-initializer-inputs', injectedViewModel ? 'warning' : 'review', injectedViewModel ? `${name} appears to accept a ViewModel; CFA screens construct their own.` : `${name} accepts initializer inputs. Verify that detail inputs are selected value data and no ViewModel is injected.`, viewFile, lineOf(view, bodyOffset + initializer.index)));
         }
