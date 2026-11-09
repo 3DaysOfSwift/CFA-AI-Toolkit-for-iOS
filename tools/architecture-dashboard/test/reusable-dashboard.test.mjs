@@ -96,7 +96,7 @@ test('generic CLI imports reviewed ratings and test results without an example g
    const duplicate=structuredClone(input);duplicate.testQuality.scenarios.push(duplicate.testQuality.scenarios[0]);
    await assert.rejects(importReview(report,duplicate,app),/duplicate/);
    const observations={schemaVersion:1,sourceFingerprint:report.sourceFingerprint,author:'Fixture',createdAt:'2026-09-13',scope:'One rule',journeys:[],separation:{complete:true,hasTestableModel:true,rationale:'Testable actor feature',decisions:[{id:'load',description:'Returns expected value',location:'model',testable:true,evidence:[prod]}]}};
-   const run={passedTests:4,failedTests:0,skippedTests:1,totalTestCount:5,startTime:1};
+   const run={passedTests:9999,failedTests:0,skippedTests:1,totalTestCount:10000,startTime:1};
    await fs.writeFile(path.join(root,'review.json'),JSON.stringify(input));
    await fs.writeFile(path.join(root,'notes.json'),JSON.stringify(observations));
    await fs.writeFile(path.join(root,'run.json'),JSON.stringify(run));
@@ -109,8 +109,8 @@ test('generic CLI imports reviewed ratings and test results without an example g
    const document={getElementById:node,querySelector:()=>node('nav'),querySelectorAll:()=>[],createElement:()=>node('created-'+id++)};
    vm.runInNewContext(html.match(/<script>([\s\S]*?)<\/script>/)[1],{document});
    assert.match(node('separation-gauge').innerHTML,/100%/);
-   assert.match(node('separation-gauge').afterChild.innerHTML,/4 \/ 5/);
-   assert.match(node('separation-gauge').afterChild.innerHTML,/80% passed/);
+   assert.match(node('separation-gauge').afterChild.innerHTML,/9999 \/ 10000/);
+   assert.match(node('separation-gauge').afterChild.innerHTML,/99\.9% passed/);
    assert.match(node('dashboard').innerHTML,/100 \/ 100/);
    assert.match(node('review').innerHTML,/#expect/);
    node('show-authored-review').events.click();
