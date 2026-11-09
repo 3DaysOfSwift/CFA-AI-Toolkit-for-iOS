@@ -865,6 +865,13 @@ export async function inspect(project) {
           findings.push(finding('view-swiftdata-access', 'review', 'This SwiftUI View appears to access SwiftData directly. Verify that storage is reached through its ViewModel and Feature.', file, line));
         }
       }
+      for (const model of source.matchAll(/\b(?:class|struct|extension)\s+(\w+ViewModel)\b(?!\s*\.)[^{}]*\{/g)) {
+        if (!declarationsByName.has(model[1])) continue;
+        const start = model.index + model[0].length;
+        for (const line of swiftDataLines(braceBody(source, start - 1), start)) {
+          findings.push(finding('view-swiftdata-access', 'review', `${model[1]} appears to access SwiftData directly. Verify that storage is reached through its Feature.`, file, line));
+        }
+      }
       for (const extension of source.matchAll(/\bextension\s+(\w+)\b(?!\s*\.)[^{}]*\{/g)) {
         if (!viewNames.has(extension[1])) continue;
         const start = extension.index + extension[0].length;

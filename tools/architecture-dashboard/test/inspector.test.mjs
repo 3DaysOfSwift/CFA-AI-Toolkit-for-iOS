@@ -499,6 +499,21 @@ test('reviews SwiftData access in a SwiftUI View outside the CFA View folder', a
   ]);
 });
 
+test('reviews direct SwiftData access in ViewModels outside the CFA View folder', async t => {
+  const file = 'Application/Presentation/NotesViewModel.swift';
+  const extension = 'Application/Presentation/NotesViewModel+Storage.swift';
+  const root = await fixture(t, {
+    [file]: 'final class NotesViewModel { let context: ModelContext }',
+    [extension]: 'extension NotesViewModel { func read() { _ = ModelContainer.self } }',
+    'Application/Presentation/NotesStore.swift': 'actor NotesStore { let context: ModelContext }'
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'view-swiftdata-access');
+  assert.deepEqual(findings.map(({file, line, severity}) => [file, line, severity]).sort(), [
+    [extension, 1, 'review'],
+    [file, 1, 'review']
+  ]);
+});
+
 test('reviews lifecycle tasks in a SwiftUI View outside the CFA View folder', async t => {
   const file = 'Application/Presentation/Notes.swift';
   const root = await fixture(t, {
