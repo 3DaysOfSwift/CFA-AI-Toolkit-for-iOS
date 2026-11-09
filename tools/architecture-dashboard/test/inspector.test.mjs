@@ -574,14 +574,18 @@ test('checks qualified AppModel factory return types and shared initializers', a
   assert.equal((await inspect(root)).findings.find(item => item.code === 'app-model-shared-factory')?.line, 2);
 });
 
-test('a live factory in an extension is not reported as definitely absent', async t => {
+test('counts live factory candidates across AppModel and its extensions', async t => {
+  const file = 'Application/2 - AppModel/AppModel.swift';
   const root = await fixture(t, {
-    'Application/2 - AppModel/AppModel.swift': 'final class AppModel {}',
+    [file]: 'final class AppModel {}',
     'Application/2 - AppModel/AppModel+Live.swift': 'extension AppModel { static func live() -> AppModel { AppModel() } }'
   });
+  assert.ok(!(await inspect(root)).findings.some(item => item.code === 'app-model-live-factory'));
+
+  await fs.writeFile(path.join(root, file), 'final class AppModel { static func live() -> AppModel { AppModel() } }');
   const finding = (await inspect(root)).findings.find(item => item.code === 'app-model-live-factory');
-  assert.equal(finding.severity, 'review');
-  assert.match(finding.message, /including extensions and active compilation conditions/);
+  assert.equal(finding?.severity, 'review');
+  assert.match(finding?.message, /Found 2 .* candidates/);
 });
 
 test('a Feature exposed in an AppModel extension resolves with a computed-exposure review', async t => {

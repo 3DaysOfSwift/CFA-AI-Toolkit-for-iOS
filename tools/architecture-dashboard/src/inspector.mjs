@@ -284,26 +284,23 @@ export async function inspect(project) {
   }
   if (appModelFile) {
     const liveFactoryPattern = /\bstatic\s+func\s+live\s*\(\s*\)\s*->\s*(?:\w+\s*\.\s*)*AppModel\b/g;
-    const liveFactories = [...appMembers.matchAll(liveFactoryPattern)]
-      .filter(match => /^\s*\{/.test(appModel.slice(match.index + match[0].length)));
-    if (liveFactories.length !== 1) findings.push(finding('app-model-live-factory', 'review', `Found ${liveFactories.length} static live() -> AppModel declarations directly inside AppModel. Verify the single production factory, including extensions and active compilation conditions.`, appModelFile, 1));
-    const constructionBodies = liveFactories.map(factory => ({
-      name: 'AppModel.live()', file: appModelFile, source: appModel,
-      opening: appModel.indexOf('{', factory.index + factory[0].length)
-    }));
     const initializerScopes = [{file: appModelFile, source: appModel, members: appMembers, start: 0}];
     for (const [file, source] of sources) {
       for (const extension of source.matchAll(/\bextension\s+AppModel\b(?!\s*\.)[^{}]*\{/g)) {
         const start = extension.index + extension[0].length;
         const members = memberSignatures(braceBody(source, start - 1));
         initializerScopes.push({file, source, members, start});
-        for (const factory of members.matchAll(liveFactoryPattern)) {
-          const end = start + factory.index + factory[0].length;
-          const body = /^\s*\{/.exec(source.slice(end));
-          if (body) constructionBodies.push({name: 'AppModel.live()', file, source, opening: end + body[0].length - 1});
-        }
       }
     }
+    const constructionBodies = [];
+    for (const {file, source, members, start} of initializerScopes) {
+      for (const factory of members.matchAll(liveFactoryPattern)) {
+        const end = start + factory.index + factory[0].length;
+        const body = /^\s*\{/.exec(source.slice(end));
+        if (body) constructionBodies.push({name: 'AppModel.live()', file, source, opening: end + body[0].length - 1});
+      }
+    }
+    if (constructionBodies.length !== 1) findings.push(finding('app-model-live-factory', 'review', `Found ${constructionBodies.length} static live() -> AppModel candidates across AppModel and its extensions. Verify the single production factory against active targets and compilation conditions.`, appModelFile, 1));
     for (const {file, source, members, start} of initializerScopes) {
       for (const initializer of members.matchAll(/(?<![.\w])init[?!]?\s*\(/g)) {
         const closing = closingParenthesis(source, start + initializer.index + initializer[0].length - 1);
