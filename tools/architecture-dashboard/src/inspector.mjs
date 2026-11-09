@@ -769,7 +769,7 @@ export async function inspect(project) {
         const code = isFeature ? 'view-stored-feature' : 'view-stored-model-dependency';
         findings.push(finding(code, 'review', `${view[1]} appears to store ${type} directly. Verify that Feature access goes through the screen-owned ViewModel.`, file, lineOf(source, start + index)));
       }
-      const viewModelInput = /(?:^|(?<=;))[ \t]*(?:@(?:SwiftUI\s*\.\s*)?(State|StateObject|ObservedObject|Bindable)\s+)?(?:(?:private|fileprivate|internal|package|public)\s+)?(?:let|var)\s+`?\w+`?\s*:\s*(?:\w+\s*\.\s*)*(\w+ViewModel)\b(?!\s*\.)(?:[ \t]*[?!])?/gm;
+      const viewModelInput = /(?:^|(?<=;))[ \t]*(?:@(?:SwiftUI\s*\.\s*)?(State|StateObject|ObservedObject|Bindable)\s+)?(?:(?:private|fileprivate|internal|package|public)\s+)?(?:let|var)\s+`?[\p{L}_][\p{L}\p{M}\p{N}_]*`?\s*:\s*(?:\w+\s*\.\s*)*(\w+ViewModel)\b(?!\s*\.)(?:[ \t]*[?!])?/gmu;
       for (const match of members.matchAll(viewModelInput)) {
         const [declaration, wrapper, type] = match;
         if (wrapper === 'State' || wrapper === 'StateObject') continue;
