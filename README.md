@@ -388,6 +388,11 @@ The inspector reports ViewModel ownership and naming separately. A recognized
 private `@State` ViewModel under a different name still counts as screen-owned.
 CFA names that property `viewModel`.
 
+The inspector also flags explicit initializer parameters that appear to accept
+a ViewModel in recognisable SwiftUI Views and their extensions, including
+outside the standard CFA folders. Review the actual call sites for implicit
+memberwise inputs, type aliases and indirect injection.
+
 ## Xcode Project Dashboard
 
 The easiest way to create a dashboard is to ask your AI coding tool:
