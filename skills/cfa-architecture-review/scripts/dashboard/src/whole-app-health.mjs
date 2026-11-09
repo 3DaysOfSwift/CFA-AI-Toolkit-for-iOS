@@ -210,11 +210,20 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
       throw Error('Each whole-app presentation criterion needs source evidence.');
     }
   }
-  const hasSourceProblem = [
+  const sourceProblems = [
     ...(review.findings || []), ...(review.fileReviews || []), ...(review.typeReviews || [])
-  ].some(item => item.status === 'problem');
-  if (hasSourceProblem && !presentation.criteria.some(criterion => criterion.status === 'problem')) {
-    throw Error('Include confirmed source problems in the report criteria before rendering.');
+  ].filter(item => item.status === 'problem').flatMap(item => item.issues?.length ? item.issues : [item]);
+  const visibleEvidence = presentation.criteria
+    .filter(criterion => criterion.status === 'problem' && Array.isArray(criterion.evidence))
+    .flatMap(criterion => criterion.evidence);
+  for (const problem of sourceProblems) {
+    const covered = problem.evidence.some(ref => visibleEvidence.some(visible =>
+      visible.file === ref.file && visible.line <= ref.endLine && ref.line <= visible.endLine
+    ));
+    if (!covered) {
+      throw Error('Include confirmed source problems in the report criteria before rendering: ' +
+        (problem.title || problem.name || problem.file));
+    }
   }
   const data = {...presentation, scope:review.scope};
   data.operations = (review.operations || []).map(op=>({group:op.group,title:op.title,path:op.path,stateOwner:op.stateOwner,taskOwner:op.taskOwner,isolation:op.isolation,reason:op.reason,unknowns:op.unknowns,steps:op.steps,checks:op.checks,scenarios:op.scenarios}));

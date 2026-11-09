@@ -184,6 +184,20 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
     await fs.writeFile(reviewPath,JSON.stringify(generalProblem));
     await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/Include confirmed source problems/);
     await assert.rejects(fs.access(output));
+    generalProblem.presentation.criteria.push({
+      title:'Different problem',detail:'Different source.',status:'problem',
+      evidence:[{file:'App.swift',line:1,endLine:1}]
+    });
+    await fs.writeFile(reviewPath,JSON.stringify(generalProblem));
+    await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/Include confirmed source problems.*Confirmed issue/);
+    generalProblem.presentation.criteria.push({
+      title:'Confirmed issue',detail:'A late result can replace current state.',status:'problem',
+      evidence:[{file:'Value.swift',line:1,endLine:1}]
+    });
+    await fs.writeFile(reviewPath,JSON.stringify(generalProblem));
+    const problemsOutput = path.join(base,'problems.html');
+    await finish(project,reviewPath,problemsOutput,undefined,syntax);
+    assert.match(await fs.readFile(problemsOutput,'utf8'),/Problems to address.*Confirmed issue/s);
     await fs.writeFile(reviewPath,JSON.stringify(review));
     const result=await finish(project,reviewPath,output,undefined,syntax);
     assert.deepEqual(result.gaps,[]);

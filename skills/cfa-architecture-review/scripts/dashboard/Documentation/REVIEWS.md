@@ -42,7 +42,10 @@ described in [OBSERVATIONS.md](OBSERVATIONS.md).
 ```
 
 `findings` and `testQuality` are optional. Use `status: "problem"` for a confirmed
-finding in a whole-app Health Check and include it in the report criteria. `scenarios` must have unique titles
+finding in a whole-app Health Check. Each confirmed source problem, including
+individual file or type issues, must share a source location with a visible
+problem criterion. The location check cannot establish that the prose describes
+the same issue. `scenarios` must have unique titles
 and status `identified` or `not-identified`. Read assertions before assigning
 identified, and cite them. Not-identified requires a test search and a documented
 scope; cite the feature behaviour needing protection. `concerns` defaults to an
