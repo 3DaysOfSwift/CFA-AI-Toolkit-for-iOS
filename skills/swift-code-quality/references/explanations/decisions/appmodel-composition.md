@@ -15,7 +15,7 @@ Constructing unrelated graphs in different scenes can create conflicting owners 
 
 ## Documented rationale
 
-The specification explicitly chooses shared production composition to keep scenes connected to the same underlying state. It limits AppModel to Features and lifecycle coordination so composition does not become business logic.
+The specification explicitly chooses shared production composition to keep scenes connected to the same underlying state. It limits AppModel to Features and lifecycle coordination so composition does not become business logic. The app delegate calls AppModel directly and synchronously at startup. AppModel signals Features and starts its app-wide listeners. It forwards each listener event to the responsible Feature, which owns the business response.
 
 ## Trade-offs and alternatives
 
@@ -27,7 +27,7 @@ A singleton is not a concurrency mechanism. Isolation protects mutable state. Do
 
 ## Verification
 
-Trace live wiring, ensure dependencies are required by the explicit initializer, and run tests against independent graphs. Check that adding a second scene does not silently open another store.
+Trace live wiring, ensure dependencies are required by the explicit initializer, and run tests against independent graphs. Check that adding a second scene does not silently open another store. For app-wide listeners, verify that AppModel owns the task lifetime and forwards events to the Feature.
 
 ## Evidence and provenance
 

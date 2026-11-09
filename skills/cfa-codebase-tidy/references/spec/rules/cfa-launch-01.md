@@ -4,7 +4,7 @@
 
 **Strength:** Required.
 
-**Guidance:** The app delegate calls AppModel startup synchronously; Features start asynchronous work without blocking launch on disk or network.
+**Guidance:** Call AppModel startup directly and synchronously from the application delegate callback. AppModel signals the relevant Features and starts its app-wide listeners before the callback returns. Features own their asynchronous work, and launch does not wait for disk or network completion.
 
 **Why:** App-wide startup signals are issued before the delegate returns.
 
