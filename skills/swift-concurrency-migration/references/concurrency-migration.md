@@ -148,6 +148,13 @@ appropriate asynchronous APIs, or caching. Moving a blocking call into an actor
 or detached Task alone does not make it cooperative; respect external API
 execution requirements and avoid blocking cooperative-pool threads.
 
+When moving an app-wide subscription, verify that repeated launch signals
+start one listener, that an event reaches the owning Feature without its screen
+present, and that cancellation or replacement stops the old listener when
+required. Check that the existing event delivery and lifetime are preserved.
+For screen-only subscriptions, verify that leaving the screen ends observation
+when its presentation lifetime ends.
+
 Review Task cancellation, replacement, retention, priority, and stale-result
 prevention. Keep short synchronous operations synchronous. Use structured
 concurrency when independent child operations belong to one workflow; do not

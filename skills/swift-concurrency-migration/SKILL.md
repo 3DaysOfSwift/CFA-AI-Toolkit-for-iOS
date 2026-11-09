@@ -84,9 +84,12 @@ Use deliberate passes:
    `SwiftDataManager` for SwiftData and `NetworkingManager` for `URLSession`;
    call the AppModel launch signal directly and synchronously from the app
    lifecycle callback, without wrapping it in a Task or using a View `.task`.
+   AppModel starts each required app-wide listener once during startup, retains
+   any asynchronous listener handle, and forwards events to the Feature that
+   owns the resulting state and behaviour. Preserve delivery when no screen is
+   visible. Keep screen-only observation scoped to the screen or its ViewModel.
    Features may start asynchronous work without making launch wait for disk or
-   network completion. Do not move GCD
-   syntax mechanically during this pass.
+   network completion. Do not move GCD syntax mechanically during this pass.
 3. Convert that feature’s asynchronous model work into directly awaitable
    Swift Concurrency. ViewModels retain handles for the unstructured tasks
    they create by default. Equivalent repeated button actions return the same
