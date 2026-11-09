@@ -123,12 +123,16 @@ operation entry points and task sites, then use `node src/whole-app-health.mjs r
 <project-root> <review.json> <new-report.html> [app-icon.png]`. The report is
 generated after the current source and review evidence pass the coverage
 checks. If coverage is unresolved, the command lists the remaining checks in
-the terminal. Use `next` to resume the review before generating the report.
-Its `nextOperations` list identifies missing workflow traces, open checks and
-missing timing scenarios. The coverage gaps also identify task sites that still
-need a workflow step. Use the operation ID to find the entry in the
-working review, trace the outstanding behaviour, and update its evidence.
-Rerun `next` to confirm the gaps have cleared before rendering.
+the terminal. To resume a batch, run
+`node src/whole-app-health.mjs next <project-root> <review.json>`.
+Use `nextFiles`, `nextEntryPoints` and `nextTaskSites` to pick up the inventory.
+`nextFileReviews` and `nextTypes` include the recorded reasons and source
+locations for work already started. `nextOperations` identifies missing traces,
+open checks, timing scenarios and invalid task links. Use the operation ID
+to find the corresponding entry in the draft and update its evidence.
+When target membership still needs verification, `targetReview` lists relevant
+project files and exclusions to check. The `gaps` list also flags missing
+report criteria and invalid report text. Resolve those gaps before rendering.
 The scanner cannot establish target membership or discover every event by itself.
 
 The review's `presentation` requires `app`, `summary`, `verdict`, `conclusion`
