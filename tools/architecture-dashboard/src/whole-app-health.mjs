@@ -237,7 +237,7 @@ export function coverageGaps(report, review) {
       const op=operations.find(item=>item.id===entry.operationId);
       if (!op) throw Error(`Task site references an unknown operation: ${entry.operationId} → ${site.file}:${site.line}:${site.column}.`);
       if (!op.evidence.some(ref => ref.file === site.file && ref.line <= site.line && ref.endLine >= site.line)) throw Error(`Operation evidence must include its reconciled task site: ${op.id} → ${site.file}:${site.line}:${site.column}.`);
-      if (!hasTaskTrace(op, site, tasks)) untracedTasks.push(`${site.file}:${site.line}:${site.column} (${op.id})`);
+      if (!hasTaskTrace(op, site, tasks)) untracedTasks.push(`${site.file}:${site.line}:${site.column} (${op.id}, expected ${taskRelations.get(site.kind)})`);
     }
     taskEntries.set(entry.siteId,entry);
   }

@@ -128,6 +128,7 @@ test('reconciled task sites must be cited in a workflow step', () => {
   const step = {id:'load',parentId:'trigger',relation:'child-task',evidence};
   review.operations[0].steps.push(step);
   assert.deepEqual(nextWork(inventory, review).nextTaskSites, [site]);
+  assert.match(coverageGaps(inventory, review).join(' '), /App.swift:3:5 \(launch, expected unstructured-task\)/);
   step.relation = 'unstructured-task';
   assert.deepEqual(coverageGaps(inventory,review), []);
   assert.deepEqual(nextWork(inventory, review).nextTaskSites, []);
