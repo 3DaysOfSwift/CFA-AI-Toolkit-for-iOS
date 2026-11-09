@@ -122,6 +122,18 @@ test('coverage reports newly unmapped sections instead of claiming total rule co
   assert.match(result.scope, /not atomic-rule coverage/);
 });
 
+test('decision notes may resolve a question with an example but need a follow-up section', t => {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'cfa-decision-notes-'));
+  t.after(() => fs.rmSync(temp, { recursive: true, force: true }));
+  fs.cpSync(directory, temp, { recursive: true });
+  const note = path.join(temp, 'decisions/concrete-features.md');
+  const original = fs.readFileSync(note, 'utf8');
+  assert.match(original, /^## Working example$/m);
+  validateCatalogue(read(), temp, { sourceRoot });
+  fs.writeFileSync(note, original.replace('## Working example', '## Additional context'));
+  assert.throws(() => validateCatalogue(read(), temp, { sourceRoot }), /concrete-features\/follow-up/);
+});
+
 test('code examples do not become invented source headings', () => {
   assert.deepEqual(headings('## Real\n~~~text\n## Not real\n~~~\n### Another'), ['Real', 'Another']);
 });
