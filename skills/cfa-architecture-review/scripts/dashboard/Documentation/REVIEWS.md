@@ -397,6 +397,9 @@ Record related files once in `fileBatches`: each batch has `title`, `files` (an 
 
 In `presentation.criteria`, give each visible criterion a `title`, `detail`,
 `status` (`pass`, `concern` or `problem`), and source `evidence` ranges.
+Use `verification` to show how the finding was established when the method
+matters. Distinguish source inspection, an executed test, and a runtime
+measurement. Source citations remain required alongside that description.
 Use `appChecks` to name the app-level questions the criterion actually answers.
 Across all criteria, cover these IDs:
 

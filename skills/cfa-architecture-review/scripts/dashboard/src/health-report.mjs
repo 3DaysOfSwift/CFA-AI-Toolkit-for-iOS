@@ -13,6 +13,9 @@ export function assess(criteria) {
   if (!Array.isArray(criteria) || !criteria.length) throw Error('Provide at least one reviewed criterion.');
   for (const c of criteria) {
     if (!c.title || !c.detail || !Object.hasOwn(weights, c.status)) throw Error('Each criterion needs a title, detail and a pass, concern or problem status.');
+    if (c.verification !== undefined && (typeof c.verification !== 'string' || !c.verification.trim())) {
+      throw Error('Criterion verification must describe the evidence used.');
+    }
   }
   const points = criteria.reduce((sum, criterion) => sum + weights[criterion.status], 0);
   if (points === criteria.length) return 100;
@@ -64,7 +67,7 @@ export function renderHealthReport(data, iconData = '') {
     const rows = data.criteria.filter(c => c.status === status);
     if (!rows.length) return '';
     const title = {pass:'What is working well',concern:'Worth a closer look',problem:'Problems to address'}[status];
-    return `<section><h2>${title}</h2>${rows.map(c => `<article class="finding"><span class="indicator ${status}" aria-label="${status}">${{pass:'✓',concern:'!',problem:'×'}[status]}</span><div><h3>${escape(c.title)}</h3><p>${escape(c.detail)}</p>${c.evidence ? `<p class="evidence">Evidence: ${escape(evidenceText(c.evidence))}</p>` : ''}</div></article>`).join('')}</section>`;
+    return `<section><h2>${title}</h2>${rows.map(c => `<article class="finding"><span class="indicator ${status}" aria-label="${status}">${{pass:'✓',concern:'!',problem:'×'}[status]}</span><div><h3>${escape(c.title)}</h3><p>${escape(c.detail)}</p>${c.verification ? `<p class="evidence">Verification: ${escape(c.verification)}</p>` : ''}${c.evidence ? `<p class="evidence">Evidence: ${escape(evidenceText(c.evidence))}</p>` : ''}</div></article>`).join('')}</section>`;
   }).join('');
   const hasConfirmedProblem = data.criteria.some(criterion => criterion.status === 'problem');
   const needsAttention = hasConfirmedProblem || score < 75;
