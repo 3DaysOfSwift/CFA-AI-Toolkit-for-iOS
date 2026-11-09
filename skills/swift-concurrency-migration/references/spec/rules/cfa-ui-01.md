@@ -8,7 +8,7 @@
 
 **Why:** A different device can reuse the same business capability.
 
-**Example:** A weight screen sends a save request to its Feature; the Feature validates and persists the value.
+**Example:** A weight screen forwards Save to its ViewModel, which calls the Feature. The Feature validates the value and saves it through its storage service.
 
 **Explanation:** [Why use a UI and model boundary in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/presentation-boundaries).
 

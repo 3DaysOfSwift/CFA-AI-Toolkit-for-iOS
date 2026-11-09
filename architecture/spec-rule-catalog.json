@@ -36,7 +36,7 @@
       "rule": "Views render and forward intent; Features own domain decisions and authoritative state.",
       "why": "A different device can reuse the same business capability.",
       "verify": "Trace validation, calculations and persistence from the screen to their model owner.",
-      "example": "A weight screen sends a save request to its Feature; the Feature validates and persists the value.",
+      "example": "A weight screen forwards Save to its ViewModel, which calls the Feature. The Feature validates the value and saves it through its storage service.",
       "explanationIds": [
         "presentation-boundaries"
       ]
