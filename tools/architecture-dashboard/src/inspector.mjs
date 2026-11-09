@@ -6,6 +6,11 @@ import { analyse, maskSwift, scanSource } from './analyse.mjs';
 const screenPath = /(?:^|\/)1 - View\/Views\/.*View\.swift$/;
 const featureTypeSuffix = /Feature(?:API)?$/;
 
+function isFeatureCandidate(type, file = '') {
+  return featureTypeSuffix.test(type) ||
+    (!type.endsWith('ViewModel') && /(?:^|\/)Features\/[^/]+\//.test(file));
+}
+
 function featurePropertyName(type) {
   const domain = type.replace(/Feature(?:API)?$/, '');
   const lowerCamelDomain = domain.replace(/^[A-Z]+(?=[A-Z][a-z]|$)|^[A-Z]/, prefix => prefix.toLowerCase());
@@ -234,9 +239,8 @@ export async function inspect(project) {
       if (close < 0 || /^\s*(?:[.\[]|as[?!]?\b)/.test(appModel.slice(close + 1))) continue;
       const type = constructor[1];
       const declarations = declarationsByName.get(type) || [];
-      if (declarations.length !== 1 || featureTypeSuffix.test(type) ||
-          /(?:^|\/)Features\/[^/]+\//.test(declarations[0].file)) continue;
-      findings.push(finding('app-model-non-feature-state', 'review', `AppModel appears to store ${match[1]} from ${type} construction. Verify the inferred type and keep lower-level services local to live() and injected into Features.`, appModelFile, line));
+      if (declarations.length !== 1 || isFeatureCandidate(type, declarations[0].file)) continue;
+      findings.push(finding('app-model-non-feature-state', 'review', `AppModel appears to store ${match[1]} from ${type} construction. Verify the inferred type and keep services and presentation state outside AppModel storage.`, appModelFile, line));
     }
     for (const match of appMembers.matchAll(/(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(private[ \t]+)?(?:(?:private\(set\)|fileprivate|internal|public|package)[ \t]+)?(?:let|var)[ \t]+(\w+)[ \t]*:[ \t]*(?:any[ \t]+)?(?:\w+[ \t]*\.[ \t]*)*(\w+)(?:<[^;\n=]*>)?[?!]?([ \t]*=(?!=))?/gm)) {
       const [, privateModifier, name, type, defaultValue] = match;
@@ -255,8 +259,8 @@ export async function inspect(project) {
         continue;
       }
       const declarations = declarationsByName.get(type) || [];
-      const isLegacyFeature = declarations.length === 1 && /(?:^|\/)Features\/[^/]+\//.test(declarations[0].file);
-      if (!featureTypeSuffix.test(type) && !isLegacyFeature) findings.push(finding('app-model-non-feature-state', 'warning', `AppModel stores ${name}: ${type}; check that it is a Feature, launch guard or private app-wide listener handle.`, appModelFile, lineOf(appModel, match.index)));
+      const declarationFile = declarations.length === 1 ? declarations[0].file : undefined;
+      if (!isFeatureCandidate(type, declarationFile)) findings.push(finding('app-model-non-feature-state', 'warning', `AppModel stores ${name}: ${type}; check that it is a Feature, launch guard or private app-wide listener handle.`, appModelFile, lineOf(appModel, match.index)));
     }
   }
   const featureProperties = new Set();
@@ -264,7 +268,7 @@ export async function inspect(project) {
     const candidates = declarationsByName.get(property.type) || [];
     const source = candidates.length === 1 ? candidates[0] : null;
     const declarationFile = source?.file;
-    const isFeature = featureTypeSuffix.test(property.type) || /(?:^|\/)Features\/[^/]+\//.test(declarationFile ?? '');
+    const isFeature = isFeatureCandidate(property.type, declarationFile);
     if (!isFeature) continue;
     featureProperties.add(name);
     if (property.computed) {
