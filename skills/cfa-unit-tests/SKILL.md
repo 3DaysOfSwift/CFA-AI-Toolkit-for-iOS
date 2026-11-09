@@ -73,6 +73,13 @@ show the expected purchase or locked experience where applicable and never
 invoke the paid operation. Verify that entitled callers can proceed. Verify
 server-side authorisation separately for server-protected operations.
 
+For account changes, hold an old account's request open, switch accounts or
+sign out, then complete the old request. Verify that its data is never
+published into the new session. Exercise successful cleanup, sign-out
+failure before the session ends, and partial authentication or cleanup
+failure where supported. Assert the actual session and retained or deleted
+data against the product's sign-out contract.
+
 For durable edits, hold the write open and verify that confirmed state stays
 unchanged until it succeeds. On failure, assert that the editor keeps its
 draft and can retry. For optional download caches, independently control disk

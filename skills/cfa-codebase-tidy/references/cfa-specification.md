@@ -1796,6 +1796,11 @@ Before accepting a change, answer every question:
     entitled outcomes been tested, including alternate entry points? Record
     unresolved paths as unverified. Verify server-side authorisation separately
     where the operation is protected by the server.
+22. For account changes in scope, does failed sign-out preserve the session
+    when it remains active? Does successful sign-out clear account-specific
+    state and storage according to the product contract? Verify that old
+    requests cannot publish into a new session and that partial failures
+    are reconciled against the actual session state.
 
 Every applicable answer must be yes. Marking a question not applicable requires
 a short explanation. Otherwise, the change is not architecturally complete.
