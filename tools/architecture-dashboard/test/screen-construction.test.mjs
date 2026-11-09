@@ -82,6 +82,7 @@ for (const expression of [
 for (const declaration of [
   '@State private var viewModel = HomeViewModel()',
   '@State private var viewModel: HomeViewModel = HomeViewModel()',
+  '@State private var reminders = HomeViewModel()',
   '@State private var reminders: HomeViewModel = .init()',
   '@State private var viewModel =\n HomeViewModel()'
 ]) {
@@ -93,7 +94,13 @@ for (const declaration of [
     assert.equal(report.screens[0].ownsViewModel, true);
     assert.deepEqual(findings, []);
     const naming = report.findings.find(item => item.code === 'view-model-property-name');
-    assert.equal(naming?.line, declaration.includes('reminders') ? 2 : undefined);
+    if (declaration.includes('reminders')) {
+      assert.equal(naming?.severity, 'warning');
+      assert.equal(naming?.file, viewPath);
+      assert.equal(naming?.line, 2);
+    } else {
+      assert.equal(naming, undefined);
+    }
   });
 }
 
