@@ -454,12 +454,15 @@ For each relevant operation, inspect:
   from expiration to the work it owns. Check the system mechanism that permits
   execution after backgrounding and report on-device delivery evidence
   separately from source review.
-- Account transitions: trace a request started in one session that completes
-  after sign-out or after a different account signs in. Locate the account
-  or session-generation check at publication, or establish how the design
-  prevents the stale result from reaching the current account. For CFA,
-  distinguish a failed sign-out that leaves the session intact from a partial
-  authentication change that requires checking the actual session state.
+- Account transitions: trace sign-out, account switching and external session
+  expiry to the Feature that coordinates cleanup. Check that a failed sign-out
+  preserves an intact session and that a session that actually ended stays
+  signed out even if cleanup fails. Compare retained data with the product's
+  contract, including account caches, unsynchronised work, independent purchases
+  and user-owned documents. Hold an old request open across the transition and
+  trace its publication check even if cancellation was requested. Include signing
+  back in as the same account, where an account ID alone cannot distinguish the
+  old session from the new one.
 - State authority: which object accepts results and controls mutations? Look for
   independent writers or conflicting cached state, not harmless value snapshots.
 - Detail navigation in CFA: trace the selected immutable snapshot from the list
