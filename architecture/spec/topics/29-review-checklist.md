@@ -94,6 +94,15 @@ Before accepting a change, answer every question:
     removal fails after navigation, verify that the failure is surfaced and
     retrying the removal does not navigate again. During migration, verify
     that existing notification and history capabilities are preserved.
+    Verify that an opening request received during restoration survives a
+    restart alongside the previously saved requests.
+25. For offline edits or cross-device sync in scope, does the app distinguish
+    local success from server confirmation? For a custom server, verify
+    that the edit and pending metadata are saved together, survive failed
+    sync and restart, and retry without duplicating the change. When replacing
+    an existing implementation, verify recovery of a previously saved pending
+    edit. Exercise conflict and rejection outcomes where applicable. Verify
+    Apple-managed sync on supported devices.
 
 Every applicable answer must be yes. Marking a question not applicable requires
 a short explanation. Otherwise, the change is not architecturally complete.
