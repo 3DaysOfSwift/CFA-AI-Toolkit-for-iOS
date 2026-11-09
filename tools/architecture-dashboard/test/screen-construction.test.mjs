@@ -562,3 +562,19 @@ test('reviews a View storing an inferred AppModel alias without confusing locals
   assert.deepEqual(report.findings.filter(item => item.code === 'stored-app-model').map(item => [item.file, item.line]),
     [[file, 3]]);
 });
+
+test('reviews inferred AppModel storage in a screen ViewModel', async t => {
+  const file = viewPath.replace('View.swift', 'ViewModel.swift');
+  const {report} = await inspectView(t, `struct HomeView: View {
+    @State private var viewModel = HomeViewModel()
+    var body: some View { Text("Home") }
+  }`, {
+    [file]: `final class HomeViewModel {
+      private let notesFeature = AppModel.shared.notesFeature
+      private let graph = AppModel.shared
+      func example() { let graph = AppModel.shared }
+    }`
+  });
+  assert.deepEqual(report.findings.filter(item => item.code === 'stored-app-model').map(item => [item.file, item.line]),
+    [[file, 3]]);
+});

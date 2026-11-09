@@ -47,6 +47,7 @@ function braceBody(source, openingBrace) {
 }
 
 const identifier = '[\\p{L}_][\\p{L}\\p{M}\\p{N}_]*';
+const inferredAppModelStorage = /\b(?:let|var)\s+\w+\s*=\s*(?:\w+\s*\.\s*)*AppModel\s*\.\s*shared\b(?!\s*[.?![(])/;
 const propertyNamePattern = '(?:`(' + identifier + ')`|(' + identifier + '))';
 
 // Keep only direct member signatures. Mask method/nested-type bodies without
@@ -560,7 +561,7 @@ export async function inspect(project) {
       const body = braceBody(source, start - 1);
       inspectScreenInputs(view[1], body, source, start, file, findings);
       const members = memberSignatures(body);
-      const storedModel = /\b(?:let|var)\s+\w+\s*=\s*(?:\w+\s*\.\s*)*AppModel\s*\.\s*shared\b(?!\s*[.?![(])/.exec(members);
+      const storedModel = inferredAppModelStorage.exec(members);
       if (storedModel) {
         findings.push(finding('stored-app-model', 'review', 'This View appears to retain AppModel.shared in a stored property. Resolve the required Features through its ViewModel.', file, lineOf(source, start + storedModel.index)));
       }
@@ -672,6 +673,10 @@ export async function inspect(project) {
     const viewModelMembers = viewModelDeclaration
       ? viewModel.slice(0, viewModelBodyStart).replace(/[^\n]/g, ' ') + memberSignatures(viewModelBody)
       : '';
+    const retainedAppModel = inferredAppModelStorage.exec(viewModelMembers);
+    if (retainedAppModel) {
+      findings.push(finding('stored-app-model', 'review', 'This ViewModel appears to retain AppModel.shared in a stored property. Keep only the concrete Features this screen needs.', viewModelFile, lineOf(viewModel, retainedAppModel.index)));
+    }
     const testName = `${viewModelName}Tests.swift`;
     const testCandidates = [...paths].filter(file => path.posix.basename(file) === testName);
     const testFile = testCandidates.length === 1 ? testCandidates[0] : null;
