@@ -75,6 +75,13 @@ Feature updates on supported devices separately from those checks. For an App
 Group widget snapshot, verify the write precedes the reload request and a
 failed write issues no request.
 
+When moving app-wide observation to AppModel, apply the
+[app-wide listener rule](references/spec/rules/cfa-app-02.md). Verify that
+repeated startup leaves one listener forwarding events to the responsible
+Feature with no relevant screen mounted. If the listener can be replaced,
+verify that the old listener stops forwarding and its cleanup leaves the
+replacement running.
+
 When moving ownership of published API or persistence values, apply the
 [immutable snapshot rule](references/spec/rules/cfa-snapshot-01.md). Check
 nested values for mutable references and keep editable drafts separate.

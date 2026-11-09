@@ -49,6 +49,12 @@ the ViewModel obtains its Feature through the normal dependency path. A detail
 preview may supply the same immutable selection as its production caller.
 Keep SwiftData access in the storage service and out of the preview.
 
+When the app needs an event independently of its screens, apply the
+[app-wide listener rule](references/spec/rules/cfa-app-02.md). Drive a
+controlled event source after repeated launch signals. Verify that one
+AppModel listener forwards each event to the owning Feature even with no
+relevant screen mounted. Shut down isolated listeners at the end of the test.
+
 If the product includes paid capabilities, apply the
 [paid capability rule](references/spec/rules/cfa-pay-01.md). Give
 `PurchasesFeature` ownership of entitlement state. Check access in the
