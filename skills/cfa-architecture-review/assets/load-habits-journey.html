@@ -1,15 +1,15 @@
 <div id="habits-journey">
   <h2>Load Habits</h2>
   <div class="text-small text-muted">First load · successful path · sequence, not measured time</div>
-  <div class="journey" role="img" aria-label="Two tasks: the launch task waits while the manager-owned task loads local data, calculates summaries and publishes the result. Both then finish.">
+  <div class="journey" role="img" aria-label="Two tasks: the launch task waits while the Feature-owned task loads local data, calculates summaries and publishes the result. Both then finish.">
     <div class="heading a">A · Launch request</div>
     <div class="heading b">B · Shared loading task</div>
     <div class="launch"><span class="dot a-dot"></span>Ask to load<br/><span class="text-small">Create B →</span></div>
-    <div class="phase" data-phase="0"><span class="dot b-dot">1</span><div>Create the loading task<div class="text-small text-muted">HabitsManager · MainActor</div></div></div>
+    <div class="phase" data-phase="0"><span class="dot b-dot">1</span><div>Create the loading task<div class="text-small text-muted">HabitsFeature · MainActor</div></div></div>
     <div class="waiting"><span>Ⅱ</span><div>Waiting for B</div><code class="text-small">await task.value</code><div class="text-small text-muted">A is suspended.<br/>It is not blocking a thread.</div></div>
     <div class="phase" data-phase="1"><span class="dot b-dot">2</span><div>Take a turn to load<div class="text-small text-muted">Wait here only if another local operation is running</div></div></div>
-    <div class="phase" data-phase="2"><span class="dot b-dot">3</span><div>Show “loading” · request data<div class="text-small text-muted">Manager → worker → storage → file actor</div></div></div>
-    <div class="phase" data-phase="3"><span class="dot b-dot">4</span><div>Read the saved habits<div class="text-small text-muted">File actor · local disk, no internet</div></div></div>
+    <div class="phase" data-phase="2"><span class="dot b-dot">3</span><div>Show “loading” · request data<div class="text-small text-muted">Feature → worker → local repository → storage actor</div></div></div>
+    <div class="phase" data-phase="3"><span class="dot b-dot">4</span><div>Read the saved habits<div class="text-small text-muted">SwiftData · local store</div></div></div>
     <div class="phase" data-phase="4"><span class="dot b-dot">5</span><div>Calculate the summaries<div class="text-small text-muted">Worker actor · today, week, streaks, lifetime</div></div></div>
     <div class="phase" data-phase="5"><span class="dot b-dot">6</span><div>Publish the loaded data<div class="text-small text-muted">MainActor · state becomes ready</div></div></div>
     <div class="finished"><span class="dot a-dot"></span>A resumes<br/>and finishes</div>
@@ -21,7 +21,7 @@
     <button class="btn" type="button" id="hj-next">Next</button>
   </div>
   <p id="hj-detail" aria-live="polite"></p>
-  <div class="text-small text-muted">Two unstructured tasks. Moving between actors does not create more tasks.</div>
+  <div class="text-small text-muted">The delegate calls AppModel synchronously; AppModel starts A and the Feature starts B. Actor hops do not create more tasks.</div>
 </div>
 <style>
 #habits-journey .journey{display:grid;grid-template-columns:minmax(95px,1fr) minmax(0,2.6fr);column-gap:20px;margin:24px 0 16px;position:relative}
@@ -54,10 +54,10 @@
  const count = root.querySelector('#hj-count');
  const detail = root.querySelector('#hj-detail');
  const descriptions = [
-  'The manager stores B so another caller can await the same load instead of starting a duplicate.',
+  'The Feature stores B so another caller can await the same load instead of starting a duplicate.',
   'If the local operation gate is busy, B suspends in its FIFO waiting list; the previous operation resumes it.',
   'B stays the same task across actor calls. Each await marks a possible suspension, not a new child task.',
-  'Reading and decoding are synchronous on the file actor. A missing file produces valid empty habit data.',
+  'The storage actor opens the SwiftData container if needed and reads the local store.',
   'B calculates the summaries on the worker actor, away from MainActor isolation.',
   'B returns to MainActor and updates observable state. A read failure instead publishes a failed state for retry.',
   'B releases the operation gate and clears its handle. Its completion lets A resume; cancelling A would not automatically cancel B.'
