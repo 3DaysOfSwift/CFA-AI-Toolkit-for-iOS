@@ -247,6 +247,11 @@ test('completion is not inferred from a build pass or tests at a different commi
   assert.ok(inspectRecord(f.file).warnings.some(warning =>
     warning.includes('evidence.failed-regression: failed at the final commit')
   ));
+  const cli = path.join(root, 'tools/migration-evidence/evidence.mjs');
+  const digest = spawnSync(process.execPath, [cli, 'digest', f.file], {encoding:'utf8'});
+  assert.equal(digest.status, 0);
+  assert.equal(digest.stdout.trim(), f.record.review.digest);
+  assert.match(digest.stderr, /evidence.failed-regression: failed at the final commit/);
 
   f.record.status = 'draft';
   f.record.repository.afterCommit = null;

@@ -270,8 +270,12 @@ export function main(args) {
     console.log(JSON.stringify(createRecord(options), null, 2));
   } else if (['validate', 'digest'].includes(command) && target && (rest.length === 0 || (command === 'validate' && rest.length === 1 && rest[0] === '--publish'))) {
     const result = inspectRecord(path.resolve(target), { publish: rest.includes('--publish'), checkDigest: command !== 'digest' });
-    if (command === 'digest' && result.valid) console.log(result.digest);
-    else console.log(JSON.stringify(result, null, 2));
+    if (command === 'digest' && result.valid) {
+      for (const warning of result.warnings) console.error(warning);
+      console.log(result.digest);
+    } else {
+      console.log(JSON.stringify(result, null, 2));
+    }
     if (!result.valid) process.exitCode = 1;
   } else throw Error('Unknown or incomplete command. Use --help.');
 }
