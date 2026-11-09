@@ -736,9 +736,9 @@ export async function inspect(project) {
     for (const location of dependencySources) {
       for (const initializer of typeInitializers(location.body)) {
         inspectInitializerTask(viewModelName, initializer, location.source, location.offset, location.file, findings);
-        const service = initializer.types.find(type => serviceTypeSuffix.test(type));
-        if (service) {
-          findings.push(finding('view-model-non-feature-dependency', 'review', `${viewModelName} accepts ${service} in its initializer. Verify that the ViewModel calls a Feature and that the Feature owns the service dependency.`, location.file, lineOf(location.source, location.offset + initializer.index)));
+        const services = [...new Set(initializer.types.filter(type => serviceTypeSuffix.test(type)))];
+        if (services.length) {
+          findings.push(finding('view-model-non-feature-dependency', 'review', `${viewModelName} accepts ${services.join(', ')} in its initializer. Verify that the ViewModel calls a Feature and that the Feature owns the service dependency.`, location.file, lineOf(location.source, location.offset + initializer.index)));
         }
       }
     }

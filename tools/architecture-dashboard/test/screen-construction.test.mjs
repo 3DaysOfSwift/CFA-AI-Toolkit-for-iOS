@@ -659,11 +659,12 @@ test('reviews a lower-level service injected directly into a screen ViewModel', 
   const file = viewPath.replace('View.swift', 'ViewModel.swift');
   const extensionFile = 'App/Presentation/HomeViewModel+Init.swift';
   const {report} = await inspectView(t, 'struct HomeView: View { @State private var viewModel = HomeViewModel() }', {
-    [file]: 'final class HomeViewModel {\n init(repository: any NotesRepository) {}\n init(notesFeature: NotesFeature) {}\n}',
+    [file]: 'final class HomeViewModel {\n init(repository: any NotesRepository, network: NetworkingManager) {}\n init(notesFeature: NotesFeature) {}\n}',
     [extensionFile]: 'extension HomeViewModel {\n convenience init(network: NetworkingManager) { self.init(notesFeature: AppModel.shared.notesFeature) }\n}'
   });
-  assert.deepEqual(report.findings.filter(item => item.code === 'view-model-non-feature-dependency')
-    .map(({file, line}) => [file, line]), [[file, 2], [extensionFile, 2]]);
+  const findings = report.findings.filter(item => item.code === 'view-model-non-feature-dependency');
+  assert.deepEqual(findings.map(({file, line}) => [file, line]), [[file, 2], [extensionFile, 2]]);
+  assert.match(findings[0].message, /NotesRepository, NetworkingManager/);
 });
 
 test('reviews stored ViewModel services without an explicit initializer', async t => {
