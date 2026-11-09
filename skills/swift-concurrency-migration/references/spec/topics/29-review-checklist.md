@@ -81,6 +81,10 @@ Before accepting a change, answer every question:
       value unchanged and the draft available for retry. Check that a successful
       retry publishes the replacement. Cancel an unsaved edit and verify that
       it leaves the confirmed and stored values unchanged.
+    - For changes to existing durable storage, open a representative store
+      from the previous version and verify that saved records remain
+      available after reopening. Verify that a failed open or upgrade
+      surfaces the failure and preserves the original data.
     - For replaceable downloads, can refresh proceed independently of cache
       restoration and complete without waiting for an optional cache write?
       Verify that a late restore or delayed write cannot replace fresher data,
