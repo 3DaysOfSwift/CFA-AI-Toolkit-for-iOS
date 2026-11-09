@@ -10,6 +10,6 @@
 
 **Example:** AppModel asks a Feature to register an eligible system background handler during launch.
 
-**Verify:** Verify permitted task identifiers and once-only launch registration. Check that scheduling is separate and expiration cancels owned work. Exercise expiration racing normal completion and verify the system callback completes exactly once. Record actual background execution on a supported device separately from controlled tests.
+**Verify:** Verify permitted task identifiers and once-only launch registration. Check that scheduling is separate. Exercise success, failure and expiration individually and verify each completes the system callback exactly once. Verify that expiration cancels owned work. Then deliver expiration while normal completion is pending and verify the race still completes the callback exactly once. Record actual background execution on a supported device separately from controlled tests.
 
 **Full rule, context and examples:** [Use AppModel as the Composition Root and Feature Facade](../topics/17-use-appmodel-as-the-composition-root-and-feature-facade.md). This card is a reading aid; apply the complete canonical section.
