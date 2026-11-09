@@ -202,6 +202,22 @@ test('identifies a launch signal scheduled inside a delegate Task or dispatch qu
   assert.match(findings[1].message, /through DispatchQueue\.async/);
 });
 
+test('identifies a launch signal deferred by DispatchQueue.asyncAfter', async t => {
+  const root = await fixture(t, {
+    'Application/AppDelegate.swift': `class Delegate {
+      func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+          AppModel.shared.applicationDidFinishLaunching()
+        }
+        return true
+      }
+    }`
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'scheduled-app-model-launch');
+  assert.deepEqual(findings.map(item => item.line), [3]);
+  assert.match(findings[0].message, /DispatchQueue\.asyncAfter/);
+});
+
 test('identifies priority and explicitly typed Tasks scheduling the launch signal', async t => {
   const root = await fixture(t, {
     'Application/PriorityDelegate.swift': 'class Delegate { func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { Task(priority: .high) { AppModel.shared.applicationDidFinishLaunching() }; return true } }',
