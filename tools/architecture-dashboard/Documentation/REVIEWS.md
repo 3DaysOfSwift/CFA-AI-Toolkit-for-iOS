@@ -280,7 +280,9 @@ synchronous action can have a single event step if it completes there. Every ste
 `event` with no parent; later steps have `parentId` referencing an earlier step
 and relation `same-task`, `child-task`, `unstructured-task`, `framework-task`,
 or `unknown`. These are reviewer-authored relationships, not an inferred call
-graph. Include synchronous events and preserve unknown boundaries.
+graph. Cite each task site assigned to an operation in that operation’s workflow
+steps as well as its overall evidence. Include synchronous events and preserve
+unknown boundaries.
 
 ## Whole-app Health Check file batches
 

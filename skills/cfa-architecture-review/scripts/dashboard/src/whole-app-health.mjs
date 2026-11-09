@@ -128,6 +128,7 @@ export function coverageGaps(report, review) {
   const missingEntries = candidates.filter(site => !entries.has(site.id));
   if (missingEntries.length) gaps.push(`${missingEntries.length} detected entry points still need reconciliation.`);
   const tasks = taskCandidates(report), taskEntries = new Map();
+  const untracedTasks = [];
   for (const entry of review.taskSites || []) {
     if (!entry.siteId || taskEntries.has(entry.siteId)) throw Error('Task reconciliation needs unique site IDs.');
     if (Boolean(entry.operationId) === Boolean(entry.excludedReason)) throw Error('Each task site needs an operation ID or an exclusion reason.');
@@ -137,9 +138,16 @@ export function coverageGaps(report, review) {
     if (entry.operationId) {
       const op=operations.find(item=>item.id===entry.operationId);
       if (!op || !op.evidence.some(ref=>ref.file===site.file && ref.line<=site.line && ref.endLine>=site.line)) throw Error('Operation evidence must include its reconciled task site.');
+      const traced = op.steps?.some(step =>
+        step.relation !== 'unknown' && step.evidence?.some(ref =>
+          ref.file === site.file && ref.line <= site.line && ref.endLine >= site.line
+        )
+      );
+      if (!traced) untracedTasks.push(`${site.file}:${site.line}:${site.column} (${op.id})`);
     }
     taskEntries.set(entry.siteId,entry);
   }
+  if (untracedTasks.length) gaps.push(`Reconciled task sites need workflow steps: ${untracedTasks.join(', ')}.`);
   const missingTasks=tasks.filter(site=>!taskEntries.has(site.id));
   if (missingTasks.length) gaps.push(`${missingTasks.length} detected task sites still need reconciliation.`);
   return gaps;

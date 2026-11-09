@@ -53,6 +53,21 @@ test('refuses stale entry IDs and unsupported caller links', () => {
   assert.throws(()=>coverageGaps(report,wrong),/evidence/);
 });
 
+test('reconciled task sites must be cited in a workflow step', () => {
+  const inventory = structuredClone(report);
+  inventory.syntax = {status:'available',files:['App.swift'],warnings:[],items:[
+    {kind:'concurrency.task',file:'App.swift',line:3,column:5}
+  ]};
+  const review = complete();
+  const [site] = taskCandidates(inventory);
+  review.taskSites = [{siteId:site.id,operationId:'launch'}];
+  const evidence = [{file:'App.swift',line:3,endLine:3}];
+  review.operations[0].evidence.push(...evidence);
+  assert.match(coverageGaps(inventory,review).join(' '), /need workflow steps: App.swift:3:5/);
+  review.operations[0].steps.push({id:'load',parentId:'trigger',relation:'unstructured-task',evidence});
+  assert.deepEqual(coverageGaps(inventory,review), []);
+});
+
 test('unknown operations and target membership cannot yield a pass score', () => {
   const review=complete(); review.targetInventoryVerified=false; review.operations[0].unknowns=['Unresolved callback'];
   assert.equal(coverageGaps(report,review).length,2);
