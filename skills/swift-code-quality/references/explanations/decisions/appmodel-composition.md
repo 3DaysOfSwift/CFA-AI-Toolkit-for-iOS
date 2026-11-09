@@ -35,9 +35,19 @@ Editorial analysis: convenient production access introduces a globally reachable
 
 A singleton is not a concurrency mechanism. Isolation protects mutable state. Do not claim SwiftUI requires AppModel or one shared graph. Multiple live product contexts need an explicit design, not accidental extra AppModels.
 
+Share Model source across device targets and include each target’s own
+presentation. Separate processes have separate Feature instances. An iPhone
+widget can read a snapshot from an App Group container, while a Watch app on
+another device needs its own copy. The receiving Feature updates its state
+when the snapshot reaches its data source.
+
 ## Verification
 
-Trace live wiring, ensure dependencies are required by the explicit initializer, and run tests against independent graphs. Check that scenes in the same process share the graph. A widget or Watch app running in a separate process has its own graph and uses the product’s data-sharing mechanism. For app-wide listeners, call startup twice with an isolated graph and a
+Trace live wiring, ensure dependencies are required by the explicit initializer, and run tests against independent graphs. Check that scenes in the same process share the graph. For an App Group widget
+snapshot, verify that a successful write precedes the timeline reload request.
+For a Watch handoff, verify on supported devices that the receiving Feature
+updates when the transferred snapshot arrives. For app-wide listeners, call
+startup twice with an isolated graph and a
 controlled event source. Verify one listener starts, events reach the Feature
 without a screen, and the test can end its listener. Inspect the actual
 application callback to confirm it calls AppModel directly before returning.
