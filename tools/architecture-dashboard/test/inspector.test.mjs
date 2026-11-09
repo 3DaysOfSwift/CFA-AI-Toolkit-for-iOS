@@ -536,3 +536,11 @@ test('an unrelated live overload does not satisfy the AppModel factory check', a
   const { findings } = await inspect(root);
   assert.match(findings.find(item => item.code === 'app-model-live-factory')?.message, /Found 0/);
 });
+
+test('an optional AppModel result does not satisfy the production factory check', async t => {
+  const root = await fixture(t, {
+    'App/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel? { nil } }'
+  });
+  const { findings } = await inspect(root);
+  assert.match(findings.find(item => item.code === 'app-model-live-factory')?.message, /Found 0/);
+});
