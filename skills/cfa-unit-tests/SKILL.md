@@ -74,6 +74,13 @@ start, a late restore cannot replace fresh data, and a pending or failed cache
 write leaves the refresh result usable. Check that a failed refresh retains
 valid data and that delayed cache writes cannot replace a newer snapshot.
 
+For restored preferences, check that a supported saved value is restored and
+that a missing or obsolete non-critical value uses the product-defined
+fallback. Where the old value should be retained, verify that restoration
+leaves it in storage. Exercise unreadable or corrupt durable storage and
+failed writes separately, and verify that the Feature reports the error
+without publishing a successful save.
+
 Build AppModel tests from an isolated dependency graph. Do not call production
 `AppModel.shared` from a unit test. When AppModel owns app-wide listeners,
 supply a controlled event source and observe the receiving Feature. Verify
