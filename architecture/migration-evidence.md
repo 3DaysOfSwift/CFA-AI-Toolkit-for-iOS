@@ -129,6 +129,11 @@ target’s minimum OS and link the evidence that changed paths support it. List
 the covered targets on the deployment compatibility evidence entry. A passing run on a newer
 OS alone does not establish that compatibility.
 
+For removed event adapters or dependencies, use the linked hybrid review to
+compare consumer behaviour at the baseline and final revisions. Where the
+product promises a buffering policy, include a slow-consumer scenario and
+record which events are delivered or dropped at each revision.
+
 In the audit linked by `completionGate.finalCfaAuditEvidenceId`, record the
 evidence and verdict for each applicable CFA requirement at the final commit.
 Explain why any requirement does not apply and how any agreed exception affects

@@ -530,7 +530,9 @@ identifies all of the following:
   adapters or dependencies, link the baseline and rerun of the affected
   consumer scenarios on each affected target. Where a
   consumer needs every event, verify repeated values, ordering and cancellation
-  separately from the latest UI state;
+  separately from the latest UI state. Where the existing contract specifies
+  buffering, hold the consumer back and compare which events it receives
+  before and after migration;
 - for existing widgets and device targets affected by Model or service
   changes, evidence of target membership, build compatibility and preserved
   data handoff. Verify the receiving target separately from the app build,
