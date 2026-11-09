@@ -238,7 +238,8 @@ function pendingAppChecks(review) {
     if (!Array.isArray(criterion.appChecks) || criterion.appChecks.some(id => !appCheckIDs.includes(id))) {
       throw Error('Use recognised app-level check IDs in criterion.appChecks.');
     }
-    if (Array.isArray(criterion.evidence) && criterion.evidence.length) {
+    if (['pass', 'concern', 'problem'].includes(criterion.status) &&
+        Array.isArray(criterion.evidence) && criterion.evidence.length) {
       criterion.appChecks.forEach(id => appChecks.add(id));
     }
   }
