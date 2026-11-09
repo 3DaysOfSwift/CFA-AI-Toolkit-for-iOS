@@ -356,8 +356,8 @@ export async function inspect(project) {
       }
       for (const sharedInitializer of members.matchAll(/\bstatic\s+let\s+`?shared`?\s*(?::\s*(?:\w+\s*\.\s*)*AppModel\s*)?=/g)) {
         const initializer = source.slice(start + sharedInitializer.index + sharedInitializer[0].length);
-        if (!/^\s*(?:(?:\w+\s*\.\s*)*(?:AppModel|Self)\s*\.\s*)?live\s*\(\s*\)/.test(initializer)) {
-          findings.push(finding('app-model-shared-factory', 'review', 'AppModel.shared does not visibly call live(). Trace its initializer and verify the production graph comes from the single live factory.', file, lineOf(source, start + sharedInitializer.index)));
+        if (!/^\s*(?:(?:\w+\s*\.\s*)*(?:AppModel|Self)\s*\.\s*)?live\s*\(\s*\)(?!\s*[?!]?\s*\.)/.test(initializer)) {
+          findings.push(finding('app-model-shared-factory', 'review', 'AppModel.shared does not visibly store the direct result of live(). Trace its initializer and verify the production graph comes from the single live factory.', file, lineOf(source, start + sharedInitializer.index)));
         }
       }
     }

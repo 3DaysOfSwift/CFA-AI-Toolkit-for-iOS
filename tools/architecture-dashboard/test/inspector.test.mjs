@@ -748,6 +748,20 @@ test('checks qualified AppModel factory return types and shared initializers', a
   assert.equal((await inspect(root)).findings.find(item => item.code === 'app-model-shared-factory')?.line, 2);
 });
 
+test('reviews a chained initializer that can replace the live AppModel graph', async t => {
+  const file = 'Application/2 - AppModel/AppModel.swift';
+  const root = await fixture(t, {
+    [file]: `final class AppModel {
+      static let shared = live()
+        .alternateGraph()
+      static func live() -> AppModel { AppModel() }
+      func alternateGraph() -> AppModel { AppModel() }
+    }`
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'app-model-shared-factory');
+  assert.deepEqual(findings.map(item => [item.file, item.line, item.severity]), [[file, 2, 'review']]);
+});
+
 test('counts live factory candidates across AppModel and its extensions', async t => {
   const file = 'Application/2 - AppModel/AppModel.swift';
   const root = await fixture(t, {
