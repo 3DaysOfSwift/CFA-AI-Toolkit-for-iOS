@@ -92,6 +92,13 @@ async Feature may still publish its results through a ReactiveSwift signal to
 an existing UIKit screen. Identify who owns the state, transformations,
 subscriptions and lifetime, and whether an adapter remains necessary.
 
+Before replacing a bridge or removing a framework, capture the affected
+consumers’ observable behaviour in the migration baseline. For a screen,
+record what it displays on first subscription and how later values, failures
+and resubscription change what the user sees. For an event consumer, record
+delivery and ordering requirements. Rerun the same scenarios on the migrated
+path for each affected target before accepting the cleanup.
+
 For each hybrid path, distinguish a temporary bridge or duplicate state from a
 deliberate integration. Assess whether a simpler supported design can preserve
 the existing screen's update timing, ordering, initial and subsequent values,
