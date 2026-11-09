@@ -312,7 +312,11 @@ skill from that toolkit before changing the project.
   stored data and meaningful interactions. Limit implementation changes to
   the agreed CFA and Swift Concurrency migration and supported platforms.
   Fix confirmed defects within scope, protect the intended behaviour with
-  tests, and record any necessary platform-driven differences.
+  tests, and record any necessary platform-driven differences. Before handoff,
+  trace remaining legacy and Swift Concurrency paths together. Reconcile
+  temporary file locations, Xcode navigator groups and target membership.
+  Audit the agreed migration scope against CFA, correct in-scope discrepancies
+  and rerun affected builds and tests after corrections.
 - Inject a clock or date function when a business rule depends on current
   time. Read it in the Feature at the point of decision. Test date and time-zone
   boundaries with controlled inputs, and advance the clock on the same
