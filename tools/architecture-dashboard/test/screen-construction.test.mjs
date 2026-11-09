@@ -259,10 +259,16 @@ test('reviews independent Tasks inside SwiftUI refresh callbacks', async t => {
         await viewModel.refresh()
         Task(operation: { await viewModel.refresh() })
       }
+      .refreshable(action: {
+        Task { await viewModel.refresh() }
+      })
+      .task(operation: {
+        Task { await viewModel.refresh() }
+      })
     }
   }`);
   const findings = report.findings.filter(item => item.code === 'task-inside-view-lifecycle');
-  assert.deepEqual(findings.map(item => item.line), [6]);
+  assert.deepEqual(findings.map(item => item.line), [6, 9, 12]);
   assert.match(findings[0].message, /\.refreshable/);
 });
 

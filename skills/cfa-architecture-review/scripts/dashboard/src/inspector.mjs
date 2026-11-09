@@ -324,16 +324,22 @@ export async function inspect(project) {
         findings.push(finding('root-storage-gate', 'review', 'Root navigation may gate the interface on storage availability. Open storage within a Feature data request and present its error in the feature screen, never a root wrapper or app-wide blocking overlay.', file, lineOf(source, bodyOffset + gate.index)));
       }
     }
-    for (const task of source.matchAll(/\.\s*(task\b\s*([({])|refreshable\b\s*\{)/g)) {
+    for (const task of source.matchAll(/\.\s*(task|refreshable)\b\s*([({])/g)) {
       let opening = task.index + task[0].length - 1;
       if (task[2] === '(') {
         const closing = closingParenthesis(source, opening);
         if (closing < 0) continue;
-        const closure = /^\s*\{/.exec(source.slice(closing + 1));
-        if (!closure) continue;
-        opening = closing + closure[0].length;
+        const argumentsText = source.slice(opening + 1, closing);
+        const inlineClosure = /^\s*(?:operation|action)\s*:\s*\{/.exec(argumentsText);
+        if (inlineClosure) {
+          opening += inlineClosure[0].length;
+        } else {
+          const trailingClosure = /^\s*\{/.exec(source.slice(closing + 1));
+          if (!trailingClosure) continue;
+          opening = closing + trailingClosure[0].length;
+        }
       }
-      const modifier = task[1].startsWith('task') ? '.task' : '.refreshable';
+      const modifier = `.${task[1]}`;
       const lifecycleBody = braceBody(source, opening);
       const bodyStartLine = lineOf(source, opening + 1);
       for (const site of scanSource(lifecycleBody, file).sites) {
