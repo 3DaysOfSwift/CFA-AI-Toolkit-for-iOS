@@ -85,7 +85,13 @@ test('requires a visible finding for confirmed operation problems', () => {
     verification:'Inspected the screen declaration.',
     evidence:[{file:'Views/HomeView.swift',line:12,endLine:14}]
   });
+  data.operations[0].checks.push({
+    status:'not-applicable', dimension:'cfa', title:'Paid capability entry point',
+    reason:'The operation is available without purchase.',
+    verification:'Traced the entry point.'
+  });
   const cfaReport = renderHealthReport(data);
+  assert.match(cfaReport, /<summary>Checks that don’t apply<\/summary>.*Paid capability entry point.*available without purchase/);
   assert.match(cfaReport, /Refresh <small>· CFA deviation<\/small><\/summary>/);
   assert.doesNotMatch(cfaReport, /aria-label="Problem"/);
   assert.match(cfaReport, /<h3>CFA alignment<\/h3>.*Screen task ownership/);

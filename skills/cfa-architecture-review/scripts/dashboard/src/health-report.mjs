@@ -64,6 +64,7 @@ export function renderHealthReport(data, iconData = '') {
   const sourceLinks = refs => refs?.length ? `<p class="evidence">Evidence: ${escape(evidenceText(refs))}</p>` : '';
   const outcomes = op => {
     const checks = (op.checks || []).filter(check => check.status !== 'not-applicable');
+    const inapplicableChecks = (op.checks || []).filter(check => check.status === 'not-applicable');
     const scenarios = op.scenarios || [];
     const applicableScenarios = scenarios.filter(scenario => scenario.status !== 'not-applicable');
     const inapplicableScenarios = scenarios.filter(scenario => scenario.status === 'not-applicable');
@@ -80,7 +81,7 @@ export function renderHealthReport(data, iconData = '') {
     }).join('');
     const behaviourChecks = checks.filter(check => check.dimension !== 'cfa');
     const cfaChecks = checks.filter(check => check.dimension === 'cfa');
-    return `${behaviourChecks.length ? `<h3>Behaviour checks</h3>${rows(behaviourChecks)}` : ''}${cfaChecks.length ? `<h3>CFA alignment</h3>${rows(cfaChecks)}` : ''}${applicableScenarios.length ? `<h3>When timing changes</h3>${rows(applicableScenarios)}` : ''}${inapplicableScenarios.length ? `<details><summary>Timing scenarios that don’t apply</summary>${rows(inapplicableScenarios)}</details>` : ''}`;
+    return `${behaviourChecks.length ? `<h3>Behaviour checks</h3>${rows(behaviourChecks)}` : ''}${cfaChecks.length ? `<h3>CFA alignment</h3>${rows(cfaChecks)}` : ''}${inapplicableChecks.length ? `<details><summary>Checks that don’t apply</summary>${rows(inapplicableChecks)}</details>` : ''}${applicableScenarios.length ? `<h3>When timing changes</h3>${rows(applicableScenarios)}` : ''}${inapplicableScenarios.length ? `<details><summary>Timing scenarios that don’t apply</summary>${rows(inapplicableScenarios)}</details>` : ''}`;
   };
   const renderOperation = op => {
     const status = operationStatus(op);
