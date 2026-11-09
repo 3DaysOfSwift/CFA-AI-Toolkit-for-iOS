@@ -221,12 +221,16 @@ final class DeepLinkingFeature {
         let lastRun = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
         try await lastRun.restore()
         precondition(lastRun.pending.isEmpty)
-        let dismissed = DestinationRequest(id: "notification-2", title: "Another launch", launchID: "launch-43")
+        let dismissed = DestinationRequest(id: "notification-dismissed", title: "Another launch", launchID: "launch-43")
+        let retained = DestinationRequest(id: "notification-retained", title: "Later launch", launchID: "launch-44")
         try await lastRun.receive(dismissed)
+        try await lastRun.receive(retained)
+        precondition(lastRun.pending == [dismissed, retained])
         try await lastRun.dismiss(id: dismissed.id)
+        precondition(lastRun.pending == [retained])
         let afterDismissal = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
         try await afterDismissal.restore()
-        precondition(afterDismissal.pending.isEmpty)
+        precondition(afterDismissal.pending == [retained])
 
         // Navigation can succeed while durable removal fails. Retry the write
         // in this process without asking another scene to navigate again.
