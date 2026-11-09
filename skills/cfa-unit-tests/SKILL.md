@@ -76,13 +76,13 @@ entitlement can change while the screen stays open, change it after initial
 presentation and verify that a later action checks the current value. Verify
 server-side authorisation separately for server-protected operations.
 
-For shared refreshes that should survive navigation, suspend the refresh and
-cancel its only screen waiter. Verify that the Feature still completes and
-retains the result. While that refresh is still suspended, admit a later
-equivalent caller and verify it receives the same outcome without starting a
-second request. Separately test that cancelling one of several waiters leaves
-the others able to finish. If a cancelled waiter must exit promptly, verify that
-it returns before releasing the suspended refresh.
+For shared refreshes that should survive navigation, suspend the request and
+cancel its only screen waiter. Release the request with no replacement waiter
+and verify that the Feature retains the result. In a separate test, admit a
+later equivalent caller while the request is suspended and verify it receives
+the same outcome without starting a second request. Also test that cancelling
+one of several waiters leaves the others able to finish. If a cancelled waiter
+must exit promptly, verify that it returns before releasing the request.
 
 For detail screens that keep a selected snapshot, construct two independent
 ViewModels with different snapshots and a shared Feature. Change the source
