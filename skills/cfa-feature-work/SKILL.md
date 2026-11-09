@@ -86,6 +86,11 @@ If the project is already CFA, make the smallest complete vertical change:
    Reusable presentation components may take snapshots, bindings and action
    closures. Use those closures to forward intent to the owning screen's
    ViewModel. Keep service calls and business decisions in the model.
+   Apply the [ViewModel task rule](references/spec/rules/cfa-task-03.md) when
+   changing a screen action that starts an unstructured task. Equivalent taps
+   return the same active handle, which async callers await. Verify that
+   completion clears the handle and a later action can start. Keep separate
+   outcomes for commands that must each take effect.
 3. Keep AppModel.shared as the production composition root. Construct shared
    services locally in AppModel.live() and inject them into the Features that
    need them. Keep service references with their consumers. Avoid additional
