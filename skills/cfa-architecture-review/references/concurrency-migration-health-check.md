@@ -175,7 +175,9 @@ must include the associated task site. Add a `presentation` object with app, sum
 criteria for the concise report. Each criterion needs title, detail, status
 (`pass`, `concern`, `problem`) and an `evidence` array of
 `{file, line, endLine}` source ranges. Cite the code that supports the claim,
-and carry confirmed operation problems into the visible findings. Map the
+and carry confirmed problems and source concerns into the visible findings.
+Include at least one complete cited range for each such finding and verify
+that the visible criterion describes the same issue. Map the
 app-level assessments to visible criteria using each criterion's `appChecks`
 array. Use the IDs `deliberate-concurrency`, `discoverable-capabilities`,
 `view-model-boundaries`, `additional-targets`, `actor-design`,
