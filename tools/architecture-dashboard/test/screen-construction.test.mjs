@@ -721,12 +721,13 @@ test('reviews a defaulted mutable memberwise ViewModel input', async t => {
   const file = 'App/Presentation/RefreshButton.swift';
   const {report} = await inspectView(t, '', {
     [file]: `struct RefreshButton: View {
-      var model = 0
+      var model = HomeViewModel()
       var controller: HomeViewModel = HomeViewModel()
       private let helper: HomeViewModel = HomeViewModel()
+      private var ownedHelper = HomeViewModel()
       var body: some View { Button("Refresh") { controller.refresh() } }
     }`
   });
   assert.deepEqual(report.findings.filter(item => item.code === 'view-model-input-storage')
-    .map(({file, line}) => [file, line]), [[file, 3]]);
+    .map(({file, line}) => [file, line]), [[file, 2], [file, 3]]);
 });

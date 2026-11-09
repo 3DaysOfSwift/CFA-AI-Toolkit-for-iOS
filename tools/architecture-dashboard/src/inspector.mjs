@@ -769,15 +769,15 @@ export async function inspect(project) {
         const code = isFeature ? 'view-stored-feature' : 'view-stored-model-dependency';
         findings.push(finding(code, 'review', `${view[1]} appears to store ${type} directly. Verify that Feature access goes through the screen-owned ViewModel.`, file, lineOf(source, start + index)));
       }
-      const viewModelInput = /(?:^|(?<=;))[ \t]*(?:@(?:SwiftUI\s*\.\s*)?(State|StateObject|ObservedObject|Bindable)\s+)?(?:(private|fileprivate|internal|package|public)\s+)?(let|var)\s+`?[\p{L}_][\p{L}\p{M}\p{N}_]*`?\s*:\s*(?:\w+\s*\.\s*)*(\w+ViewModel)\b(?!\s*\.)(?:[ \t]*[?!])?/gmu;
+      const viewModelInput = /(?:^|(?<=;))[ \t]*(?:@(?:SwiftUI\s*\.\s*)?(State|StateObject|ObservedObject|Bindable)\s+)?(?:(private|fileprivate|internal|package|public)\s+)?(let|var)\s+`?[\p{L}_][\p{L}\p{M}\p{N}_]*`?\s*(?::\s*(?:\w+\s*\.\s*)*(\w+ViewModel)\b(?!\s*\.)(?:[ \t]*[?!])?|=\s*(?:\w+\s*\.\s*)*(\w+ViewModel)(?:\s*\.\s*init)?(?=\s*\())/gmu;
       for (const match of members.matchAll(viewModelInput)) {
-        const [declaration, wrapper, access, binding, type] = match;
+        const [declaration, wrapper, access, binding, explicitType, inferredType] = match;
         if (wrapper === 'State' || wrapper === 'StateObject') continue;
         const suffix = body.slice(match.index + declaration.length);
         if (hasComputedAccessor(suffix)) continue;
-        const hasDefault = /^\s*=/.test(suffix);
+        const hasDefault = inferredType || /^\s*=/.test(suffix);
         if (hasDefault && (binding === 'let' || access === 'private' || access === 'fileprivate')) continue;
-        findings.push(finding('view-model-input-storage', 'review', `${view[1]} declares ${type} storage that may be set by its initializer. Trace its initialization to check whether another View supplies the ViewModel.`, file, lineOf(source, start + match.index)));
+        findings.push(finding('view-model-input-storage', 'review', `${view[1]} declares ${explicitType ?? inferredType} storage that may be set by its initializer. Trace its initialization to check whether another View supplies the ViewModel.`, file, lineOf(source, start + match.index)));
       }
       for (const storedModel of members.matchAll(inferredAppModelStorage)) {
         findings.push(finding('stored-app-model', 'review', 'This View appears to retain AppModel.shared in a stored property. Resolve the required Features through its ViewModel.', file, lineOf(source, start + storedModel.index)));
