@@ -17,8 +17,8 @@ struct AddHabitViewModelTests {
         viewModel.dailyTargetText = "10"
 
         let first = viewModel.save()
-        viewModel.name = "Changed after Save"
-        let repeated = viewModel.save()
+        let repeated = viewModel.save() // The disabled editor submits the same pending save.
+        viewModel.name = "Changed after Save" // Verify the submitted snapshot is retained.
         await first.value
         await repeated.value
         let savedHabits = try await repository.fetchHabits()
