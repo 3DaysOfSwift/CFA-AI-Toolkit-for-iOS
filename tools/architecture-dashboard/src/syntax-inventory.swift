@@ -54,7 +54,7 @@ final class SourceInventory: SyntaxVisitor {
     override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
         record("function", node.name.text, node)
         if node.name.text == "application" && node.signature.parameterClause.trimmedDescription.contains("didFinishLaunchingWithOptions") {
-            record("entry.launchCallback", node.name.text, node)
+            record("entry.launchCallback", node.name.text, node.funcKeyword)
         }
         if node.name.text == "userNotificationCenter",
            node.signature.parameterClause.parameters.contains(where: {
