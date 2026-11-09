@@ -1059,6 +1059,26 @@ test('reviews AppModel storage in a SwiftUI App outside the View folder', async 
   assert.deepEqual(findings.map(item => [item.file, item.line]).sort(), [[file, 2], [file, 3]]);
 });
 
+test('reviews the App declaration and scene body when conformance is in an extension', async t => {
+  const app = 'Application/ExampleApp.swift';
+  const scene = 'Application/ExampleApp+Scene.swift';
+  const root = await fixture(t, {
+    [app]: `struct ExampleApp {
+      private let model = AppModel.shared
+    }`,
+    [scene]: `extension ExampleApp: SwiftUI.App {
+      var body: some Scene {
+        if ready { WindowGroup { ContentView() } }
+        else { WindowGroup { ProgressView() } }
+      }
+    }`
+  });
+  const {findings} = await inspect(root);
+  assert.ok(findings.some(item => item.code === 'stored-app-model' && item.file === app && item.line === 2));
+  assert.ok(findings.some(item => item.code === 'conditional-app-body' && item.file === scene && item.line === 3));
+  assert.ok(findings.some(item => item.code === 'app-startup-presentation' && item.file === scene && item.line === 4));
+});
+
 test('flags conditional database startup presentation in App.body', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',

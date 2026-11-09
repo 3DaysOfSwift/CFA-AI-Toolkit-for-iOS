@@ -677,7 +677,8 @@ export async function inspect(project) {
   }
   const viewDeclarations = /\bstruct\s+(\w+)(?:\s*<[^{}]+>)?\s*:\s*(?:(?:\w+\s*\.\s*)*\w+\s*,\s*)*(?:SwiftUI\s*\.\s*)?View\b(?!\s*\.)[^{}]*\{/g;
   const viewConformances = /\bextension\s+(\w+)\s*:\s*(?:(?:\w+\s*\.\s*)*\w+\s*,\s*)*(?:SwiftUI\s*\.\s*)?View\b(?!\s*\.)[^{}]*\{/g;
-  const appDeclarations = /\bstruct\s+\w+\s*:\s*(?:(?:\w+\s*\.\s*)*\w+\s*,\s*)*(?:SwiftUI\s*\.\s*)?App\b(?!\s*\.)[^{}]*\{/g;
+  const appDeclarations = /\bstruct\s+(\w+)\s*:\s*(?:(?:\w+\s*\.\s*)*\w+\s*,\s*)*(?:SwiftUI\s*\.\s*)?App\b(?!\s*\.)[^{}]*\{/g;
+  const appConformances = /\bextension\s+(\w+)\s*:\s*(?:(?:\w+\s*\.\s*)*\w+\s*,\s*)*(?:SwiftUI\s*\.\s*)?App\b(?!\s*\.)[^{}]*\{/g;
   const sceneBodyPattern = /\bvar\s+body\s*:\s*some\s+(?:SwiftUI\s*\.\s*)?Scene\s*\{/;
   const rootViewNames = new Set(['ContentView', 'RootTabView', 'RootView']);
   const rootStorageGate = /(?<!#)\b(?:if|guard|switch)\s+[^{};]*\b\w*(?:container|database|storeReady|storageReady|startupError|launchError)\w*\b/i;
@@ -719,8 +720,17 @@ export async function inspect(project) {
       extendedViews.add(view[1]);
     }
   }
+  const appNames = new Set();
+  for (const source of sources.values()) {
+    for (const app of source.matchAll(appDeclarations)) appNames.add(app[1]);
+    for (const app of source.matchAll(appConformances)) appNames.add(app[1]);
+  }
+  function appScopes(source) {
+    return [...source.matchAll(/\b(?:struct|extension)\s+(\w+)\b(?!\s*\.)[^{}]*\{/g)]
+      .filter(scope => appNames.has(scope[1]));
+  }
   for (const [file, source] of sources) {
-    for (const app of source.matchAll(appDeclarations)) {
+    for (const app of appScopes(source)) {
       const appBody = braceBody(source, app.index + app[0].length - 1);
       const scene = sceneBodyPattern.exec(appBody);
       if (!scene) continue;
@@ -832,7 +842,7 @@ export async function inspect(project) {
         findings.push(finding('view-feature-access', 'review', 'This View appears to access a Feature directly. Trace the call and route intent and state through the owning screen and ViewModel.', file, lineOf(source, start + access.index)));
       }
     }
-    for (const app of source.matchAll(appDeclarations)) {
+    for (const app of appScopes(source)) {
       const start = app.index + app[0].length;
       const members = braceBody(source, start - 1);
       const signatures = memberSignatures(members);
