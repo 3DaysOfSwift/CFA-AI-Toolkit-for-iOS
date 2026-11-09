@@ -14,6 +14,6 @@
 
 **Related reading:** [Two callers. One refresh. No lost edits.](https://www.3daysofswiftconcurrency.com/cfa/explanation/overlapping-requests).
 
-**Verify:** Verify equivalent callers share one execution and observe its completion. Test cleanup after success, failure and cancellation, including that an obsolete task cannot clear a replacement handle.
+**Verify:** Verify equivalent callers share one execution and observe its completion. Test cleanup after success, failure and cancellation. If replacement can occur before the old task exits, finish the old task after installing its replacement and verify it leaves the replacement handle and current state intact.
 
 **Full rule, context and examples:** [Make Concurrency Behaviour Honest and Visible](../topics/20-make-concurrency-behaviour-honest-and-visible.md). This card is a reading aid; apply the complete canonical section.

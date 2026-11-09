@@ -287,7 +287,10 @@ do not claim that UI gating replaces server-side authorisation.
   verify those callers share its completion. Do not coalesce distinct commands
   that must each take effect. Verify queued commands execute in admission order
   and return their own outcomes. Test failure/cancellation cleanup and a later
-  retry using controlled dependencies, not sleeps; record exceptions explicitly.
+  retry using controlled dependencies. If the operation permits replacement
+  before cancellation finishes, suspend the old task, install a replacement
+  and let the old task finish. Verify its cleanup leaves the replacement
+  handle intact and its result cannot overwrite current state.
 
 - For changed pull-to-refresh flows, verify that the refresh action awaits
   completion through an async method or the returned task handle. Hold the
