@@ -1214,17 +1214,17 @@ test('distinguishes a matching ViewModel test filename from a suite declaration'
   assert.equal(report.screens[0].testFile, file);
   assert.deepEqual(report.findings.filter(item => item.code === 'view-model-test-suite-unresolved')
     .map(item => item.file), [file]);
-  assert.match(renderInspection(report), /matching test filename; verify named suite and target membership/);
+  assert.match(renderInspection(report), /matching test filename; verify named suite, behaviour and target membership/);
   await fs.writeFile(path.join(root, file), '// Test suite placeholder');
   const placeholder = await inspect(root);
-  assert.match(renderInspection(placeholder), /matching test filename; verify named suite and target membership/);
-  assert.doesNotMatch(renderInspection(placeholder), /matching test file found/);
+  assert.match(renderInspection(placeholder), /matching test filename; verify named suite, behaviour and target membership/);
+  assert.doesNotMatch(renderInspection(placeholder), /matching suite declaration found/);
   await fs.writeFile(path.join(root, file), 'struct Legacy { struct HomeViewModelTests {} }\nstruct Current { struct HomeViewModelTests {} }');
   const competing = await inspect(root);
   assert.match(competing.findings.find(item => item.code === 'view-model-test-suite-unresolved')?.message, /competing suite declarations on lines 1, 2/);
-  assert.doesNotMatch(renderInspection(competing), /matching test file found/);
+  assert.doesNotMatch(renderInspection(competing), /matching suite declaration found/);
   await fs.writeFile(path.join(root, file), 'struct HomeViewModelTests {}');
-  assert.match(renderInspection(await inspect(root)), /matching test file found; verify target membership/);
+  assert.match(renderInspection(await inspect(root)), /matching suite declaration found; verify behaviour and target membership/);
 });
 
 test('reviews matching ViewModel tests in production source trees', async t => {

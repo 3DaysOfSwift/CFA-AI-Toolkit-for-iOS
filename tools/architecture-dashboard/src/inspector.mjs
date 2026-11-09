@@ -1065,8 +1065,8 @@ export function renderInspection(report) {
     const unresolvedSuite = screen.testFile && report.findings.some(item =>
       item.code === 'view-model-test-suite-unresolved' && item.file === screen.testFile
     );
-    const tests = unresolvedSuite ? 'matching test filename; verify named suite and target membership'
-      : screen.testFile ? 'matching test file found; verify target membership'
+    const tests = unresolvedSuite ? 'matching test filename; verify named suite, behaviour and target membership'
+      : screen.testFile ? 'matching suite declaration found; verify behaviour and target membership'
       : screen.testCandidates?.length > 1 ? 'multiple matching test files. Verify target'
         : screen.testCandidates?.length === 1 ? 'matching test file needs target verification'
           : 'no matching test file found';
