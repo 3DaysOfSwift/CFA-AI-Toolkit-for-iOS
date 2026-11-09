@@ -212,22 +212,30 @@ outlives a screen from work allowed to continue after the app backgrounds.
 Record actual background execution only when supported by device evidence.
 
 When reviewing deep links or notification actions, apply the
-[deep-link rule](references/spec/rules/cfa-link-01.md). Trace each opening
-callback through DeepLinkingFeature to the receiving scene. Where the app
-uses the pending-request design, check that invalid requests cannot change the
-pending list or saved snapshot. Check that a valid request is saved before it
-is shown as pending. On initial save failure, check that the caller receives
-the error and that the unsaved request stays out of the list. Verify that
-a request arriving before restoration finishes is preserved alongside the
-restored entries across restart. Check that an older restore cannot resurrect
-an opened request or remove unrelated entries. A refusal, cancellation before opening,
-or failed navigation keeps the request available. Verify that either scene can open the request without
-changing another scene's destination, and that competing attempts open it
-only once. Confirm that opening the destination completes navigation even
-while its content loads. If saving removal fails after navigation, follow
-the retry and check that it saves the removal without navigating again.
-For migration reviews, compare the original and current navigation and
-notification-history behaviour.
+[deep-link rule](references/spec/rules/cfa-link-01.md). Trace URL opens and
+user actions on local and push notifications through DeepLinkingFeature to
+the receiving scene. Verify that scheduling or delivery alone leaves the
+pending list unchanged. Trace event identity through retries. Repeated
+callbacks for one opening event must not reopen it, and distinct events for
+the same destination must remain separate.
+
+Where the app uses the pending-request design, check that invalid requests
+leave the visible list and saved snapshot intact. A valid request becomes
+visible only after saving. Verify that a failed save reaches the caller
+without publishing the request. With an unreadable list, verify that the read
+error reaches the caller and preserves the original file. After recovery,
+check that retry preserves both the saved entries and the incoming request
+across restart. Also trace reception during restoration and verify that an
+older restore cannot resurrect an opened item or remove unrelated entries.
+
+Verify that refusal, cancellation before opening, and a failed or unavailable
+scene leave the request pending. Either scene can open a pending request
+without changing another scene's destination. Competing opens navigate once,
+and dismissal must not race an active open of the same request. Check that
+successful navigation counts even when cancellation follows or content is
+still loading. If saving the removal fails, verify that retry removes the
+request without navigating again. For migration reviews, compare the original
+and current navigation and notification-history behaviour.
 
 When sign-out, account switching or session expiry is in scope, apply the
 [account lifecycle rule](references/spec/rules/cfa-account-01.md). Trace when
