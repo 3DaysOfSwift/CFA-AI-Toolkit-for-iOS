@@ -172,9 +172,9 @@ export async function inspect(project) {
       const body = braceBody(source, start);
       for (const scheduled of body.matchAll(/\b(?:Task\s*(?:<[^{}\n]*>\s*)?(?:\.\s*(?:init|detached)\s*)?|DispatchQueue\s*\.\s*(?:main|global\s*\([^{}()]*\))\s*\.\s*async\s*)(?:\([^{}]*\)\s*)?\{/g)) {
         const scheduledBody = braceBody(body, scheduled.index + scheduled[0].length - 1);
-        if (/(?<!\bfunc\s+)\bapplicationDidFinishLaunching\s*\(/.test(scheduledBody)) {
+        if (/\bAppModel\s*\.\s*shared\s*\.\s*applicationDidFinishLaunching\s*\(/.test(scheduledBody)) {
           const scheduler = scheduled[0].startsWith('DispatchQueue') ? 'DispatchQueue.async' : 'Task';
-          findings.push(finding('scheduled-app-model-launch', 'review', `The launch callback appears to defer the AppModel launch signal through ${scheduler}. Check whether the callback can signal AppModel synchronously while Features own their asynchronous work.`, file, lineOf(source, start + 1 + scheduled.index)));
+          findings.push(finding('scheduled-app-model-launch', 'review', `The launch callback appears to defer the AppModel launch signal through ${scheduler}. CFA requires the callback to signal AppModel directly and synchronously. Features may start their own asynchronous work.`, file, lineOf(source, start + 1 + scheduled.index)));
         }
       }
     }
