@@ -45,9 +45,12 @@ If the project is already CFA, make the smallest complete vertical change:
    ViewModel. Keep service calls and business decisions in the model.
 3. Wire dependencies through AppModel. Do not create global singletons or add
    generic manager layers.
-4. For a removal, delete the route, View, ViewModel, feature API surface,
-   feature behaviour, storage only when its data-retention requirement permits,
-   tests and Xcode membership together. Search all callers before deleting.
+4. Establish whether the request removes a screen, an operation or the whole
+   Feature. Trace remaining callers across screens, targets and system entry
+   points. Remove only the routes, Views, ViewModels, APIs, tests and Xcode
+   memberships that belong exclusively to the removed scope. Keep shared
+   capabilities and the tests that cover their remaining callers. Remove stored
+   data only when its retention requirements permit it.
 5. Add or revise meaningful feature and ViewModel tests, build the target and
    run the affected test suite.
 
