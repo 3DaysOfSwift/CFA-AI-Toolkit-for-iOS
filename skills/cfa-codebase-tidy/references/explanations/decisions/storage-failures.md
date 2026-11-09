@@ -27,7 +27,13 @@ This is a CFA architecture requirement, not a limitation of SwiftUI. No destruct
 
 ## Verification
 
-Fail the first real store-opening request, verify navigation and Settings remain usable, then retry. Separately fail refresh with existing content. Report unavailable runtime checks rather than equating a fake fetch with store-opening validation.
+Fail the first real store-opening request. Verify the affected screen explains
+the failure while root navigation stays visible and Settings remains reachable.
+Retry the same domain request through the Feature. Verify it recovers with
+the same root and previously saved data. Separately fail a refresh and verify
+that already loaded content remains usable. Report which runtime checks ran
+and which were unavailable. A fake fetch establishes only the behaviour of
+the layers it exercises.
 
 ## Evidence and provenance
 
