@@ -170,6 +170,7 @@ the architecture:
     service, container, loading/error presentation state, or defaulted Feature
     property belongs in AppModel. AppModel starts and owns app-wide listeners
     and forwards events to the responsible Feature, which interprets them.
+    Scope observation needed only by one screen to that screen or its ViewModel.
     Feature-owned background capabilities register their own handlers. For
     BGTaskScheduler, register each permitted identifier once before launch
     finishes and schedule requests separately. Route app-level callbacks through
@@ -464,7 +465,8 @@ operations enforce authorisation independently.
   Feature with no screen present. Where cancellation or replacement is
   supported, verify that the old listener stops forwarding events and that its
   cleanup leaves the replacement running. Shut down isolated listeners during
-  test cleanup.
+  test cleanup. For screen-only observation, leave the screen and verify
+  its observation ends while app-wide event delivery continues.
 - For changed observer-backed streams that support resubscription, verify that
   a late event from the old registration cannot update the replacement and
   that delayed teardown removes only the old registration.
