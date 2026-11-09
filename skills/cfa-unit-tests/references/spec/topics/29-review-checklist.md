@@ -4,8 +4,8 @@ Before accepting a change, answer every question:
 
 1. Can the folder location alone explain which layer owns every new type?
 2. Does every unique screen have its own adjacent ViewModel?
-3. Is each ViewModel named `viewModel`, owned with `@State`, and released with
-   its View?
+3. Does each screen retain its own ViewModel in a private `@State` property
+   named `viewModel`, with state scoped to that screen’s SwiftUI identity?
 4. Can every View be created without receiving a ViewModel, AppModel, Feature,
    or repository, and do screen Views avoid receiving another screen’s actions?
    Reusable presentation components may receive action closures.
@@ -18,9 +18,10 @@ Before accepting a change, answer every question:
    and limit coordination to genuinely application-wide responsibilities?
 9. Is persistence accessed through repository protocols, and are other
    external-system details handled by appropriate microservices?
-10. Are async operations directly testable, with no Task handle stored by a
-    View and every meaningful Task lifetime stored by its ViewModel or other
-    correct owner?
+10. Are async operations directly testable? Does each unstructured task have
+    an explicit owner and a retained handle when needed? Do structured children
+    and framework-owned lifecycle tasks stay with their existing owners, with
+    no Task handles stored by a View?
 11. Has required concurrency behaviour been preserved rather than simplified
     away?
 12. Are time-dependent business rules deterministic in tests?
