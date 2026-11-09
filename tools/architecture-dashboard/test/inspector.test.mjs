@@ -605,5 +605,5 @@ test('reviews direct Feature access in root tab navigation', async t => {
   });
   const report = await inspect(root);
   assert.equal(report.screens[0].structuralRoot, false);
-  assert.ok(report.findings.some(item => item.code === 'root-feature-access'));
+  assert.equal(report.findings.find(item => item.code === 'root-feature-access')?.line, 3);
 });

@@ -233,9 +233,11 @@ export async function inspect(project) {
     // Known root conventions only: this is a review hint, not data-flow analysis.
     // Keep feature-screen conditionals and unrelated adaptive layout out of this check.
     for (const rootView of source.matchAll(/\bstruct\s+(?:ContentView|RootTabView|RootView)\s*:\s*View\b[^\{]*\{/g)) {
-      const rootBody = braceBody(source, rootView.index + rootView[0].length - 1);
-      if (/\bAppModel\s*\.\s*shared\s*\.\s*\w+Feature\b/.test(rootBody)) {
-        findings.push(finding('root-feature-access', 'review', 'Root navigation appears to access a Feature directly. Keep refresh and Feature state presentation in the owning screen and its ViewModel.', file, lineOf(source, rootView.index)));
+      const bodyOffset = rootView.index + rootView[0].length;
+      const rootBody = braceBody(source, bodyOffset - 1);
+      const featureAccess = /\bAppModel\s*\.\s*shared\s*\.\s*\w+Feature\b/.exec(rootBody);
+      if (featureAccess) {
+        findings.push(finding('root-feature-access', 'review', 'Root navigation appears to access a Feature directly. Keep refresh and Feature state presentation in the owning screen and its ViewModel.', file, lineOf(source, bodyOffset + featureAccess.index)));
       }
       if (/\b(?:if|guard|switch)\s+[^\{;\n]*\b\w*(?:container|database|storeReady|storageReady|startupError|launchError)\w*\b/i.test(rootBody)) {
         findings.push(finding('root-storage-gate', 'review', 'Root navigation may gate the interface on storage availability. Open storage within a Feature data request and present its error in the feature screen, never a root wrapper or app-wide blocking overlay.', file, lineOf(source, rootView.index)));
