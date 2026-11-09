@@ -4,11 +4,11 @@
 
 **Strength:** Required unless a documented policy limits concurrency.
 
-**Guidance:** Wrap URLSession calls in a NetworkingManager and let independent requests progress in parallel unless a documented policy limits them. For new apps, prefer a stateless value type when suitable. An actor may protect shared request state without serializing entire suspended requests.
+**Guidance:** Keep all URLSession calls in a lower-level NetworkingManager. Feature-specific API adapters validate and decode responses. AppModel may construct the manager in live() for injection without storing it as an AppModel property. Let independent requests progress in parallel unless a documented policy limits them. For new apps, prefer a stateless value type when suitable. An actor may protect shared request state without serializing entire suspended requests.
 
 **Why:** Avoid accidental bottlenecks and data races.
 
-**Example:** Independent launch providers initiate requests without waiting for another provider to finish.
+**Example:** Independent launch providers call NetworkingManager for transport and decode their own responses. A provider can start its request while another response is pending.
 
 **Explanation:** [Why use actors and Sendable values in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/isolation-and-sendable).
 
