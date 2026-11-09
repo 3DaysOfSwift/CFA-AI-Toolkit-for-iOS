@@ -143,12 +143,20 @@ test('standalone skill helper works after copying only one skill, without reposi
   t.after(() => fs.rmSync(temp, { recursive: true, force: true }));
   const skill = path.join(temp, 'one-skill');
   fs.cpSync(path.join(root, 'skills/swift-code-quality'), skill, { recursive: true });
-  const output = execFileSync(process.execPath, [path.join(skill, 'scripts/explanations.mjs'),
-    'lookup', 'CFA-TASK-01'], { cwd: temp, encoding: 'utf8' });
-  const result = JSON.parse(output);
-  assert.equal(result.id, 'unstructured-tasks');
-  assert.ok(fs.readFileSync(path.join(skill, 'references/explanations', result.note), 'utf8').includes('## Documented rationale'));
-  assert.equal(result.links[0].url, read().topics.find(topic => topic.id === 'unstructured-tasks').publication.url);
+  const cases = [
+    ['CFA-TASK-01', 'unstructured-tasks'],
+    ['CFA-SPEC-TASK-01', 'overlapping-requests'],
+    ['CFA-SPEC-LAUNCH-01', 'appmodel-composition'],
+    ['CFA-SPEC-LAUNCH-02', 'storage-failures'],
+  ];
+  for (const [key, topic] of cases) {
+    const output = execFileSync(process.execPath, [path.join(skill, 'scripts/explanations.mjs'),
+      'lookup', key], { cwd: temp, encoding: 'utf8' });
+    const result = JSON.parse(output);
+    assert.equal(result.id, topic);
+    assert.ok(fs.readFileSync(path.join(skill, 'references/explanations', result.note), 'utf8').includes('## Documented rationale'));
+    assert.equal(result.links[0].url, read().topics.find(item => item.id === topic).publication.url);
+  }
   assert.throws(() => execFileSync(process.execPath, [path.join(skill, 'scripts/explanations.mjs'), 'audit'],
     { cwd: temp, stdio: 'pipe' }), /Audit requires canonical/);
 });

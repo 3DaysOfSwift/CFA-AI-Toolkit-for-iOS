@@ -619,7 +619,8 @@
       "classification": "mixed",
       "ruleIds": [
         "CFA-OVERLAP-01",
-        "CFA-OVERLAP-02"
+        "CFA-OVERLAP-02",
+        "CFA-SPEC-TASK-01"
       ],
       "note": "decisions/overlapping-requests.md",
       "rationaleStatus": "documented-basis-editorial-analysis",
