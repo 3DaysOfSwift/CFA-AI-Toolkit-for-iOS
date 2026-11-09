@@ -85,7 +85,12 @@ results in the report, rather than presenting scanner counts as findings.
    a screen. Trace synchronous service work before and after suspension to
    determine where expensive work executes. Treat missing configuration or
    unresolved dispatch as an evidence gap and keep CFA conformance separate
-   from concurrency correctness.
+   from concurrency correctness. Trace values and closure captures across
+   isolation boundaries. For a mutable reference declared `@unchecked Sendable`,
+   identify the documented safety invariant and verify it against reads and
+   writes on both sides of the boundary. For CFA persistence, follow values
+   returned to the Feature and verify that the storage worker keeps its
+   context and live records within its isolation.
    For networking, trace independent requests from their callers through the
    networking service to URLSession. Look for sequential awaits, explicit queues,
    shared task chains, blocking calls or expensive synchronous actor-isolated
