@@ -57,8 +57,10 @@ skill from that toolkit before changing the project.
   AppModel starts those listeners and forwards events to the responsible Feature.
   Features own their background capabilities and register handlers when needed;
   honor system callback, expiration and completion requirements.
-  Its explicit initializer assigns injected Features; one static live() factory
-  constructs production dependencies. Never store a service or UI error there.
+  Its explicit initializer assigns injected Features, sets the launch guard to
+  false, and sets listener task handles to nil. One static live() factory
+  constructs production dependencies for AppModel.shared. Never store a service
+  or UI error in AppModel.
 - SwiftData uses SwiftDataManager; URLSession calls use NetworkingManager.
   Features own those collaborators. Call the AppModel launch signal directly
   and synchronously from the application lifecycle callback, never a View .task
