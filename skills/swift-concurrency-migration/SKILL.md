@@ -166,6 +166,13 @@ Use deliberate passes:
    representative synthetic records. Check that those records
    remain available after reopening and that an open or migration failure
    surfaces without replacing the store with empty data.
+   Apply the [database availability rule](references/spec/rules/cfa-launch-02.md)
+   when changing store access. Hold the first open pending and then fail it.
+   Verify that root navigation and unaffected screens stay available and that
+   the affected screen can retry the same request at the same store location.
+   Separately fail a fetch after the store opens. Verify that a failed initial
+   fetch surfaces an error, a failed refresh keeps prior data visible, and
+   retry reuses the opened store.
    If preference restoration changes, test with values written by the old
    app. Apply the [preference recovery rule](references/spec/rules/cfa-pref-01.md)
    to distinguish a supported value, a missing or obsolete non-critical value,
