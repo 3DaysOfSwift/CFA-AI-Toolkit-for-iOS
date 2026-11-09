@@ -90,10 +90,14 @@ test('an explicitly unassessed type keeps the whole-app review open', () => {
   const review = complete();
   review.typeReviews[0].status = 'unassessed';
   review.typeReviews[0].reason = 'Trace the app lifecycle.';
+  review.typeReviews[0].verification = 'Inspect the declaration and startup callback.';
+  review.typeReviews[0].evidence = [{file:'App.swift', line:1, endLine:2, excerpt:'Fixture source'}];
   const pending = nextWork(report, review);
   assert.equal(pending.pendingTypes, 1);
   assert.deepEqual(pending.nextTypes, [{
-    name:'App', file:'App.swift', line:1, status:'unassessed', reason:'Trace the app lifecycle.'
+    name:'App', kind:'struct', file:'App.swift', line:1, status:'unassessed',
+    reason:'Trace the app lifecycle.', verification:'Inspect the declaration and startup callback.',
+    evidence:[{file:'App.swift', line:1, endLine:2}]
   }]);
   assert.match(coverageGaps(report, review).join(' '), /Recorded types still need review: App \(App.swift:1\)/);
 });

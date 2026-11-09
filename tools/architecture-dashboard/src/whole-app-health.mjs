@@ -120,7 +120,9 @@ export function nextWork(report, review, limit = 8) {
       .map(({file, status, reason, verification, evidence}) => ({
         file, status, reason, verification, evidence: evidenceLocations(evidence)
       })),
-    nextTypes: pendingTypes.slice(0, limit).map(({name, file, line, status, reason}) => ({name, file, line, status, reason})),
+    nextTypes: pendingTypes.slice(0, limit).map(({name, kind, file, line, status, reason, verification, evidence}) => ({
+      name, kind, file, line, status, reason, verification, evidence: evidenceLocations(evidence)
+    })),
     nextEntryPoints: pendingEntries.slice(0, limit),
     nextTaskSites: pendingTasks.slice(0, limit),
     nextOperations: pendingOperations.slice(0, limit),
