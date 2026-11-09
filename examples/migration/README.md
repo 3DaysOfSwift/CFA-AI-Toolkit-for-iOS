@@ -18,3 +18,10 @@ behaviour or that changing architecture preserves all its requirements. Inspect
 real callers, cancellation, failure handling and platform availability first.
 Swift Concurrency is available in Swift 5.5 and later: Swift 6 language mode is
 this suite's target for the migrated examples, not a prerequisite for CFA itself.
+
+## Migration cases
+
+- [Callback networking](Callback%20Networking/case.md)
+- [MainActor result handling](MainActor%20Result/case.md)
+- [Observation migration](Observation%20Migration/case.md)
+- [Serial weight saves](Serial%20Weight%20Saves/case.md)
