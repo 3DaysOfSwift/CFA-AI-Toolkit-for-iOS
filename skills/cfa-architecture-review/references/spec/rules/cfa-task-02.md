@@ -4,7 +4,7 @@
 
 **Strength:** Default.
 
-**Guidance:** Continue the shared refresh and retain successful data even when the screen that requested it leaves; later equivalent callers can join.
+**Guidance:** By default, let a departing screen stop waiting while the Feature-owned shared refresh continues, even if that screen was the only caller. Retain successful data and let later equivalent callers join an in-flight request. Use another policy only for a specific product or resource requirement.
 
 **Why:** The user may return and benefit from completed work.
 
