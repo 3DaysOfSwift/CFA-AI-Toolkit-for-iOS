@@ -209,7 +209,10 @@ Binary configuration remains part of the fingerprint and can be inspected
 separately. The inventory lists symbolic links it encountered under
 `scope.symbolicLinkPaths`. The scanners do not follow them. Check whether
 a link refers to shipping source or configuration before confirming target
-coverage. Retargeting a listed link invalidates the review. Changes inside
+coverage. While membership is unverified, `next` returns these links, build
+definitions and excluded test directories under `targetReview`. Use them to
+locate evidence for the actual target membership. Retargeting a listed link
+invalidates the review. Changes inside
 its destination are tracked only if the destination is independently scanned.
 An exported HTML file is a dated
 snapshot.

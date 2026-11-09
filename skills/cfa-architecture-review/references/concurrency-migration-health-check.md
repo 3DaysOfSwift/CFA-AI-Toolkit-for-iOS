@@ -162,7 +162,9 @@ the finding accordingly. A build-definition hash identifies the scanned
 input; it does not resolve inherited settings or build overrides.
 
 Reconcile the full production target and file list,
-including sources the lexical scan cannot resolve. Check the directories listed
+including sources the lexical scan cannot resolve. When `next` returns
+`targetReview`, reconcile its build definition paths, excluded test
+directories and symbolic links with actual target membership. Check the directories listed
 under `productionTargets.excludedTestDirectories` in the checklist against
 actual target membership before confirming that they contain only test sources. If any such directory contains production Swift, run `prepare` again with `--include-tests` as the last argument. The new draft preserves that inventory scope for subsequent commands. Record verified test-only files in a separate file batch with source and membership evidence. Give their candidate entry points and task sites an explicit exclusion reason. Record evidence-backed file batches, detected candidate entry points and each meaningful user or system operation using `scripts/dashboard/Documentation/REVIEWS.md`. A shared helper can be reviewed once and linked from multiple operations after checking each caller. Individual type verdicts are optional. Include
 `productionTargets` (an array of reviewed target and local-package names),
