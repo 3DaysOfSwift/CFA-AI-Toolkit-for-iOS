@@ -681,7 +681,7 @@ test('inspects annotated AppModel properties without treating a private task as 
 
 test('does not mistake a structural tab root or nested Feature value for a missing or renamed owner', async t => {
   const root = await fixture(t, {
-    'Application/1 - View/Views/ContentView.swift': 'struct ContentView: View { @State private var selectedTab = 0; var body: some View { TabView(selection: $selectedTab) { PracticeView().tag(0) } } }',
+    'Application/1 - View/Views/RootTabView.swift': 'struct RootTabView: View { @State private var selectedTab = 0; var body: some View { TabView(selection: $selectedTab) { PracticeView().tag(0) } } }',
     'Application/1 - View/Views/Practice/PracticeView.swift': 'struct PracticeView: View { @State private var viewModel = PracticeViewModel(); var body: some View { Text("Practice") } }',
     'Application/1 - View/Views/Practice/PracticeViewModel.swift': 'final class PracticeViewModel { private var retryCommand: PracticeFeature.Command = .refresh; init(practiceFeature: PracticeFeature = AppModel.shared.practiceFeature) {} }',
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() }; let practiceFeature: PracticeFeature }',
@@ -693,8 +693,8 @@ test('does not mistake a structural tab root or nested Feature value for a missi
   const codes = report.findings.map(item => item.code);
   assert.ok(!codes.includes('view-model-missing'));
   assert.ok(!codes.includes('feature-reference-name'));
-  assert.match(renderInspection(report), /ContentView: structural tab root/);
-  assert.doesNotMatch(renderInspection(report), /ContentView: missing ViewModel/);
+  assert.match(renderInspection(report), /RootTabView: structural tab root/);
+  assert.doesNotMatch(renderInspection(report), /RootTabView: missing ViewModel/);
   assert.match(renderInspection(report), /2 View candidates/);
 });
 
