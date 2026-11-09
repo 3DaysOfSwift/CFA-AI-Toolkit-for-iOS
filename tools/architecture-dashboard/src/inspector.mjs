@@ -199,7 +199,7 @@ export async function inspect(project) {
     for (const callback of source.matchAll(/\bfunc\s+application\s*\([^{}]*\bdidFinishLaunchingWithOptions\b[^{}]*\)\s*(?:->\s*[^\{]+)?\s*\{/g)) {
       const start = callback.index + callback[0].length - 1;
       const body = braceBody(source, start);
-      for (const scheduled of body.matchAll(/\b(?:Task\s*(?:<[^{}\n]*>\s*)?(?:\.\s*(?:init|detached)\s*)?|DispatchQueue\s*\.\s*(?:main|global\s*\([^{}()]*\))\s*\.\s*async\s*)(?:\([^{}]*\)\s*)?\{/g)) {
+      for (const scheduled of body.matchAll(/\b(?:Task\s*(?:<[^{}\n]*>\s*)?(?:\.\s*(?:init|detached)\s*)?|DispatchQueue\s*\.\s*(?:main|global\s*\([^{}()]*\))\s*\.\s*async\s*)(?:\([^{}]*\)\s*|\([^{}]*?\b(?:operation|execute)\s*:\s*)?\{/g)) {
         const scheduledBody = braceBody(body, scheduled.index + scheduled[0].length - 1);
         if (/\bAppModel\s*\.\s*shared\s*\.\s*applicationDidFinishLaunching\s*\(/.test(scheduledBody)) {
           const scheduler = scheduled[0].startsWith('DispatchQueue') ? 'DispatchQueue.async' : 'Task';
