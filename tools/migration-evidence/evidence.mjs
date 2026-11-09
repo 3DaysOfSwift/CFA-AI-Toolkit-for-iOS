@@ -207,6 +207,9 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
       errors.push('result: completed requires recorded before behaviour evidence at beforeCommit; otherwise use partial');
     }
     for (const item of record.evidence) {
+      if (item.phase !== 'before' && item.outcome === 'not-run') {
+        warnings.push(`evidence.${item.id}: check was not run. Identify passing final-commit evidence that covers it, or explain why it is outside the required verification scope.`);
+      }
       if (item.phase === 'before' || item.outcome !== 'failed') continue;
       const timing = item.commit && item.commit === record.repository.afterCommit
         ? 'at the final commit' : 'during migration';
@@ -283,9 +286,12 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
         } else if (['navigatorEvidenceId', 'manualArchitectureReviewEvidenceId'].includes(field) &&
                    item.targets?.length && !item.targets.some(target => gate.affectedTargets.includes(target))) {
           errors.push(`completionGate.${field}: ${item.id} names only unrelated targets.`);
-        } else if (field === 'testEvidenceId' && item.targets?.length &&
-                   !item.targets.some(target => gate.affectedTargets.includes(target))) {
-          warnings.push(`evidence.${item.id}: link the named test targets to the affected application targets they exercise.`);
+        } else if (field === 'testEvidenceId') {
+          if (!item.targets?.length) {
+            errors.push(`completionGate.${field}: ${item.id} must name the targets exercised by the test run.`);
+          } else if (!item.targets.some(target => gate.affectedTargets.includes(target))) {
+            warnings.push(`evidence.${item.id}: link the named test targets to the affected application targets they exercise.`);
+          }
         } else if (field === 'manualBehaviourRegressionEvidenceId') {
           if (!item.environment) {
             errors.push(`evidence.${item.id}: record the manual regression build configuration, OS and device or simulator.`);

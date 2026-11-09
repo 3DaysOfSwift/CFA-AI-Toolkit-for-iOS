@@ -90,8 +90,8 @@ evidence IDs in `completionGate.dataHandoffEvidenceIds`. Use an empty list
 only when the reviewer confirms no data handoff is affected. List the
 producing and receiving targets and the environment used to exercise the
 handoff. Use the exact Xcode target names, with no surrounding whitespace. Completion requires both target names and the environment. The
-validator also rejects handoff evidence that names only unrelated targets. A passing build establishes compilation only. For automated test evidence,
-record which affected app or extension targets the named test targets exercise.
+validator also rejects handoff evidence that names only unrelated targets. A passing build establishes compilation only. The linked final test run must name the targets it exercises. For test targets
+with separate names, record which affected app or extension targets they exercise.
 The validator cannot infer that relationship from test target names.
 
 For each affected system background capability, link the owning Feature and
@@ -113,7 +113,9 @@ lists every affected target. Navigator and human architecture reviews can
 cover the whole project without a target list. When they name targets, the
 validator rejects a list containing only unrelated targets. If evidence is
 shared with another checkpoint, record the human architecture review and
-its outcome separately within that evidence. Resolve warnings during review
+its outcome separately within that evidence. For a completed record, the validator flags checks recorded as not run during
+or after migration. Link equivalent passing final-commit evidence or explain
+why the check falls outside required verification. Resolve warnings during review
 and keep the migration partial while any required check remains unverified,
 even when the record passes validation.
 
