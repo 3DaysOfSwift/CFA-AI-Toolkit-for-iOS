@@ -125,7 +125,7 @@ export async function inspect(project) {
       }
       // Lexical analysis cannot establish whether this is an app-wide listener.
       if (type === 'Task' && privateModifier) {
-        findings.push(finding('app-model-task-purpose', 'review', `AppModel retains ${name}; verify it owns an app-wide listener and that its lifecycle is managed.`, appModelFile, lineOf(appModel, match.index)));
+        findings.push(finding('app-model-task-purpose', 'review', `AppModel retains ${name}; trace whether startup creates one app-wide listener, whether it forwards events to the owning Feature without a screen present, and how it stops or is replaced when required.`, appModelFile, lineOf(appModel, match.index)));
         continue;
       }
       const declarations = declarationsByName.get(type) || [];

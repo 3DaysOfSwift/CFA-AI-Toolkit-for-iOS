@@ -293,7 +293,12 @@ test('requests review of an AppModel task without assuming its purpose', async t
   });
   const report = await inspect(root);
   assert.ok(!report.findings.some(item => item.code === 'app-model-non-feature-state'));
-  assert.ok(report.findings.some(item => item.code === 'app-model-task-purpose' && item.severity === 'review' && /transactionUpdatesTask/.test(item.message)));
+  const listener = report.findings.find(item => item.code === 'app-model-task-purpose');
+  assert.equal(listener?.severity, 'review');
+  assert.match(listener.message, /transactionUpdatesTask/);
+  assert.match(listener.message, /startup creates one app-wide listener/);
+  assert.match(listener.message, /forwards events to the owning Feature without a screen present/);
+  assert.match(listener.message, /stops or is replaced/);
 });
 
 test('inspects AppModel properties regardless of indentation', async t => {
