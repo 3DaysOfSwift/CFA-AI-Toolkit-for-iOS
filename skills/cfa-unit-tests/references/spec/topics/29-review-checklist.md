@@ -39,6 +39,12 @@ Before accepting a change, answer every question:
     return to it safely?
 19. Are failures, partial loading, offline persistence, and retry behaviour
     represented honestly?
+    - For durable edits, does the Feature publish the saved value only after
+      required persistence succeeds, leaving the draft available on failure?
+    - For replaceable downloads, can refresh proceed independently of cache
+      restoration and complete without waiting for an optional cache write?
+      Can a late restore overwrite fresher data, or a failed refresh discard
+      valid data? Both should be prevented.
 20. Are domain types stored with the feature that owns their meaning?
 
 Every applicable answer must be yes. Marking a question not applicable requires
