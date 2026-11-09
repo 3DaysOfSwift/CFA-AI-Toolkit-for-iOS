@@ -186,13 +186,14 @@ skill from that toolkit before changing the project.
   outcome. Matching inputs alone do not make commands duplicates. Define how
   failure and cancellation affect queued work and when to clear task handles.
 - PurchasesFeature owns entitlement state. Screen ViewModels check current
-  entitlement before presenting or calling a paid capability. Trace every
-  identifiable entry point to a check before paid presentation or execution.
-  Verify locked and entitled outcomes, flag confirmed unguarded paths and mark
-  unresolved paths as unverified. Keep pricing and
-  entitlement checks out of the capability Feature so the product can change
-  which capabilities it charges for. Protected server operations enforce their
-  own access policy.
+  entitlement before presenting or calling a paid capability. Identify paid
+  capabilities from the product requirements and entitlement policy. Trace
+  alternative screens and other callers to a check before paid presentation
+  or execution. Verify locked and entitled outcomes. Cite the source and
+  consequence of confirmed unguarded paths, and mark unresolved paths as
+  unverified. Keep pricing and entitlement checks out of the capability
+  Feature so the product can change which capabilities it charges for.
+  Protected server operations enforce their own access policy.
 - Publish durable user edits as saved only after required persistence succeeds.
   For simple preferences, update UserDefaults before publishing the value. Its
   setter confirms the in-memory update only. Use a storage API that reports
