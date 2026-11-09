@@ -193,7 +193,10 @@ final class ControlledTransport: URLProtocol, @unchecked Sendable {
             Self.heldRequestStarted.continuation.yield(())
             return
         }
-        let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
+        guard let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil) else {
+            client?.urlProtocol(self, didFailWithError: URLError(.badServerResponse))
+            return
+        }
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
         client?.urlProtocol(self, didLoad: Data(#"{"name":"Artemis"}"#.utf8))
         client?.urlProtocolDidFinishLoading(self)
@@ -215,12 +218,16 @@ final class ControlledTransport: URLProtocol, @unchecked Sendable {
         defer { session.invalidateAndCancel() }
 
         let api = LaunchAPI(networkingManager: NetworkingManager(session: session))
-        let held = Task { try await api.download(from: URL(string: "https://example.invalid/held")!) }
+        guard let heldURL = URL(string: "https://example.invalid/held"),
+              let independentURL = URL(string: "https://example.invalid/independent") else {
+            throw URLError(.badURL)
+        }
+        let held = Task { try await api.download(from: heldURL) }
         defer { held.cancel() }
         var starts = ControlledTransport.heldRequestStarted.stream.makeAsyncIterator()
         _ = await starts.next()
 
-        let independent = try await api.download(from: URL(string: "https://example.invalid/independent")!)
+        let independent = try await api.download(from: independentURL)
         precondition(independent.name == "Artemis")
 
         held.cancel()
