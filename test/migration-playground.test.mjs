@@ -36,12 +36,12 @@ for (const name of examples) for (const [side, version] of [['Before','5'], ['Af
 
 test('MainActor Result returns queued outcomes even when a refresh caller cancels', {skip:process.platform !== 'darwin', timeout:120000}, () => {
   const page = fs.readFileSync(path.join(root, 'examples/migration/MainActor Result/After.playground/Contents.swift'), 'utf8');
-  const feature = page.slice(page.indexOf('// AFTER:'), page.indexOf('// MARK: - Test fixtures'));
+  const feature = page.slice(page.indexOf('protocol LaunchProviding'), page.indexOf('// MARK: - Test fixtures'));
   assert.match(feature, /final class LaunchFeature/);
   // Replace only the I/O fixture: the Feature under test is the playground's actual code.
   const source = `import Foundation
 import Observation
-actor LaunchProvider {
+actor ControlledLaunchProvider: LaunchProviding {
     enum Failure: Error { case unavailable }
     private var started = false
     private var startWaiter: CheckedContinuation<Void, Never>?
@@ -72,7 +72,7 @@ extension LaunchFeature {
 }
 @main struct Runner {
     @MainActor static func main() async {
-        let provider = LaunchProvider()
+        let provider = ControlledLaunchProvider()
         let feature = LaunchFeature(provider: provider)
         let first = Task { await feature.refresh(available: false) }
         await provider.waitForFirst()
