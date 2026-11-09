@@ -234,9 +234,9 @@
       "section": "Keep Persistence Behind Repository Contracts",
       "applies": "An app requires cross-device data or offline edits",
       "strength": "Default",
-      "rule": "Add offline editing or cross-device sync only when the product needs it. For compatible Apple-device data, consider SwiftData with CloudKit or iCloud documents according to the data format. Keep live SwiftData stores out of iCloud Drive. For a custom server, follow its sync contract and use a dedicated sync service when needed. If that workflow supports offline edits, persist the edit and pending-sync metadata together before reporting local success. Report server confirmation separately and define conflict handling and safe retries.",
+      "rule": "Add offline editing or cross-device sync only when the product needs it. For compatible Apple-device data, consider SwiftData with CloudKit or iCloud documents according to the data format. Keep live SwiftData stores out of iCloud Drive. For a custom server, follow its sync contract and use a dedicated sync service when needed. If that workflow supports offline edits, persist the edit and pending-sync metadata together before reporting local success. Report server confirmation separately. Preserve pending changes across failures and restarts, make retries safe against duplication, and define conflict and rejection outcomes with the developer. Apple-managed sync also needs a product decision when multiple devices can edit the same item offline.",
       "why": "The simplest storage strategy depends on actual product requirements.",
-      "verify": "Verify capabilities and schema on supported devices. Check that pending edits survive restarts, retries do not duplicate changes, and conflicts and rejections follow product policy.",
+      "verify": "Verify capabilities, deployment target, account availability and schema on real supported devices. Exercise offline edits of the same item, failed sync and restart, duplicate-safe retries and server rejection where applicable.",
       "example": "SwiftData with CloudKit may suit a compatible Apple-device app; a server-backed app follows its server contract.",
       "explanationIds": [
         "persistence-boundaries"
