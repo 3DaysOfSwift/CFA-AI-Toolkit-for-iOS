@@ -56,6 +56,13 @@ has a different policy, verify that the Feature keeps the result even if its
 only screen waiter leaves. Where a screen must exit promptly, verify its wait
 ends before the suspended refresh completes.
 
+When tidying existing offline edits or sync, follow the
+[sync rule](references/spec/rules/cfa-sync-01.md). Preserve pending edit
+identities, their persisted metadata and the existing conflict and rejection
+policy. Verify that moving storage or task ownership leaves pending edits
+recoverable after failure and restart and safe to retry. Keep locally saved
+and server-confirmed outcomes distinct.
+
 Keep cancellation and ordering tests in the named ViewModel or Feature suite when they exercise that owner. Use a dedicated concurrency test group for cross-boundary scenarios that need one. Use controllable continuations/barriers to pause reads, writes and workers; release in adverse order and assert externally observable results. Cover overlapping operations, stale completion, cancellation, failed commits, edit/delete during processing and retry where applicable. Never depend on sleep duration or scheduler luck. Bound arrival waits with test timeouts and always release barriers during cleanup. Add a watchdog when a blocked operation could otherwise prevent completion. Describe coverage and remaining cases; no finite suite proves 100% race freedom.
 
 6. **Unit-test completeness.** Inventory every ViewModel and give each its own named test suite/file. Inventory each feature's public functions, observable states and testable branches; map them to named tests. Add missing success, validation, error, cancellation, retry and overlapping-operation cases where applicable. Exercise private helpers through observable outcomes rather than exposing them for tests. Thin forwarding methods may share a behavioural test, but no behaviour may be marked covered merely because the underlying dependency has tests. Keep test data synthetic and dependencies injectable. Register new files in both Xcode and any shared test harness. Run focused tests and then the full suite; report passed, failed and skipped counts separately, with reasons for skips. Record remaining gaps explicitly rather than treating file presence or code coverage as proof of completeness.
