@@ -492,7 +492,7 @@ test('installed Health Check rescans source, surfaces gaps and rejects stale rev
     await fs.writeFile(reviewPath,JSON.stringify(multiSiteProblem));
     await assert.rejects(finish(project,reviewPath,output,undefined,syntax), /Include confirmed source problems.*Confirmed issue/);
     await assert.rejects(fs.access(output));
-    const omittedConcern = structuredClone(generalProblem);
+    const omittedConcern = structuredClone(multiSiteProblem);
     omittedConcern.findings[0].status = 'concern';
     await fs.writeFile(reviewPath,JSON.stringify(omittedConcern));
     for (const checkpoint of [progress, next]) {

@@ -408,27 +408,27 @@ function reportFindingsGaps(review) {
     ...(operation.checks || []).filter(check => check.status === 'fail' && check.dimension !== 'cfa'),
     ...(operation.scenarios || []).filter(scenario => scenario.status === 'problem')
   ]);
-  const visibleEvidence = criteria
+  const coversEvidence = (finding, visibleEvidence) => finding.evidence.every(ref =>
+    visibleEvidence.some(visible =>
+      visible.file === ref.file && visible.line <= ref.line && visible.endLine >= ref.endLine
+    )
+  );
+  const problemEvidence = criteria
     .filter(criterion => criterion.status === 'problem')
     .flatMap(criterion => criterion.evidence);
   for (const problem of [...sourceProblems, ...operationProblems]) {
-    const covered = problem.evidence.every(ref => visibleEvidence.some(visible =>
-      visible.file === ref.file && visible.line <= ref.line && visible.endLine >= ref.endLine
-    ));
-    if (!covered) {
+    if (!coversEvidence(problem, problemEvidence)) {
       gaps.push('Include confirmed source problems in the report criteria before rendering: ' +
         (problem.title || problem.name || problem.file));
     }
   }
+  const concernEvidence = criteria
+    .filter(criterion => ['concern', 'problem'].includes(criterion.status))
+    .flatMap(criterion => criterion.evidence);
   for (const concern of (review.findings || []).filter(finding => finding.status === 'concern')) {
-    const covered = criteria.some(criterion =>
-      ['concern', 'problem'].includes(criterion.status) && concern.evidence.some(ref =>
-        criterion.evidence.some(visible =>
-          visible.file === ref.file && visible.line <= ref.line && visible.endLine >= ref.endLine
-        )
-      )
-    );
-    if (!covered) gaps.push('Include source concerns in the report criteria before rendering: ' + concern.title);
+    if (!coversEvidence(concern, concernEvidence)) {
+      gaps.push('Include source concerns in the report criteria before rendering: ' + concern.title);
+    }
   }
   return gaps;
 }
