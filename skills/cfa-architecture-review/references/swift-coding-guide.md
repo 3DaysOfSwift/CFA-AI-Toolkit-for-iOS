@@ -388,6 +388,11 @@ Measure cold launch, warm launch and interaction latency on a physical device ou
 
 Use injectable dependencies and synthetic data. Cover feature decisions and ViewModel presentation behaviour at their respective boundaries. Use controlled continuations for concurrency tests, with bounded waits and cleanup. Required fixtures should fail explicitly rather than crash or silently skip assertions.
 
+Test current state and event delivery separately. If a consumer needs every
+event, send consecutive equal-valued events and verify both are processed in
+order. Check cancellation and any required buffering independently of what
+the screen displays after those events.
+
 Run focused tests, then the relevant wider suite and build. Source parsing is not type checking; a core suite is not device UI, StoreKit or AI validation. Record failures, skips and environment blockers accurately. A passing rerun does not explain an earlier crash.
 
 **Review:** Can the evidence support the specific claim being made about correctness or readiness?
