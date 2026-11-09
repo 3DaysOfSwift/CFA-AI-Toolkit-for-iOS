@@ -67,3 +67,18 @@ test('groups distinct actions under their capability without merging them', () =
   assert.ok(html.indexOf('Set reminder') < html.indexOf('Remove reminder'));
   assert.ok(html.indexOf('Remove reminder') < html.indexOf('operation-group">Navigation'));
 });
+
+test('requires a visible finding for confirmed operation problems', () => {
+  const data = {
+    app:'App', summary:'Summary', verdict:'Clear ownership', scope:'App',
+    conclusion:'Conclusion', criteria:[{title:'Ownership', detail:'Checked', status:'pass'}],
+    operations:[{title:'Refresh', checks:[{status:'fail', dimension:'correctness'}]}]
+  };
+  assert.throws(() => renderHealthReport(data), /Include confirmed operation problems/);
+  data.operations[0].checks[0].dimension = 'cfa';
+  assert.doesNotThrow(() => renderHealthReport(data));
+  data.operations[0].scenarios = [{status:'problem'}];
+  assert.throws(() => renderHealthReport(data), /Include confirmed operation problems/);
+  data.criteria.push({title:'Refresh ordering', detail:'A stale result can replace the latest result.', status:'problem'});
+  assert.match(renderHealthReport(data), /Problems to address/);
+});

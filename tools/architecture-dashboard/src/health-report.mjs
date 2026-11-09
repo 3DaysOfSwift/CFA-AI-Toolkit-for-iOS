@@ -16,6 +16,13 @@ export function assess(criteria) {
 export function renderHealthReport(data, iconData = '') {
   if (!data.app || !data.summary || !data.verdict?.trim() || !data.scope || !data.conclusion) throw Error('Provide an app name, summary, substantive verdict, scope and conclusion.');
   const score = assess(data.criteria);
+  const hasOperationProblem = (data.operations || []).some(operation =>
+    operation.checks?.some(check => check.status === 'fail' && check.dimension !== 'cfa') ||
+    operation.scenarios?.some(scenario => scenario.status === 'problem')
+  );
+  if (hasOperationProblem && !data.criteria.some(criterion => criterion.status === 'problem')) {
+    throw Error('Include confirmed operation problems in the report criteria before rendering.');
+  }
   const sections = ['pass','concern','problem'].map(status => {
     const rows = data.criteria.filter(c => c.status === status);
     if (!rows.length) return '';
