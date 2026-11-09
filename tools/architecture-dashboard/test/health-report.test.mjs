@@ -112,3 +112,16 @@ test('a confirmed problem keeps the verdict red even with a high score', () => {
   assert.match(renderHealthReport(report), /class="number">80%<.*class="stamp negative">Needs attention</s);
   assert.match(renderHealthReport({...report, qualitativeOnly:true}), /class="number">×</);
 });
+
+test('requires a visible problem when the structural verdict reports a conflict', () => {
+  const data = {
+    app:'App', summary:'Two workflows compete for shared state', verdict:'Needs attention',
+    scope:'App', conclusion:'Give shared state one owner', architecturalConflict:true,
+    criteria:[{title:'Launch', detail:'Starts correctly', status:'pass'}]
+  };
+  assert.throws(() => renderHealthReport(data), /Include confirmed operation problems/);
+  data.criteria.push({title:'Competing state owners', detail:'Either workflow can overwrite the other.', status:'problem'});
+  const html = renderHealthReport(data);
+  assert.match(html, /stamp negative">Needs attention/);
+  assert.match(html, /Problems to address.*Competing state owners/s);
+});
