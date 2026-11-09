@@ -181,13 +181,16 @@ skill from that toolkit before changing the project.
   of the old listener leaves the replacement running. Stop isolated listeners after tests.
 - Features own their background capabilities. During synchronous launch,
   AppModel can ask each Feature to register its permitted BGTaskScheduler
-  identifiers once. Schedule work separately and route app-level callbacks
-  through AppModel to the owning Feature. Cancel work on expiration and
+  identifiers once before launch finishes. Schedule work separately. The system
+  decides when eligible work runs. Route app-level callbacks through AppModel
+  to the owning Feature. Cancel work on expiration and
   verify that success, failure and expiration each complete the system
   callback exactly once, including when expiration races completion. Work
   may outlive a screen, but continuing after iOS backgrounds the app requires
-  a system mechanism. Record actual background delivery on a supported device
-  separately from controlled handler tests.
+  a supported system mechanism, such as a background URLSession for eligible
+  transfers. Background push delivery is best effort. An ordinary Swift Task
+  grants no background runtime. Record actual background delivery on a
+  supported device separately from controlled handler tests.
 - When adding a device or extension target or changing shared Model code or
   services used by an existing target, verify that each affected target includes
   the shared Model and only its own Views and ViewModels. Each process has its
