@@ -21,13 +21,19 @@ The specification separates actor isolation, immutable values, operation orderin
 
 Editorial analysis: explicit workers and value snapshots add conversion and testing work. Keep trivial coordination simple. Compiler settings and API isolation annotations matter; do not infer execution solely from syntax.
 
+A networking actor serialises access to its own state. Once a request
+suspends waiting for a response, another call can enter. Inspect synchronous
+work before the request starts and any explicit waits or limits. A small
+value wrapper can avoid a separate allocation for the wrapper, depending
+on how it is stored. Copies can still share one configured URLSession.
+
 ## Scope and exceptions
 
 Swift isolation and Sendable rules are language concepts; CFA's Feature/worker placement is an architectural choice. Respect the deployment target, language mode, default isolation and SDK in the actual project.
 
 ## Verification
 
-Build with the real concurrency settings. Test stale completion separately from compiler diagnostics and measure expensive paths. Verify snapshots do not leak context-bound managed objects.
+Build with the real concurrency settings. Test stale completion separately from compiler diagnostics and measure expensive paths. Verify snapshots do not leak context-bound managed objects. For independent requests, hold one response open and verify the next request reaches the transport. Measure a suspected bottleneck before changing the wrapper.
 
 ## Evidence and provenance
 
