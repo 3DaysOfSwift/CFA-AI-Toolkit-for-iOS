@@ -93,6 +93,9 @@ export async function inspect(project) {
     if (liveFactories.length !== 1) findings.push(finding('app-model-live-factory', 'review', `Found ${liveFactories.length} static live() declarations directly inside AppModel. Verify the single production factory, including extensions and active compilation conditions.`, appModelFile, 1));
     for (const match of appMembers.matchAll(/^[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(private[ \t]+)?(?:private\(set\)[ \t]+)?(?:let|var)[ \t]+(\w+)[ \t]*:[ \t]*(?:any[ \t]+)?(\w+)(?:<[^;\n=]*>)?[?!]?([ \t]*=(?!=))?/gm)) {
       const [, privateModifier, name, type, defaultValue] = match;
+      const suffix = appModel.slice(match.index + match[0].length);
+      // A getter is not stored state. Property observers still belong to storage.
+      if (!defaultValue && /^\s*\{(?!\s*(?:willSet|didSet)\b)/.test(suffix)) continue;
       if (defaultValue) findings.push(finding('app-model-default-value', 'warning', `AppModel property ${name} has a default value; initialise it in the explicit initializer.`, appModelFile, lineOf(appModel, match.index)));
       if (type === 'Bool' && privateModifier) {
         // A declaration's order and type do not establish its purpose.

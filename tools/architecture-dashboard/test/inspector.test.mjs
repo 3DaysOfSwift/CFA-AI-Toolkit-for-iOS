@@ -493,3 +493,17 @@ test('reports ambiguous Feature test filenames across targets', async t => {
   assert.match(ambiguity?.message, /PhoneTests.*WatchTests/);
   assert.ok(!findings.some(item => item.code === 'feature-tests-missing'));
 });
+
+test('distinguishes AppModel computed getters from stored properties with observers', async t => {
+  const root = await fixture(t, {
+    'Application/2 - AppModel/AppModel.swift': `final class AppModel {
+      var computedValue: String { "value" }
+      var storedValue: String { didSet { reportChange() } }
+      static func live() -> AppModel { AppModel() }
+    }`
+  });
+  const { findings } = await inspect(root);
+  const storage = findings.filter(item => item.code === 'app-model-non-feature-state');
+  assert.equal(storage.length, 1);
+  assert.match(storage[0].message, /storedValue/);
+});
