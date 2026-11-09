@@ -72,7 +72,9 @@ export function scanSource(source, file) {
       // A return/property type followed by a body is not a constructor call.
       // Work from syntax, never filenames, line numbers or a particular app.
       if (kind==='task' && /(?:(?:->|:)\s*(?:sending\s+)?|\b(?:struct|class|enum|actor|protocol|extension)\s+)(?:Swift\s*\.\s*)?$/.test(masked.slice(0,match.index))) continue;
-      sites.push({ id: `${file}:${match.index}:${kind}`, kind, label, ...evidence(match.index) });
+      // SwiftSyntax locates these modifiers at their member name, after the dot.
+      const offset = kind === 'view-task' || kind === 'refresh' ? match[0].search(/\w/) : 0;
+      sites.push({ id: `${file}:${match.index}:${kind}`, kind, label, ...evidence(match.index + offset) });
     }
   }
   const declarations = [];

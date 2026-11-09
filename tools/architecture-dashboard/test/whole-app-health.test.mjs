@@ -5,6 +5,7 @@ import {fileURLToPath, pathToFileURL} from 'node:url';
 import {install} from '../../../scripts/install.mjs';
 import {stageSkillsPackage} from '../../../test/fixtures/skills-package.mjs';
 import {coverageGaps, inventoryCandidates, taskCandidates, nextWork} from '../src/whole-app-health.mjs';
+import {scanSource} from '../src/analyse.mjs';
 import {renderHealthReport} from '../src/health-report.mjs';
 import {prepare, finish, progress, next} from '../src/whole-app-health.mjs';
 import fs from 'node:fs/promises';
@@ -264,6 +265,21 @@ test('matches same-line parser entry points to the right lexical column', () => 
   const candidates = inventoryCandidates(combined);
   assert.deepEqual(candidates.map(site => site.column), [40, 10]);
   assert.equal(candidates[0].id, 'lexical-second');
+});
+
+test('deduplicates multiple SwiftUI modifiers on one line by member location', () => {
+  const file = 'View.swift';
+  const source = 'content.task {}.task {}.refreshable {}.refreshable {}';
+  const lexical = scanSource(source, file);
+  const items = [...source.matchAll(/\.(task|refreshable)/g)].map(match => ({
+    kind: match[1] === 'task' ? 'entry.viewTask' : 'entry.refreshable',
+    file, line: 1, column: match.index + 2
+  }));
+  const candidates = inventoryCandidates({files:[lexical], syntax:{items}});
+  assert.deepEqual(candidates.map(site => site.id), lexical.sites.filter(site => ["view-task", "refresh"].includes(site.kind)).map(site => site.id));
+
+  assert.deepEqual(candidates.map(site => site.column).sort((a, b) => a - b),
+    items.map(site => site.column));
 });
 
 test('syntax entry points join the inventory without duplicating lexical findings', () => {
