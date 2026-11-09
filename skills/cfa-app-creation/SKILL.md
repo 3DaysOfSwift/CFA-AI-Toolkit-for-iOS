@@ -108,7 +108,10 @@ When the requested app includes a widget or another device target, apply the
 [multi-device rule](references/spec/rules/cfa-device-01.md). Include the
 shared Model and only that target’s Views and ViewModels. Compose services for
 each process and keep business rules shared. Build each target and verify its
-source membership, API availability and any required snapshot handoff.
+source membership and API availability. Test any required snapshot handoff
+and receiving Feature update on supported devices separately from the build.
+Use the rule’s verification checklist for widget reload ordering and missing,
+unreadable, delayed or stale snapshots.
 
 ## Settings About and footer
 

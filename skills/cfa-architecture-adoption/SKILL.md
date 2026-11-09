@@ -69,8 +69,11 @@ When moving shared Model code used by an existing widget or another device
 target, apply the [multi-device rule](references/spec/rules/cfa-device-01.md).
 Record the existing target membership and data handoff before moving files.
 Preserve the handoff and its user-visible behaviour, including when a snapshot
-is unavailable. Verify affected targets can still build and exercise the
-handoff separately from source membership checks.
+is missing, unreadable, delayed or stale. Verify affected targets still build
+and check membership and API availability. Exercise transfer and receiving
+Feature updates on supported devices separately from those checks. For an App
+Group widget snapshot, verify the write precedes the reload request and a
+failed write issues no request.
 
 When moving durable storage ownership, preserve the existing store location,
 schema compatibility and saved records. Verify against a disposable store written

@@ -254,7 +254,11 @@ Record each required check against the final commit in the migration ledger or
 handoff, including the hybrid review and final CFA audit. Reconcile the affected
 target list with every consumer of the changed code, including extensions.
 Identify which targets each passed build covers and link separate evidence for
-affected cross-target data handoffs. Preserve any relevant failed run from
+affected cross-target data handoffs. Apply the
+[multi-device rule](references/spec/rules/cfa-device-01.md) to changed shared
+Model or service code. Verify the receiving Feature and any widget reload
+ordering separately from compilation. Record device evidence separately from
+controlled tests. Preserve any relevant failed run from
 during or after migration. Before completion, verify the same scenario on
 the affected target, build configuration and OS at the final commit.
 If a required check is missing or a failure remains unresolved, report the
