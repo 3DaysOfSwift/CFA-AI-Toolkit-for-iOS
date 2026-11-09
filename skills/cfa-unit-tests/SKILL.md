@@ -75,7 +75,13 @@ write leaves the refresh result usable. Check that a failed refresh retains
 valid data and that delayed cache writes cannot replace a newer snapshot.
 
 Build AppModel tests from an isolated dependency graph. Do not call production
-`AppModel.shared` from a unit test. Give each production ViewModel a matching
+`AppModel.shared` from a unit test. When AppModel owns app-wide listeners,
+supply a controlled event source and observe the receiving Feature. Verify
+repeated startup signals start each listener once and that events reach the
+Feature without a screen. Where cancellation or replacement is supported,
+exercise it and shut down isolated listeners during test cleanup.
+
+Give each production ViewModel a matching
 test file and test what its View can observe: loading/ready/error states,
 actions, drafts, selection and asynchronous results.
 Give each concrete Feature a matching API test file under `FeatureTests`,
