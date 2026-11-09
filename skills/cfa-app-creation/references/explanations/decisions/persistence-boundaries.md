@@ -33,10 +33,12 @@ A late restore cannot replace a newer server response, and a refresh failure
 leaves valid in-memory data available.
 
 Published snapshot structs for API or persisted data use `let` properties and
-represent immutable values. Replace them with newly constructed confirmed
-snapshots after a successful save or refresh. Never retain a locally modified
-snapshot as saved state. The screen ViewModel owns editable form drafts and passes proposed changes
-to the Feature for validation and persistence. A failed save leaves the
+represent immutable values. Check nested values and collection elements for
+mutable reference state, because a `let` property can still point to an object
+that changes in place. Replace snapshots after a successful save or refresh.
+Never retain a locally modified snapshot as saved state. The screen ViewModel
+owns editable form drafts and passes proposed changes to the Feature for
+validation and persistence. A failed save leaves the
 draft available for retry and the last confirmed snapshot in place.
 
 ## Problem
@@ -71,7 +73,7 @@ the actor and context are created. Confirm that only immutable Sendable
 domain values leave the storage boundary. A deliberately UI-owned context
 is an exception for work proven short.
 
-Exercise fresh directory preparation, concurrent first requests, isolated test stores, failed saves, reopening and retry. Verify record updates preserve unrelated records. Record runtime/toolchain and preserve shipped paths and schema.
+Exercise fresh directory preparation, concurrent first requests, isolated test stores, failed saves, reopening and retry. Verify record updates preserve unrelated records. Hold a previously published snapshot while saving a change and verify that it stays unchanged when the Feature publishes the replacement. Record runtime/toolchain and preserve shipped paths and schema.
 
 For optional caches, hold restoration and writes independently in tests.
 Confirm refresh starts while restoration is pending and still proceeds when
