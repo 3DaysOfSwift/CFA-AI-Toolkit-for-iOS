@@ -20,6 +20,10 @@ the evaluator the expected outcome.
   ReactiveSwift signals to the existing UIKit screen. The record does not
   identify which callers need that adapter.
 - The manual behaviour regression and human architecture review are absent.
+- The existing UIKit browsing screen has working navigation and filters. A
+  handoff note proposes replacing the entire screen with SwiftUI because the
+  deployment target supports it. The requested migration does not include a
+  redesign.
 
 ## Expected outcome
 
@@ -30,6 +34,10 @@ the evaluator the expected outcome.
   targets. Record any intentional package boundary with its reason.
 - Trace the adapter's actual consumers before deciding whether to simplify
   or retain it. Preserve existing behaviour and platform support.
+- Keep the existing browsing behaviour and presentation scope. Replace a UI
+  component only when the migration requires it, and verify that its existing
+  behaviour survives the replacement. Treat an optional UIKit-to-SwiftUI
+  rewrite as separate work.
 - Complete the final CFA audit and rerun checks after corrections. Require
   the before-and-after navigator map, manual behaviour regression and human
   architecture review before declaring completion. If corrections change the
@@ -38,5 +46,5 @@ the evaluator the expected outcome.
 
 Fail the evaluation if the response declares completion from the build and
 test results, treats the source diff as navigator inspection, removes the
-reactive adapter without tracing consumers, or delegates routine source
-corrections back to the developer.
+reactive adapter without tracing consumers, widens the scope to an optional
+UI rewrite, or delegates routine source corrections back to the developer.
