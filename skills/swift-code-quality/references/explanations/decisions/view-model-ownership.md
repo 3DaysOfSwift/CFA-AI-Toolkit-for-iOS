@@ -7,7 +7,7 @@ Status: documented basis with editorial analysis; not a founder-approved histori
 
 ## Rule
 
-A CFA screen owns its dedicated private ViewModel, inline by default. A detail View may receive selected value data and construct its State-backed ViewModel in its initializer; ViewModels are never passed into Views. The ViewModel resolves narrow live Features and permits isolated Feature dependencies in tests.
+A CFA screen owns its dedicated ViewModel in a private property named `viewModel`. It constructs the ViewModel inline by default. A detail View may receive selected value data and construct its State-backed ViewModel in its initializer; ViewModels are never passed into Views. The ViewModel resolves narrow live Features and permits isolated Feature dependencies in tests.
 
 ## Problem
 
@@ -29,7 +29,7 @@ This is a CFA convention, not a SwiftUI ban on View inputs. Reusable presentatio
 
 ## Verification
 
-Test ViewModels with isolated concrete Features. Inspect navigation, sheets and previews as well as declarations. Open independent destinations and ensure selection does not leak between them; source inspection alone cannot establish lifetime behaviour.
+Test ViewModels with isolated concrete Features. Inspect navigation, sheets and previews as well as declarations. Verify ownership and the property name separately. Open independent destinations and ensure selection does not leak between them; source inspection alone cannot establish lifetime behaviour.
 
 ## Evidence and provenance
 
