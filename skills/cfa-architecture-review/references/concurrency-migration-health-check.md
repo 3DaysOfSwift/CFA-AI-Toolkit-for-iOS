@@ -484,6 +484,12 @@ For each relevant operation, inspect:
   Check that failure or cancellation of a predecessor follows the documented
   policy and leaves later calls and task cleanup consistent. Record the product
   reason for policies such as latest-request-wins.
+- Button-driven tasks in CFA: trace the action from the View to its ViewModel.
+  Check that independently managed work has a named handle stored before
+  suspension. Hold the work pending, repeat an equivalent action and verify
+  it shares execution and completion. Check cleanup after success or failure
+  and that a later retry starts new work. Assess distinct commands against
+  their own admission policy.
 - Pull-to-refresh: trace the `.refreshable` closure through the ViewModel
   and check which completion it awaits. For CFA, if the method returns a
   task handle, check that the closure awaits its value. Hold the work pending
