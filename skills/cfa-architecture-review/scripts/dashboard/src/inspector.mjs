@@ -356,7 +356,7 @@ export async function inspect(project) {
     if (ownedState && ownedState.name !== 'viewModel') {
       findings.push(finding('view-model-property-name', 'warning', `${name} owns its ViewModel as ${ownedState.name}; CFA names the property viewModel.`, viewFile, lineOf(view, bodyOffset + ownedState.index)));
     }
-    const structuralRoot = name === 'ContentView' && /\bTabView\s*\{/.test(body) && !/\b(?:AppModel|\w+Feature)\b/.test(members);
+    const structuralRoot = name === 'ContentView' && /\bTabView\s*[(\{]/.test(body) && !/\b(?:AppModel|\w+Feature)\b/.test(members);
     if (!viewModel && !structuralRoot) findings.push(finding('view-model-missing', 'review', `${name} has no adjacent ${viewModelName}. Verify whether it is a screen requiring a dedicated ViewModel or a reusable presentation component.`, viewFile, 1));
     else if (viewModel) {
       if (!ownsViewModel) findings.push(finding('view-model-ownership', 'review', `${name} has no recognized private @State ViewModel storage. Verify that the screen constructs and stores its ViewModel. Detail Views may initialize that stored state from selected value data. A computed property does not satisfy CFA screen ownership.`, viewFile, lineOf(view, declaration.index)));
