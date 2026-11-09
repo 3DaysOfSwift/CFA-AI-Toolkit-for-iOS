@@ -79,10 +79,11 @@ capability, account and schema behaviour on supported devices.
 
 For system background work in scope, apply the
 [background-work rule](references/spec/rules/cfa-bg-01.md). Keep registration
-and work with the owning Feature. Signal registration once during synchronous
-launch and schedule separately. Verify that expiration cancels owned work
-and that the system callback completes once, including when expiration and
-normal completion race. Verify actual delivery separately on a supported device.
+and work with the owning Feature. Verify each permitted identifier registers
+once during synchronous launch and scheduling happens separately. Check that
+success, failure and expiration each complete the system callback exactly once,
+including when expiration races normal completion. Verify that expiration
+cancels the owned work. Verify actual delivery separately on a supported device.
 
 When adding or changing a widget or another device target, apply the
 [multi-device rule](references/spec/rules/cfa-device-01.md). Reuse the owning

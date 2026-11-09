@@ -141,7 +141,8 @@ Use deliberate passes:
    system mechanism, permitted identifiers and scheduling behaviour. Trace
    registration once during synchronous launch and route delivery to the owning
    Feature. Verify cancellation on expiration and exactly-once system
-   completion for success, failure and a race with expiration. Record actual
+   completion for success, failure, expiration alone and expiration racing
+   normal completion. Record actual
    delivery on a supported device separately from controlled handler tests.
    When migrating networking, apply the
    [independent request rule](references/spec/rules/cfa-net-01.md). Preserve
