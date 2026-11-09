@@ -27,12 +27,16 @@ Link to evidence IDs in record.json. Distinguish build, automated tests and
 manual checks; record failures and checks not run. A build is not proof of
 behaviour preservation. Keep remaining risks and work visible.
 
-For the final migration record, use one row per in-scope behaviour from the
-product behaviour contract. Include user journeys and access to existing saved
-data. Link the original and final-commit evidence by ID.
+For the final migration record, use one row per in-scope behaviour and
+affected target that exposes it. Include user journeys and access to existing
+saved data. Link the original and final-commit evidence for the same scenario
+by ID. Evidence can be reused across rows when it actually covers them. If a
+test target has a different name, identify the product target it exercises.
+If a baseline result cannot be recovered for a required comparison, record
+it as unknown and keep the migration open.
 
-| Requirement ID and behaviour | Baseline evidence | Final-commit evidence | Manual regression evidence | Difference and approval |
-| --- | --- | --- | --- | --- |
+| Requirement ID and behaviour | Affected target | Baseline evidence | Final-commit evidence | Manual regression evidence | Difference and approval |
+| --- | --- | --- | --- | --- | --- |
 
 Classify each difference as an authorised product change, confirmed defect fix,
 necessary platform difference, regression or unknown. Record verification of

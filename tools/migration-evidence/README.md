@@ -55,8 +55,9 @@ navigator map from manual Xcode inspection, Feature and legacy primitive
 inventories, hybrid review, deployment compatibility, final CFA audit, build, tests, manual behaviour
 regression and human architecture review. Record an executed test or manual observation at `repository.beforeCommit`
 for the behaviour baseline. If a manual baseline names targets, it must cover
-at least one affected target. Compare that evidence with the final regression
-checks. Use
+at least one affected target. Compare the same scenarios on each affected target that exposes them. The
+validator checks for baseline evidence. Verify scenario and target coverage
+using the case study’s behaviour table. Use
 `completionGate.deploymentCompatibilityEvidenceId` to link the minimum OS of
 each affected target and the evidence that changed paths support it. The
 evidence must name every affected target. Update and review older completed

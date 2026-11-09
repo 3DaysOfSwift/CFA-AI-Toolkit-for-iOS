@@ -129,6 +129,15 @@ target’s minimum OS and link the evidence that changed paths support it. List
 the covered targets on the deployment compatibility evidence entry. A passing run on a newer
 OS alone does not establish that compatibility.
 
+For behaviour regression, compare each in-scope requirement on every affected
+target that exposes it. Link evidence for the same scenario at the baseline
+and final revisions. Name all affected targets on the linked final manual
+regression record. If checks ran separately, cite each run and its environment
+from that record. An unknown required baseline comparison keeps the migration
+open. The presence of a baseline test or observation in the validator establishes
+that a baseline was recorded. The reviewer establishes coverage of each affected
+target and scenario.
+
 In the final CFA audit, compare the resolved bundle identifiers of existing
 app and test targets against the baseline for each affected build
 configuration. Cite the before and after build settings, and record any
