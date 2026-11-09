@@ -391,8 +391,11 @@ do not claim that UI gating replaces server-side authorisation.
   cancelling before navigation leaves a saved request available after restart.
   Cancel after the destination opens and verify that it still counts as opened
   and the pending item is removed. Verify either scene can open a shared
-  request, and simultaneous attempts navigate only once. Race an open against dismissal of the same request and
-  verify that the outcomes agree with the pending list and navigation state.
+  request, simultaneous attempts navigate only once, and the other scene keeps
+  its current destination. Replay the same opening event after navigation and
+  verify it does not reopen the destination. Verify a distinct event for that
+  destination remains available. Race an open against dismissal of the same
+  request and verify the outcomes agree with the pending list and navigation state.
   Force a removal write to fail
   after navigation, then verify that the error is reported and retrying the
   write removes the item without reopening the destination. During migration,

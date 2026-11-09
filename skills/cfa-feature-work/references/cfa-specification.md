@@ -1887,8 +1887,10 @@ Before accepting a change, answer every question:
     Verify that declining or cancelling before navigation preserves the
     request across restart. Either scene can open it, and successful
     navigation or explicit dismissal removes it. A cancellation after
-    navigation still counts as opened. Verify that competing scene requests
-    open the destination once. If saving the
+    navigation still counts as opened. Verify that competing scenes open the
+    destination once and that the other scene keeps its current destination.
+    Replay the same opening event and verify it does not reopen the destination.
+    A distinct event for the same destination remains available. If saving the
     removal fails after navigation, verify that the failure is surfaced and
     retrying the removal does not navigate again. During migration, verify
     that existing notification and history capabilities are preserved.
