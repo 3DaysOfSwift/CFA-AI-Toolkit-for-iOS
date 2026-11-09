@@ -27,6 +27,12 @@ Link to evidence IDs in record.json. Distinguish build, automated tests and
 manual checks; record failures and checks not run. A build is not proof of
 behaviour preservation. Keep remaining risks and work visible.
 
+For the final migration record, link the baseline and final-commit checks for
+the affected user journeys and access to existing saved data. Record what
+changed and distinguish authorised product changes, confirmed defect fixes,
+and necessary platform differences from regressions or unexplained changes.
+Keep the migration open while a regression or unexplained change remains.
+
 For the final migration record, describe the hybrid paths reviewed and the
 reasons for retaining any legacy mechanisms. For each removed adapter or
 dependency, link the baseline behaviour and the same scenarios rerun on each
