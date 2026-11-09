@@ -4,7 +4,7 @@ import PlaygroundSupport
 PlaygroundPage.current.needsIndefiniteExecution = true
 
 // MARK: - CFA implementation
-// NetworkingManager owns the shared transport boundary.
+// This wrapper holds a configured URLSession and keeps no mutable request state.
 struct NetworkingManager: Sendable {
     private let session: URLSession
     init(session: URLSession) { self.session = session }
