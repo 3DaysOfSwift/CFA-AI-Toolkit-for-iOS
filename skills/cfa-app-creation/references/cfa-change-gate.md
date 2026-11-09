@@ -234,9 +234,11 @@ from precedent use; do not reframe it as a completed partial migration.
 - When launch and screen refresh can overlap, confirm callers await the one
   Feature-owned in-flight task rather than duplicate the request or silently
   return; test its success, failure and reset after completion.
-- Confirm a repeated synchronous Button action reuses its ViewModel-owned task
-  rather than creating a new `Task` per press; its async callers await the
-  returned task's value.
+- Confirm repeated synchronous Button actions follow their intended policy:
+  equivalent requests may reuse a ViewModel-owned task when one result satisfies
+  every caller; distinct commands that must each take effect are admitted and
+  coordinated without silently dropping presses. Async callers await the
+  appropriate task's value.
 - Read the App `body`: it must install a stable root without branching on
   storage, loading, or errors. Do not merely move that branch into RootTabView.
 - For persistence changes, fail the initial store open and verify the root stays
