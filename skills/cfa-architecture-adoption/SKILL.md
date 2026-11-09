@@ -21,8 +21,15 @@ screen-construction invariant: a private `viewModel` property with inline `@Stat
 A detail View may construct its own State-backed ViewModel from a selected immutable snapshot
 in its initializer. Never inject or share ViewModels. Keep screen and scene
 selection in presentation and follow the [detail snapshot lifetime rule](references/spec/rules/cfa-ui-03.md)
-when the source data changes. Review-only work
-reports violations; tests inject Features into ViewModels, not ViewModels into Views.
+when the source data changes. When changing an existing detail flow, verify
+that two independently identified destinations retain their own selections
+when the source list changes or omits an item. Preserve any existing explicit
+refresh behaviour. For edited values, apply the
+[screen editing rule](references/spec/rules/cfa-ui-04.md): the screen
+ViewModel owns the unsaved draft, a failed save keeps it available for retry,
+and Cancel discards it. The Feature publishes a replacement confirmed value
+after required persistence succeeds. Review-only work reports violations;
+tests inject Features into ViewModels, not ViewModels into Views.
 
 Restructure an existing app around CFA while preserving its observable behaviour.
 
