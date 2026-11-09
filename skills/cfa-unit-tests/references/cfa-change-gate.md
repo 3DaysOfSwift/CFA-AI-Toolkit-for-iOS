@@ -235,13 +235,16 @@ the architecture:
     business authority; do not promote all stateful helpers into AppModel.
     When account changes affect other Features, coordinate the real workflow
     explicitly. Trace sign-out, account switching and external session expiry
-    when supported. If sign-out fails before the session ends, retain account state;
-    after success clear affected state and prevent old requests from republishing
-    it. Check the current account or session generation before publishing an
-    in-flight result, including when a request has been cancelled. If the same
-    account can sign back in before earlier work finishes, verify that the
-    earlier session cannot publish into the new one. Reconcile
-    partial authentication outcomes and handle cleanup failures honestly.
+    when supported. Verify that external expiry reaches its owner with the
+    account screen closed. If sign-out fails before the session ends, keep the
+    session and its data intact and report the failure so the user can retry.
+    Reconcile partial authentication outcomes against the actual session. When
+    a session ends, clear its affected state. Report cleanup failures and
+    verify that a failed cleanup leaves an ended session signed out. Check the
+    current account or session generation before publishing an in-flight result,
+    including when a request has been cancelled. If the same account can sign
+    back in before earlier work finishes, verify that the earlier session
+    cannot publish into the new one.
     If sign-out promises a fresh-install experience, clear account-specific
     in-memory state, caches and local files after successful sign-out. Preserve
     independent purchases and user-owned documents, and handle unsynchronised
