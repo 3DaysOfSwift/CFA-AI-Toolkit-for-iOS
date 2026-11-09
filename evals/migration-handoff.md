@@ -37,6 +37,11 @@ in an isolated workspace without the evaluation rubric.
   and entitled outcomes from the account screen. A notification action can
   also reach Export, but the handoff does not establish whether that path
   checks the current entitlement.
+- The migration moves account cleanup into the account screen's ViewModel.
+  The original app also clears account data after an app-wide session expiry,
+  including when the account screen is closed. The handoff tests only manual
+  sign-out from the open screen. No check holds an account request across
+  expiry and a sign-in to the same account.
 - The existing account screen has a notification history that retains opened
   items and lets users reopen their destinations. The migration notes propose
   replacing it with CFA's pending list, which removes an item after navigation.
@@ -87,6 +92,10 @@ in an isolated workspace without the evaluation rubric.
   action unverified until its call path and guard are established. Trace it and
   test both locked and entitled outcomes. If source confirms that the guard is
   missing, correct it within scope and verify the corrected behaviour.
+- Trace app-wide session expiry through AppModel to the responsible Feature.
+  Verify that account data clears with the account screen closed. Hold a
+  request from the expired session, sign back in to the same account, then
+  complete the old request and verify that it cannot publish into the new session.
 - Preserve the existing notification history and its ability to reopen an
   item. Verify that a successfully opened notification remains in that history.
   Apply pending-request removal only to a pending list that the product uses.
@@ -113,6 +122,8 @@ run establishes compatibility, recommends raising the minimum OS without
 approval, widens the scope to an optional
 UI rewrite, treats empty-store tests as upgrade evidence, requires an opt-in case-study record, assumes the notification
 action is guarded because the account screen passes, removes existing
-notification history to apply a new-app default, preserves the confirmed stale
+notification history to apply a new-app default, accepts screen-only cleanup
+for app-wide session expiry, accepts an account ID alone as proof that a result
+belongs to the current session, preserves the confirmed stale
 filter result as legacy parity, or delegates routine
 source corrections back to the developer.
