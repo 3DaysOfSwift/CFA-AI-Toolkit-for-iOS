@@ -38,11 +38,26 @@ final class SourceInventory: SyntaxVisitor {
     }
 
     override func visit(_ node: SourceFileSyntax) -> SyntaxVisitorContinueKind {
-        if file.split(separator: "/").last == "main.swift",
-           let firstStatement = node.statements.first(where: { $0.item.as(DeclSyntax.self) == nil }) {
-            record("entry.main", "main.swift", firstStatement)
+        if file.split(separator: "/").last == "main.swift" {
+            recordTopLevelStartup(in: node.statements)
         }
         return .visitChildren
+    }
+
+    private func recordTopLevelStartup(in statements: CodeBlockItemListSyntax) {
+        for statement in statements {
+            if let conditional = statement.item.as(IfConfigDeclSyntax.self) {
+                // The source inventory does not select a build configuration.
+                for clause in conditional.clauses {
+                    if let branch = clause.elements?.as(CodeBlockItemListSyntax.self) {
+                        recordTopLevelStartup(in: branch)
+                    }
+                }
+            } else if statement.item.as(DeclSyntax.self) == nil {
+                record("entry.main", "main.swift", statement)
+                return
+            }
+        }
     }
 
     private func recordMain(_ name: String, _ node: some SyntaxProtocol, attributes: AttributeListSyntax) {

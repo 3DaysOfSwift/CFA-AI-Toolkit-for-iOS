@@ -15,6 +15,10 @@ test('compiled SwiftSyntax scanner inventories startup candidates', {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cfa-startup-inventory-'));
   t.after(() => fs.rm(root, {recursive:true, force:true}));
   await fs.writeFile(path.join(root, 'main.swift'), 'import Foundation\nprint("start")\nprint("finish")\n');
+  const conditional = path.join(root, 'Conditional');
+  await fs.mkdir(conditional);
+  await fs.writeFile(path.join(conditional, 'main.swift'),
+    '#if DEBUG\nprint("debug")\nprint("next")\n#else\nprint("release")\n#endif\n');
   await fs.writeFile(path.join(root, 'App.swift'), [
     '@available(*, deprecated, message: "Use @main") struct Old {}',
     '@main enum App { static func main() async {} }',
@@ -31,6 +35,8 @@ test('compiled SwiftSyntax scanner inventories startup candidates', {
     .map(({kind, name, file, line, column}) => [kind, name, file, line, column]), [
     ['entry.main', 'App', 'App.swift', 2, 1],
     ['entry.launchCallback', 'application', 'App.swift', 5, 10],
+    ['entry.main', 'main.swift', 'Conditional/main.swift', 2, 1],
+    ['entry.main', 'main.swift', 'Conditional/main.swift', 5, 1],
     ['entry.main', 'main.swift', 'main.swift', 2, 1]
   ]);
 });
