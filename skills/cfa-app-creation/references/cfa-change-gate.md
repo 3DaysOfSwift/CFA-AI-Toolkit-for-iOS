@@ -44,7 +44,10 @@ the architecture:
    Remove a request after successful navigation or explicit dismissal. Declining,
    cancelling before navigation, or failing to navigate leaves it pending.
    Navigation succeeds when the destination opens, even if cancellation follows
-   or its content is still loading. A separate history is opt-in for new apps.
+   or its content is still loading. If saving removal fails after navigation,
+   report the storage failure and retry removal without navigating again.
+   Until removal is saved, the request may reappear after restart.
+   A separate history is opt-in for new apps.
    During migration, preserve existing deep-link, notification and history
    capabilities.
 4. When the app uses `ThemeManager`, it is a presentation dependency supplied through the
