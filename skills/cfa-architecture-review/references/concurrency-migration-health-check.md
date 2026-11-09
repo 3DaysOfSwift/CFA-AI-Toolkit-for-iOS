@@ -88,9 +88,13 @@ results in the report, rather than presenting scanner counts as findings.
    from concurrency correctness. Trace values and closure captures across
    isolation boundaries. For a mutable reference declared `@unchecked Sendable`,
    identify the documented safety invariant and verify it against reads and
-   writes on both sides of the boundary. For CFA persistence, follow values
-   returned to the Feature and verify that the storage worker keeps its
-   context and live records within its isolation.
+   writes on both sides of the boundary. For CFA SwiftData, locate the
+   SwiftDataManager and the context owner. Verify that non-trivial production
+   work uses a dedicated `@ModelActor`, keeps its context and live records
+   within the storage boundary, and returns immutable Sendable values to
+   the Feature. Trace where the context is created and where the expensive
+   work executes. A deliberately UI-owned context needs evidence that its work
+   stays short and follows the same storage boundary.
    For networking, trace independent requests from their callers through the
    networking service to URLSession. Look for sequential awaits, explicit queues,
    shared task chains, blocking calls or expensive synchronous actor-isolated
