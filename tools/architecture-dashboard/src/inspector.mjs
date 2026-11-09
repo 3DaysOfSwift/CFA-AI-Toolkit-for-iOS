@@ -48,7 +48,7 @@ function braceBody(source, openingBrace) {
 }
 
 const identifier = '[\\p{L}_][\\p{L}\\p{M}\\p{N}_]*';
-const inferredAppModelStorage = /\b(?:let|var)\s+\w+\s*=\s*(?:\w+\s*\.\s*)*AppModel\s*\.\s*shared\b(?!\s*[.?![(])/g;
+const inferredAppModelStorage = /\b(?:let|var)\s+`?[\p{L}_][\p{L}\p{M}\p{N}_]*`?\s*=\s*(?:\w+\s*\.\s*)*AppModel\s*\.\s*shared\b(?!\s*[.?![(])/gu;
 const propertyNamePattern = '(?:`(' + identifier + ')`|(' + identifier + '))';
 
 // Keep only direct member signatures. Mask method/nested-type bodies without
@@ -63,7 +63,7 @@ function memberSignatures(body) {
 }
 
 function* storedTypedMembers(members, body) {
-  const property = /\b(?:let|var)\s+`?\w+`?\s*:\s*(?:\(\s*any\s+((?:\w+\s*\.\s*)*\w+)\s*\)\s*\?|(?:(?:any|some)\s+)?((?:\w+\s*\.\s*)*\w+)\b(?!\s*\.)(?:[ \t]*[?!])?)/g;
+  const property = /\b(?:let|var)\s+`?[\p{L}_][\p{L}\p{M}\p{N}_]*`?\s*:\s*(?:\(\s*any\s+((?:\w+\s*\.\s*)*\w+)\s*\)\s*\?|(?:(?:any|some)\s+)?((?:\w+\s*\.\s*)*\w+)\b(?!\s*\.)(?:[ \t]*[?!])?)/gu;
   for (const match of members.matchAll(property)) {
     if (hasComputedAccessor(body.slice(match.index + match[0].length))) continue;
     yield { index: match.index, type: (match[1] ?? match[2]).split('.').at(-1).trim() };

@@ -610,7 +610,7 @@ test('reviews a View storing an inferred AppModel alias without confusing locals
     [file]: `struct ModelAliasView: View {
       private let feature = AppModel.shared.notesFeature
       private let graph = AppModel.shared
-      private let otherGraph = App.AppModel.shared
+      private let données = App.AppModel.shared
       var body: some View { Text(graph.notesFeature.title) }
     }
     struct LocalAliasView: View {
@@ -673,7 +673,7 @@ test('reviews stored ViewModel services without an explicit initializer', async 
   const file = viewPath.replace('View.swift', 'ViewModel.swift');
   const {report} = await inspectView(t, 'struct HomeView: View { @State private var viewModel = HomeViewModel() }', {
     [file]: `final class HomeViewModel {
-      private let repository: (any App.NotesRepository)? = nil
+      private let dépôt: (any App.NotesRepository)? = nil
       private var computed: NotesRepository? { nil }
       private var snapshot: NotesRepository.Snapshot?
       func example() { let local: NetworkingManager = .init() }
