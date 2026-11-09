@@ -374,6 +374,26 @@ private actor DelayedRestoreRepository: PendingRequestRepository {
         try await restoredAfterRetry.restore()
         precondition(restoredAfterRetry.pending == [retained])
 
+        // A corrupt durable list must not be mistaken for an empty one.
+        let corruptURL = folder.appendingPathComponent("corrupt-pending.json")
+        let corruptBytes = Data("{".utf8)
+        try corruptBytes.write(to: corruptURL)
+        let recovering = DeepLinkingFeature(store: PendingRequestStore(fileURL: corruptURL))
+        do {
+            try await recovering.receive(request)
+            throw ExampleFailure.expectedStorageError
+        } catch DecodingError.dataCorrupted {
+            let savedBytes = try Data(contentsOf: corruptURL)
+            precondition(recovering.pending.isEmpty && savedBytes == corruptBytes)
+        }
+        let recoveredBytes = try JSONEncoder().encode([retained])
+        try recoveredBytes.write(to: corruptURL, options: .atomic)
+        try await recovering.receive(request)
+        precondition(recovering.pending == [retained, request])
+        let recoveredRun = DeepLinkingFeature(store: PendingRequestStore(fileURL: corruptURL))
+        try await recoveredRun.restore()
+        precondition(recoveredRun.pending == [retained, request])
+
         let blockedDirectory = folder.appendingPathComponent("blocked-directory")
         try Data().write(to: blockedDirectory)
         let badURL = blockedDirectory.appendingPathComponent("pending.json")
