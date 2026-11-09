@@ -393,6 +393,14 @@ that repeated startup signals do not create duplicate listeners. Trace events
 to the owning Feature when no relevant screen is visible. Record this lifecycle
 evidence separately from any startup timing measurement.
 
+Apply the [storage launch rule](spec/rules/cfa-launch-02.md) to CFA targets.
+Trace the first storage request and check that the root appears and unrelated
+navigation works while opening is pending and after it fails. Inspect root
+wrappers and blocking overlays as well as the delegate. Follow failure and
+retry through the affected Feature, ViewModel and screen, and verify that
+retry preserves existing data. Use controlled storage tests for these outcomes
+and record first-frame measurements separately.
+
 Apply this review to CFA and non-CFA apps without requiring any particular
 architecture, AppModel name or launch delegate. First establish which work the
 app actually needs at launch and whether the callback applies to that target or
