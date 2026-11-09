@@ -62,6 +62,14 @@ function memberSignatures(body) {
   }).join('');
 }
 
+function* storedTypedMembers(members, body) {
+  const property = /\b(?:let|var)\s+`?\w+`?\s*:\s*(?:\(\s*any\s+((?:\w+\s*\.\s*)*\w+)\s*\)\s*\?|(?:(?:any|some)\s+)?((?:\w+\s*\.\s*)*\w+)\b(?!\s*\.)(?:[ \t]*[?!])?)/g;
+  for (const match of members.matchAll(property)) {
+    if (hasComputedAccessor(body.slice(match.index + match[0].length))) continue;
+    yield { index: match.index, type: (match[1] ?? match[2]).split('.').at(-1).trim() };
+  }
+}
+
 function closingParenthesis(source, opening) {
   let depth = 0;
   for (let index = opening; index < source.length; index++) {
@@ -600,12 +608,12 @@ export async function inspect(project) {
       const body = braceBody(source, start - 1);
       inspectScreenInputs(view[1], body, source, start, file, findings);
       const members = memberSignatures(body);
-      const modelProperty = /\b(?:let|var)\s+`?\w+`?\s*:\s*(?:any\s+)?(?:\w+\s*\.\s*)*(\w*(?:Feature(?:API)?|Repository|NetworkingManager|SwiftDataManager)|AppModel)\b(?!\s*\.)(?:[ \t]*[?!])?/g;
-      for (const match of members.matchAll(modelProperty)) {
-        if (hasComputedAccessor(body.slice(match.index + match[0].length))) continue;
-        if (match[1] === 'AppModel') reviewedAppModelDeclarations.add(start + match.index);
-        const code = featureTypeSuffix.test(match[1]) ? 'view-stored-feature' : 'view-stored-model-dependency';
-        findings.push(finding(code, 'review', `${view[1]} appears to store ${match[1]} directly. Verify that Feature access goes through the screen-owned ViewModel.`, file, lineOf(source, start + match.index)));
+      for (const { index, type } of storedTypedMembers(members, body)) {
+        const isFeature = featureTypeSuffix.test(type);
+        if (!isFeature && !serviceTypeSuffix.test(type) && type !== 'AppModel') continue;
+        if (type === 'AppModel') reviewedAppModelDeclarations.add(start + index);
+        const code = isFeature ? 'view-stored-feature' : 'view-stored-model-dependency';
+        findings.push(finding(code, 'review', `${view[1]} appears to store ${type} directly. Verify that Feature access goes through the screen-owned ViewModel.`, file, lineOf(source, start + index)));
       }
       const viewModelInput = /(?:^|(?<=;))[ \t]*(?:@(?:SwiftUI\s*\.\s*)?(State|StateObject|ObservedObject|Bindable)\s+)?(?:(?:private|fileprivate|internal|package|public)\s+)?(?:let|var)\s+`?\w+`?\s*:\s*(?:\w+\s*\.\s*)*(\w+ViewModel)\b(?!\s*\.)(?:[ \t]*[?!])?/gm;
       for (const match of members.matchAll(viewModelInput)) {
@@ -747,14 +755,12 @@ export async function inspect(project) {
     const viewModelMembers = viewModelDeclaration
       ? viewModel.slice(0, viewModelBodyStart).replace(/[^\n]/g, ' ') + memberSignatures(viewModelBody)
       : '';
-    const storedDependency = /\b(?:let|var)\s+`?\w+`?\s*:\s*(?:(?:any|some)\s+)?(?:\w+\s*\.\s*)*(\w+)\b(?!\s*\.)(?:[ \t]*[?!])?/g;
-    for (const match of viewModelMembers.matchAll(storedDependency)) {
-      if (!serviceTypeSuffix.test(match[1]) || hasComputedAccessor(viewModel.slice(match.index + match[0].length))) continue;
-      findings.push(finding('view-model-non-feature-dependency', 'review', `${viewModelName} appears to store ${match[1]} directly. Verify that the ViewModel calls a Feature and that the Feature owns the service dependency.`, viewModelFile, lineOf(viewModel, match.index)));
+    const retainedAppModels = [];
+    for (const member of storedTypedMembers(viewModelMembers, viewModel ?? '')) {
+      if (member.type === 'AppModel') retainedAppModels.push(member);
+      if (!serviceTypeSuffix.test(member.type)) continue;
+      findings.push(finding('view-model-non-feature-dependency', 'review', `${viewModelName} appears to store ${member.type} directly. Verify that the ViewModel calls a Feature and that the Feature owns the service dependency.`, viewModelFile, lineOf(viewModel, member.index)));
     }
-    const typedAppModelStorage = /\b(?:let|var)\s+`?\w+`?\s*:\s*(?:\w+\s*\.\s*)*AppModel\b(?!\s*\.)(?:[ \t]*[?!])?/g;
-    const retainedAppModels = [...viewModelMembers.matchAll(typedAppModelStorage)].filter(match =>
-      !hasComputedAccessor(viewModel.slice(match.index + match[0].length)));
     const inferredModel = inferredAppModelStorage.exec(viewModelMembers);
     if (inferredModel) retainedAppModels.push(inferredModel);
     for (const match of retainedAppModels) {

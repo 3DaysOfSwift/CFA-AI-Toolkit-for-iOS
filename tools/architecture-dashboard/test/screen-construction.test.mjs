@@ -118,7 +118,7 @@ test('reviews a stored Feature input even when Swift synthesizes the View initia
   const file = 'App/Presentation/NoteRow.swift';
   const { findings } = await inspectView(t, '', {
     [file]: `struct NoteRow: View {
-      let notes: any NotesFeatureAPI
+      let notes: (any NotesFeatureAPI)?
       let snapshot: NotesFeature.Snapshot
       let refresh: () -> Void
       var computed: NotesFeature? { nil }
@@ -672,7 +672,7 @@ test('reviews stored ViewModel services without an explicit initializer', async 
   const file = viewPath.replace('View.swift', 'ViewModel.swift');
   const {report} = await inspectView(t, 'struct HomeView: View { @State private var viewModel = HomeViewModel() }', {
     [file]: `final class HomeViewModel {
-      private let network: App.NetworkingManager = .init()
+      private let repository: (any App.NotesRepository)? = nil
       private var computed: NotesRepository? { nil }
       private var snapshot: NotesRepository.Snapshot?
       func example() { let local: NetworkingManager = .init() }
