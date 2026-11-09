@@ -30,9 +30,12 @@ behaviour preservation. Keep remaining risks and work visible.
 For the final migration record, describe the hybrid paths reviewed and the
 reasons for retaining any legacy mechanisms. Summarise the final CFA audit,
 the corrections made, and the checks repeated after those corrections. Link
-both reviews to evidence at the final commit. Record each affected target’s
-minimum OS and link the evidence that changed paths support it. Use the completion gate in
-`record.json`. Use the scoped feature record for earlier checkpoints.
+both reviews to evidence at the final commit. In `record.json`, list every
+affected target in `completionGate.affectedTargets` and name the targets
+covered by each build in its `targets` array. Include affected extensions and
+device targets, and link evidence for any changed data handoff. Record each
+affected target’s minimum OS and link evidence that changed paths support it.
+Use the scoped feature record for earlier checkpoints.
 
 ## Transferable lesson
 
