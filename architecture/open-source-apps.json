@@ -29,8 +29,7 @@
       ],
       "description": "Schedule ownership, provider refresh and optional cache",
       "ruleIds": [
-        "CFA-SPEC-CACHE-01",
-        "CFA-SPEC-TASK-01"
+        "CFA-SPEC-CACHE-01"
       ]
     },
     {

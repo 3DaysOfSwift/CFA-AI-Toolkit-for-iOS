@@ -251,7 +251,7 @@
       "rule": "Each Feature defines whether equivalent calls share execution or commands queue, and owns work that must outlive a screen.",
       "why": "Task lifetime and repeated actions remain predictable.",
       "verify": "Test overlapping callers, cancellation, failure, stale results and operation cleanup.",
-      "example": "Two equivalent refresh callers await the same Feature-owned request.",
+      "example": "Two equivalent reload callers await the same Feature-owned task. See the bundled Habit Tracker Pro HabitsFeature under 2 - AppModel/Features/Habits.",
       "explanationIds": [
         "unstructured-tasks",
         "overlapping-requests"
