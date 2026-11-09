@@ -48,9 +48,10 @@ individual file or type issues, failed operation correctness or clarity checks,
 and timing-scenario problems, must share a source location with a visible problem
 criterion. Source findings marked `concern` must also share a location with a
 visible concern or problem criterion. Workflow rows show a concurrency result from their behaviour checks
-and timing scenarios. CFA-only deviations stay in the expanded CFA alignment
-section. The location check cannot establish that the prose describes
-the same issue. `scenarios` must have unique titles
+and timing scenarios. A failed CFA check adds a CFA deviation label to the
+workflow row. Its evidence remains in the expanded CFA alignment section,
+and the deviation does not change the row's concurrency result. The location
+check cannot establish that the prose describes the same issue. `scenarios` must have unique titles
 and status `identified` or `not-identified`. Read assertions before assigning
 identified, and cite them. Not-identified requires a test search and a documented
 scope; cite the feature behaviour needing protection. `concerns` defaults to an

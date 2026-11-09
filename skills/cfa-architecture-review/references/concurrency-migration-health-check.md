@@ -499,7 +499,8 @@ evidence with the relevant findings; do not imply unreviewed code was assessed.
 The `presentation.verdict` field is required and supplies this card text; do not
 copy the review scope or a procedural summary into it.
 
-Keep CFA-only deviations in the CFA alignment checks. Use the overall card
+Record CFA-only deviations in the CFA alignment checks. The workflow row
+labels the deviation separately from its concurrency result. Use the overall card
 and its criteria to assess Swift Concurrency and architectural clarity. A
 confirmed defect keeps the Result at **Needs attention** even when the
 numerical score is high. Use the separate Frankenstein verdict to identify
