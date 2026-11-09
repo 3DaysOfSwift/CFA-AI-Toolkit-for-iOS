@@ -26,9 +26,9 @@ progress ledger and continue methodically, even when the review takes an hour.
 Use the documented criteria and perform the source review needed to support them.
 Do not turn an unavailable measurement into an invented score.
 
-Verify that the selected iOS target uses Swift Concurrency. If it does not,
-explain that this skill does not apply; offer a separate migration review rather
-than a misleading zero-score dashboard. GCD may coexist with Swift Concurrency.
+Verify whether the selected iOS target uses Swift Concurrency. For GCD-only
+scope, explain that the concurrency dashboard is unavailable and continue the
+manual ownership and concurrency review. GCD may coexist with Swift Concurrency.
 Do not require Trend, an `AppModel` class name, or this repository's folder names.
 For an unfamiliar SwiftUI MVVM project, trace its actual View → ViewModel →
 feature owner → supporting services and integrations, and identify its actual
