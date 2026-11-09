@@ -28,6 +28,11 @@ target. Keep an intentional package placement when it is required or explicitly
 agreed, explain why it differs from the default map, and report an unresolved
 move and its concrete blocker rather than silently treating it as complete.
 
+If an existing widget or device target uses Model code that moves, apply the
+[multi-device rule](spec/rules/cfa-device-01.md). Verify the affected target
+still compiles with its shared Model and target-specific presentation. Preserve
+its existing data handoff and verify changed paths within the migration scope.
+
 ## Final CFA audit and correction
 
 After the scoped feature migration and placement and hybrid reviews, audit the

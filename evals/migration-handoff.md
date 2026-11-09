@@ -17,6 +17,8 @@ the evaluator the expected outcome.
 - A browse Feature still lives in a package described in the migration notes
   as temporary. The source diff lists the move into that package. No one has
   checked the resulting Xcode navigator or affected target membership.
+  An existing widget also consumes shared browsing Model code from this package.
+  The passing checks covered the app target only.
 - The browse provider uses a native async API. An adapter still emits
   ReactiveSwift signals to the existing UIKit screen. The record does not
   identify which callers need that adapter. A proposed cleanup would replace
@@ -42,6 +44,8 @@ the evaluator the expected outcome.
 - Inspect the physical placement, Xcode navigator, package boundaries and
   target membership. Make safe in-scope moves, then rebuild and test affected
   targets. Record any intentional package boundary with its reason.
+  Check the widget’s membership and build, and verify that moving shared Model
+  code preserves its existing data handoff and behaviour.
 - Trace the adapter's actual consumers before deciding whether to simplify
   or retain it. Verify the target’s deployment settings and the proposed
   API’s availability. Keep a compatible path for the oldest supported OS
