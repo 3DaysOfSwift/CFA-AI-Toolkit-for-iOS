@@ -39,6 +39,14 @@ placement. An intentional package boundary can explain a different physical
 location. A matching test filename identifies a candidate test file. The command
 reads source and prints its findings without modifying the inspected project.
 
+For a service placement finding, trace who uses the service and which
+capability its work belongs to. Under CFA-SPEC-SVC-01, a launch provider can
+stay beside the schedule Feature even if a second Feature uses it. A generic
+networking service belongs in shared services when no Feature naturally owns
+its responsibility. Where common configuration or shared state warrants one
+instance, verify that AppModel.live() constructs it and injects it through
+the consumers' initializers. A folder path alone cannot establish that wiring.
+
 ```sh
 node src/cli.mjs /path/to/your-ios-repository --out reports/first-review
 open reports/first-review/report.html
