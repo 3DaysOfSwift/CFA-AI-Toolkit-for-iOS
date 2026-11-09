@@ -358,6 +358,18 @@ private actor DelayedRestoreRepository: PendingRequestRepository {
         try await restarted.restore()
         precondition(restarted.pending == restoring.pending)
 
+        // A delayed restoration cannot put an opened request back on screen.
+        async let restorationBeforeOpen: Void = restoring.restore()
+        await delayedStore.waitUntilRestoreIsHeld()
+        try await restoring.open(id: duringRestore.id) { _ in true }
+        precondition(restoring.pending == [retained, incoming])
+        await delayedStore.finishRestore()
+        try await restorationBeforeOpen
+        precondition(restoring.pending == [retained, incoming])
+        let restartedAfterOpen = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
+        try await restartedAfterOpen.restore()
+        precondition(restartedAfterOpen.pending == restoring.pending)
+
         // Navigation can succeed while durable removal fails. Retry the write
         // in this process without asking another scene to navigate again.
         let retryFolder = folder.appendingPathComponent("removal-retry")
