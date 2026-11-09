@@ -10,6 +10,6 @@
 
 **Example:** In the planned Next Rocket Launch showcase, the iPhone writes an App Group snapshot for its widget and then requests a timeline reload. The Watch countdown needs only the next launch, so the phone sends that small snapshot separately through Watch Connectivity. Transfer a larger snapshot file only when the Watch presentation needs it.
 
-**Verify:** Build each target and check membership and API availability. Verify a successful snapshot write precedes the widget reload request and a failed write issues no request. Test transfer and receiving Feature updates on supported devices separately from builds and controlled tests. Exercise missing, unreadable, delayed or stale data.
+**Verify:** Build each target and check membership, API availability and lifecycle requirements. Verify a successful snapshot write precedes the widget reload request and a failed write issues no request. Test transfer and receiving Feature updates on supported devices separately from builds and controlled tests. Exercise missing, unreadable, delayed or stale data.
 
 **Full rule, context and examples:** [Use AppModel as the Composition Root and Feature Facade](../topics/17-use-appmodel-as-the-composition-root-and-feature-facade.md). This card is a reading aid; apply the complete canonical section.

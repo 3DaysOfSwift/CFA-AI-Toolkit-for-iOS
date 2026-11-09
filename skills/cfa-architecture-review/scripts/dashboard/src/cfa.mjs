@@ -160,12 +160,14 @@ skill from that toolkit before changing the project.
   separately from controlled handler tests.
 - For additional device or extension targets, verify that each target includes
   the shared Model and only its own Views and ViewModels. Each process has its
-  own AppModel and Feature instances. For an App Group widget snapshot, request
-  a timeline reload only after a successful write. Verify a failed write issues
+  own AppModel and Feature instances. Adapt composition and platform services
+  for each target while reusing the same business rules. For an App Group
+  widget snapshot, request a timeline reload only after a successful write. Verify a failed write issues
   no request. WidgetKit controls the
   reload timing. Send the Watch a separate snapshot through a suitable transfer,
   such as Watch Connectivity. Build each affected target and check API
-  availability. Separately verify the handoff on supported devices, including
+  availability and lifecycle requirements. Separately verify the handoff on
+  supported devices, including
   how receiving Features refresh their state and handle missing, unreadable,
   delayed and stale snapshots.
 - Keep Features explicitly on MainActor. Networking, persistence and expensive
