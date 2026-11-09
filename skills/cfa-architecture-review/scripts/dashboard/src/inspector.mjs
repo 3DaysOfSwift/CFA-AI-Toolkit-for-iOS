@@ -433,8 +433,11 @@ export async function inspect(project) {
     const outsideManager = match => !managerBodies.some(({start, end}) => match.index >= start && match.index < end);
     const sessionNames = new Set([...source.matchAll(/\b(\w+)\s*:\s*(?:Foundation(?:Networking)?\s*\.\s*)?URLSession\b(?!\s*\.)/g)]
       .map(match => match[1]));
-    for (const alias of source.matchAll(/\b(?:let|var)\s+(\w+)\s*=\s*(?:Foundation(?:Networking)?\s*\.\s*)?URLSession\s*\.\s*shared\b/g)) {
-      const remainder = source.slice(alias.index + alias[0].length);
+    for (const alias of source.matchAll(/\b(?:let|var)\s+(\w+)\s*=\s*(?:Foundation(?:Networking)?\s*\.\s*)?URLSession\s*(?:\.\s*shared\b|\()/g)) {
+      const end = alias.index + alias[0].length;
+      const closing = alias[0].endsWith('(') ? closingParenthesis(source, end - 1) : end - 1;
+      if (closing < 0) continue;
+      const remainder = source.slice(closing + 1);
       if (/^[ \t]*(?:[;\n}]|$)/.test(remainder) && !/^\s*[.([?]/.test(remainder)) {
         sessionNames.add(alias[1]);
       }
