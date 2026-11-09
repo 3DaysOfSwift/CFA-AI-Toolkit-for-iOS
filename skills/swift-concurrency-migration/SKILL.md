@@ -106,6 +106,12 @@ Use deliberate passes:
    visible. Keep screen-only observation scoped to the screen or its ViewModel.
    Features may start asynchronous work without making launch wait for disk or
    network completion. Do not move GCD syntax mechanically during this pass.
+   When migrating networking, apply the
+   [independent request rule](references/spec/rules/cfa-net-01.md). Preserve
+   intentional rate limits or ordering. For independent requests, verify that
+   the second reaches a controlled transport while the first response is held
+   open. If an actor protects shared request policy, trace whether either
+   caller waits for another request's response before starting its own.
 3. Convert that feature’s asynchronous model work into directly awaitable
    Swift Concurrency. ViewModels retain handles for the unstructured tasks
    they create by default. Equivalent repeated button actions return the same

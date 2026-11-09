@@ -156,7 +156,11 @@ the architecture:
     while that location remains descriptive. Put broadly applicable services
     in a shared location and compose a shared instance in `AppModel.live()`
     when common configuration or shared state requires it. Views/ViewModels
-    never open storage or make transport calls.
+    never open storage or make transport calls. Independent requests must
+    reach the transport without waiting for another response unless a
+    documented policy limits them. Where networking changes, hold one
+    response open and verify that a second independent request reaches
+    the transport before releasing the first.
 16. The app delegate calls `AppModel.shared.applicationDidFinishLaunching()`
     directly and synchronously. Features may start asynchronous work without
     making the callback await disk or network completion.
