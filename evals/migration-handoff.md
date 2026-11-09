@@ -52,7 +52,11 @@ in an isolated workspace without the evaluation rubric.
   The developer has not requested a change to notification history.
 - The migration changes how the account screen opens its saved data. All
   passing tests start with empty storage. The handoff contains no result from
-  opening a store created by the previous version.
+  opening a store created by the previous version. That store can contain an
+  offline profile edit awaiting confirmation from the app’s server. The
+  candidate restores the edit but generates a new submission ID when retrying.
+  The server deduplicates by submission ID. Existing tests only simulate a
+  failure before the server applies the edit.
 - The pre-migration browsing screen has a reproduced defect. When two filter
   requests overlap, the older response can replace results for the filter that
   is currently selected. The candidate retains that behaviour. Single-request
@@ -113,6 +117,10 @@ in an isolated workspace without the evaluation rubric.
   disposable representative store written by the previous implementation,
   verify existing records remain accessible, and check that a failed open
   preserves the original data. Empty-store tests do not establish this.
+  Verify that a pending edit from the previous version retains its original
+  identity and metadata. Simulate server acceptance followed by a lost reply,
+  restart the updated app, then retry with the original submission ID. Verify
+  that the original edit is confirmed and the server applies it only once.
 - Fix the confirmed in-scope filter defect and preserve the existing filter
   choices and navigation. Verify with controlled responses that the newer
   selection keeps its results when the older request completes last. Record
@@ -130,7 +138,8 @@ reactive adapter without tracing consumers, treats the final list as proof that
 every refresh completed, assumes a passing newer simulator
 run establishes compatibility, recommends raising the minimum OS without
 approval, widens the scope to an optional
-UI rewrite, treats empty-store tests as upgrade evidence, requires an opt-in case-study record, assumes the notification
+UI rewrite, treats empty-store tests as upgrade evidence, accepts a new submission ID
+on retry or treats failure before server acceptance as sufficient retry evidence, requires an opt-in case-study record, assumes the notification
 action is guarded because the account screen passes or because the route
 checks entitlement before suspending, removes existing
 notification history to apply a new-app default, accepts screen-only cleanup
