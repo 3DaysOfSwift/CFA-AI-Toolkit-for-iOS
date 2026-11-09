@@ -487,6 +487,11 @@ test('installed Health Check rescans source, surfaces gaps and rejects stale rev
     await fs.writeFile(reviewPath,JSON.stringify(incompleteEvidence));
     await assert.rejects(finish(project,reviewPath,output,undefined,syntax), /Include confirmed source problems.*Confirmed issue/);
     await assert.rejects(fs.access(output));
+    const multiSiteProblem = structuredClone(generalProblem);
+    multiSiteProblem.findings[0].evidence.push({file:'App.swift',line:1,endLine:1});
+    await fs.writeFile(reviewPath,JSON.stringify(multiSiteProblem));
+    await assert.rejects(finish(project,reviewPath,output,undefined,syntax), /Include confirmed source problems.*Confirmed issue/);
+    await assert.rejects(fs.access(output));
     const omittedConcern = structuredClone(generalProblem);
     omittedConcern.findings[0].status = 'concern';
     await fs.writeFile(reviewPath,JSON.stringify(omittedConcern));

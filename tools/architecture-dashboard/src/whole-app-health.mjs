@@ -412,7 +412,7 @@ function reportFindingsGaps(review) {
     .filter(criterion => criterion.status === 'problem')
     .flatMap(criterion => criterion.evidence);
   for (const problem of [...sourceProblems, ...operationProblems]) {
-    const covered = problem.evidence.some(ref => visibleEvidence.some(visible =>
+    const covered = problem.evidence.every(ref => visibleEvidence.some(visible =>
       visible.file === ref.file && visible.line <= ref.line && visible.endLine >= ref.endLine
     ));
     if (!covered) {
