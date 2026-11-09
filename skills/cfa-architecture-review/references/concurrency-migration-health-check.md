@@ -547,15 +547,19 @@ For each relevant operation, inspect:
   replacement is still pending and verify the old cleanup leaves the new
   task's handle and loading state intact. Include a cancelled request that
   still returns. Use controlled completion order where feasible.
-- Optional download caches: when CFA applies, verify that a slow restore does
-  not delay the remote request and that a restore arriving after a successful
-  download cannot replace fresh data. Follow refresh through the caller's
-  completion as well as publication. A pending or failed optional write must
-  not hold the caller open or turn a successful refresh into a failure. Trace
-  overlapping cache writes to check that an older write cannot replace a newer
-  snapshot and that a failed replacement leaves the previous cache usable.
-  Check that retries are bounded, a failed refresh keeps valid in-memory data,
-  and the app only claims offline availability for data actually saved.
+- Optional download caches: in CFA, apply the
+  [optional snapshot rule](spec/rules/cfa-cache-01.md). Verify that a slow
+  restore does not delay the remote request and that a missing, incompatible
+  or unreadable cache does not prevent it. For independent sources, finish
+  one source's refresh before releasing restoration. Verify that restoration
+  preserves the fresh result for that source and still restores usable cached
+  data for a source that has not refreshed. Hold the optional write pending
+  and verify the Feature publishes the fresh data and the caller returns
+  before releasing the write. Check that a failed write leaves the refresh
+  successful and the previous cache usable. Trace overlapping writes to
+  verify an older write cannot replace a newer snapshot. Check that retries
+  are bounded, a failed refresh keeps valid in-memory data, and the app only
+  claims offline availability for data actually saved.
 - Required saves: trace the user edit through the storage result to publication.
   In CFA, apply the [editor draft rule](spec/rules/cfa-obs-02.md). While a
   save is pending, the screen ViewModel holds the draft and the Feature still
