@@ -122,6 +122,7 @@ test('reviews a stored Feature input even when Swift synthesizes the View initia
       let snapshot: NotesFeature.Snapshot
       let refresh: () -> Void
       var computed: NotesFeature? { nil }
+      var derived: NotesFeature { makeFeature() }
       var body: some View { Button("Refresh", action: refresh) }
     }`
   });

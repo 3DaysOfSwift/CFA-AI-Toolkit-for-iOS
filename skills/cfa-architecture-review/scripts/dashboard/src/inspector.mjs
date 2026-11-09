@@ -596,7 +596,7 @@ export async function inspect(project) {
       const body = braceBody(source, start - 1);
       inspectScreenInputs(view[1], body, source, start, file, findings);
       const members = memberSignatures(body);
-      const modelProperty = /\b(?:let|var)\s+`?\w+`?\s*:\s*(?:any\s+)?(?:\w+\s*\.\s*)*(\w*(?:Feature(?:API)?|Repository|NetworkingManager|SwiftDataManager)|AppModel)\b(?!\s*\.)\s*[?!]?/g;
+      const modelProperty = /\b(?:let|var)\s+`?\w+`?\s*:\s*(?:any\s+)?(?:\w+\s*\.\s*)*(\w*(?:Feature(?:API)?|Repository|NetworkingManager|SwiftDataManager)|AppModel)\b(?!\s*\.)(?:[ \t]*[?!])?/g;
       for (const match of members.matchAll(modelProperty)) {
         if (hasComputedAccessor(body.slice(match.index + match[0].length))) continue;
         const code = featureTypeSuffix.test(match[1]) ? 'view-stored-feature' : 'view-stored-model-dependency';
