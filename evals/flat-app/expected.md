@@ -6,8 +6,8 @@ Architecture Adoption**. It first identifies these missing ownership boundaries:
 - a wallet feature that owns the balance and its existing persistence write;
 - a conversation feature that owns the message state and the existing
   hard-coded response; the fixture does not make an AI request;
-- a dedicated ViewModel constructed by `ContentView` in its private `@State
-  viewModel` property;
+- a dedicated ViewModel constructed inline in `ContentView` as
+  `@State private var viewModel = ContentViewModel()`;
 - AppModel composition for the real feature implementations; and
 - named tests for both Features and the screen ViewModel.
 
