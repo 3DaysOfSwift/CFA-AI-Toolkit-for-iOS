@@ -110,6 +110,8 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /Composition code may\s+configure and inject the session/);
   assert.match(content, /In new apps, start with a stateless value type/);
   assert.match(content, /independent requests able to progress in parallel/);
+  assert.match(content, /#Preview \{ NotesEditorView\(\) \}/);
+  assert.match(content, /default Feature dependency comes\s+from AppModel\.shared/);
   assert.match(content, /A changed input does not\s+automatically replace its State-backed ViewModel/);
   assert.match(content, /genuinely shared across the app, define it once as a static\s+property on a purpose-named enum/);
   assert.match(content, /snapshot structs use let properties and immutable contents/);

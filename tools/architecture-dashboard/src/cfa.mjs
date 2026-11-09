@@ -113,8 +113,9 @@ skill from that toolkit before changing the project.
   separate notification history or global navigation router only when the
   product requires one. Preserve existing deep-link, notification and history
   behaviour during migration.
-- A normal preview constructs the View and follows the same ownership and
-  storage boundaries. Keep SwiftData containers and contexts out of previews.
+- A normal preview constructs the View, for example #Preview { NotesEditorView() }.
+  The View constructs its own ViewModel, whose default Feature dependency comes
+  from AppModel.shared. Keep SwiftData containers and contexts out of previews.
 - Keep Views declarative. Feature state and business decisions belong outside
   the View layer. Reusable presentation components may receive display values,
   bindings and action closures that forward intent to their owning screen and
