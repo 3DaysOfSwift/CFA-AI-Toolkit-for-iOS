@@ -130,7 +130,9 @@ evidence and verdict for each applicable CFA requirement at the final commit.
 Explain why any requirement does not apply and how any agreed exception affects
 the conformance verdict. An unresolved applicable requirement keeps the audit
 open. The validator checks the audit link, revision and recorded outcome. The
-reviewer checks the audit’s coverage and evidence.
+reviewer checks the audit’s coverage and evidence. A failed run at the final
+commit is flagged for review. Verify that a passing rerun covers the same
+scenario, target, build configuration and OS before accepting completion.
 
 When any gate is missing, use progress language such as “Continuing migration:
 verify the Xcode navigator map.” Never convert a baseline pass, source parse or

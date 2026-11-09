@@ -163,6 +163,11 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
     }
   }
   if (record.result === 'completed') {
+    for (const item of record.evidence) {
+      if (item.phase === 'after' && item.outcome === 'failed' && item.commit === record.repository.afterCommit) {
+        warnings.push(`evidence.${item.id}: failed at the final commit; verify a passing rerun covers the same scenario, target, build configuration and OS before accepting completion.`);
+      }
+    }
     if (!record.repository.afterCommit) errors.push('result: completed requires a pinned afterCommit');
     for (const kind of ['build', 'test']) if (!record.evidence.some(item => item.kind === kind && item.phase === 'after' && item.outcome === 'passed' && item.commit === record.repository.afterCommit)) errors.push(`result: completed requires a passed after ${kind} at afterCommit; otherwise use partial`);
     const gate = record.completionGate;

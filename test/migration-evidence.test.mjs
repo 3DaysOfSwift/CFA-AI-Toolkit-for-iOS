@@ -244,6 +244,9 @@ test('completion is not inferred from a build pass or tests at a different commi
   f.record.completionGate.manualBehaviourRegressionEvidenceId = rerun.id;
   f.seal();
   assert.equal(inspectRecord(f.file).valid, true);
+  assert.ok(inspectRecord(f.file).warnings.some(warning =>
+    warning.includes('evidence.failed-regression: failed at the final commit')
+  ));
 
   f.record.status = 'draft';
   f.record.repository.afterCommit = null;
