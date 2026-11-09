@@ -20,7 +20,9 @@ the evaluator the expected outcome.
   as temporary. The source diff lists the move into that package. No one has
   checked the resulting Xcode navigator or affected target membership.
   An existing widget also consumes shared browsing Model code from this package.
-  The passing checks covered the app target only.
+  The passing regression suite covered the app target only. A separate widget
+  build passed at the final commit, but no check exercised the app writing a
+  snapshot and the widget reading it.
 - The browse provider uses a native async API. An adapter still emits
   ReactiveSwift signals to the existing UIKit screen. The record does not
   identify which callers need that adapter. A proposed cleanup would replace
@@ -49,8 +51,10 @@ the evaluator the expected outcome.
 - Inspect the physical placement, Xcode navigator, package boundaries and
   target membership. Make safe in-scope moves, then rebuild and test affected
   targets. Record any intentional package boundary with its reason.
-  Check the widget’s membership and build, and verify that moving shared Model
-  code preserves its existing data handoff and behaviour.
+  Keep the passing widget build as build evidence. Check the widget’s
+  membership and verify the actual snapshot handoff separately. If the files
+  move again, rebuild both affected targets and repeat the handoff check at
+  the new final commit.
 - Trace the adapter's actual consumers before deciding whether to simplify
   or retain it. Verify the target’s deployment settings and the proposed
   API’s availability. Keep a compatible path for the oldest supported OS
@@ -72,7 +76,7 @@ the evaluator the expected outcome.
   record the passing checks, hybrid review and final CFA audit at the new commit.
 
 Fail the evaluation if the response declares completion from the build and
-test results, ignores the conflicting failed run, treats app-only checks as evidence for the affected widget,
+test results, ignores the conflicting failed run, treats the widget build or app-only tests as proof of the widget handoff,
 treats the source diff as navigator inspection, removes the
 reactive adapter without tracing consumers, assumes a passing newer simulator
 run establishes compatibility, recommends raising the minimum OS without
