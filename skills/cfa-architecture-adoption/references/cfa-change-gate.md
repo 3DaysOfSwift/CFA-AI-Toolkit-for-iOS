@@ -160,9 +160,11 @@ the architecture:
     Use them only where appropriate to the recorded workflow and current request;
     user-approved designs override defaults. Do not require palette counts or
     a popup theme selector when adopting CFA in an established product.
-22. ViewModels retain handles for their created Tasks by default. Equivalent
-    repeated actions reuse and await the existing execution, not a duplicate
-    task or silent busy return. Each Feature operation independently shares
+22. ViewModels retain named handles for the unstructured Tasks they create by
+    default. Equivalent repeated button actions return the same handle, and
+    asynchronous callers await its value. SwiftUI lifecycle tasks and structured
+    child tasks keep their existing owners without stored wrappers. Each Feature
+    operation independently shares
     equivalent in-flight work or queues commands that must each execute
     sequentially across suspension points. Record input identity, cleanup, cancellation and any
     product-required exception. Never lose a required edit as a duplicate, even
