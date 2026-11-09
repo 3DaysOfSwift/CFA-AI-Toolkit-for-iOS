@@ -1145,12 +1145,19 @@ test('reviews direct Feature access in reusable Views outside screen folders', a
     }
     struct Worker {
       func read() { _ = AppModel.shared.profileFeature.name }
-    }`
+    }
+    struct LocalBadge: View {
+      var body: some View { Text(Domain.ProfileFeature().name) }
+    }
+    extension Badge {
+      func label() -> String { ProfileFeature.init().name }
+    }`,
+    'Application/2 - AppModel/Features/Profile/ProfileFeature.swift': 'final class ProfileFeature { let name = "Profile" }'
   });
   const report = await inspect(root);
   assert.equal(report.screens.length, 0);
   assert.deepEqual(report.findings.filter(item => item.code === 'view-feature-access')
-    .map(item => [item.file, item.line]), [[file, 2]]);
+    .map(item => [item.file, item.line]), [[file, 2], [file, 8], [file, 11]]);
 });
 
 test('reviews direct Feature access in root tab navigation', async t => {

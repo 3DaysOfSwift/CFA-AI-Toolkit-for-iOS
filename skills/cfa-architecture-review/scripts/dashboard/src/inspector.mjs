@@ -514,6 +514,8 @@ export async function inspect(project) {
         return use;
       }
     }
+    return [...source.matchAll(/\b(\w+Feature)\s*(?:\.\s*init\s*)?\(/g)]
+      .find(match => concreteFeatures.has(match[1]));
   }
 
   const screens = [];
@@ -649,9 +651,7 @@ export async function inspect(project) {
     for (const preview of source.matchAll(/(?:#Preview\b\s*(?:\([^{}]*?\)\s*)?|\b(?:struct|enum|class|extension)\s+\w+\s*:[^{}]*?\bPreviewProvider\b[^{}]*)\{/g)) {
       const start = preview.index + preview[0].length;
       const previewBody = braceBody(source, start - 1);
-      const access = findFeatureAccess(previewBody)
-        ?? [...previewBody.matchAll(/\b(\w+Feature)\s*(?:\.\s*init\s*)?\(/g)]
-          .find(match => concreteFeatures.has(match[1]));
+      const access = findFeatureAccess(previewBody);
       const composition = /\bAppModel\s*(?:\.\s*(?:live|init)\s*)?\(/.exec(previewBody);
       if (composition) {
         findings.push(finding('preview-app-model-composition', 'review', 'This preview appears to construct AppModel. Verify that the preview constructs the View and uses its normal ViewModel and Feature route.', file, lineOf(source, start + composition.index)));
