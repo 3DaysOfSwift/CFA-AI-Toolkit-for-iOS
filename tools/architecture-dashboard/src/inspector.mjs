@@ -304,6 +304,8 @@ export function renderInspection(report) {
     lines.push('', 'Findings:');
     for (const item of report.findings) lines.push(`- ${item.severity.toUpperCase()} ${item.code}: ${item.message}${item.file ? ` (${item.file}:${item.line})` : ''}`);
   }
-  lines.push('', 'Lexical inventory only; review findings before changing code. No tests were run.');
+  lines.push('', 'Source scan limits:');
+  for (const limitation of report.limitations) lines.push('- ' + limitation);
+  lines.push('Use this map to guide source review. No tests were run.');
   return lines.join('\n');
 }
