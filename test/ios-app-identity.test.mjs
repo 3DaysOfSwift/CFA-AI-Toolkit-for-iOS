@@ -40,3 +40,9 @@ test('rejects a non reverse-DNS bundle identifier', () => {
   invalidBundleIdentifier.CFBundleIdentifier = 'Phone Drive';
   assert.throws(() => verifyAppIdentity(invalidBundleIdentifier), /reverse-DNS/);
 });
+
+test('checks a resolved identifier against the requested project identity', () => {
+  const info = validInfo();
+  assert.equal(verifyAppIdentity(info, info.CFBundleIdentifier), true);
+  assert.throws(() => verifyAppIdentity(info, 'com.example.PhoneDrive'), /does not match the expected identifier/);
+});

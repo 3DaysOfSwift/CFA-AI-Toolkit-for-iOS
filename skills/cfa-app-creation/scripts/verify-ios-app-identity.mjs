@@ -18,10 +18,14 @@ function requiredString(info, key, displayName) {
   return value;
 }
 
-export function verifyAppIdentity(info) {
+export function verifyAppIdentity(info, expectedBundleIdentifier) {
   const bundleIdentifier = requiredString(info, 'CFBundleIdentifier', 'bundle identifier');
   if (!/^[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+$/.test(bundleIdentifier)) {
     throw Error(`Bundle identifier is not a valid reverse-DNS identifier: ${bundleIdentifier}`);
+  }
+
+  if (expectedBundleIdentifier !== undefined && bundleIdentifier !== expectedBundleIdentifier) {
+    throw Error(`Built app bundle identifier ${bundleIdentifier} does not match the expected identifier ${expectedBundleIdentifier}.`);
   }
 
   requiredString(info, 'CFBundleDisplayName', 'display name');
@@ -45,11 +49,11 @@ function resolveInfoPlistPath(inputPath) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
   try {
-    const inputPath = process.argv[2];
-    if (!inputPath) {
-      throw Error('Usage: node verify-ios-app-identity.mjs <built Info.plist | app.app | app.xcarchive>');
+    const [inputPath, flag, expectedBundleIdentifier, ...extra] = process.argv.slice(2);
+    if (!inputPath || extra.length || (flag !== undefined && (flag !== '--bundle-id' || !expectedBundleIdentifier))) {
+      throw Error('Usage: node verify-ios-app-identity.mjs <built Info.plist | app.app | app.xcarchive> [--bundle-id <expected-identifier>]');
     }
-    verifyAppIdentity(readPlist(resolveInfoPlistPath(inputPath)));
+    verifyAppIdentity(readPlist(resolveInfoPlistPath(inputPath)), expectedBundleIdentifier);
     console.log('Built app bundle identifier, display name, marketing version and build number are valid.');
   } catch (error) {
     console.error(error.message);

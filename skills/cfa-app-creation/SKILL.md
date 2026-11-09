@@ -182,13 +182,14 @@ check with visual rotation testing or a successful App Store upload.
 ## App identity check
 
 After the same generic iOS-device Release build, run
-`node scripts/verify-ios-app-identity.mjs <path-to-built-app>` from this
+`node scripts/verify-ios-app-identity.mjs <path-to-built-app> --bundle-id <expected-identifier>` from this
 skill's directory. The [checker](scripts/verify-ios-app-identity.mjs) also
 accepts an `.xcarchive` or built `Info.plist`. It requires concrete, non-empty
 bundle identifier, display name, marketing version, and build number values;
 unresolved build settings and template placeholders fail the check. Run it
 against every newly created app target before handoff and against the archive
-when archiving is in scope. Report an unavailable build or archive check
+when archiving is in scope. Inspect identifiers across build configurations
+and verify test-target identifiers separately. Report an unavailable build or archive check
 accurately.
 
 ## Initial app icon
