@@ -404,17 +404,23 @@ check as needing investigation rather than guessing.
 
 First map the application's capabilities and their authoritative state owners,
 using actual responsibilities rather than folder names or a required Feature
-suffix. Identify View, screen coordination and model boundaries. For each important
+suffix. Distinguish authoritative application state from implementation state
+such as in-flight request bookkeeping, service caches and database connections.
+For CFA projects, flag competing authorities for the same business state and
+check the isolation of internal service state. Identify View, screen
+coordination and model boundaries. For each important
 business rule, locate its implementation and explain whether it can operate
 without constructing UI. Check whether ViewModels arrange existing capabilities
 or implement business policies that deserve a model owner.
 
 Inspect SwiftUI View bodies, actions and initializers. Distinguish ordinary
 presentation logic and delegated button actions from embedded business rules,
-persistence and multi-step operation coordination. For CFA projects, check inline
-private ViewModel ownership and forbidden initializer injection; in other
-architectures, explain the actual lifetime or ownership consequence rather than
-marking injection as a concurrency defect by itself.
+persistence and multi-step operation coordination. For CFA projects, check that
+each screen constructs its own private State-backed ViewModel. Construction is
+normally inline. A detail View may construct its own ViewModel in its
+initializer from a selected immutable snapshot. Flag externally supplied
+ViewModels. In other architectures, describe the actual lifetime or ownership
+consequences of injection.
 
 For every reviewed journey, connect the trigger to calls, state commits and
 completion. Identify existing-task execution, new unstructured roots, structured

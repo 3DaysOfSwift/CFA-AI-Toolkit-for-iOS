@@ -96,6 +96,9 @@ skill from that toolkit before changing the project.
   property on a purpose-named enum. Keep Feature-specific values with their
   Feature. Use authoritative bundle metadata for app identity and localization
   resources for translatable text. Keep secrets out of app constants.
+- Features own authoritative application state. Microservices can own internal
+  request bookkeeping, caches or database machinery under suitable isolation.
+  Check whether any service becomes a second authority for the same business state.
 - Start with independent Features; compose them only for a genuine business
   responsibility, without duplicating authoritative state or creating cycles.
 - For sign-out, account switching or external session expiry, let the owning
