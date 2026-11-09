@@ -338,7 +338,7 @@
       "id": "CFA-SPEC-DESIGN-01",
       "title": "Preserve product intent",
       "section": "Architecture versus product design",
-      "applies": "Creating, migrating or maintaining an app",
+      "applies": "Migrating an existing app to CFA and Swift Concurrency",
       "strength": "Required",
       "rule": "Preserve business outcomes and capabilities while migrating to CFA and Swift Concurrency; fix confirmed in-scope defects and allow necessary minor platform-driven presentation differences without seeking unrelated modernisation.",
       "why": "Migration changes how the app works internally without silently removing what users rely on.",

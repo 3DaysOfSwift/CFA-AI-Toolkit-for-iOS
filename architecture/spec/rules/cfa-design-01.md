@@ -1,6 +1,6 @@
 # CFA-SPEC-DESIGN-01: Preserve product intent
 
-**Applies when:** Creating, migrating or maintaining an app.
+**Applies when:** Migrating an existing app to CFA and Swift Concurrency.
 
 **Strength:** Required.
 
