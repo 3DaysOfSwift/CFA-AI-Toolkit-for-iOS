@@ -652,6 +652,10 @@ export async function inspect(project) {
       const access = findFeatureAccess(previewBody)
         ?? [...previewBody.matchAll(/\b(\w+Feature)\s*(?:\.\s*init\s*)?\(/g)]
           .find(match => concreteFeatures.has(match[1]));
+      const composition = /\bAppModel\s*(?:\.\s*(?:live|init)\s*)?\(/.exec(previewBody);
+      if (composition) {
+        findings.push(finding('preview-app-model-composition', 'review', 'This preview appears to construct AppModel. Verify that the preview constructs the View and uses its normal ViewModel and Feature route.', file, lineOf(source, start + composition.index)));
+      }
       for (const line of swiftDataLines(previewBody, start)) {
         findings.push(finding('view-swiftdata-access', 'review', 'This preview appears to access SwiftData directly. Preview construction follows the same CFA storage boundary as the app.', file, line));
       }

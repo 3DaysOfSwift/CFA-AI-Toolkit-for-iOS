@@ -1217,6 +1217,26 @@ test('reviews direct Feature access in a preview while leaving normal previews c
     .map(({file, line}) => [file, line]), [[file, 3], [file, 7], [file, 15]]);
 });
 
+test('reviews AppModel composition in previews outside the View folder', async t => {
+  const file = 'App/PreviewContent/HomePreview.swift';
+  const root = await fixture(t, {
+    [file]: `#Preview { HomeView() }
+    #Preview {
+      let model = Example.AppModel.live()
+      HomeView()
+    }
+    #Preview {
+      let model = AppModel()
+      HomeView()
+    }`
+  });
+  const { findings } = await inspect(root);
+  assert.deepEqual(findings.filter(item => item.code === 'preview-app-model-composition')
+    .map(({file, line, severity}) => [file, line, severity]), [
+    [file, 3, 'review'], [file, 7, 'review']
+  ]);
+});
+
 test('surfaces a stored Feature dependency as coordination to review', async t => {
   const file = 'Application/2 - AppModel/Features/Profile/UserProfileFeature.swift';
   const root = await fixture(t, {
