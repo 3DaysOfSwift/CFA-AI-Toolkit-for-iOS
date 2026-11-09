@@ -115,12 +115,16 @@ test('reviews Feature tests placed within a production source tree', async t => 
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() }; let settingsFeature: SettingsFeature }',
     'Application/2 - AppModel/Features/Settings/SettingsFeature.swift': 'final class SettingsFeature {}',
     'ApplicationTests/SettingsFeatureTests.swift': 'struct SettingsFeatureTests {}',
+    'Application/4 - Swift Extensions/FeatureTests/SettingsFeatureTests.swift': 'struct SettingsFeatureTests {}',
     [file]: 'struct SettingsFeatureTests {}'
   });
   const {findings} = await inspect(root);
   const placement = findings.find(item => item.code === 'feature-test-placement');
   assert.deepEqual([placement?.file, placement?.line, placement?.severity], [file, 1, 'review']);
   assert.ok(findings.some(item => item.code === 'feature-test-placement' && item.file === 'ApplicationTests/SettingsFeatureTests.swift'));
+  assert.ok(findings.some(item => item.code === 'feature-test-placement'
+    && item.file === 'Application/4 - Swift Extensions/FeatureTests/SettingsFeatureTests.swift'
+    && item.message.includes('production source tree')));
   assert.ok(findings.some(item => item.code === 'feature-tests-ambiguous'));
   assert.ok(!findings.some(item => item.code === 'feature-tests-missing'));
 });

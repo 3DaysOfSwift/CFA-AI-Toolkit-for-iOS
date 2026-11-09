@@ -4,7 +4,7 @@ import path from 'node:path';
 import { analyse, maskSwift, scanSource } from './analyse.mjs';
 
 const screenPath = /(?:^|\/)1 - View\/Views\/.*View\.swift$/;
-const productionSourceTree = /(?:^|\/)(?:1 - View|2 - AppModel)\//;
+const productionSourceTree = /(?:^|\/)(?:1 - View|2 - AppModel|3 - App Resources|4 - Swift Extensions)\//;
 const featureTypeSuffix = /Feature(?:API)?$/;
 const serviceTypeSuffix = /(?:Repository|NetworkingManager|SwiftDataManager)$/;
 
