@@ -22,6 +22,21 @@ test('paid capability matches are review leads, with possible indexed callers',(
   assert.equal(indexed.indexFreshness, compilerIndex.indexFreshness);
   assert.equal(indexed.indexExcludedCalls, 3);
 });
+test('traces upstream indexed callers through helpers and stops at cycles', () => {
+  const compilerIndex = {status:'available', calls:[
+    {calleeID:'caller-1', callerID:'router', caller:'route', file:'Router.swift', line:7, column:5},
+    {calleeID:'router', callerID:'shortcut', caller:'perform', file:'Shortcut.swift', line:3, column:5},
+    {calleeID:'shortcut', callerID:'router', caller:'route', file:'Router.swift', line:9, column:5}
+  ]};
+  const result = auditEntitlements({...analysis, compilerIndex}, {
+    capabilities:[{name:'Export', writtenCalls:['exportFeature.export']}]
+  });
+  const [match] = result.capabilities[0].calls;
+  assert.deepEqual(match.possibleIndexedCallers.map(call => call.file), ['Router.swift']);
+  assert.deepEqual(match.possibleIndexedUpstreamCallers.map(call => call.file), ['Shortcut.swift', 'Router.swift']);
+  assert.equal(match.status, 'review-required');
+});
+
 test('no matches and missing syntax cannot be reported as a pass',()=>{
   const result=auditEntitlements({...analysis,syntax:{status:'unavailable',reason:'Xcode not selected'},callCandidates:[]},{capabilities:[{name:'Export',writtenCalls:['exportFeature.export']}]});
   assert.equal(result.capabilities[0].status,'no-matches-unverified');

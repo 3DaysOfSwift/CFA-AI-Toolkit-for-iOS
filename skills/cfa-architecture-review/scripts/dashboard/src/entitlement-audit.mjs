@@ -15,21 +15,38 @@ export function auditEntitlements(analysis, policy) {
   if (!Array.isArray(analysis?.callCandidates)) throw Error('Analysis does not contain callCandidates.');
   const calls = analysis.callCandidates;
   const indexed = analysis.compilerIndex?.status === 'available' ? analysis.compilerIndex.calls || [] : [];
+  const callsByCallee = new Map();
+  for (const call of indexed) {
+    if (!call.calleeID) continue;
+    if (!callsByCallee.has(call.calleeID)) callsByCallee.set(call.calleeID, []);
+    callsByCallee.get(call.calleeID).push(call);
+  }
+
   function possibleCallers(matches) {
-    const enclosingIDs = new Set(matches.map(match => match.callerID).filter(Boolean));
-    const leads = new Map();
-    for (const call of indexed) {
-      if (!enclosingIDs.has(call.calleeID)) continue;
-      const lead = {caller:call.caller, file:call.file, line:call.line, column:call.column};
-      leads.set(JSON.stringify(lead), lead);
+    const pending = [...new Set(matches.map(match => match.callerID).filter(Boolean))];
+    const visited = new Set(pending);
+    const direct = new Map();
+    const upstream = new Map();
+    const directCount = pending.length;
+    for (let index = 0; index < pending.length; index++) {
+      const leads = index < directCount ? direct : upstream;
+      for (const call of callsByCallee.get(pending[index]) ?? []) {
+        const lead = {caller:call.caller, file:call.file, line:call.line, column:call.column};
+        const key = JSON.stringify(lead);
+        if (!direct.has(key)) leads.set(key, lead);
+        if (call.callerID && !visited.has(call.callerID)) {
+          visited.add(call.callerID);
+          pending.push(call.callerID);
+        }
+      }
     }
-    return [...leads.values()];
+    return {possibleIndexedCallers:[...direct.values()], possibleIndexedUpstreamCallers:[...upstream.values()]};
   }
   const capabilities = policy.capabilities.map(capability => {
     const matches = calls.filter(call => capability.writtenCalls.includes(call.written)).map(call => ({
       file:call.file, line:call.line, column:call.column, written:call.written,
       enclosingFunction:call.enclosingFunction || null,
-      possibleIndexedCallers:possibleCallers(call.possibleIndexMatches || []),
+      ...possibleCallers(call.possibleIndexMatches || []),
       status:'review-required'
     }));
     return {name:capability.name, writtenCalls:capability.writtenCalls, status:matches.length ? 'review-required' : 'no-matches-unverified', calls:matches};
@@ -43,7 +60,7 @@ export function auditEntitlements(analysis, policy) {
     indexModule:analysis.compilerIndex?.module || null, indexReason:analysis.compilerIndex?.reason || null,
     indexFreshness:analysis.compilerIndex?.indexFreshness || 'unverified',
     indexExcludedCalls:analysis.compilerIndex?.excludedCalls ?? null, capabilities,
-    limitations:['Exact written-call matches are candidates, not resolved targets, proof of an entitlement check, or proof of a missing check.', 'Aliases, dynamic dispatch, properties, closures, external modules and unlisted spellings can be missed.', 'Indexed callers are possible navigation leads; index freshness and target coverage must be verified.', 'Inspect each entry point and test locked and entitled outcomes. No matches do not imply protection.']};
+    limitations:['Exact written-call matches are candidates, not resolved targets, proof of an entitlement check, or proof of a missing check.', 'Aliases, dynamic dispatch, properties, closures, external modules and unlisted spellings can be missed.', 'Direct and upstream indexed callers are possible navigation leads; index freshness and target coverage must be verified.', 'Inspect each entry point and test locked and entitled outcomes. No matches do not imply protection.']};
 }
 
 if (process.argv[1] && existsSync(process.argv[1]) && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
