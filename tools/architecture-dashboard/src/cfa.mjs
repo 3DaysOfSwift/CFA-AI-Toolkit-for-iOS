@@ -82,8 +82,11 @@ skill from that toolkit before changing the project.
   supplied snapshot seeds the destination identity. A changed input does not
   automatically replace its State-backed ViewModel.
   Keep the selected snapshot and navigation stable when the source list changes.
-  Use explicit refresh where appropriate and adopt live updates when the product
-  calls for them.
+  Omission from a refreshed list does not establish deletion. Prefer explicit
+  refresh where it meets the product need. If several consumers need live
+  updates for one item, prefer a focused Feature API by item identity and
+  define its lifetime and missing-item behaviour. Verify that refreshing the
+  source list leaves two independent detail destinations stable.
 - In a new app with deep links or notification actions, DeepLinkingFeature
   validates opening requests and owns the durable pending list shown in Settings.
   Save the safe data needed to identify and present each request before adding

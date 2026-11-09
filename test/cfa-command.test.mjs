@@ -114,6 +114,8 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /independent requests able to progress in parallel/);
   assert.match(content, /#Preview \{ NotesEditorView\(\) \}/);
   assert.match(content, /default Feature dependency comes\s+from AppModel\.shared/);
+  assert.match(content, /Omission from a refreshed list does not establish deletion/);
+  assert.match(content, /leaves two independent detail destinations stable/);
   assert.match(content, /A changed input does not\s+automatically replace its State-backed ViewModel/);
   assert.match(content, /genuinely shared across the app, define it once as a static\s+property on a purpose-named enum/);
   assert.match(content, /Start a new app without a constants enum until such a value is needed/);
