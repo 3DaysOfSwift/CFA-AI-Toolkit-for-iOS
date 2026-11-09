@@ -36,7 +36,10 @@ export async function collectProjectAnalysis(root, options = {}, providers = {})
   if (before.sourceFingerprint !== after.sourceFingerprint) throw Error('Source changed during analysis. Run it again.');
   const sourceFiles = new Set(before.files.map(file => file.path));
   const syntaxFiles = new Set(syntax.files || []);
-  const syntaxCoverage = syntax.status === 'available' && sourceFiles.size === syntaxFiles.size && [...sourceFiles].every(file => syntaxFiles.has(file)) ? 'matching' : 'unverified';
+  const matchingFileSets = sourceFiles.size === syntaxFiles.size &&
+    [...sourceFiles].every(file => syntaxFiles.has(file));
+  const syntaxCoverage = syntax.status === 'available' && matchingFileSets && !syntax.warnings?.length
+    ? 'matching' : 'unverified';
   // A shared source line is a navigation lead, not proof that two records are the same call.
   const indexedByLine = new Map();
   for (const call of compilerIndex.calls) {

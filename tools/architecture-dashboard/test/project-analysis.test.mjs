@@ -49,3 +49,16 @@ test('preserves ambiguous same-line matches instead of choosing a callee', async
     assert.equal(result.callCandidates[0].resolvedCallee,undefined);
   } finally { await fs.rm(root,{recursive:true,force:true}); }
 });
+
+test('keeps syntax coverage unverified when a listed file has parser warnings', async () => {
+  const partialSyntax = async () => ({
+    ...(await syntax()), warnings:['Parser reported errors in App.swift']
+  });
+  const result = await analyseProject(os.tmpdir(), {}, {
+    analyse:async () => inventory(), syntax:partialSyntax
+  });
+  assert.equal(result.syntax.status, 'available');
+  assert.equal(result.syntax.coverage, 'unverified');
+  assert.deepEqual(result.syntax.warnings, ['Parser reported errors in App.swift']);
+  assert.equal(result.callCandidates[0].written, 'refresh');
+});
