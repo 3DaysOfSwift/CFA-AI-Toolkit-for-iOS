@@ -14,8 +14,14 @@ struct PendingSnapshot: Sendable {
     let requests: [DestinationRequest]
 }
 
+protocol PendingRequestRepository: Sendable {
+    func snapshot() async throws -> PendingSnapshot
+    func insert(_ request: DestinationRequest) async throws -> PendingSnapshot
+    func remove(id: String) async throws -> PendingSnapshot
+}
+
 // The actor serializes file access. Only safe destination data is stored.
-actor PendingRequestStore {
+actor PendingRequestStore: PendingRequestRepository {
     private let fileURL: URL
     private var requests: [DestinationRequest] = []
     private var resolvedIDs: Set<String> = []
@@ -71,12 +77,12 @@ enum PendingRequestError: Error {
 @MainActor @Observable
 final class DeepLinkingFeature {
     private(set) var pending: [DestinationRequest] = []
-    @ObservationIgnored private let store: PendingRequestStore
+    @ObservationIgnored private let store: any PendingRequestRepository
     @ObservationIgnored private var lastPublishedRevision = -1
     @ObservationIgnored private var activeRequests: Set<String> = []
     @ObservationIgnored private var openedAwaitingRemoval: Set<String> = []
 
-    init(store: PendingRequestStore) { self.store = store }
+    init(store: any PendingRequestRepository) { self.store = store }
 
     func restore() async throws { publish(try await store.snapshot()) }
 
