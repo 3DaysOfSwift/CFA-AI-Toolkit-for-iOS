@@ -91,7 +91,11 @@ Use deliberate passes:
    the [paid capability rule](references/spec/rules/cfa-pay-01.md). Trace access
    before and after migration, including routes that bypass the usual screen.
    Verify that locked users cannot reach paid presentation or execution and
-   that entitled users retain access. Preserve existing server-side enforcement.
+   that entitled users retain access. If a route can suspend between its check
+   and paid presentation or execution, verify that it checks again when access
+   can change during the wait. Revoke access during a controlled suspension and
+   verify that the resumed route blocks the capability. Preserve existing
+   server-side enforcement.
    When migrating account-scoped work, apply the
    [account lifecycle rule](references/spec/rules/cfa-account-01.md). Preserve
    the existing cleanup and retention contract. Trace sign-out, account
