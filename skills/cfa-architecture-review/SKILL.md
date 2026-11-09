@@ -136,11 +136,13 @@ work stays short.
 
 Apply the [Feature isolation rule](references/spec/rules/cfa-conc-01.md)
 even when a Feature has no current screen. Check its effective MainActor
-isolation in each affected target, accounting for annotations and default
-isolation. Follow expensive synchronous work into the service and check its
-effective isolation too. An async signature or separate type is insufficient
-evidence that the work leaves MainActor. Separate source findings from measured
-responsiveness.
+isolation in each affected target, accounting for the Swift language mode,
+default isolation and relevant SDK annotations. Trace networking, persistence
+and expensive processing into the services that perform the work. CFA services
+avoid MainActor by default. When a framework requires MainActor, verify that
+the requirement stays within a narrow adapter. An async signature or separate
+type alone does not establish where work runs. Separate source findings from
+measured responsiveness.
 
 When reviewing shared refreshes in a CFA app, apply the
 [shared refresh rule](references/spec/rules/cfa-task-02.md). Trace who owns

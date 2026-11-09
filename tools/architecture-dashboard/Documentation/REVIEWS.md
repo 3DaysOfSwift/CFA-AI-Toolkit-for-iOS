@@ -256,6 +256,11 @@ default isolation and SDK annotations when they affect the result. A type
 name, an actor count or an async declaration alone does not establish the
 execution boundary. When a responsiveness conclusion depends on timing,
 record a measurement separately from the source trace.
+When assessing CFA conformance, verify that the Feature owns authoritative
+state on MainActor and that networking, storage and expensive processing use
+an appropriate isolation boundary off MainActor by default. Check that any
+framework-required MainActor call is confined to a narrow adapter. Keep the
+CFA conformance finding separate from any demonstrated concurrency defect.
 
 ### Timing scenarios
 
