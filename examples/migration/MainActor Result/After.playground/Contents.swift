@@ -22,7 +22,8 @@ final class LaunchFeature {
     var isRefreshing: Bool { refreshTask != nil }
     init(provider: any LaunchProviding) { self.provider = provider }
 
-    // The fixture publishes every simulated outcome in admission order.
+    // The legacy callback accepts every call. Keep that policy even if the
+    // caller is already cancelled, and publish each outcome in admission order.
     func refresh(available: Bool) async -> Bool {
         let previous = refreshTask
         let id = UUID()

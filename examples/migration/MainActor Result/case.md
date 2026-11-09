@@ -36,8 +36,11 @@ Open and run `Before.playground` and `After.playground`. Each prints `Passed:` a
 
 The playground uses a stateless value type to simulate the provider outcome.
 Its async method shows the call boundary without simulating network timing.
-The legacy example only models success. Once admitted, a refresh runs to completion even if its caller is cancelled. The Feature owns the task, and the caller awaits its result. Cancelling the caller neither cancels that task nor ends its wait for the result. A screen that needs to leave promptly needs a separate cancellation path for its wait. The automated check holds the first request open, admits a second request
+The legacy example only models success and accepts every submitted call.
+The migrated fixture preserves admission even when the caller is already
+cancelled. Once admitted, a refresh runs to completion even if its caller is cancelled. The Feature owns the task, and the caller awaits its result. Cancelling the caller neither cancels that task nor ends its wait for the result. A screen that needs to leave promptly needs a separate cancellation path for its wait. The automated check holds the first request open, admits a second request
 and cancels its caller. The first request then fails, and the second still
 succeeds. This verifies queue order and the Feature-owned lifetime with a
-controlled provider. Actual transport cancellation and timeouts are outside
+controlled provider. It also verifies that a caller cancelled before entering
+the Feature still receives the outcome of its own refresh. Actual transport cancellation and timeouts are outside
 the example’s scope.

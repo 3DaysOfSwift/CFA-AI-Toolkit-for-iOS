@@ -98,6 +98,14 @@ extension LaunchFeature {
         let calls = await provider.calls
         precondition(calls == [true, false, true])
         precondition(feature.name == "Artemis" && !feature.isRefreshing && feature.refreshFailure == nil)
+        let cancelledBeforeAdmission = Task { @MainActor in
+            await feature.refresh(available: true)
+        }
+        cancelledBeforeAdmission.cancel()
+        let accepted = await cancelledBeforeAdmission.value
+        let finalCalls = await provider.calls
+        precondition(accepted && finalCalls == [true, false, true, true])
+        precondition(!feature.isRefreshing)
     }
 }
 `;
