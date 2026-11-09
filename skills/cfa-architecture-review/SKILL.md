@@ -270,7 +270,9 @@ and current navigation and notification-history behaviour.
 When sign-out, account switching or session expiry is in scope, apply the
 [account lifecycle rule](references/spec/rules/cfa-account-01.md). Trace when
 the session actually ends, which Feature coordinates cleanup, and what each
-affected Feature clears or retains. Follow an old session's request across
+affected Feature clears or retains. Reconcile partial authentication failures
+with the actual session. If external expiry is supported, verify it reaches
+its owner when the account screen is absent. Follow an old session's request across
 its suspension points to the final state update. Verify that a late result
 cannot repopulate cleared state or enter a new session, even if the old task
 was cancelled. If the same account can sign back in while earlier work is

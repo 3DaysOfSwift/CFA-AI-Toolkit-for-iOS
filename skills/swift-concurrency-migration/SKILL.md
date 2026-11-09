@@ -101,8 +101,10 @@ Use deliberate passes:
    the existing cleanup and retention contract. Trace sign-out, account
    switching and any external session expiry before removing legacy observers.
    Verify that failed sign-out preserves account data when the session stays
-   active, and exercise a late result after sign-out, switching or expiry
-   where supported. Check that the expiry signal still reaches its owner when
+   active. Exercise partial authentication failures and check the actual session.
+   Verify that cleanup failure after the session ends surfaces the error and
+   leaves the session ended. Complete an old request after sign-out, switching
+   or expiry where supported, even if cancellation was requested. Check that the expiry signal still reaches its owner when
    the account screen is absent. If the same account can sign back in before
    earlier work finishes, verify that the old session cannot publish into
    the new one. Where storage effects can overlap a session change, verify
