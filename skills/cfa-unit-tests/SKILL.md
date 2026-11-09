@@ -78,8 +78,10 @@ server-side authorisation separately for server-protected operations.
 
 For shared refreshes that should survive navigation, suspend the refresh and
 cancel its only screen waiter. Verify that the Feature still completes and
-retains the result. Test that cancelling one of several waiters leaves the
-others able to finish. If a cancelled waiter must exit promptly, verify that
+retains the result. While that refresh is still suspended, admit a later
+equivalent caller and verify it receives the same outcome without starting a
+second request. Separately test that cancelling one of several waiters leaves
+the others able to finish. If a cancelled waiter must exit promptly, verify that
 it returns before releasing the suspended refresh.
 
 For detail screens that keep a selected snapshot, construct two independent
@@ -113,6 +115,8 @@ For account changes, hold an old account's request open, switch accounts or
 sign out, then complete the old request. Verify that its data is never
 published after sign-out or into the new session. Where the same account can
 sign in again before its earlier request completes, test that sequence too.
+If a session can expire externally, drive that event while account work is
+pending and verify the Feature reconciles the session and rejects the old result.
 Exercise successful cleanup, sign-out
 failure before the session ends, and partial authentication or cleanup
 failure where supported. Assert the actual session and retained or deleted
