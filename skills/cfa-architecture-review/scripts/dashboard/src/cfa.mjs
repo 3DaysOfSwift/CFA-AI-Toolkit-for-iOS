@@ -106,7 +106,8 @@ skill from that toolkit before changing the project.
   draft available for retry if saving fails. Discard it when the user cancels
   editing, and publish confirmed changes only after required persistence succeeds.
 - When a value is genuinely shared across the app, define it once as a static
-  property on a purpose-named enum. Keep Feature-specific values with their
+  property on a purpose-named enum. A new app can start without a constants
+  enum. Keep Feature-specific values with their
   Feature. Use authoritative bundle metadata for app identity and localization
   resources for translatable text. Keep secrets out of app constants.
 - Features own authoritative application state. Microservices can own internal
