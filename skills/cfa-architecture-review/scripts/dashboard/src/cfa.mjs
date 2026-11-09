@@ -26,6 +26,8 @@ const outdatedServiceGuidance = 'SwiftData uses SwiftDataManager; URLSession cal
 const serviceGuidanceUpdate = 'Clarify SwiftDataManager ownership and keep independent network requests able to progress in parallel.';
 const outdatedScreenGuidance = 'Every screen owns a dedicated ViewModel. Declare it as @State private var';
 const screenGuidanceUpdate = 'Apply private @State ViewModel ownership to SwiftUI screens and trace the actual presentation owner for UIKit migrations.';
+const outdatedDeepLinkGuidance = 'remove it on actual navigation or explicit dismissal';
+const deepLinkGuidanceUpdate = 'Explain how to retry a failed pending-request removal without navigating again.';
 const projectGuidance = `${guidanceMarker}
 # CFA project guidance
 
@@ -199,6 +201,9 @@ function doctor(projectArgument) {
       if (content.includes(outdatedScreenGuidance)) {
         console.log(`WARN outdated screen ownership guidance in ${file}. ${screenGuidanceUpdate}`);
       }
+      if (content.includes(outdatedDeepLinkGuidance)) {
+        console.log(`WARN outdated deep-link guidance in ${file}. ${deepLinkGuidanceUpdate}`);
+      }
       if (content.includes(outdatedAppModelGuidance)) {
         console.log(`WARN outdated AppModel guidance in ${file}; update the CFA guidance block to allow private task handles for app-wide listeners.`);
       }
@@ -251,6 +256,9 @@ function enableProject(values) {
     }
     if (existingGuidance.includes(outdatedScreenGuidance)) {
       console.log(`Update the existing CFA screen ownership guidance block. ${screenGuidanceUpdate}`);
+    }
+    if (existingGuidance.includes(outdatedDeepLinkGuidance)) {
+      console.log(`Update the existing CFA deep-link guidance block. ${deepLinkGuidanceUpdate}`);
     }
     if (existingGuidance.includes(outdatedAppModelGuidance)) {
       console.log('The existing AppModel guidance should allow private task handles for app-wide listeners. Edit only the CFA guidance block.');
