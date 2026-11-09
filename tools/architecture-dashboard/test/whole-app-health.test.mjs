@@ -310,6 +310,11 @@ test('installed Health Check rescans source, surfaces gaps and rejects stale rev
     const taskMap = await fs.readFile(path.join(base,'inventory','task-map.html'),'utf8');
     assert.match(taskMap,/Task sites/);
     assert.match(taskMap,/SwiftSyntax available · file coverage matching/);
+    const partial = path.join(base, 'partial-inventory');
+    await prepare(project, partial, async () => ({...await syntax(), files:['App.swift']}));
+    const partialMap = await fs.readFile(path.join(partial, 'task-map.html'), 'utf8');
+    assert.match(partialMap, /file coverage unverified/);
+    assert.match(partialMap, /SwiftSyntax did not inventory: Value\.swift/);
     const draftPath=path.join(base,'inventory','review-draft.json');
     const pending=await progress(project,draftPath,syntax);
     assert.ok(pending.gaps.some(gap=>gap.includes('Swift files')));

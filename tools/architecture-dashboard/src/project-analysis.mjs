@@ -36,8 +36,8 @@ export async function collectProjectAnalysis(root, options = {}, providers = {})
   if (before.sourceFingerprint !== after.sourceFingerprint) throw Error('Source changed during analysis. Run it again.');
   const sourceFiles = new Set(before.files.map(file => file.path));
   const syntaxFiles = new Set(syntax.files || []);
-  const matchingFileSets = sourceFiles.size === syntaxFiles.size &&
-    [...sourceFiles].every(file => syntaxFiles.has(file));
+  const missingFiles = [...sourceFiles].filter(file => !syntaxFiles.has(file));
+  const matchingFileSets = sourceFiles.size === syntaxFiles.size && !missingFiles.length;
   const syntaxCoverage = syntax.status === 'available' && matchingFileSets && !syntax.warnings?.length
     ? 'matching' : 'unverified';
   // A shared source line is a navigation lead, not proof that two records are the same call.
@@ -56,7 +56,7 @@ export async function collectProjectAnalysis(root, options = {}, providers = {})
   }));
   const analysis = {schemaVersion:1, generatedAt:new Date().toISOString(), sourceFingerprint:before.sourceFingerprint,
     scope:before.scope, files:before.files.map(({path,hash})=>({path,hash})),
-    buildDefinitions:before.buildDefinitions || [], syntax:{...syntax,items:scopedSyntaxItems,excludedItems:excludedSyntaxItems,coverage:excludedSyntaxItems ? 'unverified' : syntaxCoverage}, compilerIndex, callCandidates,
+    buildDefinitions:before.buildDefinitions || [], syntax:{...syntax,items:scopedSyntaxItems,excludedItems:excludedSyntaxItems,missingFiles:syntax.status === 'available' ? missingFiles : [],coverage:excludedSyntaxItems ? 'unverified' : syntaxCoverage}, compilerIndex, callCandidates,
     limitations:['Syntax calls and lexical task nesting are not resolved relationships or runtime parentage.',
       'Same-line index matches are candidates only; multiple calls and macros can make them ambiguous.',
       'Compiler-index calls reflect an unverified build configuration and are not proof of runtime dispatch.',

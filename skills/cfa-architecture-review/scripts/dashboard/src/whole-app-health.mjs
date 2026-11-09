@@ -130,6 +130,7 @@ export function renderTaskMap(taskMap) {
   const parserNotes = [
     taskMap.reason,
     ...(taskMap.warnings || []),
+    ...(taskMap.missingFiles || []).map(file => `SwiftSyntax did not inventory: ${file}.`),
     taskMap.excludedItems ? `Parser findings outside the source inventory: ${taskMap.excludedItems}.` : null
   ].filter(Boolean);
   const diagnostics = parserNotes.map(note => `<p>${esc(note)}</p>`).join('');
@@ -287,8 +288,8 @@ export async function prepare(root, output, syntaxProvider = collectSyntax, opti
   await fs.writeFile(path.join(output,'checklist.json'),JSON.stringify(checklist,null,2)+'\n',{flag:'wx'});
   const draft = {schemaVersion:1,sourceFingerprint:report.sourceFingerprint,author:'Health Check reviewer',includeTests:report.scope.includeTests,scope:'Whole application',productionTargets:[],targetInventoryVerified:false,fileReviews:[],fileBatches:[],operationInventory:{scope:'Whole application',method:'Source review and scanner inventory',coverage:'partial'},operations:[],entryPoints:[],taskSites:[]};
   await fs.writeFile(path.join(output,'review-draft.json'),JSON.stringify(draft,null,2)+'\n',{flag:'wx'});
-  const {status, coverage, reason, warnings, excludedItems} = report.syntax;
-  const taskMap = {sourceFingerprint:report.sourceFingerprint, status, coverage, reason, warnings, excludedItems,
+  const {status, coverage, reason, warnings, excludedItems, missingFiles} = report.syntax;
+  const taskMap = {sourceFingerprint:report.sourceFingerprint, status, coverage, reason, warnings, excludedItems, missingFiles,
     note:'Syntax locations and lexical nesting are leads only. Task parentage, ownership and call relationships require source review.',
     sites:taskCandidates(report)};
   await fs.writeFile(path.join(output,'task-map.json'),JSON.stringify(taskMap,null,2)+'\n',{flag:'wx'});
