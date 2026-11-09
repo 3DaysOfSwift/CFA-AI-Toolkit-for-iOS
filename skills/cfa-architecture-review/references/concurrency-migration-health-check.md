@@ -353,6 +353,12 @@ lifecycle callback; the receiving owners may start their own asynchronous work.
 Identify a deferred initial signal as a departure from that policy and highlight
 the exact source path to the team, including its ownership and ordering effects.
 
+For CFA targets, follow the direct AppModel call through Feature startup and
+the start of any required app-wide listeners before the callback returns. Check
+that repeated startup signals do not create duplicate listeners. Trace events
+to the owning Feature when no relevant screen is visible. Record this lifecycle
+evidence separately from any startup timing measurement.
+
 Apply this review to CFA and non-CFA apps without requiring any particular
 architecture, AppModel name or launch delegate. First establish which work the
 app actually needs at launch and whether the callback applies to that target or

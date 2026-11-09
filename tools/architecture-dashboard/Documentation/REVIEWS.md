@@ -319,7 +319,11 @@ Across all criteria, cover these IDs:
 A criterion can cover several questions when its detail and evidence address
 each one. For launch performance, report the measurement conditions and result
 when available. Otherwise, describe the startup path and state that timing was
-unavailable. The structural-conflict verdict comes from the classified operation
+unavailable. When reviewing CFA conformance, also record whether AppModel
+signals Feature startup and starts required app-wide listeners before the
+launch callback returns. Trace duplicate prevention and delivery to the owning
+Feature with no relevant screen visible. Record those checks independently of
+any launch timing. The structural-conflict verdict comes from the classified operation
 checks. For an older review, update its findings and add the corresponding
 `appChecks` before regenerating the report. Use `progress` or `next` to list
 missing questions before rendering.
