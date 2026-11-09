@@ -30,8 +30,10 @@ must not describe the app as CFA merely because folders could be added.
 ## Migration handoff
 
 Use the [migration handoff case](migration-handoff.md) to check that an installed
-host follows the completion gate when builds pass but placement, hybrid paths
-and manual verification still need attention.
+host follows the completion gate when builds pass but placement, hybrid paths,
+shared refresh lifetime and background behaviour still need verification.
+Review each claimed outcome against the rubric. A foreground test cannot
+establish system background delivery or completion during expiration.
 
 ## Product-design scope
 

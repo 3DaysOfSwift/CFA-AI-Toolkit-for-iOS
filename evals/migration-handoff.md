@@ -156,8 +156,10 @@ test results, ignores the conflicting failed run, treats the widget build or app
 treats the source diff as navigator inspection, removes the
 reactive adapter without tracing consumers, treats the final list as proof that
 every refresh completed, accepts cancelling a shared download when a screen
-leaves despite the baseline lifetime, assumes a passing newer simulator
-run establishes compatibility, recommends raising the minimum OS without
+leaves despite the baseline lifetime, accepts screen-bound registration for
+existing system background work, treats foreground tests as proof of
+background delivery or exactly-once completion, assumes a passing newer
+simulator run establishes compatibility, recommends raising the minimum OS without
 approval, widens the scope to an optional
 UI rewrite, treats empty-store tests as upgrade evidence, accepts a new submission ID
 on retry or treats failure before server acceptance as sufficient retry evidence, requires an opt-in case-study record, assumes the notification
