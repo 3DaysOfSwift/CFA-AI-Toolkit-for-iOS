@@ -497,9 +497,9 @@ test('installed Health Check rescans source, surfaces gaps and rejects stale rev
     await fs.writeFile(reviewPath,JSON.stringify(omittedConcern));
     for (const checkpoint of [progress, next]) {
       const {gaps} = await checkpoint(project, reviewPath, syntax);
-      assert.match(gaps.join(' '), /Include source concerns.*Confirmed issue/);
+      assert.match(gaps.join(' '), /Include source concerns.*Confirmed issue.*missing Value\.swift:1/);
     }
-    await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/Include source concerns.*Confirmed issue/);
+    await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/Include source concerns.*Confirmed issue.*missing Value\.swift:1/);
     await assert.rejects(fs.access(output));
     const invalidStatus = structuredClone(generalProblem);
     invalidStatus.findings[0].status = 'Problem';

@@ -408,26 +408,28 @@ function reportFindingsGaps(review) {
     ...(operation.checks || []).filter(check => check.status === 'fail' && check.dimension !== 'cfa'),
     ...(operation.scenarios || []).filter(scenario => scenario.status === 'problem')
   ]);
-  const coversEvidence = (finding, visibleEvidence) => finding.evidence.every(ref =>
-    visibleEvidence.some(visible =>
+  const missingEvidence = (finding, visibleEvidence) => finding.evidence.filter(ref =>
+    !visibleEvidence.some(visible =>
       visible.file === ref.file && visible.line <= ref.line && visible.endLine >= ref.endLine
     )
-  );
+  ).map(({file, line, endLine}) => `${file}:${line}${endLine > line ? `–${endLine}` : ''}`);
   const problemEvidence = criteria
     .filter(criterion => criterion.status === 'problem')
     .flatMap(criterion => criterion.evidence);
   for (const problem of [...sourceProblems, ...operationProblems]) {
-    if (!coversEvidence(problem, problemEvidence)) {
+    const missing = missingEvidence(problem, problemEvidence);
+    if (missing.length) {
       gaps.push('Include confirmed source problems in the report criteria before rendering: ' +
-        (problem.title || problem.name || problem.file));
+        (problem.title || problem.name || problem.file) + ` (missing ${missing.join(', ')})`);
     }
   }
   const concernEvidence = criteria
     .filter(criterion => ['concern', 'problem'].includes(criterion.status))
     .flatMap(criterion => criterion.evidence);
   for (const concern of (review.findings || []).filter(finding => finding.status === 'concern')) {
-    if (!coversEvidence(concern, concernEvidence)) {
-      gaps.push('Include source concerns in the report criteria before rendering: ' + concern.title);
+    const missing = missingEvidence(concern, concernEvidence);
+    if (missing.length) {
+      gaps.push(`Include source concerns in the report criteria before rendering: ${concern.title} (missing ${missing.join(', ')})`);
     }
   }
   return gaps;
