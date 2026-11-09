@@ -28,6 +28,9 @@ the architecture:
    Construct it inline by default.
    A detail View may construct its own State-backed ViewModel in its initializer
    from selected value data. Never pass in or share a ViewModel.
+   Previews use the same ownership and storage boundaries. A normal preview
+   constructs the View, which creates its ViewModel and resolves its Feature
+   through the normal default. Do not attach SwiftData to a View or preview.
 2. ViewModels default narrow Feature dependencies from AppModel.shared; tests
    may provide isolated Features.
 3. Preserve independent screen and scene selection in presentation, not shared

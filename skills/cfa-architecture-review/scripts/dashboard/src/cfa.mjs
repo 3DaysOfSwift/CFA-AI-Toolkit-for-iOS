@@ -38,6 +38,8 @@ skill from that toolkit before changing the project.
 - A detail View may receive selected immutable value data and construct its own
   State-backed ViewModel in its initializer. Do not inject or share ViewModels;
   keep each scene's selection in presentation, not in a shared Feature.
+- A normal preview constructs the View and follows the same ownership and
+  storage boundaries. Keep SwiftData containers and contexts out of previews.
 - Keep Views declarative. Feature state and business decisions belong outside
   the View layer.
 - Published domain snapshots use immutable properties and contents, without
