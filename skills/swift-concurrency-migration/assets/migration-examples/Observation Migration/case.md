@@ -17,7 +17,7 @@ It does not preserve a notification for every mutation.
 
 The Feature and ViewModel use `@Observable` and are isolated to `@MainActor`.
 `HabitView` constructs its own private State-backed ViewModel. The ViewModel
-defaults to the Feature from AppModel. The runnable check injects a fresh
+defaults to the Feature supplied by `AppModel.shared`, which uses a single `live()` factory. The example focuses on observation and composition without an app launch callback. The runnable check injects a fresh
 Feature and reads the count through the ViewModel’s computed property,
 then verifies that a new tracking registration receives a later change. SwiftUI normally
 establishes observation as it evaluates the properties a View reads; manual

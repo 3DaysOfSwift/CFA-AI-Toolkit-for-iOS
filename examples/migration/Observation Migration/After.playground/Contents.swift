@@ -16,8 +16,16 @@ final class HabitFeature {
 
 @MainActor
 final class AppModel {
-    static let shared = AppModel()
-    let habitFeature = HabitFeature()
+    static let shared = AppModel.live()
+    let habitFeature: HabitFeature
+
+    init(habitFeature: HabitFeature) {
+        self.habitFeature = habitFeature
+    }
+
+    static func live() -> AppModel {
+        AppModel(habitFeature: HabitFeature())
+    }
 }
 
 @MainActor @Observable
