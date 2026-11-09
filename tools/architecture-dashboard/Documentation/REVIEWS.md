@@ -190,8 +190,9 @@ Inventory coverage is `partial` or `complete`. A complete inventory requires
 an explicit discovery method and all identified entry points, including rows
 that remain unassessed. Missing or incomplete assessments produce an inconclusive
 overall result. A local defect alone does not establish an architectural conflict.
-Regenerate the analysis and review after source changes. An exported HTML file is
-a dated snapshot and does not monitor the project for changes.
+Regenerate the analysis and refresh the review after changes to scanned Swift
+files or local build definitions, including target membership changes. An
+exported HTML file is a dated snapshot.
 
 Use one operation for each meaningful action with a distinct behavioural path;
 shared code can be cited by several operations after each caller is checked. Set

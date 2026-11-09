@@ -96,9 +96,11 @@ business-outcome coverage.
 
 The importer rejects mismatched fingerprints, missing site IDs, duplicate
 journeys for the same site and invalid evidence ranges before writing a report.
-The fingerprint covers the scanned Swift paths and contents, including dirty
-edits. It does not cover project settings, external dependencies or excluded
-files. Recheck those separately when interpreting isolation or live wiring.
+The fingerprint includes scanned Swift paths and contents, local Xcode project,
+workspace, scheme and build configuration files, and Swift package lockfiles
+found in the scan. It also records excluded test directories and skipped source
+paths. Verify target membership, external dependencies and settings outside
+the scan separately when interpreting isolation or live wiring.
 
 Coverage is the number of unique scanned creation/framework-entry sites with
 notes, not the number of fully traced tasks or a correctness percentage.

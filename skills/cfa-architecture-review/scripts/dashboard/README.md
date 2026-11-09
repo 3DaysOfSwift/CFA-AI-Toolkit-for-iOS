@@ -70,7 +70,7 @@ Each journey shows task identity, context, steps, expandable source evidence and
 explicit unknowns. Sites without notes remain listed.
 
 See [OBSERVATIONS.md](Documentation/OBSERVATIONS.md) for the format. A source fingerprint rejects
-notes attached to different scanned Swift contents. Validation checks source
+notes attached to a different scanned source or build configuration. Validation checks source
 alignment, not the truth of a claim. Reports are offline snapshots, not live views.
 
 ```sh
@@ -168,7 +168,7 @@ Report files contain source paths and symbols; review them before sharing.
   possible child creation sites and framework callbacks.
 - Provides filters, file drill-down, source excerpts and review questions.
 - Finds limited GCD, blocking-work and UI-responsibility warnings.
-- Records scan scope and a Swift-source fingerprint for observation alignment.
+- Records scan scope and fingerprints scanned Swift files and local build definitions.
 - Runs offline, without analytics, external fonts, scripts or CDN assets.
 - Lists scanned files and detected types as unassessed until a source-backed
   reviewer supplies a result; records explicit developer acceptance of a problem
