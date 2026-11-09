@@ -303,9 +303,12 @@ from precedent use; do not reframe it as a completed partial migration.
   visible, the affected feature shows its request error, and Settings or another
   independent screen remains reachable. Verify successful retry and retained
   data after failed refresh. Report any storage/UI checks that did not run.
-- Confirm that cached domain data remains representable while a refresh runs or
-  fails, and that concrete feature types and their AppModel properties retain
-  the `Feature` suffix.
+- For optional download caches, verify refresh starts while restoration is
+  pending and returns fresh data while the cache write is pending. A failed
+  refresh preserves valid displayed data. A late restore or delayed write
+  must leave the newer snapshot intact.
+- Confirm that concrete feature types and their AppModel properties retain the
+  `Feature` suffix.
 - Inspect AppModel's stored properties, initializer, and `live()`; then search
   for `AppModel.shared` stored elsewhere, View-tied launch calls,
   `ModelContainer` outside the storage boundary, and direct `URLSession` calls.
