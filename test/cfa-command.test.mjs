@@ -79,6 +79,7 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /NetworkingManager\. In new apps, start with a\s+stateless value type/);
   assert.match(content, /independent requests able to progress in parallel/);
   assert.match(content, /A changed input does not\s+automatically replace its State-backed ViewModel/);
+  assert.match(content, /genuinely shared across the app, define it once as a static\s+property on a purpose-named enum/);
   assert.match(content, /snapshot structs use let properties and immutable contents/);
   assert.match(content, /nested values and collection elements for references that can change\s+in place/);
   assert.match(content, /draft available for retry if saving fails/);

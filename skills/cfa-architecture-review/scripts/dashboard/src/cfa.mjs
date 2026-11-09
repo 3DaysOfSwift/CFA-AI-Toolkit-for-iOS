@@ -85,6 +85,10 @@ skill from that toolkit before changing the project.
   The screen ViewModel owns temporary unsaved editor values. Keep the
   draft available for retry if saving fails. Discard it when the user cancels
   editing, and publish confirmed changes only after required persistence succeeds.
+- When a value is genuinely shared across the app, define it once as a static
+  property on a purpose-named enum. Keep Feature-specific values with their
+  Feature. Use authoritative bundle metadata for app identity and localization
+  resources for translatable text. Keep secrets out of app constants.
 - Start with independent Features; compose them only for a genuine business
   responsibility, without duplicating authoritative state or creating cycles.
 - For sign-out or account switching, let the owning Feature coordinate explicit
