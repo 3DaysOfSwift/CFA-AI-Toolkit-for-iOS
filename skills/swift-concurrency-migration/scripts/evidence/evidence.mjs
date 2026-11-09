@@ -184,6 +184,12 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
     }
   }
   if (record.result === 'completed') {
+    const hasBehaviourBaseline = record.repository.beforeCommit && record.evidence.some(item =>
+      ['manual', 'test'].includes(item.kind) && item.phase === 'before' &&
+      item.commit === record.repository.beforeCommit && item.outcome !== 'not-run');
+    if (!hasBehaviourBaseline) {
+      errors.push('result: completed requires recorded before behaviour evidence at beforeCommit; otherwise use partial');
+    }
     for (const item of record.evidence) {
       if (item.phase === 'before' || item.outcome !== 'failed') continue;
       const timing = item.commit && item.commit === record.repository.afterCommit

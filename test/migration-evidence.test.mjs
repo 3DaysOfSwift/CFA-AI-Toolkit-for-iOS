@@ -150,6 +150,18 @@ test('completion is not inferred from a build pass or tests at a different commi
     reference: 'evidence.md', summary: 'Fictional completion-gate evidence.',
     outcome: 'passed', command: null, environment: 'Fixture environment', recordedAt: '2026-10-25'
   });
+  const baseline = {
+    ...afterEvidence('before-journey', 'manual'),
+    phase: 'before', commit: f.record.repository.beforeCommit, outcome: 'not-run'
+  };
+  f.record.evidence.push(baseline);
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.includes('requires recorded before behaviour evidence')));
+  baseline.outcome = 'observed';
+  baseline.commit = f.record.repository.afterCommit;
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.includes('requires recorded before behaviour evidence')));
+  baseline.commit = f.record.repository.beforeCommit;
   f.record.evidence.push(
     afterEvidence('after-navigator', 'manual'),
     afterEvidence('after-feature-inventory', 'source'),
