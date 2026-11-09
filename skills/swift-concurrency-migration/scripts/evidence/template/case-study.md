@@ -37,8 +37,10 @@ affected target in `completionGate.affectedTargets` and name the targets
 covered by each build in its `targets` array. Include affected extensions and
 device targets, and link each changed data handoff in
 `completionGate.dataHandoffEvidenceIds` (empty only if none are affected). Record each
-affected target’s minimum OS and link evidence that changed paths support it
-through `completionGate.deploymentCompatibilityEvidenceId`. If a test ran on
+affected target’s minimum OS and list the covered targets on the evidence
+linked by `completionGate.deploymentCompatibilityEvidenceId`. For handoffs,
+record the producing and receiving targets and the verification environment.
+If a test ran on
 a newer OS, record its actual version and provide separate evidence that the
 changed path works on the minimum supported OS.
 Use the scoped feature record for earlier checkpoints.

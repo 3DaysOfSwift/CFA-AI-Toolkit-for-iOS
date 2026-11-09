@@ -66,14 +66,19 @@ links and outcomes. The reviewer compares the declared affected targets with
 the actual consumers of the changed code, checks the behaviour contract,
 and verifies any affected handoff. List the final-commit test or manual
 evidence IDs in `completionGate.dataHandoffEvidenceIds`. Use an empty list
-only when the reviewer confirms no data handoff is affected. A passing build entry for a target does
-not establish that its data handoff worked. When runs disagree at the final
-commit, compare their target, build configuration and OS. Preserve failed
-runs, link the final-commit check on the affected configuration, and explain
-how it resolves the failure. Keep the migration partial while a required
-failure remains unresolved. The validator checks
-the recorded evidence links. It cannot determine whether one run supersedes
-another.
+only when the reviewer confirms no data handoff is affected. List the
+producing and receiving targets and the environment used to exercise the
+handoff. A passing build establishes compilation only.
+
+Read the warnings from both `validate` and `digest`. For a failed run during
+or after migration, keep the failure record and link a passing rerun at the
+final commit for the same scenario, target, build configuration and OS.
+Explain how the rerun resolves the failure. Check that minimum-OS evidence
+lists every affected target. If evidence is shared with another checkpoint,
+confirm that it explicitly records the human architecture review and its
+outcome. The validator checks evidence links and reports warnings. The
+reviewer resolves them and keeps the migration partial while any required
+check remains unverified.
 
 ## Validate and review
 
