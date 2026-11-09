@@ -137,7 +137,9 @@ that the root appears and unaffected destinations remain accessible.
 
 For durable edits, hold the write open and verify that confirmed state stays
 unchanged until it succeeds. On failure, assert that the editor keeps its
-draft and can retry. For optional download caches, independently control disk
+draft and can retry. Separately, cancel an unsaved edit and verify that the
+draft is discarded without changing the stored or confirmed values.
+For optional download caches, independently control disk
 and network completion. Verify that a slow restore leaves refresh free to
 start and a late restore cannot replace fresh data. Hold a cache write pending
 and verify both publication and caller completion before releasing it. Verify

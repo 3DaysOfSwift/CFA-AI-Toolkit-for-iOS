@@ -312,6 +312,11 @@ do not claim that UI gating replaces server-side authorisation.
   works and the affected Feature presents a recoverable request error. Verify
   successful retry and retained data after failed refresh. Report any
   storage or UI checks that did not run.
+- For changes to durable editing, hold the save pending and verify that
+  confirmed state stays unchanged. Fail the save and verify the screen
+  ViewModel retains the draft for retry. Verify a successful retry publishes
+  the confirmed replacement. Separately, cancel an unsaved edit and verify
+  that the draft is discarded and the stored and confirmed values are unchanged.
 - For optional download caches, verify refresh starts while restoration is
   pending and returns fresh data while the cache write is pending. A failed
   refresh preserves valid displayed data. A late restore or delayed write
