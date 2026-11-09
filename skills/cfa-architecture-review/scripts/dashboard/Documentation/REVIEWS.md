@@ -406,6 +406,11 @@ or warm launch, and what the measurement ends at. Report first-frame timing
 separately from disk restoration or Feature refresh completion. Otherwise,
 describe the startup path and state that timing was unavailable.
 
+The inspector flags some direct synchronous reads in the delegate callback,
+AppModel construction and the launch signal. Trace branches and helper calls
+on the synchronous launch path to check for other blocking I/O. Identify work
+started inside a Feature-owned task separately from work the delegate waits for.
+
 When reviewing CFA conformance, record whether AppModel signals Feature
 startup and creates and retains required asynchronous listener tasks before
 the launch callback returns. Record event consumption separately from task
