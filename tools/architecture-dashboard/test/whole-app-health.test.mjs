@@ -62,9 +62,17 @@ test('whole-app reviews require timing outcomes even if an old input disables th
   assert.match(coverageGaps(report,review).join(' '),/timing-scenario/);
   review.operations[0].scenarios=['repeat','leave','late-result','failure'].map(id=>({id,status:'not-applicable'}));
   assert.deepEqual(coverageGaps(report,review),[]);
-  review.operations[0].scenarios[1].status='unresolved';
-  assert.equal(nextWork(report,review).pendingOperations,1);
-  assert.deepEqual(nextWork(report,review).nextOperations[0].missingTimingScenarios,['leave']);
+  Object.assign(review.operations[0].scenarios[1], {
+    status:'unresolved', title:'Leave the screen',
+    outcome:'The refresh owner is unclear.', verification:'Trace the cancellation handler.'
+  });
+  const work = nextWork(report, review);
+  assert.equal(work.pendingOperations, 1);
+  assert.deepEqual(work.nextOperations[0].missingTimingScenarios, ['leave']);
+  assert.deepEqual(work.nextOperations[0].unresolvedTimingScenarios, [{
+    id:'leave', title:'Leave the screen', outcome:'The refresh owner is unclear.',
+    verification:'Trace the cancellation handler.'
+  }]);
   assert.match(coverageGaps(report,review).join(' '),/timing-scenario/);
 });
 

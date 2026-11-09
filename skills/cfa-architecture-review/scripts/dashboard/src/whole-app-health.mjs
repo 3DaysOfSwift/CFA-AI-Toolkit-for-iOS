@@ -73,6 +73,9 @@ export function nextWork(report, review, limit = 8) {
     unresolvedSteps: (operation.steps || [])
       .filter(step => step.relation === 'unknown')
       .map(({id, title, detail}) => ({id, title, detail})),
+    unresolvedTimingScenarios: (operation.scenarios || [])
+      .filter(scenario => scenario.status === 'unresolved')
+      .map(({id, title, outcome, verification}) => ({id, title, outcome, verification})),
     missingTimingScenarios: missingTimingScenarios(operation)
   })).filter(operation => operation.openChecks || operation.missingTrace || operation.missingTimingScenarios.length);
   return {
