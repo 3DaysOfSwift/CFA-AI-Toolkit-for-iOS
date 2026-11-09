@@ -643,11 +643,13 @@ test('flags SwiftData without a manager and direct URLSession calls', async t =>
 test('a SwiftData import in tests is a target-membership review, not an app defect', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
-    'ApplicationTests/StorageTests.swift': 'import SwiftData\nstruct StorageTests {}'
+    'ApplicationTests/StorageTests.swift': 'import class SwiftData.ModelContainer\nstruct StorageTests {}'
   });
   const finding = (await inspect(root)).findings.find(item => item.code === 'swiftdata-manager-missing');
   assert.equal(finding.severity, 'review');
   assert.match(finding.message, /includes tests and does not resolve target membership/);
+  assert.equal(finding.file, 'ApplicationTests/StorageTests.swift');
+  assert.equal(finding.line, 1);
 });
 
 test('flags conditional database startup presentation in App.body', async t => {

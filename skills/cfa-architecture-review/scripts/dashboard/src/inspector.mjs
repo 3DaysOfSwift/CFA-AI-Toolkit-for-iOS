@@ -370,9 +370,13 @@ export async function inspect(project) {
   }
 
   const screens = [];
-  const usesSwiftData = [...sources].some(([file, source]) => file.endsWith('.swift') && /\bimport\s+SwiftData\b/.test(source));
-  if (usesSwiftData && !declarationsByName.get('SwiftDataManager')?.some(({declaration}) => declaration.type !== 'protocol')) {
-    findings.push(finding('swiftdata-manager-missing', 'review', 'SwiftData is imported, but no concrete SwiftDataManager declaration was found. Check whether the import belongs to an app target and whether an appropriate storage boundary exists; this scan also includes tests and does not resolve target membership.', null, null));
+  if (!declarationsByName.get('SwiftDataManager')?.some(({declaration}) => declaration.type !== 'protocol')) {
+    for (const [file, source] of sources) {
+      const swiftDataImport = /\bimport\s+(?:(?:typealias|struct|class|enum|protocol|let|var|func)\s+)?SwiftData\b/.exec(source);
+      if (!swiftDataImport) continue;
+      findings.push(finding('swiftdata-manager-missing', 'review', 'SwiftData is imported, but no concrete SwiftDataManager declaration was found. Check whether the import belongs to an app target and whether an appropriate storage boundary exists; this scan also includes tests and does not resolve target membership.', file, lineOf(source, swiftDataImport.index)));
+      break;
+    }
   }
   for (const [file, source] of sources) {
     const managerBodies = [...source.matchAll(/\b(?:struct|class|actor|enum|extension)\s+NetworkingManager\b[^{}]*\{/g)]
