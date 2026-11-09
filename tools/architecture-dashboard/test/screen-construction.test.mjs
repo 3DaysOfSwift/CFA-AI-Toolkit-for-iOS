@@ -261,3 +261,17 @@ test('reviews a direct Feature call even when the screen owns a ViewModel', asyn
   assert.equal(report.screens[0].ownsViewModel, true);
   assert.equal(report.findings.find(item => item.code === 'view-feature-access')?.line, 4);
 });
+
+test('reviews direct Feature access in an extension of a scanned screen', async t => {
+  const extensionFile = 'App/1 - View/Views/Home/HomeView+Actions.swift';
+  const {report} = await inspectView(t, `struct HomeView: View {
+    @State private var viewModel = HomeViewModel()
+    var body: some View { Text("Home") }
+  }`, {
+    [extensionFile]: `extension HomeView {
+      func refresh() async { await AppModel.shared.homeFeature.refresh() }
+    }`
+  });
+  const findings = report.findings.filter(item => item.code === 'view-feature-access');
+  assert.deepEqual(findings.map(({file, line}) => [file, line]), [[extensionFile, 2]]);
+});

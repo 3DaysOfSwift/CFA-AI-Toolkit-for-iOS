@@ -385,6 +385,20 @@ export async function inspect(project) {
     screens.push({ name, viewFile, viewModelFile: viewModel ? viewModelFile : null, ownsViewModel, structuralRoot, testFile, testCandidates, dependencies });
   }
 
+  const screenNames = new Set(screens.map(screen => screen.name));
+  for (const [file, source] of sources) {
+    if (!/(?:^|\/)1 - View\//.test(file)) continue;
+    for (const extension of source.matchAll(/\bextension\s+(\w+)\b[^{}]*\{/g)) {
+      if (!screenNames.has(extension[1])) continue;
+      const start = extension.index + extension[0].length;
+      const body = braceBody(source, start - 1);
+      const access = /\bAppModel\s*\.\s*shared\s*\.\s*\w+Feature\b/.exec(body);
+      if (access) {
+        findings.push(finding('view-feature-access', 'review', 'This screen extension appears to access a Feature directly. Trace the call and route it through the owning ViewModel.', file, lineOf(source, start + access.index)));
+      }
+    }
+  }
+
   return {
     schemaVersion: 2,
     project: path.basename(root),
