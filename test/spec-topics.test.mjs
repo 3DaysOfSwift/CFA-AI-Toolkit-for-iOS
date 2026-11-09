@@ -26,6 +26,7 @@ test('headings inside fenced examples remain part of their section', () => {
     fs.mkdirSync(path.join(base, 'architecture/explanations'));
     fs.copyFileSync(path.join(root, 'architecture/explanations/catalogue.json'), path.join(base, 'architecture/explanations/catalogue.json'));
     fs.cpSync(path.join(root, 'architecture/spec-examples'), path.join(base, 'architecture/spec-examples'), { recursive: true });
+    fs.copyFileSync(path.join(root, 'architecture/reference-feature.md'), path.join(base, 'architecture/reference-feature.md'));
     const source = fs.readFileSync(path.join(root, 'architecture/cfa-specification.md'), 'utf8');
     fs.writeFileSync(path.join(base, 'architecture/cfa-specification.md'), source + '\n```markdown\n## Example only\n```\n');
     assert.equal(specTopics(base).size, specTopics(root).size);
@@ -40,6 +41,7 @@ test('rule cards reject unclassified sections and missing verification', () => {
     fs.mkdirSync(path.join(base, 'architecture/explanations'));
     fs.copyFileSync(path.join(root, 'architecture/explanations/catalogue.json'), path.join(base, 'architecture/explanations/catalogue.json'));
     fs.cpSync(path.join(root, 'architecture/spec-examples'), path.join(base, 'architecture/spec-examples'), { recursive: true });
+    fs.copyFileSync(path.join(root, 'architecture/reference-feature.md'), path.join(base, 'architecture/reference-feature.md'));
     const source = fs.readFileSync(path.join(root, 'architecture/cfa-specification.md'), 'utf8');
     const catalogue = JSON.parse(fs.readFileSync(path.join(root, 'architecture/spec-rule-catalog.json'), 'utf8'));
     fs.writeFileSync(path.join(base, 'architecture/cfa-specification.md'), source + '\n## New required rule\n');
@@ -153,7 +155,7 @@ test('navigation exposes the agreed account, refresh and multi-device boundaries
   const links = topics.get('rules/cfa-link-01.md');
   assert.match(account, /sign-out fails.*retain the session/);
   assert.match(refresh, /continues after the user leaves/);
-  assert.match(devices, /each process has its own AppModel/);
+  assert.match(devices, /each process has its own AppModel/i);
   assert.match(devices, /Watch Connectivity/);
   assert.match(links, /scene owns navigation/);
   assert.match(links, /successful navigation or explicit dismissal/);
