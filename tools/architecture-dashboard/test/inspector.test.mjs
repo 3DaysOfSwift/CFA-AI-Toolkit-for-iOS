@@ -622,3 +622,18 @@ test('reviews direct Feature access in a preview while leaving normal previews c
   assert.deepEqual(findings.filter(item => item.code === 'preview-feature-access')
     .map(({file, line}) => [file, line]), [[file, 3]]);
 });
+
+test('surfaces a stored Feature dependency as coordination to review', async t => {
+  const file = 'Application/2 - AppModel/Features/Profile/UserProfileFeature.swift';
+  const root = await fixture(t, {
+    [file]: `final class UserProfileFeature {
+      private let orders: OrdersFeature
+      private let service: AccountService
+      var computed: OrdersFeature { orders }
+      func signOut() { let local: OrdersFeature = orders }
+    }`
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'feature-coordination');
+  assert.deepEqual(findings.map(({file, line, severity}) => [file, line, severity]), [[file, 2, 'review']]);
+  assert.match(findings[0].message, /business capability.*one owner per state.*dependency cycle/);
+});
