@@ -315,6 +315,11 @@ export async function inspect(project) {
         findings.push(finding('app-model-storage-construction', 'review', `${name} references a ModelContainer initializer. Trace whether it opens storage during graph construction. CFA opens the store within the storage owner’s data request.`, file, lineOf(source, opening + 1 + container.index)));
       }
     }
+    const sharedDeclaration = /\bstatic\s+(?:let|var)\s+`?shared`?(?![\p{L}\p{M}\p{N}_])/u;
+    if (constructionBodies.some(body => body.name === 'AppModel.live()') &&
+        !appModelScopes.some(({members}) => sharedDeclaration.test(members))) {
+      findings.push(finding('app-model-shared-missing', 'review', 'AppModel defines live() but no static shared property was found. Verify that the app exposes one production graph as AppModel.shared.', appModelFile, lineOf(appModel, appModelDeclaration.index)));
+    }
     for (const {file, source, members, start} of appModelScopes) {
       for (const match of members.matchAll(/\bstatic[ \t]+(let|var)[ \t]+(\w+)[ \t]*(?::\s*[^;=\n]+)?\s*=(?!=)/g)) {
         const [, binding, name] = match;

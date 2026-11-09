@@ -99,7 +99,7 @@ test('reviews an actor exposed as a Feature while leaving its worker alone', asy
 
 test('reports a missing named feature test file', async t => {
   const root = await fixture(t, {
-    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() }; let settingsFeature: SettingsFeature }',
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static let shared = live(); static func live() -> AppModel { AppModel() }; let settingsFeature: SettingsFeature }',
     'Application/2 - AppModel/Features/Settings/SettingsFeature.swift': 'final class SettingsFeature {}'
   });
   const report = await inspect(root);
@@ -260,6 +260,19 @@ test('flags extra static AppModel storage while allowing shared and computed pro
   const { findings } = await inspect(root);
   assert.deepEqual(findings.filter(item => item.code === 'app-model-static-state')
     .map(({file, line}) => [file, line]), [[file, 3]]);
+});
+
+test('reviews a production factory without an AppModel.shared property', async t => {
+  const file = 'Application/2 - AppModel/AppModel.swift';
+  const root = await fixture(t, {
+    [file]: 'final class AppModel { static func live() -> AppModel { AppModel() } }'
+  });
+  const missingShared = item => item.code === 'app-model-shared-missing';
+  const finding = (await inspect(root)).findings.find(missingShared);
+  assert.equal(finding?.severity, 'review');
+  assert.equal(finding?.file, file);
+  await fs.writeFile(path.join(root, file), 'final class AppModel { static func live() -> AppModel { AppModel() } }\nextension AppModel { static let shared = live() }');
+  assert.ok(!(await inspect(root)).findings.some(missingShared));
 });
 
 test('checks static AppModel storage in an extension at its source location', async t => {
@@ -968,7 +981,7 @@ test('reports missing ownership and tests without pretending to verify semantics
   const root = await fixture(t, {
     'Application/1 - View/Views/Chat/ChatView.swift': 'import SwiftUI\nstruct ChatView: View { var body: some View { Text("Hi") } }',
     'Application/1 - View/Views/Chat/ChatViewModel.swift': 'final class ChatViewModel { init() {} }',
-    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }'
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static let shared = live(); static func live() -> AppModel { AppModel() } }'
   });
   const report = await inspect(root);
   assert.deepEqual(report.findings.map(item => item.code), [
@@ -983,7 +996,7 @@ test('ignores fake dependencies in comments and strings and flags unresolved pro
   const root = await fixture(t, {
     'Application/1 - View/Views/Chat/ChatView.swift': 'import SwiftUI\nstruct ChatView: View { @State private var viewModel = ChatViewModel(); var body: some View { Text("AppModel.shared.fakeFeature") } }',
     'Application/1 - View/Views/Chat/ChatViewModel.swift': '// AppModel.shared.fakeFeature\nfinal class ChatViewModel { init(chatsFeature: any ChatsFeatureAPI = AppModel.shared.missingFeature) {} }',
-    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static let shared = live(); static func live() -> AppModel { AppModel() } }',
     'ApplicationTests/ViewModelTests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}'
   });
   const report = await inspect(root);
