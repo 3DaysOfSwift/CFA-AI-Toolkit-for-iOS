@@ -38,7 +38,11 @@ development, App Creation guides product shaping without expanding this task.
 If the project is already CFA, make the smallest complete vertical change:
 
 1. Add or change the feature-owned domain behaviour in its Feature and
-   repository boundary.
+   repository boundary. Keep unsaved editor values in the screen ViewModel.
+   Publish a durable edit as saved only after required persistence succeeds.
+   On failure, keep the draft available for retry and leave confirmed state
+   unchanged. For a replaceable download, publish current server data and let
+   optional caching finish independently.
 2. Give every new screen-level SwiftUI View its own adjacent, bespoke ViewModel.
    Reusable presentation components may take snapshots, bindings and action
    closures. Use those closures to forward intent to the owning screen's
