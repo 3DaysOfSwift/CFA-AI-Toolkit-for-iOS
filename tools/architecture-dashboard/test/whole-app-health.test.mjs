@@ -59,10 +59,12 @@ test('syntax entry points join the inventory without duplicating lexical finding
     {kind:'entry.launchCallback',file:'App.swift',line:2,column:1},
     {kind:'entry.main',file:'App.swift',line:1,column:1},
     {kind:'entry.backgroundHandler',file:'App.swift',line:3,column:1},
+    {kind:'entry.incomingLink',file:'App.swift',line:3,column:2},
+    {kind:'entry.notificationResponse',file:'App.swift',line:3,column:3},
     {kind:'concurrency.task',file:'App.swift',line:3,column:1}
   ]};
   const candidates=inventoryCandidates(combined);
-  assert.equal(candidates.length,3);
+  assert.equal(candidates.length,5);
   assert.equal(candidates.filter(c=>c.kind==='launch-callback').length,1);
   assert.equal(candidates.filter(c=>c.kind==='main').length,1);
   const background = candidates.find(c=>c.kind==='background-handler');
@@ -70,8 +72,13 @@ test('syntax entry points join the inventory without duplicating lexical finding
   const review = complete();
   review.operations[0].evidence[0].line = 1;
   review.entryPoints.push({siteId:candidates.find(c=>c.kind==='main').id, operationId:'launch'});
-  assert.deepEqual(nextWork(combined,review).nextEntryPoints,[background]);
+  const openingSites = candidates.filter(c=>['incoming-link','notification-response'].includes(c.kind));
+  assert.equal(openingSites.length,2);
+  assert.deepEqual(nextWork(combined,review).nextEntryPoints,[background,...openingSites]);
   review.entryPoints.push({siteId:background.id, excludedReason:'Registration belongs to a test-only target.'});
+  for (const site of openingSites) review.entryPoints.push({siteId:site.id, operationId:'launch'});
+  assert.throws(()=>coverageGaps(combined,review),/evidence must include its reconciled entry point/);
+  review.operations[0].evidence[0].endLine = 3;
   assert.deepEqual(nextWork(combined,review).nextEntryPoints,[]);
   assert.match(coverageGaps(combined,complete()).join(' '),/entry points/);
   assert.equal(taskCandidates(combined).length,1);
