@@ -79,6 +79,13 @@ record the producing and receiving targets and the verification environment.
 If a test ran on
 a newer OS, record its actual version and provide separate evidence that the
 changed path works on the minimum supported OS.
+For existing app and test targets, compare resolved bundle identifiers in
+each affected build configuration. Cite the baseline and final evidence IDs
+and record authorisation for any change.
+
+| Target and build configuration | Baseline bundle identifier and evidence ID | Final bundle identifier and evidence ID | Authorisation for a change |
+| --- | --- | --- | --- |
+
 Keep failed runs and record the matching passing rerun at the final commit.
 Use `rerunOf` on the passing evidence entry and explain how the scenario,
 target, build configuration and OS match the failed run.

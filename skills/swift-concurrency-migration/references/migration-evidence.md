@@ -129,6 +129,11 @@ target’s minimum OS and link the evidence that changed paths support it. List
 the covered targets on the deployment compatibility evidence entry. A passing run on a newer
 OS alone does not establish that compatibility.
 
+In the final CFA audit, compare the resolved bundle identifiers of existing
+app and test targets against the baseline for each affected build
+configuration. Cite the before and after build settings, and record any
+explicitly requested identifier change and its authorisation.
+
 For every removed adapter or dependency, use the linked hybrid review to
 compare the same consumer scenarios at the baseline and final revisions for
 each affected target. Cite the before and after evidence IDs and the applicable
