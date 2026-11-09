@@ -12,6 +12,6 @@
 
 **Explanation:** [Why use record-level persistence boundaries in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/persistence-boundaries).
 
-**Verify:** Verify capabilities, deployment target, account availability and schema on real supported devices. Exercise offline edits of the same item, failed sync and restart, duplicate-safe retries and server rejection where applicable.
+**Verify:** For custom sync, fail the local write and verify that neither local success nor a sendable pending edit is published. After a successful local save, fail sync, restart and retry with the same edit identity to verify one logical server change. When replacing a sync implementation, verify recovery and retry of an edit persisted by the previous version. Exercise conflict and rejection outcomes where applicable. Verify Apple-managed sync, including conflicting offline edits, on supported devices with the required capabilities, account and schema.
 
 **Full rule, context and examples:** [Keep Persistence Behind Repository Contracts](../topics/19-keep-persistence-behind-repository-contracts.md). This card is a reading aid; apply the complete canonical section.
