@@ -41,14 +41,16 @@ described in [OBSERVATIONS.md](OBSERVATIONS.md).
 }
 ```
 
-`findings` and `testQuality` are optional. Whole-app Health Check findings use `pass`, `concern` or `problem`.
-Use `problem` for a confirmed defect. Each report criterion needs at least one
-structured evidence reference with a file and line range. Each confirmed source problem, including
-individual file or type issues, failed operation correctness or clarity checks,
-and timing-scenario problems, must have at least one complete cited source
-range included in a visible problem criterion. Source findings marked
-`concern` likewise need a complete cited range in a visible concern or problem
-criterion. Partial overlap is insufficient. Workflow rows show a concurrency result from their behaviour checks
+`findings` and `testQuality` are optional. Whole-app Health Check findings use
+`pass`, `concern` or `problem`. Use `problem` for a confirmed defect. Each
+report criterion needs a structured evidence reference with a file and line
+range. Across the visible problem criteria, include every cited source range
+for each confirmed defect, including file or type issues, failed operation
+correctness or clarity checks, and timing-scenario problems. Across the
+visible concern or problem criteria, include every cited range for each source
+finding marked `concern`. A criterion's citation must contain the entire
+cited range. When a range is missing, the report gate lists its file and lines.
+Workflow rows show a concurrency result from their behaviour checks
 and timing scenarios. A failed CFA check adds a CFA deviation label to the
 workflow row. Its evidence remains in the expanded CFA alignment section,
 and the deviation does not change the row's concurrency result. The location
