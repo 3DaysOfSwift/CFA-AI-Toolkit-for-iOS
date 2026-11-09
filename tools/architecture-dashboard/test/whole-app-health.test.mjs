@@ -64,10 +64,12 @@ test('reconciled task sites must be cited in a workflow step', () => {
   const evidence = [{file:'App.swift',line:3,endLine:3}];
   review.operations[0].evidence.push(...evidence);
   assert.match(coverageGaps(inventory,review).join(' '), /need workflow steps: App.swift:3:5/);
+  assert.deepEqual(nextWork(inventory, review).nextTaskSites, [site]);
   review.operations[0].steps[0].evidence = evidence;
   assert.match(coverageGaps(inventory,review).join(' '), /need workflow steps: App.swift:3:5/);
   review.operations[0].steps.push({id:'load',parentId:'trigger',relation:'unstructured-task',evidence});
   assert.deepEqual(coverageGaps(inventory,review), []);
+  assert.deepEqual(nextWork(inventory, review).nextTaskSites, []);
 });
 
 test('unknown operations and target membership cannot yield a pass score', () => {

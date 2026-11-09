@@ -27,13 +27,25 @@ const hasOpenChecks = operation => !operation.checks?.length ||
   Boolean(operation.unknowns?.length) ||
   Boolean(operation.steps?.some(step => step.relation === 'unknown'));
 
+function hasTaskTrace(operation, site) {
+  return operation?.steps?.some(step =>
+    step.relation !== 'event' && step.relation !== 'unknown' && step.evidence?.some(ref =>
+      ref.file === site.file && ref.line <= site.line && ref.endLine >= site.line
+    )
+  );
+}
+
 // Describe the next concrete review work without treating inventory as evidence.
 export function nextWork(report, review, limit = 8) {
   const entries = new Set((review.entryPoints || []).map(item => item.siteId));
-  const tasks = new Set((review.taskSites || []).map(item => item.siteId));
+  const tasks = new Map((review.taskSites || []).map(item => [item.siteId, item]));
+  const operations = new Map((review.operations || []).map(item => [item.id, item]));
   const pendingFiles = pendingSourceFiles(report, review);
   const pendingEntries = inventoryCandidates(report).filter(site => !entries.has(site.id));
-  const pendingTasks = taskCandidates(report).filter(site => !tasks.has(site.id));
+  const pendingTasks = taskCandidates(report).filter(site => {
+    const entry = tasks.get(site.id);
+    return !entry || (entry.operationId && !hasTaskTrace(operations.get(entry.operationId), site));
+  });
   const pendingOperations = (review.operations || []).map(operation => ({
     id: operation.id,
     title: operation.title,
@@ -137,12 +149,7 @@ export function coverageGaps(report, review) {
     if (entry.operationId) {
       const op=operations.find(item=>item.id===entry.operationId);
       if (!op || !op.evidence.some(ref=>ref.file===site.file && ref.line<=site.line && ref.endLine>=site.line)) throw Error('Operation evidence must include its reconciled task site.');
-      const traced = op.steps?.some(step =>
-        step.relation !== 'event' && step.relation !== 'unknown' && step.evidence?.some(ref =>
-          ref.file === site.file && ref.line <= site.line && ref.endLine >= site.line
-        )
-      );
-      if (!traced) untracedTasks.push(`${site.file}:${site.line}:${site.column} (${op.id})`);
+      if (!hasTaskTrace(op, site)) untracedTasks.push(`${site.file}:${site.line}:${site.column} (${op.id})`);
     }
     taskEntries.set(entry.siteId,entry);
   }
