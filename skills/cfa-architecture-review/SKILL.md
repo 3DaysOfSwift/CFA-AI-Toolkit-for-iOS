@@ -19,20 +19,23 @@ do not impose CFA on another architecture or link to an unpublished article.
 For a **Concurrency Migration Health Check**, a **Frankenstein architecture** check,
 or a request to assess how an Xcode project actually uses Swift Concurrency, read
 [Concurrency Migration Health Check](references/concurrency-migration-health-check.md).
-This mode reviews the whole application by default; use a narrower scope only
-when explicitly requested. It reviews the project's actual architecture without
-requiring CFA or a dashboard. Keep its correctness verdict separate from CFA conformance.
-Run the bundled `whole-app-health.mjs` inventory and reconcile the full source and entry points in evidence-backed operation batches as described in that workflow, then generate the single
-app-specific Health Check HTML report using its validated review input.
+The Health Check reviews the whole application. If the developer explicitly
+requests a narrower scope, perform a focused review and deliver scoped findings.
+Assess the project's actual architecture regardless of whether it uses CFA.
+Keep the Swift Concurrency correctness verdict separate from CFA conformance.
+For a whole-app Health Check, run the bundled `whole-app-health.mjs` inventory.
+Reconcile source files, entry points and task sites in evidence-backed operation
+batches, then generate one app-specific HTML report from the validated review.
 Use that workflow's checkpoint and completion check: builds, tests and simulator
-launches do not complete the assessment; finish with its scoped verdict and report.
+launches do not complete the assessment. Finish with the whole-app verdict and report.
 
-Apply the specification's screen-construction invariant within a CFA conformance review's requested
-scope: a private `viewModel` property with inline `@State` construction by default.
+In a CFA conformance review, apply the screen-construction invariant to
+screen-level SwiftUI Views: a private `viewModel` property with inline `@State` construction by default.
 A detail View may construct its own State-backed ViewModel from selected value data
 in its initializer. Never inject or share ViewModels; keep screen and scene navigation selections
 out of Features. Review-only work
 reports violations; tests inject Features into ViewModels, not ViewModels into Views.
+For existing UIKit screens, trace their actual presentation owners to Features.
 
 Review the requested scope without refactoring the application or changing
 project instructions. Missing optional themes, CFA footers or starter branding
