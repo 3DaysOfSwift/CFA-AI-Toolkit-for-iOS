@@ -20,8 +20,12 @@ language mode and runs the behavioural assertions using a command-line entry
 point. Open and run the playgrounds in Xcode to verify the playground launchers.
 The installed skill and release package include the playgrounds.
 
-Before applying an example to an app, check its callers, cancellation and
-failure handling. Check the availability of the APIs on the app’s minimum OS
+Before applying an example to an app, identify the existing behaviour its
+callers rely on and verify that it survives the migration. Include callback
+delivery, ordering, cancellation and failure handling when they affect the
+caller. The examples also demonstrate behaviours specific to their fixtures.
+For instance, the refresh in MainActor Result queues distinct outcomes. A
+real refresh whose callers need the same result can share one request. Check the availability of the APIs on the app’s minimum OS
 separately from Swift language mode. The migrated Serial Weight Saves,
 MainActor Result and Observation Migration examples all use Observation, which
 requires macOS 14 for these playgrounds and iOS 17 when applied to an iOS app.
@@ -32,7 +36,8 @@ Concurrency is available in Swift 5.5 and later.
 ## Migration cases
 
 - [Callback networking](Callback%20Networking/case.md) preserves a successful
-  decode, an HTTP 503 error and a malformed JSON error when moving to async URLSession.
+  decode and three distinct failures when moving to async URLSession: HTTP 503,
+  malformed JSON and an offline transport error.
 - [MainActor result handling](MainActor%20Result/case.md) preserves publication
   before completion and demonstrates failed refresh and retry in the playground.
   The source checkout's automated test covers overlapping calls and cancellation

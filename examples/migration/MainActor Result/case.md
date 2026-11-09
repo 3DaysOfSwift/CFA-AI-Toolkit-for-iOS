@@ -6,7 +6,11 @@ Background callback work dispatches a result to the main queue.
 
 ## Behaviour to preserve
 
-Both examples publish Artemis on MainActor before reporting completion. The migrated example also demonstrates failure and retry: a failed refresh keeps the last confirmed value, and a successful retry clears the error.
+Both examples publish Artemis on MainActor before reporting completion. The
+After fixture adds a separate demonstration of failure and retry. A failed
+refresh keeps the last confirmed value, and a successful retry clears the
+error. Use the existing app’s failure and retry behaviour as the contract
+when applying the pattern to a migration.
 
 ## Migration
 
