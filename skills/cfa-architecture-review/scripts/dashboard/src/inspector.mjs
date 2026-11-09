@@ -635,7 +635,7 @@ export async function inspect(project) {
   // Independent work may be scheduled here. Review only closures that
   // appear to call the shared launch signal.
   for (const [file, source] of sources) {
-    for (const callback of source.matchAll(/\bfunc\s+application\s*\(\s*_\s+\w+\s*:\s*(?:UIKit\s*\.\s*)?UIApplication\s*,\s*didFinishLaunchingWithOptions\s*(?:\w+\s*)?:[^{}]*?\)\s*->\s*(?:Swift\s*\.\s*)?Bool\s*\{/g)) {
+    for (const callback of source.matchAll(/\bfunc\s+application\s*\(\s*_(?:\s+\w+)?\s*:\s*(?:UIKit\s*\.\s*)?UIApplication\s*,\s*didFinishLaunchingWithOptions\s*(?:\w+\s*)?:[^{}]*?\)\s*->\s*(?:Swift\s*\.\s*)?Bool\s*\{/g)) {
       const start = callback.index + callback[0].length - 1;
       const body = braceBody(source, start);
       inspectSynchronousLaunchReads('The launch callback', file, source, start, findings);

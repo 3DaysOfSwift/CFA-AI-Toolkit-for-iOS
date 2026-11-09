@@ -705,6 +705,20 @@ test('identifies priority and explicitly typed Tasks scheduling the launch signa
   assert.deepEqual(files, ['Application/DetachedDelegate.swift', 'Application/ExplicitInitializerDelegate.swift', 'Application/OperationArgumentDelegate.swift', 'Application/PriorityDelegate.swift', 'Application/TypedDelegate.swift']);
 });
 
+test('reviews deferred startup when the delegate omits unused parameter names', async t => {
+  const file = 'Application/AppDelegate.swift';
+  const root = await fixture(t, {
+    [file]: `class Delegate {
+      func application(_: UIKit.UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        Task { AppModel.shared.applicationDidFinishLaunching() }
+        return true
+      }
+    }`
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'scheduled-app-model-launch');
+  assert.deepEqual(findings.map(({file, line}) => [file, line]), [[file, 3]]);
+});
+
 test('checks qualified AppModel factory return types and shared initializers', async t => {
   const file = 'Application/2 - AppModel/AppModel.swift';
   const source = `final class AppModel {
