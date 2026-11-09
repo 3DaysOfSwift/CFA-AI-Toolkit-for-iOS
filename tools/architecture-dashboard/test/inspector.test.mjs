@@ -528,3 +528,11 @@ test('checks semicolon-separated AppModel storage and excludes method locals', a
   assert.ok(findings.some(item => item.code === 'app-model-task-purpose' && /listener/.test(item.message)));
   assert.ok(!findings.some(item => /local/.test(item.message)));
 });
+
+test('an unrelated live overload does not satisfy the AppModel factory check', async t => {
+  const root = await fixture(t, {
+    'App/2 - AppModel/AppModel.swift': 'final class AppModel { static func live(environment: String) -> AppModel { AppModel() } }'
+  });
+  const { findings } = await inspect(root);
+  assert.match(findings.find(item => item.code === 'app-model-live-factory')?.message, /Found 0/);
+});

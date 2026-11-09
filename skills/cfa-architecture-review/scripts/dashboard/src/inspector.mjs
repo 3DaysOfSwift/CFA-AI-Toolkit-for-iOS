@@ -97,8 +97,8 @@ export async function inspect(project) {
     findings.push(finding('app-model-ambiguous', 'review', `Multiple AppModel files were found: ${appModelFiles.join(', ')}. Verify target membership or inspect one app directory at a time before attributing Feature routes.`, null, null));
   }
   if (appModelFile) {
-    const liveFactories = [...appMembers.matchAll(/\bstatic\s+func\s+live\s*\(/g)];
-    if (liveFactories.length !== 1) findings.push(finding('app-model-live-factory', 'review', `Found ${liveFactories.length} static live() declarations directly inside AppModel. Verify the single production factory, including extensions and active compilation conditions.`, appModelFile, 1));
+    const liveFactories = [...appMembers.matchAll(/\bstatic\s+func\s+live\s*\(\s*\)\s*->\s*AppModel\b/g)];
+    if (liveFactories.length !== 1) findings.push(finding('app-model-live-factory', 'review', `Found ${liveFactories.length} static live() -> AppModel declarations directly inside AppModel. Verify the single production factory, including extensions and active compilation conditions.`, appModelFile, 1));
     const sharedInitializer = /\bstatic\s+let\s+shared\s*(?::\s*AppModel\s*)?=/.exec(appMembers);
     if (sharedInitializer) {
       const initializer = appModel.slice(sharedInitializer.index + sharedInitializer[0].length);
