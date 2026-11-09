@@ -15,15 +15,19 @@ test instrumentation. The migrated Feature keeps its observable state on
 `URLProtocol` test subclass, which adds no mutable state. In the toolkit source checkout, run the automated
 checks from its root with `node --test test/migration-playground.test.mjs`; the
 test harness checks the playground structure on all supported test platforms.
-On macOS with Xcode, it also compiles each implementation in its declared
-language mode and executes its behaviour check. The installed skill and release package include the
-playgrounds but not that test harness; run the playgrounds in Xcode there.
+On macOS with Xcode, it compiles the example code with `swiftc` in the declared
+language mode and runs the behavioural assertions using a command-line entry
+point. Open and run the playgrounds in Xcode to verify the playground launchers.
+The installed skill and release package include the playgrounds.
 
-These examples guide a migration; they do not prove another app has the same
-behaviour or that changing architecture preserves all its requirements. Inspect
-real callers, cancellation, failure handling and platform availability first.
-Swift Concurrency is available in Swift 5.5 and later: Swift 6 language mode is
-this suite's target for the migrated examples, not a prerequisite for CFA itself.
+Before applying an example to an app, check its callers, cancellation and
+failure handling. Check the availability of the APIs on the app’s minimum OS
+separately from Swift language mode. The migrated Serial Weight Saves,
+MainActor Result and Observation Migration examples all use Observation, which
+requires macOS 14 for these playgrounds and iOS 17 when applied to an iOS app.
+Keep a compatible observation mechanism when the target supports earlier OS
+versions. Swift 6 is the language mode chosen for the After examples. Swift
+Concurrency is available in Swift 5.5 and later.
 
 ## Migration cases
 
