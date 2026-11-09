@@ -85,8 +85,13 @@ Before accepting a change, answer every question:
     several waiters leaves the others able to receive the result. If the
     screen requires a prompt exit, verify that its wait ends before the
     shared refresh completes.
-18. Is expensive work kept away from the Main Actor while observable results
-    return to it safely?
+18. Are Feature owners explicitly isolated to MainActor, and does expensive
+    work run under an appropriate service isolation or execution strategy?
+    Trace the call from the Feature through the service using the target's
+    Swift language mode, default isolation and relevant SDK annotations.
+    Confirm that observable results return to MainActor safely. An async
+    declaration alone does not establish where the work executes. Record
+    responsiveness evidence where timing matters.
 19. Are failures, partial loading, offline persistence, and retry behaviour
     represented honestly?
     - For durable edits, does the Feature publish the saved value only after
