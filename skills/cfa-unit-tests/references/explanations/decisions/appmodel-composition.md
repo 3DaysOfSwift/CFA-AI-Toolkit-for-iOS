@@ -53,11 +53,18 @@ when the snapshot reaches its data source.
 Trace live wiring, ensure dependencies are required by the explicit initializer, and run tests against independent graphs. Check that scenes in the same process share the graph. For an App Group widget
 snapshot, verify that a successful write precedes the timeline reload request.
 For a Watch handoff, verify on supported devices that the receiving Feature
-updates when the transferred snapshot arrives. For app-wide listeners, call
-startup twice with an isolated graph and a
-controlled event source. Verify one listener starts, events reach the Feature
-without a screen, and the test can end its listener. Inspect the actual
-application callback to confirm it calls AppModel directly before returning.
+updates when the transferred snapshot arrives.
+
+For app-wide listeners, call startup twice with an isolated graph and a
+controlled event source. Verify that one listener starts and that events
+reach the Feature without a relevant screen mounted. If the listener can
+be replaced, hold the old listener’s cleanup until the replacement starts.
+Deliver a late event from the old listener and verify that it stops forwarding
+events and that its cleanup leaves the replacement running. Shut down isolated
+listeners during test cleanup.
+
+Inspect the actual application callback to confirm it calls AppModel directly
+before returning.
 A successful simulator launch alone does not establish that call path.
 Measure first-frame timing separately from disk and network completion.
 
