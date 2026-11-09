@@ -693,3 +693,21 @@ test('reviews direct container construction in the AppModel factory at its sourc
   const storage = findings.filter(item => item.code === 'app-model-storage-construction');
   assert.deepEqual(storage.map(item => [item.severity, item.file, item.line]), [['review',file,3]]);
 });
+
+test('reviews storage construction in AppModel init but not unrelated methods', async t => {
+  const file = 'Application/2 - AppModel/AppModel.swift';
+  const root = await fixture(t, {
+    [file]: [
+      'final class AppModel {',
+      '  init(storeURL: URL = defaultURL()) throws {',
+      '    _ = try ModelContainer(for: Note.self)',
+      '  }',
+      '  func unrelated() throws { _ = try ModelContainer(for: Other.self) }',
+      '}'
+    ].join('\n')
+  });
+  const {findings} = await inspect(root);
+  const storage = findings.filter(item => item.code === 'app-model-storage-construction');
+  assert.deepEqual(storage.map(item => item.line), [3]);
+  assert.match(storage[0].message, /AppModel\.init/);
+});
