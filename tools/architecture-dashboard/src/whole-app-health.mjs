@@ -365,7 +365,7 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
     if (!covered) throw Error('Include source concerns in the report criteria before rendering: ' + concern.title);
   }
   const data = {...presentation, scope:review.scope};
-  data.operations = (review.operations || []).map(op=>({group:op.group,title:op.title,path:op.path,stateOwner:op.stateOwner,taskOwner:op.taskOwner,isolation:op.isolation,reason:op.reason,unknowns:op.unknowns,steps:op.steps,checks:op.checks,scenarios:op.scenarios}));
+  data.operations = (review.operations || []).map(op=>({group:op.group,title:op.title,path:op.path,stateOwner:op.stateOwner,taskOwner:op.taskOwner,isolation:op.isolation,reason:op.reason,unknowns:op.unknowns,steps:op.steps,checks:op.checks,scenarios:op.scenarios,problemKind:op.problemKind}));
   data.architecturalConflict = review.operations.some(op => op.problemKind === 'architectural-conflict');
   const selectedIcon = icon || await appIcon(root);
   const iconData = selectedIcon ? `data:image/png;base64,${(await fs.readFile(selectedIcon)).toString('base64')}` : '';

@@ -422,6 +422,7 @@ test('installed Health Check rescans source, surfaces gaps and rejects stale rev
     const conflictHtml = await fs.readFile(conflictOutput,'utf8');
     assert.match(conflictHtml,/Frankenstein architecture detected.*Yes. Architectural conflicts/);
     assert.match(conflictHtml,/state-ownership<\/strong><p>Architectural conflict<\/p>/);
+    assert.match(conflictHtml,/Start <small>· Architectural conflict<\/small><\/summary>/);
     assert.match(problemHtml,/<summary><span class="indicator problem" aria-label="Problem">×<\/span>Start/);
     await fs.writeFile(reviewPath,JSON.stringify(review));
     const cfaDeviation = structuredClone(review);
