@@ -140,6 +140,9 @@ asynchronous work. If `refresh()` returns a Task handle, use
 is itself an `async` method, use `.task { await viewModel.refresh() }` instead.
 Awaiting an independently created Task's `value` does not make it a child of
 the screen task or automatically cancel it when the screen task is cancelled.
+The cancelled screen task can still wait for the shared result. If the
+presentation needs to stop waiting promptly, handle cancellation for that
+waiter independently while leaving the Feature's task running.
 Choose its owner and cancellation policy explicitly; a shared Feature refresh
 normally continues when a screen leaves.
 SwiftUI starts the screen task before the View appears. It does not guarantee

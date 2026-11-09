@@ -4,7 +4,7 @@
 
 **Strength:** Default.
 
-**Guidance:** By default, let a departing screen stop waiting while the Feature-owned shared refresh continues, even if that screen was the only caller. Retain successful data and let later equivalent callers join an in-flight request. Use another policy only for a specific product or resource requirement.
+**Guidance:** By default, let a departing screen stop waiting while the Feature-owned shared refresh continues, even if that screen was the only caller. Retain successful data and let later equivalent callers join an in-flight request. Awaiting the shared Task handle does not end the wait on caller cancellation. If the screen needs a prompt exit, cancel its wait independently. Use another policy only for a specific product or resource requirement.
 
 **Why:** The user may return and benefit from completed work.
 
