@@ -577,7 +577,7 @@ test('inspects AppModel properties regardless of indentation', async t => {
 
 test('inspects annotated AppModel properties without treating a private task as a verified listener', async t => {
   const root = await fixture(t, {
-    'Application/2 - AppModel/AppModel.swift': 'final class AppModel {\n    static let shared: AppModel = live()\n    @ObservationIgnored private var updateTask: Task<Void, Never>? = nil\n    private var hasLaunched: Bool = false\n    @ObservationIgnored private var secretCache: String\n    @ObservationIgnored\n    private var backupTask: _Concurrency.Task<Void, Never>?\n    static func live() -> AppModel { AppModel() }\n}'
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel {\n    static let shared: AppModel = live()\n    @ObservationIgnored private var updateTask: Task<Void, Never>? = nil\n    private var hasLaunched: Bool = false\n    @ObservationIgnored private var secretCache: String\n    @ObservationIgnored\n    private var backupTask:\n      _Concurrency.Task<Void, Never>?\n    static func live() -> AppModel { AppModel() }\n}'
   });
   const report = await inspect(root);
   const checks = report.findings.filter(item => item.code === 'app-model-task-purpose');

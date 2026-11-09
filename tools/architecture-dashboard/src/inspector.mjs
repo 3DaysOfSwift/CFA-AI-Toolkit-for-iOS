@@ -308,7 +308,7 @@ export async function inspect(project) {
           (declarations.length !== 1 || isFeatureCandidate(type, declarations[0].file))) continue;
       findings.push(finding('app-model-non-feature-state', 'review', `AppModel appears to store ${match[1]} from ${type} construction. Verify the inferred type and keep services and presentation state outside AppModel storage.`, appModelFile, line));
     }
-    for (const match of appMembers.matchAll(/(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(private[ \t]+)?(?:(?:private\(set\)|fileprivate|internal|public|package)[ \t]+)?(?:let|var)[ \t]+(\w+)[ \t]*:[ \t]*(?:any[ \t]+)?(?:\w+[ \t]*\.[ \t]*)*(\w+)/gm)) {
+    for (const match of appMembers.matchAll(/(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(private[ \t]+)?(?:(?:private\(set\)|fileprivate|internal|public|package)[ \t]+)?(?:let|var)[ \t]+(\w+)[ \t]*:\s*(?:any\s+)?(?:\w+\s*\.\s*)*(\w+)/gm)) {
       const [, privateModifier, name, type] = match;
       let suffix = appModel.slice(match.index + match[0].length);
       const genericStart = /^\s*</.exec(suffix);
