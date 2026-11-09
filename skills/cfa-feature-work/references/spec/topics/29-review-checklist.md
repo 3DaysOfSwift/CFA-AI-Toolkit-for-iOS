@@ -84,10 +84,13 @@ Before accepting a change, answer every question:
     stays available while storage or networking is pending or fails.
 24. For deep linking in scope, do URL opens and notification actions reach
     the same routing capability while the receiving scene owns navigation?
-    Where the app uses CFA's pending-request design, verify that declining
-    navigation preserves the request across restart, either scene can open
-    it, and successful navigation or explicit dismissal removes it. Verify
-    that competing scene requests open the destination once. If saving the
+    Where the app uses CFA's pending-request design, verify that a failed
+    initial save surfaces the error and leaves the pending list unchanged.
+    Verify that declining or cancelling before navigation preserves the
+    request across restart. Either scene can open it, and successful
+    navigation or explicit dismissal removes it. A cancellation after
+    navigation still counts as opened. Verify that competing scene requests
+    open the destination once. If saving the
     removal fails after navigation, verify that the failure is surfaced and
     retrying the removal does not navigate again. During migration, verify
     that existing notification and history capabilities are preserved.
