@@ -27,6 +27,12 @@ Link to evidence IDs in record.json. Distinguish build, automated tests and
 manual checks; record failures and checks not run. A build is not proof of
 behaviour preservation. Keep remaining risks and work visible.
 
+For the final migration record, describe the hybrid paths reviewed and the
+reasons for retaining any legacy mechanisms. Summarise the final CFA audit,
+the corrections made, and the checks repeated after those corrections. Link
+both reviews to evidence at the final commit using the completion gate in
+`record.json`. Use the scoped feature record for earlier checkpoints.
+
 ## Transferable lesson
 
 Explain when this lesson applies, when it does not, and what a future migration
