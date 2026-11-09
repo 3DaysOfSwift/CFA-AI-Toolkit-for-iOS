@@ -94,8 +94,12 @@ results in the report, rather than presenting scanner counts as findings.
    suspension points, but it may process another call while a request is
    suspended; an actor alone is not evidence that transfers cannot overlap.
    `@concurrent` is not a prerequisite for overlapping actor-initiated requests.
-   Report a source-supported risk separately from a measured delay, and use a
-   controlled overlapping-request test or profiling where practical.
+   For CFA, apply the [networking rule](spec/rules/cfa-net-01.md) and check
+   that URLSession calls go through NetworkingManager. Where practical, hold
+   the first response open and verify that a second independent request
+   reaches the transport before releasing it. Respect documented rate limits.
+   Report a source-supported risk separately from a measured delay, and
+   distinguish transport initiation from transfer timing on a real connection.
 7. **State observation:** Trace how a screen receives current state and updates,
    including identity, snapshots, actor boundaries, subscriptions and cleanup.
    For CFA live data, follow the property read by the View through its ViewModel
