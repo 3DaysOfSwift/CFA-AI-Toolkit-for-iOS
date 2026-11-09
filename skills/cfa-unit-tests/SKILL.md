@@ -73,6 +73,13 @@ show the expected purchase or locked experience where applicable and never
 invoke the paid operation. Verify that entitled callers can proceed. Verify
 server-side authorisation separately for server-protected operations.
 
+For detail screens that keep a selected snapshot, construct two independent
+ViewModels with different snapshots and a shared Feature. Change the source
+list, including omitting a selected item, and verify each ViewModel retains
+its own display. If detail refresh is supported, check that it updates only
+the intended destination. Use a UI or manual test to verify that both scenes
+retain their navigation and that a source refresh does not dismiss either.
+
 For deep links and notification actions, drive scene outcomes through a
 controlled handler. Verify that refusal or cancellation before navigation
 leaves the request pending and that navigation consumes it even if cancellation
