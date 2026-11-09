@@ -10,6 +10,6 @@
 
 **Example:** A Settings screen asks the Feature to open its pending item in the receiving scene.
 
-**Verify:** Test two scenes, declined navigation and unavailable destination handling.
+**Verify:** Verify that either scene can open a pending request and that simultaneous attempts navigate only once. A successful open removes the shared item while preserving the other scene’s navigation. Declined navigation or an unavailable scene leaves the request pending.
 
 **Full rule, context and examples:** [Keep Screen Initializers Clean](../topics/15-keep-screen-initializers-clean.md). This card is a reading aid; apply the complete canonical section.
