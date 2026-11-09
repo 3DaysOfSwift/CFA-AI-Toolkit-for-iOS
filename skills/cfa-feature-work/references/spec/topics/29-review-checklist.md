@@ -28,11 +28,14 @@ Before accepting a change, answer every question:
    and limit coordination to genuinely application-wide responsibilities?
    Verify repeated startup signals start each listener once and that it forwards
    events to the owning Feature even when no relevant screen is visible.
+   When a listener must stop or be replaced, verify the old task stops
+   delivering events, including in isolated tests.
    For system background work, does the responsible Feature register each
    permitted handler once during launch and schedule requests separately?
    Verify that success, failure and expiration each complete the system
-   callback once, and that expiration cancels the work as required. Exercise
-   background execution on a supported device.
+   callback once, including when expiration races normal completion, and
+   that expiration cancels the work. Exercise background execution on a
+   supported device.
 9. Is persistence accessed through repository protocols, and are other
    external-system details handled by appropriate microservices?
 10. Are async operations directly testable? Does each unstructured task have
@@ -103,6 +106,13 @@ Before accepting a change, answer every question:
     an existing implementation, verify recovery of a previously saved pending
     edit. Exercise conflict and rejection outcomes where applicable. Verify
     Apple-managed sync on supported devices.
+26. For additional device or extension targets in scope, does each target
+    include the shared Model and only its own Views and ViewModels? Build
+    each target and verify API availability. Separately verify the snapshot
+    handoff on supported devices, including the receiving Feature's state
+    update and how it handles missing, unreadable, delayed or stale data.
+    For an App Group widget snapshot, verify that the app requests a
+    timeline reload only after the snapshot write succeeds.
 
 Every applicable answer must be yes. Marking a question not applicable requires
 a short explanation. Otherwise, the change is not architecturally complete.
