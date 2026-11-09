@@ -261,8 +261,10 @@ scene leave the request pending. Either scene can open a pending request
 without changing another scene's destination. Competing opens navigate once,
 and dismissal must not race an active open of the same request. Check that
 successful navigation counts even when cancellation follows or content is
-still loading. If saving the removal fails, verify that retry removes the
-request without navigating again. For migration reviews, compare the original
+still loading. If saving the removal fails after navigation, verify that retry
+removes the request without navigating again. For a failed explicit dismissal,
+verify that the error is surfaced and the request stays pending until retry
+succeeds. For migration reviews, compare the original
 and current navigation and notification-history behaviour.
 
 When sign-out, account switching or session expiry is in scope, apply the

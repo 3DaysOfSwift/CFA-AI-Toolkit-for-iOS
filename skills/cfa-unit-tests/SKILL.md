@@ -113,8 +113,10 @@ request and reopen the store to verify both entries survive.
 Verify that refusal or cancellation before navigation
 leaves the request pending and that navigation consumes it even if cancellation
 follows. Simulate a failed removal after navigation, then retry the write and
-verify that the handler is called only once. Exercise competing scenes and
-an open racing an explicit dismissal of the same request. Assert the outcomes
+verify that the handler is called only once. Separately, fail the write for
+an explicit dismissal. Verify that the error reaches the caller, the request
+stays pending, and reopening the store after retry shows it was removed.
+Exercise competing scenes and an open racing an explicit dismissal of the same request. Assert the outcomes
 against the pending list and both scenes’ navigation state. While one scene
 is deciding, open a different pending request in another scene and verify
 that the first request stays pending. Suspend restoration,
