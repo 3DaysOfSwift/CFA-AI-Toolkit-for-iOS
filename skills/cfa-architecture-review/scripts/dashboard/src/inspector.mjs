@@ -346,9 +346,10 @@ export async function inspect(project) {
         }
       }
     }
-    for (const match of appMembers.matchAll(/(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(?:(?:private(?:\(set\))?|fileprivate|internal|public|package)[ \t]+)?(?:let|var)[ \t]+(\w+)\s*=(?!=)/gm)) {
+    for (const match of appMembers.matchAll(new RegExp(String.raw`(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(?:(?:private(?:\(set\))?|fileprivate|internal|public|package)[ \t]+)?(?:let|var)[ \t]+${propertyNamePattern}\s*=(?!=)`, 'gmu'))) {
       const line = lineOf(appModel, match.index);
-      findings.push(finding('app-model-default-value', 'warning', `AppModel property ${match[1]} has a default value; initialise it in the explicit initializer.`, appModelFile, line));
+      const name = match[1] ?? match[2];
+      findings.push(finding('app-model-default-value', 'warning', `AppModel property ${name} has a default value; initialise it in the explicit initializer.`, appModelFile, line));
       const start = match.index + match[0].length;
       const constructor = /^\s*(?:\w+\s*\.\s*)*([A-Z]\w*)\s*\(/.exec(appModel.slice(start));
       if (!constructor) continue;
@@ -358,11 +359,12 @@ export async function inspect(project) {
       const declarations = declarationsByName.get(type) || [];
       if (!isKnownNonFeatureType(type) &&
           (declarations.length !== 1 || isFeatureCandidate(type, declarations[0].file))) continue;
-      findings.push(finding('app-model-non-feature-state', 'review', `AppModel appears to store ${match[1]} from ${type} construction. Verify the inferred type and keep services and presentation state outside AppModel storage.`, appModelFile, line));
+      findings.push(finding('app-model-non-feature-state', 'review', `AppModel appears to store ${name} from ${type} construction. Verify the inferred type and keep services and presentation state outside AppModel storage.`, appModelFile, line));
     }
     const booleanLocations = [];
-    for (const match of appMembers.matchAll(/(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(private[ \t]+)?(?:(?:private\(set\)|fileprivate|internal|public|package)[ \t]+)?(?:let|var)[ \t]+(\w+)[ \t]*:\s*(?:any\s+)?(?:\w+\s*\.\s*)*(\w+)/gm)) {
-      const [, privateModifier, name, type] = match;
+    for (const match of appMembers.matchAll(new RegExp(String.raw`(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(private[ \t]+)?(?:(?:private\(set\)|fileprivate|internal|public|package)[ \t]+)?(?:let|var)[ \t]+${propertyNamePattern}[ \t]*:\s*(?:any\s+)?(?:\w+\s*\.\s*)*(\w+)`, 'gmu'))) {
+      const [, privateModifier, escapedName, plainName, type] = match;
+      const name = escapedName ?? plainName;
       let suffix = appModel.slice(match.index + match[0].length);
       let optionalTask = false;
       const genericStart = /^\s*</.exec(suffix);

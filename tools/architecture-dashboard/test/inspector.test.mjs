@@ -758,7 +758,7 @@ test('reviews inferred AppModel service storage from another module and allows f
   const file = 'App/2 - AppModel/AppModel.swift';
   const root = await fixture(t, {
     [file]: `final class AppModel {
-      let stored =
+      let \`stored\` =
         Infrastructure.NetworkingManager()
       static func live() -> AppModel {
         let local = Infrastructure.SwiftDataManager()
@@ -773,7 +773,7 @@ test('reviews inferred AppModel service storage from another module and allows f
 
 test('inspects AppModel properties regardless of indentation', async t => {
   const root = await fixture(t, {
-    'Application/2 - AppModel/AppModel.swift': 'final class AppModel {\n  private var twoSpaceTask: Task<Void, Never>?\n\tprivate var tabTask: Task<Void, Never>?\n        private var unexpectedCache: String\n    static func live() -> AppModel { AppModel() }\n}'
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel {\n  private var `twoSpaceTask`: Task<Void, Never>?\n\tprivate var tabTask: Task<Void, Never>?\n        private var unexpectedCache: String\n    static func live() -> AppModel { AppModel() }\n}'
   });
   const findings = (await inspect(root)).findings;
   assert.ok(findings.some(item => item.code === 'app-model-task-purpose' && /twoSpaceTask/.test(item.message)));
