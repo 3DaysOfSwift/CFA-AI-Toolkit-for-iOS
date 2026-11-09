@@ -32,8 +32,10 @@ func runExample() {
     feature.recordCompletedDay()
     precondition(feature.completedDays == 2 && count.read() == 1)
 
-    // An observer that needs another notification registers its next read.
-    withObservationTracking { _ = feature.completedDays } onChange: { count.record() }
+    // Register the next read and pick up the latest state, including changes
+    // made after the first registration fired.
+    let latestCount = withObservationTracking { feature.completedDays } onChange: { count.record() }
+    precondition(latestCount == 2)
     feature.recordCompletedDay()
     precondition(feature.completedDays == 3 && count.read() == 2)
     print("Passed: Observation tracking is one-shot and can be registered again.")

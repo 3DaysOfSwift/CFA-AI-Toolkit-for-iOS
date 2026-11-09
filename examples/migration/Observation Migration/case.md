@@ -6,7 +6,7 @@ A MainActor ObservableObject publishes changes with Combine.
 
 ## Behaviour to preserve
 
-Both models record two completed days through separate calls. Combine notifies twice; one Observation tracking registration notifies once.
+Both models record the first two completed days through separate calls. The Combine subscription notifies twice, while the first Observation registration notifies once. The migrated check then reads the latest value during re-registration and verifies that a third change notifies the new observer.
 
 ## Migration
 
@@ -21,4 +21,4 @@ Open and run `Before.playground` and `After.playground`. Each prints `Passed:` a
 
 ## Boundaries
 
-Observation needs iOS 17/macOS 14 or newer; it does not replace Combine stream operators or demonstrate SwiftUI rendering.
+Observation needs iOS 17/macOS 14 or newer. This case covers the Feature’s observable state. In an app, the View observes that state through its screen ViewModel. A migration that relies on receiving every event still needs to verify its delivery contract.
