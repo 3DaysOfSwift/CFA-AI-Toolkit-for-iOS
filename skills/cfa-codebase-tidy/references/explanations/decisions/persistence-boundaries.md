@@ -59,9 +59,9 @@ Editorial analysis: a shared storage owner needs clear schema and lifetime polic
 
 Use JSON by default for replaceable snapshots. Instant Loading binary
 snapshots are an opt-in technique for stable formats. Their decoder must
-safely reject incompatible or corrupt data. Offer them when the developer
-asks about the technique. Keep JSON as the default when creating or migrating
-an app.
+safely reject incompatible or corrupt data. Help apply the technique when the
+developer requests it. During app creation or migration, recommend JSON when
+a simple cache fits and leave binary snapshots out of the proposal.
 
 One store is a CFA choice, not a SwiftData limit. Keep each context and managed object within its isolation boundary. The guide reports a macOS investigation; do not claim all iOS versions reproduce it, or that passing tests guarantee framework safety.
 

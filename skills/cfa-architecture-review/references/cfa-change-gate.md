@@ -124,8 +124,9 @@ the architecture:
     policy, preserve a good cache if
     replacement fails, and prevent older writes or restores from replacing
     newer data. Report offline availability only for a saved cache.
-    Use JSON by default. Offer Instant Loading binary snapshots only on request
-    for a sufficiently stable format with safe rejection of incompatible data.
+    Use JSON by default. Leave Instant Loading binary snapshots out of app
+    creation and migration proposals. Help apply them on request for a
+    sufficiently stable format with safe rejection of incompatible data.
     Apply the [offline editing and sync rule](spec/rules/cfa-sync-01.md) when
     the product requires synchronization. For offline edits sent to a custom
     server, save the edit and its pending-sync metadata together before
