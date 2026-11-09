@@ -74,6 +74,8 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.equal(repeated.status, 0, repeated.stderr);
   assert.equal(doctor.status, 0, doctor.stderr);
   assert.match(content, /Keep this text\./);
+  assert.match(content, /Preserve the existing product design\s+during migration and maintenance/);
+  assert.match(content, /Missing optional themes, branding or a CFA footer\s+do not count as architecture findings/);
   assert.match(content, /View → ViewModel → Feature → Microservices/);
   assert.match(content, /SwiftDataManager owns container and context creation/);
   assert.match(content, /Route URLSession requests through NetworkingManager/);

@@ -44,6 +44,11 @@ This iOS project uses Cooperative Feature Architecture (CFA). The supporting
 product is CFA AI Toolkit for iOS. Match each request to the relevant installed
 skill from that toolkit before changing the project.
 
+- Apply optional new-app visual defaults only when establishing a new design
+  and the developer has not supplied one. Preserve the existing product design
+  during migration and maintenance, and keep explicitly requested visual
+  changes within scope. Missing optional themes, branding or a CFA footer
+  do not count as architecture findings.
 - Preserve the CFA call path: View → ViewModel → Feature → Microservices (such as providers, storage or device API adapters).
 - Every screen-level SwiftUI View owns a dedicated ViewModel. Declare it as
   @State private var viewModel and construct it inline by default. Keep View
