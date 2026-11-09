@@ -350,6 +350,10 @@ steps as well as its overall evidence. After confirming the scanner candidate,
 use `unstructured-task` for Task and Task.detached, `child-task` for async let
 and task group children, `same-task` for the task group scope itself, and
 `framework-task` for SwiftUI task and refreshable callbacks.
+If the written name resolves to a different API, record the candidate with an
+`excludedReason` that identifies the actual declaration or receiver. For
+example, a custom queue's `addTask` method need not create a structured child.
+Still trace the call's actual behaviour in its operation when it is in scope.
 When a task site is also the trigger,
 cite it in both the event step and a subsequent step that explains how the
 work runs. Include synchronous events and preserve unknown boundaries.
