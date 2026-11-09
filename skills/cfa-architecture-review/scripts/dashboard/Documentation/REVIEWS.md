@@ -204,7 +204,12 @@ available as UTF-8 text. The `targetInventoryVerified` flag records the
 reviewer's confirmation. The report command validates the record and source
 fingerprint, so confirm effective membership independently of that flag.
 Binary configuration remains part of the fingerprint and can be inspected
-separately. An exported HTML file is a dated
+separately. The inventory lists symbolic links it encountered under
+`scope.symbolicLinkPaths`. The scanners do not follow them. Check whether
+a link refers to shipping source or configuration before confirming target
+coverage. Retargeting a listed link invalidates the review. Changes inside
+its destination are tracked only if the destination is independently scanned.
+An exported HTML file is a dated
 snapshot.
 
 Use one operation for each meaningful action with a distinct behavioural path;

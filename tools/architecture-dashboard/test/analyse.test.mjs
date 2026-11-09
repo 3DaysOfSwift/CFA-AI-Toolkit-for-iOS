@@ -54,10 +54,16 @@ test('scan excludes test folders and symlinks and does not change input',async()
     assert.deepEqual(report.files.map(file => file.path), ['App.swift', 'Contest/ContestFeature.swift', 'reports/ReportFeature.swift']);
     assert.equal(report.files[0].entries.length,1);
     assert.deepEqual(report.scope.excludedTestDirectories, ['AppTests']);
+    assert.deepEqual(report.scope.symbolicLinkPaths, ['Link.swift']);
+    await fs.unlink(path.join(root,'Link.swift'));
+    await fs.symlink('Contest/ContestFeature.swift',path.join(root,'Link.swift'));
+    const retargeted = await analyse(root);
+    assert.deepEqual(retargeted.files, report.files);
+    assert.notEqual(retargeted.sourceFingerprint, report.sourceFingerprint);
     await fs.mkdir(path.join(root, 'ExtraTests'));
     const expanded = await analyse(root);
     assert.deepEqual(expanded.files, report.files);
-    assert.notEqual(expanded.sourceFingerprint, report.sourceFingerprint);
+    assert.notEqual(expanded.sourceFingerprint, retargeted.sourceFingerprint);
     assert.equal((await analyse(root,{includeTests:true})).scope.fileCount,4);
     assert.equal(await fs.readFile(path.join(root,'App.swift'),'utf8'),before);
   } finally { await fs.rm(root,{recursive:true,force:true}); }

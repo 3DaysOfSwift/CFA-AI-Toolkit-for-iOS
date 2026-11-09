@@ -88,11 +88,18 @@ const excluded = new Set(['.git', '.build', '.swiftpm', 'Pods', 'Carthage', 'nod
 export async function analyse(root, { includeTests = false, excludedOutput } = {}) {
   root = await fs.realpath(root);
   if (!(await fs.stat(root)).isDirectory()) throw new Error('Repository path must be a directory.');
-  const files = [], skipped = [], excludedTestDirectories = [], buildDefinitions = [];
+  const files = [], skipped = [], excludedTestDirectories = [], buildDefinitions = [], symbolicLinks = [];
   async function walk(directory, scanSwift = true) {
     for (const entry of (await fs.readdir(directory, { withFileTypes: true })).sort((a,b) => a.name.localeCompare(b.name))) {
       const absolute = path.join(directory, entry.name);
-      if (entry.isSymbolicLink()) continue;
+      if (entry.isSymbolicLink()) {
+        if (!excluded.has(entry.name) && !entry.name.startsWith('.') && absolute !== excludedOutput) {
+          const relative = path.relative(root, absolute).split(path.sep).join('/');
+          const destinationHash = createHash('sha256').update(await fs.readlink(absolute)).digest('hex');
+          symbolicLinks.push([relative, destinationHash]);
+        }
+        continue;
+      }
       if (entry.isDirectory()) {
         if (excluded.has(entry.name) || entry.name.startsWith('.') || absolute === excludedOutput) continue;
         if (scanSwift && !includeTests && /(?:^tests?$|Tests?$)/.test(entry.name)) {
@@ -123,10 +130,11 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
   if (excludedTestDirectories.length) fingerprint.update(JSON.stringify(excludedTestDirectories));
   if (buildDefinitions.length) fingerprint.update(JSON.stringify(buildDefinitions));
   if (skipped.length) fingerprint.update(JSON.stringify(skipped));
+  if (symbolicLinks.length) fingerprint.update(JSON.stringify(symbolicLinks));
   const sourceFingerprint = fingerprint.digest('hex');
   return { schemaVersion: 3, sourceFingerprint, buildDefinitions: buildDefinitions.map(([file, hash]) => ({path: file, hash})), dashboard: dashboard(files), project: path.basename(root), generatedAt: new Date().toISOString(),
     method: 'Lexical source inventory — not compiler-resolved or runtime-observed',
-    scope: { includeTests, fileCount: files.length, skipped, excludedTestDirectories, buildDefinitionPaths: buildDefinitions.map(([file]) => file), targetMembership: 'Not resolved; inactive compilation branches may be included' },
+    scope: { includeTests, fileCount: files.length, skipped, excludedTestDirectories, symbolicLinkPaths: symbolicLinks.map(([file]) => file), buildDefinitionPaths: buildDefinitions.map(([file]) => file), targetMembership: 'Not resolved; inactive compilation branches may be included' },
     limitations: [
       'Matches are source matches: similarly named custom APIs may match; wrappers and unusual syntax may be missed.',
       'String interpolation bodies and Swift regex literals are not fully parsed. Source offsets use UTF-16 code units.',

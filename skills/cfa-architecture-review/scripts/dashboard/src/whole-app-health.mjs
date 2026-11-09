@@ -197,6 +197,7 @@ export async function prepare(root, output, syntaxProvider = collectSyntax, opti
     productionTargets: {
       status:'pending', targets:[],
       excludedTestDirectories: report.scope.excludedTestDirectories,
+      symbolicLinkPaths: report.scope.symbolicLinkPaths,
       buildDefinitionPaths: report.scope.buildDefinitionPaths
     },
     files: report.files.map(file=>({file:file.path,status:'pending'})),
