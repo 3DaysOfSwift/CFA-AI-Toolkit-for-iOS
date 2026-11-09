@@ -83,6 +83,7 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.equal((content.match(/CFA Toolkit project guidance/g) ?? []).length, 1);
   assert.match(repeated.stdout, /already enabled/);
   assert.match(doctor.stdout, /INFO CFA project guidance found/);
+  assert.doesNotMatch(doctor.stdout, /outdated startup guidance/);
 });
 
 test('enable-project can create Claude guidance when explicitly requested', (t) => {
@@ -102,7 +103,7 @@ test('doctor warns about previously installed CFA guidance without changing it',
   const project = path.join(directory, 'project');
   fs.mkdirSync(project);
   const agents = path.join(project, 'AGENTS.md');
-  const original = '<!-- CFA Toolkit project guidance -->\nAppModel properties exposing feature managers use the Manager suffix.\n- AppModel stores only shared, concrete Features, and one private launch guard.\n- SwiftData uses SwiftDataManager; URLSession calls use NetworkingManager.\n- Every screen owns a dedicated ViewModel. Declare it as @State private var\n  viewModel and construct it inline by default.\n  twice, and remove it on actual navigation or explicit dismissal. Leave\n  A departing screen may stop waiting while the Feature keeps refreshing.\n';
+  const original = '<!-- CFA Toolkit project guidance -->\nAppModel properties exposing feature managers use the Manager suffix.\n- AppModel stores only shared, concrete Features, and one private launch guard.\n- SwiftData uses SwiftDataManager; URLSession calls use NetworkingManager.\n- Every screen owns a dedicated ViewModel. Declare it as @State private var\n  viewModel and construct it inline by default.\n  twice, and remove it on actual navigation or explicit dismissal. Leave\n  A departing screen may stop waiting while the Feature keeps refreshing.\n  or a scheduled Task. Features can start their own asynchronous work without\n  delaying the callback for disk or network completion.\n';
   fs.writeFileSync(agents, original);
 
   const doctor = spawnSync(command, ['doctor', project], { encoding: 'utf8' });
@@ -120,6 +121,8 @@ test('doctor warns about previously installed CFA guidance without changing it',
   assert.match(doctor.stdout, /outdated shared-refresh guidance.*cancel the screen’s wait independently/);
   assert.match(repeated.stdout, /existing CFA shared-refresh guidance.*cancel the screen’s wait independently/);
   assert.match(repeated.stdout, /existing AppModel guidance.*app-wide listeners/);
+  assert.match(doctor.stdout, /outdated startup guidance.*before the launch callback returns/);
+  assert.match(repeated.stdout, /existing CFA startup guidance.*before the launch callback returns/);
   assert.match(repeated.stdout, /will not overwrite project instructions/);
   assert.equal(fs.readFileSync(agents, 'utf8'), original);
 });

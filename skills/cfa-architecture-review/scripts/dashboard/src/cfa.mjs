@@ -20,6 +20,8 @@ const cfaSkillNames = [
 ];
 // Keep this legacy ownership marker stable so upgrades recognise existing guidance.
 const guidanceMarker = '<!-- CFA Toolkit project guidance -->';
+const outdatedStartupGuidance = 'or a scheduled Task. Features can start their own asynchronous work without';
+const startupGuidanceUpdate = 'AppModel must signal Features and start required app-wide listeners before the launch callback returns.';
 const outdatedAppModelGuidance = 'AppModel stores only shared, concrete Features, and one private launch guard.';
 const outdatedFeatureGuidance = 'managers use the Manager suffix';
 const outdatedServiceGuidance = 'SwiftData uses SwiftDataManager; URLSession calls use NetworkingManager.';
@@ -254,6 +256,9 @@ function doctor(projectArgument) {
       if (content.includes(outdatedSharedWaitGuidance)) {
         console.log(`WARN outdated shared-refresh guidance in ${file}. ${sharedWaitGuidanceUpdate}`);
       }
+      if (content.includes(outdatedStartupGuidance)) {
+        console.log(`WARN outdated startup guidance in ${file}. ${startupGuidanceUpdate}`);
+      }
       if (content.includes(outdatedAppModelGuidance)) {
         console.log(`WARN outdated AppModel guidance in ${file}; update the CFA guidance block to allow private task handles for app-wide listeners.`);
       }
@@ -312,6 +317,9 @@ function enableProject(values) {
     }
     if (existingGuidance.includes(outdatedSharedWaitGuidance)) {
       console.log(`Update the existing CFA shared-refresh guidance block. ${sharedWaitGuidanceUpdate}`);
+    }
+    if (existingGuidance.includes(outdatedStartupGuidance)) {
+      console.log(`Update the existing CFA startup guidance block. ${startupGuidanceUpdate}`);
     }
     if (existingGuidance.includes(outdatedAppModelGuidance)) {
       console.log('The existing AppModel guidance should allow private task handles for app-wide listeners. Edit only the CFA guidance block.');
