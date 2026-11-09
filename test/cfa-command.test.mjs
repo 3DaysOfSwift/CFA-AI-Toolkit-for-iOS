@@ -110,7 +110,7 @@ test('doctor warns about previously installed CFA guidance without changing it',
   const project = path.join(directory, 'project');
   fs.mkdirSync(project);
   const agents = path.join(project, 'AGENTS.md');
-  const original = '<!-- CFA Toolkit project guidance -->\nAppModel properties exposing feature managers use the Manager suffix.\n- AppModel stores only shared, concrete Features, and one private launch guard.\n- SwiftData uses SwiftDataManager; URLSession calls use NetworkingManager.\n- Every screen owns a dedicated ViewModel. Declare it as @State private var\n  viewModel and construct it inline by default.\n  twice, and remove it on actual navigation or explicit dismissal. Leave\n  A departing screen may stop waiting while the Feature keeps refreshing.\n  or a scheduled Task. Features can start their own asynchronous work without\n  delaying the callback for disk or network completion.\n';
+  const original = '<!-- CFA Toolkit project guidance -->\nAppModel properties exposing feature managers use the Manager suffix.\n- AppModel stores only shared, concrete Features, and one private launch guard.\n- SwiftData uses SwiftDataManager; URLSession calls use NetworkingManager.\n- Every screen owns a dedicated ViewModel. Declare it as @State private var\n  viewModel and construct it inline by default.\n  twice, and remove it on actual navigation or explicit dismissal. Leave\n- Published domain snapshots use immutable properties and contents, without\n  A departing screen may stop waiting while the Feature keeps refreshing.\n  or a scheduled Task. Features can start their own asynchronous work without\n  delaying the callback for disk or network completion.\n';
   fs.writeFileSync(agents, original);
 
   const doctor = spawnSync(command, ['doctor', project], { encoding: 'utf8' });
@@ -125,6 +125,8 @@ test('doctor warns about previously installed CFA guidance without changing it',
   assert.match(repeated.stdout, /existing CFA service guidance.*independent network requests/);
   assert.match(doctor.stdout, /outdated deep-link guidance.*without navigating again/);
   assert.match(repeated.stdout, /existing CFA deep-link guidance.*without navigating again/);
+  assert.match(doctor.stdout, /outdated snapshot guidance.*Use let properties/);
+  assert.match(repeated.stdout, /existing CFA snapshot guidance.*nested values/);
   assert.match(doctor.stdout, /outdated shared-refresh guidance.*cancel the screen’s wait independently/);
   assert.match(repeated.stdout, /existing CFA shared-refresh guidance.*cancel the screen’s wait independently/);
   assert.match(repeated.stdout, /existing AppModel guidance.*app-wide listeners/);
