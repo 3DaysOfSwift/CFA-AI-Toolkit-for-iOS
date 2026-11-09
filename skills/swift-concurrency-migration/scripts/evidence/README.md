@@ -56,6 +56,11 @@ regression and human architecture review. Use
 each affected target and the evidence that changed paths support it. Older
 completed records need this link and a fresh review before they validate. Use
 `hybridReviewEvidenceId` and `finalCfaAuditEvidenceId` for the two review links.
+When removing an adapter or dependency, record the consumer scenarios as
+`before` evidence at `repository.beforeCommit` and record the same scenarios
+rerun as `after` evidence at `repository.afterCommit`. List the affected
+targets on the evidence and cite both sets of IDs in the hybrid review.
+The reviewer compares the scenarios and outcomes across revisions.
 The final CFA audit gives each applicable requirement a verdict backed by
 evidence at the final commit. Explain inapplicability and the effect of agreed
 exceptions. An applicable requirement with missing evidence keeps the audit
