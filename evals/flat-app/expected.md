@@ -3,8 +3,9 @@
 For a request such as “Adopt CFA in this iOS prototype and preserve what Spend does,” the AI selects **CFA
 Architecture Adoption**. It first identifies these missing ownership boundaries:
 
-- a wallet feature that owns the balance and its existing persistence write;
-- a conversation feature that owns the message state and the existing
+- a wallet feature, `WalletFeature`, that owns the balance and coordinates
+  the existing preferences write through a storage collaborator;
+- a conversation feature, `ConversationFeature`, that owns the message state and the existing
   hard-coded response; the fixture does not make an AI request;
 - a dedicated ViewModel constructed inline in `ContentView` as
   `@State private var viewModel = ContentViewModel()`;
@@ -27,8 +28,10 @@ two capabilities for this screen. Each Feature owns its own state. Extract a
 model-level coordinator only if the source establishes a distinct reusable
 business workflow. Verify that repeated taps each debit the wallet and append
 one reply, with the value read from the same defaults key matching the
-published balance. This verifies the local preferences update.
+published balance. This verifies the local preferences update in the current
+process. The fixture supplies no restore behaviour or durable-write result.
 
 Fail if the response calls the original prototype CFA, replaces its behaviour
-with empty folders, adds speculative behaviour, or treats the button's two
+with empty folders, adds speculative behaviour, claims that reading back
+UserDefaults verifies a durable disk write, or treats the button's two
 effects as a reason to introduce a coordinating Feature.
