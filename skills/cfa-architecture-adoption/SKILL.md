@@ -75,6 +75,13 @@ Feature updates on supported devices separately from those checks. For an App
 Group widget snapshot, verify the write precedes the reload request and a
 failed write issues no request.
 
+When changing shared refresh ownership, apply the
+[refresh lifetime rule](references/spec/rules/cfa-task-02.md). Trace screen
+cancellation and Feature cancellation separately. Under the default policy,
+verify that the Feature retains the result after the last screen leaves and
+that a later equivalent caller can join a refresh that is still in flight.
+Preserve any product-specific cancellation requirement.
+
 When moving app-wide observation to AppModel, apply the
 [app-wide listener rule](references/spec/rules/cfa-app-02.md). Verify that
 repeated startup leaves one listener forwarding events to the responsible

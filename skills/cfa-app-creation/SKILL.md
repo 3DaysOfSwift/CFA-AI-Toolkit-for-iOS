@@ -49,6 +49,13 @@ the ViewModel obtains its Feature through the normal dependency path. A detail
 preview may supply the same immutable selection as its production caller.
 Keep SwiftData access in the storage service and out of the preview.
 
+For a Feature-owned shared refresh, apply the
+[refresh lifetime rule](references/spec/rules/cfa-task-02.md). By default,
+let the refresh finish and retain its result even if its only screen leaves.
+Verify this separately from a later caller joining an in-flight refresh.
+If a screen must stop waiting promptly, verify that its wait ends while
+the shared refresh continues.
+
 When the app needs an event independently of its screens, apply the
 [app-wide listener rule](references/spec/rules/cfa-app-02.md). Drive a
 controlled event source after repeated launch signals. Verify that one
