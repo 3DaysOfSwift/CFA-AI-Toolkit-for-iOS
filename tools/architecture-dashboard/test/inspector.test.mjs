@@ -742,6 +742,20 @@ struct Habit: SwiftUI.App {
   assert.equal(presentation?.line, 7);
 });
 
+test('reviews a direct ModelContainer reference in a structural App body', async t => {
+  const file = 'Application/HabitApp.swift';
+  const root = await fixture(t, {
+    [file]: `struct Habit: App {
+      var body: some Scene {
+        let container = try! ModelContainer(for: HabitRecord.self)
+        WindowGroup { RootTabView() }
+      }
+    }`
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'app-startup-presentation');
+  assert.deepEqual(findings.map(({file, line, severity}) => [file, line, severity]), [[file, 3, 'review']]);
+});
+
 test('flags storage-gated conventional roots as review hints', async t => {
   const root = await fixture(t, {
     'Application/1 - View/ContentView.swift': 'struct ContentView: View {\n var body: some View {\n if sessionIsReady,\n let container = storage.container { RootTabView() } else { ProgressView() } } }',

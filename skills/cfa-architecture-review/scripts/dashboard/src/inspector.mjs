@@ -525,7 +525,7 @@ export async function inspect(project) {
         const bodyStart = sceneBody.index + sceneBody[0].length;
         const body = braceBody(members, bodyStart - 1);
         const conditional = /(?<!#)\b(?:if|switch)\b/.exec(body);
-        const presentation = /\.modelContainer\s*\(|\b(?:ProgressView|ContentUnavailableView)\s*\(/.exec(body);
+        const presentation = swiftDataAccess.exec(body) ?? /\b(?:ProgressView|ContentUnavailableView)\s*\(/.exec(body);
         if (conditional) findings.push(finding('conditional-app-body', 'review', 'App.body contains a conditional. Check whether it gates root navigation on storage or an unrelated condition.', file, lineOf(source, start + bodyStart + conditional.index)));
         if (presentation) findings.push(finding('app-startup-presentation', 'review', 'App.body contains storage or loading presentation. Check whether database availability gates the interface; a lexical match alone cannot establish this.', file, lineOf(source, start + bodyStart + presentation.index)));
       }
