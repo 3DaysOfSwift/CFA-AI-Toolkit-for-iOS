@@ -657,7 +657,7 @@ export async function inspect(project) {
         findings.push(finding('stored-app-model', 'review', 'This View appears to retain AppModel.shared in a stored property. Resolve the required Features through its ViewModel.', file, lineOf(source, start + storedModel.index)));
       }
 
-      for (const match of members.matchAll(new RegExp(`\\b(?:let|var)\\s+${propertyNamePattern}\\s*(?::\\s*(?<optional>(?:Swift\\s*\\.\\s*)?Optional\\s*<\\s*)?(?:(?:Swift|_Concurrency)\\s*\\.\\s*)?Task\\s*<|(?<inferred>=\\s*(?:(?:Swift|_Concurrency)\\s*\\.\\s*)?Task\\b))`, 'gu'))) {
+      for (const match of members.matchAll(new RegExp(`\\b(?:let|var)\\s+${propertyNamePattern}\\s*(?::\\s*(?:(?<genericWrapper>(?:Swift\\s*\\.\\s*)?(?:(?:Optional|Array)\\s*<|Dictionary\\s*<\\s*\\w+\\s*,)\\s*)|(?<bracketWrapper>\\[\\s*(?:\\w+\\s*:\\s*)?))?(?:(?:Swift|_Concurrency)\\s*\\.\\s*)?Task\\s*<|(?<inferred>=\\s*(?:(?:Swift|_Concurrency)\\s*\\.\\s*)?Task\\b))`, 'gu'))) {
         const suffix = body.slice(match.index + match[0].length);
         if (match.groups.inferred) {
           const genericStart = /^\s*</.exec(suffix);
@@ -667,7 +667,8 @@ export async function inspect(project) {
         } else {
           const close = closingGenericArguments(body, match.index + match[0].length - 1);
           let afterType = body.slice(close + 1);
-          if (match.groups.optional) afterType = afterType.replace(/^\s*>/, '');
+          if (match.groups.genericWrapper) afterType = afterType.replace(/^\s*>/, '');
+          if (match.groups.bracketWrapper) afterType = afterType.replace(/^\s*\]/, '');
           if (close >= 0 && hasComputedAccessor(afterType.replace(/^\s*[?!]/, ''))) continue;
         }
         findings.push(finding('screen-task-handle', 'review', `${view[1]} declares ${match[1] ?? match[2]} with a possible Task handle. If it stores the handle, move task ownership to the ViewModel.`, file, lineOf(source, start + match.index)));
