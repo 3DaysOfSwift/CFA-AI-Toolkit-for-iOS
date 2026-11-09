@@ -211,9 +211,14 @@ export async function inspect(project) {
     if (direct) return direct;
     for (const alias of source.matchAll(/\blet\s+([A-Za-z_]\w*)(?:\s*:\s*AppModel)?\s*=\s*AppModel\s*\.\s*shared\b(?!\s*\.)/g)) {
       const access = new RegExp(`(?<![.\\w])${alias[1]}\\s*\\.\\s*(\\w+)`, 'g');
-      access.lastIndex = alias.index + alias[0].length;
-      const use = [...source.matchAll(access)].find(match => isFeature(match[1]));
-      if (use) return use;
+      const start = alias.index + alias[0].length;
+      // Keep alias review local. Resolving captures or shadowing needs Swift semantics.
+      const remainingScope = memberSignatures(braceBody('{' + source.slice(start), 0));
+      const use = [...remainingScope.matchAll(access)].find(match => isFeature(match[1]));
+      if (use) {
+        use.index += start;
+        return use;
+      }
     }
   }
 

@@ -626,6 +626,11 @@ test('reviews direct Feature access in a preview while leaving normal previews c
     #Preview("Aliased access") {
       let model = AppModel.shared
       Text(model.homeFeature.title)
+    }
+    #Preview("Separate local bindings") {
+      if enabled { let model = AppModel.shared; use(model) }
+      let model = PreviewFixture()
+      Text(model.homeFeature.title)
     }`
   });
   const { findings } = await inspect(root);
