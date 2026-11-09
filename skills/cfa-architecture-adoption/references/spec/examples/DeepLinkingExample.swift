@@ -64,6 +64,7 @@ final class DeepLinkingFeature {
     @ObservationIgnored private let store: PendingRequestStore
     @ObservationIgnored private var lastPublishedRevision = -1
     @ObservationIgnored private var opening: Set<String> = []
+    @ObservationIgnored private var openedAwaitingRemoval: Set<String> = []
 
     init(store: PendingRequestStore) { self.store = store }
 
@@ -76,6 +77,7 @@ final class DeepLinkingFeature {
     // Explicit dismissal removes the saved request as well as its visible entry.
     func dismiss(id: String) async throws {
         publish(try await store.remove(id: id))
+        openedAwaitingRemoval.remove(id)
     }
 
     // The scene checks cancellation and returns true only after navigation occurs.
@@ -83,8 +85,13 @@ final class DeepLinkingFeature {
         guard !Task.isCancelled, !opening.contains(id), let request = pending.first(where: { $0.id == id }) else { return }
         opening.insert(id)
         defer { opening.remove(id) }
-        guard await navigate(request) else { return }
-        publish(try await store.remove(id: id))
+        if !openedAwaitingRemoval.contains(id) {
+            guard await navigate(request) else { return }
+            // If the write fails, retry cleanup without navigating again.
+            // This marker lasts only for the current process.
+            openedAwaitingRemoval.insert(id)
+        }
+        try await dismiss(id: id)
     }
 
     private func publish(_ snapshot: PendingSnapshot) {
@@ -183,6 +190,29 @@ final class DeepLinkingFeature {
         let afterDismissal = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
         try await afterDismissal.restore()
         precondition(afterDismissal.pending.isEmpty)
+
+        // Navigation can succeed while durable removal fails. Retry the write
+        // in this process without asking another scene to navigate again.
+        let retryFolder = folder.appendingPathComponent("removal-retry")
+        let movedFolder = folder.appendingPathComponent("removal-paused")
+        try FileManager.default.createDirectory(at: retryFolder, withIntermediateDirectories: false)
+        let retryURL = retryFolder.appendingPathComponent("pending.json")
+        let removalRetry = DeepLinkingFeature(store: PendingRequestStore(fileURL: retryURL))
+        try await removalRetry.receive(request)
+        try FileManager.default.moveItem(at: retryFolder, to: movedFolder)
+        do {
+            try await removalRetry.open(id: request.id) { _ in true }
+            throw ExampleFailure.expectedStorageError
+        } catch is ExampleFailure {
+            throw ExampleFailure.expectedStorageError
+        } catch {
+            precondition(removalRetry.pending == [request])
+        }
+        try FileManager.default.moveItem(at: movedFolder, to: retryFolder)
+        try await removalRetry.open(id: request.id) { _ in
+            preconditionFailure("Retrying removal must not navigate again")
+        }
+        precondition(removalRetry.pending.isEmpty)
 
         let badURL = folder.appendingPathComponent("missing-directory/pending.json")
         let unavailable = DeepLinkingFeature(store: PendingRequestStore(fileURL: badURL))
