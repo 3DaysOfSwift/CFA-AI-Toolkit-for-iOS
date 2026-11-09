@@ -385,7 +385,8 @@ missing or ambiguous test mappings and looks for the expected ViewModel test
 suite in matching files. Check the test target and what the suite exercises
 before drawing conclusions about coverage.
 It distinguishes recognisable navigation-only tab roots from feature screens
-and flags possible Feature access or storage gating in root navigation. Treat
+and flags possible Feature access, storage gates and launch-progress gates in
+root navigation. Treat
 these findings as review leads. The scan can miss indirect wiring and cannot
 verify Xcode target membership or runtime behaviour. The CFA Architecture
 Review skill uses the map to guide source inspection and verify findings.
@@ -393,10 +394,11 @@ The inspector reports ViewModel ownership and naming separately. A recognized
 private `@State` ViewModel under a different name still counts as screen-owned.
 CFA names that property `viewModel`.
 
-The inspector also flags explicit initializer parameters that appear to accept
-a ViewModel in recognisable SwiftUI Views and their extensions, including
-outside the standard CFA folders. Review the actual call sites for implicit
-memberwise inputs, type aliases and indirect injection.
+The inspector also flags possible ViewModel inputs in recognisable SwiftUI
+Views outside the standard CFA folders. It checks explicit initializers,
+recognisable stored inputs, static storage and common SwiftUI environment
+injection patterns. Confirm the actual call site and owner in source,
+especially when aliases or indirect wiring obscure the type.
 
 ## Xcode Project Dashboard
 
