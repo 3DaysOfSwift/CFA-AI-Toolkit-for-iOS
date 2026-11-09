@@ -159,7 +159,9 @@ Before accepting a change, answer every question:
     retrying the removal does not navigate again. During migration, verify
     that existing notification and history capabilities are preserved.
     Verify that an opening request received during restoration survives a
-    restart alongside the previously saved requests.
+    restart alongside the previously saved requests. If a scene opens a request
+    while an older restore is pending, verify that the late result cannot
+    resurrect the opened request or remove unrelated pending entries.
 25. For offline edits or cross-device sync in scope, does the app distinguish
     local success from server confirmation? For a custom server, fail the local
     write and verify that it reports failure without admitting an edit for upload.

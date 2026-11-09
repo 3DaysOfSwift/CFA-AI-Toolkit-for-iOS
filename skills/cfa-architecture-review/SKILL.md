@@ -219,7 +219,8 @@ pending list or saved snapshot. Check that a valid request is saved before it
 is shown as pending. On initial save failure, check that the caller receives
 the error and that the unsaved request stays out of the list. Verify that
 a request arriving before restoration finishes is preserved alongside the
-restored entries across restart. A refusal, cancellation before opening,
+restored entries across restart. Check that an older restore cannot resurrect
+an opened request or remove unrelated entries. A refusal, cancellation before opening,
 or failed navigation keeps the request available. Verify that either scene can open the request without
 changing another scene's destination, and that competing attempts open it
 only once. Confirm that opening the destination completes navigation even
