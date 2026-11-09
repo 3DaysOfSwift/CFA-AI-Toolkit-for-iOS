@@ -65,7 +65,8 @@ The final CFA audit gives each applicable requirement a verdict backed by
 evidence at the final commit. Explain inapplicability and the effect of agreed
 exceptions. An applicable requirement with missing evidence keeps the audit
 open. Record the regression under
-`completionGate.manualBehaviourRegressionEvidenceId`. If evidence is missing
+`completionGate.manualBehaviourRegressionEvidenceId` and name the affected
+targets exercised by that regression. If evidence is missing
 or failed, use `partial` and explain the gap. Validation checks the recorded
 links and outcomes. The reviewer compares the declared affected targets with
 the actual consumers of the changed code, checks the behaviour contract,
