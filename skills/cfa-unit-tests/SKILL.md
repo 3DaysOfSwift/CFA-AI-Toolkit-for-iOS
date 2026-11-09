@@ -140,6 +140,11 @@ initial store opening in a controlled dependency, then fail it. Verify that
 the affected Feature exposes a recoverable error and can retry. Separately
 exercise launch and navigation while storage is slow or unavailable. Verify
 that the root appears and unaffected destinations remain accessible.
+For file-backed storage, use a disposable configured store URL. Verify that
+first use creates missing parent directories and overlapping first requests
+share the opened store. Block directory creation with a file, verify that the
+request fails and leaves that file intact, then remove the test obstruction
+and retry at the same URL. Save and reopen the store to verify persistence.
 
 For durable edits, hold the write open and verify that confirmed state stays
 unchanged until it succeeds. On failure, assert that the editor keeps its

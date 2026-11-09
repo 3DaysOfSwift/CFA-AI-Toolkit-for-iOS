@@ -161,6 +161,10 @@ unaffected navigation, or move the error out of its owning Feature. Use
 existing runtime evidence or exercise a safe failure path within the agreed
 review scope. A mock fetch can verify Feature recovery, while a real
 store-opening and navigation check is needed to establish the launch outcome.
+For file-backed storage, trace directory preparation at the configured store
+URL and follow failures to the affected screen. Check that retry keeps the
+same store and preserves existing files. Record controlled failure evidence
+separately from the actual storage and navigation checks.
 
 For an event needed regardless of which screen is visible, apply the
 [app-wide listener rule](references/spec/rules/cfa-app-02.md). Trace from
