@@ -120,6 +120,16 @@ test('individual checks preserve verified strengths and separate CFA deviations'
   assert.match(mixed.html,/Concurrency correctness: ✅ Stable · Architectural clarity: ⚠️ Needs investigation/);
  });
 
+test('explicitly inapplicable CFA checks differ from absent CFA assessment', () => {
+  const result = operationAssessments({operations: [
+    {...op, checks: [{dimension: 'cfa', status: 'not-applicable', title: 'Paid capability', reason: 'This action is free.', evidence: []}]},
+    op
+  ]});
+  assert.match(result.html, /1 not assessed · 1 not applicable/);
+  assert.match(result.html, /CFA conformance: — Not applicable/);
+  assert.match(result.html, /CFA conformance: ➖ Not assessed/);
+});
+
 test('unreviewed CFA conformance remains explicit despite stable concurrency',()=>{
  const result=operationAssessments({operations:[op]});
  assert.match(result.html,/Concurrency correctness: ✅ Stable/);

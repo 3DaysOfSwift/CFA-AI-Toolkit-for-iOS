@@ -3,7 +3,13 @@ export const missingTimingScenarios = operation => ['repeat', 'leave', 'late-res
 
 const esc = v => String(v ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const labels={sound:'✅ Stable',problem:'❌ Problem',investigate:'⚠️ Needs investigation',unassessed:'➖ Not assessed'};
-const cfaLabels={sound:'✅ Pass',problem:'❌ Fail',investigate:'⚠️ Needs investigation',unassessed:'➖ Not assessed'};
+const cfaLabels={sound:'✅ Pass',problem:'❌ Fail',investigate:'⚠️ Needs investigation',unassessed:'➖ Not assessed','not-applicable':'— Not applicable'};
+
+function cfaOutcome(operation) {
+  const checks = (operation.checks ?? []).filter(check => check.dimension === 'cfa');
+  if (checks.length && checks.every(check => check.status === 'not-applicable')) return 'not-applicable';
+  return checkOutcome(checks, 'cfa');
+}
 const priority={problem:0,investigate:1,unassessed:2,sound:3};
 export function checkOutcome(checks,dimension) {
   const applicable=checks.filter(c=>c.dimension===dimension && c.status!=='not-applicable');
@@ -70,7 +76,7 @@ export function operationAssessments(review) {
   });
   const counts=Object.fromEntries(Object.keys(labels).map(s=>[s,operations.filter(o=>operationStatus(o)===s).length]));
   const inventory=review?.operationInventory;
-  const cfaCounts=Object.fromEntries(Object.keys(cfaLabels).map(status=>[status,operations.filter(op=>checkOutcome(op.checks??[],'cfa')===status).length]));
+  const cfaCounts=Object.fromEntries(Object.keys(cfaLabels).map(status=>[status,operations.filter(op=>cfaOutcome(op)===status).length]));
   const complete = inventory?.coverage === 'complete' && operations.length > 0 &&
     operations.every(op => [op.correctness, op.clarity].every(status => status === 'sound' || status === 'problem') &&
       !op.unknowns?.length && !op.steps?.some(step => step.relation === 'unknown') &&
@@ -89,7 +95,7 @@ export function operationAssessments(review) {
   const field=(name,value)=>'<p><strong>'+name+':</strong> '+esc(value)+'</p>';
   const rows=[...operations].sort((a,b)=>priority[operationStatus(a)]-priority[operationStatus(b)]).map(op=>{
     const status=operationStatus(op);
-    const cfaStatus=checkOutcome(op.checks??[],'cfa');
+    const cfaStatus=cfaOutcome(op);
     const sources=op.evidence.map(e=>'<details><summary>'+esc(e.file.split('/').pop())+' · Lines '+e.line+'–'+e.endLine+'</summary><p class="path">'+esc(e.file)+'</p><pre>'+esc(e.excerpt)+'</pre></details>').join('');
     const checkSummary=op.checks ? Object.entries(checkLabels).map(([status,label])=>[label,op.checks.filter(c=>c.dimension!=='cfa'&&c.status===status).length]).filter(([,count])=>count).map(([label,count])=>count+' '+label).join(' · ') : op.reason;
     const attention = op.checks
@@ -105,5 +111,5 @@ export function operationAssessments(review) {
     const attentionSummary=[...attention,...op.unknowns,...unresolvedSteps,...timingAttention,...cfaAttention].map(text=>'<span style="display:block;font-weight:400;margin:6px 0;overflow-wrap:anywhere">'+esc(text)+'</span>').join('');
     return '<details class="review"><summary>'+labels[status]+' · '+esc(op.title)+'<span style="display:block;font-weight:400;margin:6px 0;overflow-wrap:anywhere">'+esc(checkSummary)+'</span>'+attentionSummary+'<span style="display:block;font-weight:400;margin:6px 0">Concurrency correctness: '+labels[op.correctness]+' · Architectural clarity: '+labels[op.clarity]+' · CFA conformance: '+cfaLabels[cfaStatus]+'</span></summary>'+renderChecks(op.checks)+renderTimingScenarios(op.scenarios)+field('Assessment',op.reason)+field('Correctness',labels[op.correctness])+field('Architectural clarity',labels[op.clarity])+(status==='problem'?field('Problem type',problemLabel(op.problemKind)):'')+'<h3>What the code currently does</h3>'+[['Trigger',op.trigger],['Execution path',op.path],['Application state owner',op.stateOwner],['Task owner and lifetime',op.taskOwner],['Actor boundaries',op.isolation],['Verification performed',op.verification]].map(([k,v])=>field(k,v)).join('')+renderSteps(op.steps)+(op.unknowns.length?field('Unresolved boundaries',op.unknowns.join('; ')):'')+'<h3>Source evidence</h3>'+sources+(op.recommendation?'<h3>Suggested change</h3><p>'+esc(op.recommendation)+'</p>':'')+'</details>';
   }).join('');
-  return {counts,verdict,html:'<h2>Does the reviewed code work correctly?</h2><p><strong>'+correctnessVerdict+'</strong></p>'+(inventory?.coverage!=='complete'?'<p>The operation inventory is incomplete; this is not a whole-app pass.</p>':'')+'<h3>CFA conformance</h3><p>'+cfaCounts.sound+' operations pass · '+cfaCounts.problem+' fail · '+cfaCounts.investigate+' need investigation · '+cfaCounts.unassessed+' not assessed.</p><p>CFA conformance is assessed separately from Swift Concurrency correctness.</p><h3>Is this a Frankenstein architecture?</h3><p><strong>'+verdict+'</strong></p><p>Assessment of the recorded source snapshot. Source changes require a new analysis and review. These judgments describe the code; suggested changes are not implemented behavior.</p>'+(inventory?field('Scope',inventory.scope)+field('Entry-point discovery',inventory.method)+field('Inventory coverage',inventory.coverage):'')+'<p><strong>'+operations.length+' identified operations · '+counts.sound+' stable · '+counts.problem+' problems · '+counts.investigate+' need investigation · '+counts.unassessed+' not assessed</strong></p><p class="small muted">Coverage counts identified operations, not all possible runtime paths. A complete inventory is a reviewer assertion supported by the discovery method, not a scanner guarantee.</p>'+(rows||'<p class="empty">No operation assessments imported. Task counts cannot establish whether this architecture works well. Supply a source-linked review with the report’s --review option, including synchronous actions and lifecycle entry points.</p>')};
+  return {counts,verdict,html:'<h2>Does the reviewed code work correctly?</h2><p><strong>'+correctnessVerdict+'</strong></p>'+(inventory?.coverage!=='complete'?'<p>The operation inventory is incomplete; this is not a whole-app pass.</p>':'')+'<h3>CFA conformance</h3><p>'+cfaCounts.sound+' operations pass · '+cfaCounts.problem+' fail · '+cfaCounts.investigate+' need investigation · '+cfaCounts.unassessed+' not assessed · '+cfaCounts['not-applicable']+' not applicable.</p><p>CFA conformance is assessed separately from Swift Concurrency correctness.</p><h3>Is this a Frankenstein architecture?</h3><p><strong>'+verdict+'</strong></p><p>Assessment of the recorded source snapshot. Source changes require a new analysis and review. These judgments describe the code; suggested changes are not implemented behavior.</p>'+(inventory?field('Scope',inventory.scope)+field('Entry-point discovery',inventory.method)+field('Inventory coverage',inventory.coverage):'')+'<p><strong>'+operations.length+' identified operations · '+counts.sound+' stable · '+counts.problem+' problems · '+counts.investigate+' need investigation · '+counts.unassessed+' not assessed</strong></p><p class="small muted">Coverage counts identified operations, not all possible runtime paths. A complete inventory is a reviewer assertion supported by the discovery method, not a scanner guarantee.</p>'+(rows||'<p class="empty">No operation assessments imported. Task counts cannot establish whether this architecture works well. Supply a source-linked review with the report’s --review option, including synchronous actions and lifecycle entry points.</p>')};
 }
