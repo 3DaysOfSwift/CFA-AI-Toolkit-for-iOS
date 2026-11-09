@@ -361,14 +361,54 @@ async function loadCurrentReview(root, input, syntaxProvider) {
   return {report, review:await importReview(report,raw,root)};
 }
 
+function reportFindingsGaps(review) {
+  const gaps = [];
+  const criteria = review.presentation?.criteria ?? [];
+  for (const finding of review.findings || []) {
+    if (!['pass', 'concern', 'problem'].includes(finding.status)) {
+      gaps.push('Whole-app finding status must be pass, concern or problem: ' + finding.title);
+    }
+  }
+  const sourceProblems = [
+    ...(review.findings || []), ...(review.fileReviews || []), ...(review.typeReviews || [])
+  ].filter(item => item.status === 'problem').flatMap(item => item.issues?.length ? item.issues : [item]);
+  const operationProblems = (review.operations || []).flatMap(operation => [
+    ...(operation.checks || []).filter(check => check.status === 'fail' && check.dimension !== 'cfa'),
+    ...(operation.scenarios || []).filter(scenario => scenario.status === 'problem')
+  ]);
+  const visibleEvidence = criteria
+    .filter(criterion => criterion.status === 'problem')
+    .flatMap(criterion => criterion.evidence);
+  for (const problem of [...sourceProblems, ...operationProblems]) {
+    const covered = problem.evidence.some(ref => visibleEvidence.some(visible =>
+      visible.file === ref.file && visible.line <= ref.line && visible.endLine >= ref.endLine
+    ));
+    if (!covered) {
+      gaps.push('Include confirmed source problems in the report criteria before rendering: ' +
+        (problem.title || problem.name || problem.file));
+    }
+  }
+  for (const concern of (review.findings || []).filter(finding => finding.status === 'concern')) {
+    const covered = criteria.some(criterion =>
+      ['concern', 'problem'].includes(criterion.status) && concern.evidence.some(ref =>
+        criterion.evidence.some(visible =>
+          visible.file === ref.file && visible.line <= ref.line && visible.endLine >= ref.endLine
+        )
+      )
+    );
+    if (!covered) gaps.push('Include source concerns in the report criteria before rendering: ' + concern.title);
+  }
+  return gaps;
+}
+
 export async function progress(root, input, syntaxProvider = collectSyntax) {
   const {report, review} = await loadCurrentReview(root, input, syntaxProvider);
-  return {gaps:[...coverageGaps(report,review), ...appCheckGaps(review)],files:report.files.length,operations:(review.operations || []).length};
+  return {gaps:[...coverageGaps(report,review), ...appCheckGaps(review), ...reportFindingsGaps(review)],files:report.files.length,operations:(review.operations || []).length};
 }
 export async function next(root, input, syntaxProvider = collectSyntax) {
   const {report, review} = await loadCurrentReview(root, input, syntaxProvider);
   const work = nextWork(report,review);
-  return {...work, gaps:[...work.gaps, ...appCheckGaps(review)]};
+  return {...work, gaps:[...work.gaps, ...appCheckGaps(review), ...reportFindingsGaps(review)]};
 }
 export async function finish(root, input, output, icon, syntaxProvider = collectSyntax) {
   const {report, review} = await loadCurrentReview(root, input, syntaxProvider);
@@ -385,40 +425,8 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
   if (missingAppChecks.length) {
     throw Error('Record app-level assessments before rendering: ' + missingAppChecks.join(', '));
   }
-  for (const finding of review.findings || []) {
-    if (!['pass', 'concern', 'problem'].includes(finding.status)) {
-      throw Error('Whole-app finding status must be pass, concern or problem: ' + finding.title);
-    }
-  }
-  const sourceProblems = [
-    ...(review.findings || []), ...(review.fileReviews || []), ...(review.typeReviews || [])
-  ].filter(item => item.status === 'problem').flatMap(item => item.issues?.length ? item.issues : [item]);
-  const operationProblems = (review.operations || []).flatMap(operation => [
-    ...operation.checks.filter(check => check.status === 'fail' && check.dimension !== 'cfa'),
-    ...operation.scenarios.filter(scenario => scenario.status === 'problem')
-  ]);
-  const visibleEvidence = presentation.criteria
-    .filter(criterion => criterion.status === 'problem')
-    .flatMap(criterion => criterion.evidence);
-  for (const problem of [...sourceProblems, ...operationProblems]) {
-    const covered = problem.evidence.some(ref => visibleEvidence.some(visible =>
-      visible.file === ref.file && visible.line <= ref.line && visible.endLine >= ref.endLine
-    ));
-    if (!covered) {
-      throw Error('Include confirmed source problems in the report criteria before rendering: ' +
-        (problem.title || problem.name || problem.file));
-    }
-  }
-  for (const concern of (review.findings || []).filter(finding => finding.status === 'concern')) {
-    const covered = presentation.criteria.some(criterion =>
-      ['concern', 'problem'].includes(criterion.status) && concern.evidence.some(ref =>
-        criterion.evidence.some(visible =>
-          visible.file === ref.file && visible.line <= ref.line && visible.endLine >= ref.endLine
-        )
-      )
-    );
-    if (!covered) throw Error('Include source concerns in the report criteria before rendering: ' + concern.title);
-  }
+  const findingsGaps = reportFindingsGaps(review);
+  if (findingsGaps.length) throw Error(findingsGaps.join('\n'));
   const data = {...presentation, scope:review.scope};
   data.operations = (review.operations || []).map(op=>({group:op.group,title:op.title,trigger:op.trigger,verification:op.verification,evidence:op.evidence,path:op.path,stateOwner:op.stateOwner,taskOwner:op.taskOwner,isolation:op.isolation,reason:op.reason,unknowns:op.unknowns,steps:op.steps,checks:op.checks,scenarios:op.scenarios,problemKind:op.problemKind,recommendation:op.recommendation}));
   const taskSites = new Map(taskCandidates(report).map(site => [site.id, site]));
