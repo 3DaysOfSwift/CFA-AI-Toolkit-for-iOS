@@ -151,6 +151,16 @@ actor RetryableNotes: NotesRepository {
         precondition(afterOverlap.first == item)
         precondition(Set(afterOverlap.dropFirst().map(\.id)) == Set([firstNote.id, secondNote.id]))
         precondition(afterOverlap.count == 3)
+        let corruptBytes = Data("Invalid JSON".utf8)
+        try corruptBytes.write(to: url, options: .atomic)
+        let corruptFeature = NotesFeature(repository: disk)
+        let corruptEditor = NotesEditorViewModel(notesFeature: corruptFeature)
+        corruptEditor.text = "Keep this draft"
+        let corruptSave = await corruptEditor.save().value
+        let remainingBytes = try Data(contentsOf: url)
+        precondition(!corruptSave && corruptEditor.saveError != nil)
+        precondition(corruptEditor.text == "Keep this draft" && corruptFeature.notes.isEmpty)
+        precondition(remainingBytes == corruptBytes, "A failed read must not overwrite saved bytes")
         print("Notes reference: failed save, retry, ordered overlap and JSON storage passed")
     }
 }
