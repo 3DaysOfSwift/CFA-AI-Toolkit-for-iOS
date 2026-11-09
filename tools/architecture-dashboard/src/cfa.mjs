@@ -114,7 +114,8 @@ skill from that toolkit before changing the project.
   private task handles needed for app-wide listeners. Its initializer assigns
   the supplied Features, sets the guard to false and sets the handles to nil.
   One static live() factory constructs production dependencies for
-  AppModel.shared. Keep services and UI errors out of its stored properties.
+  AppModel.shared. Keep services, ViewModels and other presentation state
+  out of AppModel's stored properties.
 - AppModel starts each needed app-wide listener once and forwards events to
   the responsible Feature. Define how asynchronous listeners stop or are
   replaced when needed, including in isolated tests. A listener intended to
