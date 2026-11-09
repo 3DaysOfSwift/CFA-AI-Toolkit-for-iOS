@@ -347,7 +347,10 @@ export function renderInspection(report) {
       lines.push(`${screen.name}: structural tab root · no ViewModel required by this pattern`);
       continue;
     }
-    const routes = screen.dependencies.map(dependency => `${dependency.property}${dependency.featureType ? ` (${dependency.featureType})` : ' (unresolved)'}`);
+    const routes = screen.dependencies.map(({property, featureType, featureFile}) => {
+      if (!featureType) return `${property} (unresolved)`;
+      return `${property} (${featureType}${featureFile ? '' : ', source unresolved'})`;
+    });
     lines.push(`${screen.name}: ${screen.viewModelFile ? screenName(screen.viewModelFile) : 'no adjacent ViewModel; review screen role'} → ${routes.join(', ') || 'no visible feature route'} · ${screen.testFile ? 'matching test file found' : 'no test file found'}`);
   }
   if (report.findings.length) {
