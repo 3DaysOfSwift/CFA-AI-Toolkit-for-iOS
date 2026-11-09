@@ -274,11 +274,13 @@ test('reviews direct SwiftData preview and query usage without flagging a normal
     'Application/PreviewContent/SafeLegacyPreview.swift': 'struct SafeLegacyPreview: PreviewProvider { static var previews: some View { NotesView() } }',
     'Application/2 - AppModel/SwiftDataManager.swift': 'class SwiftDataManager { let container: ModelContainer }',
     'Application/1 - View/QueryScreen.swift': 'struct QueryScreen: View { @Query var notes: [Note]; var body: some View { Text("Notes") } }\n#Preview { QueryScreen().modelContainer(container) }',
+    'Application/Components/QualifiedQuery.swift': 'struct QualifiedQuery: View { @SwiftData.Query var notes: [Note] }',
     'Application/1 - View/EnvironmentScreen.swift': 'struct EnvironmentScreen: View { @Environment(\\.modelContext) private var context; var body: some View { Text("Notes") } }',
     'Application/1 - View/SimplePreview.swift': '#Preview { NotesView() }\n// @Query var notes: [Note]\nlet example = ".modelContainer(container)"'
   });
   const matches = (await inspect(root)).findings.filter(item => item.code === 'view-swiftdata-access');
-  assert.equal(matches.length, 6);
+  assert.equal(matches.length, 7);
+  assert.ok(matches.some(item => item.file.endsWith('/QualifiedQuery.swift') && item.line === 1));
   assert.ok(matches.some(item => item.file.endsWith('NotesPreview.swift') && item.line === 1));
   assert.ok(matches.some(item => item.file.endsWith('/LegacyPreview.swift') && item.line === 1));
   assert.ok(matches.every(item => item.severity === 'review'));
