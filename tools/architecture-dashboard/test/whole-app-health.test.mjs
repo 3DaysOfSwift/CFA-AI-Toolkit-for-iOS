@@ -85,6 +85,19 @@ test('a whole-app operation needs a workflow trace', () => {
   assert.match(work.gaps.join(' '), /need a workflow trace/);
 });
 
+test('a CFA-only deviation leaves the operation concurrency result stable', () => {
+  const html = renderHealthReport({
+    app:'App',summary:'Summary',verdict:'Clear ownership',scope:'Scope',conclusion:'Conclusion',
+    criteria:[{title:'Clear ownership',detail:'Reviewed',status:'pass'}],
+    operations:[{title:'Save',checks:[
+      {dimension:'correctness',status:'pass',title:'Save owns its work'},
+      {dimension:'cfa',status:'fail',title:'Naming differs from CFA'}
+    ]}]
+  });
+  assert.match(html, /aria-label="Stable">✓<\/span>Save/);
+  assert.match(html, /CFA alignment.*× Naming differs from CFA/s);
+});
+
 test('an unresolved task relationship keeps an operation pending', () => {
   const review = complete();
   review.operations[0].steps = [
@@ -251,12 +264,15 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
     await fs.writeFile(reviewPath,JSON.stringify(timingProblem));
     const problemsOutput = path.join(base,'problems.html');
     await finish(project,reviewPath,problemsOutput,undefined,syntax);
-    assert.match(await fs.readFile(problemsOutput,'utf8'),/Problems to address.*Confirmed issue.*Duplicate work on repeated action/s);
+    const problemHtml = await fs.readFile(problemsOutput,'utf8');
+    assert.match(problemHtml,/Problems to address.*Confirmed issue.*Duplicate work on repeated action/s);
+    assert.match(problemHtml,/<summary><span class="indicator problem" aria-label="Problem">×<\/span>Start/);
     await fs.writeFile(reviewPath,JSON.stringify(review));
     const result=await finish(project,reviewPath,output,undefined,syntax);
     assert.deepEqual(result.gaps,[]);
     const html=await fs.readFile(output,'utf8');
     assert.match(html,/100%/);
+    assert.match(html,/<summary><span class="indicator pass" aria-label="Stable">✓<\/span>Start/);
     assert.match(html,/When timing changes/);
     assert.match(html,/The owner handles this case/);
     assert.match(html,/App\.swift:1–2/);
