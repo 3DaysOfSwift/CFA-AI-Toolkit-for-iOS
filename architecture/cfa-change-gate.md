@@ -280,8 +280,11 @@ the architecture:
 Review the changed source as one feature slice, not as isolated files.
 When the scope includes a paid capability, establish its entitlement policy and
 trace every identifiable entry point to a check of current entitlement before
-paid presentation or execution. Flag established unguarded paths and report unresolved paths as unverified. Test locked and entitled paths;
-do not claim that UI gating replaces server-side authorisation.
+paid presentation or execution. Flag established unguarded paths and report
+unresolved paths as unverified. Test locked and entitled paths. If entitlement
+can change during a suspension before use, change it while the route is
+suspended and verify the resumed route checks again. Server-protected
+operations enforce authorisation independently.
 
 - Where one execution satisfies equivalent ViewModel actions or Feature calls,
   verify those callers share its completion. Do not coalesce distinct commands

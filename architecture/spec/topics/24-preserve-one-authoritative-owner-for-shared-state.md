@@ -35,5 +35,9 @@ which capabilities are paid from product requirements and entitlement policy;
 do not infer a paid capability from a name alone. If an entry point, dynamic
 dispatch or entitlement check cannot be resolved, report it as unverified rather
 than claiming the check passed. Exercise locked and entitled outcomes and
-relevant alternate entry points in behavioural tests.
+relevant alternate entry points in behavioural tests. If a route suspends
+between checking entitlement and using the capability, determine whether access
+can change during the wait. Where it can, check the current entitlement again
+before presenting or invoking the capability. Test access changing while the
+route is suspended and verify the outcome when it resumes.
 

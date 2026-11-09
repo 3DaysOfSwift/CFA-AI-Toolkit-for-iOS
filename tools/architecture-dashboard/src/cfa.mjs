@@ -255,8 +255,9 @@ skill from that toolkit before changing the project.
   alternative screens, deep links, notification actions and additional targets
   that reach the capability. A route that bypasses the screen checks current
   entitlement in its own caller before invoking the capability. Verify locked
-  and entitled outcomes for each applicable route. Cite the source and
-  consequence of confirmed unguarded paths, and mark unresolved paths as
+  and entitled outcomes for each applicable route. If access can change
+  during a suspension before use, check it again after resuming and verify
+  this behaviour with a controlled test. Cite the source and consequence of confirmed unguarded paths, and mark unresolved paths as
   unverified. Keep pricing and entitlement checks out of the capability
   Feature so the product can change which capabilities it charges for.
   Protected server operations enforce their own access policy.

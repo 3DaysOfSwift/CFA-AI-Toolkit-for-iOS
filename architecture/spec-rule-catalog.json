@@ -317,7 +317,7 @@
       "strength": "Required when applicable",
       "rule": "PurchasesFeature owns entitlement state. The screen ViewModel checks current entitlement before presenting or calling the paid capability and otherwise presents the locked or purchase experience. Apply the check at every relevant entry point. When a route bypasses a screen ViewModel, its caller checks current entitlement before invoking the capability. Keep pricing and entitlement checks out of the capability Feature. Server-protected operations enforce their own authorisation.",
       "why": "Pricing changes remain separate from capability behaviour.",
-      "verify": "Establish which capabilities are paid from product requirements and entitlement policy. Trace every known entry point for paid presentation or execution, and test locked and entitled outcomes on alternate routes as well as the usual screen. Report confirmed unguarded paths with source evidence and their consequence. Mark unresolved paths unverified.",
+      "verify": "Establish which capabilities are paid from product requirements and entitlement policy. Trace every known entry point for paid presentation or execution, and test locked and entitled outcomes on alternate routes as well as the usual screen. Where entitlement can change between the check and use, change it during a controlled suspension and verify the resumed route rechecks before presentation or execution. Report confirmed unguarded paths with source evidence and their consequence. Mark unresolved paths unverified.",
       "example": "An export screen checks PurchasesFeature before presenting or calling the paid export capability.",
       "explanationIds": []
     },

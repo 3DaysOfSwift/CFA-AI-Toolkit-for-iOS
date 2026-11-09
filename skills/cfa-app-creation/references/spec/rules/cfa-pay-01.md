@@ -10,6 +10,6 @@
 
 **Example:** An export screen checks PurchasesFeature before presenting or calling the paid export capability.
 
-**Verify:** Establish which capabilities are paid from product requirements and entitlement policy. Trace every known entry point for paid presentation or execution, and test locked and entitled outcomes on alternate routes as well as the usual screen. Report confirmed unguarded paths with source evidence and their consequence. Mark unresolved paths unverified.
+**Verify:** Establish which capabilities are paid from product requirements and entitlement policy. Trace every known entry point for paid presentation or execution, and test locked and entitled outcomes on alternate routes as well as the usual screen. Where entitlement can change between the check and use, change it during a controlled suspension and verify the resumed route rechecks before presentation or execution. Report confirmed unguarded paths with source evidence and their consequence. Mark unresolved paths unverified.
 
 **Full rule, context and examples:** [Preserve One Authoritative Owner for Shared State](../topics/24-preserve-one-authoritative-owner-for-shared-state.md). This card is a reading aid; apply the complete canonical section.
