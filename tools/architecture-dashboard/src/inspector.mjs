@@ -677,7 +677,7 @@ export async function inspect(project) {
   }
   const viewDeclarations = /\bstruct\s+(\w+)(?:\s*<[^{}]+>)?\s*:\s*(?:(?:\w+\s*\.\s*)*\w+\s*,\s*)*(?:SwiftUI\s*\.\s*)?View\b(?!\s*\.)[^{}]*\{/g;
   const viewConformances = /\bextension\s+(\w+)\s*:\s*(?:(?:\w+\s*\.\s*)*\w+\s*,\s*)*(?:SwiftUI\s*\.\s*)?View\b(?!\s*\.)[^{}]*\{/g;
-  const appDeclarations = /\bstruct\s+\w+\s*:\s*(?:SwiftUI\s*\.\s*)?App\b[^{}]*\{/g;
+  const appDeclarations = /\bstruct\s+\w+\s*:\s*(?:(?:\w+\s*\.\s*)*\w+\s*,\s*)*(?:SwiftUI\s*\.\s*)?App\b(?!\s*\.)[^{}]*\{/g;
   const sceneBodyPattern = /\bvar\s+body\s*:\s*some\s+(?:SwiftUI\s*\.\s*)?Scene\s*\{/;
   const rootViewNames = new Set(['ContentView', 'RootTabView', 'RootView']);
   const rootStorageGate = /(?<!#)\b(?:if|guard|switch)\s+[^{};]*\b\w*(?:container|database|storeReady|storageReady|startupError|launchError)\w*\b/i;
@@ -835,6 +835,15 @@ export async function inspect(project) {
     for (const app of source.matchAll(appDeclarations)) {
       const start = app.index + app[0].length;
       const members = braceBody(source, start - 1);
+      const signatures = memberSignatures(members);
+      const retainedModels = [
+        ...[...storedTypedMembers(signatures, members)].filter(member => member.type === 'AppModel'),
+        ...signatures.matchAll(inferredAppModelStorage)
+      ];
+      for (const {index} of retainedModels) {
+        reviewedAppModelDeclarations.add(start + index);
+        findings.push(finding('stored-app-model', 'review', 'This SwiftUI App appears to retain AppModel. Keep App structural and signal the shared model from the application lifecycle callback.', file, lineOf(source, start + index)));
+      }
       const sceneBody = sceneBodyPattern.exec(members);
       if (sceneBody) {
         const bodyStart = sceneBody.index + sceneBody[0].length;

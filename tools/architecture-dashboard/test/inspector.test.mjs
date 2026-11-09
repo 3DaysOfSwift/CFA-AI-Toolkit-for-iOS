@@ -1045,6 +1045,20 @@ test('a storage manager in a test-named folder does not settle app storage owner
   assert.match(review.message, /only in test-named folders/);
 });
 
+test('reviews AppModel storage in a SwiftUI App outside the View folder', async t => {
+  const file = 'Application/ExampleApp.swift';
+  const root = await fixture(t, {
+    [file]: `struct ExampleApp: AnotherProtocol, SwiftUI.App {
+      private let model = AppModel.shared
+      private let secondModel: AppModel = AppModel.shared
+      private var computedModel: AppModel { AppModel.shared }
+      var body: some Scene { WindowGroup { ContentView() } }
+    }`
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'stored-app-model');
+  assert.deepEqual(findings.map(item => [item.file, item.line]).sort(), [[file, 2], [file, 3]]);
+});
+
 test('flags conditional database startup presentation in App.body', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
