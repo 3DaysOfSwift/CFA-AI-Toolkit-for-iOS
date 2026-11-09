@@ -21,4 +21,9 @@ Open and run `Before.playground` and `After.playground`. Each prints `Passed:` a
 
 ## Boundaries
 
-Observation needs iOS 17/macOS 14 or newer. This case covers the Feature’s observable state. In an app, the View observes that state through its screen ViewModel. A migration that relies on receiving every event still needs to verify its delivery contract.
+Observation needs iOS 17/macOS 14 or newer. The counter is in memory. A
+Feature that records durable completions publishes the updated count after
+the required save succeeds. In an app, the View observes the Feature’s state
+through its screen ViewModel. The re-registration demonstrates reading the
+latest state. If an existing subscriber must process every completion event,
+preserve and verify that delivery contract separately.
