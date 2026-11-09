@@ -55,7 +55,11 @@ regression and human architecture review. Use
 `completionGate.deploymentCompatibilityEvidenceId` to link the minimum OS of
 each affected target and the evidence that changed paths support it. Older
 completed records need this link and a fresh review before they validate. Use
-`hybridReviewEvidenceId` and `finalCfaAuditEvidenceId` for the two review links. Record the regression under
+`hybridReviewEvidenceId` and `finalCfaAuditEvidenceId` for the two review links.
+The final CFA audit gives each applicable requirement a verdict backed by
+evidence at the final commit. Explain inapplicability and the effect of agreed
+exceptions. An applicable requirement with missing evidence keeps the audit
+open. Record the regression under
 `completionGate.manualBehaviourRegressionEvidenceId`. If evidence is missing
 or failed, use `partial` and explain the gap. Validation checks the recorded
 links and outcomes. The reviewer compares the declared affected targets with

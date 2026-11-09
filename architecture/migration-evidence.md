@@ -125,6 +125,13 @@ Use an empty list only after confirming no handoff is affected. Record each targ
 evidence that changed paths support it. A passing run on a newer
 OS alone does not establish that compatibility.
 
+In the audit linked by `completionGate.finalCfaAuditEvidenceId`, record the
+evidence and verdict for each applicable CFA requirement at the final commit.
+Explain why any requirement does not apply and how any agreed exception affects
+the conformance verdict. An unresolved applicable requirement keeps the audit
+open. The validator checks the audit link, revision and recorded outcome. The
+reviewer checks the audit’s coverage and evidence.
+
 When any gate is missing, use progress language such as “Continuing migration:
 verify the Xcode navigator map.” Never convert a baseline pass, source parse or
 single route refactor into a completion claim. Capture a user correction that

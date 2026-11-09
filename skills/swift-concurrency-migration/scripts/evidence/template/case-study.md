@@ -28,9 +28,11 @@ manual checks; record failures and checks not run. A build is not proof of
 behaviour preservation. Keep remaining risks and work visible.
 
 For the final migration record, describe the hybrid paths reviewed and the
-reasons for retaining any legacy mechanisms. Summarise the final CFA audit,
-the corrections made, and the checks repeated after those corrections. Link
-both reviews to evidence at the final commit. In `record.json`, list every
+reasons for retaining any legacy mechanisms. Link the final CFA audit and
+hybrid review at the final commit. In the CFA audit, give each applicable
+requirement an evidence-backed verdict. Explain inapplicability and the effect
+of agreed exceptions. Record the corrections and repeated checks. An applicable
+requirement with missing evidence keeps the audit open. In `record.json`, list every
 affected target in `completionGate.affectedTargets` and name the targets
 covered by each build in its `targets` array. Include affected extensions and
 device targets, and link each changed data handoff in
