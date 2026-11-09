@@ -101,17 +101,20 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
           continue;
         }
         await walk(absolute, scanSwift);
-      } else if (entry.isFile() && /(?:\.(?:pbxproj|xcconfig|xcscheme|entitlements)$|Info\.plist$|^(?:contents\.xcworkspacedata|Package\.resolved)$)/.test(entry.name)) {
+      } else if (entry.isFile()) {
+        const packageManifest = /^Package(?:@swift-\d+(?:\.\d+)*)?\.swift$/.test(entry.name);
+        const buildDefinition = packageManifest || /(?:\.(?:pbxproj|xcconfig|xcscheme|entitlements)$|Info\.plist$|^(?:contents\.xcworkspacedata|Package\.resolved)$)/.test(entry.name);
+        const swiftSource = scanSwift && entry.name.endsWith('.swift');
+        if (!buildDefinition && !swiftSource) continue;
         const relative = path.relative(root, absolute).split(path.sep).join('/');
-        const hash = createHash('sha256').update(await fs.readFile(absolute)).digest('hex');
-        buildDefinitions.push([relative, hash]);
-      } else if (scanSwift && entry.isFile() && entry.name.endsWith('.swift')) {
-        const relative = path.relative(root, absolute).split(path.sep).join('/');
-        if ((await fs.stat(absolute)).size > 2_000_000) { skipped.push({ file: relative, reason: 'Over 2 MB source limit' }); continue; }
-        const source = await fs.readFile(absolute, 'utf8');
-        const hash = createHash('sha256').update(source).digest('hex');
-        if (/^Package(?:@swift-\d+(?:\.\d+)*)?\.swift$/.test(entry.name)) buildDefinitions.push([relative, hash]);
-        files.push({ path: relative, hash, lineCount: source.split('\n').length, ...scanSource(source, relative) });
+        if (swiftSource && (await fs.stat(absolute)).size > 2_000_000) { skipped.push({ file: relative, reason: 'Over 2 MB source limit' }); continue; }
+        const bytes = await fs.readFile(absolute);
+        const hash = createHash('sha256').update(bytes).digest('hex');
+        if (buildDefinition) buildDefinitions.push([relative, hash]);
+        if (swiftSource) {
+          const source = bytes.toString('utf8');
+          files.push({ path: relative, hash, lineCount: source.split('\n').length, ...scanSource(source, relative) });
+        }
       }
     }
   }
