@@ -369,6 +369,11 @@ do not claim that UI gating replaces server-side authorisation.
   it. Verify retry uses the configured store and that the failure neither
   removes existing data nor substitutes another store. Report any storage or
   UI checks that did not run.
+- For time-dependent business decisions, verify the Feature reads an injected
+  clock when making the decision. Test relevant date and time-zone boundaries.
+  Where a Feature must work across a date change, advance the controlled clock
+  on the same instance and verify its next decision. Direct time reads in a
+  View are suitable for transient visuals.
 - For changes to durable editing, hold the save pending and verify that
   confirmed state stays unchanged. Fail the save and verify the screen
   presents a recoverable error and its ViewModel retains the draft for retry.

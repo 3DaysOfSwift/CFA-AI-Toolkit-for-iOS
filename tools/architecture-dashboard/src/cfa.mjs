@@ -303,6 +303,11 @@ skill from that toolkit before changing the project.
   the agreed CFA and Swift Concurrency migration and supported platforms.
   Fix confirmed defects within scope, protect the intended behaviour with
   tests, and record any necessary platform-driven differences.
+- Inject a clock or date function when a business rule depends on current
+  time. Read it in the Feature at the point of decision. Test date and time-zone
+  boundaries with controlled inputs, and advance the clock on the same
+  Feature instance when it must operate across a date change. A View may
+  read time directly for transient visuals.
 - Give each ViewModel its own named test file and suite under View model tests.
   Give each concrete Feature a named API test file under FeatureTests. When
   adding or moving tests, verify membership in the intended test target and
