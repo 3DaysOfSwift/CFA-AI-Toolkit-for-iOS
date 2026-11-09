@@ -439,6 +439,10 @@ at any time with:
 cfa doctor
 ```
 
+If it flags older CFA guidance, update the marked guidance in your project
+instruction file. Running `cfa enable-project` again preserves the existing
+block. See the [installation guide](docs/INSTALLATION.md) for details.
+
 The installer places `cfa` in `~/.local/bin`. If Terminal says `command not
 found: cfa`, add that folder to your zsh path once, then open a new Terminal:
 
