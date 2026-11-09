@@ -32,11 +32,14 @@ First identify the live target, AppModel composition, existing feature owner,
 affected Views/ViewModels, storage and tests. Record the intended user journey,
 success/failure states and existing behaviour that must remain intact.
 
-If the change introduces or touches a paid capability, establish its access
-policy from the product requirements. The screen ViewModel reads current
+If the change introduces or touches a paid capability, apply the
+[paid capability rule](references/spec/rules/cfa-pay-01.md) and establish its
+access policy from the product requirements. The screen ViewModel reads current
 entitlement from PurchasesFeature before presenting or invoking the capability.
 Trace other entry points to their own checks and test both locked and entitled
-behaviour. Keep pricing decisions separate from the capability's implementation.
+behaviour. If a changed route suspends between checking entitlement and using
+the capability, verify that a revocation during the wait blocks the resumed
+route. Keep pricing decisions separate from the capability's implementation.
 Server operations enforce their own access policy.
 
 When changing deep links or notification actions, apply the

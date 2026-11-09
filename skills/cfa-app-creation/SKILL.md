@@ -54,8 +54,10 @@ If the product includes paid capabilities, apply the
 `PurchasesFeature` ownership of entitlement state. Check access in the
 screen's ViewModel before presenting or invoking the paid capability. Trace
 any other entry point, such as a notification action or shortcut, to its own
-guard and test locked and entitled outcomes. Keep pricing policy outside the
-capability Feature. Protected server operations enforce their own access.
+guard and test locked and entitled outcomes. If entitlement can change while a
+route suspends before use, recheck it before presenting or invoking the paid
+capability. Verify this by revoking access during the suspension. Keep pricing
+policy outside the capability Feature. Protected server operations enforce their own access.
 
 If the product opens destinations from URLs or notification actions, apply
 the [deep-link rules](references/spec/rules/cfa-link-01.md). Route opening
