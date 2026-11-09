@@ -94,6 +94,17 @@ actor HeldNotesLoad: NotesRepository {
         await staying.value
         precondition(sharedFeature.notes == [loadedNote] && stayingModel.loadError == nil)
 
+        let unattendedLoad = HeldNotesLoad()
+        let unattendedFeature = NotesFeature(repository: unattendedLoad)
+        let onlyModel = NotesEditorViewModel(notesFeature: unattendedFeature)
+        let onlyWaiter = Task { await onlyModel.load() }
+        await unattendedLoad.waitForLoad()
+        onlyWaiter.cancel()
+        let unattendedNote = Note(id: UUID(), text: "Loaded after cancellation")
+        await unattendedLoad.finish(with: unattendedNote)
+        await onlyWaiter.value
+        precondition(unattendedFeature.notes == [unattendedNote])
+
         let restoringRepository = HeldNotesLoad()
         let restoringFeature = NotesFeature(repository: restoringRepository)
         let restore = Task { try await restoringFeature.loadIfNeeded() }
