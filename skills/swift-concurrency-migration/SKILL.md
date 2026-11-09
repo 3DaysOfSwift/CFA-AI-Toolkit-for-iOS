@@ -80,6 +80,11 @@ Use deliberate passes:
    capabilities. Verify the same destinations and existing deferred-open
    and history behaviour after migration. Apply the new-app pending design
    only where it fits the agreed scope and preserves the existing behaviour.
+   When migration changes a paid capability or one of its entry points, apply
+   the [paid capability rule](references/spec/rules/cfa-pay-01.md). Trace access
+   before and after migration, including routes that bypass the usual screen.
+   Verify that locked users cannot reach paid presentation or execution and
+   that entitled users retain access. Preserve existing server-side enforcement.
 2. Move one complete feature at a time into CFA. Give each screen-level SwiftUI View a
    dedicated ViewModel; reusable presentation components do not automatically need
    one. Move testable feature decisions into its Feature,
