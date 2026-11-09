@@ -100,7 +100,7 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
           continue;
         }
         await walk(absolute);
-      } else if (entry.isFile() && /(?:\.(?:pbxproj|xcconfig|xcscheme)$|^(?:contents\.xcworkspacedata|Package\.resolved)$)/.test(entry.name)) {
+      } else if (entry.isFile() && /(?:\.(?:pbxproj|xcconfig|xcscheme|entitlements)$|Info\.plist$|^(?:contents\.xcworkspacedata|Package\.resolved)$)/.test(entry.name)) {
         const relative = path.relative(root, absolute).split(path.sep).join('/');
         const hash = createHash('sha256').update(await fs.readFile(absolute)).digest('hex');
         buildDefinitions.push([relative, hash]);

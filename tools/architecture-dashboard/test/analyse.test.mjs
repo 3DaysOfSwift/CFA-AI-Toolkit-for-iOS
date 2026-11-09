@@ -85,3 +85,18 @@ test('changing Xcode target definitions invalidates source review evidence', asy
   assert.deepEqual(after.files, before.files);
   assert.notEqual(after.sourceFingerprint, before.sourceFingerprint);
 });
+
+test('changing app capability or lifecycle configuration invalidates source review evidence', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cfa-app-configuration-'));
+  t.after(() => fs.rm(root, {recursive:true, force:true}));
+  await fs.writeFile(path.join(root, 'App.swift'), 'struct App {}');
+  for (const file of ['App-Info.plist', 'App.entitlements']) {
+    const configuration = path.join(root, file);
+    await fs.writeFile(configuration, 'Original configuration');
+    const before = await analyse(root);
+    await fs.writeFile(configuration, 'Changed configuration');
+    const after = await analyse(root);
+    assert.deepEqual(after.files, before.files);
+    assert.notEqual(after.sourceFingerprint, before.sourceFingerprint, file);
+  }
+});
