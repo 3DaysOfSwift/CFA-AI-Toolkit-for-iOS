@@ -169,10 +169,11 @@ test('identifies priority and explicitly typed Tasks scheduling the launch signa
     'Application/PriorityDelegate.swift': 'class Delegate { func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { Task(priority: .high) { AppModel.shared.applicationDidFinishLaunching() }; return true } }',
     'Application/DetachedDelegate.swift': 'class Delegate { func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { Task.detached(priority: .background) { await AppModel.shared.applicationDidFinishLaunching() }; return true } }',
     'Application/TypedDelegate.swift': 'class Delegate { func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { Task<Void, Never> { AppModel.shared.applicationDidFinishLaunching() }; return true } }',
+    'Application/ExplicitInitializerDelegate.swift': 'class Delegate { func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { Task<Void, Never>.init { AppModel.shared.applicationDidFinishLaunching() }; return true } }',
     'Application/DirectDelegate.swift': 'class Delegate { func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { AppModel.shared.applicationDidFinishLaunching(); Task(priority: .high) { await refresh() }; return true } }'
   });
   const files = (await inspect(root)).findings.filter(item => item.code === 'scheduled-app-model-launch').map(item => item.file).sort();
-  assert.deepEqual(files, ['Application/DetachedDelegate.swift', 'Application/PriorityDelegate.swift', 'Application/TypedDelegate.swift']);
+  assert.deepEqual(files, ['Application/DetachedDelegate.swift', 'Application/ExplicitInitializerDelegate.swift', 'Application/PriorityDelegate.swift', 'Application/TypedDelegate.swift']);
 });
 
 test('a live factory in an extension is not reported as definitely absent', async t => {
