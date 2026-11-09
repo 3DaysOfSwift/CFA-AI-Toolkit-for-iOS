@@ -251,7 +251,9 @@ the architecture:
     current account or session generation before publishing an in-flight result,
     including when a request has been cancelled. If the same account can sign
     back in before earlier work finishes, verify that the earlier session
-    cannot publish into the new one.
+    cannot publish into the new one. Trace delayed writes and cleanup to
+    persistent storage. Verify they cannot recreate cleared records or delete
+    data saved by a newer session.
     If sign-out promises a fresh-install experience, clear account-specific
     in-memory state, caches and local files after successful sign-out. Preserve
     independent purchases and user-owned documents, and handle unsynchronised

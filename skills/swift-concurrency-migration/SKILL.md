@@ -105,7 +105,8 @@ Use deliberate passes:
    where supported. Check that the expiry signal still reaches its owner when
    the account screen is absent. If the same account can sign back in before
    earlier work finishes, verify that the old session cannot publish into
-   the new one.
+   the new one. Where storage effects can overlap a session change, verify
+   that delayed writes and cleanup leave the correct session’s records intact.
 2. Move one complete feature at a time into CFA. Give each screen-level SwiftUI View a
    dedicated ViewModel; reusable presentation components do not automatically need
    one. Move testable feature decisions into its Feature,

@@ -57,7 +57,9 @@ session ended and cleanup fails, keep the app signed out and surface the
 cleanup error. After a session change, check the active account or session
 generation before publishing in-flight results, even after requesting cancellation. If the same account can sign in
 again while earlier work is pending, use session identity and verify that the
-old result cannot reach the new session. Verify cleanup and retained data
+old result cannot reach the new session. Verify that delayed writes cannot
+recreate cleared records and that delayed cleanup leaves newer records intact.
+Check cleanup and retained data
 against the product's sign-out contract.
 
 When changing offline editing or cross-device synchronization, apply the

@@ -226,7 +226,9 @@ was cancelled. If the same account can sign back in while earlier work is
 pending, hold an old request open through sign-out and sign-in. Verify that
 the final state update checks session identity, since both sessions have the
 same account ID. Distinguish failed sign-out with an intact session from
-cleanup failure after the session has ended.
+cleanup failure after the session has ended. Trace delayed writes and cleanup
+to persistent storage and verify that they cannot affect newer-session records
+or recreate cleared data.
 
 When reviewing a widget or another device target, apply the
 [multi-device rule](references/spec/rules/cfa-device-01.md). Inspect each
