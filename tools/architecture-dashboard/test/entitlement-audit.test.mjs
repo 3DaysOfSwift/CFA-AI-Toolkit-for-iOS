@@ -8,8 +8,8 @@ test('paid capability matches are review leads, with possible indexed callers',(
   assert.equal(result.capabilities[0].status,'review-required');
   assert.equal(result.capabilities[0].calls.length,1);
   assert.deepEqual(result.capabilities[0].calls[0].possibleIndexedCallers,[
-    {caller:'openExport',file:'View.swift',line:8,column:5},
-    {caller:'openExport',file:'View.swift',line:8,column:25}
+    {caller:'openExport',callerID:null,calleeID:'caller-1',file:'View.swift',line:8,column:5},
+    {caller:'openExport',callerID:null,calleeID:'caller-1',file:'View.swift',line:8,column:25}
   ]);
   assert.equal(result.sourceFingerprint,'abc');
   assert.deepEqual(result.scope, analysis.scope);
@@ -33,7 +33,11 @@ test('traces upstream indexed callers through helpers and stops at cycles', () =
   });
   const [match] = result.capabilities[0].calls;
   assert.deepEqual(match.possibleIndexedCallers.map(call => call.file), ['Router.swift']);
-  assert.deepEqual(match.possibleIndexedUpstreamCallers.map(call => call.file), ['Shortcut.swift', 'Router.swift']);
+  assert.deepEqual(match.possibleIndexedEnclosingIDs, ['caller-1']);
+  assert.deepEqual(match.possibleIndexedCallers.map(call => [call.callerID, call.calleeID]), [['router', 'caller-1']]);
+  assert.deepEqual(match.possibleIndexedUpstreamCallers.map(call => [call.callerID, call.calleeID]), [
+    ['shortcut', 'router'], ['router', 'shortcut']
+  ]);
   assert.equal(match.status, 'review-required');
 });
 

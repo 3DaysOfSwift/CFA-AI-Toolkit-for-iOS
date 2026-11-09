@@ -24,6 +24,7 @@ export function auditEntitlements(analysis, policy) {
 
   function possibleCallers(matches) {
     const pending = [...new Set(matches.map(match => match.callerID).filter(Boolean))];
+    const possibleIndexedEnclosingIDs = [...pending];
     const visited = new Set(pending);
     const direct = new Map();
     const upstream = new Map();
@@ -31,7 +32,10 @@ export function auditEntitlements(analysis, policy) {
     for (let index = 0; index < pending.length; index++) {
       const leads = index < directCount ? direct : upstream;
       for (const call of callsByCallee.get(pending[index]) ?? []) {
-        const lead = {caller:call.caller, file:call.file, line:call.line, column:call.column};
+        const lead = {
+          caller:call.caller, callerID:call.callerID ?? null, calleeID:call.calleeID,
+          file:call.file, line:call.line, column:call.column
+        };
         const key = JSON.stringify(lead);
         if (!direct.has(key)) leads.set(key, lead);
         if (call.callerID && !visited.has(call.callerID)) {
@@ -40,7 +44,11 @@ export function auditEntitlements(analysis, policy) {
         }
       }
     }
-    return {possibleIndexedCallers:[...direct.values()], possibleIndexedUpstreamCallers:[...upstream.values()]};
+    return {
+      possibleIndexedEnclosingIDs,
+      possibleIndexedCallers:[...direct.values()],
+      possibleIndexedUpstreamCallers:[...upstream.values()]
+    };
   }
   const capabilities = policy.capabilities.map(capability => {
     const matches = calls.filter(call => capability.writtenCalls.includes(call.written)).map(call => ({

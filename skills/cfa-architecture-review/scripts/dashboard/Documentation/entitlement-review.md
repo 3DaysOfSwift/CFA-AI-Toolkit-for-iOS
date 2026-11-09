@@ -37,7 +37,10 @@ node src/entitlement-audit.mjs --analysis /tmp/project-analysis.json --policy /t
 Inspect every candidate. The report lists immediate callers in
 `possibleIndexedCallers` and call sites reached through additional indexed
 hops in `possibleIndexedUpstreamCallers`. An upstream lead can point to a
-shortcut or other entry route that calls through several helpers. Verify
+shortcut or other entry route that calls through several helpers. Use
+`callerID` and `calleeID` to connect indexed call sites back to the candidate
+`possibleIndexedEnclosingIDs`. Several enclosing IDs can match one source
+line. Verify
 each hop in the selected build and trace routes that the index omits.
 
 Verify the source revision,
