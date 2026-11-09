@@ -43,8 +43,12 @@ capability. For screen routes, check that the ViewModel reads current
 entitlement from `PurchasesFeature` before presenting or invoking the paid
 capability. For an entry point that bypasses the screen, trace the check in
 that route's caller before it invokes the capability. A check on a different
-route gives no evidence that this caller is guarded. Exercise locked and
-entitled outcomes for both exposure and execution where applicable. Keep pricing and entitlement
+route gives no evidence that this caller is guarded. If the route suspends
+between checking entitlement and using the capability, trace whether the check
+can become stale. Where entitlement can change during that wait, exercise the
+change while the route is suspended and verify the outcome when it resumes.
+Exercise locked and entitled outcomes for both exposure and execution where
+applicable. Keep pricing and entitlement
 checks outside the capability Feature so its behaviour can be reused when the
 pricing policy changes. For a confirmed unguarded path,
 cite the entry point and the paid call or exposure and describe the consequence.
