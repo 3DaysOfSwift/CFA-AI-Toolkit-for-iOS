@@ -475,6 +475,12 @@ For each relevant operation, inspect:
   Check that failure or cancellation of a predecessor follows the documented
   policy and leaves later calls and task cleanup consistent. Record the product
   reason for policies such as latest-request-wins.
+- Pull-to-refresh: trace the `.refreshable` closure through the ViewModel
+  and check which completion it awaits. For CFA, if the method returns a
+  task handle, check that the closure awaits its value. Hold the work pending
+  and verify that the indicator remains active while the screen waits.
+  Assess cancellation of that wait separately from ownership of a shared
+  Feature refresh.
 - Lifetime: navigation away, observation ending, sign-out and account changes.
   Work may intentionally outlive a screen; establish its owner and purpose.
 - Background work: trace registration, scheduling, system delivery and the

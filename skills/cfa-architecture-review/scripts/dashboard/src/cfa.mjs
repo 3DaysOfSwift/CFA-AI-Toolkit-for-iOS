@@ -47,6 +47,8 @@ skill from that toolkit before changing the project.
   and ViewModel initializers and View body construction free of blocking work
   and asynchronous side effects. Use SwiftUI's .task for initial work tied to
   the screen's lifetime. The first frame may appear before that work completes.
+  In .refreshable, await the refresh method or its returned task handle's
+  value so the indicator stays active while the screen waits.
   For existing UIKit screens in a migration, map the actual presentation owner
   to its Features and tests.
 - A concrete feature owner uses the
