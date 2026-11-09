@@ -115,11 +115,13 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
       if (item.outcome === 'observed') errors.push(`evidence.${item.id}: use passed, failed or not-run for builds/tests`);
     }
   }
+  const phaseOrder = ['before', 'during', 'after'];
   for (const item of record.evidence) {
     if (!item.rerunOf) continue;
     const failed = record.evidence.find(candidate => candidate.id === item.rerunOf);
     if (item.outcome !== 'passed' || failed?.outcome !== 'failed' ||
-        item.kind !== failed.kind || item.recordedAt < failed.recordedAt) {
+        item.kind !== failed.kind || item.recordedAt < failed.recordedAt ||
+        phaseOrder.indexOf(item.phase) < phaseOrder.indexOf(failed.phase)) {
       errors.push(`evidence.${item.id}.rerunOf: link an earlier failed check of the same kind from a passing rerun.`);
       continue;
     }

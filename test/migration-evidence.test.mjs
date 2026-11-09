@@ -352,6 +352,11 @@ test('completion is not inferred from a build pass or tests at a different commi
   f.write();
   assert.ok(inspectRecord(f.file).errors.some(error => error.startsWith('evidence.earlier-regression:')));
   earlierRerun.commit = f.record.repository.afterCommit;
+  earlierRerun.phase = 'before';
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.startsWith('evidence.rerun-earlier-regression.rerunOf:')));
+  assert.ok(inspectRecord(f.file).errors.some(error => error.startsWith('evidence.earlier-regression:')));
+  earlierRerun.phase = 'after';
   f.seal();
   assert.equal(inspectRecord(f.file).valid, true);
   assert.ok(!inspectRecord(f.file).warnings.some(warning => warning.includes('list the affected targets exercised by the manual regression')));
