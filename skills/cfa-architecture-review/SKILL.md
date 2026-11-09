@@ -91,6 +91,14 @@ access and the [persistence rules](references/spec/topics/19-keep-persistence-be
 to SwiftData access. A manager declaration identifies a candidate boundary.
 Confirm that the relevant requests actually go through it.
 
+When reviewing an optional download cache, apply the
+[optional snapshot rule](references/spec/rules/cfa-cache-01.md). Trace three
+separate points: when refresh can start, when the caller receives its result,
+and when the replacement cache becomes durable. Check whether a late restore
+can replace fresh data or an older write can replace a newer cache. For a
+failed replacement, verify the previous cache remains readable and the fresh
+response stays usable. Trace required saves for user edits separately.
+
 For a suspected startup storage gate, apply the
 [database availability rule](references/spec/rules/cfa-launch-02.md). Trace
 from AppModel construction and root presentation to the first store-opening
