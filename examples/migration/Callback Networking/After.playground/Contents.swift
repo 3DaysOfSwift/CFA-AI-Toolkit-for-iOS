@@ -26,6 +26,9 @@ actor LaunchAPI {
     }
 }
 
+struct Launch: Decodable, Equatable, Sendable { let name: String }
+enum DownloadError: Error, Equatable { case invalidResponse; case httpStatus(Int) }
+
 // MARK: - Test fixtures
 // Deterministic network fixture; no real service is contacted.
 // URLSession owns the protocol lifecycle; this subclass adds no mutable state.
@@ -46,9 +49,6 @@ final class FixtureURLProtocol: URLProtocol, @unchecked Sendable {
     }
     override func stopLoading() {}
 }
-
-struct Launch: Decodable, Equatable, Sendable { let name: String }
-enum DownloadError: Error, Equatable { case invalidResponse; case httpStatus(Int) }
 
 // MARK: - Behaviour check
 func runExample() async throws {
