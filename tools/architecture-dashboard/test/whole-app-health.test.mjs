@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {spawnSync} from 'node:child_process';
+import {fileURLToPath} from 'node:url';
 import {coverageGaps, inventoryCandidates, taskCandidates, nextWork} from '../src/whole-app-health.mjs';
 import {renderHealthReport} from '../src/health-report.mjs';
 import {prepare, finish, progress, next} from '../src/whole-app-health.mjs';
@@ -373,4 +375,15 @@ test('retains test-named directories in subsequent scans when explicitly include
   const work = await next(project,path.join(output,'review-draft.json'),syntax);
   assert.ok(work.nextFiles.includes(helper));
   assert.ok(!work.gaps.some(gap => gap.includes('different files')));
+});
+
+test('rejects scope flags on report instead of silently using a different scope', () => {
+  const cli = fileURLToPath(new URL('../src/whole-app-health.mjs', import.meta.url));
+  for (const icon of [[], ['icon.png']]) {
+    const result = spawnSync(process.execPath, [
+      cli, 'report', '.', 'review.json', 'report.html', ...icon, '--include-tests'
+    ], {encoding:'utf8'});
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /^Usage:/);
+  }
 });

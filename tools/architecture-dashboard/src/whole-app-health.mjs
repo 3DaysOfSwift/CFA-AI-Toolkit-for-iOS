@@ -342,20 +342,20 @@ if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.me
     const includeTests = args[0] === 'prepare' && args.at(-1) === '--include-tests';
     if (includeTests) args.pop();
     const [mode, root, input, output, icon, moduleFlag, moduleName] = args;
-    if (mode === 'prepare' && root && input && (!output || (output === '--index-store' && icon && moduleFlag === '--module' && moduleName && args.length === 7))) {
+    if (mode === 'prepare' && root && input && (args.length === 3 || (output === '--index-store' && icon && moduleFlag === '--module' && moduleName && args.length === 7))) {
       const result = await prepare(root,input,collectSyntax,{includeTests, ...(output ? {indexStore:icon,module:moduleName} : {})});
       console.log(`Inventoried ${result.files.length} Swift files and ${inventoryCandidates(result).length} possible entry points. Review inventory.json before producing the report.`);
       if (output) {
         const analysis = JSON.parse(await fs.readFile(path.join(input,'project-analysis.json'),'utf8'));
         console.log(`Compiler index: ${analysis.compilerIndex.status}${analysis.compilerIndex.status === 'unavailable' ? ` — ${analysis.compilerIndex.reason}` : ''}.`);
       }
-    } else if (mode === 'progress' && root && input && !output) {
+    } else if (mode === 'progress' && root && input && args.length === 3) {
       const result = await progress(root,input);
       console.log(result.gaps.length ? 'Remaining review work:\n- ' + result.gaps.join('\n- ') : 'Source checklist reconciled. Add a substantive presentation and generate the report.');
-    } else if (mode === 'next' && root && input && !output) {
+    } else if (mode === 'next' && root && input && args.length === 3) {
       const result = await next(root,input);
       console.log(JSON.stringify(result,null,2));
-    } else if (mode === 'report' && root && input && output) {
+    } else if (mode === 'report' && root && input && output && (args.length === 4 || (args.length === 5 && icon && !icon.startsWith('--')))) {
       const result = await finish(root,input,output,icon);
       console.log(`Inventoried ${result.files} source files, ${result.operations} recorded operations; ${result.gaps.length} coverage gaps. Report: ${output}`);
     } else throw Error('Usage: node whole-app-health.mjs prepare <project> <new-inventory-dir> [--index-store <path> --module <name>] [--include-tests] | progress <project> <review.json> | next <project> <review.json> | report <project> <review.json> <new-report.html> [app-icon.png]');
