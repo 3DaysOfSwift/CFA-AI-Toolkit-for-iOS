@@ -25,8 +25,8 @@ launch and several screens can use the same response. Let independent
 requests progress in parallel. Queue commands only when each must take effect
 in order, as this fixture requires for its simulated publications.
 
-The Feature exposes a typed failure. A screen ViewModel can turn it into
-user-facing text.
+The Feature exposes a typed failure and uses `nil` until it has a confirmed
+launch name. A screen ViewModel supplies any error or empty-state text.
 
 ## Run and verify
 

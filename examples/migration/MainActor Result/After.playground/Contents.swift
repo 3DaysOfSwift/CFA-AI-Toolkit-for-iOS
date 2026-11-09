@@ -17,7 +17,7 @@ final class LaunchFeature {
     @ObservationIgnored private let provider: any LaunchProviding
     private var refreshTask: Task<Bool, Never>?
     @ObservationIgnored private var refreshID: UUID?
-    private(set) var name = "No launch loaded"
+    private(set) var name: String?
     private(set) var refreshFailure: RefreshFailure?
     var isRefreshing: Bool { refreshTask != nil }
     init(provider: any LaunchProviding) { self.provider = provider }
@@ -64,6 +64,7 @@ struct FixtureLaunchProvider: LaunchProviding {
 @MainActor
 func runExample() async {
     let feature = LaunchFeature(provider: FixtureLaunchProvider())
+    precondition(feature.name == nil && !feature.isRefreshing && feature.refreshFailure == nil)
     let loaded = await feature.refresh(available: true)
     precondition(loaded && feature.name == "Artemis")
     let failedRefreshSucceeded = await feature.refresh(available: false)
