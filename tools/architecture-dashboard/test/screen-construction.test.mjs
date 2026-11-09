@@ -171,4 +171,8 @@ test('flags possible screen-owned task handles without flagging lifecycle tasks'
     report.findings.filter(item => item.code === 'screen-task-handle').map(item => item.line),
     [3, 4]
   );
+  assert.deepEqual(
+    report.findings.filter(item => item.code === 'task-inside-view-lifecycle').map(item => item.line),
+    [7]
+  );
 });

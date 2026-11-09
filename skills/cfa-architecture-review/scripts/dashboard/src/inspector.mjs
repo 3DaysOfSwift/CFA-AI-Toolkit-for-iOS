@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { analyse, maskSwift } from './analyse.mjs';
+import { analyse, maskSwift, scanSource } from './analyse.mjs';
 
 const screenPath = /(?:^|\/)1 - View\/Views\/.*View\.swift$/;
 const featureTypeSuffix = /Feature(?:API)?$/;
@@ -183,7 +183,13 @@ export async function inspect(project) {
         if (!closure) continue;
         opening = closing + closure[0].length;
       }
-      if (/(?<!\bfunc\s+)\bapplicationDidFinishLaunching\s*\(/.test(braceBody(source, opening))) {
+      const lifecycleBody = braceBody(source, opening);
+      const bodyStartLine = lineOf(source, opening + 1);
+      for (const site of scanSource(lifecycleBody, file).sites) {
+        if (site.kind !== 'task' && site.kind !== 'detached') continue;
+        findings.push(finding('task-inside-view-lifecycle', 'review', 'A SwiftUI .task body appears to create an independent Task. Verify its lifetime owner. Await lifecycle-bound work directly and give independent screen work a ViewModel owner.', file, bodyStartLine + site.line - 1));
+      }
+      if (/(?<!\bfunc\s+)\bapplicationDidFinishLaunching\s*\(/.test(lifecycleBody)) {
         findings.push(finding('view-tied-app-launch', 'review', 'A View-layer .task appears to call applicationDidFinishLaunching. Check whether this is production launch behavior rather than a preview or test, and use the app lifecycle callback for the shared launch signal.', file, lineOf(source, task.index)));
       }
     }
