@@ -354,7 +354,10 @@ export function renderInspection(report) {
       if (!featureType) return `${property} (unresolved)`;
       return `${property} (${featureType}${featureFile ? '' : ', source unresolved'})`;
     });
-    lines.push(`${screen.name}: ${screen.viewModelFile ? screenName(screen.viewModelFile) : 'no adjacent ViewModel; review screen role'} → ${routes.join(', ') || 'no visible feature route'} · ${screen.testFile ? 'matching test file found' : 'no test file found'}`);
+    const viewModel = screen.viewModelFile ? screenName(screen.viewModelFile) : 'no adjacent ViewModel; review screen role';
+    const ownership = screen.ownsViewModel ? 'private @State recognized' : 'ownership needs review';
+    const tests = screen.testFile ? 'matching test file found' : 'no matching test file found';
+    lines.push(`${screen.name}: ${viewModel} → ${routes.join(', ') || 'no visible feature route'} · ${ownership} · ${tests}`);
   }
   if (report.findings.length) {
     lines.push('', 'Findings:');
