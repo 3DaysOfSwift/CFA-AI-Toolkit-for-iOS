@@ -1488,9 +1488,9 @@ normally continues when a screen leaves.
 SwiftUI starts the screen task before the View appears. It does not guarantee
 that storage or network work
 finishes before the first frame, so the screen must render an observed loading,
-cached, empty, or error state while the work continues. Use the app lifecycle,
-not a screen `.task`, for a shared refresh that must begin with launch or outlive
-one screen.
+cached, empty, or error state while the work continues. Use the app lifecycle, not a screen `.task`, for a shared refresh that must
+begin with launch. A refresh that only needs to outlive its initiating screen
+can start when requested; the Feature owns its lifetime.
 
 When the launch lifecycle and one or more screen `.task` modifiers can request
 the same Feature refresh, the Feature stores one in-flight `Task<Void, Never>`.
