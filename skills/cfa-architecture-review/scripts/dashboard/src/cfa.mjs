@@ -108,6 +108,11 @@ skill from that toolkit before changing the project.
 - A Feature-owned shared refresh normally continues when a screen leaves;
   preserve its result for later callers unless a specific product or resource
   requirement calls for another cancellation policy.
+  A departing screen may stop waiting while the Feature keeps refreshing.
+- Cancel superseded presentation work such as search. Cancel screen-only work
+  on disappearance when continuing would have no value. Check cancellation
+  before expensive work and before publishing, and protect current state
+  against stale results after suspension.
 - At the Feature boundary, equivalent requests await one in-flight task and
   receive its outcome. One caller cancelling must leave shared work running
   when other callers still need it. Queue commands that must each take effect
