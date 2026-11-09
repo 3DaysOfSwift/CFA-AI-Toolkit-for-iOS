@@ -232,6 +232,11 @@ test('completion is not inferred from a build pass or tests at a different commi
   assert.ok(inspectRecord(f.file).warnings.some(warning =>
     warning.includes('evidence.after-widget-handoff: identify the producing and receiving targets')
   ));
+  handoff.targets = ['AnotherApp', 'AnotherWidget'];
+  f.write();
+  assert.ok(inspectRecord(f.file).warnings.some(warning =>
+    warning.includes('evidence.after-widget-handoff: the handoff names no affected target')
+  ));
   handoff.targets = ['App', 'Widget'];
   f.write();
   assert.ok(!inspectRecord(f.file).warnings.some(warning =>
