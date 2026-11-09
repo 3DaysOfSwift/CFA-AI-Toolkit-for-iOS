@@ -205,6 +205,19 @@ test('selected detail data and owned State are reviewed rather than rejected', a
   assert.ok(findings.every(item => item.severity === 'review'));
 });
 
+test('a local with a Unicode prefix is not the ViewModel backing property', async t => {
+  const { report, findings } = await inspectView(t, `struct HomeView: View {
+    @State private var viewModel: HomeViewModel
+    init(launch: LaunchSnapshot) {
+      let pré_viewModel = State(initialValue: HomeViewModel(launch: launch))
+      _viewModel = pré_viewModel
+    }
+    var body: some View { Text("Home") }
+  }`);
+  assert.equal(report.screens[0].ownsViewModel, false);
+  assert.ok(findings.some(item => item.code === 'view-model-ownership'));
+});
+
 for (const expression of [
   'State(initialValue: HomeViewModel())',
   'State(wrappedValue: HomeViewModel())'
