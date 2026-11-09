@@ -689,7 +689,7 @@ test('inspects AppModel properties regardless of indentation', async t => {
 
 test('inspects annotated AppModel properties without treating a private task as a verified listener', async t => {
   const root = await fixture(t, {
-    'Application/2 - AppModel/AppModel.swift': 'final class AppModel {\n    static let shared: AppModel = live()\n    @ObservationIgnored private var updateTask: Task<Void, Never>? = nil\n    private var hasLaunched: Bool = false\n    @ObservationIgnored private var secretCache: String\n    @ObservationIgnored\n    private var backupTask:\n      _Concurrency.Task<Void, Never>?\n    static func live() -> AppModel { AppModel() }\n}'
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel {\n    static let shared: AppModel = live()\n    @ObservationIgnored private var updateTask: Task<Void, Never>? = nil\n    private var hasLaunched: Bool = false\n    @ObservationIgnored private var secretCache: String\n    @ObservationIgnored\n    private var backupTask:\n      _Concurrency.Task<Void, Never>?\n      = nil\n    static func live() -> AppModel { AppModel() }\n}'
   });
   const report = await inspect(root);
   const checks = report.findings.filter(item => item.code === 'app-model-task-purpose');
@@ -697,9 +697,10 @@ test('inspects annotated AppModel properties without treating a private task as 
   assert.ok(checks.every(item => item.severity === 'review'));
   assert.ok(!report.findings.some(item => item.code === 'app-model-non-feature-state' && /backupTask/.test(item.message)));
   const defaults = report.findings.filter(item => item.code === 'app-model-default-value');
-  assert.equal(defaults.length, 2);
+  assert.equal(defaults.length, 3);
   assert.match(defaults[0].message, /updateTask/);
   assert.match(defaults[1].message, /hasLaunched/);
+  assert.match(defaults[2].message, /backupTask/);
   assert.ok(report.findings.some(item => item.code === 'app-model-non-feature-state' && /secretCache/.test(item.message)));
 });
 

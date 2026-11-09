@@ -369,7 +369,7 @@ export async function inspect(project) {
         }
       }
       suffix = suffix.replace(/^[?!]/, '');
-      const defaultValue = /^[ \t]*=(?!=)/.test(suffix);
+      const defaultValue = /^\s*=(?!=)/.test(suffix);
       // A getter is not stored state. Property observers still belong to storage.
       if (!defaultValue && hasComputedAccessor(suffix)) continue;
       if (defaultValue) findings.push(finding('app-model-default-value', 'warning', `AppModel property ${name} has a default value; initialise it in the explicit initializer.`, appModelFile, lineOf(appModel, match.index)));
