@@ -99,6 +99,12 @@ through the Feature to the screen ViewModel. Check that the ViewModel owns
 screen-specific error text and that it distinguishes failure of the requested
 operation from failure of an optional cache write.
 
+When reviewing time-dependent business rules, apply the
+[injectable clock rule](references/spec/rules/cfa-time-01.md). Trace each
+decision to where the Feature reads its clock. Check whether a date captured
+during initialization would go stale. Review transient visual timers
+separately from business decisions.
+
 When reviewing preference restoration, apply the
 [preference recovery rule](references/spec/rules/cfa-pref-01.md). Trace a
 supported value, a missing value and an obsolete value in a recognised

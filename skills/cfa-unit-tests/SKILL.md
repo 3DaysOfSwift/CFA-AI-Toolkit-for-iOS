@@ -212,6 +212,12 @@ opens it at the intended location and can reopen the saved records. Exercise
 a failed open or upgrade and confirm that it preserves the existing data.
 Keep these storage checks separate from tests that start with an empty store.
 
+For time-dependent business decisions, apply the
+[injectable clock rule](references/spec/rules/cfa-time-01.md). Use controlled
+dates and time zones for relevant boundaries. If the Feature must operate
+across a date change, advance its injected clock and verify the next decision
+on the same instance. Recreating it could hide a date captured at initialization.
+
 For restored preferences, apply the
 [preference recovery rule](references/spec/rules/cfa-pref-01.md). Verify that
 a supported saved value is restored. Test a missing value and an obsolete
