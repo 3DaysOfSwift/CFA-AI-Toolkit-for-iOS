@@ -533,17 +533,27 @@ For each relevant operation, inspect:
   display. Assess intentional live updates against the product requirements.
 - Deep links and notification actions in CFA: apply the
   [pending destination rule](spec/rules/cfa-link-01.md) within the app's product
-  scope. Trace the request from receipt through validation, durable admission
-  and scene navigation. Invalid input should leave the pending list intact.
-  A failed initial save should report the error and leave the request out of
-  the pending list. Check that both saved and newly received requests survive
-  a restoration race and restart. Trace two scenes trying to open the same
-  item, and an open racing explicit dismissal. Verify refusal or cancellation before
-  navigation preserves the request, and an opened destination counts as success
-  independently of its content loading. If removal fails after navigation,
-  trace a retry that saves the removal without opening the destination again.
-  Check what remains pending after restart and whether the other scene's
-  navigation stays independent.
+  scope. Trace URL opens and user actions on local or push notifications
+  through validation, durable admission and scene navigation. Scheduling and
+  delivery alone leave the list unchanged. Verify that repeated callbacks for
+  one opening event are deduplicated and separate events for the same
+  destination remain distinct. Invalid input and a failed initial save leave
+  the list unchanged. Report storage failures and preserve an unreadable
+  snapshot until recovery. Check that restoration and a concurrent incoming
+  request preserve both the existing entries and the new request across
+  restart without resurrecting opened items.
+  Apply the [scene navigation rule](spec/rules/cfa-link-02.md) in multi-window
+  apps. Either scene can open a pending item without changing another scene's
+  navigation. Verify that two simultaneous opens of the same item navigate
+  once, an explicit dismissal cannot race its active open, and a different
+  item can still open while the first scene is deciding. Refusal, cancellation
+  before opening and an unavailable destination leave the item pending.
+  Opening the destination counts as success even if its content is still
+  loading or cancellation follows. If removal fails after navigation, verify
+  that retry saves the removal without navigating again. If dismissal cannot
+  be saved, verify the failure is surfaced and the item remains pending for
+  retry. Check the durable outcome after restart. For migrations, compare
+  existing opening, deferral and history behaviour against the baseline.
 - Suspension: apply the [stale-result rule](spec/rules/cfa-conc-02.md) when
   reviewing CFA. For a replaceable operation, suspend the older request, let
   the newer one publish, then complete the older request with success or
