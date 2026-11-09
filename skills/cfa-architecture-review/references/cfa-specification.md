@@ -565,8 +565,9 @@ values frequently while evaluating changes. Constructing a View must therefore
 remain fast and must not start loading, persistence, networking, observation,
 or any other work as a side effect.
 
-Every screen conventionally names its one direct backing object `viewModel` and
-creates it at the property declaration unless the selected-data detail exception applies.
+Name the screen’s dedicated ViewModel property `viewModel`, including in detail
+Views. Construct it at the property declaration unless the selected-data detail
+exception applies.
 
 The ViewModel initializer must also be quick and free of work-starting side
 effects. It may retain the feature capabilities it needs from `AppModel.shared`,
