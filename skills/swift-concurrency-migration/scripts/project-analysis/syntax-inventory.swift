@@ -56,6 +56,13 @@ final class SourceInventory: SyntaxVisitor {
         if node.name.text == "application" && node.signature.parameterClause.trimmedDescription.contains("didFinishLaunchingWithOptions") {
             record("entry.launchCallback", node.name.text, node)
         }
+        if node.name.text == "userNotificationCenter",
+           node.signature.parameterClause.parameters.contains(where: {
+               $0.firstName.text == "didReceive" &&
+                   ["UNNotificationResponse", "UserNotifications.UNNotificationResponse"].contains($0.type.trimmedDescription)
+           }) {
+            record("entry.notificationResponse", node.name.text, node)
+        }
         functions.append(node.name.text)
         return .visitChildren
     }
@@ -81,6 +88,9 @@ final class SourceInventory: SyntaxVisitor {
                 if name == "addTask" || name == "addTaskUnlessCancelled" { record("concurrency.groupChild", name, member.declName) }
                 if name == "task" { record("entry.viewTask", name, member.declName) }
                 if name == "refreshable" { record("entry.refreshable", name, member.declName) }
+                if name == "onOpenURL" || name == "onContinueUserActivity" {
+                    record("entry.incomingLink", name, member.declName)
+                }
             }
         }
         return .visitChildren

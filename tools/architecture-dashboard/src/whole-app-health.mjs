@@ -40,7 +40,7 @@ export function renderTaskMap(taskMap) {
 }
 export function inventoryCandidates(report) {
   const candidates = report.files.flatMap(file => file.sites.filter(site => candidateKinds.has(site.kind)));
-  const kindMap = {'entry.launchCallback':'launch-callback','entry.button':'button-action','entry.viewTask':'view-task','entry.refreshable':'refresh','entry.main':'main','entry.backgroundHandler':'background-handler'};
+  const kindMap = {'entry.launchCallback':'launch-callback','entry.button':'button-action','entry.viewTask':'view-task','entry.refreshable':'refresh','entry.main':'main','entry.backgroundHandler':'background-handler','entry.incomingLink':'incoming-link','entry.notificationResponse':'notification-response'};
   const available = new Map();
   for (const site of candidates) {
     const key=JSON.stringify([site.file,site.line,site.kind]);
