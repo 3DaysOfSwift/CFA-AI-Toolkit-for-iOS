@@ -135,6 +135,7 @@ test('unreviewed CFA conformance remains explicit despite stable concurrency',()
  assert.match(result.html,/Concurrency correctness: ✅ Stable/);
  assert.match(result.html,/CFA conformance: ➖ Not assessed/);
  assert.match(result.html,/0 operations pass · 0 fail · 0 need investigation · 1 not assessed/);
+ assert.match(result.html,/Whole-app CFA conformance requires a separate review of every applicable item/);
 });
 
 test('timing problems prevent a stable dashboard verdict despite passing checks', () => {
