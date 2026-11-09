@@ -4,11 +4,11 @@
 
 **Strength:** Default.
 
-**Guidance:** Prefer independent Features; an existing Feature or distinct coordinating Feature can coordinate other Features when a real business responsibility requires it.
+**Guidance:** Start with independent Features and inject lower-level services through their initializers. An existing Feature or a distinct coordinating Feature may coordinate other Features when a reusable business responsibility requires it. Keep the dependency direction explicit and acyclic. A screen that only combines existing outputs can do that in its ViewModel.
 
 **Why:** Avoid both feature spaghetti and needless coordinators.
 
-**Example:** A Today capability can coordinate existing Features when its reusable selection decisions belong in the Model.
+**Example:** A Today capability can coordinate existing Features when its reusable selection decisions belong in the Model. A cohesive CheckoutFeature can own its cart and use a private payment service.
 
 **Explanation:** [Why use cohesive features in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/feature-ownership).
 
