@@ -95,6 +95,10 @@ the architecture:
     Publish durable user edits as saved only after required persistence succeeds.
     A current server response does not wait for an optional cache write: publish
     it, attempt caching independently, and prevent older cached data replacing it.
+    When a non-critical preference is missing or obsolete, use its
+    product-defined safe fallback. Treat unreadable or corrupt storage and
+    failed writes as errors. A fallback must never imply that user records
+    loaded or saved successfully.
 14. AppModel stores `shared`, concrete Features, one private launch Boolean,
     and private task handles needed to own app-wide listeners. Its explicit
     initializer assigns injected Features, sets the launch guard to false and
