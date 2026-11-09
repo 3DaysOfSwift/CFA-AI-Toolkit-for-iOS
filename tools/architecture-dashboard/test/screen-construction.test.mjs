@@ -10,6 +10,7 @@ const constructionCodes = new Set([
   'view-model-ownership',
   'screen-initializer-inputs',
   'view-stored-feature',
+  'view-stored-model-dependency',
   'view-model-initializer-construction'
 ]);
 
@@ -125,6 +126,24 @@ test('reviews a stored Feature input even when Swift synthesizes the View initia
   });
   assert.deepEqual(findings.map(item => [item.code, item.file, item.line, item.severity]), [
     ['view-stored-feature', file, 2, 'review']
+  ]);
+});
+
+test('reviews stored model dependencies without requiring an explicit initializer', async t => {
+  const file = 'App/Presentation/NoteRow.swift';
+  const { findings } = await inspectView(t, '', {
+    [file]: `struct NoteRow: View {
+      let storage: App.NotesRepository
+      let networking: NetworkingManager
+      let model: AppModel?
+      let snapshot: NotesRepository.Snapshot
+      var body: some View { Text("Note") }
+    }`
+  });
+  assert.deepEqual(findings.map(item => [item.code, item.file, item.line]), [
+    ['view-stored-model-dependency', file, 2],
+    ['view-stored-model-dependency', file, 3],
+    ['view-stored-model-dependency', file, 4]
   ]);
 });
 

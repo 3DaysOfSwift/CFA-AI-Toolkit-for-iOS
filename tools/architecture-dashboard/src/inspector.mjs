@@ -5,6 +5,7 @@ import { analyse, maskSwift, scanSource } from './analyse.mjs';
 
 const screenPath = /(?:^|\/)1 - View\/Views\/.*View\.swift$/;
 const featureTypeSuffix = /Feature(?:API)?$/;
+const serviceTypeSuffix = /(?:Repository|NetworkingManager|SwiftDataManager)$/;
 
 function isKnownNonFeatureType(type) {
   return type.endsWith('ViewModel') || type === 'NetworkingManager' || type === 'SwiftDataManager';
@@ -109,7 +110,7 @@ function* typeInitializers(body) {
     const types = initializerParameterTypes(parameters);
     const injectedViewModel = types.some(type => type.endsWith('ViewModel'));
     const injectedAppModel = types.includes('AppModel');
-    const possibleModelDependency = types.find(type => featureTypeSuffix.test(type) || type.endsWith('Repository'));
+    const possibleModelDependency = types.find(type => featureTypeSuffix.test(type) || serviceTypeSuffix.test(type));
     const tail = body.slice(closing + 1);
     const openingBody = /^\s*(?:(?:async|throws|rethrows)\s*)*\{/.exec(tail);
     const bodyStart = openingBody ? closing + 1 + openingBody[0].length : null;
@@ -135,7 +136,7 @@ function inspectScreenInputs(name, body, source, start, file, findings) {
       findings.push(finding('screen-initializer-inputs', 'warning', `${name} appears to accept AppModel; CFA screens resolve Features through their own ViewModel.`, file, lineOf(source, start + initializer.index)));
     }
     if (initializer.possibleModelDependency) {
-      findings.push(finding('screen-initializer-inputs', 'review', `${name} accepts ${initializer.possibleModelDependency}. Verify whether this injects a Feature or repository into a screen.`, file, lineOf(source, start + initializer.index)));
+      findings.push(finding('screen-initializer-inputs', 'review', `${name} accepts ${initializer.possibleModelDependency}. Verify whether this injects a Feature or microservice into a View.`, file, lineOf(source, start + initializer.index)));
     }
   }
 }
@@ -595,10 +596,11 @@ export async function inspect(project) {
       const body = braceBody(source, start - 1);
       inspectScreenInputs(view[1], body, source, start, file, findings);
       const members = memberSignatures(body);
-      const featureProperty = /\b(?:let|var)\s+`?\w+`?\s*:\s*(?:any\s+)?(?:\w+\s*\.\s*)*(\w+Feature(?:API)?)\b(?!\s*\.)\s*[?!]?/g;
-      for (const match of members.matchAll(featureProperty)) {
+      const modelProperty = /\b(?:let|var)\s+`?\w+`?\s*:\s*(?:any\s+)?(?:\w+\s*\.\s*)*(\w*(?:Feature(?:API)?|Repository|NetworkingManager|SwiftDataManager)|AppModel)\b(?!\s*\.)\s*[?!]?/g;
+      for (const match of members.matchAll(modelProperty)) {
         if (hasComputedAccessor(body.slice(match.index + match[0].length))) continue;
-        findings.push(finding('view-stored-feature', 'review', `${view[1]} appears to store ${match[1]} directly. Verify that Feature access goes through the screen-owned ViewModel.`, file, lineOf(source, start + match.index)));
+        const code = featureTypeSuffix.test(match[1]) ? 'view-stored-feature' : 'view-stored-model-dependency';
+        findings.push(finding(code, 'review', `${view[1]} appears to store ${match[1]} directly. Verify that Feature access goes through the screen-owned ViewModel.`, file, lineOf(source, start + match.index)));
       }
       const storedModel = inferredAppModelStorage.exec(members);
       if (storedModel) {
