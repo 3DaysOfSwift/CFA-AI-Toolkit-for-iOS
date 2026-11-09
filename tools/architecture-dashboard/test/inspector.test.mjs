@@ -1161,6 +1161,11 @@ test('distinguishes a matching ViewModel test filename from a suite declaration'
   assert.equal(report.screens[0].testFile, file);
   assert.deepEqual(report.findings.filter(item => item.code === 'view-model-test-suite-unresolved')
     .map(item => item.file), [file]);
+  assert.match(renderInspection(report), /matching test filename; named suite needs verification/);
+  await fs.writeFile(path.join(root, file), '// Test suite placeholder');
+  const placeholder = await inspect(root);
+  assert.match(renderInspection(placeholder), /matching test filename; named suite needs verification/);
+  assert.doesNotMatch(renderInspection(placeholder), /matching test file found/);
 });
 
 test('reviews matching ViewModel tests in production source trees', async t => {

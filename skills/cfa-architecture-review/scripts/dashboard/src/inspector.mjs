@@ -1036,7 +1036,11 @@ export function renderInspection(report) {
     });
     const viewModel = screen.viewModelFile ? screenName(screen.viewModelFile) : 'no adjacent ViewModel; review screen role';
     const ownership = screen.ownsViewModel ? 'private @State recognized' : 'ownership needs review';
-    const tests = screen.testFile ? 'matching test file found'
+    const unresolvedSuite = screen.testFile && report.findings.some(item =>
+      item.code === 'view-model-test-suite-unresolved' && item.file === screen.testFile
+    );
+    const tests = unresolvedSuite ? 'matching test filename; named suite needs verification'
+      : screen.testFile ? 'matching test file found'
       : screen.testCandidates?.length > 1 ? 'multiple matching test files. Verify target'
         : screen.testCandidates?.length === 1 ? 'matching test file needs target verification'
           : 'no matching test file found';
