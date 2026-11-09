@@ -361,11 +361,13 @@ test('reviews stored task handles in Views outside conventional screen folders',
   const {report} = await inspectView(t, '', {
     [file]: `struct RefreshRow: View {
       @State private var work: Swift.Task<Void, Never>?
+      private var current: Task<Void, Never>? { work }
+      private var watched: Task<Void, Never>? { didSet { observe() } }
       var body: some View { Text("Refresh").task { await refresh() } }
     }`
   });
   assert.deepEqual(report.findings.filter(item => item.code === 'screen-task-handle')
-    .map(({file, line}) => [file, line]), [[file, 2]]);
+    .map(({file, line}) => [file, line]), [[file, 2], [file, 4]]);
 });
 
 test('flags possible screen-owned task handles without flagging lifecycle tasks', async t => {
