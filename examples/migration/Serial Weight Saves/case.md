@@ -10,7 +10,7 @@ Valid saves remain in the order admitted by the serial queue or Feature; invalid
 
 ## Migration
 
-The Feature sequences saves and delegates storage to an actor. Callers await the Feature's async save directly; a real migration must check the original completion queue and cancellation contract.
+The Feature sequences saves and delegates storage to an actor. Callers await the Feature's async save directly. This example keeps the legacy success/failure Boolean so the comparison preserves what each caller receives. A real migration must also check the original completion queue and cancellation contract.
 
 ## Run and verify
 

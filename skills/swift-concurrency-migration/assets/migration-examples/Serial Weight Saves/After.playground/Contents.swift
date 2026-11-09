@@ -5,7 +5,7 @@ import PlaygroundSupport
 PlaygroundPage.current.needsIndefiniteExecution = true
 
 // MARK: - CFA implementation
-// storage owns the saved data; the Feature owns the observable snapshot.
+// Storage owns the saved data; the Feature owns the observable snapshot.
 // This actor represents the storage boundary, not a database implementation.
 actor WeightStorage {
     enum SaveError: Error { case invalidWeight }
@@ -70,7 +70,7 @@ func runExample() async {
     precondition(finalSaved && feature.weights == [70, 72] && stored == feature.weights)
     precondition(feature.saveError == nil)
 
-    // Submit all three before awaiting, including a failed middle operation.
+    // Start three callers before awaiting their results. One submits an invalid value.
     let queuedStorage = WeightStorage()
     let queuedFeature = WeightLogFeature(storage: queuedStorage)
     let firstQueued = Task { await queuedFeature.save(80) }
@@ -81,7 +81,7 @@ func runExample() async {
     let lastResult = await lastQueued.value
     let queuedStored = await queuedStorage.read()
     precondition(firstResult && !rejectedResult && lastResult)
-    // Concurrent tasks can be admitted in either order; both valid saves must persist.
+    // Scheduling can change the admission order. Both valid saves must persist.
     precondition(queuedFeature.weights.sorted() == [80, 82] && queuedStored == queuedFeature.weights)
     print("Passed: valid saves were retained; the invalid value was rejected.")
 }
