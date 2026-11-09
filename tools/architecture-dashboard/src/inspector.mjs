@@ -343,6 +343,14 @@ export async function inspect(project) {
         findings.push(finding('preview-feature-access', 'review', 'This preview appears to access a Feature directly. A normal CFA preview constructs the View and uses its usual ViewModel and Feature route.', file, lineOf(source, start + access.index)));
       }
     }
+    for (const view of source.matchAll(viewDeclarations)) {
+      if (isViewFile && /^struct\s+(?:ContentView|RootTabView|RootView)\s*:\s*View\b/.test(view[0])) continue;
+      const start = view.index + view[0].length;
+      const access = findFeatureAccess(braceBody(source, start - 1));
+      if (access) {
+        findings.push(finding('view-feature-access', 'review', 'This View appears to access a Feature directly. Trace the call and route intent and state through the owning screen and ViewModel.', file, lineOf(source, start + access.index)));
+      }
+    }
     if (!isViewFile) {
       for (const view of source.matchAll(viewDeclarations)) {
         const start = view.index + view[0].length;
@@ -396,10 +404,6 @@ export async function inspect(project) {
     if (!declaration) continue;
     const bodyOffset = declaration.index + declaration[0].length;
     const body = braceBody(view, bodyOffset - 1);
-    const featureAccess = findFeatureAccess(body);
-    if (featureAccess && name !== 'ContentView' && name !== 'RootView') {
-      findings.push(finding('view-feature-access', 'review', 'This View appears to access a Feature directly. Trace the call and route screen intent and state through the owning ViewModel.', viewFile, lineOf(view, bodyOffset + featureAccess.index)));
-    }
     const members = memberSignatures(body);
     for (const match of members.matchAll(/\b(?:let|var)\s+(\w+)\s*(?::\s*Task\s*<|(=\s*Task\b))/g)) {
       if (match[2] && !/^\s*[<.{(]/.test(body.slice(match.index + match[0].length))) continue;
@@ -501,16 +505,14 @@ export async function inspect(project) {
     screens.push({ name, viewFile, viewModelFile: viewModel ? viewModelFile : null, ownsViewModel, structuralRoot, testFile, testCandidates, dependencies });
   }
 
-  const screenNames = new Set(screens.map(screen => screen.name));
   for (const [file, source] of sources) {
-    if (!/(?:^|\/)1 - View\//.test(file)) continue;
-    for (const extension of source.matchAll(/\bextension\s+(\w+)\b[^{}]*\{/g)) {
-      if (!screenNames.has(extension[1])) continue;
+    for (const extension of source.matchAll(/\bextension\s+(\w+)\b(?!\s*\.)[^{}]*\{/g)) {
+      if (!viewNames.has(extension[1])) continue;
       const start = extension.index + extension[0].length;
       const body = braceBody(source, start - 1);
       const access = findFeatureAccess(body);
       if (access) {
-        findings.push(finding('view-feature-access', 'review', 'This screen extension appears to access a Feature directly. Trace the call and route it through the owning ViewModel.', file, lineOf(source, start + access.index)));
+        findings.push(finding('view-feature-access', 'review', 'This View extension appears to access a Feature directly. Trace the call and route it through the owning ViewModel.', file, lineOf(source, start + access.index)));
       }
     }
   }

@@ -652,6 +652,22 @@ test('recognizes storage and networking declarations independently of filenames'
   assert.deepEqual(findings.filter(item => item.code === 'direct-url-session').map(({file, line}) => [file, line]), [['Client.swift', 1], ['NetworkingManager.swift', 2]]);
 });
 
+test('reviews direct Feature access in reusable Views outside screen folders', async t => {
+  const file = 'Application/Components/Badge.swift';
+  const root = await fixture(t, {
+    [file]: `struct Badge: SwiftUI.View {
+      var body: some View { Text(AppModel.shared.profileFeature.name) }
+    }
+    struct Worker {
+      func read() { _ = AppModel.shared.profileFeature.name }
+    }`
+  });
+  const report = await inspect(root);
+  assert.equal(report.screens.length, 0);
+  assert.deepEqual(report.findings.filter(item => item.code === 'view-feature-access')
+    .map(item => [item.file, item.line]), [[file, 2]]);
+});
+
 test('reviews direct Feature access in root tab navigation', async t => {
   const root = await fixture(t, {
     'Application/1 - View/Views/ContentView.swift': `struct ContentView: View {
