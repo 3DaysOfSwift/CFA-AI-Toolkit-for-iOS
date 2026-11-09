@@ -5,7 +5,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {importReview} from './review-import.mjs';
 import {missingTimingScenarios} from './operation-assessments.mjs';
-import {renderHealthReport} from './health-report.mjs';
+import {renderHealthReport, validateReportPresentation} from './health-report.mjs';
 import {collectSyntax} from './syntax-evidence.mjs';
 import {collectProjectAnalysis} from './project-analysis.mjs';
 
@@ -329,8 +329,9 @@ async function appIcon(root) {
 }
 function pendingAppChecks(review) {
   const appChecks = new Set();
-  const criteria = review.presentation?.criteria ?? [];
-  if (!Array.isArray(criteria)) throw Error('Provide presentation.criteria as a list of findings.');
+  const criteria = Array.isArray(review.presentation?.criteria)
+    ? review.presentation.criteria
+    : [];
   for (const criterion of criteria) {
     if (criterion?.appChecks === undefined) continue;
     if (!Array.isArray(criterion.appChecks) || criterion.appChecks.some(id => !appCheckIDs.includes(id))) {
@@ -361,9 +362,27 @@ async function loadCurrentReview(root, input, syntaxProvider) {
   return {report, review:await importReview(report,raw,root)};
 }
 
+function reportPresentationGap(review) {
+  const presentation = review.presentation;
+  if (!presentation?.app || !presentation.summary || typeof presentation.verdict !== 'string' || !presentation.verdict.trim() || !presentation.conclusion || !Array.isArray(presentation.criteria) || !presentation.criteria.length) return 'Provide presentation app, summary, verdict, conclusion and criteria.';
+  for (const criterion of presentation.criteria) {
+    if (!Array.isArray(criterion?.evidence) || !criterion.evidence.length) {
+      return 'Each whole-app presentation criterion needs source evidence as file and line references.';
+    }
+  }
+  try {
+    validateReportPresentation({...presentation, scope:review.scope});
+  } catch (error) {
+    return error.message;
+  }
+  return null;
+}
+
 function reportFindingsGaps(review) {
   const gaps = [];
-  const criteria = review.presentation?.criteria ?? [];
+  const criteria = Array.isArray(review.presentation?.criteria)
+    ? review.presentation.criteria.filter(criterion => Array.isArray(criterion?.evidence))
+    : [];
   for (const finding of review.findings || []) {
     if (!['pass', 'concern', 'problem'].includes(finding.status)) {
       gaps.push('Whole-app finding status must be pass, concern or problem: ' + finding.title);
@@ -403,24 +422,20 @@ function reportFindingsGaps(review) {
 
 export async function progress(root, input, syntaxProvider = collectSyntax) {
   const {report, review} = await loadCurrentReview(root, input, syntaxProvider);
-  return {gaps:[...coverageGaps(report,review), ...appCheckGaps(review), ...reportFindingsGaps(review)],files:report.files.length,operations:(review.operations || []).length};
+  return {gaps:[...coverageGaps(report,review), ...appCheckGaps(review), ...reportFindingsGaps(review), reportPresentationGap(review)].filter(Boolean),files:report.files.length,operations:(review.operations || []).length};
 }
 export async function next(root, input, syntaxProvider = collectSyntax) {
   const {report, review} = await loadCurrentReview(root, input, syntaxProvider);
   const work = nextWork(report,review);
-  return {...work, gaps:[...work.gaps, ...appCheckGaps(review), ...reportFindingsGaps(review)]};
+  return {...work, gaps:[...work.gaps, ...appCheckGaps(review), ...reportFindingsGaps(review), reportPresentationGap(review)].filter(Boolean)};
 }
 export async function finish(root, input, output, icon, syntaxProvider = collectSyntax) {
   const {report, review} = await loadCurrentReview(root, input, syntaxProvider);
   const gaps = coverageGaps(report,review);
   if (gaps.length) throw Error('Health Check is not complete; no report was generated. Complete the review checklist:\n- ' + gaps.join('\n- '));
+  const presentationGap = reportPresentationGap(review);
+  if (presentationGap) throw Error(presentationGap);
   const presentation = review.presentation;
-  if (!presentation?.app || !presentation.summary || typeof presentation.verdict !== 'string' || !presentation.verdict.trim() || !presentation.conclusion || !Array.isArray(presentation.criteria) || !presentation.criteria.length) throw Error('Provide presentation app, summary, verdict, conclusion and criteria.');
-  for (const criterion of presentation.criteria) {
-    if (!Array.isArray(criterion?.evidence) || !criterion.evidence.length) {
-      throw Error('Each whole-app presentation criterion needs source evidence as file and line references.');
-    }
-  }
   const missingAppChecks = pendingAppChecks(review);
   if (missingAppChecks.length) {
     throw Error('Record app-level assessments before rendering: ' + missingAppChecks.join(', '));
@@ -463,7 +478,7 @@ if (process.argv[1] && existsSync(process.argv[1]) && realpathSync(process.argv[
       }
     } else if (mode === 'progress' && root && input && args.length === 3) {
       const result = await progress(root,input);
-      console.log(result.gaps.length ? 'Remaining review work:\n- ' + result.gaps.join('\n- ') : 'Source checklist reconciled. Add a substantive presentation and generate the report.');
+      console.log(result.gaps.length ? 'Remaining review work:\n- ' + result.gaps.join('\n- ') : 'Source checklist and report presentation validated. Generate the report.');
     } else if (mode === 'next' && root && input && args.length === 3) {
       const result = await next(root,input);
       console.log(JSON.stringify(result,null,2));

@@ -29,12 +29,19 @@ function operationStatus(operation) {
   return 'pass';
 }
 
-export function renderHealthReport(data, iconData = '') {
+export function validateReportPresentation(data) {
   const headings = [data.app, data.summary, data.verdict, data.scope];
   if (headings.some(value => typeof value !== 'string' || !value.trim()) || !data.conclusion) {
     throw Error('Provide an app name, summary, substantive verdict, scope and conclusion.');
   }
   const score = assess(data.criteria);
+  const conclusionItems = Array.isArray(data.conclusion) ? data.conclusion : [data.conclusion];
+  if (!conclusionItems.length || conclusionItems.some(item => typeof item !== 'string' || !item.trim())) throw Error('Provide non-empty conclusion points.');
+  return {score, conclusionItems};
+}
+
+export function renderHealthReport(data, iconData = '') {
+  const {score, conclusionItems} = validateReportPresentation(data);
   const hasOperationProblem = data.architecturalConflict === true ||
     (data.operations || []).some(operation => operationStatus(operation) === 'problem');
   if (hasOperationProblem && !data.criteria.some(criterion => criterion.status === 'problem')) {
@@ -67,8 +74,6 @@ export function renderHealthReport(data, iconData = '') {
   // The conclusion uses a consistent tick; individual findings keep their own status.
   const conclusionStatus = 'pass';
   const conclusionSymbol = '✓';
-  const conclusionItems = Array.isArray(data.conclusion) ? data.conclusion : [data.conclusion];
-  if (!conclusionItems.length || conclusionItems.some(item => typeof item !== 'string' || !item.trim())) throw Error('Provide non-empty conclusion points.');
   const conclusionList = `<ul class="conclusion-list">${conclusionItems.map(item => `<li><span class="conclusion-tick ${conclusionStatus}" aria-hidden="true">${conclusionSymbol}</span><span>${escape(item)}</span></li>`).join('')}</ul>`;
   const icon = iconData ? `<img class="icon" src="${escape(iconData)}" alt="${escape(data.app)} app icon">` : '<div class="icon placeholder" aria-hidden="true">⌘</div>';
 

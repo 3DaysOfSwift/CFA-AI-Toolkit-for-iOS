@@ -393,6 +393,16 @@ test('installed Health Check rescans source, surfaces gaps and rejects stale rev
       'cancellation', 'mutable-value-copies'
     ];
     await fs.writeFile(reviewPath,JSON.stringify(review));
+    for (const [presentation, expected] of [
+      [{...review.presentation, conclusion: []}, /non-empty conclusion points/],
+      [{...review.presentation, criteria: {}}, /Provide presentation/]
+    ]) {
+      await fs.writeFile(reviewPath, JSON.stringify({...review, presentation}));
+      for (const checkpoint of [progress, next]) {
+        assert.match((await checkpoint(project, reviewPath, syntax)).gaps.join(' '), expected);
+      }
+      await assert.rejects(finish(project, reviewPath, output, undefined, syntax), expected);
+    }
     const missingClarity = structuredClone(review);
     missingClarity.operations[0].checks.find(check => check.id === 'architectural-clarity').status = 'not-applicable';
     await fs.writeFile(reviewPath,JSON.stringify(missingClarity));
