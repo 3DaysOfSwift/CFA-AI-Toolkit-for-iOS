@@ -7,6 +7,11 @@ struct DestinationRequest: Codable, Equatable, Sendable {
     let id: String
     let title: String
     let launchID: String
+
+    var isValid: Bool {
+        !id.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        !launchID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
 }
 
 struct PendingSnapshot: Sendable {
@@ -55,7 +60,11 @@ actor PendingRequestStore: PendingRequestRepository {
     private func loadIfNeeded() throws {
         guard !loaded else { return }
         do {
-            requests = try JSONDecoder().decode([DestinationRequest].self, from: Data(contentsOf: fileURL))
+            let saved = try JSONDecoder().decode([DestinationRequest].self, from: Data(contentsOf: fileURL))
+            guard saved.allSatisfy(\.isValid), Set(saved.map(\.id)).count == saved.count else {
+                throw PendingRequestError.invalidSavedRequests
+            }
+            requests = saved
         } catch let error as CocoaError where error.code == .fileReadNoSuchFile {
             requests = []
         }
@@ -75,6 +84,7 @@ actor PendingRequestStore: PendingRequestRepository {
 }
 
 enum PendingRequestError: Error {
+    case invalidSavedRequests
     case invalidDestination
     case operationInProgress
 }
@@ -92,8 +102,7 @@ final class DeepLinkingFeature {
     func restore() async throws { publish(try await store.snapshot()) }
 
     func receive(_ request: DestinationRequest) async throws {
-        guard !request.id.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              !request.launchID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+        guard request.isValid else {
             throw PendingRequestError.invalidDestination
         }
         publish(try await store.insert(request))
@@ -410,6 +419,22 @@ private actor DelayedRestoreRepository: PendingRequestRepository {
         let restoredAfterRetry = DeepLinkingFeature(store: PendingRequestStore(fileURL: retryURL))
         try await restoredAfterRetry.restore()
         precondition(restoredAfterRetry.pending == [retained])
+
+        // Decodable data can still violate the pending list's identity rules.
+        let invalidURL = folder.appendingPathComponent("invalid-pending.json")
+        let invalidRequest = DestinationRequest(id: "invalid", title: "Missing launch", launchID: " ")
+        for invalidList in [[request, request], [invalidRequest]] {
+            let bytes = try JSONEncoder().encode(invalidList)
+            try bytes.write(to: invalidURL)
+            let invalidStore = DeepLinkingFeature(store: PendingRequestStore(fileURL: invalidURL))
+            do {
+                try await invalidStore.receive(incoming)
+                preconditionFailure("An invalid saved list must be rejected before writing")
+            } catch PendingRequestError.invalidSavedRequests {
+                let preserved = try Data(contentsOf: invalidURL)
+                precondition(invalidStore.pending.isEmpty && preserved == bytes)
+            }
+        }
 
         // A corrupt durable list must not be mistaken for an empty one.
         let corruptURL = folder.appendingPathComponent("corrupt-pending.json")
