@@ -12,6 +12,6 @@
 
 **Explanation:** [Why use an ownership-based project structure in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/project-structure).
 
-**Verify:** Build Release for a generic iOS device and inspect the built orientation arrays.
+**Verify:** Build Release for a generic iOS device and inspect the built orientation arrays. When preparing an archive, inspect its app plist too. Exercise supported rotation and iPad resizing before claiming UI compatibility.
 
 **Full rule, context and examples:** [Make the Architecture Visible in the Folder Structure](../topics/12-make-the-architecture-visible-in-the-folder-structure.md). This card is a reading aid; apply the complete canonical section.

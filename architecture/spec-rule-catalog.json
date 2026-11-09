@@ -728,7 +728,7 @@
       "rule": "Declare supported orientations in each configuration and inspect the built or archived Info.plist; honour explicit product choices.",
       "why": "A simulator build alone does not prove archive configuration or layout compatibility.",
       "example": "A universal app declares appropriate iPhone and iPad orientations.",
-      "verify": "Build Release for a generic iOS device and inspect the built orientation arrays.",
+      "verify": "Build Release for a generic iOS device and inspect the built orientation arrays. When preparing an archive, inspect its app plist too. Exercise supported rotation and iPad resizing before claiming UI compatibility.",
       "explanationIds": [
         "project-structure"
       ]
