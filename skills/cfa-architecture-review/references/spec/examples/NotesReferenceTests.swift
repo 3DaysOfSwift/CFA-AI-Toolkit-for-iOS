@@ -151,6 +151,14 @@ actor HeldNotesLoad: NotesRepository {
             preconditionFailure("A failed save must leave the editor open")
         }.value
         precondition(!failure && model.text == "fail" && model.saveError != nil && feature.notes.isEmpty)
+        let cancelledSave = model.save {
+            preconditionFailure("A cancelled save must leave the editor open")
+        }
+        cancelledSave.cancel()
+        let savedAfterCancellation = await cancelledSave.value
+        precondition(!savedAfterCancellation && model.text == "fail")
+        precondition(model.saveError == nil && !model.isSaving && feature.notes.isEmpty)
+
         model.text = "retry"
         let success = await model.save().value
         precondition(success && model.text.isEmpty && feature.notes.map(\.text) == ["retry"])

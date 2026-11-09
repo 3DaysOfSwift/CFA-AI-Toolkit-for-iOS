@@ -170,6 +170,8 @@ final class NotesEditorViewModel {
                     onSuccess()
                 }
                 return true
+            } catch is CancellationError {
+                return false
             } catch NoteError.emptyText {
                 self?.saveError = "Enter a note before saving."
                 return false

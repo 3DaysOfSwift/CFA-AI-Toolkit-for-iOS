@@ -4,7 +4,8 @@ This complete feature slice follows the path from a screen through its dedicated
 ViewModel, Feature and JSON persistence service. The screen ViewModel owns the
 unsaved text. The Feature queues admitted saves in order, persists each note
 before publication, and continues owned work if the awaiting caller is cancelled.
-A caller already cancelled at entry does not submit a save.
+A caller already cancelled at entry does not submit a save. The editor retains
+its draft without displaying a storage error for cancellation.
 The caller still awaits the admitted save’s outcome. A failed save leaves the
 editor open with its text available for retry. Cancel clears the draft and
 closes the editor without saving. During a save, the editor disables text
@@ -225,6 +226,8 @@ final class NotesEditorViewModel {
                     onSuccess()
                 }
                 return true
+            } catch is CancellationError {
+                return false
             } catch NoteError.emptyText {
                 self?.saveError = "Enter a note before saving."
                 return false
