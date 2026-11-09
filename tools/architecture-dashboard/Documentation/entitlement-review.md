@@ -51,8 +51,9 @@ cite the entry point and the paid call or exposure and describe the consequence.
 Matching source text alone does not resolve the call or establish a guard or
 violation. Syntax and index records are matched by source line. If several calls occur on
 one line, verify which enclosing symbol belongs to the paid call before
-following its callers. The compiler index is build-specific and its freshness
-is unverified. Aliases, external code,
+following its callers. Check the reported index module and reason against the
+build you intend to review. Index freshness and target coverage require
+separate evidence. Aliases, external code,
 dynamic dispatch and omitted spellings can escape this scan. Read
 `syntaxCoverage`, `syntaxWarnings` and `syntaxReason` before interpreting the
 results. If the parser reports errors, trace the affected files directly and
