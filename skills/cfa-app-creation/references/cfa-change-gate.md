@@ -187,8 +187,9 @@ the architecture:
     on supported devices, and record that evidence separately from target builds
     and controlled storage tests. If multiple targets can edit the same data,
     exercise the product’s conflict policy.
-15. SwiftData access goes through `SwiftDataManager`; every `URLSession` call
-    goes through `NetworkingManager`. Features own those lower-level
+15. SwiftData access goes through `SwiftDataManager`; every `URLSession` request
+    goes through `NetworkingManager`. Composition code may configure and inject
+    a session. Features own those lower-level
     collaborators. Keep domain-specific services beside their owning Feature
     while that location remains descriptive. Put broadly applicable services
     in a shared location and compose a shared instance in `AppModel.live()`

@@ -200,8 +200,8 @@ skill from that toolkit before changing the project.
   dedicated @ModelActor for non-trivial production database work. Verify
   where the context is created and that expensive work executes off MainActor.
   Keep any deliberately UI-owned context limited to work proven short.
-- Route URLSession calls through NetworkingManager. In new apps, start with a
-  stateless value type when it meets the session and concurrency requirements.
+- Route URLSession requests through NetworkingManager. Composition code may
+  configure and inject the session. In new apps, start with a stateless value type when it meets the session and concurrency requirements.
   Keep independent requests able to progress in parallel unless an explicit
   policy limits them. When changing networking, hold one response open and
   verify that an independent request reaches the transport before it completes.

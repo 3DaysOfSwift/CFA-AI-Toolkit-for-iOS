@@ -4,7 +4,7 @@
 
 **Strength:** Required unless a documented policy limits concurrency.
 
-**Guidance:** Keep all URLSession calls in a lower-level NetworkingManager. Feature-specific API adapters validate and decode responses. AppModel may construct the manager in live() for injection without storing it as an AppModel property. Let independent requests progress in parallel unless a documented policy limits them. For new apps, prefer a stateless value type when suitable. An actor may protect shared request state without serializing entire suspended requests.
+**Guidance:** Start URLSession requests through a lower-level NetworkingManager. Composition code may configure and inject a session. Feature-specific API adapters validate and decode responses. AppModel may construct the manager in live() for injection without storing it as an AppModel property. Let independent requests progress in parallel unless a documented policy limits them. For new apps, prefer a stateless value type when suitable. An actor may protect shared request state without serializing entire suspended requests.
 
 **Why:** Avoid accidental bottlenecks and data races.
 
