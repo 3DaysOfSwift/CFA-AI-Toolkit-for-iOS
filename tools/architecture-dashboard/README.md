@@ -111,9 +111,10 @@ The review's `presentation` requires `app`, `summary`, `verdict`, `conclusion`
 and a nonempty list of `criteria`. Use the verdict to describe the app’s
 concurrency design. Each criterion has a `title`, `detail`, `status` (`pass`,
 `concern` or `problem`) and optional `evidence`. The renderer weights criteria
-equally (1, ½ or 0 respectively) to choose the assessment label. Set
-`qualitativeOnly` to show the Result without a percentage. Coverage checks
-come from the whole-app review workflow.
+equally (1, ½ or 0 respectively) to choose the assessment label. The score
+reaches 100% only when every reviewed criterion passes. Set `qualitativeOnly`
+to show the Result without a percentage. Coverage comes from the whole-app
+review workflow. Runtime claims need their own evidence, regardless of the score.
 
 ### Experimental compiler-index map
 
