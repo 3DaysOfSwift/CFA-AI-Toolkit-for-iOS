@@ -46,8 +46,9 @@ date, outcome and evidence reference. A check not run still has a planned comman
 and a note explaining why. Commands are text: the helper never executes them.
 A `completed` record requires a pinned `repository.afterCommit` and passed
 evidence at that revision for every completion gate entry. Link the navigator
-map, Feature and legacy primitive inventories, build, tests, manual behaviour
-regression and human architecture review. Record the regression under
+map, Feature and legacy primitive inventories, hybrid review, final CFA audit,
+build, tests, manual behaviour regression and human architecture review. Use
+`hybridReviewEvidenceId` and `finalCfaAuditEvidenceId` for the two review links. Record the regression under
 `completionGate.manualBehaviourRegressionEvidenceId`. If evidence is missing
 or failed, use `partial` and explain the gap. Validation checks the recorded
 links and outcomes. A human reviewer checks the actual behaviour contract and

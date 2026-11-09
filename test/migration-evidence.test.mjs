@@ -153,6 +153,8 @@ test('completion is not inferred from a build pass or tests at a different commi
     afterEvidence('after-navigator', 'manual'),
     afterEvidence('after-feature-inventory', 'source'),
     afterEvidence('after-primitive-inventory', 'source'),
+    afterEvidence('after-hybrid-review', 'source'),
+    afterEvidence('after-cfa-audit', 'source'),
     afterEvidence('after-behaviour-regression', 'manual'),
     afterEvidence('after-architecture-review', 'manual')
   );
@@ -160,6 +162,8 @@ test('completion is not inferred from a build pass or tests at a different commi
     navigatorEvidenceId: 'after-navigator',
     featureInventoryEvidenceId: 'after-feature-inventory',
     primitiveInventoryEvidenceId: 'after-primitive-inventory',
+    hybridReviewEvidenceId: 'after-hybrid-review',
+    finalCfaAuditEvidenceId: 'after-cfa-audit',
     buildEvidenceId: 'after-build',
     testEvidenceId: 'after-test',
     manualBehaviourRegressionEvidenceId: 'after-behaviour-regression',
@@ -169,6 +173,13 @@ test('completion is not inferred from a build pass or tests at a different commi
   f.write();
   assert.ok(inspectRecord(f.file).errors.some(error => error.startsWith('completionGate.manualBehaviourRegressionEvidenceId')));
   f.record.evidence.find(item => item.id === 'after-behaviour-regression').outcome = 'passed';
+  for (const field of ['hybridReviewEvidenceId', 'finalCfaAuditEvidenceId']) {
+    const item = f.record.evidence.find(candidate => candidate.id === f.record.completionGate[field]);
+    item.commit = f.record.repository.beforeCommit;
+    f.write();
+    assert.ok(inspectRecord(f.file).errors.some(error => error.startsWith(`completionGate.${field}`)));
+    item.commit = f.record.repository.afterCommit;
+  }
   f.seal();
   assert.equal(inspectRecord(f.file).valid, true);
 

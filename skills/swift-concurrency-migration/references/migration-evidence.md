@@ -117,8 +117,9 @@ Case records may describe a completed feature checkpoint, but an agent must not
 call the **migration** complete without a completion gate. The final scenario
 record must pin the resulting commit and link passed evidence at that commit
 for the final Xcode navigator map, full scoped
-feature inventory, scoped legacy-primitive inventory, post-change build, test,
-manual behaviour regression and human architecture review.
+feature inventory, scoped legacy-primitive inventory, hybrid implementation
+review, final CFA audit, post-change build, test, manual behaviour regression
+and human architecture review.
 
 When any gate is missing, use progress language such as “Continuing migration:
 verify the Xcode navigator map.” Never convert a baseline pass, source parse or
