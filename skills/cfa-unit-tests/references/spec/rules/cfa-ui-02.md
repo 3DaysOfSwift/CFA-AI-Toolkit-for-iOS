@@ -12,6 +12,6 @@
 
 **Explanation:** [Why use screen-owned ViewModels in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/view-model-ownership).
 
-**Verify:** Inspect screen declarations, navigation destinations, previews and ViewModel construction.
+**Verify:** Inspect screen declarations, navigation destinations, previews and ViewModel construction. Verify that each screen owns its ViewModel and that the stored property is named `viewModel`. Record ownership and naming findings separately.
 
 **Full rule, context and examples:** [Give Every Unique Screen Its Own ViewModel](../topics/14-give-every-unique-screen-its-own-viewmodel.md). This card is a reading aid; apply the complete canonical section.

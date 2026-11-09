@@ -49,7 +49,7 @@
       "strength": "Required",
       "rule": "A screen owns its dedicated `@State private var viewModel` and constructs it inline by default. A detail screen may initialise its own State-backed ViewModel from selected immutable value data in the View initializer. Do not pass or share ViewModels between Views.",
       "why": "Presentation state remains local to the screen.",
-      "verify": "Inspect screen declarations, navigation destinations, previews and ViewModel construction.",
+      "verify": "Inspect screen declarations, navigation destinations, previews and ViewModel construction. Verify that each screen owns its ViewModel and that the stored property is named `viewModel`. Record ownership and naming findings separately.",
       "example": "NotesEditorView declares its own private State-backed NotesEditorViewModel.",
       "explanationIds": [
         "view-model-ownership"
