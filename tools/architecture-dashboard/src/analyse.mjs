@@ -59,8 +59,10 @@ export function scanSource(source, file) {
   const masked = maskSwift(source), lines = source.split(/\r\n|\n|\r/);
   const isUI = /(?:View|ViewModel)\.swift$/.test(file) || /(?:^|\/)1 - View\//.test(file);
   const evidence = (index) => {
-    const line = masked.slice(0, index).split(/\r\n|\n|\r/).length;
-    return { file, line, excerpt: lines.slice(Math.max(0, line - 3), line + 4).join('\n') };
+    const preceding = masked.slice(0, index).split(/\r\n|\n|\r/);
+    const line = preceding.length;
+    const column = Buffer.byteLength(lines[line - 1].slice(0, preceding.at(-1).length)) + 1;
+    return { file, line, column, excerpt: lines.slice(Math.max(0, line - 3), line + 4).join('\n') };
   };
   const sites = [];
   for (const [kind, label, pattern] of rules) {

@@ -211,6 +211,20 @@ test('an unresolved task relationship keeps an operation pending', () => {
   assert.deepEqual(nextWork(report, review).gaps, []);
 });
 
+test('matches same-line parser entry points to the right lexical column', () => {
+  const combined = structuredClone(report);
+  combined.files[0].sites = [
+    {id:'lexical-second',kind:'button-action',file:'App.swift',line:2,column:40}
+  ];
+  combined.syntax = {items:[
+    {kind:'entry.button',file:'App.swift',line:2,column:10},
+    {kind:'entry.button',file:'App.swift',line:2,column:40}
+  ]};
+  const candidates = inventoryCandidates(combined);
+  assert.deepEqual(candidates.map(site => site.column), [40, 10]);
+  assert.equal(candidates[0].id, 'lexical-second');
+});
+
 test('syntax entry points join the inventory without duplicating lexical findings', () => {
   const combined=structuredClone(report);
   combined.syntax={status:'available',files:['App.swift'],warnings:[],items:[
