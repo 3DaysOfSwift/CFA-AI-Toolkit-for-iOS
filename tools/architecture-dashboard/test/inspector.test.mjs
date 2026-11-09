@@ -308,17 +308,18 @@ test('locates multiple SwiftData access lines in a View-layer file', async t => 
 });
 
 test('reviews a preview that injects a SwiftData context through the environment', async t => {
-  const file = 'Application/PreviewContent/NotesPreview.swift';
+  const file = 'Application/1 - View/NotesPreview.swift';
   const root = await fixture(t, {
     [file]: [
       '#Preview {',
       '  NotesView().environment(\\.modelContext, context)',
+      '    .modelContainer(container)',
       '}',
       '#Preview { NotesView().environment(\\.locale, locale) }'
     ].join('\n')
   });
   const findings = (await inspect(root)).findings.filter(item => item.code === 'view-swiftdata-access');
-  assert.deepEqual(findings.map(item => [item.file, item.line, item.severity]), [[file, 2, 'review']]);
+  assert.deepEqual(findings.map(item => [item.file, item.line, item.severity]), [[file, 2, 'review'], [file, 3, 'review']]);
 });
 
 test('reviews SwiftData access in a SwiftUI View outside the CFA View folder', async t => {

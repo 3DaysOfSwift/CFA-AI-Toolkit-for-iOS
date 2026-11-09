@@ -583,12 +583,11 @@ export async function inspect(project) {
     for (const preview of source.matchAll(/(?:#Preview\b\s*(?:\([^{}]*?\)\s*)?|\b(?:struct|enum|class|extension)\s+\w+\s*:[^{}]*?\bPreviewProvider\b[^{}]*)\{/g)) {
       const start = preview.index + preview[0].length;
       const previewBody = braceBody(source, start - 1);
-      previewRanges.push({start, end: start + previewBody.length});
       const access = findFeatureAccess(previewBody);
-      const storage = swiftDataAccess.exec(previewBody);
-      if (storage) {
-        findings.push(finding('view-swiftdata-access', 'review', 'This preview appears to access SwiftData directly. Preview construction follows the same CFA storage boundary as the app.', file, lineOf(source, start + storage.index)));
+      for (const line of swiftDataLines(previewBody, start)) {
+        findings.push(finding('view-swiftdata-access', 'review', 'This preview appears to access SwiftData directly. Preview construction follows the same CFA storage boundary as the app.', file, line));
       }
+      previewRanges.push({start, end: start + previewBody.length});
       if (access) {
         findings.push(finding('preview-feature-access', 'review', 'This preview appears to access a Feature directly. A normal CFA preview constructs the View and uses its usual ViewModel and Feature route.', file, lineOf(source, start + access.index)));
       }
