@@ -355,12 +355,15 @@ do not claim that UI gating replaces server-side authorisation.
   saved. Admit a request while restoration is suspended and verify that both
   the restored and new requests survive restart. Verify that declining or
   cancelling before navigation leaves a saved request available after restart.
-  Exercise competing opens from two scenes and verify that
-  only one navigates. Race an open against dismissal of the same request and
+  Cancel after the destination opens and verify that it still counts as opened
+  and the pending item is removed. Verify either scene can open a shared
+  request, and simultaneous attempts navigate only once. Race an open against dismissal of the same request and
   verify that the outcomes agree with the pending list and navigation state.
   Force a removal write to fail
   after navigation, then verify that the error is reported and retrying the
-  write removes the item without reopening the destination. Use the
+  write removes the item without reopening the destination. During migration,
+  verify that existing URL and notification destinations, deferred opening
+  behaviour and any ability to reopen an item from history are preserved. Use the
   [review checklist](spec/topics/29-review-checklist.md) for the full scope.
 - Confirm that concrete feature types and their AppModel properties retain the
   `Feature` suffix.
