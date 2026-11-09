@@ -771,13 +771,16 @@ test('reviews ViewModel injection from the app scene', async t => {
   const file = 'App/ExampleApp.swift';
   const {report} = await inspectView(t, '', {
     [file]: `struct ExampleApp: App {
+      private let model: HomeViewModel = HomeViewModel()
+      private let theme: Theme = Theme()
       var body: some Scene {
         WindowGroup { HomeView().environment(HomeViewModel()) }
+        WindowGroup { HomeView().environment(self.model).environment(self.theme) }
       }
     }`
   });
   assert.deepEqual(report.findings.filter(item => item.code === 'view-model-environment-provider')
-    .map(item => [item.file, item.line]), [[file, 3]]);
+    .map(item => [item.file, item.line]), [[file, 5], [file, 6]]);
 });
 
 test('reviews ViewModel environment injection in a separate View extension', async t => {

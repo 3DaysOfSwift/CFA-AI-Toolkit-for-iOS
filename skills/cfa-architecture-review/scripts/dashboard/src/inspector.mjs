@@ -682,9 +682,9 @@ export async function inspect(project) {
   const rootViewNames = new Set(['ContentView', 'RootTabView', 'RootView']);
   const rootStorageGate = /(?<!#)\b(?:if|guard|switch)\s+[^{};]*\b\w*(?:container|database|storeReady|storageReady|startupError|launchError)\w*\b/i;
   const rootStartupGate = /(?<!#)\b(?:if|guard|switch)\s+[^{};]*\b\w*(?:isStartingUp|isLaunching|isInitializing|hasLaunched|hasFinishedLaunching|startupPhase|launchPhase|startupState|launchState|startupReady|launchReady)\w*\b/i;
-  function inspectEnvironmentProviders(owner, body, file, source, offset) {
+  function inspectEnvironmentProviders(owner, body, file, source, offset, ownerBody = body) {
     const suppliedViewModel = /\.\s*(?:environment|environmentObject)\s*\(\s*(?:\w+\s*\.\s*)*(\w+ViewModel)(?:\s*\.\s*init)?\s*\(/g;
-    const memberTypes = new Map(storedTypedMembers(memberSignatures(body), body)
+    const memberTypes = new Map(storedTypedMembers(memberSignatures(ownerBody), ownerBody)
       .filter(({type}) => type.endsWith('ViewModel')).map(({name, type}) => [name, type]));
     const suppliedMember = /\.\s*(?:environment|environmentObject)\s*\(\s*self\s*\.\s*(\w+)\s*\)/g;
     const providers = [...body.matchAll(suppliedViewModel)].map(match => ({index: match.index, type: match[1]}));
@@ -839,7 +839,7 @@ export async function inspect(project) {
       if (sceneBody) {
         const bodyStart = sceneBody.index + sceneBody[0].length;
         const body = braceBody(members, bodyStart - 1);
-        inspectEnvironmentProviders('App.body', body, file, source, start + bodyStart);
+        inspectEnvironmentProviders('App.body', body, file, source, start + bodyStart, members);
         const conditional = /(?<!#)\b(?:if|switch)\b/.exec(body);
         const presentation = swiftDataAccess.exec(body) ?? /\b(?:ProgressView|ContentUnavailableView)\s*\(/.exec(body);
         if (conditional) findings.push(finding('conditional-app-body', 'review', 'App.body contains a conditional. Check whether root navigation stays available while Features start, load, or fail.', file, lineOf(source, start + bodyStart + conditional.index)));
