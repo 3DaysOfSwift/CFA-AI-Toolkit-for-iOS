@@ -190,6 +190,11 @@ skill from that toolkit before changing the project.
   can leave without a replacement, that other waiters still receive the result
   when one leaves, and that a later equivalent caller joins without a duplicate
   request. Where prompt exit is required, verify it while the refresh is suspended.
+- The ViewModel retains named handles for the independent tasks it creates.
+  A synchronous button action can return the existing handle when repeated
+  calls are equivalent. Async callers await that same handle's value.
+  Keep SwiftUI lifecycle tasks and structured child tasks with their existing
+  owners.
 - Cancel superseded presentation work such as search. Cancel screen-only work
   on disappearance when continuing would have no value. Check cancellation
   before expensive work and before publishing, and protect current state
