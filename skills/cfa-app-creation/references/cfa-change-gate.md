@@ -254,6 +254,10 @@ do not claim that UI gating replaces server-side authorisation.
   screen, or implementing a new business capability itself? Only the latter
   points towards extracting business behaviour into the model. Keep presentation
   coordination in the presentation layer; dependency count alone is not a defect.
+- For changed workflows that coordinate Features, trace which Feature owns
+  each business decision and state update. Verify that coordination serves a
+  business capability, preserves one authoritative owner for each state value,
+  and keeps dependencies free of cycles.
 - Inventory screen initializers and call sites. Verify private ViewModel
   ownership and the `viewModel` property name separately. Allow selected-value
   detail initialization and reject ViewModel

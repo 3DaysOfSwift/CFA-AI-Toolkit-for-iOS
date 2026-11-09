@@ -53,6 +53,14 @@ violations and unresolved requirements separately, and state what evidence
 would resolve each open requirement. For a focused review, report the scoped
 findings without issuing a whole-app conformance verdict.
 
+For Feature-to-Feature dependencies, apply the
+[coordination rule](references/spec/rules/cfa-feature-02.md). Trace the workflow
+from its callers through the coordinating Feature to the owners of the state
+it reads or changes. Verify the business responsibility and dependency
+direction. A stored Feature reference is a lead. Report an architecture
+violation only when the traced dependency conflicts with the rule, such as a
+cycle or duplicated ownership.
+
 For independent network requests, trace each caller to transport initiation.
 Look for synchronous work before the first suspension, waits on another
 request, and deliberate request limits. An actor can accept another call
