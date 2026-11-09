@@ -251,7 +251,9 @@ skill from that toolkit before changing the project.
   and targets. Keep live SwiftData stores out of iCloud Drive. For a custom
   server, follow its sync contract. Save each offline edit and its pending-sync
   metadata together before reporting local success. Report server confirmation
-  separately. Verify recovery after failed sync and restart, duplicate-safe
+  separately. Force a local write failure and verify that it neither reports
+  local success nor makes the edit eligible for upload. Verify recovery after
+  failed sync and restart, duplicate-safe
   retries, and the agreed conflict and rejection outcomes. When changing
   existing sync code, verify that the updated app restores and safely retries
   a pending edit persisted by the previous implementation. Verify Apple-managed

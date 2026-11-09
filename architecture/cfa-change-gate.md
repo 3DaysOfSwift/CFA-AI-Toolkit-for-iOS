@@ -129,7 +129,9 @@ the architecture:
     Apply the [offline editing and sync rule](spec/rules/cfa-sync-01.md) when
     the product requires synchronization. For offline edits sent to a custom
     server, save the edit and its pending-sync metadata together before
-    reporting local success. Report server confirmation separately. Verify
+    reporting local success. Report server confirmation separately. Force a
+    local write failure and verify the app reports the failure without
+    publishing local success or admitting a pending edit for upload. Verify
     pending edits survive failed sync and restart, retries avoid duplicates,
     and conflicting edits and server rejections follow the product policy.
     If changing an existing sync implementation, start verification with
