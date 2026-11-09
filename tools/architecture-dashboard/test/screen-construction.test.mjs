@@ -184,3 +184,14 @@ test('flags possible screen-owned task handles without flagging lifecycle tasks'
     [7]
   );
 });
+
+test('an unrelated property named viewModel does not imply ViewModel state assignment', async t => {
+  const { report, findings } = await inspectView(t, `struct HomeView: View {
+    @State private var home = HomeViewModel()
+    private let viewModel: String
+    init() { viewModel = "Home" }
+    var body: some View { Text(viewModel) }
+  }`);
+  assert.equal(report.screens[0].ownsViewModel, true);
+  assert.deepEqual(findings, []);
+});

@@ -268,7 +268,9 @@ export async function inspect(project) {
             `\\b_${property}\\s*=\\s*State\\s*\\(\\s*(?:initialValue|wrappedValue)\\s*:\\s*${viewModelName}\\s*\\(`
           ).test(initializerBody));
           if (parameters.trim() && !/:\s*(?:any\s+)?\w*ViewModel\b/.test(parameters) && ownConstruction) ownedState ??= ownConstruction;
-          const assignsViewModel = ['viewModel', ...typedStateProperties.map(property => property.name)].some(property =>
+          const statePropertyNames = typedStateProperties.map(property => property.name);
+          if (inlineState) statePropertyNames.push(inlineState[1]);
+          const assignsViewModel = statePropertyNames.some(property =>
             new RegExp(`\\b_?${property}\\s*=`).test(initializerBody)
           );
           if (assignsViewModel) {
