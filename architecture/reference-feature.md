@@ -20,8 +20,9 @@ xcrun swiftc -swift-version 6 -parse-as-library NotesReference.swift NotesRefere
 Run from the folder containing both files. The checks do not simulate SwiftUI
 navigation or a device. The example provides a composable editor and AppModel;
 to use it as an app, place the types in their CFA folders and supply the app's
-normal scene and lifecycle wiring. Use the existing starter apps for full Xcode
-projects and compare them against the current specification.
+normal scene and lifecycle wiring. For a complete Xcode project, see the
+[project examples](spec/examples/open-source-apps.md). The full toolkit includes
+the starter apps. A standalone skill includes this runnable feature slice.
 
 ```swift
 import Foundation
