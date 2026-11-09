@@ -44,9 +44,14 @@ Use scope.constraints or the case study for selection rationale and applicabilit
 Before/after build and test entries include their command, environment, commit,
 date, outcome and evidence reference. A check not run still has a planned command
 and a note explaining why. Commands are text: the helper never executes them.
-`completed` requires recorded passing after-build and after-test results at the
-resulting commit, but does not prove behaviour preservation. Human review must
-also examine the actual behaviour contract and its coverage.
+A `completed` record requires a pinned `repository.afterCommit` and passed
+evidence at that revision for every completion gate entry. Link the navigator
+map, Feature and legacy primitive inventories, build, tests, manual behaviour
+regression and human architecture review. Record the regression under
+`completionGate.manualBehaviourRegressionEvidenceId`. If evidence is missing
+or failed, use `partial` and explain the gap. Validation checks the recorded
+links and outcomes. A human reviewer checks the actual behaviour contract and
+its coverage.
 
 ## Validate and review
 
@@ -90,8 +95,3 @@ approved-case catalogue, cross-record checks (unique IDs, supersession and
 repository-level holdout isolation), release manifests and baseline-versus-case
 evaluation are subsequent increments. Neither this helper nor the migration
 skill currently claims to retrieve approved precedents automatically.
-
-A completed record must link passed manual behaviour regression evidence at the
-final commit using `completionGate.manualBehaviourRegressionEvidenceId`. The
-manual architecture review has its own field. If regression was not run or did
-not pass, record the migration as partial and describe the missing evidence.
