@@ -46,7 +46,8 @@ export async function collectProjectAnalysis(root, options = {}, providers = {})
     possibleIndexMatches:indexedByLine.get(JSON.stringify([item.file,item.line])) || []
   }));
   const analysis = {schemaVersion:1, generatedAt:new Date().toISOString(), sourceFingerprint:before.sourceFingerprint,
-    scope:before.scope, files:before.files.map(({path,hash})=>({path,hash})), syntax:{...syntax,coverage:syntaxCoverage}, compilerIndex, callCandidates,
+    scope:before.scope, files:before.files.map(({path,hash})=>({path,hash})),
+    buildDefinitions:before.buildDefinitions || [], syntax:{...syntax,coverage:syntaxCoverage}, compilerIndex, callCandidates,
     limitations:['Syntax calls and lexical task nesting are not resolved relationships or runtime parentage.',
       'Same-line index matches are candidates only; multiple calls and macros can make them ambiguous.',
       'Compiler-index calls reflect an unverified build configuration and are not proof of runtime dispatch.',

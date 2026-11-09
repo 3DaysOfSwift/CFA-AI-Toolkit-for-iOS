@@ -5,7 +5,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
-const inventory = () => ({sourceFingerprint:'abc',scope:{skipped:[]},files:[{path:'App.swift',hash:'hash'}]});
+const inventory = () => ({sourceFingerprint:'abc',scope:{skipped:[]},files:[{path:'App.swift',hash:'hash'}],buildDefinitions:[{path:'App.entitlements',hash:'config-hash'}]});
 const syntax = async () => ({status:'available',files:['App.swift'],items:[{kind:'call.expression',name:'refresh',file:'App.swift',line:2}],warnings:[]});
 
 test('combines syntax and index evidence without treating calls as runtime traces', async () => {
@@ -15,6 +15,7 @@ test('combines syntax and index evidence without treating calls as runtime trace
       {file:'App.swift',line:2,caller:'start',callee:'refresh'},
       {file:'Excluded.swift',line:1,caller:'test',callee:'refresh'}]});
     assert.equal(result.syntax.coverage,'matching');
+    assert.deepEqual(result.buildDefinitions, inventory().buildDefinitions);
     assert.equal(result.compilerIndex.status,'available');
     assert.equal(result.compilerIndex.indexFreshness,'unverified');
     assert.equal(result.compilerIndex.calls.length,1);
