@@ -64,9 +64,11 @@ reintroduce a footer that the user removed or repeatedly offer one.
 ## Orientation and archive checks
 
 Apply the specification's Supported Orientations and Archive Validation rule
-to every new project, including copied blueprints. Set explicit iPhone and iPad
-orientations in Debug and Release. Keep all four iPad orientations for
-multitasking; do not use full-screen-only mode as a warning workaround.
+to every new project, including copied blueprints. Declare orientations for
+each supported device family in every build configuration. For universal apps,
+default to portrait and both landscapes on iPhone and all four on iPad. Honour
+an explicit iPhone choice and keep all four iPad orientations when multitasking
+is supported. Preserve the intended device families when resolving warnings.
 
 After a generic iOS-device Release build, run
 `node scripts/verify-ios-orientations.mjs <path-to-built-app>` from this skill's
