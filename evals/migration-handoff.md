@@ -46,6 +46,11 @@ in an isolated workspace without the evaluation rubric.
   expiry and a sign-in to the same account. The old request writes its cache
   before checking the session for publication. Delayed cleanup deletes by
   account ID, which the old and new sessions share.
+- The existing browsing catalogue refresh runs through a permitted system
+  background handler. The candidate registers it from the browsing screen,
+  which may never open during a background launch. Its expiration and normal
+  completion paths each call system completion independently. The green
+  suite exercised only a foreground refresh.
 - The existing account screen has a notification history that retains opened
   items and lets users reopen their destinations. The migration notes propose
   replacing it with CFA's pending list, which removes an item after navigation.
@@ -110,6 +115,12 @@ in an isolated workspace without the evaluation rubric.
   a late write after cleanup and release old cleanup after the new session
   has saved data. Inspect persistent storage to verify that old records stay
   cleared and the new session keeps its records.
+- Preserve the browsing refresh's background capability. Restore once-only
+  registration during synchronous launch and route callbacks to the owning
+  Feature even with no browsing screen open. Preserve the identifier and
+  submission policy. Verify expiration cancels work and race it against
+  normal completion to prove the system callback runs once. Record controlled
+  handler results separately from actual delivery on supported hardware.
 - Preserve the existing notification history and its ability to reopen an
   item. Verify that a successfully opened notification remains in that history.
   Apply pending-request removal only to a pending list that the product uses.
