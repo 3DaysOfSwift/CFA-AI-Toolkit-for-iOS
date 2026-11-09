@@ -419,17 +419,18 @@ export async function inspect(project) {
       }
       const testName = `${property.type}Tests.swift`;
       const namedTests = [...paths].filter(file => path.posix.basename(file) === testName);
-      const testCandidates = namedTests.filter(file => file.split('/').includes('FeatureTests'));
       for (const file of namedTests) {
-        if (productionSourceTree.test(file)) {
-          findings.push(finding('feature-test-placement', 'review', `${testName} appears in a production source tree. Verify that it belongs to the unit-test target and its FeatureTests group.`, file, 1));
+        const inProduction = productionSourceTree.test(file);
+        if (inProduction || !file.split('/').includes('FeatureTests')) {
+          const location = inProduction ? 'in a production source tree' : 'outside a FeatureTests folder';
+          findings.push(finding('feature-test-placement', 'review', `${testName} appears ${location}. Verify that it belongs to the unit-test target and its FeatureTests group.`, file, 1));
         }
       }
-      if (testCandidates.length > 1) {
-        findings.push(finding('feature-tests-ambiguous', 'review', `Multiple files match ${testName}: ${testCandidates.join(', ')}. Verify which test target covers this Feature.`, property.file, property.line));
+      if (namedTests.length > 1) {
+        findings.push(finding('feature-tests-ambiguous', 'review', `Multiple files match ${testName}: ${namedTests.join(', ')}. Verify which test target covers this Feature.`, property.file, property.line));
       }
-      if (!testCandidates.length) {
-        findings.push(finding('feature-tests-missing', 'review', `No ${testName} was found under FeatureTests in the scanned directory. Check the project root and test target before concluding the test is missing.`, property.file, property.line));
+      if (!namedTests.length) {
+        findings.push(finding('feature-tests-missing', 'review', `No ${testName} was found in the scanned directory. Check the project root and test target before concluding the test is missing.`, property.file, property.line));
       }
     }
   }
