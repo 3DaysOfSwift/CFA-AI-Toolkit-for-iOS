@@ -228,5 +228,7 @@ struct NotesEditorView: View {
 
 The editor’s lifecycle task awaits the ViewModel’s async load directly. The
 Feature owns the shared load and can retain its result after the editor closes.
-The ViewModel skips updating its error state when the caller is cancelled and
-retains a task for retries started by the button.
+The screen caller awaits the shared result even if SwiftUI cancels its task.
+On return, the ViewModel checks cancellation before updating the editor’s
+error state. The ViewModel retains a separate task for retries started by the
+button.
