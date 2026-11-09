@@ -6,11 +6,11 @@ Background callback work dispatches a result to the main queue.
 
 ## Behaviour to preserve
 
-Both examples publish Artemis on MainActor. The migrated example also retains the previous value if a later refresh fails.
+Both examples publish Artemis on MainActor before reporting completion. The migrated example also demonstrates failure and retry: a failed refresh keeps the last confirmed value, and a successful retry clears the error.
 
 ## Migration
 
-The Feature awaits its provider and publishes observable state on MainActor. Requests with different inputs are queued so an older result cannot overwrite a later request.
+The Feature awaits its provider and publishes observable state on MainActor. This fixture queues every refresh in admission order, including requests with different inputs. Callers await their own refresh through publication.
 
 ## Run and verify
 

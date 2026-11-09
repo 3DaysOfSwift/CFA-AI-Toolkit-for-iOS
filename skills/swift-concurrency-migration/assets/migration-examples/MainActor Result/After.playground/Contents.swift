@@ -57,7 +57,9 @@ func runExample() async {
     precondition(feature.name == "Artemis")
     await feature.refresh(available: false)
     precondition(feature.name == "Artemis" && feature.errorMessage != nil)
-    print("Passed: the result is published on MainActor; failure retains it.")
+    await feature.refresh(available: true)
+    precondition(feature.name == "Artemis" && feature.errorMessage == nil)
+    print("Passed: MainActor publication, failure retention and retry.")
 }
 
 // MARK: - Run after example
