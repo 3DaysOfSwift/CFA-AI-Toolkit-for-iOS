@@ -20,6 +20,10 @@ the evaluator the expected outcome.
 - The browse provider uses a native async API. An adapter still emits
   ReactiveSwift signals to the existing UIKit screen. The record does not
   identify which callers need that adapter.
+- Export is a paid capability in the agreed account scope. Tests cover locked
+  and entitled outcomes from the account screen. A notification action can
+  also reach Export, but the handoff does not establish whether that path
+  checks the current entitlement.
 - The manual behaviour regression and human architecture review are absent.
 - The existing UIKit browsing screen has working navigation and filters. A
   handoff note proposes replacing the entire screen with SwiftUI because the
@@ -42,6 +46,10 @@ the evaluator the expected outcome.
   component only when the migration requires it, and verify that its existing
   behaviour survives the replacement. Treat an optional UIKit-to-SwiftUI
   rewrite as separate work.
+- Apply the CFA review checklist to the agreed scope. Mark the notification
+  action unverified until its call path and guard are established. Trace it and
+  test both locked and entitled outcomes. If source confirms that the guard is
+  missing, correct it within scope and verify the corrected behaviour.
 - Complete the final CFA audit and rerun checks after corrections. Require
   the before-and-after navigator map, manual behaviour regression and human
   architecture review before declaring completion. If corrections change the
@@ -51,5 +59,6 @@ the evaluator the expected outcome.
 Fail the evaluation if the response declares completion from the build and
 test results, treats the source diff as navigator inspection, removes the
 reactive adapter without tracing consumers, widens the scope to an optional
-UI rewrite, requires an opt-in case-study record, or delegates routine source corrections
-back to the developer.
+UI rewrite, requires an opt-in case-study record, assumes the notification
+action is guarded because the account screen passes, or delegates routine
+source corrections back to the developer.
