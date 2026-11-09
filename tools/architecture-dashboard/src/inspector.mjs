@@ -210,7 +210,7 @@ export async function inspect(project) {
       const bodyStartLine = lineOf(source, opening + 1);
       for (const site of scanSource(lifecycleBody, file).sites) {
         if (site.kind !== 'task' && site.kind !== 'detached') continue;
-        findings.push(finding('task-inside-view-lifecycle', 'review', 'A SwiftUI .task body appears to create an independent Task. Verify its lifetime owner. Await lifecycle-bound work directly and give independent screen work a ViewModel owner.', file, bodyStartLine + site.line - 1));
+        findings.push(finding('task-inside-view-lifecycle', 'review', 'A SwiftUI .task body appears to create an independent Task. Trace its lifetime and cancellation. In CFA, await lifecycle-bound work directly, let the ViewModel own independent screen work, and let the Feature own shared operations that may outlive the screen.', file, bodyStartLine + site.line - 1));
       }
       if (/(?<!\bfunc\s+)\bapplicationDidFinishLaunching\s*\(/.test(lifecycleBody)) {
         findings.push(finding('view-tied-app-launch', 'review', 'A View-layer .task appears to call applicationDidFinishLaunching. Check whether this is production launch behavior rather than a preview or test, and use the app lifecycle callback for the shared launch signal.', file, lineOf(source, task.index)));
