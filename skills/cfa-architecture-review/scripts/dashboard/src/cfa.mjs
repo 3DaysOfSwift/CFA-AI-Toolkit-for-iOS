@@ -67,8 +67,15 @@ skill from that toolkit before changing the project.
   false, and sets listener task handles to nil. One static live() factory
   constructs production dependencies for AppModel.shared. Never store a service
   or UI error in AppModel.
-- SwiftData uses SwiftDataManager; URLSession calls use NetworkingManager.
-  Features own those collaborators. Call the AppModel launch signal directly
+- SwiftDataManager owns container and context creation. Keep SwiftData records
+  and contexts inside the storage boundary and give Features narrow load and
+  save operations.
+- Route URLSession calls through NetworkingManager. In new apps, start with a
+  stateless value type when it meets the session and concurrency requirements.
+  Keep independent requests able to progress in parallel unless an explicit
+  policy limits them. AppModel.live() can compose shared services locally and
+  inject them into Features or their providers.
+- Call the AppModel launch signal directly
   and synchronously from the application lifecycle callback, never a View .task
   or a scheduled Task. Features can start their own asynchronous work without
   delaying the callback for disk or network completion.

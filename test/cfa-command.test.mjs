@@ -66,6 +66,9 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.equal(doctor.status, 0, doctor.stderr);
   assert.match(content, /Keep this text\./);
   assert.match(content, /View → ViewModel → Feature → Microservices/);
+  assert.match(content, /SwiftDataManager owns container and context creation/);
+  assert.match(content, /NetworkingManager\. In new apps, start with a\s+stateless value type/);
+  assert.match(content, /independent requests able to progress in parallel/);
   assert.match(content, /Call the AppModel launch signal directly\s+and synchronously from the application lifecycle callback/);
   assert.equal((content.match(/CFA Toolkit project guidance/g) ?? []).length, 1);
   assert.match(repeated.stdout, /already enabled/);
