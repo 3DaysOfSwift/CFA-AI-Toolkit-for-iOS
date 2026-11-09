@@ -152,8 +152,11 @@ If the project is already CFA, make the smallest complete vertical change:
    Apply the [ViewModel task rule](references/spec/rules/cfa-task-03.md) when
    changing a screen action that starts an unstructured task. Equivalent taps
    return the same active handle, which async callers await. Verify that
-   completion clears the handle and a later action can start. Keep separate
-   outcomes for commands that must each take effect.
+   success, failure and cancellation clear the handle so a later action can
+   start. If replacement can start before the old task exits, hold the old
+   task open, install the replacement, and then let the old task finish.
+   Verify that its result and cleanup leave the replacement’s state and handle
+   intact. Keep separate outcomes for commands that must each take effect.
 3. Keep AppModel.shared as the production composition root. Construct shared
    services locally in AppModel.live() and inject them into the Features that
    need them. Keep service references with their consumers. Avoid additional

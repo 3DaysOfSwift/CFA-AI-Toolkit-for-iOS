@@ -264,9 +264,10 @@ skill from that toolkit before changing the project.
   A synchronous button action can return the existing handle when repeated
   calls are equivalent. Async callers await that same handle's value.
   Install the handle before suspension and clear it after handling success,
-  failure or cancellation. An older execution must never clear a replacement
-  handle. Keep SwiftUI lifecycle tasks and structured child tasks with their
-  existing owners. Await directly when the current task owns the work.
+  failure or cancellation. If replacement can start before the old task exits,
+  finish the old task after installing its replacement. Verify that its result
+  and cleanup leave the current state and replacement handle intact. Keep
+  SwiftUI lifecycle tasks and structured child tasks with their existing owners. Await directly when the current task owns the work.
 - Cancel superseded presentation work such as search. Cancel screen-only work
   on disappearance when continuing would have no value. Check cancellation
   before expensive work and before publishing, and protect current state
