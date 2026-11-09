@@ -234,6 +234,9 @@ export async function inspect(project) {
     // Keep feature-screen conditionals and unrelated adaptive layout out of this check.
     for (const rootView of source.matchAll(/\bstruct\s+(?:ContentView|RootTabView|RootView)\s*:\s*View\b[^\{]*\{/g)) {
       const rootBody = braceBody(source, rootView.index + rootView[0].length - 1);
+      if (/\bAppModel\s*\.\s*shared\s*\.\s*\w+Feature\b/.test(rootBody)) {
+        findings.push(finding('root-feature-access', 'review', 'Root navigation appears to access a Feature directly. Keep refresh and Feature state presentation in the owning screen and its ViewModel.', file, lineOf(source, rootView.index)));
+      }
       if (/\b(?:if|guard|switch)\s+[^\{;\n]*\b\w*(?:container|database|storeReady|storageReady|startupError|launchError)\w*\b/i.test(rootBody)) {
         findings.push(finding('root-storage-gate', 'review', 'Root navigation may gate the interface on storage availability. Open storage within a Feature data request and present its error in the feature screen, never a root wrapper or app-wide blocking overlay.', file, lineOf(source, rootView.index)));
       }
@@ -356,7 +359,7 @@ export async function inspect(project) {
     if (ownedState && ownedState.name !== 'viewModel') {
       findings.push(finding('view-model-property-name', 'warning', `${name} owns its ViewModel as ${ownedState.name}; CFA names the property viewModel.`, viewFile, lineOf(view, bodyOffset + ownedState.index)));
     }
-    const structuralRoot = name === 'ContentView' && /\bTabView\s*[(\{]/.test(body) && !/\b(?:AppModel|\w+Feature)\b/.test(members);
+    const structuralRoot = name === 'ContentView' && /\bTabView\s*[(\{]/.test(body) && !/\b(?:AppModel|\w+Feature)\b/.test(body);
     if (!viewModel && !structuralRoot) findings.push(finding('view-model-missing', 'review', `${name} has no adjacent ${viewModelName}. Verify whether it is a screen requiring a dedicated ViewModel or a reusable presentation component.`, viewFile, 1));
     else if (viewModel) {
       if (!ownsViewModel) findings.push(finding('view-model-ownership', 'review', `${name} has no recognized private @State ViewModel storage. Verify that the screen constructs and stores its ViewModel. Detail Views may initialize that stored state from selected value data. A computed property does not satisfy CFA screen ownership.`, viewFile, lineOf(view, declaration.index)));

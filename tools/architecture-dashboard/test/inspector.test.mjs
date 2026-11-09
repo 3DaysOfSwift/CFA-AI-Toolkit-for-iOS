@@ -594,3 +594,16 @@ test('recognizes service filenames directly under the scan root', async t => {
   assert.ok(!findings.some(item => item.code === 'swiftdata-manager-missing'));
   assert.deepEqual(findings.filter(item => item.code === 'direct-url-session').map(item => item.file), ['Client.swift']);
 });
+
+test('reviews direct Feature access in root tab navigation', async t => {
+  const root = await fixture(t, {
+    'Application/1 - View/Views/ContentView.swift': `struct ContentView: View {
+      var body: some View {
+        TabView { PracticeView() }.task { await AppModel.shared.practiceFeature.refresh() }
+      }
+    }`
+  });
+  const report = await inspect(root);
+  assert.equal(report.screens[0].structuralRoot, false);
+  assert.ok(report.findings.some(item => item.code === 'root-feature-access'));
+});
