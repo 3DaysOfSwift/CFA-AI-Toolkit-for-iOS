@@ -23,7 +23,7 @@ Editorial analysis: continuing durable work consumes resources after presentatio
 
 ## Scope and exceptions
 
-Swift cancellation signals and CFA policy are different. Check the API's cancellation behaviour; do not assume an external request stopped or a transaction rolled back. Shared waiters need a documented ownership policy.
+Swift cancellation signals and CFA policy are different. Check the API's cancellation behaviour; do not assume an external request stopped or a transaction rolled back. A Feature-owned shared refresh normally continues when a screen leaves, even if it was the only caller, so the result remains available for later use. A different policy needs a specific product or resource reason. Shared waiters need a documented ownership policy.
 
 ## Verification
 
