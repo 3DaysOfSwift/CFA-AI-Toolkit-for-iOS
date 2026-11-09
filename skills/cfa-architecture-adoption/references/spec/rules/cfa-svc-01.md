@@ -4,7 +4,7 @@
 
 **Strength:** Default.
 
-**Guidance:** Keep a service with its Feature while ownership remains descriptive; place generic services in a shared location when justified.
+**Guidance:** Keep domain-specific services beside their Feature while that location describes their purpose, even when another Feature uses them. Move broadly applicable services to a shared location. Compose a shared dependency locally in AppModel.live() when common configuration or shared state warrants it, and inject it into its consumers.
 
 **Why:** Organizing code around capability makes it easier to find.
 
