@@ -153,6 +153,23 @@ test('locates possible work started by a SwiftUI initializer', async t => {
   assert.deepEqual(tasks.map(item => [item.file, item.line, item.severity]), [[viewPath, 4, 'review']]);
 });
 
+test('locates possible work started by the screen ViewModel initializer', async t => {
+  const modelFile = viewPath.replace('View.swift', 'ViewModel.swift');
+  const { report } = await inspectView(t, `struct HomeView: View {
+    @State private var viewModel = HomeViewModel()
+    var body: some View { Text("Home") }
+  }`, {
+    [modelFile]: `final class HomeViewModel {
+      init() {
+        Task { await load() }
+      }
+      func refresh() { Task { await load() } }
+    }`
+  });
+  const tasks = report.findings.filter(item => item.code === 'screen-initializer-task');
+  assert.deepEqual(tasks.map(item => [item.file, item.line]), [[modelFile, 3]]);
+});
+
 test('maps a conventionally located screen with qualified View conformance', async t => {
   const {report} = await inspectView(t, `struct HomeView: SwiftUI.View {
     @State private var viewModel = HomeViewModel()

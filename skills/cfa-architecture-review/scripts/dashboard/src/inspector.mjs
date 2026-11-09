@@ -85,7 +85,7 @@ function initializerParameterTypes(parameters) {
   return types;
 }
 
-function* viewInitializers(body) {
+function* typeInitializers(body) {
   for (const initializer of memberSignatures(body).matchAll(/(?<![.\w])init[?!]?\s*\(/g)) {
     const opening = initializer.index + initializer[0].length - 1;
     const closing = closingParenthesis(body, opening);
@@ -103,12 +103,16 @@ function* viewInitializers(body) {
   }
 }
 
+function inspectInitializerTask(name, initializer, source, start, file, findings) {
+  const task = initializer.initializerBody && /\bTask\s*(?:\.\s*(?:detached|init)\s*)?(?:\([^{}]*\)\s*)?\{/.exec(initializer.initializerBody);
+  if (task) {
+    findings.push(finding('screen-initializer-task', 'review', `${name}'s initializer contains a Task. Trace whether construction starts work or only defines a closure for later use.`, file, lineOf(source, start + initializer.bodyStart + task.index)));
+  }
+}
+
 function inspectScreenInputs(name, body, source, start, file, findings) {
-  for (const initializer of viewInitializers(body)) {
-    const task = initializer.initializerBody && /\bTask\s*(?:\.\s*(?:detached|init)\s*)?(?:\([^{}]*\)\s*)?\{/.exec(initializer.initializerBody);
-    if (task) {
-      findings.push(finding('screen-initializer-task', 'review', `${name}'s initializer contains a Task. Trace whether construction starts work or only defines a closure for later use.`, file, lineOf(source, start + initializer.bodyStart + task.index)));
-    }
+  for (const initializer of typeInitializers(body)) {
+    inspectInitializerTask(name, initializer, source, start, file, findings);
     if (initializer.injectedViewModel) {
       findings.push(finding('screen-initializer-inputs', 'warning', `${name} appears to accept a ViewModel; CFA screens construct their own.`, file, lineOf(source, start + initializer.index)));
     }
@@ -579,8 +583,12 @@ export async function inspect(project) {
     const viewModel = sources.get(viewModelFile);
     const viewModelDeclaration = viewModel && new RegExp(`\\bclass\\s+${viewModelName}\\b[^\\{]*\\{`).exec(viewModel);
     const viewModelBodyStart = viewModelDeclaration ? viewModelDeclaration.index + viewModelDeclaration[0].length : 0;
+    const viewModelBody = viewModelDeclaration ? braceBody(viewModel, viewModelBodyStart - 1) : '';
+    for (const initializer of typeInitializers(viewModelBody)) {
+      inspectInitializerTask(viewModelName, initializer, viewModel, viewModelBodyStart, viewModelFile, findings);
+    }
     const viewModelMembers = viewModelDeclaration
-      ? viewModel.slice(0, viewModelBodyStart).replace(/[^\n]/g, ' ') + memberSignatures(braceBody(viewModel, viewModelBodyStart - 1))
+      ? viewModel.slice(0, viewModelBodyStart).replace(/[^\n]/g, ' ') + memberSignatures(viewModelBody)
       : '';
     const testName = `${viewModelName}Tests.swift`;
     const testCandidates = [...paths].filter(file => path.posix.basename(file) === testName);
@@ -595,7 +603,7 @@ export async function inspect(project) {
       `@${stateTypePattern}\\s+private\\s+var\\s+([A-Za-z_]\\w*)\\s*:\\s*${viewModelTypePattern}\\b`, 'g'
     ))].map(match => ({ name: match[1], index: match.index }));
     const dependencies = [];
-    for (const { index, parameters, injectedViewModel, injectedAppModel, possibleModelDependency, initializerBody } of viewInitializers(body)) {
+    for (const { index, parameters, injectedViewModel, injectedAppModel, possibleModelDependency, initializerBody } of typeInitializers(body)) {
       if (!injectedViewModel && !injectedAppModel && !possibleModelDependency && parameters.trim() && viewModel) {
         findings.push(finding('screen-initializer-inputs', 'review', `${name} accepts initializer inputs. Check that a detail screen receives selected immutable data and constructs its own ViewModel. Check for injected Features, repositories and navigation actions owned by another screen.`, viewFile, lineOf(view, bodyOffset + index)));
       }
