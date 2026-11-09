@@ -212,6 +212,9 @@ from precedent use; do not reframe it as a completed partial migration.
   and return their own outcomes. Test failure/cancellation cleanup and a later
   retry using controlled dependencies, not sleeps; record exceptions explicitly.
 
+- For a shared refresh that should survive navigation, verify that it completes
+  and keeps its result when its only screen waiter leaves. Also verify that
+  cancelling one of several waiters leaves the other callers able to finish.
 - Trace every affected screen to its ViewModel and required AppModel Features.
   Do not require a distinct Feature per tab or screen. Require named tests for
   each actual Feature; test shared data across screens without duplicating owners.
