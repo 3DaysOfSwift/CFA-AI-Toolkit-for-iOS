@@ -342,9 +342,13 @@ do not claim that UI gating replaces server-side authorisation.
   the confirmed replacement. Separately, cancel an unsaved edit and verify
   that the draft is discarded and the stored and confirmed values are unchanged.
 - For optional download caches, verify refresh starts while restoration is
-  pending and returns fresh data while the cache write is pending. A failed
-  refresh preserves valid displayed data. A late restore or delayed write
-  must leave the newer snapshot intact.
+  pending, or when the cache is missing, incompatible or unreadable. Hold the
+  cache write pending and verify the Feature publishes fresh data and releases
+  its refresh callers. Force the cache write to fail and verify that retries
+  are bounded, the fresh data stays visible, the previous usable cache is
+  preserved and the app does not claim the fresh data is available offline.
+  A failed refresh preserves valid displayed data. A late restore or delayed
+  write must leave the newer snapshot intact.
 - For changes to the pending deep-link flow, verify that invalid opening
   requests leave the pending list and its stored snapshot intact. Force the initial save to fail
   and verify that the failure is reported and the request is never presented as
