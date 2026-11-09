@@ -42,7 +42,8 @@ described in [OBSERVATIONS.md](OBSERVATIONS.md).
 ```
 
 `findings` and `testQuality` are optional. Use `status: "problem"` for a confirmed
-finding in a whole-app Health Check. Each confirmed source problem, including
+finding in a whole-app Health Check. Each report criterion needs at least one
+structured evidence reference with a file and line range. Each confirmed source problem, including
 individual file or type issues, failed operation correctness or clarity checks,
 and timing-scenario problems, must share a source location with a visible problem
 criterion. CFA-only deviations stay separate from Swift Concurrency defects. The location check cannot establish that the prose describes

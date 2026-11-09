@@ -159,6 +159,10 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
     await fs.writeFile(reviewPath,JSON.stringify(review));
     await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/criterion needs source evidence/);
     await assert.rejects(fs.access(output));
+    review.presentation.criteria[0].evidence = 'App.swift:1 (source inspected)';
+    await fs.writeFile(reviewPath,JSON.stringify(review));
+    await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/criterion needs source evidence as file and line references/);
+    await assert.rejects(fs.access(output));
     review.presentation.criteria[0].evidence = [null];
     await fs.writeFile(reviewPath,JSON.stringify(review));
     await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/evidence must name a repository-relative file/);

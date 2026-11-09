@@ -212,9 +212,8 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
   const presentation = review.presentation;
   if (!presentation?.app || !presentation.summary || !presentation.verdict?.trim() || !presentation.conclusion || !Array.isArray(presentation.criteria) || !presentation.criteria.length) throw Error('Provide presentation app, summary, verdict, conclusion and criteria.');
   for (const criterion of presentation.criteria) {
-    const evidence = criterion?.evidence;
-    if (!Array.isArray(evidence) && (typeof evidence !== 'string' || !evidence.trim())) {
-      throw Error('Each whole-app presentation criterion needs source evidence.');
+    if (!Array.isArray(criterion?.evidence) || !criterion.evidence.length) {
+      throw Error('Each whole-app presentation criterion needs source evidence as file and line references.');
     }
   }
   const sourceProblems = [
@@ -225,7 +224,7 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
     ...operation.scenarios.filter(scenario => scenario.status === 'problem')
   ]);
   const visibleEvidence = presentation.criteria
-    .filter(criterion => criterion.status === 'problem' && Array.isArray(criterion.evidence))
+    .filter(criterion => criterion.status === 'problem')
     .flatMap(criterion => criterion.evidence);
   for (const problem of [...sourceProblems, ...operationProblems]) {
     const covered = problem.evidence.some(ref => visibleEvidence.some(visible =>
