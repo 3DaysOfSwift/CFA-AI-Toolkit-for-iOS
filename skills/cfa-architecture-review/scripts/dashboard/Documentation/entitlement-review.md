@@ -31,8 +31,10 @@ node scripts/dashboard/src/entitlement-audit.mjs --analysis /tmp/project-analysi
 ```
 
 Inspect every candidate and any indexed caller leads, verify the source revision,
-and trace the actual entry point and entitlement check. Check alternative
-callers and test locked and entitled outcomes. Matching source text is not a
+and trace the actual entry point and entitlement check. Review presentation
+separately: a screen can expose paid data or controls without making a call
+listed in the policy. Trace alternate screens and other callers, and test
+locked and entitled outcomes for both exposure and execution. Matching source text is not a
 resolved call, a verified guard, or proof of a violation; the compiler index is
 build-specific and its freshness is unverified. Aliases, external code,
 dynamic dispatch and omitted spellings can escape this scan. If the syntax

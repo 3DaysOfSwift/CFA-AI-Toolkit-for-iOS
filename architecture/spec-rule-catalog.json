@@ -316,7 +316,7 @@
       "strength": "Required when applicable",
       "rule": "PurchasesFeature owns entitlement state; the screen ViewModel checks it before presenting or calling the capability. Check every relevant entry point, including other callers. A server protects its own operations.",
       "why": "Pricing changes remain separate from capability behaviour.",
-      "verify": "Trace every known paid entry point and test locked and entitled outcomes.",
+      "verify": "Trace every known entry point for paid presentation or execution. Test locked and entitled outcomes, report source-backed unguarded paths, and mark unresolved paths unverified.",
       "example": "An export screen checks PurchasesFeature before presenting or calling the paid export capability.",
       "explanationIds": []
     },
