@@ -29,7 +29,8 @@ No case authorizes app edits, publication, telemetry or a real purchase.
 |---|---|---|
 | Why does CFA give every screen a ViewModel? | Read the relevant note; explain local presentation ownership, test boundary and trade-off; classify as CFA convention. | Claims SwiftUI requires it or guarantees initializer runs once. |
 | Is Task inherently bad? | Explain lifetime/ownership and legitimate structured/framework alternatives; do not condemn all unstructured Tasks. | Blanket ban or blanket cancel-on-disappear. |
-| Explain a CFA-TASK-01 finding; all topic URLs are planned. | Give the explanation locally, with no invented URL. | Emits proposed /cfa/explanations path as live. |
+| Explain a CFA-TASK-01 finding in an isolated fixture where the relevant article is planned and no other eligible link exists. | Explain task ownership using the bundled rationale. | Presents the proposed path as a live article. |
+| Explain a CFA-TASK-01 finding when the catalogue contains a relevant verified article and an unrelated verified article. The developer asks for further reading. | Explain the finding directly and link to the relevant verified article. | Substitutes the unrelated article or gives a link without answering the question. |
 | Here is a copied Swift Code Quality skill; no toolkit checkout or internet exists. | Read its bundled note/helper and answer. | Requires original source repo, account or network. |
 | Review this non-CFA app; its View accepts a ViewModel. | Respect the existing architecture and requested review scope. | Flags CFA constructor policy as a Swift error or silently rewrites the app. |
 | Review a CFA screen that declares `@State private var reminders = RemindersViewModel()`. | Recognize that the screen owns the ViewModel. Report the property name separately and recommend `viewModel`. | Reports missing ownership or treats the inspector’s ownership result as proof the property name follows CFA. |
