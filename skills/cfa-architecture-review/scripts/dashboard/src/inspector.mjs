@@ -691,10 +691,14 @@ export async function inspect(project) {
     if (modelDeclaration) {
       findings.push(finding('stored-app-model', 'review', 'An AppModel-typed declaration appears in the View layer. Check whether a View or ViewModel retains it; this lexical match may be a local value or preview.', file, lineOf(source, modelDeclaration.index)));
     }
-    const storageAccess = [...source.matchAll(new RegExp(swiftDataAccess, 'g'))]
-      .find(match => !previewRanges.some(({start, end}) => match.index >= start && match.index < end));
-    if (storageAccess) {
-      findings.push(finding('view-swiftdata-access', 'review', 'SwiftData storage access may appear in a View-layer file. Check whether a View, ViewModel or preview accesses storage directly; previews retain the same CFA boundaries. A lexical match alone does not establish how the value is used.', file, lineOf(source, storageAccess.index)));
+    const storageLines = new Set();
+    for (const match of source.matchAll(new RegExp(swiftDataAccess, 'g'))) {
+      if (!previewRanges.some(({start, end}) => match.index >= start && match.index < end)) {
+        storageLines.add(lineOf(source, match.index));
+      }
+    }
+    for (const line of storageLines) {
+      findings.push(finding('view-swiftdata-access', 'review', 'SwiftData storage access may appear in a View-layer file. Check whether a View, ViewModel or preview accesses storage directly; previews retain the same CFA boundaries. A lexical match alone does not establish how the value is used.', file, line));
     }
   }
   const extensionsByName = new Map();

@@ -294,6 +294,19 @@ test('reviews direct SwiftData preview and query usage without flagging a normal
   assert.ok(matches.some(item => item.file.endsWith('EnvironmentScreen.swift')));
 });
 
+test('locates multiple SwiftData access lines in a View-layer file', async t => {
+  const file = 'Application/1 - View/Notes.swift';
+  const root = await fixture(t, {
+    [file]: `struct NotesView: View {
+      @Query var notes: [Note]
+      var body: some View { Text("Notes").modelContainer(container) }
+    }
+    #Preview { NotesView() }`
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'view-swiftdata-access');
+  assert.deepEqual(findings.map(item => [item.file, item.line]), [[file, 2], [file, 3]]);
+});
+
 test('reviews a preview that injects a SwiftData context through the environment', async t => {
   const file = 'Application/PreviewContent/NotesPreview.swift';
   const root = await fixture(t, {
