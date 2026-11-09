@@ -193,7 +193,9 @@ review scope. A mock fetch can verify Feature recovery, while a real
 store-opening and navigation check is needed to establish the launch outcome.
 For file-backed storage, trace directory preparation at the configured store
 URL and follow failures to the affected screen. Check that retry keeps the
-same store and preserves existing files. Record controlled failure evidence
+same store and preserves existing files. Trace a fetch failure after a
+successful open separately. Verify that retry reuses the working store and
+that a failed refresh leaves previously loaded data visible. Record controlled failure evidence
 separately from the actual storage and navigation checks.
 
 For an event needed regardless of which screen is visible, apply the
