@@ -32,16 +32,19 @@ test('all inventoried canonical sections are associated or explicitly excluded',
   assert.ok(result.priorities.every(row => row.observedOccurrences === null));
 });
 
-test('canonical rule cards with explanation links resolve to a linked catalogue topic', () => {
+test('canonical rule cards and lookup agree on the primary explanation and published reading', () => {
   const catalogue = validate(read());
+  const cards = JSON.parse(fs.readFileSync(path.join(sourceRoot, 'spec-rule-catalog.json'), 'utf8'));
   const rules = path.join(sourceRoot, 'spec/rules');
   for (const file of fs.readdirSync(rules).filter(name => name.endsWith('.md'))) {
     const card = fs.readFileSync(path.join(rules, file), 'utf8');
-    const explanation = card.split('\n').find(line => line.startsWith('**Explanation:**'));
-    if (!explanation) continue;
     const [, rule] = /^# (CFA-SPEC-[A-Z]+-\d{2}):/.exec(card);
+    const { explanationIds = [] } = cards.rules.find(item => item.id === rule);
+    if (!explanationIds.length) continue;
     const result = lookup(catalogue, rule);
-    const expected = [...explanation.matchAll(/\((https:[^)]*)\)/g)].map(match => match[1]);
+    assert.ok(explanationIds.includes(result.id), rule + ': ' + result.id);
+    const reading = card.split('\n').filter(line => /^\*\*(Explanation|Related reading):\*\*/.test(line));
+    const expected = reading.flatMap(line => [...line.matchAll(/\((https:[^)]*)\)/g)].map(match => match[1]));
     for (const url of expected) {
       assert.ok(result.links.some(link => link.url === url), `${rule}: ${url}`);
     }
