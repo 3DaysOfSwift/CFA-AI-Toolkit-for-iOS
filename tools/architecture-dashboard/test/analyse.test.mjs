@@ -20,6 +20,11 @@ test('ordinary await creates no task; nested unstructured tasks stay distinct',(
   assert.equal(sites.filter(s=>s.kind==='async-let').length,1);
   assert.ok(sites.every(s=>!('parentTask' in s)));
 });
+test('finds task closures written as explicit operation arguments', () => {
+  const source = 'Task(operation: { refresh() })\nTask.detached(priority: .background, operation: { refresh() })';
+  assert.deepEqual(scanSource(source,'A.swift').sites.map(site => site.kind), ['task','detached']);
+});
+
 test('framework modifiers, detached work and group scopes have distinct kinds',()=>{
   const source='Task.detached { }\n.task(id: item) { }\n.refreshable { }\nwithThrowingTaskGroup(of: Int.self) { group in group.addTask { 1 } }';
   assert.deepEqual(scanSource(source,'A.swift').sites.map(s=>s.kind),['detached','view-task','refresh','group','group-child']);
