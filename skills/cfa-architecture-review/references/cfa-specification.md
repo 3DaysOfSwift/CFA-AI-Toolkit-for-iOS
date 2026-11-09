@@ -754,6 +754,9 @@ scenes receive the same event. Do not create a separate notification history
 or global UI router by default. Store only safe data needed to identify and
 present a request; handle expired or unavailable destinations clearly. Persist
 before claiming a request is safely kept, and handle storage failures honestly.
+If the saved list is unreadable, surface the error and preserve the file.
+Resume accepting durable requests once the saved list can be read or the
+product’s explicit recovery flow has resolved the failure.
 
 For this pending list, record notification actions received from the system,
 not notifications merely scheduled or delivered. iOS does not guarantee that
