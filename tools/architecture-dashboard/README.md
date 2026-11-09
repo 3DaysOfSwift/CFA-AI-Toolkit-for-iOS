@@ -34,6 +34,10 @@ fields `featureType` and `featureFile` distinguish a written type name from a
 located declaration. Scan one app directory at a time if the repository contains
 multiple AppModel files.
 
+The inspector checks ViewModel ownership separately from naming. A screen can
+own its ViewModel in private `@State` under another name and still receive a
+naming warning. CFA uses `viewModel` for the screen’s ViewModel property.
+
 Use the findings to verify source, target membership, and Xcode navigator
 placement. An intentional package boundary can explain a different physical
 location. A matching filename identifies a candidate test file. Placement and
