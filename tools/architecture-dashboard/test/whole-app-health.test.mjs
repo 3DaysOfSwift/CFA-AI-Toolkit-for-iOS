@@ -299,6 +299,7 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
     const problemHtml = await fs.readFile(problemsOutput,'utf8');
     assert.match(problemHtml,/Problems to address.*Confirmed issue.*Duplicate work on repeated action/s);
     assert.match(problemHtml,/Frankenstein architecture detected.*No architectural conflicts/);
+    assert.match(problemHtml, /When timing changes.*Timing defect.*Repeating the action starts duplicate work/s);
     checkProblem.presentation.criteria = timingProblem.presentation.criteria;
     checkProblem.operations[0].checks[0].problemKind = 'architectural-conflict';
     await fs.writeFile(reviewPath,JSON.stringify(checkProblem));

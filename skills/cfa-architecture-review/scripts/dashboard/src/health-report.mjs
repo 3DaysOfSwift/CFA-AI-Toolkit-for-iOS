@@ -71,7 +71,11 @@ export function renderHealthReport(data, iconData = '') {
       'local-defect': 'Local defect',
       'cfa-deviation': 'CFA deviation'
     };
-    const rows = items => items.map(item => `<div class="behaviour-row"><strong>${labels[item.status] || '?'} ${escape(item.title)}</strong>${problemLabels[item.problemKind] ? `<p>${problemLabels[item.problemKind]}</p>` : ''}<p>${escape(item.reason || item.outcome)}</p>${item.consequence ? `<p><strong>Consequence:</strong> ${escape(item.consequence)}</p>` : ''}<p class="evidence">${escape(item.verification)}</p>${sourceLinks(item.evidence)}</div>`).join('');
+    const rows = items => items.map(item => {
+      const classification = item.status === 'problem' ? 'Timing defect'
+        : item.status === 'fail' && Object.hasOwn(problemLabels, item.problemKind) ? problemLabels[item.problemKind] : '';
+      return `<div class="behaviour-row"><strong>${labels[item.status] || '?'} ${escape(item.title)}</strong>${classification ? `<p>${classification}</p>` : ''}<p>${escape(item.reason || item.outcome)}</p>${item.consequence ? `<p><strong>Consequence:</strong> ${escape(item.consequence)}</p>` : ''}<p class="evidence">${escape(item.verification)}</p>${sourceLinks(item.evidence)}</div>`;
+    }).join('');
     const behaviourChecks = checks.filter(check => check.dimension !== 'cfa');
     const cfaChecks = checks.filter(check => check.dimension === 'cfa');
     return `${behaviourChecks.length ? `<h3>Behaviour checks</h3>${rows(behaviourChecks)}` : ''}${cfaChecks.length ? `<h3>CFA alignment</h3>${rows(cfaChecks)}` : ''}${scenarios.length ? `<h3>When timing changes</h3>${rows(scenarios)}` : ''}`;
