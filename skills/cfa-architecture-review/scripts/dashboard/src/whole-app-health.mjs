@@ -48,6 +48,12 @@ function hasTaskTrace(operation, site) {
 const pendingTypeReviews = review => (review.typeReviews || [])
   .filter(item => item.status === 'investigate' || item.status === 'unassessed');
 
+function hasProductionTargets(review) {
+  const targets = review.productionTargets;
+  return Array.isArray(targets) && targets.length > 0 &&
+    targets.every(target => typeof target === 'string' && target.trim());
+}
+
 // Describe the next concrete review work without treating inventory as evidence.
 export function nextWork(report, review, limit = 8) {
   const entries = new Set((review.entryPoints || []).map(item => item.siteId));
@@ -92,7 +98,7 @@ export function nextWork(report, review, limit = 8) {
     nextEntryPoints: pendingEntries.slice(0, limit),
     nextTaskSites: pendingTasks.slice(0, limit),
     nextOperations: pendingOperations.slice(0, limit),
-    ...(review.targetInventoryVerified === true ? {} : {
+    ...(review.targetInventoryVerified === true && hasProductionTargets(review) ? {} : {
       targetReview: {
         buildDefinitionPaths: report.scope.buildDefinitionPaths ?? [],
         excludedTestDirectories: report.scope.excludedTestDirectories ?? [],
@@ -127,7 +133,7 @@ export function inventoryCandidates(report) {
 }
 export function coverageGaps(report, review) {
   const gaps = [];
-  if (!review.productionTargets?.length || review.productionTargets.some(t => typeof t !== 'string' || !t.trim())) gaps.push('Production targets and local packages have not been accounted for.');
+  if (!hasProductionTargets(review)) gaps.push('Production targets and local packages have not been accounted for.');
   if (review.targetInventoryVerified !== true) gaps.push('Production target membership and excluded sources need verification.');
   for (const {file, reason} of report.scope.skipped) {
     gaps.push(`Source file could not be scanned: ${file} (${reason}).`);

@@ -52,6 +52,12 @@ test('shows target-membership evidence to reconcile when resuming a review', () 
     excludedTestDirectories: ['AppTests'],
     symbolicLinkPaths: ['SharedSource']
   });
+  for (const productionTargets of [[], [' '], 'App']) {
+    const incomplete = {...complete(), productionTargets};
+    const work = nextWork(inventory, incomplete);
+    assert.deepEqual(work.targetReview, nextWork(inventory, pending).targetReview);
+    assert.match(work.gaps.join(' '), /Production targets and local packages/);
+  }
   assert.equal(nextWork(inventory, complete()).targetReview, undefined);
 });
 
