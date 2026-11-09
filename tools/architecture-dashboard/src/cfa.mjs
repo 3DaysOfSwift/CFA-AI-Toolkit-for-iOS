@@ -90,7 +90,8 @@ skill from that toolkit before changing the project.
   scene can open a shared pending request without changing another scene’s
   navigation. Deduplicate callbacks for the same opening event. Keep separate
   opening events distinct even when they point to the same destination.
-  Coordinate competing opens and dismissals for each pending request. Persist
+  Coordinate competing opens and dismissals by request identity. Keep other
+  requests available while one scene decides whether to navigate. Persist
   removal after actual navigation or explicit dismissal. Leave requests pending
   when navigation is declined, cancelled before it opens, or fails. Cancellation
   after navigation still counts as an open. If removal fails after navigation,

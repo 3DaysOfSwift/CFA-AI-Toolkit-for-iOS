@@ -1935,7 +1935,9 @@ Before accepting a change, answer every question:
     request across restart. Either scene can open it, and successful
     navigation or explicit dismissal removes it. A cancellation after
     navigation still counts as opened. Verify that competing scenes open the
-    destination once and that the other scene keeps its current destination.
+    same request only once and that the other scene keeps its current
+    destination. Hold one scene’s decision open and verify another scene can
+    open a different request while the first request stays pending.
     Replay the same opening event and verify it does not reopen the destination.
     A distinct event for the same destination remains available. If saving the
     removal fails after navigation, verify that the failure is surfaced and
