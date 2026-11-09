@@ -165,6 +165,10 @@ extension WeightLogFeature { var testSaveID: UUID? { lastSaveID } }
         precondition(a && !b && c && attempts == [80, -1, 80])
         precondition(feature.weights == [80, 80] && feature.saveFailure == nil)
         precondition(feature.testSaveID == nil)
+        let retried = await feature.save(82)
+        let attemptsAfterRetry = await storage.attempts
+        precondition(retried && attemptsAfterRetry == [80, -1, 80, 82])
+        precondition(feature.weights == [80, 80, 82] && feature.testSaveID == nil)
     }
 }`;
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfa-weight-order-'));
