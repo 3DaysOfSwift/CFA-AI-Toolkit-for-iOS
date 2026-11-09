@@ -192,7 +192,10 @@ Use deliberate passes:
    metadata. Simulate the server applying an edit but losing its reply, then
    retry with the original identity and verify one logical server change. Verify that
    pending edits survive failed sync and restart, and that local success remains
-   distinct from server confirmation. Preserve the existing sync contract.
+   distinct from server confirmation. Force a local write failure and verify
+   that the app reports no local success and makes no edit eligible for
+   upload. Preserve the existing conflict and rejection outcomes. For
+   Apple-managed sync, verify conflicting offline edits on supported devices.
 3. Convert that feature’s asynchronous model work into directly awaitable
    Swift Concurrency. ViewModels retain handles for the unstructured tasks
    they create by default. Equivalent repeated button actions return the same

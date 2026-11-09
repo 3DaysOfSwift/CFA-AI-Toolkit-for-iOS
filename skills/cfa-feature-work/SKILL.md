@@ -75,7 +75,8 @@ and duplicate-safe retries with the same edit identity. Include a lost reply
 after the server applies the edit and verify it is applied only once. Test the
 agreed conflict and rejection outcomes. When replacing the sync implementation, include a
 pending edit saved by the previous version. For Apple-managed sync, verify
-capability, account and schema behaviour on supported devices.
+capability, account and schema behaviour on supported devices. Exercise
+conflicting offline edits against the agreed resolution policy.
 
 For system background work in scope, apply the
 [background-work rule](references/spec/rules/cfa-bg-01.md). Keep registration

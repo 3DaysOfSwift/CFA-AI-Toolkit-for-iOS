@@ -80,7 +80,9 @@ according to the target capabilities and the product's data contract. Agree
 on what local success means, what requires server confirmation, and how
 conflicts or rejections appear to the user. For custom-server offline edits,
 save the edit and its pending-sync metadata together before reporting local
-success. Verify failed sync and restart. Simulate the server applying an edit
+success. Force a local write failure and verify that the app reports no local
+success and makes no edit eligible for upload. Verify failed sync and restart.
+Simulate the server applying an edit
 but losing its reply, then retry with the original identity and confirm one
 logical server change. For
 Apple-managed sync, verify the account, schema and conflicting offline
