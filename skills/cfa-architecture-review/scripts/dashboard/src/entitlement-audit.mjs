@@ -15,15 +15,21 @@ export function auditEntitlements(analysis, policy) {
   const calls = Array.isArray(analysis?.callCandidates) ? analysis.callCandidates : [];
   if (!Array.isArray(analysis?.callCandidates)) throw Error('Analysis does not contain callCandidates.');
   const indexed = analysis.compilerIndex?.status === 'available' ? analysis.compilerIndex.calls || [] : [];
-  function callers(id) {
-    if (!id) return [];
-    return indexed.filter(call => call.calleeID === id).map(call => ({caller:call.caller, file:call.file, line:call.line}));
+  function possibleCallers(matches) {
+    const enclosingIDs = new Set(matches.map(match => match.callerID).filter(Boolean));
+    const leads = new Map();
+    for (const call of indexed) {
+      if (!enclosingIDs.has(call.calleeID)) continue;
+      const lead = {caller:call.caller, file:call.file, line:call.line};
+      leads.set(JSON.stringify(lead), lead);
+    }
+    return [...leads.values()];
   }
   const capabilities = policy.capabilities.map(capability => {
     const matches = calls.filter(call => capability.writtenCalls.includes(call.written)).map(call => ({
       file:call.file, line:call.line, column:call.column, written:call.written,
       enclosingFunction:call.enclosingFunction || null,
-      possibleIndexedCallers:(call.possibleIndexMatches || []).flatMap(match => callers(match.callerID)),
+      possibleIndexedCallers:possibleCallers(call.possibleIndexMatches || []),
       status:'review-required'
     }));
     return {name:capability.name, writtenCalls:capability.writtenCalls, status:matches.length ? 'review-required' : 'no-matches-unverified', calls:matches};
