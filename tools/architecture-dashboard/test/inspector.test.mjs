@@ -906,6 +906,17 @@ test('reviews direct container construction in the AppModel factory at its sourc
   assert.deepEqual(storage.map(item => [item.severity, item.file, item.line]), [['review',file,3]]);
 });
 
+test('reviews storage construction in an AppModel factory extension', async t => {
+  const file = 'Application/AppModel+Live.swift';
+  const root = await fixture(t, {
+    'Application/AppModel.swift': 'final class AppModel {}',
+    [file]: 'extension AppModel {\n  static func live() -> AppModel {\n    _ = try ModelContainer(for: Note.self)\n    return AppModel()\n  }\n}'
+  });
+  const {findings} = await inspect(root);
+  const storage = findings.filter(item => item.code === 'app-model-storage-construction');
+  assert.deepEqual(storage.map(({file, line}) => [file, line]), [[file, 3]]);
+});
+
 test('reviews storage construction in a flat AppModel without treating placement as conventional', async t => {
   const file = 'Application/Composition.swift';
   const root = await fixture(t, {
