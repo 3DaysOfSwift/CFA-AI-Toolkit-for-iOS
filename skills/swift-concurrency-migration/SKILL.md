@@ -134,6 +134,13 @@ Use deliberate passes:
    visible. Keep screen-only observation scoped to the screen or its ViewModel.
    Features may start asynchronous work without making launch wait for disk or
    network completion. Do not move GCD syntax mechanically during this pass.
+   For existing background capabilities, apply the
+   [background-work rule](references/spec/rules/cfa-bg-01.md). Preserve the
+   system mechanism, permitted identifiers and scheduling behaviour. Trace
+   registration once during synchronous launch and route delivery to the owning
+   Feature. Verify cancellation on expiration and exactly-once system
+   completion for success, failure and a race with expiration. Record actual
+   delivery on a supported device separately from controlled handler tests.
    When migrating networking, apply the
    [independent request rule](references/spec/rules/cfa-net-01.md). Preserve
    intentional rate limits or ordering. For independent requests, verify that
