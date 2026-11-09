@@ -211,6 +211,12 @@ test('CFA App verifier rejects launch signals inside priority or detached tasks'
   fs.writeFileSync(app, original.replace(signal, `Task { if true { print("ready") }; ${signal} }`));
   const nested = spawnSync('node', [path.join(root, 'scripts/verify-xcode-template-structure.mjs'), copy], {encoding: 'utf8'});
   assert.notEqual(nested.status, 0, 'nested block before launch');
+  fs.writeFileSync(app, original.replace(signal, `Task { print("}"); ${signal} }`));
+  const braceInString = spawnSync('node', [path.join(root, 'scripts/verify-xcode-template-structure.mjs'), copy], {encoding: 'utf8'});
+  assert.notEqual(braceInString.status, 0, 'brace inside a string must not close the task');
+  fs.writeFileSync(app, original.replace(signal, `Task { print("AppModel.shared.applicationDidFinishLaunching()") }; ${signal}`));
+  const signalInString = spawnSync('node', [path.join(root, 'scripts/verify-xcode-template-structure.mjs'), copy], {encoding: 'utf8'});
+  assert.equal(signalInString.status, 0, signalInString.stderr);
   fs.writeFileSync(app, original.replace(signal, `Task { print("independent work") }; ${signal}`));
   const independent = spawnSync('node', [path.join(root, 'scripts/verify-xcode-template-structure.mjs'), copy], {encoding: 'utf8'});
   assert.equal(independent.status, 0, independent.stderr);

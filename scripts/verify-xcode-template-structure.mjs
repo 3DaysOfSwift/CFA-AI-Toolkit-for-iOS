@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { maskSwift } from '../tools/architecture-dashboard/src/analyse.mjs';
 
 const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 export const root = path.resolve(scriptDirectory, '..');
@@ -36,7 +37,8 @@ function checkEntry(info, templateDirectory, { id, sourcePath, group }) {
 }
 
 // This is a lexical check for the known template, not a Swift parser.
-function schedulesLaunch(source) {
+function schedulesLaunch(input) {
+  const source = maskSwift(input);
   const tasks = /\bTask\s*(?:<[^{}\n]*>\s*)?(?:\.\s*detached\s*)?(?:\([^{}]*\)\s*)?\{/g;
   for (const match of source.matchAll(tasks)) {
     const start = match.index + match[0].length;
