@@ -1811,5 +1811,16 @@ Before accepting a change, answer every question:
     requests cannot publish into a new session and that partial failures
     are reconciled against the actual session state.
 
+23. Does the application delegate call the AppModel launch method directly
+    and synchronously? Verify that it initiates startup once and that the root
+    stays available while storage or networking is pending or fails.
+24. For deep linking in scope, do URL opens and notification actions reach
+    the same routing capability while the receiving scene owns navigation?
+    Where the app uses CFA's pending-request design, verify that declining
+    navigation preserves the request across restart, either scene can open
+    it, and successful navigation or explicit dismissal removes it. During
+    migration, verify that existing notification and history capabilities
+    are preserved.
+
 Every applicable answer must be yes. Marking a question not applicable requires
 a short explanation. Otherwise, the change is not architecturally complete.
