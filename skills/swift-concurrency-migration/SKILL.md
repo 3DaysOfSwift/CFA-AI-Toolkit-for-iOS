@@ -85,6 +85,11 @@ Use deliberate passes:
    before and after migration, including routes that bypass the usual screen.
    Verify that locked users cannot reach paid presentation or execution and
    that entitled users retain access. Preserve existing server-side enforcement.
+   When migrating account-scoped work, apply the
+   [account lifecycle rule](references/spec/rules/cfa-account-01.md). Preserve
+   the existing cleanup and retention contract. Verify that a failed
+   sign-out before the session ends preserves account data, and exercise a
+   late result from the old session after a successful sign-out or switch.
 2. Move one complete feature at a time into CFA. Give each screen-level SwiftUI View a
    dedicated ViewModel; reusable presentation components do not automatically need
    one. Move testable feature decisions into its Feature,

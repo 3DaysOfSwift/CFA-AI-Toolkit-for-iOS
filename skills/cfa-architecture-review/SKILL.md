@@ -110,6 +110,15 @@ trace that path too. For screen-only observation, check the screen or
 ViewModel lifetime instead. Record which behaviour is supported by source
 and which was exercised by tests.
 
+When sign-out, account switching or session expiry is in scope, apply the
+[account lifecycle rule](references/spec/rules/cfa-account-01.md). Trace when
+the session actually ends, which Feature coordinates cleanup, and what each
+affected Feature clears or retains. Follow an old session's request across
+its suspension points to the final state update. Verify that cancellation
+and session checks prevent a late result from repopulating cleared state or
+appearing under a different account. Distinguish a sign-out failure that
+leaves the session intact from cleanup failure after the session has ended.
+
 For a dashboard or detailed concurrency analysis, read the [dashboard workflow](references/dashboard-workflow.md). The bundled tool is at `scripts/dashboard/src/cli.mjs` relative to this skill; it requires Node.js 20+. It inventories source patterns, not semantic correctness. Only use its concurrency dashboard when the selected scope contains Swift Concurrency. If the app uses only GCD, continue a manual ownership and concurrency review; mark the dashboard unavailable rather than refusing the review or inventing zero scores.
 
 A focused CFA review does not require an app-wide dashboard or numerical ratings. A requested full dashboard requires the complete source-evidence workflow. Do not infer testing evidence from source inspection or claim race freedom from a score.
