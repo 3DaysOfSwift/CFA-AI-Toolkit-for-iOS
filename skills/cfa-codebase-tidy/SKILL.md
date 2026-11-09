@@ -58,6 +58,13 @@ joins without a duplicate request and that cancelling one of several waiters
 leaves the others able to receive the result. Where a screen must exit
 promptly, verify its wait ends before the suspended refresh completes.
 
+When tidying app-wide observation, apply the
+[app-wide listener rule](references/spec/rules/cfa-app-02.md). Keep lifetime
+ownership in AppModel and event interpretation in the responsible Feature.
+Verify that repeated startup leaves one listener, delivery works without a
+relevant screen, and any supported replacement survives the old listener's
+cleanup.
+
 When tidying a cache for replaceable downloads, apply the
 [optional snapshot rule](references/spec/rules/cfa-cache-01.md), including its
 verification checklist. Confirm that refresh proceeds while restoration is

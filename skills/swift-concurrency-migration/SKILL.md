@@ -137,6 +137,12 @@ Use deliberate passes:
    any asynchronous listener handle, and forwards events to the Feature that
    owns the resulting state and behaviour. Preserve delivery when no screen is
    visible. Keep screen-only observation scoped to the screen or its ViewModel.
+   For changed listeners, apply the
+   [app-wide listener rule](references/spec/rules/cfa-app-02.md). Record the
+   original delivery behaviour and verify that repeated startup forwards a
+   controlled event once with no relevant screen mounted. If replacement is
+   supported, verify that the old listener stops forwarding and its cleanup
+   leaves the replacement running.
    Features may start asynchronous work without making launch wait for disk or
    network completion. Do not move GCD syntax mechanically during this pass.
    For existing background capabilities, apply the
