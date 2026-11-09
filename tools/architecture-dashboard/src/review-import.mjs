@@ -15,6 +15,7 @@ export async function importReview(report,input,root) {
     for(const item of items) {
       if(!item||!fields.every(k=>text(item[k]))) fail('missing review text');
       if(!Array.isArray(item.evidence)||!item.evidence.length) fail('source evidence required');
+      if (item.evidence.some(ref => !ref || !text(ref.file))) fail('evidence must name a repository-relative file');
       refs.push(...item.evidence);
     }
   };
@@ -159,7 +160,10 @@ export async function importReview(report,input,root) {
   for(const ref of refs) {
     if(!text(ref.file)||path.isAbsolute(ref.file)||ref.file.split(/[\\/]/).includes('..')) fail('evidence must stay inside repository');
     if(!cache.has(ref.file)) {
-      const real=await fs.realpath(path.join(base,ref.file));
+      const real=await fs.realpath(path.join(base,ref.file)).catch(error => {
+        if (error.code === 'ENOENT' || error.code === 'ENOTDIR') fail('evidence file not found: '+ref.file);
+        throw error;
+      });
       if(!real.startsWith(base+path.sep)) fail('evidence symlink escapes repository');
       const source=await fs.readFile(real,'utf8');
       const expected=hashes.get(ref.file)??review.evidenceHashes?.[ref.file];
@@ -167,7 +171,7 @@ export async function importReview(report,input,root) {
       cache.set(ref.file,source.split('\n'));
     }
     const lines=cache.get(ref.file);
-    if(!Number.isInteger(ref.line)||!Number.isInteger(ref.endLine)||ref.line<1||ref.endLine<ref.line||ref.endLine>lines.length) fail('invalid evidence lines');
+    if(!Number.isInteger(ref.line)||!Number.isInteger(ref.endLine)||ref.line<1||ref.endLine<ref.line||ref.endLine>lines.length) fail(`invalid evidence lines: ${ref.file}:${ref.line}–${ref.endLine}`);
     ref.excerpt=lines.slice(ref.line-1,ref.endLine).join('\n');
   }
   return review;
