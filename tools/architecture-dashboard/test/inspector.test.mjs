@@ -559,6 +559,29 @@ test('reviews synchronous launch reads without attributing Task work to the call
   assert.deepEqual(findings.map(item => [item.file, item.line, item.severity]), [[file, 3, 'review']]);
 });
 
+test('reviews direct synchronous reads in AppModel construction and startup', async t => {
+  const model = 'App/2 - AppModel/AppModel.swift';
+  const startup = 'App/2 - AppModel/AppModel+Startup.swift';
+  const root = await fixture(t, {
+    [model]: `final class AppModel {
+      init() { _ = try? Data(contentsOf: url) }
+      static func live() -> AppModel {
+        _ = try? Foundation.Data.init(contentsOf: url)
+        return AppModel()
+      }
+      func unrelated() { _ = try? Data(contentsOf: url) }
+    }`,
+    [startup]: `extension AppModel {
+      func applicationDidFinishLaunching() -> Void {
+        _ = try? String(contentsOf: url, encoding: .utf8)
+        Task { _ = try? Data(contentsOf: url) }
+      }
+    }`
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'blocking-app-launch-io');
+  assert.deepEqual(findings.map(item => [item.file, item.line]).sort(), [[startup, 3], [model, 2], [model, 4]]);
+});
+
 test('reviews a launch signal deferred through mutable local aliases', async t => {
   const file = 'Application/AppDelegate.swift';
   const root = await fixture(t, {
