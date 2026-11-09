@@ -139,6 +139,10 @@ test('reconciled task sites must be cited in a workflow step', () => {
     id:'second-load',parentId:'trigger',relation:'unstructured-task',taskSiteId:second.id,evidence
   });
   assert.deepEqual(coverageGaps(inventory,review), []);
+  review.operations[0].steps.push({
+    id:'stale-link',parentId:'trigger',relation:'unstructured-task',taskSiteId:'stale',evidence
+  });
+  assert.match(coverageGaps(inventory,review).join(' '), /launch\/stale-link must cite its reconciled task site/);
 });
 
 test('unknown operations and target membership cannot yield a pass score', () => {

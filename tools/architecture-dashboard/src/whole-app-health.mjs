@@ -37,15 +37,18 @@ const hasOpenChecks = operation => !operation.checks?.length ||
   Boolean(operation.unknowns?.length) ||
   Boolean(operation.steps?.some(step => step.relation === 'unknown'));
 
+function stepCitesTask(step, site) {
+  return step.relation !== 'event' && step.relation !== 'unknown' &&
+    step.evidence?.some(ref => ref.file === site.file && ref.line <= site.line && ref.endLine >= site.line);
+}
+
 function hasTaskTrace(operation, site, sites) {
   const sharesLine = sites.some(other =>
     other.id !== site.id && other.file === site.file && other.line === site.line
   );
   return operation?.steps?.some(step =>
-    step.relation !== 'event' && step.relation !== 'unknown' &&
-    (step.taskSiteId === undefined ? !sharesLine : step.taskSiteId === site.id) && step.evidence?.some(ref =>
-      ref.file === site.file && ref.line <= site.line && ref.endLine >= site.line
-    )
+    (step.taskSiteId === undefined ? !sharesLine : step.taskSiteId === site.id) &&
+    stepCitesTask(step, site)
   );
 }
 
@@ -216,6 +219,15 @@ export function coverageGaps(report, review) {
     }
     taskEntries.set(entry.siteId,entry);
   }
+  for (const operation of operations) {
+    for (const step of operation.steps || []) {
+      if (step.taskSiteId === undefined) continue;
+      const site = tasks.find(item => item.id === step.taskSiteId);
+      if (!site || taskEntries.get(site.id)?.operationId !== operation.id || !stepCitesTask(step, site)) {
+        gaps.push(`Workflow step ${operation.id}/${step.id} must cite its reconciled task site.`);
+      }
+    }
+  }
   if (untracedTasks.length) gaps.push(`Reconciled task sites need workflow steps: ${untracedTasks.join(', ')}.`);
   const missingTasks=tasks.filter(site=>!taskEntries.has(site.id));
   if (missingTasks.length) gaps.push(`${missingTasks.length} detected task sites still need reconciliation.`);
@@ -376,7 +388,9 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
   for (const [index, operation] of data.operations.entries()) {
     operation.steps = operation.steps.map(step => {
       const site = taskSites.get(step.taskSiteId);
-      if (!site || taskOwners.get(site.id) !== review.operations[index].id) return step;
+      if (!site || taskOwners.get(site.id) !== review.operations[index].id) {
+        return {...step, taskLocation: undefined};
+      }
       return {...step, taskLocation: `${site.file}:${site.line}:${site.column}`};
     });
   }
