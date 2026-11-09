@@ -34,6 +34,16 @@ test('maps a complete screen to AppModel, feature, collaborator and named tests'
   assert.match(renderInspection(report), /ChatViewModel → chatsFeature/);
 });
 
+test('reviews Feature placement outside the AppModel feature folders', async t => {
+  const featureFile = 'Packages/Feed/Sources/Features/Feed/FeedFeature.swift';
+  const root = await fixture(t, {
+    'App/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() }; let feedFeature: FeedFeature }',
+    [featureFile]: 'import Foundation\nfinal class FeedFeature {}'
+  });
+  const finding = (await inspect(root)).findings.find(item => item.code === 'feature-placement');
+  assert.deepEqual([finding?.file, finding?.line, finding?.severity], [featureFile, 2, 'review']);
+});
+
 test('reports a missing named feature test file', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() }; let settingsFeature: SettingsFeature }',

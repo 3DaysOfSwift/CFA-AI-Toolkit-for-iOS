@@ -95,7 +95,8 @@ export async function inspect(project) {
     }
   }
   for (const [name, property] of appProperties) {
-    const declarationFile = inventory.files.find(file => file.declarations.some(declaration => declaration.name === property.type))?.path;
+    const featureSource = inventory.files.find(file => file.declarations.some(declaration => declaration.name === property.type));
+    const declarationFile = featureSource?.path;
     const isFeature = featureTypeSuffix.test(property.type) || /(?:^|\/)Features\/[^/]+\//.test(declarationFile ?? '');
     if (!isFeature) continue;
     if (!featureTypeSuffix.test(property.type)) {
@@ -108,6 +109,12 @@ export async function inspect(project) {
       findings.push(finding('feature-property-name', 'warning', `${name} should use the same domain name as ${property.type}, ending in Feature${featureTypeSuffix.test(property.type) ? ` (${expected})` : ''}.`, appModelFile, property.line));
     }
     if (featureTypeSuffix.test(property.type) && !property.type.endsWith('API')) {
+      const declaration = featureSource?.declarations.find(item => item.name === property.type && item.type === 'class');
+      const featureFolder = path.posix.join(path.posix.dirname(appModelFile), 'Features');
+      const relative = declarationFile && path.posix.relative(featureFolder, declarationFile);
+      if (declaration && (relative.startsWith('../') || !relative.includes('/'))) {
+        findings.push(finding('feature-placement', 'review', `${property.type} is outside a named subfolder of ${featureFolder}. Verify the intended package and target placement before moving it.`, declarationFile, declaration.line));
+      }
       const testName = `${property.type}Tests.swift`;
       if (![...paths].some(file => file.split('/').includes('FeatureTests') && path.posix.basename(file) === testName)) {
         findings.push(finding('feature-tests-missing', 'review', `No ${testName} was found under FeatureTests in the scanned directory. Check the project root and test target before concluding the test is missing.`, appModelFile, property.line));
