@@ -228,6 +228,9 @@ test('installed Health Check rescans source, surfaces gaps and rejects stale rev
     const project=path.join(base,'app'); await fs.mkdir(project);
     await fs.writeFile(path.join(project,'App.swift'),'struct App {\r\n}\r\n');
     await fs.writeFile(path.join(project,'Value.swift'),'struct Value {}\n');
+    const buildSettings = path.join(project, 'App.xcconfig');
+    const initialSettings = 'SWIFT_VERSION = 6.0\n';
+    await fs.writeFile(buildSettings, initialSettings);
     const syntax=async()=>({status:'available',files:['App.swift','Value.swift'],items:[],warnings:[]});
     const inventory=await prepare(project,path.join(base,'inventory'),syntax);
     assert.match(await fs.readFile(path.join(base,'inventory','task-map.html'),'utf8'),/Task sites/);
@@ -387,8 +390,12 @@ test('installed Health Check rescans source, surfaces gaps and rejects stale rev
     assert.match(html,/The owner handles this case/);
     assert.match(html,/App\.swift:1–2/);
     assert.doesNotMatch(html,/What still needs checking/);
-    await fs.writeFile(path.join(project,'App.swift'),'struct Changed {}\n');
     const mustNotParse = async () => assert.fail('Stale evidence should be rejected before running SwiftSyntax');
+    await fs.appendFile(buildSettings, 'SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor\n');
+    await assert.rejects(next(project, reviewPath, mustNotParse), /fingerprint mismatch/);
+    await assert.rejects(finish(project, reviewPath, path.join(base, 'stale-settings.html'), undefined, mustNotParse), /fingerprint mismatch/);
+    await fs.writeFile(buildSettings, initialSettings);
+    await fs.writeFile(path.join(project,'App.swift'),'struct Changed {}\n');
     await assert.rejects(finish(project,reviewPath,path.join(base,'stale.html'),undefined,mustNotParse),/fingerprint mismatch/);
   } finally { await fs.rm(base,{recursive:true,force:true}); }
 });
