@@ -274,11 +274,13 @@ For an event needed regardless of which screen is visible, apply the
 [app-wide listener rule](references/spec/rules/cfa-app-02.md). Trace from
 the app lifecycle callback to AppModel's listener startup and retained
 task handle, then follow an event to the Feature that interprets it and
-owns the resulting state. Check repeated startup and delivery with no
-screen mounted. Where the listener supports cancellation or replacement,
-trace that path too. For screen-only observation, check the screen or
-ViewModel lifetime instead. Record which behaviour is supported by source
-and which was exercised by tests.
+owns the resulting state. After repeated startup signals, use a controlled
+event source to verify that one listener forwards each event with no relevant
+screen mounted. Where cancellation or replacement is supported, verify that
+the old listener stops forwarding and its cleanup leaves the replacement
+running. Check that isolated tests shut down their listeners. For screen-only
+observation, check the screen or ViewModel lifetime instead. Record which
+behaviour is supported by source and which was exercised by tests.
 
 When reviewing scheduled background work, apply the
 [background-work rule](references/spec/rules/cfa-bg-01.md). Check that each

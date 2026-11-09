@@ -121,12 +121,17 @@ results in the report, rather than presenting scanner counts as findings.
    and cancellation separately from the screen's current value. Where the
    contract requires it, send two equal-valued events and verify both are
    processed. A correct final value cannot establish that both arrived.
-   For an app-wide listener, trace startup, repeated startup signals, event
-   forwarding and cancellation or replacement. Check that required events
-   still reach the app with the relevant screen absent. In CFA, AppModel owns
-   the listener and forwards events to the responsible Feature, which interprets
-   them and owns the resulting state. Trace screen-only observation separately
-   against the screen's lifetime. For a stream backed by a registered observer,
+   For a CFA app-wide listener, apply the
+   [app-wide listener rule](spec/rules/cfa-app-02.md). Trace startup and the
+   retained task handle for asynchronous listeners. Drive a controlled event
+   source after repeated startup signals and verify that one listener forwards
+   each event with the relevant screen absent. The responsible Feature
+   interprets events and owns the resulting state. Where cancellation or
+   replacement is supported, check that the old listener stops forwarding
+   and its cleanup cannot stop the replacement. Verify that isolated tests
+   shut down their listeners during cleanup. Trace screen-only observation
+   separately against the screen's lifetime. For a stream backed by a
+   registered observer,
    trace who owns registration, who ends consumption, and how the producer
    removes the observer. Exercise events arriving during teardown and immediate
    resubscription. Check that an old registration cannot publish to the new
