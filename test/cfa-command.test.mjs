@@ -150,6 +150,8 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /use task identity to reject stale results and clear the handle only when\s+that identity still matches/);
   assert.match(content, /ViewModel\s+owns explicitly created screen tasks and retains their named handles/);
   assert.match(content, /even\s+if it was the only caller\. Later equivalent callers can join/);
+  assert.match(content, /Link baseline\s+and final-commit evidence for each in-scope behaviour/);
+  assert.match(content, /manual regression results with the tested build and environment/);
   assert.match(content, /remaining callers of legacy dependencies and record which adapters were\s+removed or retained to preserve behaviour or platform support/);
   assert.equal((content.match(/CFA Toolkit project guidance/g) ?? []).length, 1);
   assert.match(repeated.stdout, /already enabled/);

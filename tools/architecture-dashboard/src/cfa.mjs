@@ -380,7 +380,9 @@ skill from that toolkit before changing the project.
   the agreed CFA and Swift Concurrency migration and supported platforms.
   Fix confirmed defects within scope, protect the intended behaviour with
   tests, and record any necessary platform-driven differences. Compare the
-  migrated journeys and access to saved data with the baseline. Classify
+  migrated journeys and access to saved data with the baseline. Link baseline
+  and final-commit evidence for each in-scope behaviour. Record the required
+  manual regression results with the tested build and environment. Classify
   observed differences and resolve regressions or unexplained changes before
   calling the migration complete. Before handoff,
   trace remaining legacy and Swift Concurrency paths together. Identify
