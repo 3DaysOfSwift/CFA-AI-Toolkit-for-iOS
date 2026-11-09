@@ -19,7 +19,7 @@ export const migrationEvidenceFiles = [
   'examples/synthetic-serial-writes/record.json', 'examples/synthetic-serial-writes/case-study.md',
   'examples/synthetic-serial-writes/exercise-note.md'
 ];
-export function sync(base = root) {
+export function sync(base = root, { skipXcodeProjects = false } = {}) {
   const copy = (source,destination) => {
     const from=path.join(base,source), to=path.join(base,destination);
     fs.mkdirSync(path.dirname(to),{recursive:true});
@@ -46,7 +46,7 @@ export function sync(base = root) {
     for (const file of explanationFiles) copy(`architecture/explanations/${file}`, `skills/${name}/references/explanations/${file}`);
     copy('tools/explanations/explanations.mjs', `skills/${name}/scripts/explanations.mjs`);
   }
-  for (const name of iconSkills) {
+  for (const name of skipXcodeProjects ? [] : iconSkills) {
     for (const file of files(path.join(base, starterIcon))) {
       copy(`${starterIcon}/${file}`, `skills/${name}/assets/AppIcon.appiconset/${file}`);
     }
@@ -86,4 +86,13 @@ export function sync(base = root) {
     .replace('../tools/migration-evidence/README.md', '../scripts/evidence/README.md');
   fs.writeFileSync(path.join(base, 'skills/swift-concurrency-migration/references/migration-evidence.md'), captureGuide);
 }
-if(process.argv[1] && import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href) { sync(); console.log('Bundled skill dependencies synchronised.'); }
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  const args = process.argv.slice(2);
+  if (args.length > 1 || args.some(arg => arg !== '--skip-xcode-projects')) {
+    console.error('Usage: node scripts/sync.mjs [--skip-xcode-projects]');
+    process.exitCode = 1;
+  } else {
+    sync(root, { skipXcodeProjects: args.includes('--skip-xcode-projects') });
+    console.log('Bundled skill dependencies synchronised.');
+  }
+}

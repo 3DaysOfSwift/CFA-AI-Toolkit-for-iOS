@@ -9,7 +9,8 @@ The canonical specification is `architecture/cfa-specification.md`. Tool source 
 Run `npm run sync`, `npm run validate`, `npm run evals` and `npm test` before
 proposing a change.
 
-For an audit scoped to guidance, skills, examples and tooling, run
+For an audit scoped to guidance, skills, examples and tooling, regenerate copies
+with `node scripts/sync.mjs --skip-xcode-projects`, then run
 `node scripts/validate.mjs --skip-xcode-projects`. It checks source and bundled
 copies while skipping starter app and Xcode template checks. Use the full
 validation and test commands for release verification.
