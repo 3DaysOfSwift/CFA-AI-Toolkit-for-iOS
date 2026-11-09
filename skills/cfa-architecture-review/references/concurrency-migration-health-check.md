@@ -210,14 +210,17 @@ an unknown relationship. `Task {}` creates an unstructured task even inside
 another task; an `await` alone is not a new task. Include operations that never
 create a task. Describe unresolved dynamic dispatch and external boundaries;
 neither lexical nesting nor a scan proves a call graph or runtime execution.
-Link findings and accepted decisions to the affected operations where relevant.
+Each operation needs a source-backed trace before rendering. Cite assigned task
+sites both in the operation evidence and in the step that explains how the work
+runs. A task that also triggers the operation has an event step and an execution
+step. Link findings and accepted decisions to the affected operations.
 
 Partial reports are checkpoints. Continue through the remaining inventory while
 source and review actions are available. A demonstrated defect may establish a
 verdict early, but does not complete the rest of the app's review. Finish with one
-consolidated report covering the identified operations and explicit unresolved
-questions. If unavailable evidence prevents finishing, identify that blocker and
-label the assessment incomplete; never present a sample as a completed Health Check.
+consolidated report once the identified operations and workflow traces pass the
+completion checks. If unavailable evidence prevents finishing, keep the checkpoint
+for resumption and describe the specific blocker in the handoff.
 
 ## Keep the assessment on course
 

@@ -116,14 +116,15 @@ On macOS with Xcode, this also compiles a local SwiftSyntax inventory and writes
 `task-map.json` with source-located tasks and lexical nesting. It does not infer
 task ownership or runtime parentage. Parser failure and scope mismatches remain
 visible for investigation.
-Reconcile the current inventory against the production targets, files, types and
-operation entry points, then use `node src/whole-app-health.mjs report
+Reconcile the current inventory against the production targets, source files,
+operation entry points and task sites, then use `node src/whole-app-health.mjs report
 <project-root> <review.json> <new-report.html> [app-icon.png]`. The report is
 generated after the current source and review evidence pass the coverage
 checks. If coverage is unresolved, the command lists the remaining checks in
 the terminal. Use `next` to resume the review before generating the report.
-Its `nextOperations` list names reviewed operations that still have open checks
-or missing timing scenarios. Use the operation ID to find the entry in the
+Its `nextOperations` list identifies missing workflow traces, open checks and
+missing timing scenarios. The coverage gaps also identify task sites that still
+need a workflow step. Use the operation ID to find the entry in the
 working review, trace the outstanding behaviour, and update its evidence.
 Rerun `next` to confirm the gaps have cleared before rendering.
 The scanner cannot establish target membership or discover every event by itself.
@@ -132,8 +133,8 @@ The review's `presentation` requires `app`, `summary`, `verdict`, `conclusion`
 and a nonempty list of `criteria`. Use the verdict to describe the app’s
 concurrency design. Each criterion has a `title`, `detail`, `status` (`pass`,
 `concern` or `problem`) and source `evidence` ranges (an array of `{file, line, endLine}` objects). The
-importer checks ranges against the scanned source. Older reviews can still use
-non-empty evidence text, which requires manual verification. Include confirmed
+importer checks ranges against the scanned source. Convert free-text citations
+in older reviews to file and line ranges before rendering. Include confirmed
 operation, file and type problems among the report criteria. The renderer weights criteria
 equally (1, ½ or 0 respectively) to choose the assessment label. The score
 reaches 100% only when every reviewed criterion passes. Set `qualitativeOnly`
