@@ -4,7 +4,7 @@
 
 **Strength:** Required.
 
-**Guidance:** Expose current observable Feature state through a single owner. On supported deployment targets, use `@Observable` for ViewModels and UI-observed Features. Keep Combine where compatibility or publisher composition requires it. Use `@Bindable` only when a control needs a writable binding. A computed ViewModel property can expose Feature state by reading the observable stored value. Use a separate event API where consumers must process every event. Observation alone does not synchronize independent devices or processes.
+**Guidance:** Expose current observable Feature state through a single owner. On supported deployment targets, use `@Observable` for ViewModels and UI-observed Features. Keep Combine where compatibility or publisher composition requires it. Use `@Bindable` only when a control needs a writable binding. A computed ViewModel property can expose Feature state by reading the observable stored value. SwiftUI tracks the stored value read during evaluation, so manual forwarding is unnecessary. Expose a stored observable result when displaying the outcome of asynchronous work. Keep a separate event API where consumers must process every event, including repeated equal values. Observation alone does not synchronize independent devices or processes.
 
 **Why:** Views can update without creating competing domain state.
 
