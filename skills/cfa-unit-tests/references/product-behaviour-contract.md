@@ -28,6 +28,14 @@ production code:
 - reliable support or analytics evidence when it describes observable product
   behaviour.
 
+If the app has accounts, inventory sign-out, account switching and session
+expiry, including entry points outside the account screen. Record what the
+existing product clears or retains and which data belongs to the account.
+Exercise failed sign-out with the session intact, partial authentication
+changes where possible, and requests that finish after the account changes.
+Before removing an observer, verify that the replacement still covers each
+entry point and prevents old results from reaching the current account.
+
 Run the existing test suite and record which tests pass, fail, or cannot run in
 the baseline environment. A pre-existing failure is evidence to investigate,
 not permission to ignore the covered behaviour.
