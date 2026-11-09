@@ -21,7 +21,8 @@ export function assess(criteria) {
 function operationStatus(operation) {
   const checks = (operation.checks || []).filter(check => check.dimension !== 'cfa');
   const scenarios = operation.scenarios || [];
-  if (checks.some(check => check.status === 'fail') || scenarios.some(scenario => scenario.status === 'problem')) return 'problem';
+  if (operation.correctness === 'problem' || operation.clarity === 'problem' ||
+      checks.some(check => check.status === 'fail') || scenarios.some(scenario => scenario.status === 'problem')) return 'problem';
   if (!checks.some(check => check.status === 'pass') ||
       checks.some(check => ['unresolved', 'not-checked'].includes(check.status)) ||
       !operation.steps?.length || missingTimingScenarios(operation).length ||
@@ -32,10 +33,8 @@ function operationStatus(operation) {
 export function renderHealthReport(data, iconData = '') {
   if (!data.app || !data.summary || !data.verdict?.trim() || !data.scope || !data.conclusion) throw Error('Provide an app name, summary, substantive verdict, scope and conclusion.');
   const score = assess(data.criteria);
-  const hasOperationProblem = data.architecturalConflict === true || (data.operations || []).some(operation =>
-    operation.checks?.some(check => check.status === 'fail' && check.dimension !== 'cfa') ||
-    operation.scenarios?.some(scenario => scenario.status === 'problem')
-  );
+  const hasOperationProblem = data.architecturalConflict === true ||
+    (data.operations || []).some(operation => operationStatus(operation) === 'problem');
   if (hasOperationProblem && !data.criteria.some(criterion => criterion.status === 'problem')) {
     throw Error('Include confirmed operation problems in the report criteria before rendering.');
   }

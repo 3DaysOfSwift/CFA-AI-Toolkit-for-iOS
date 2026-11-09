@@ -103,6 +103,18 @@ test('requires a visible finding for confirmed operation problems', () => {
   assert.match(renderHealthReport(data), /Problems to address/);
 });
 
+test('preserves an operation-level defect even with unresolved evidence', () => {
+  const data = {
+    app:'App', summary:'Summary', verdict:'Needs attention', scope:'App', conclusion:'Conclusion',
+    criteria:[{title:'Ownership', detail:'Checked', status:'pass'}],
+    operations:[{title:'Save', correctness:'problem', clarity:'investigate',
+      checks:[{title:'Cancellation', dimension:'correctness', status:'unresolved'}]}]
+  };
+  assert.throws(() => renderHealthReport(data), /Include confirmed operation problems/);
+  data.criteria.push({title:'Duplicate save', detail:'Repeated calls can duplicate an edit.', status:'problem'});
+  assert.match(renderHealthReport(data), /aria-label="Problem">×<\/span>Save/);
+});
+
 test('withholds a stable workflow result until its trace and timing outcomes exist', () => {
   const operation = {title:'Save',checks:[{dimension:'correctness',status:'pass'}]};
   const data = {
