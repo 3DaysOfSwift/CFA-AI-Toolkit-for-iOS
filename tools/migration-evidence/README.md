@@ -89,8 +89,7 @@ Read the warnings from both `validate` and `digest`. For a failed run during
 or after migration, keep the failure record and link a passing rerun at the
 final commit for the same scenario, target, build configuration and OS.
 Set the passing evidence entry’s optional `rerunOf` to the failed evidence
-ID. When both entries list targets, the rerun must include every target
-listed by the failed check. Missing or differing environment descriptions
+ID. The rerun must name every target listed by the failed check. Missing or differing environment descriptions
 receive a review warning because the descriptions are free text. Explain how the rerun resolves the failure. Check that minimum-OS evidence
 lists every affected target. Navigator and human architecture reviews can
 cover the whole project without a target list. When they name targets, the

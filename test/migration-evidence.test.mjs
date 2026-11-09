@@ -325,6 +325,11 @@ test('completion is not inferred from a build pass or tests at a different commi
   assert.ok(inspectRecord(f.file).errors.some(error => error.includes('after-behaviour-regression.rerunOf')));
   rerun.rerunOf = failedRegression.id;
   failedRegression.targets = ['Widget'];
+  delete rerun.targets;
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.includes(
+    'evidence.after-behaviour-regression.rerunOf: rerun omits targets from failed-regression: Widget.'
+  ));
   rerun.targets = ['App'];
   f.write();
   assert.ok(inspectRecord(f.file).errors.includes(

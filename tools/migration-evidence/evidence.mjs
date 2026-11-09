@@ -123,8 +123,9 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
       errors.push(`evidence.${item.id}.rerunOf: link an earlier failed check of the same kind from a passing rerun.`);
       continue;
     }
-    if (failed.targets?.length && item.targets?.length) {
-      const missing = failed.targets.filter(target => !item.targets.includes(target));
+    if (failed.targets?.length) {
+      const rerunTargets = new Set(item.targets ?? []);
+      const missing = failed.targets.filter(target => !rerunTargets.has(target));
       if (missing.length) {
         errors.push(`evidence.${item.id}.rerunOf: rerun omits targets from ${failed.id}: ${missing.join(', ')}.`);
       }
