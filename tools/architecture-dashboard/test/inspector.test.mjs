@@ -1179,6 +1179,18 @@ test('reviews matching ViewModel tests in production source trees', async t => {
   assert.ok(placement.every(item => item.severity === 'review' && /unit-test target/.test(item.message)));
 });
 
+test('reviews a Feature test file containing only comments', async t => {
+  const file = 'AppTests/FeatureTests/LaunchFeatureTests.swift';
+  const root = await fixture(t, {
+    'App/2 - AppModel/Features/Launch/LaunchFeature.swift': 'final class LaunchFeature {}',
+    [file]: '// LaunchFeatureTests are still to be written'
+  });
+  const {findings} = await inspect(root);
+  const empty = findings.find(item => item.code === 'feature-test-source-empty');
+  assert.deepEqual([empty?.file, empty?.line, empty?.severity], [file, 1, 'review']);
+  assert.ok(!findings.some(item => item.code === 'feature-tests-missing'));
+});
+
 test('reviews a single test filename that matches competing Feature declarations', async t => {
   const root = await fixture(t, {
     'App/2 - AppModel/Features/Launch/LaunchFeature.swift': 'final class LaunchFeature {}',
