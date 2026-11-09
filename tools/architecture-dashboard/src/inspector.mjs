@@ -580,6 +580,7 @@ export async function inspect(project) {
   for (const [file, source] of sources) {
     const isViewFile = /(?:^|\/)1 - View\//.test(file);
     const previewRanges = [];
+    const reviewedAppModelDeclarations = new Set();
     for (const preview of source.matchAll(/(?:#Preview\b\s*(?:\([^{}]*?\)\s*)?|\b(?:struct|enum|class|extension)\s+\w+\s*:[^{}]*?\bPreviewProvider\b[^{}]*)\{/g)) {
       const start = preview.index + preview[0].length;
       const previewBody = braceBody(source, start - 1);
@@ -600,6 +601,7 @@ export async function inspect(project) {
       const modelProperty = /\b(?:let|var)\s+`?\w+`?\s*:\s*(?:any\s+)?(?:\w+\s*\.\s*)*(\w*(?:Feature(?:API)?|Repository|NetworkingManager|SwiftDataManager)|AppModel)\b(?!\s*\.)(?:[ \t]*[?!])?/g;
       for (const match of members.matchAll(modelProperty)) {
         if (hasComputedAccessor(body.slice(match.index + match[0].length))) continue;
+        if (match[1] === 'AppModel') reviewedAppModelDeclarations.add(start + match.index);
         const code = featureTypeSuffix.test(match[1]) ? 'view-stored-feature' : 'view-stored-model-dependency';
         findings.push(finding(code, 'review', `${view[1]} appears to store ${match[1]} directly. Verify that Feature access goes through the screen-owned ViewModel.`, file, lineOf(source, start + match.index)));
       }
@@ -694,7 +696,8 @@ export async function inspect(project) {
       }
     }
     inspectLifecycleClosures(source, file, findings);
-    const modelDeclaration = /\b(?:let|var)\s+\w+\s*:\s*(?:\w+\s*\.\s*)*AppModel\b(?!\s*\.)/.exec(source);
+    const modelDeclaration = [...source.matchAll(/\b(?:let|var)\s+\w+\s*:\s*(?:\w+\s*\.\s*)*AppModel\b(?!\s*\.)/g)]
+      .find(match => !reviewedAppModelDeclarations.has(match.index));
     if (modelDeclaration) {
       findings.push(finding('stored-app-model', 'review', 'An AppModel-typed declaration appears in the View layer. Check whether a View or ViewModel retains it; this lexical match may be a local value or preview.', file, lineOf(source, modelDeclaration.index)));
     }

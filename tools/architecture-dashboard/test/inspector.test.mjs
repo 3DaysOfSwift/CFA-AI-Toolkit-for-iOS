@@ -269,6 +269,25 @@ test('local and preview storage references are not asserted to be production vio
   assert.match(findings.find(item => item.code === 'view-swiftdata-access').message, /previews retain the same CFA boundaries/);
 });
 
+test('reports a stored AppModel once and retains a separate local declaration lead', async t => {
+  const file = 'Application/1 - View/Detail.swift';
+  const root = await fixture(t, {
+    [file]: `struct Detail: View {
+      let model: AppModel
+      var body: some View {
+        let local: AppModel = model
+        return Text("Detail")
+      }
+    }`
+  });
+  const findings = (await inspect(root)).findings.filter(item =>
+    item.code === 'stored-app-model' || item.code === 'view-stored-model-dependency');
+  assert.deepEqual(findings.map(item => [item.code, item.line]), [
+    ['view-stored-model-dependency', 2],
+    ['stored-app-model', 4]
+  ]);
+});
+
 test('reviews direct SwiftData preview and query usage without flagging a normal preview', async t => {
   const root = await fixture(t, {
     'Application/1 - View/PreviewSupport.swift': 'import SwiftUI\n#Preview { NotesView().`modelContainer`(container) }',
