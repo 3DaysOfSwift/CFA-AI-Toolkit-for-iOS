@@ -110,6 +110,13 @@ storage service and confirm production target membership. Apply the
 access and the [persistence rules](references/spec/topics/19-keep-persistence-behind-repository-contracts.md)
 to SwiftData access. A manager declaration identifies a candidate boundary.
 Confirm that the relevant requests actually go through it.
+For SwiftData, trace the context and managed records through the storage
+owner, including the repository's returned values and nested contents.
+Verify that Features receive immutable Sendable domain values. For non-trivial
+production work, identify the dedicated `@ModelActor` and trace context
+creation and expensive operations. A deliberately UI-owned context still
+keeps its records inside the storage boundary and requires evidence that its
+work stays short.
 
 Apply the [Feature isolation rule](references/spec/rules/cfa-conc-01.md)
 even when a Feature has no current screen. Check its effective MainActor
