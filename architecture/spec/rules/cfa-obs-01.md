@@ -10,6 +10,6 @@
 
 **Example:** A screen reads its ViewModel's computed property, which reads observable Feature state; the screen updates when that state changes.
 
-**Verify:** Trace the observed property from its Feature owner to the displayed View. When migrating event consumers, verify delivery of repeated values, ordering and cancellation separately from UI state updates.
+**Verify:** Trace the observed property from its Feature owner to the displayed View. When migrating event consumers, verify delivery of repeated values, ordering and cancellation separately from UI state updates. If the existing contract specifies buffering, verify what reaches a slow consumer.
 
 **Full rule, context and examples:** [Use Observation Deliberately](../topics/23-use-observation-deliberately.md). This card is a reading aid; apply the complete canonical section.

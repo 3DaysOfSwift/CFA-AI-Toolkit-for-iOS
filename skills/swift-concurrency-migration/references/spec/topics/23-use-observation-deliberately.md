@@ -21,6 +21,7 @@ when it represents completed asynchronous work.
 Use Observation to present current state. During migration, identify consumers
 that must process each event, including repeated events with the same value.
 Preserve their delivery, ordering and cancellation contract through an event
-API suited to those consumers. Verify that contract separately from the UI
-reading the latest observable value.
+API suited to those consumers. If the existing contract specifies buffering,
+verify what reaches a slow consumer. Check the event contract separately
+from the UI reading the latest observable value.
 
