@@ -423,7 +423,7 @@
       "strength": "Required",
       "rule": "Keep ViewModels owned by their screens and out of AppModel.",
       "why": "AppModel exposes model capabilities without owning UI state.",
-      "example": "Each screen creates a ViewModel that accesses the required concrete Features.",
+      "example": "Each screen-level SwiftUI View creates its own ViewModel, which accesses the required concrete Features.",
       "verify": "Inspect AppModel properties and the ViewModel ownership tree.",
       "explanationIds": [
         "view-model-ownership",

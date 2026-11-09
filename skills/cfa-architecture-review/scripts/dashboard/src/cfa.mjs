@@ -32,9 +32,10 @@ product is CFA AI Toolkit for iOS. Match each request to the relevant installed
 skill from that toolkit before changing the project.
 
 - Preserve the CFA call path: View → ViewModel → Feature → Microservices (such as providers, storage or device API adapters).
-- Every screen owns a dedicated ViewModel. Declare it as @State private var
-  viewModel and construct it inline by default. Keep View and ViewModel
-  initializers free of work-starting side effects.
+- Every screen-level SwiftUI View owns a dedicated ViewModel. Declare it as
+  @State private var viewModel and construct it inline by default. Keep View
+  and ViewModel initializers free of work-starting side effects. For existing UIKit screens
+  in a migration, map the actual presentation owner to its Features and tests.
 - A concrete feature owner uses the
   Feature suffix; its AppModel property, ViewModel dependency and initializer
   label use the matching lower-camel-case Feature name. Use concrete features

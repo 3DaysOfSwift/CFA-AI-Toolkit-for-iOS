@@ -1742,9 +1742,11 @@ Reject or refactor the following during review:
 Before accepting a change, answer every question:
 
 1. Can the folder location alone explain which layer owns every new type?
-2. Does every unique screen have its own adjacent ViewModel?
-3. Does each screen retain its own ViewModel in a private `@State` property
-   named `viewModel`, with state scoped to that screen’s SwiftUI identity?
+2. Does every screen-level SwiftUI View have its own adjacent ViewModel? For
+   existing UIKit screens in a migration, have you mapped their actual
+   presentation owners to their Features and tests?
+3. Does each screen-level SwiftUI View retain its ViewModel in a private
+   `@State` property named `viewModel`, with state scoped to its SwiftUI identity?
 4. Can every View be created without receiving a ViewModel, AppModel, Feature,
    or repository, and do screen Views avoid receiving another screen’s actions?
    Reusable presentation components may receive action closures.

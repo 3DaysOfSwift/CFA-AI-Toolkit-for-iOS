@@ -8,7 +8,7 @@
 
 **Why:** AppModel exposes model capabilities without owning UI state.
 
-**Example:** Each screen creates a ViewModel that accesses the required concrete Features.
+**Example:** Each screen-level SwiftUI View creates its own ViewModel, which accesses the required concrete Features.
 
 **Explanation:** [Why use screen-owned ViewModels in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/view-model-ownership) · [Why use AppModel in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/appmodel-composition).
 
