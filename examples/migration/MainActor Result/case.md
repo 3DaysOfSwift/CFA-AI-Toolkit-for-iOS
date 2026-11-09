@@ -15,10 +15,11 @@ The Feature awaits its provider and publishes observable state on MainActor. In 
 outcome is processed in admission order. Each caller receives its own success
 or failure after the Feature publishes it.
 
-For an app refresh where launch and several screens can use the same response,
-share the Feature-owned in-flight request. Apply the
-CFA overlapping-call rule (`CFA-SPEC-TASK-01`) to
-choose the policy from what each caller needs.
+Apply the CFA overlapping-call rule (`CFA-SPEC-TASK-01`) to choose the
+policy from what each caller needs. Share one Feature-owned request when
+launch and several screens can use the same response. Let independent
+requests progress in parallel. Queue commands only when each must take effect
+in order, as this fixture requires for its simulated publications.
 
 ## Run and verify
 

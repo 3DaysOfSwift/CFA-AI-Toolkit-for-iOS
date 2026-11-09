@@ -24,7 +24,7 @@ final class LaunchFeature {
     private(set) var errorMessage: String?
     init(provider: LaunchProvider) { self.provider = provider }
 
-    // Requests may have different inputs, so each is processed in order.
+    // The fixture publishes every simulated outcome in admission order.
     func refresh(available: Bool) async -> Bool {
         let previous = refreshTask
         let id = UUID()
