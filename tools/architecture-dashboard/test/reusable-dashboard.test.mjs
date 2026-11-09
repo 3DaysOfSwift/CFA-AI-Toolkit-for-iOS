@@ -81,6 +81,17 @@ test('generic CLI imports reviewed ratings and test results without an example g
    assert.match(read.testQuality.scenarios[0].evidence[0].excerpt,/#expect/);
    const tampered=structuredClone(input);tampered.testQuality.scenarios[0].evidence[0].file='../outside.swift';
    await assert.rejects(importReview(report,tampered,app),/inside repository/);
+   const sibling = path.join(root, 'Sample-sibling');
+   await fs.mkdir(sibling);
+   const outside = path.join(sibling, 'FeatureTests.swift');
+   await fs.writeFile(outside, assertion);
+   const linkedFile = 'Tests/LinkedFeatureTests.swift';
+   await fs.symlink(outside, path.join(app, linkedFile), 'file');
+   const linked = structuredClone(input);
+   linked.testQuality.scenarios[0].evidence[0].file = linkedFile;
+   linked.evidenceHashes[linkedFile] = input.evidenceHashes[ref.file];
+   await assert.rejects(importReview(report,linked,app),/evidence symlink escapes repository/);
+   await fs.unlink(path.join(app, linkedFile));
    await assert.rejects(importReview(report,{...input,sourceFingerprint:'wrong'},app),/fingerprint/);
    const duplicate=structuredClone(input);duplicate.testQuality.scenarios.push(duplicate.testQuality.scenarios[0]);
    await assert.rejects(importReview(report,duplicate,app),/duplicate/);
