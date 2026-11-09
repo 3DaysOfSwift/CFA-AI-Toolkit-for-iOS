@@ -27,7 +27,12 @@ Preserve an existing product's approved interaction contract during maintenance.
 
 ## Verification
 
-Test rapid edits, invalid intermediate input, failed persistence and retry. Verify the latest edit survives and that controls remain usable with larger text. Test behaviour, not just the absence of a Save label.
+Test rapid edits, invalid intermediate input, failed persistence and retry.
+On a failed durable save, verify that the editor retains the draft and that
+the Feature and store retain the last confirmed value. A successful retry
+publishes the replacement. Cancelling an unsaved edit discards the draft
+while leaving the confirmed value intact. Check that the latest valid inline
+edit survives and that controls remain usable with larger text.
 
 ## Evidence and provenance
 
