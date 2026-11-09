@@ -46,7 +46,12 @@ Before accepting a change, answer every question:
 16. Does each piece of shared state have one authoritative owner and mutate only
     through named feature commands?
 17. Can every meaningful Task lifetime—durable, replaceable, presentational, or
-    long-lived—be explained and managed appropriately?
+    long-lived—be explained and managed appropriately? For a shared refresh
+    that should survive navigation, verify that it completes and retains its
+    result when its only screen waiter leaves. Verify that cancelling one of
+    several waiters leaves the others able to receive the result. If the
+    screen requires a prompt exit, verify that its wait ends before the
+    shared refresh completes.
 18. Is expensive work kept away from the Main Actor while observable results
     return to it safely?
 19. Are failures, partial loading, offline persistence, and retry behaviour
