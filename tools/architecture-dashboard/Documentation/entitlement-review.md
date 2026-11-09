@@ -37,10 +37,14 @@ node src/entitlement-audit.mjs --analysis /tmp/project-analysis.json --policy /t
 Inspect every candidate and any indexed caller leads, verify the source revision,
 and trace the actual entry point and entitlement check. Review presentation
 separately: a screen can expose paid data or controls without making a call
-listed in the policy. Trace alternate screens and other callers. Check that the
+listed in the policy. Trace alternate screens and other callers, including
+deep links, notification actions, and additional targets when they reach the
+capability. Check that the
 ViewModel reads current entitlement from `PurchasesFeature` before presenting
 or invoking the paid capability. Exercise locked and entitled outcomes for both
-exposure and execution on the relevant routes. For a confirmed unguarded path,
+exposure and execution on the relevant routes. Keep pricing and entitlement
+checks outside the capability Feature so its behaviour can be reused when the
+pricing policy changes. For a confirmed unguarded path,
 cite the entry point and the paid call or exposure and describe the consequence.
 Matching source text alone does not resolve the call or establish a guard or
 violation. Syntax and index records are matched by source line. If several calls occur on

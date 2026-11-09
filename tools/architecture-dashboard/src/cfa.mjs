@@ -113,8 +113,10 @@ skill from that toolkit before changing the project.
   failure and cancellation affect queued work and when to clear task handles.
 - PurchasesFeature owns entitlement state. Screen ViewModels check access before
   presenting or calling a paid capability. Trace every other entry point to its
-  own guard and verify both locked and entitled outcomes. Server operations
-  enforce their own access policy.
+  own guard and verify both locked and entitled outcomes. Keep pricing and
+  entitlement checks out of the capability Feature so the product can change
+  which capabilities it charges for. Protected server operations enforce their
+  own access policy.
 - Publish durable user edits as saved only after required persistence succeeds.
 - Start remote refresh and optional cache restoration independently when both
   are needed. Publish current server data without waiting for the cache write.
