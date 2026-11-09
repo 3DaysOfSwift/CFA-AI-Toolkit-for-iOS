@@ -16,10 +16,12 @@ mode questions. Defaults are not described as compulsory for all CFA apps.
 ## 2. New product, later iteration
 
 Prompt: “Add an extra-practice screen.”
-Context: Existing new-product project; the user previously chose two themes
-and removed the CFA footer.
-Expected: Reuse the app and approved design. Add the requested feature without
-restoring seven themes or the footer. Existing files do not trigger a mode switch.
+Context: Existing new-product project with a PracticeFeature that already
+provides the required capability. The user previously chose two themes and
+removed the CFA footer.
+Expected: Add the requested screen with its own ViewModel using the existing
+PracticeFeature. Preserve the approved design, including the two themes and
+absence of the footer. Existing files do not trigger a mode switch.
 
 ## 3. Office app tidy-up
 
