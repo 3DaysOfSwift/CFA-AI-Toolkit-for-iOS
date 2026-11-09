@@ -33,7 +33,7 @@
       "section": "Maintain an Absolute UI and Model Boundary",
       "applies": "Creating or changing UI",
       "strength": "Required",
-      "rule": "Views render and forward intent; Features own domain decisions and authoritative state.",
+      "rule": "Views render and forward intent. A reusable presentation component may receive an action closure that forwards intent to its owning screen and ViewModel. Features own domain decisions and authoritative state.",
       "why": "A different device can reuse the same business capability.",
       "verify": "Trace validation, calculations and persistence from the screen to their model owner.",
       "example": "A weight screen forwards Save to its ViewModel, which calls the Feature. The Feature validates the value and saves it through its storage service.",

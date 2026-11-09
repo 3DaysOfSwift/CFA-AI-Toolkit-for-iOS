@@ -4,7 +4,7 @@
 
 **Strength:** Required.
 
-**Guidance:** Views render and forward intent; Features own domain decisions and authoritative state.
+**Guidance:** Views render and forward intent. A reusable presentation component may receive an action closure that forwards intent to its owning screen and ViewModel. Features own domain decisions and authoritative state.
 
 **Why:** A different device can reuse the same business capability.
 
