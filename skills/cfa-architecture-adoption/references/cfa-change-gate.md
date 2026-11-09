@@ -33,10 +33,12 @@ the architecture:
 3. Preserve independent screen and scene selection in presentation, not shared
    Features. Selected detail data may be passed into the View.
    When a new app supports deep links or notification actions, its
-   DeepLinkingFeature records received opening requests and retains deferred
-   destinations; scheduling or delivery alone does not add one. The receiving
-   scene owns navigation. Remove a pending request after successful navigation
-   or explicit dismissal, and preserve existing history during migration.
+   DeepLinkingFeature records received opening requests. Persist safe pending
+   requests before confirming they are kept. Scheduling and delivery alone do
+   not add an item. The receiving scene owns navigation, and concurrent attempts
+   must not open the same request twice. Remove it after successful navigation
+   or explicit dismissal. During migration, preserve existing deep-link,
+   notification and history capabilities.
 4. When the app uses `ThemeManager`, it is a presentation dependency supplied through the
    SwiftUI environment. AppModel and features are not environment
    values.
