@@ -15,7 +15,10 @@ ViewModel duplicate protection cannot cover another screen or Feature calling th
 
 ## Documented rationale
 
-The specification places overlap policy at the shared capability boundary and distinguishes equivalence from queue admission. Each caller must receive the outcome of the work it requested.
+The specification places overlap policy at the shared capability boundary and distinguishes equivalence from queue admission. Each caller that continues waiting receives the outcome of the work it
+requested. By default, a Feature-owned refresh continues when the last
+screen stops waiting. The Feature can retain a successful result or let a
+later equivalent caller join the in-flight request.
 
 ## Trade-offs and alternatives
 
@@ -33,7 +36,11 @@ finishes, and that both callers receive their own outcomes even if the first
 fails. The bundled Serial Weight Saves migration example exercises this policy.
 For equivalent requests, hold one provider call open while another caller joins.
 Verify that the provider runs once and both callers can receive its outcome.
-Check that cancellation of one waiter leaves shared work available to the others.
+Cancel one waiter and verify another can still finish. In a separate run,
+cancel the only screen waiter and verify that the Feature still retains the
+result. If the screen must stop waiting promptly, cancel its wait while the
+refresh is suspended and verify that the screen returns before the refresh
+completes.
 
 ## Evidence and provenance
 
