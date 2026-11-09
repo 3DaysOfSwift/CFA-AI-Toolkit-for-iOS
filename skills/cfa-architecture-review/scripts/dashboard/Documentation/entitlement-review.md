@@ -37,9 +37,13 @@ node src/entitlement-audit.mjs --analysis /tmp/project-analysis.json --policy /t
 Inspect every candidate and any indexed caller leads, verify the source revision,
 and trace the actual entry point and entitlement check. Review presentation
 separately: a screen can expose paid data or controls without making a call
-listed in the policy. Trace alternate screens and other callers, and test
-locked and entitled outcomes for both exposure and execution. Matching source text is not a
-resolved call, a verified guard, or proof of a violation; the compiler index is
+listed in the policy. Trace alternate screens and other callers. Check that the
+ViewModel reads current entitlement from `PurchasesFeature` before presenting
+or invoking the paid capability. Exercise locked and entitled outcomes for both
+exposure and execution on the relevant routes. For a confirmed unguarded path,
+cite the entry point and the paid call or exposure and describe the consequence.
+Matching source text alone does not resolve the call or establish a guard or
+violation. The compiler index is
 build-specific and its freshness is unverified. Aliases, external code,
 dynamic dispatch and omitted spellings can escape this scan. If the syntax
 inventory is unavailable or a path cannot be resolved, record it as unverified;
