@@ -94,6 +94,16 @@ pending edit saved by the previous version. For Apple-managed sync, verify
 capability, account and schema behaviour on supported devices. Exercise
 conflicting offline edits against the agreed resolution policy.
 
+When changing event observation, apply the
+[app-wide listener rule](references/spec/rules/cfa-app-02.md). AppModel owns
+listeners needed regardless of which screen is visible. The responsible
+Feature interprets forwarded events and owns the resulting state. Keep
+screen-only observation scoped to the screen or its ViewModel. For a changed
+app-wide listener, verify that repeated launch signals still leave one listener
+and that events reach the Feature with no relevant screen open. If replacement
+is supported, verify that the old listener stops forwarding and its cleanup
+leaves the replacement running.
+
 For system background work in scope, apply the
 [background-work rule](references/spec/rules/cfa-bg-01.md). Keep registration
 and work with the owning Feature. Verify each permitted identifier registers
