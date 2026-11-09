@@ -38,6 +38,12 @@ test('coverage requires source files and detected entry points, without individu
 test('an explicitly unassessed type keeps the whole-app review open', () => {
   const review = complete();
   review.typeReviews[0].status = 'unassessed';
+  review.typeReviews[0].reason = 'Trace the app lifecycle.';
+  const pending = nextWork(report, review);
+  assert.equal(pending.pendingTypes, 1);
+  assert.deepEqual(pending.nextTypes, [{
+    name:'App', file:'App.swift', line:1, status:'unassessed', reason:'Trace the app lifecycle.'
+  }]);
   assert.match(coverageGaps(report, review).join(' '), /Recorded types still need review: App \(App.swift:1\)/);
 });
 

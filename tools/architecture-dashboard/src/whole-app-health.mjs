@@ -35,12 +35,16 @@ function hasTaskTrace(operation, site) {
   );
 }
 
+const pendingTypeReviews = review => (review.typeReviews || [])
+  .filter(item => item.status === 'investigate' || item.status === 'unassessed');
+
 // Describe the next concrete review work without treating inventory as evidence.
 export function nextWork(report, review, limit = 8) {
   const entries = new Set((review.entryPoints || []).map(item => item.siteId));
   const tasks = new Map((review.taskSites || []).map(item => [item.siteId, item]));
   const operations = new Map((review.operations || []).map(item => [item.id, item]));
   const pendingFiles = pendingSourceFiles(report, review);
+  const pendingTypes = pendingTypeReviews(review);
   const pendingEntries = inventoryCandidates(report).filter(site => !entries.has(site.id));
   const pendingTasks = taskCandidates(report).filter(site => {
     const entry = tasks.get(site.id);
@@ -62,10 +66,12 @@ export function nextWork(report, review, limit = 8) {
   })).filter(operation => operation.openChecks || operation.missingTrace || operation.missingTimingScenarios.length);
   return {
     pendingFiles: pendingFiles.length,
+    pendingTypes: pendingTypes.length,
     pendingEntryPoints: pendingEntries.length,
     pendingTaskSites: pendingTasks.length,
     pendingOperations: pendingOperations.length,
     nextFiles: pendingFiles.slice(0, limit),
+    nextTypes: pendingTypes.slice(0, limit).map(({name, file, line, status, reason}) => ({name, file, line, status, reason})),
     nextEntryPoints: pendingEntries.slice(0, limit),
     nextTaskSites: pendingTasks.slice(0, limit),
     nextOperations: pendingOperations.slice(0, limit),
@@ -109,7 +115,7 @@ export function coverageGaps(report, review) {
   }
   const missingFiles = pendingSourceFiles(report, review);
   if (missingFiles.length) gaps.push(`${missingFiles.length} Swift files still need review: ${missingFiles.join(', ')}.`);
-  const openTypes = (review.typeReviews || []).filter(item => ['investigate', 'unassessed'].includes(item.status));
+  const openTypes = pendingTypeReviews(review);
   if (openTypes.length) {
     const locations = openTypes.map(item => `${item.name} (${item.file}:${item.line})`);
     gaps.push(`Recorded types still need review: ${locations.join(', ')}.`);
