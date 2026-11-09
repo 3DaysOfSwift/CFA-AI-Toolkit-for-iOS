@@ -215,6 +215,19 @@ private actor DelayedRestoreRepository: PendingRequestRepository {
         } catch PendingRequestError.operationInProgress {
             precondition(firstRun.pending == [initialRequest])
         }
+        // A reservation applies to one request, so another scene can open
+        // a different event while the first scene is still deciding.
+        let independentRequest = DestinationRequest(
+            id: "notification-independent", title: "Independent launch", launchID: "launch-44"
+        )
+        try await firstRun.receive(independentRequest)
+        var independentDestination: DestinationRequest?
+        try await firstRun.open(id: independentRequest.id) { destination in
+            independentDestination = destination
+            return true
+        }
+        precondition(independentDestination == independentRequest)
+        precondition(firstRun.pending == [initialRequest])
         releaseNavigation?.resume(returning: false)
         try await firstAttempt.value
         precondition(firstRun.pending == [initialRequest])
