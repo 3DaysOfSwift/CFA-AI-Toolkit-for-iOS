@@ -25,11 +25,13 @@ actor WeightStorage: WeightSaving {
 
 @MainActor @Observable
 final class WeightLogFeature {
+    enum SaveFailure { case storageRejectedWrite }
+
     @ObservationIgnored private let storage: any WeightSaving
     @ObservationIgnored private var lastSave: Task<Bool, Never>?
     @ObservationIgnored private var lastSaveID: UUID?
     private(set) var weights: [Int] = []
-    private(set) var saveError: String?
+    private(set) var saveFailure: SaveFailure?
 
     init(storage: any WeightSaving) { self.storage = storage }
 
@@ -49,10 +51,10 @@ final class WeightLogFeature {
             do {
                 try await storage.save(weight)
                 weights.append(weight) // Publish only after storage succeeds.
-                saveError = nil
+                saveFailure = nil
                 return true
             } catch {
-                saveError = "Weight could not be saved."
+                saveFailure = .storageRejectedWrite
                 return false
             }
         }
@@ -71,11 +73,11 @@ func runExample() async {
     let firstSaved = await feature.save(70)
     let invalidSaved = await feature.save(-1)
     precondition(firstSaved && !invalidSaved && feature.weights == [70])
-    precondition(feature.saveError != nil)
+    precondition(feature.saveFailure == .storageRejectedWrite)
     let finalSaved = await feature.save(72)
     let stored = await storage.read()
     precondition(finalSaved && feature.weights == [70, 72] && stored == feature.weights)
-    precondition(feature.saveError == nil)
+    precondition(feature.saveFailure == nil)
 
     // Run three callers as child tasks. The Feature controls the save order
     // after admission, and this example waits for every outcome.

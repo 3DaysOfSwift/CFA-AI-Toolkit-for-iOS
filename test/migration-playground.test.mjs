@@ -88,7 +88,7 @@ extension LaunchFeature {
         precondition(!firstSucceeded && secondSucceeded)
         let calls = await provider.calls
         precondition(calls == [false, true])
-        precondition(feature.name == "Artemis" && feature.errorMessage == nil)
+        precondition(feature.name == "Artemis" && feature.refreshFailure == nil)
     }
 }
 `;
@@ -154,7 +154,7 @@ extension WeightLogFeature { var testSaveID: UUID? { lastSaveID } }
         let a = await first.value, b = await invalid.value, c = await last.value
         let attempts = await storage.attempts
         precondition(a && !b && c && attempts == [80, -1, 80])
-        precondition(feature.weights == [80, 80] && feature.saveError == nil)
+        precondition(feature.weights == [80, 80] && feature.saveFailure == nil)
         precondition(feature.testSaveID == nil)
     }
 }`;

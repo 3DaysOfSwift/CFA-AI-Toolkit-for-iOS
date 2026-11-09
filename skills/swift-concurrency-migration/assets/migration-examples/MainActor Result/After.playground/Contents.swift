@@ -12,11 +12,13 @@ protocol LaunchProviding: Sendable {
 // AFTER: the Feature owns observable state and awaits the provider's result.
 @MainActor @Observable
 final class LaunchFeature {
+    enum RefreshFailure { case providerFailed }
+
     @ObservationIgnored private let provider: any LaunchProviding
     @ObservationIgnored private var refreshTask: Task<Bool, Never>?
     @ObservationIgnored private var refreshID: UUID?
     private(set) var name = "No launch loaded"
-    private(set) var errorMessage: String?
+    private(set) var refreshFailure: RefreshFailure?
     init(provider: any LaunchProviding) { self.provider = provider }
 
     // The fixture publishes every simulated outcome in admission order.
@@ -34,10 +36,10 @@ final class LaunchFeature {
             do {
                 let downloadedName = try await provider.download(available: available)
                 name = downloadedName
-                errorMessage = nil
+                refreshFailure = nil
                 return true
             } catch {
-                errorMessage = "The launch could not be loaded."
+                refreshFailure = .providerFailed
                 return false
             }
         }
@@ -64,9 +66,9 @@ func runExample() async {
     let loaded = await feature.refresh(available: true)
     precondition(loaded && feature.name == "Artemis")
     let failedRefreshSucceeded = await feature.refresh(available: false)
-    precondition(!failedRefreshSucceeded && feature.name == "Artemis" && feature.errorMessage != nil)
+    precondition(!failedRefreshSucceeded && feature.name == "Artemis" && feature.refreshFailure == .providerFailed)
     let retried = await feature.refresh(available: true)
-    precondition(retried && feature.name == "Artemis" && feature.errorMessage == nil)
+    precondition(retried && feature.name == "Artemis" && feature.refreshFailure == nil)
     print("Passed: MainActor publication, failure retention and retry.")
 }
 
