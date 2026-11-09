@@ -4,7 +4,7 @@
 
 **Strength:** Required.
 
-**Guidance:** Each Feature defines whether equivalent calls share execution or commands queue, and owns work that must outlive a screen.
+**Guidance:** Define overlap policy at the Feature boundary. By default, equivalent calls share one execution and commands that must each take effect queue in admission order across suspension points, with an outcome for each caller. Document the product reason for another policy, such as latest-request-wins. Features own work that must outlive a screen.
 
 **Why:** Task lifetime and repeated actions remain predictable.
 
