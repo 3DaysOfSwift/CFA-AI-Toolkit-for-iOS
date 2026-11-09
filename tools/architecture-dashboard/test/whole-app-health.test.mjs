@@ -199,7 +199,8 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
       operationInventory:{scope:'App',method:'Source review',coverage:'complete'},
       operations:[{id:'launch',title:'Start',trigger:'Launch',path:'App',stateOwner:'App',taskOwner:'App',isolation:'Main actor',reason:'Reviewed',verification:'Source inspection',correctness:'sound',clarity:'sound',unknowns:[],triggerSource:{file:'App.swift',line:1},steps:[{id:'trigger',title:'Start',relation:'event',detail:'The app starts here.',evidence}],checks,scenarios,evidence}]});
     await fs.writeFile(reviewPath,JSON.stringify(review));
-    assert.deepEqual((await progress(project,reviewPath,syntax)).gaps,[]);
+    assert.match((await progress(project,reviewPath,syntax)).gaps.join(' '), /App-level assessments still needed:.*launch-performance/);
+    assert.match((await next(project,reviewPath,syntax)).gaps.join(' '), /App-level assessments still needed:.*launch-performance/);
     const badBatch=structuredClone(review); badBatch.fileBatches[0].evidence=[{file:'App.swift',line:1,endLine:1}];
     await fs.writeFile(reviewPath,JSON.stringify(badBatch));
     await assert.rejects(progress(project,reviewPath,syntax),/batch evidence must include each source file/);

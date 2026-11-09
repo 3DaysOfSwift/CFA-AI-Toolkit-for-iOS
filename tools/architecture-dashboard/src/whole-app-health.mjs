@@ -229,17 +229,35 @@ async function appIcon(root) {
     return images.length ? path.join(assets[0],images[0].filename) : null;
   } catch { return null; }
 }
+function pendingAppChecks(review) {
+  const appChecks = new Set();
+  for (const criterion of (review.presentation?.criteria || [])) {
+    if (criterion.appChecks === undefined) continue;
+    if (!Array.isArray(criterion.appChecks) || criterion.appChecks.some(id => !appCheckIDs.includes(id))) {
+      throw Error('Use recognised app-level check IDs in criterion.appChecks.');
+    }
+    criterion.appChecks.forEach(id => appChecks.add(id));
+  }
+  return appCheckIDs.filter(id => !appChecks.has(id));
+}
+
+function appCheckGaps(review) {
+  const missing = pendingAppChecks(review);
+  return missing.length ? ['App-level assessments still needed: ' + missing.join(', ')] : [];
+}
+
 export async function progress(root, input, syntaxProvider = collectSyntax) {
   const {report} = await currentInventory(root, syntaxProvider);
   const raw = JSON.parse(await fs.readFile(input,'utf8'));
   const review = await importReview(report,raw,root);
-  return {gaps:coverageGaps(report,review),files:report.files.length,operations:(review.operations || []).length};
+  return {gaps:[...coverageGaps(report,review), ...appCheckGaps(review)],files:report.files.length,operations:(review.operations || []).length};
 }
 export async function next(root, input, syntaxProvider = collectSyntax) {
   const {report} = await currentInventory(root, syntaxProvider);
   const raw = JSON.parse(await fs.readFile(input,'utf8'));
   const review = await importReview(report,raw,root);
-  return nextWork(report,review);
+  const work = nextWork(report,review);
+  return {...work, gaps:[...work.gaps, ...appCheckGaps(review)]};
 }
 export async function finish(root, input, output, icon, syntaxProvider = collectSyntax) {
   const {report} = await currentInventory(root, syntaxProvider);
@@ -254,15 +272,7 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
       throw Error('Each whole-app presentation criterion needs source evidence as file and line references.');
     }
   }
-  const appChecks = new Set();
-  for (const criterion of presentation.criteria) {
-    if (criterion.appChecks === undefined) continue;
-    if (!Array.isArray(criterion.appChecks) || criterion.appChecks.some(id => !appCheckIDs.includes(id))) {
-      throw Error('Use recognised app-level check IDs in criterion.appChecks.');
-    }
-    criterion.appChecks.forEach(id => appChecks.add(id));
-  }
-  const missingAppChecks = appCheckIDs.filter(id => !appChecks.has(id));
+  const missingAppChecks = pendingAppChecks(review);
   if (missingAppChecks.length) {
     throw Error('Record app-level assessments before rendering: ' + missingAppChecks.join(', '));
   }
