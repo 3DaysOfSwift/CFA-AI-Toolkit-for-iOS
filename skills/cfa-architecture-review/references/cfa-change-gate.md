@@ -379,8 +379,10 @@ do not claim that UI gating replaces server-side authorisation.
   they are authoritative. Keep secrets out of app constants.
 - For changed app-wide listeners, drive a controlled event source after repeated
   startup signals. Verify a single listener forwards events to the owning
-  Feature with no screen present. Exercise supported cancellation or replacement
-  and shut down isolated listeners during test cleanup.
+  Feature with no screen present. Where cancellation or replacement is
+  supported, verify that the old listener stops forwarding events and that its
+  cleanup leaves the replacement running. Shut down isolated listeners during
+  test cleanup.
 - For changed observer-backed streams that support resubscription, verify that
   a late event from the old registration cannot update the replacement and
   that delayed teardown removes only the old registration.

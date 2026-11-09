@@ -35,14 +35,15 @@ Before accepting a change, answer every question:
    and limit coordination to genuinely application-wide responsibilities?
    Verify repeated startup signals start each listener once and that it forwards
    events to the owning Feature even when no relevant screen is visible.
-   When a listener must stop or be replaced, verify the old task stops
-   delivering events, including in isolated tests.
+   Where cancellation or replacement is supported, verify the old listener
+   stops forwarding events and its cleanup leaves the replacement running.
+   Shut down isolated listeners after tests.
    For system background work, does the responsible Feature register each
    permitted handler once during launch and schedule requests separately?
    Verify that success, failure and expiration each complete the system
    callback once, including when expiration races normal completion, and
-   that expiration cancels the work. Exercise background execution on a
-   supported device.
+   that expiration cancels the work. Record actual background execution on a
+   supported device separately from controlled tests.
 9. Is persistence accessed through repository protocols, and are other
    external-system details handled by appropriate microservices?
    For independent network requests, hold the first response open in a
