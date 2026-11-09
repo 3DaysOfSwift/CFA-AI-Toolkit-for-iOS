@@ -398,4 +398,8 @@ test('rejects a malformed review scope before scanning', async t => {
   await assert.rejects(progress(base,draft,syntax), /includeTests must be true or false/);
   await assert.rejects(next(base,draft,syntax), /includeTests must be true or false/);
   await assert.rejects(finish(base,draft,output,undefined,syntax), /includeTests must be true or false/);
+  for (const invalid of [{schemaVersion:2, sourceFingerprint:'snapshot'}, {schemaVersion:1}]) {
+    await fs.writeFile(draft, JSON.stringify(invalid));
+    await assert.rejects(next(base,draft,syntax), /schema-version 1 Health Check review with a source fingerprint/);
+  }
 });
