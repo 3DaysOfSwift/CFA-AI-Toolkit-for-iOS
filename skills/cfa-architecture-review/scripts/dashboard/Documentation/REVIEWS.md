@@ -206,15 +206,15 @@ use `not-applicable` and explain why, rather than omitting it or awarding a pass
 
 ### Timing scenarios
 
-New whole-app review drafts set `behaviourScenariosRequired: true`. For each
-operation, record a `scenarios` array containing the four IDs `repeat`, `leave`,
+Every new whole-app report requires timing assessments. For each operation,
+record a `scenarios` array containing the four IDs `repeat`, `leave`,
 `late-result` and `failure`. Each entry has `id`, `title`, `status` (`pass`,
 `problem`, `unresolved`, or `not-applicable`), `outcome`, `verification`, and
 source `evidence` using the same checked file and line references as other review
 items. A `problem` also needs a `consequence`. Explain why a scenario is not
 applicable when appropriate; do not invent an issue or runtime result. Unresolved
-or missing scenarios block a new whole-app report until assessed. Older reviews
-without the flag remain readable and are not silently upgraded.
+or missing scenarios block a new whole-app report until assessed. When resuming an older review, add missing scenario assessments before
+generating a new whole-app report. Any existing flag is ignored.
 
 Trace repeated triggers, navigation or caller departure, older results arriving
 late, and failures through the actual state and task owners. Record the observed
