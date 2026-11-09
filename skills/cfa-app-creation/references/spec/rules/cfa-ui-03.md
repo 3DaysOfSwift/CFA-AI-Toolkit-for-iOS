@@ -4,7 +4,7 @@
 
 **Strength:** Permitted exception.
 
-**Guidance:** A detail View may receive a selected immutable snapshot and use it to construct its own State-backed ViewModel in the View initializer.
+**Guidance:** A detail View may receive a selected immutable snapshot and use it to construct its own State-backed ViewModel in the View initializer. The snapshot is initial input for that destination identity. Keep selection in presentation and preserve the displayed snapshot and navigation when the source list changes. Use explicit refresh where appropriate. Live updates are a product choice.
 
 **Why:** Each destination can preserve its selection independently.
 
