@@ -1,71 +1,38 @@
 <div id="habits-journey">
   <h2>Load Habits</h2>
-  <div class="text-small text-muted">First load · successful path · sequence, not measured time</div>
-  <div class="journey" role="img" aria-label="Two tasks: the launch task waits while the Feature-owned task loads local data, calculates summaries and publishes the result. Both then finish.">
-    <div class="heading a">A · Launch request</div>
-    <div class="heading b">B · Shared loading task</div>
-    <div class="launch"><span class="dot a-dot"></span>Ask to load<br/><span class="text-small">Create B →</span></div>
-    <div class="phase" data-phase="0"><span class="dot b-dot">1</span><div>Create the loading task<div class="text-small text-muted">HabitsFeature · MainActor</div></div></div>
-    <div class="waiting"><span>Ⅱ</span><div>Waiting for B</div><code class="text-small">await task.value</code><div class="text-small text-muted">A is suspended.<br/>It is not blocking a thread.</div></div>
-    <div class="phase" data-phase="1"><span class="dot b-dot">2</span><div>Take a turn to load<div class="text-small text-muted">Wait here only if another local operation is running</div></div></div>
-    <div class="phase" data-phase="2"><span class="dot b-dot">3</span><div>Show “loading” · request data<div class="text-small text-muted">Feature → worker → local repository → storage actor</div></div></div>
-    <div class="phase" data-phase="3"><span class="dot b-dot">4</span><div>Read the saved habits<div class="text-small text-muted">SwiftData · local store</div></div></div>
-    <div class="phase" data-phase="4"><span class="dot b-dot">5</span><div>Calculate the summaries<div class="text-small text-muted">Worker actor · today, week, streaks, lifetime</div></div></div>
-    <div class="phase" data-phase="5"><span class="dot b-dot">6</span><div>Publish the loaded data<div class="text-small text-muted">MainActor · state becomes ready</div></div></div>
-    <div class="finished"><span class="dot a-dot"></span>A resumes<br/>and finishes</div>
-    <div class="phase" data-phase="6"><span class="dot b-dot">7</span><div>Release the turn · finish B<div class="text-small text-muted">Clear the stored task handle</div></div></div>
-  </div>
+  <p class="text-small text-muted">Habit Tracker Pro · source-derived sequence</p>
+  <ol aria-label="Loading steps">
+    <li>App delegate calls AppModel synchronously.</li>
+    <li>AppModel calls HabitsFeature.startLoading() directly.</li>
+    <li>The Feature starts and retains a reload task, then startup returns.</li>
+    <li>The reload task queues the operation behind earlier habit work.</li>
+    <li>The queued operation sets loading state and awaits the storage service.</li>
+    <li>The Feature publishes saved habits or a load error on the Main Actor.</li>
+    <li>The operation and reload tasks finish; their handles are cleared.</li>
+  </ol>
   <div class="viz-controls">
-    <button class="btn" type="button" id="hj-back">Previous</button>
-    <span id="hj-count" class="tabular-nums text-small"></span>
-    <button class="btn" type="button" id="hj-next">Next</button>
+    <button type="button" id="habits-back">Previous</button>
+    <span id="habits-step" aria-live="polite"></span>
+    <button type="button" id="habits-next">Next</button>
   </div>
-  <p id="hj-detail" aria-live="polite"></p>
-  <div class="text-small text-muted">The delegate calls AppModel synchronously; AppModel starts A and the Feature starts B. Actor hops do not create more tasks.</div>
+  <p class="text-small text-muted">A later reload caller can await the same in-flight reload. The queue uses a separate task; actor calls do not create tasks by themselves.</p>
 </div>
-<style>
-#habits-journey .journey{display:grid;grid-template-columns:minmax(95px,1fr) minmax(0,2.6fr);column-gap:20px;margin:24px 0 16px;position:relative}
-#habits-journey .heading{font-weight:500;padding-bottom:16px}
-#habits-journey .heading.a{grid-column:1}#habits-journey .heading.b{grid-column:2}
-#habits-journey .launch{grid-column:1;grid-row:2;align-self:center}
-#habits-journey .waiting{grid-column:1;grid-row:3/8;display:flex;flex-direction:column;justify-content:center;gap:12px;border-left:2px dashed var(--border);padding-left:12px}
-#habits-journey .waiting>span{font-weight:500}
-#habits-journey .finished{grid-column:1;grid-row:8;align-self:center}
-#habits-journey .phase{grid-column:2;display:flex;align-items:center;gap:12px;min-height:76px;position:relative;padding:8px 0;opacity:.6}
-#habits-journey .phase:before{content:"";position:absolute;top:0;bottom:0;left:15px;width:1px;background:var(--border);z-index:0}
-#habits-journey .phase[data-phase="0"]:before{top:50%}#habits-journey .phase[data-phase="6"]:before{bottom:50%}
-#habits-journey .phase.selected{opacity:1}
-#habits-journey .phase.selected>div{font-weight:500}
-#habits-journey .phase>div{min-width:0}
-#habits-journey .phase .text-small{font-weight:400}
-#habits-journey .dot{display:inline-flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;width:30px;height:30px;border-radius:50%;color:var(--foreground)}
-#habits-journey .a-dot{width:12px;height:12px;background:var(--viz-series-2);margin-right:6px}
-#habits-journey .b-dot{background:color-mix(in srgb,var(--viz-series-1) 18%,var(--background))}
-#habits-journey .selected .b-dot{background:color-mix(in srgb,var(--viz-series-1) 45%,var(--background))}
-#habits-journey #hj-detail{min-height:3em}
-@media(max-width:420px){#habits-journey .journey{column-gap:12px;grid-template-columns:minmax(85px,1fr) minmax(0,2fr)}#habits-journey .phase{gap:8px;min-height:92px}#habits-journey .waiting{padding-left:8px}#habits-journey code{overflow-wrap:anywhere}}
-</style>
 <script>
 (() => {
- const root = document.getElementById('habits-journey');
- const phases = [...root.querySelectorAll('[data-phase]')];
- const back = root.querySelector('#hj-back');
- const next = root.querySelector('#hj-next');
- const count = root.querySelector('#hj-count');
- const detail = root.querySelector('#hj-detail');
- const descriptions = [
-  'The Feature stores B so another caller can await the same load instead of starting a duplicate.',
-  'If the local operation gate is busy, B suspends in its FIFO waiting list; the previous operation resumes it.',
-  'B stays the same task across actor calls. Each await marks a possible suspension, not a new child task.',
-  'The storage actor opens the SwiftData container if needed and reads the local store.',
-  'B calculates the summaries on the worker actor, away from MainActor isolation.',
-  'B returns to MainActor and updates observable state. A read failure instead publishes a failed state for retry.',
-  'B releases the operation gate and clears its handle. Its completion lets A resume; cancelling A would not automatically cancel B.'
- ];
- let step = 0;
- function draw(){phases.forEach((p,i)=>p.classList.toggle('selected',i===step));count.textContent=`${step+1} / ${phases.length}`;detail.textContent=descriptions[step];back.disabled=step===0;next.disabled=step===phases.length-1;}
- back.addEventListener('click',()=>{if(step>0){step--;draw();}});
- next.addEventListener('click',()=>{if(step<phases.length-1){step++;draw();}});
- draw();
+  const root = document.getElementById('habits-journey');
+  const steps = [...root.querySelectorAll('li')];
+  const back = root.querySelector('#habits-back');
+  const next = root.querySelector('#habits-next');
+  const label = root.querySelector('#habits-step');
+  let current = 0;
+  function draw() {
+    steps.forEach((step, index) => { step.style.fontWeight = index === current ? '700' : '400'; });
+    label.textContent = `${current + 1} / ${steps.length}`;
+    back.disabled = current === 0;
+    next.disabled = current === steps.length - 1;
+  }
+  back.addEventListener('click', () => { if (current > 0) { current--; draw(); } });
+  next.addEventListener('click', () => { if (current < steps.length - 1) { current++; draw(); } });
+  draw();
 })();
 </script>

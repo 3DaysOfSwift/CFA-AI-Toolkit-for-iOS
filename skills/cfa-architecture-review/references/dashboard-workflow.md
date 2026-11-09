@@ -132,6 +132,6 @@ the requested visual and source inventory without claiming an imported report.
   publish diagrams or commit changes unless requested. If observation is needed
   to settle a question, explain the smallest relevant diagnostic next step.
 
-The [Trend Load Habits example](trend-load-habits.md) explains the
+The [Habit Tracker Pro Load Habits example](habit-tracker-load-habits.md) explains the
 starting example for this skill. Read it when adapting its included visual asset;
 it illustrates the method, not a required architecture for other repositories.
