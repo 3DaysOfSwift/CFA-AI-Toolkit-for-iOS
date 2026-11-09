@@ -220,10 +220,14 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
   const sourceProblems = [
     ...(review.findings || []), ...(review.fileReviews || []), ...(review.typeReviews || [])
   ].filter(item => item.status === 'problem').flatMap(item => item.issues?.length ? item.issues : [item]);
+  const operationProblems = (review.operations || []).flatMap(operation => [
+    ...operation.checks.filter(check => check.status === 'fail' && check.dimension !== 'cfa'),
+    ...operation.scenarios.filter(scenario => scenario.status === 'problem')
+  ]);
   const visibleEvidence = presentation.criteria
     .filter(criterion => criterion.status === 'problem' && Array.isArray(criterion.evidence))
     .flatMap(criterion => criterion.evidence);
-  for (const problem of sourceProblems) {
+  for (const problem of [...sourceProblems, ...operationProblems]) {
     const covered = problem.evidence.some(ref => visibleEvidence.some(visible =>
       visible.file === ref.file && visible.line <= ref.endLine && ref.line <= visible.endLine
     ));

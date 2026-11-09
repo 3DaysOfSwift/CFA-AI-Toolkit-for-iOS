@@ -198,9 +198,31 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
       evidence:[{file:'Value.swift',line:1,endLine:1}]
     });
     await fs.writeFile(reviewPath,JSON.stringify(generalProblem));
+    const timingProblem = structuredClone(generalProblem);
+    timingProblem.operations[0].scenarios[0] = {
+      ...timingProblem.operations[0].scenarios[0], status:'problem',
+      consequence:'Repeating the action starts duplicate work.',
+      evidence:[{file:'App.swift',line:2,endLine:2}]
+    };
+    await fs.writeFile(reviewPath,JSON.stringify(timingProblem));
+    await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/Include confirmed source problems.*repeat/);
+    await assert.rejects(fs.access(output));
+    const checkProblem = structuredClone(generalProblem);
+    checkProblem.operations[0].checks[0] = {
+      ...checkProblem.operations[0].checks[0], status:'fail', problemKind:'local-defect',
+      consequence:'Two callers can overwrite the same result.',
+      evidence:[{file:'App.swift',line:2,endLine:2}]
+    };
+    await fs.writeFile(reviewPath,JSON.stringify(checkProblem));
+    await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/Include confirmed source problems.*state-ownership/);
+    timingProblem.presentation.criteria.push({
+      title:'Duplicate work on repeated action',detail:'Repeated actions start competing work.',status:'problem',
+      evidence:[{file:'App.swift',line:2,endLine:2}]
+    });
+    await fs.writeFile(reviewPath,JSON.stringify(timingProblem));
     const problemsOutput = path.join(base,'problems.html');
     await finish(project,reviewPath,problemsOutput,undefined,syntax);
-    assert.match(await fs.readFile(problemsOutput,'utf8'),/Problems to address.*Confirmed issue/s);
+    assert.match(await fs.readFile(problemsOutput,'utf8'),/Problems to address.*Confirmed issue.*Duplicate work on repeated action/s);
     await fs.writeFile(reviewPath,JSON.stringify(review));
     const result=await finish(project,reviewPath,output,undefined,syntax);
     assert.deepEqual(result.gaps,[]);
