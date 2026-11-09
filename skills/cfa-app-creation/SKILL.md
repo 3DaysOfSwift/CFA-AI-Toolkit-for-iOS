@@ -65,10 +65,19 @@ that behaviour is verified. Do not introduce an app-level startup-error screen.
 
 ## Test targets
 
-Create the app target and its unit-test target only. Do not create a UI-test
-target and do not leave an empty `AppNameUITests` folder in a new project.
+Start with the app target and its unit-test target. Add product targets such
+as a widget or Watch app when the request calls for them. Do not create a
+UI-test target or leave an empty `AppNameUITests` folder in a new project.
 Feature and ViewModel tests belong in the unit-test target. Add UI automation
 only after an explicit request identifies the scenario it should cover.
+
+## Additional product targets
+
+When the requested app includes a widget or another device target, apply the
+[multi-device rule](references/spec/rules/cfa-device-01.md). Include the
+shared Model and only that target’s Views and ViewModels. Compose services for
+each process and keep business rules shared. Build each target and verify its
+source membership, API availability and any required snapshot handoff.
 
 ## Settings About and footer
 
