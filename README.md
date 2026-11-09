@@ -266,17 +266,14 @@ failure states, persistent colour themes and focused tests.
 
 ### Start shared work early, and screen work early too
 
-CFA makes a deliberate distinction between two valid refresh paths. The app
-delegate starts an app-wide system refresh at the earliest launch callback, so
-shared work can run while the UI is prepared. When a screen needs its own
-initial asynchronous work, it can use SwiftUI `.task` to start it as the View
-appears. Neither path promises that a remote
-request has already finished. The owning Feature coordinates duplicate requests
-and publishes observed loading, cached, empty, success or error state.
+The app delegate calls AppModel synchronously at launch. AppModel signals the
+Features that need startup work, and each Feature starts and owns its own
+asynchronous work. The first screen can appear while requests are in flight.
 
-This avoids a common false choice: using a View task as the whole app's launch
-mechanism, or postponing all loading until a screen is visibly on screen. CFA
-uses both routes, each with a clear owner.
+Use SwiftUI’s `.task` for initial work tied to a screen. If launch and a
+screen request the same refresh, the Feature can share the in-flight request.
+Keep the current data, refresh status and errors separately observable so the
+screen can keep showing cached data during a refresh or after a failure.
 
 ## The CFA architecture
 
@@ -285,8 +282,8 @@ CFA gives every type of code a clear home:
 - **View:** says what the screen looks like.
 - **ViewModel:** holds the screen state and prepares it for the View.
 - **Feature:** owns the feature’s business rules and feature state.
-- **Repository:** reads and writes data, such as a local file, database or web service.
-- **AppModel:** creates the real features and repositories in one place.
+- **Microservices:** handle networking, storage or device APIs for Features. A repository is one kind of microservice.
+- **AppModel:** constructs and connects the app’s Features and their dependencies.
 
 The path through one feature is:
 
