@@ -158,8 +158,8 @@
       "strength": "Required with platform constraints",
       "rule": "Include shared Model source and only the target’s own Views and ViewModels. Each process has its own AppModel and Features. Transfer immutable snapshots through a mechanism appropriate to the target. The receiving Feature refreshes its own observable state when its data source changes.",
       "why": "Capabilities can be reused without assuming shared process memory.",
-      "verify": "Build each target and check membership and API availability. Test snapshot transfer and refresh on supported devices, including missing, delayed or stale data.",
-      "example": "An iPhone widget reads a shared App Group snapshot; a Watch receives a copy through Watch Connectivity.",
+      "verify": "Build each target and check membership and API availability. Verify the widget reload request follows the snapshot write. Test snapshot transfer and refresh on supported devices, including missing, unreadable, delayed or stale data.",
+      "example": "An iPhone app writes its App Group snapshot before requesting a widget timeline reload. The Watch receives a separate copy through Watch Connectivity.",
       "explanationIds": []
     },
     {
