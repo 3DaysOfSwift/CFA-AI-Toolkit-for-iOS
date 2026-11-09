@@ -61,7 +61,12 @@ or failed, use `partial` and explain the gap. Validation checks the recorded
 links and outcomes. The reviewer compares the declared affected targets with
 the actual consumers of the changed code, checks the behaviour contract,
 and verifies any affected handoff. A passing build entry for a target does
-not establish that its data handoff worked.
+not establish that its data handoff worked. When runs disagree at the final
+commit, compare their target, configuration and environment. Preserve failed
+runs and explain how each relevant failure was resolved. Keep the migration
+partial while a required failure remains unresolved. The validator checks
+the recorded evidence links. It cannot determine whether one run supersedes
+another.
 
 ## Validate and review
 
