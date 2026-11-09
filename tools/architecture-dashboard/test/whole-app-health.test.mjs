@@ -174,8 +174,14 @@ test('syntax entry points join the inventory without duplicating lexical finding
 test('unavailable or inconsistent parser evidence does not become a pass', () => {
   const missing=structuredClone(report); missing.syntax={status:'unavailable',reason:'Xcode unavailable'};
   assert.match(coverageGaps(missing,complete()).join(' '),/Xcode unavailable/);
-  const mismatch=structuredClone(report); mismatch.syntax={status:'available',files:[],items:[],warnings:[]};
-  assert.match(coverageGaps(mismatch,complete()).join(' '),/different files/);
+  const mismatch = structuredClone(report);
+  mismatch.syntax = {status:'available',files:['Other.swift'],items:[],warnings:['Parser reported errors in App.swift']};
+  assert.deepEqual(coverageGaps(mismatch,complete()), [
+    'SwiftSyntax warning: Parser reported errors in App.swift',
+    'The SwiftSyntax and source inventories cover different files.',
+    'Missing from SwiftSyntax: App.swift.',
+    'Missing from lexical inventory: Other.swift.'
+  ]);
 });
 
 test('report rescans source, surfaces coverage gaps and rejects stale review', async () => {

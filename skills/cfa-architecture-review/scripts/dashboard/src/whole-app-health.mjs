@@ -120,11 +120,17 @@ export function coverageGaps(report, review) {
     gaps.push(`Source file could not be scanned: ${file} (${reason}).`);
   }
   if (report.syntax?.status === 'unavailable') gaps.push(report.syntax.reason);
-  if (report.syntax?.warnings?.length) gaps.push(`${report.syntax.warnings.length} Swift files have parser warnings requiring investigation.`);
+  for (const warning of report.syntax?.warnings ?? []) gaps.push(`SwiftSyntax warning: ${warning}`);
   if (report.syntax?.status === 'available') {
     const scannerFiles = new Set(report.files.map(file=>file.path));
     const syntaxFiles = new Set(report.syntax.files);
-    if ([...scannerFiles].some(file=>!syntaxFiles.has(file)) || [...syntaxFiles].some(file=>!scannerFiles.has(file))) gaps.push('The SwiftSyntax and source inventories cover different files.');
+    const missingSyntax = [...scannerFiles].filter(file => !syntaxFiles.has(file));
+    const missingSource = [...syntaxFiles].filter(file => !scannerFiles.has(file));
+    if (missingSyntax.length || missingSource.length) {
+      gaps.push('The SwiftSyntax and source inventories cover different files.');
+      if (missingSyntax.length) gaps.push(`Missing from SwiftSyntax: ${missingSyntax.join(', ')}.`);
+      if (missingSource.length) gaps.push(`Missing from lexical inventory: ${missingSource.join(', ')}.`);
+    }
   }
   const missingFiles = pendingSourceFiles(report, review);
   if (missingFiles.length) gaps.push(`${missingFiles.length} Swift files still need review: ${missingFiles.join(', ')}.`);
