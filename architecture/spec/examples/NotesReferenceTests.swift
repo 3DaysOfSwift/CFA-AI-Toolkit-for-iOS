@@ -34,8 +34,60 @@ actor RetryableNotes: NotesRepository {
     func save(_ note: Note) async throws {}
 }
 
+actor HeldNotesLoad: NotesRepository {
+    private(set) var attempts = 0
+    private var started: CheckedContinuation<Void, Never>?
+    private var response: CheckedContinuation<[Note], Never>?
+
+    func load() async throws -> [Note] {
+        attempts += 1
+        precondition(attempts == 1, "Both callers should share one repository load")
+        let notes = await withCheckedContinuation { continuation in
+            response = continuation
+            started?.resume()
+            started = nil
+        }
+        try Task.checkCancellation()
+        return notes
+    }
+
+    func waitForLoad() async {
+        if response != nil { return }
+        await withCheckedContinuation { started = $0 }
+    }
+
+    func finish(with note: Note) {
+        response?.resume(returning: [note])
+        response = nil
+    }
+
+    func save(_ note: Note) async throws {}
+}
+
 @main struct NotesReferenceTests {
     @MainActor static func main() async throws {
+        let heldLoad = HeldNotesLoad()
+        let sharedFeature = NotesFeature(repository: heldLoad)
+        let departingModel = NotesEditorViewModel(notesFeature: sharedFeature)
+        let stayingModel = NotesEditorViewModel(notesFeature: sharedFeature)
+        let departing = Task { await departingModel.load() }
+        await heldLoad.waitForLoad()
+        let stayingStarted = AsyncStream<Void>.makeStream()
+        let staying = Task { @MainActor in
+            stayingStarted.continuation.yield(())
+            await stayingModel.load()
+        }
+        // This test resumes on MainActor after the staying caller suspends in load.
+        var stayingSignal = stayingStarted.stream.makeAsyncIterator()
+        await stayingSignal.next()
+        stayingStarted.continuation.finish()
+        departing.cancel()
+        let loadedNote = Note(id: UUID(), text: "Shared load")
+        await heldLoad.finish(with: loadedNote)
+        await departing.value
+        await staying.value
+        precondition(sharedFeature.notes == [loadedNote] && stayingModel.loadError == nil)
+
         let retryRepository = RetryableNotes()
         let retryFeature = NotesFeature(repository: retryRepository)
         let retryModel = NotesEditorViewModel(notesFeature: retryFeature)
