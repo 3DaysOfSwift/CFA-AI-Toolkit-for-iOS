@@ -25,3 +25,15 @@ must not describe the app as CFA merely because folders could be added.
 Use the [migration handoff case](migration-handoff.md) to check that an installed
 host follows the completion gate when builds pass but placement, hybrid paths
 and manual verification still need attention.
+
+## Product-design scope
+
+Use the [product-design scope cases](product-design-scope/expected.md) to check
+that new-app defaults stay within the requested work and that maintenance,
+migration and explicit design requests retain their own scopes.
+
+## Explanation responses
+
+Use the [explanation response cases](explanations.md) to check that the installed
+skills distinguish CFA conventions from Swift requirements, preserve Feature
+ownership, and link only to verified published explanations.
