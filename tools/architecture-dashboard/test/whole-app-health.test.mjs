@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {spawnSync} from 'node:child_process';
-import {fileURLToPath} from 'node:url';
+import {fileURLToPath, pathToFileURL} from 'node:url';
+import {install} from '../../../scripts/install.mjs';
+import {stageSkillsPackage} from '../../../test/fixtures/skills-package.mjs';
 import {coverageGaps, inventoryCandidates, taskCandidates, nextWork} from '../src/whole-app-health.mjs';
 import {renderHealthReport} from '../src/health-report.mjs';
 import {prepare, finish, progress, next} from '../src/whole-app-health.mjs';
@@ -194,9 +196,14 @@ test('unavailable or inconsistent parser evidence does not become a pass', () =>
   ]);
 });
 
-test('report rescans source, surfaces coverage gaps and rejects stale review', async () => {
+test('installed Health Check rescans source, surfaces gaps and rejects stale review', async () => {
   const base=await fs.mkdtemp(path.join(os.tmpdir(),'whole-health-test-'));
   try {
+    const source = stageSkillsPackage(path.join(base, 'package'));
+    const installation = install({source, destination:path.join(base, 'customer'), mode:'skills', installCommand:false});
+    const reviewSkill = installation.paths.find(folder => path.basename(folder) === 'cfa-architecture-review');
+    const workflow = path.join(reviewSkill, 'scripts/dashboard/src/whole-app-health.mjs');
+    const {prepare, finish, progress, next} = await import(pathToFileURL(workflow).href);
     const project=path.join(base,'app'); await fs.mkdir(project);
     await fs.writeFile(path.join(project,'App.swift'),'struct App {\r\n}\r\n');
     await fs.writeFile(path.join(project,'Value.swift'),'struct Value {}\n');
