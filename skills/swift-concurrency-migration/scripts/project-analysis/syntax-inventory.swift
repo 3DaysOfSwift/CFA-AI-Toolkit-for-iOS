@@ -73,6 +73,8 @@ final class SourceInventory: SyntaxVisitor {
         case "withTaskGroup", "withThrowingTaskGroup", "withDiscardingTaskGroup", "withThrowingDiscardingTaskGroup":
             record("concurrency.taskGroup", called, node)
         case "Button", "SwiftUI.Button": record("entry.button", called, node)
+        case "BGTaskScheduler.shared.register", "BackgroundTasks.BGTaskScheduler.shared.register":
+            record("entry.backgroundHandler", called, node)
         default:
             if let member = node.calledExpression.as(MemberAccessExprSyntax.self) {
                 let name = member.declName.baseName.text
