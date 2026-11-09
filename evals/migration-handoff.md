@@ -37,6 +37,10 @@ in an isolated workspace without the evaluation rubric.
   leaves and can be joined by another screen. The candidate cancels the
   underlying download from the departing screen's cancellation handler. Its
   tests cover completion while one screen stays open.
+  The candidate also waits for the optional cache write before returning the
+  refresh result. Its late cache restore replaces the entire displayed
+  catalogue, even when one of two independent providers has already returned
+  fresh data. Tests exercise only the successful write and restore order.
 - Export is a paid capability in the agreed account scope. Tests cover locked
   and entitled outcomes from the account screen. A notification action can
   also reaches Export. It checks entitlement, awaits loading the selected
@@ -105,6 +109,11 @@ in an isolated workspace without the evaluation rubric.
   publishes the result with no replacement waiter. Separately, verify that
   an equivalent caller joins without another request and that one of several
   waiters can leave while the others still receive the result.
+- Keep the optional cache off the refresh completion path. Hold the cache
+  write open and verify that fresh data publishes and the caller returns.
+  Fail the write and reopen storage to verify the previous usable snapshot
+  remains. Hold restoration until one provider refreshes, then verify that
+  it keeps its fresh data while the other provider restores its cached data.
 - Record the UIKit screen’s actual presentation owner and its Feature dependencies.
   Keep the existing browsing behaviour and presentation scope. Replace a UI
   component only when the migration requires it, and verify that its existing
@@ -156,7 +165,8 @@ test results, ignores the conflicting failed run, treats the widget build or app
 treats the source diff as navigator inspection, removes the
 reactive adapter without tracing consumers, treats the final list as proof that
 every refresh completed, accepts cancelling a shared download when a screen
-leaves despite the baseline lifetime, accepts screen-bound registration for
+leaves despite the baseline lifetime, accepts optional writes blocking refresh
+completion or late restores replacing fresher provider data, accepts screen-bound registration for
 existing system background work, treats foreground tests as proof of
 background delivery or exactly-once completion, assumes a passing newer
 simulator run establishes compatibility, recommends raising the minimum OS without
