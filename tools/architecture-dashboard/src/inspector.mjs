@@ -559,7 +559,13 @@ export async function inspect(project) {
       const start = view.index + view[0].length;
       const body = braceBody(source, start - 1);
       inspectScreenInputs(view[1], body, source, start, file, findings);
-      for (const match of memberSignatures(body).matchAll(new RegExp(`\\b(?:let|var)\\s+${propertyNamePattern}\\s*(?::\\s*(?:Swift\\s*\\.\\s*)?Task\\s*<|(=\\s*(?:Swift\\s*\\.\\s*)?Task\\b))`, 'gu'))) {
+      const members = memberSignatures(body);
+      const storedModel = /\b(?:let|var)\s+\w+\s*=\s*(?:\w+\s*\.\s*)*AppModel\s*\.\s*shared\b(?!\s*[.?![(])/.exec(members);
+      if (storedModel) {
+        findings.push(finding('stored-app-model', 'review', 'This View appears to retain AppModel.shared in a stored property. Resolve the required Features through its ViewModel.', file, lineOf(source, start + storedModel.index)));
+      }
+
+      for (const match of members.matchAll(new RegExp(`\\b(?:let|var)\\s+${propertyNamePattern}\\s*(?::\\s*(?:Swift\\s*\\.\\s*)?Task\\s*<|(=\\s*(?:Swift\\s*\\.\\s*)?Task\\b))`, 'gu'))) {
         const suffix = body.slice(match.index + match[0].length);
         if (match[3]) {
           const genericStart = /^\s*</.exec(suffix);

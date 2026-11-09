@@ -543,3 +543,22 @@ test('an initializer assignment to another instance does not establish screen ow
   }`);
   assert.equal(report.screens[0].ownsViewModel, false);
 });
+
+test('reviews a View storing an inferred AppModel alias without confusing locals or Feature access', async t => {
+  const file = 'App/Presentation/ModelAliasView.swift';
+  const {report} = await inspectView(t, '', {
+    [file]: `struct ModelAliasView: View {
+      private let feature = AppModel.shared.notesFeature
+      private let graph = AppModel.shared
+      var body: some View { Text(graph.notesFeature.title) }
+    }
+    struct LocalAliasView: View {
+      var body: some View {
+        let graph = AppModel.shared
+        Text(graph.notesFeature.title)
+      }
+    }`
+  });
+  assert.deepEqual(report.findings.filter(item => item.code === 'stored-app-model').map(item => [item.file, item.line]),
+    [[file, 3]]);
+});
