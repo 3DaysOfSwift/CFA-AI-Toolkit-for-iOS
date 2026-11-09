@@ -182,6 +182,12 @@ any offline availability indicator refers only to saved data. Check that a
 failed refresh retains valid displayed data and that delayed cache writes
 cannot replace a newer snapshot.
 
+For refreshable Feature data, start with a confirmed value and hold the next
+request open. Assert that the confirmed value remains available while the
+Feature reports the operation in progress. Fail the request and verify that
+the Feature retains the value, ends the operation and exposes the failure
+independently.
+
 For offline edits sent to a custom server, apply the
 [sync rule](references/spec/rules/cfa-sync-01.md). Fail the local write and
 verify that neither local success nor a sendable pending edit is published.

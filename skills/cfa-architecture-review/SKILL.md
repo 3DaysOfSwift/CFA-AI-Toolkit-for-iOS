@@ -167,6 +167,12 @@ and any offline-availability claim describes the snapshot actually saved.
 Trace required saves for user edits separately and verify that a failed write
 leaves the last confirmed value unchanged.
 
+When reviewing Feature state, trace confirmed data, operation state and
+failure outcomes separately. Check that starting a refresh preserves usable
+data while the operation is pending and that failure can be reported without
+discarding it. A result-like state enum that bundles all three conflicts with
+the CFA launch and refresh guidance even when it uses a different name.
+
 When offline edits or cross-device sync are in scope, apply the
 [sync rule](references/spec/rules/cfa-sync-01.md). Trace local persistence,
 pending sync and server confirmation separately. For a custom server, verify
