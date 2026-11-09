@@ -326,19 +326,20 @@ export async function inspect(project) {
       findings.push(finding('app-model-shared-missing', 'review', 'AppModel defines live() but no static shared property was found. Verify that the app exposes one production graph as AppModel.shared.', appModelFile, lineOf(appModel, appModelDeclaration.index)));
     }
     for (const {file, source, members, start} of appModelScopes) {
-      for (const match of members.matchAll(/\bstatic[ \t]+(let|var)[ \t]+(\w+)[ \t]*(?::\s*[^;=\n]+)?\s*=(?!=)/g)) {
-        const [, binding, name] = match;
+      for (const match of members.matchAll(new RegExp(String.raw`\bstatic\s+(let|var)\s+${propertyNamePattern}\s*(?::\s*[^;=\n]+)?\s*=(?!=)`, 'gu'))) {
+        const [, binding, escapedName, plainName] = match;
+        const name = escapedName ?? plainName;
         if (name === 'shared') {
           if (binding === 'var') findings.push(finding('app-model-mutable-shared', 'warning', 'AppModel.shared is mutable. Declare the production graph with static let shared and construct it through live().', file, lineOf(source, start + match.index)));
           continue;
         }
         findings.push(finding('app-model-static-state', 'warning', `AppModel declares static stored property ${name}; CFA reserves static storage in AppModel for the shared production graph.`, file, lineOf(source, start + match.index)));
       }
-      const computedShared = /\bstatic\s+var\s+shared\s*:\s*(?:\w+\s*\.\s*)*AppModel\b/.exec(members);
+      const computedShared = /\bstatic\s+var\s+`?shared`?\s*:\s*(?:\w+\s*\.\s*)*AppModel\b/.exec(members);
       if (computedShared && hasComputedAccessor(source.slice(start + computedShared.index + computedShared[0].length))) {
         findings.push(finding('app-model-computed-shared', 'warning', 'AppModel.shared is computed. CFA uses one stored static let initialized through live(). Trace whether the getter creates a new graph on access.', file, lineOf(source, start + computedShared.index)));
       }
-      for (const sharedInitializer of members.matchAll(/\bstatic\s+let\s+shared\s*(?::\s*(?:\w+\s*\.\s*)*AppModel\s*)?=/g)) {
+      for (const sharedInitializer of members.matchAll(/\bstatic\s+let\s+`?shared`?\s*(?::\s*(?:\w+\s*\.\s*)*AppModel\s*)?=/g)) {
         const initializer = source.slice(start + sharedInitializer.index + sharedInitializer[0].length);
         if (!/^\s*(?:(?:\w+\s*\.\s*)*(?:AppModel|Self)\s*\.\s*)?live\s*\(\s*\)/.test(initializer)) {
           findings.push(finding('app-model-shared-factory', 'review', 'AppModel.shared does not visibly call live(). Trace its initializer and verify the production graph comes from the single live factory.', file, lineOf(source, start + sharedInitializer.index)));

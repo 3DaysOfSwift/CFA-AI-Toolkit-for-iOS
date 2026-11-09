@@ -282,7 +282,7 @@ test('reviews competing conditional shared graphs and checks each initializer', 
       #if DEBUG
       static let shared = live()
       #else
-      static let shared = AppModel()
+      static let \`shared\` = AppModel()
       #endif
       static func live() -> AppModel { AppModel() }
     }`
@@ -299,8 +299,8 @@ test('checks static AppModel storage in an extension at its source location', as
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel {}',
     [file]: `extension AppModel {
-      static let shared = AppModel()
-      static let alternateGraph = AppModel()
+      static let \`shared\` = AppModel()
+      static let \`alternateGraph\` = AppModel()
       static func live() -> AppModel { AppModel() }
     }`
   });
@@ -318,7 +318,7 @@ test('flags a mutable shared AppModel graph', async t => {
   const file = 'Application/2 - AppModel/AppModel.swift';
   const root = await fixture(t, {
     [file]: `final class AppModel {
-      private(set) static var shared: AppModel
+      private(set) static var \`shared\`: AppModel
         = live()
       static func live() -> AppModel { AppModel() }
     }`
@@ -333,7 +333,7 @@ test('flags a computed shared AppModel graph', async t => {
   const file = 'Application/2 - AppModel/AppModel.swift';
   const root = await fixture(t, {
     [file]: `final class AppModel {
-      static var shared: AppModel { live() }
+      static var \`shared\`: AppModel { live() }
       static func live() -> AppModel { AppModel() }
     }`
   });
