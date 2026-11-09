@@ -112,6 +112,11 @@ Use deliberate passes:
    the second reaches a controlled transport while the first response is held
    open. If an actor protects shared request policy, trace whether either
    caller waits for another request's response before starting its own.
+   When migrating an existing cache of replaceable downloads, apply the
+   [optional snapshot rule](references/spec/rules/cfa-cache-01.md). Verify that
+   a slow restore cannot delay refresh or overwrite fresh data, and that an
+   optional write cannot hold up a successful refresh. Keep required
+   persistence for user edits on the save path before reporting success.
 3. Convert that feature’s asynchronous model work into directly awaitable
    Swift Concurrency. ViewModels retain handles for the unstructured tasks
    they create by default. Equivalent repeated button actions return the same
