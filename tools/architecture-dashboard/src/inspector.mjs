@@ -51,6 +51,7 @@ function braceBody(source, openingBrace) {
 const identifier = '[\\p{L}_][\\p{L}\\p{M}\\p{N}_]*';
 const inferredAppModelStorage = /\b(?:let|var)\s+`?[\p{L}_][\p{L}\p{M}\p{N}_]*`?\s*=\s*(?:\w+\s*\.\s*)*AppModel\s*\.\s*shared\b(?!\s*[.?![(])/gu;
 const propertyNamePattern = '(?:`(' + identifier + ')`|(' + identifier + '))';
+const sharedPropertyAccess = new RegExp(String.raw`\bAppModel\s*\.\s*shared\s*\.\s*${propertyNamePattern}`, 'gu');
 
 // Keep only direct member signatures. Mask method/nested-type bodies without
 // changing offsets, so a nested example cannot satisfy the screen's ownership.
@@ -234,10 +235,10 @@ export async function inspect(project) {
     propertyCandidates.get(name).push(property);
   }
   const appProperties = new Map();
-  for (const match of appMembers.matchAll(/\b(?:let|var)\s+(\w+)\s*:\s*(?:any\s+)?(?:\w+\s*\.\s*)*(\w+)/g)) {
-    recordProperty(match[1], {
+  for (const match of appMembers.matchAll(new RegExp(String.raw`\b(?:let|var)\s+${propertyNamePattern}\s*:\s*(?:any\s+)?(?:\w+\s*\.\s*)*(\w+)`, 'gu'))) {
+    recordProperty(match[1] ?? match[2], {
       file: appModelFile,
-      type: match[2],
+      type: match[3],
       line: lineOf(appModel, match.index),
       computed: hasComputedAccessor(appModel.slice(match.index + match[0].length))
     });
@@ -248,9 +249,10 @@ export async function inspect(project) {
       for (const extension of source.matchAll(/\bextension\s+AppModel\b(?!\s*\.)[^{}]*\{/g)) {
         const offset = extension.index + extension[0].length;
         const body = braceBody(source, offset - 1);
-        for (const match of memberSignatures(body).matchAll(/(?:^|(?<=;))[ \t]*(?:(?:private|fileprivate|internal|package|public)\s+)?var\s+(\w+)\s*:\s*(?:\w+\s*\.\s*)*(\w+Feature)\b(?!\s*\.)/gm)) {
+        for (const match of memberSignatures(body).matchAll(new RegExp(String.raw`(?:^|(?<=;))[ \t]*(?:(?:private|fileprivate|internal|package|public)\s+)?var\s+${propertyNamePattern}\s*:\s*(?:\w+\s*\.\s*)*(\w+Feature)\b(?!\s*\.)`, 'gmu'))) {
           if (!hasComputedAccessor(body.slice(match.index + match[0].length))) continue;
-          const [, name, type] = match;
+          const [, escapedName, plainName, type] = match;
+          const name = escapedName ?? plainName;
           const property = {file, type, line: lineOf(source, offset + match.index), computed: true};
           recordProperty(name, property);
         }
@@ -536,8 +538,8 @@ export async function inspect(project) {
 
   function findFeatureAccess(source) {
     const isFeature = name => name.endsWith('Feature') || featureProperties.has(name);
-    const direct = [...source.matchAll(/\bAppModel\s*\.\s*shared\s*\.\s*(\w+)/g)]
-      .find(match => isFeature(match[1]));
+    const direct = [...source.matchAll(sharedPropertyAccess)]
+      .find(match => isFeature(match[1] ?? match[2]));
     if (direct) return direct;
     for (const alias of source.matchAll(/\blet\s+([A-Za-z_]\w*)(?:\s*:\s*(?:\w+\s*\.\s*)*AppModel)?\s*=\s*(?:\w+\s*\.\s*)*AppModel\s*\.\s*shared\b(?!\s*\.)/g)) {
       const access = new RegExp(`(?<![.\\w])${alias[1]}\\s*\\.\\s*(\\w+)`, 'g');
@@ -920,8 +922,8 @@ export async function inspect(project) {
     }
     if (viewModel) {
       const references = dependencySources.flatMap(location =>
-        [...location.body.matchAll(/\bAppModel\s*\.\s*shared\s*\.\s*(\w+)/g)]
-          .map(match => ({property: match[1], file: location.file, line: lineOf(location.source, location.offset + match.index)}))
+        [...location.body.matchAll(sharedPropertyAccess)]
+          .map(match => ({property: match[1] ?? match[2], file: location.file, line: lineOf(location.source, location.offset + match.index)}))
       );
       for (const {property, file, line} of references) {
         const exposure = appProperties.get(property);

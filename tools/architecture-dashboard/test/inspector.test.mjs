@@ -1542,9 +1542,9 @@ test('does not resolve competing AppModel exposures to one Feature', async t => 
   const extensionFile = 'Application/2 - AppModel/AppModel+Chat.swift';
   const root = await fixture(t, {
     [file]: 'final class AppModel {\n#if INTERNAL\n let chatFeature: ChatFeature\n#endif\n}',
-    [extensionFile]: '#if !INTERNAL\nextension AppModel { var chatFeature: ChatFeature { ChatFeature() } }\n#endif',
+    [extensionFile]: '#if !INTERNAL\nextension AppModel { var `chatFeature`: ChatFeature { ChatFeature() } }\n#endif',
     'Application/1 - View/Views/Chat/ChatView.swift': 'struct ChatView: View { @State private var viewModel = ChatViewModel() }',
-    'Application/1 - View/Views/Chat/ChatViewModel.swift': 'final class ChatViewModel { let chatFeature = AppModel.shared.chatFeature }'
+    'Application/1 - View/Views/Chat/ChatViewModel.swift': 'final class ChatViewModel { let chatFeature = AppModel.shared.`chatFeature` }'
   });
   const report = await inspect(root);
   const ambiguity = report.findings.find(item => item.code === 'app-model-property-ambiguous');
