@@ -51,6 +51,9 @@ skill from that toolkit before changing the project.
   label use the matching lower-camel-case Feature name. Use concrete features
   directly; do not add matching FeatureAPI protocols. Lower-level services keep names that
   describe their actual jobs.
+- On supported deployment targets, use @Observable for ViewModels and
+  Features whose state the UI observes. Preserve a compatible observation
+  mechanism when a migration must support an older deployment target.
 - A detail View may receive selected immutable value data and construct its own
   State-backed ViewModel in its initializer. Do not inject or share ViewModels;
   keep each scene's selection in presentation, not in a shared Feature. The
