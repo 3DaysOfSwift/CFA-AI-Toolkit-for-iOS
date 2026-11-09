@@ -216,6 +216,9 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
         const item = record.evidence.find(candidate => candidate.id === gate[field]);
         if (!item || !kinds.includes(item.kind) || item.phase !== 'after' || item.outcome !== 'passed' || item.commit !== record.repository.afterCommit) {
           errors.push(`completionGate.${field}: requires passed after evidence at afterCommit with kind ${kinds.join(' or ')}`);
+        } else if (field === 'testEvidenceId' && item.targets?.length &&
+                   !item.targets.some(target => gate.affectedTargets.includes(target))) {
+          warnings.push(`evidence.${item.id}: link the named test targets to the affected application targets they exercise.`);
         } else if (field === 'manualBehaviourRegressionEvidenceId') {
           if (!item.targets?.length) {
             warnings.push(`evidence.${item.id}: list the affected targets exercised by the manual regression.`);

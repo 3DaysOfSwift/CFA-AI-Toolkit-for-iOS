@@ -79,7 +79,9 @@ evidence IDs in `completionGate.dataHandoffEvidenceIds`. Use an empty list
 only when the reviewer confirms no data handoff is affected. List the
 producing and receiving targets and the environment used to exercise the
 handoff. The validator rejects handoff evidence that names only unrelated
-targets. A passing build establishes compilation only.
+targets. A passing build establishes compilation only. For automated test evidence,
+record which affected app or extension targets the named test targets exercise.
+The validator cannot infer that relationship from test target names.
 
 Read the warnings from both `validate` and `digest`. For a failed run during
 or after migration, keep the failure record and link a passing rerun at the

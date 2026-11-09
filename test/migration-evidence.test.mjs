@@ -175,6 +175,13 @@ test('completion is not inferred from a build pass or tests at a different commi
     manualBehaviourRegressionEvidenceId: 'after-behaviour-regression',
     manualArchitectureReviewEvidenceId: 'after-architecture-review'
   };
+  testEvidence.targets = ['AppTests'];
+  f.write();
+  const testTargetWarning = 'link the named test targets to the affected application targets';
+  assert.ok(inspectRecord(f.file).warnings.some(warning => warning.includes(testTargetWarning)));
+  testEvidence.targets.push('App');
+  f.write();
+  assert.ok(!inspectRecord(f.file).warnings.some(warning => warning.includes(testTargetWarning)));
   const navigator = f.record.evidence.find(item => item.id === 'after-navigator');
   navigator.kind = 'diff';
   f.write();
