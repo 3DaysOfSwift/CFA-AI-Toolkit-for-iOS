@@ -222,6 +222,9 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
           } else if (!item.targets.some(target => gate.affectedTargets.includes(target))) {
             errors.push(`completionGate.${field}: ${item.id} names only unrelated targets.`);
           }
+        } else if (['navigatorEvidenceId', 'manualArchitectureReviewEvidenceId'].includes(field) &&
+                   item.targets?.length && !item.targets.some(target => gate.affectedTargets.includes(target))) {
+          errors.push(`completionGate.${field}: ${item.id} names only unrelated targets.`);
         } else if (field === 'testEvidenceId' && item.targets?.length &&
                    !item.targets.some(target => gate.affectedTargets.includes(target))) {
           warnings.push(`evidence.${item.id}: link the named test targets to the affected application targets they exercise.`);

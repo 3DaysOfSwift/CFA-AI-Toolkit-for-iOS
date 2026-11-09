@@ -275,6 +275,15 @@ test('completion is not inferred from a build pass or tests at a different commi
     warning.includes('evidence.after-widget-handoff: identify the producing and receiving targets')
   ));
 
+  for (const field of ['navigatorEvidenceId', 'manualArchitectureReviewEvidenceId']) {
+    const review = f.record.evidence.find(item => item.id === f.record.completionGate[field]);
+    review.targets = ['Unrelated'];
+    f.write();
+    assert.ok(inspectRecord(f.file).errors.includes(
+      `completionGate.${field}: ${review.id} names only unrelated targets.`
+    ));
+    review.targets = ['App', 'Widget'];
+  }
   const architectureReview = f.record.completionGate.manualArchitectureReviewEvidenceId;
   f.record.completionGate.manualArchitectureReviewEvidenceId = f.record.completionGate.navigatorEvidenceId;
   f.write();
