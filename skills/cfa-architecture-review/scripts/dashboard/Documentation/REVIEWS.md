@@ -266,6 +266,13 @@ a screen that needs a prompt exit can end its wait before the refresh finishes.
 For other architectures, judge the observed behaviour against the app's
 ownership and cancellation policy.
 
+For a durable edit, distinguish discarding an unsaved draft from leaving
+after the operation is accepted. In the `leave` scenario, record whether
+the accepted save continues and how confirmed state reflects a completed
+write when its caller has left. In the `failure` scenario, trace what
+happens to the confirmed value and draft and whether the user can retry.
+Evaluate these outcomes against the operation's ownership policy.
+
 Trace repeated triggers, navigation or caller departure, older results arriving
 late, and failures through the actual state and task owners. Record the observed
 policy, test or reproduction separately from source-only reasoning. The report
