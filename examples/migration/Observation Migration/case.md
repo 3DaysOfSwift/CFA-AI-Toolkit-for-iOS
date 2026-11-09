@@ -10,8 +10,9 @@ Both models record the first two completed days through separate calls. The Comb
 
 ## Migration
 
-The Feature uses @Observable; UI isolation remains explicit. The runnable check
-shows a second tracking registration receiving a later change. SwiftUI normally
+The Feature and ViewModel use `@Observable` and are isolated to `@MainActor`.
+The runnable check reads the count through the ViewModel’s computed property,
+then verifies that a new tracking registration receives a later change. SwiftUI normally
 establishes observation as it evaluates the properties a View reads; manual
 re-registration is shown here to make one-shot tracking visible.
 

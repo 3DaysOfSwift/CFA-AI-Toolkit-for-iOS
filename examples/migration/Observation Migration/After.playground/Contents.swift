@@ -13,6 +13,17 @@ final class HabitFeature {
     func recordCompletedDay() { completedDays += 1 }
 }
 
+@MainActor @Observable
+final class HabitViewModel {
+    private let habitFeature: HabitFeature
+
+    init(habitFeature: HabitFeature) {
+        self.habitFeature = habitFeature
+    }
+
+    var completedDays: Int { habitFeature.completedDays }
+}
+
 // MARK: - Test fixtures
 // Test-only counter records observation callbacks safely.
 final class NotificationCount: @unchecked Sendable {
@@ -26,23 +37,24 @@ final class NotificationCount: @unchecked Sendable {
 @MainActor
 func runExample() {
     let feature = HabitFeature()
+    let viewModel = HabitViewModel(habitFeature: feature)
     let count = NotificationCount()
-    withObservationTracking { _ = feature.completedDays } onChange: { count.record() }
+    withObservationTracking { _ = viewModel.completedDays } onChange: { count.record() }
     feature.recordCompletedDay()
     feature.recordCompletedDay()
-    precondition(feature.completedDays == 2 && count.read() == 1)
+    precondition(viewModel.completedDays == 2 && count.read() == 1)
 
     // Register the next read and pick up the latest state, including changes
     // made after the first registration fired.
-    let latestCount = withObservationTracking { feature.completedDays } onChange: { count.record() }
+    let latestCount = withObservationTracking { viewModel.completedDays } onChange: { count.record() }
     precondition(latestCount == 2)
     feature.recordCompletedDay()
-    precondition(feature.completedDays == 3 && count.read() == 2)
+    precondition(viewModel.completedDays == 3 && count.read() == 2)
     print("Passed: Observation tracking is one-shot and can be registered again.")
 }
 
 // MARK: - Run after example
 Task { @MainActor in
-     runExample()
+    runExample()
     PlaygroundPage.current.finishExecution()
 }
