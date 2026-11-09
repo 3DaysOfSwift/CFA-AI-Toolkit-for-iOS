@@ -294,7 +294,7 @@ The path through one feature is:
 View → dedicated ViewModel → Feature → Microservices
 ```
 
-Here is an illustrative CFA folder map. Each screen has its own ViewModel;
+Here is an illustrative CFA folder map. Each screen-level SwiftUI View has its own ViewModel;
 Features represent capabilities and can serve multiple screens. A screen can
 also use more than one Feature.
 
@@ -349,7 +349,7 @@ Read the full [CFA specification](architecture/cfa-specification.md) and
 
 - Create a commercially structured SwiftUI project instead of a pile of files.
 - Keep business decisions out of SwiftUI Views.
-- Give every screen its own ViewModel.
+- Give every screen-level SwiftUI View its own ViewModel.
 - Keep each feature’s state and rules with the Feature that owns it.
 - Use Swift Concurrency with clear ownership, cancellation and ordering.
 - Preserve the product’s behaviour while migrating a legacy app.
@@ -521,13 +521,13 @@ This section is for AI coding assistants (Codex, Claude Code, Cursor and others)
 **Rules to keep in every change**
 
 - Path: View → dedicated ViewModel → Feature → Microservices. These supporting services can include repositories, networking and device API adapters. Views never receive ViewModels, Features, AppModel or repositories.
-- Each screen owns its ViewModel in a private `@State` property named `viewModel`, created inline by default. A detail View may initialise its own State-backed ViewModel from selected value data. The ViewModel defaults its narrow Feature dependencies from `AppModel.shared`.
+- Each screen-level SwiftUI View owns its ViewModel in a private `@State` property named `viewModel`, created inline by default. A detail View may initialise its own State-backed ViewModel from selected value data. The ViewModel defaults its narrow Feature dependencies from `AppModel.shared`.
 - Features are concrete `@MainActor` classes named `…Feature`, with no matching protocol. Use `@Observable` when a Feature exposes UI-observed state. Features are never called Managers.
 - Features keep domain data, operation state and errors as separate values. Never use a `LoadState` enum that carries all three.
 - Each Feature defines its overlapping-call policy: share requests when one execution satisfies every caller; queue commands that must each take effect, even if their inputs match. Keep task ownership and completion explicit.
 - AppModel stores `shared`, the concrete Features, one launch Boolean and private task handles for app-wide listeners, and has a single `static func live()`. The app delegate calls `applicationDidFinishLaunching()` directly and synchronously; Features can start their own asynchronous work.
 - `App.body` has a stable root. Database availability never gates the UI. SwiftData goes through `SwiftDataManager`, with a `@ModelActor` for non-trivial persistence work. `URLSession` goes through `NetworkingManager`.
-- Write `@MainActor` explicitly on Features, ViewModels and AppModel, and use actors for shared storage. Never use locks, GCD inside async code, or `@unchecked Sendable` as an escape hatch.
+- Write `@MainActor` explicitly on Features, ViewModels and AppModel, and use actors for shared storage. Keep necessary legacy synchronization behind a documented boundary that preserves its guarantees. Use `@unchecked Sendable` only when the type maintains a documented thread-safety invariant.
 - Name ViewModel methods for the work they do: `refresh()`, `save()`, `retry()`.
 - Tests: one suite per ViewModel, plus named `FeatureTests` for each Feature. Use an isolated AppModel graph rather than `AppModel.shared`; avoid arbitrary sleeps and scheduler assumptions when coordinating tests.
 - Preserve an established product's design. Themes, footers and branding are defaults for new apps only.
