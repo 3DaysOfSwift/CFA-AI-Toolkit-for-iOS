@@ -486,11 +486,11 @@ export async function inspect(project) {
 
   for (const [type, candidates] of declarationsByName) {
     if (!type.endsWith('Feature')) continue;
-    const owner = candidates.find(({file, declaration}) =>
-      declaration.type === 'class' && /(?:^|\/)2 - AppModel\/Features\//.test(file));
-    if (owner) {
-      inspectFeatureIsolation(owner);
-      inspectFeatureTests(type, owner.file, owner.declaration.line);
+    for (const candidate of candidates) {
+      const {file, declaration} = candidate;
+      if (declaration.type !== 'class' || !/(?:^|\/)2 - AppModel\/Features\//.test(file)) continue;
+      inspectFeatureIsolation(candidate);
+      inspectFeatureTests(type, file, declaration.line);
     }
   }
 

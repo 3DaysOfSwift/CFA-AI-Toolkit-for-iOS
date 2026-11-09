@@ -114,6 +114,20 @@ test('reviews explicit nonisolated Feature declarations without inferring defaul
   assert.ok(!(await inspect(root)).findings.some(item => item.code === 'feature-isolation'));
 });
 
+test('reviews a nonisolated Feature in a later conditional declaration', async t => {
+  const file = 'Application/2 - AppModel/Features/Settings/SettingsFeature.swift';
+  const root = await fixture(t, {
+    [file]: `#if DEBUG
+    @MainActor final class SettingsFeature {}
+    #else
+    nonisolated final class SettingsFeature {}
+    #endif`
+  });
+  const {findings} = await inspect(root);
+  const isolation = findings.filter(item => item.code === 'feature-isolation');
+  assert.deepEqual(isolation.map(item => [item.file, item.line, item.severity]), [[file, 4, 'review']]);
+});
+
 test('reports a missing named feature test file', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static let shared = live(); static func live() -> AppModel { AppModel() }; let settingsFeature: SettingsFeature }',
