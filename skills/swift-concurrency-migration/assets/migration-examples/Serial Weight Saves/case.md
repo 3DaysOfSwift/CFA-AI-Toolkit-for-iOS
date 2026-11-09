@@ -24,4 +24,6 @@ Open and run `Before.playground` and `After.playground`. Each prints `Passed:` a
 
 In-memory fixture; no actual disk failure or process restart. The shared automated
 check also holds the first save open and verifies that admitted saves run in order
-across a failing middle command. It does not cover every possible interleaving.
+across a failing middle command. It also verifies that two identical admitted
+saves both take effect, and that the queue releases its last admission after
+completion.

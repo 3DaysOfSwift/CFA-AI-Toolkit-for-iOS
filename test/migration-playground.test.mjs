@@ -119,7 +119,7 @@ actor WeightStorage: WeightSaving {
     private(set) var attempts: [Int] = []
     func save(_ weight: Int) async throws {
         attempts.append(weight)
-        if weight == 80 {
+        if !started {
             started = true
             startWaiter?.resume(); startWaiter = nil
             await withCheckedContinuation { releaseWaiter = $0 }
@@ -145,7 +145,7 @@ extension WeightLogFeature { var testSaveID: UUID? { lastSaveID } }
         let invalid = Task { await feature.save(-1) }
         while feature.testSaveID == firstID { await Task.yield() }
         let secondID = feature.testSaveID
-        let last = Task { await feature.save(82) }
+        let last = Task { await feature.save(80) }
         while feature.testSaveID == secondID { await Task.yield() }
         let before = await storage.attempts
         precondition(before == [80])
@@ -153,8 +153,9 @@ extension WeightLogFeature { var testSaveID: UUID? { lastSaveID } }
         await storage.releaseFirst()
         let a = await first.value, b = await invalid.value, c = await last.value
         let attempts = await storage.attempts
-        precondition(a && !b && c && attempts == [80, -1, 82])
-        precondition(feature.weights == [80, 82] && feature.saveError == nil)
+        precondition(a && !b && c && attempts == [80, -1, 80])
+        precondition(feature.weights == [80, 80] && feature.saveError == nil)
+        precondition(feature.testSaveID == nil)
     }
 }`;
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfa-weight-order-'));
