@@ -105,9 +105,12 @@ skill from that toolkit before changing the project.
 - A Feature-owned shared refresh normally continues when a screen leaves;
   preserve its result for later callers unless a specific product or resource
   requirement calls for another cancellation policy.
-- Share equivalent in-flight requests when appropriate; queue commands that
-  must each complete. Matching inputs alone do not make two required user
-  actions duplicates. Define ownership, cancellation and failure handling.
+- At the Feature boundary, equivalent requests await one in-flight task and
+  receive its outcome. One caller cancelling must leave shared work running
+  when other callers still need it. Queue commands that must each take effect
+  in admission order, including across awaits, and return each caller's own
+  outcome. Matching inputs alone do not make commands duplicates. Define how
+  failure and cancellation affect queued work and when to clear task handles.
 - PurchasesFeature owns entitlement state. Screen ViewModels check access before
   presenting or calling a paid capability. Trace every other entry point to its
   own guard and verify both locked and entitled outcomes. Server operations
