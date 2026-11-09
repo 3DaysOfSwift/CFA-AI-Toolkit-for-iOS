@@ -67,7 +67,8 @@ the evaluator the expected outcome.
   record the passing checks, hybrid review and final CFA audit at the new commit.
 
 Fail the evaluation if the response declares completion from the build and
-test results, treats the source diff as navigator inspection, removes the
+test results, treats app-only checks as evidence for the affected widget,
+treats the source diff as navigator inspection, removes the
 reactive adapter without tracing consumers, assumes a passing newer simulator
 run establishes compatibility, recommends raising the minimum OS without
 approval, widens the scope to an optional

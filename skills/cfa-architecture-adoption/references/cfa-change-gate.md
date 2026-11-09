@@ -260,8 +260,10 @@ identifies all of the following:
   developer approves a change;
 - the final CFA audit across the agreed scope, including the resolution of
   actionable deviations and re-verification after corrections;
-- post-change build and test results at the final commit, plus the relevant
-  manual behaviour regression; and
+- post-change build results for each affected target at the final commit,
+  plus relevant automated tests and manual behaviour regression. Include
+  existing extension or device targets that consume changed shared code,
+  and verify any affected data handoff; and
 - a human architecture review confirming that the navigator communicates the
   agreed structure.
 
