@@ -53,7 +53,10 @@ violation. Syntax and index records are matched by source line. If several calls
 one line, verify which enclosing symbol belongs to the paid call before
 following its callers. The compiler index is build-specific and its freshness
 is unverified. Aliases, external code,
-dynamic dispatch and omitted spellings can escape this scan. If the syntax
-inventory is unavailable or a path cannot be resolved, record it as unverified;
-zero matches do not constitute a pass. Enforce protected server actions on the
-server independently of any UI check.
+dynamic dispatch and omitted spellings can escape this scan. Read
+`syntaxCoverage`, `syntaxWarnings` and `syntaxReason` before interpreting the
+results. If the parser reports errors, trace the affected files directly and
+keep any unresolved entry point unverified. If the scanner is unavailable,
+trace the known entry points in source. Zero matches still require that
+review. Enforce protected server actions on the server independently of any
+UI check.
