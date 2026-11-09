@@ -70,6 +70,10 @@ skill from that toolkit before changing the project.
 - Share equivalent in-flight requests when appropriate; queue commands that
   must each complete. Matching inputs alone do not make two required user
   actions duplicates. Define ownership, cancellation and failure handling.
+- PurchasesFeature owns entitlement state. Screen ViewModels check access before
+  presenting or calling a paid capability. Trace every other entry point to its
+  own guard and verify both locked and entitled outcomes. Server operations
+  enforce their own access policy.
 - Publish durable user edits as saved only after required persistence succeeds.
   A current server response does not wait for an optional cache write; prevent
   an older cached snapshot from replacing fresher data.

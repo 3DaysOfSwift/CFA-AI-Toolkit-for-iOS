@@ -91,6 +91,10 @@ judgment. Health Check preparation writes the same record as
 same analyser for its baseline. Analysis output may contain source paths and
 symbols, so review it before sharing.
 
+For paid capabilities, use the [entitlement review workflow](Documentation/entitlement-review.md)
+to find candidate call sites and trace their entry points. Verify presentation
+access and the locked and entitled outcomes separately.
+
 ### Readable Health Check report
 
 For a whole-app Health Check, first run
