@@ -253,8 +253,9 @@ The CFA AI Toolkit for iOS contains eight AI skills and one local analysis tool.
 | [Swift Code Quality](skills/swift-code-quality/SKILL.md) | apply Matt’s Swift standards to production code, examples and open-source projects. |
 
 The included **Xcode Project Dashboard** scans a Swift Concurrency project and
-creates a local HTML report. It exposes task creation, task ownership, source
-locations, architecture observations and imported test results.
+creates a local HTML report. It lists task creation sites and source locations
+and displays reviewed ownership, architecture observations and imported test
+results. Task ownership requires tracing the code and its callers.
 
 ## Start with a complete CFA app
 
@@ -384,8 +385,9 @@ ViewModels, `AppModel.shared` Feature routes, and named tests it can identify.
 It flags gaps for review. A source scan can miss screens and routes that use
 different layouts or indirect wiring. The CFA Architecture Review skill uses
 the map to guide source inspection and verify findings.
-Existing app code is not renamed automatically; `cfa doctor` warns if an
-earlier installed project-guidance block still requires the old Manager suffix.
+The inspector reports ViewModel ownership and naming separately. A recognized
+private `@State` ViewModel under a different name still counts as screen-owned.
+CFA names that property `viewModel`.
 
 ## Xcode Project Dashboard
 
