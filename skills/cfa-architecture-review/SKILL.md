@@ -78,7 +78,12 @@ Check stored properties and nested references for mutation, and follow writes
 through persistence to publication. A local draft or mutable value alone does
 not establish a synchronization defect. For a concurrency finding, identify
 the competing copy or mutation path and how it can diverge. For CFA conformance,
-check the published snapshot's immutability separately.
+check the published snapshot's immutability separately. For editor paths, apply
+the [draft rule](references/spec/rules/cfa-ui-04.md). Verify that the screen
+ViewModel owns the unsaved input and submits it to the owning Feature. Trace
+failed saves to retained input and unchanged confirmed state, and Cancel to
+discarding the draft without a write. Check that success publishes only after
+required persistence succeeds.
 
 When known paid capabilities fall within the review scope, identify their
 entitlement policy and trace each identifiable entry point to its check. Report
