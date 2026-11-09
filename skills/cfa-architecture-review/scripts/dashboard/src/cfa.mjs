@@ -294,10 +294,12 @@ skill from that toolkit before changing the project.
   The storage owner prepares the parent directory at the configured store URL
   before opening a file-backed store. Directory and opening failures follow
   the request through Feature, ViewModel and screen. Retry the same request
-  while preserving the configured store and existing data. A failed fetch
-  cannot justify discarding a working container or substituting an empty store.
-  Verify that the root appears and independent navigation works while the
-  initial open is pending and after it fails.
+  while preserving the configured location and existing data. Retry opening
+  if the store never opened, and reuse the working container if only a fetch
+  failed. Surface a failed initial fetch as an error and keep previously loaded
+  data visible if a refresh fails. Verify that the root appears and independent
+  navigation works while the initial open is pending and after it fails.
+  Separately verify that retry after a fetch failure reuses the opened store.
 - During migration, preserve business behaviour, user-facing capabilities,
   stored data and meaningful interactions. Limit implementation changes to
   the agreed CFA and Swift Concurrency migration and supported platforms.
