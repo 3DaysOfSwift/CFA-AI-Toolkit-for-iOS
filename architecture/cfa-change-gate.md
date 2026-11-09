@@ -522,7 +522,9 @@ identifies all of the following:
   delivery on supported hardware separately from handler tests;
 - the hybrid implementation review, identifying remaining users of legacy
   mechanisms and dependencies and recording which adapters were removed or
-  intentionally retained to preserve behaviour or platform support. Where a
+  intentionally retained to preserve behaviour or platform support. For removed
+  adapters or dependencies, link the baseline and rerun of the affected
+  consumer scenarios on each affected target. Where a
   consumer needs every event, verify repeated values, ordering and cancellation
   separately from the latest UI state;
 - for existing widgets and device targets affected by Model or service

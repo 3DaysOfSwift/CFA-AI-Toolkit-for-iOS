@@ -28,7 +28,9 @@ manual checks; record failures and checks not run. A build is not proof of
 behaviour preservation. Keep remaining risks and work visible.
 
 For the final migration record, describe the hybrid paths reviewed and the
-reasons for retaining any legacy mechanisms. Link the final CFA audit and
+reasons for retaining any legacy mechanisms. For each removed adapter or
+dependency, link the baseline behaviour and the same scenarios rerun on each
+affected target. Link the final CFA audit and
 hybrid review at the final commit. In the CFA audit, give each applicable
 requirement an evidence-backed verdict. Explain inapplicability and the effect
 of agreed exceptions. Record the corrections and repeated checks. An applicable
