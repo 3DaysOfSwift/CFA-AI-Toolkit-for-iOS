@@ -69,6 +69,9 @@ function hasProductionTargets(review) {
     targets.every(target => typeof target === 'string' && target.trim());
 }
 
+const evidenceLocations = evidence =>
+  (evidence || []).map(({file, line, endLine}) => ({file, line, endLine}));
+
 // Describe the next concrete review work without treating inventory as evidence.
 export function nextWork(report, review, limit = 8) {
   const entries = new Set((review.entryPoints || []).map(item => item.siteId));
@@ -92,15 +95,15 @@ export function nextWork(report, review, limit = 8) {
       .filter(check => check.status === 'unresolved' || check.status === 'not-checked')
       .map(({id, title, dimension, status, reason, question, resolveBy, evidence}) => ({
         id, title, dimension, status, reason, question, resolveBy,
-        evidence: (evidence || []).map(({file, line, endLine}) => ({file, line, endLine}))
+        evidence: evidenceLocations(evidence)
       })),
     unknowns: operation.unknowns || [],
     unresolvedSteps: (operation.steps || [])
       .filter(step => step.relation === 'unknown')
-      .map(({id, title, detail}) => ({id, title, detail})),
+      .map(({id, title, detail, evidence}) => ({id, title, detail, evidence: evidenceLocations(evidence)})),
     unresolvedTimingScenarios: (operation.scenarios || [])
       .filter(scenario => scenario.status === 'unresolved')
-      .map(({id, title, outcome, verification}) => ({id, title, outcome, verification})),
+      .map(({id, title, outcome, verification, evidence}) => ({id, title, outcome, verification, evidence: evidenceLocations(evidence)})),
     missingTimingScenarios: missingTimingScenarios(operation)
   })).filter(operation => operation.openChecks || operation.missingTrace || operation.missingTimingScenarios.length);
   return {

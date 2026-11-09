@@ -88,14 +88,15 @@ test('whole-app reviews require timing outcomes even if an old input disables th
   assert.deepEqual(coverageGaps(report,review),[]);
   Object.assign(review.operations[0].scenarios[1], {
     status:'unresolved', title:'Leave the screen',
-    outcome:'The refresh owner is unclear.', verification:'Trace the cancellation handler.'
+    outcome:'The refresh owner is unclear.', verification:'Trace the cancellation handler.',
+    evidence:[{file:'App.swift',line:2,endLine:2,excerpt:'Fixture source'}]
   });
   const work = nextWork(report, review);
   assert.equal(work.pendingOperations, 1);
   assert.deepEqual(work.nextOperations[0].missingTimingScenarios, ['leave']);
   assert.deepEqual(work.nextOperations[0].unresolvedTimingScenarios, [{
     id:'leave', title:'Leave the screen', outcome:'The refresh owner is unclear.',
-    verification:'Trace the cancellation handler.'
+    verification:'Trace the cancellation handler.', evidence:[{file:'App.swift',line:2,endLine:2}]
   }]);
   assert.match(coverageGaps(report,review).join(' '),/timing-scenario/);
 });
@@ -213,13 +214,13 @@ test('an unresolved task relationship keeps an operation pending', () => {
   const review = complete();
   review.operations[0].steps = [
     { id: 'trigger', relation: 'event' },
-    { id: 'work', title: 'Load schedule', detail: 'Caller ownership is unclear.', parentId: 'trigger', relation: 'unknown' }
+    { id: 'work', title: 'Load schedule', detail: 'Caller ownership is unclear.', parentId: 'trigger', relation: 'unknown', evidence: [{file:'App.swift',line:2,endLine:2}] }
   ];
   const work = nextWork(report, review);
   assert.match(work.gaps.join(' '), /1 operations have unresolved checks or boundaries/);
   assert.equal(work.nextOperations[0].id, 'launch');
   assert.deepEqual(work.nextOperations[0].unresolvedSteps, [
-    { id: 'work', title: 'Load schedule', detail: 'Caller ownership is unclear.' }
+    { id: 'work', title: 'Load schedule', detail: 'Caller ownership is unclear.', evidence: [{file:'App.swift',line:2,endLine:2}] }
   ]);
   review.operations[0].steps[1].relation = 'same-task';
   assert.deepEqual(nextWork(report, review).gaps, []);
