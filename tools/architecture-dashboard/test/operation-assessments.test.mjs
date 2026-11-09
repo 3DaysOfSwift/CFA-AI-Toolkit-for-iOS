@@ -116,6 +116,7 @@ test('timing problems prevent a stable dashboard verdict despite passing checks'
   }]};
   const failed = operationAssessments(review);
   assert.equal(failed.counts.problem, 1);
+  assert.match(failed.verdict, /Inconclusive/);
   assert.match(failed.html, /confirmed correctness problem.*Duplicate saves can occur/s);
   review.operations[0].scenarios = [{status:'unresolved',title:'Repeat',outcome:'Save overlap is unknown.'}];
   const unresolved = operationAssessments(review);

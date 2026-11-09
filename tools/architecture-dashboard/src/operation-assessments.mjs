@@ -35,15 +35,15 @@ export function operationStatus(op) {
   return [op.correctness,op.clarity].sort((a,b)=>priority[a]-priority[b])[0];
 }
 export function operationAssessments(review) {
+  const expectsTiming = operation => operation.scenarios !== undefined || review?.behaviourScenariosRequired === true;
   const operations=(review?.operations??[]).map(operation => {
     const scenarios = operation.scenarios || [];
     if (scenarios.some(scenario => scenario.status === 'problem')) {
       return {...operation, correctness:'problem', problemKind:operation.problemKind || 'local-defect'};
     }
-    const timingReviewStarted = operation.scenarios !== undefined || review.behaviourScenariosRequired === true;
     const unresolvedBoundary = operation.steps?.some(step => step.relation === 'unknown') ||
       (operation.clarity === 'sound' && operation.unknowns?.length);
-    const unresolvedTiming = timingReviewStarted && missingTimingScenarios(operation).length;
+    const unresolvedTiming = expectsTiming(operation) && missingTimingScenarios(operation).length;
     if (operation.correctness === 'sound' && (unresolvedBoundary || unresolvedTiming)) {
       return {...operation, correctness:'investigate'};
     }
@@ -54,7 +54,8 @@ export function operationAssessments(review) {
   const cfaCounts=Object.fromEntries(Object.keys(cfaLabels).map(status=>[status,operations.filter(op=>checkOutcome(op.checks??[],'cfa')===status).length]));
   const complete = inventory?.coverage === 'complete' && operations.length > 0 &&
     operations.every(op => [op.correctness, op.clarity].every(status => status === 'sound' || status === 'problem') &&
-      !op.unknowns?.length && !op.steps?.some(step => step.relation === 'unknown'));
+      !op.unknowns?.length && !op.steps?.some(step => step.relation === 'unknown') &&
+      (!expectsTiming(op) || !missingTimingScenarios(op).length));
   const conflicts=operations.filter(o=>operationStatus(o)==='problem'&&o.problemKind==='architectural-conflict');
   const verdict=conflicts.length?'Yes — architectural conflicts identified':complete?'No architectural conflicts identified in the assessed scope':'Inconclusive — assessment coverage is incomplete';
   const correctnessProblems=operations.filter(o=>o.correctness==='problem').length;
@@ -75,7 +76,7 @@ export function operationAssessments(review) {
       : [];
     const cfaAttention=(op.checks??[]).filter(c=>c.dimension==='cfa' && ['fail','unresolved','not-checked'].includes(c.status)).map(c=>'CFA · '+c.title+': '+(c.status==='fail'?c.consequence:c.status==='unresolved'?c.question:c.reason));
     const timingAttention=(op.scenarios??[]).filter(scenario=>['problem','unresolved'].includes(scenario.status)).map(scenario=>scenario.title+': '+(scenario.consequence || scenario.outcome));
-    const unreviewedTiming = (op.scenarios !== undefined || review.behaviourScenariosRequired === true)
+    const unreviewedTiming = expectsTiming(op)
       ? missingTimingScenarios(op).filter(id => !op.scenarios?.some(scenario => scenario.id === id))
       : [];
     if (unreviewedTiming.length) timingAttention.push('Timing scenarios still to assess: '+unreviewedTiming.join(', '));
