@@ -95,9 +95,12 @@ the architecture:
    cancellation policy needs a specific product or resource reason.
    A ViewModel retains a handle for each independently managed button action;
    equivalent repeated actions reuse that handle, which async callers can await.
-10. A non-trivial SwiftData repository is a `@ModelActor`. Its `ModelContext`
-    and SwiftData records stay inside that actor; it returns `Sendable` domain
-    values to the main-actor concrete feature type.
+10. A production SwiftData repository with non-trivial reads, writes, imports
+    or data sets uses a dedicated `@ModelActor`. Keep its `ModelContext` and
+    SwiftData records within the storage boundary and return immutable
+    `Sendable` domain values to the MainActor Feature. Use the MainActor
+    context exception only for deliberately UI-owned work proven short.
+    The storage boundary still applies in that case.
 11. Views remain declarative. Bundle/system reads and presentation formatting
     belong to the adjacent ViewModel; business, persistence, and shared state
     belong to the owning Feature.
