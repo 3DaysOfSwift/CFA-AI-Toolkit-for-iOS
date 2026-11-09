@@ -69,6 +69,7 @@ test('individual checks preserve verified strengths and separate CFA deviations'
   assert.match(collapsedRow,/CFA · Feature naming: Does not follow CFA naming/);
   assert.match(html,/0 operations pass · 1 fail/);
   assert.match(html,/How to resolve/);
+  assert.match(html, /Feature naming<\/strong><p>Uses Manager suffix<\/p><p>CFA deviation<\/p>/);
   assert.match(operationAssessments(imported).verdict,/Inconclusive/);
   const resolved=structuredClone(input);
   resolved.operations[0].checks.find(c=>c.id==='cancellation').status='pass';

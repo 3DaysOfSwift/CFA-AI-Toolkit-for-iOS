@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import path from 'node:path';
-import {checkOutcome, missingTimingScenarios} from './operation-assessments.mjs';
+import {checkOutcome, missingTimingScenarios, problemLabel} from './operation-assessments.mjs';
 import {fileURLToPath} from 'node:url';
 
 const escape = value => String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
@@ -85,14 +85,9 @@ export function renderHealthReport(data, iconData = '') {
     const applicableScenarios = scenarios.filter(scenario => scenario.status !== 'not-applicable');
     const inapplicableScenarios = scenarios.filter(scenario => scenario.status === 'not-applicable');
     const labels = {pass:'✓', fail:'×', problem:'×', unresolved:'?', 'not-checked':'?', 'not-applicable':'—'};
-    const problemLabels = {
-      'architectural-conflict': 'Architectural conflict',
-      'local-defect': 'Local defect',
-      'cfa-deviation': 'CFA deviation'
-    };
     const rows = items => items.map(item => {
       const classification = item.status === 'problem' ? 'Timing defect'
-        : item.status === 'fail' && Object.hasOwn(problemLabels, item.problemKind) ? problemLabels[item.problemKind] : '';
+        : item.status === 'fail' ? problemLabel(item.problemKind) : '';
       return `<div class="behaviour-row"><strong>${labels[item.status] || '?'} ${escape(item.title)}</strong>${classification ? `<p>${classification}</p>` : ''}<p>${escape(item.reason || item.outcome)}</p>${item.consequence ? `<p><strong>Consequence:</strong> ${escape(item.consequence)}</p>` : ''}<p class="evidence">${escape(item.verification)}</p>${sourceLinks(item.evidence)}</div>`;
     }).join('');
     const behaviourChecks = checks.filter(check => check.dimension !== 'cfa');
