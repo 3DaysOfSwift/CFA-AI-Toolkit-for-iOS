@@ -228,6 +228,20 @@ test('completion is not inferred from a build pass or tests at a different commi
   f.write();
   assert.ok(inspectRecord(f.file).errors.some(error => error.startsWith('completionGate.dataHandoffEvidenceIds')));
   f.record.completionGate.dataHandoffEvidenceIds = [handoff.id];
+
+  const failedRegression = {
+    ...afterEvidence('failed-regression', 'manual'),
+    outcome: 'failed',
+    environment: 'App Debug, oldest supported OS'
+  };
+  const rerun = f.record.evidence.find(item => item.id === 'after-behaviour-regression');
+  rerun.environment = failedRegression.environment;
+  f.record.evidence.push(failedRegression);
+  f.record.limitations.push('The failed-regression run was resolved by after-behaviour-regression on the affected configuration.');
+  f.record.completionGate.manualBehaviourRegressionEvidenceId = failedRegression.id;
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.startsWith('completionGate.manualBehaviourRegressionEvidenceId')));
+  f.record.completionGate.manualBehaviourRegressionEvidenceId = rerun.id;
   f.seal();
   assert.equal(inspectRecord(f.file).valid, true);
 
