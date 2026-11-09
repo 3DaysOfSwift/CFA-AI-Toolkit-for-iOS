@@ -412,6 +412,9 @@ export async function inspect(project) {
     }
     if (featureTypeSuffix.test(property.type) && !property.type.endsWith('API')) {
       const declaration = source?.declaration;
+      if (declaration?.type === 'actor') {
+        findings.push(finding('feature-isolation', 'review', `${property.type} is an actor exposed by AppModel. Verify its role. CFA Feature owners explicitly use MainActor, and worker actors belong behind the Feature boundary.`, declarationFile, declaration.line));
+      }
       const featureFolder = path.posix.join(path.posix.dirname(appModelFile), 'Features');
       const relative = declarationFile && path.posix.relative(featureFolder, declarationFile);
       if (declaration?.type === 'class' && (relative.startsWith('../') || !relative.includes('/'))) {

@@ -86,6 +86,17 @@ test('reviews Feature placement for a qualified Feature outside the AppModel fea
   assert.deepEqual([finding?.file, finding?.line, finding?.severity], [featureFile, 2, 'review']);
 });
 
+test('reviews an actor exposed as a Feature while leaving its worker alone', async t => {
+  const file = 'Application/2 - AppModel/Features/Settings/SettingsFeature.swift';
+  const root = await fixture(t, {
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() }; let settingsFeature: SettingsFeature }',
+    [file]: 'actor SettingsFeature {}\nactor SettingsStorage {}'
+  });
+  const {findings} = await inspect(root);
+  assert.deepEqual(findings.filter(item => item.code === 'feature-isolation')
+    .map(({file, line, severity}) => [file, line, severity]), [[file, 1, 'review']]);
+});
+
 test('reports a missing named feature test file', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() }; let settingsFeature: SettingsFeature }',
