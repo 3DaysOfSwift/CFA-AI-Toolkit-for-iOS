@@ -229,6 +229,10 @@ export async function inspect(project) {
       }
       findings.push(finding('app-model-static-state', 'warning', `AppModel declares static stored property ${name}; CFA reserves static storage in AppModel for the shared production graph.`, appModelFile, lineOf(appModel, match.index)));
     }
+    const computedShared = /\bstatic\s+var\s+shared\s*:\s*(?:\w+\s*\.\s*)*AppModel\b/.exec(appMembers);
+    if (computedShared && hasComputedAccessor(appModel.slice(computedShared.index + computedShared[0].length))) {
+      findings.push(finding('app-model-computed-shared', 'warning', 'AppModel.shared is computed. CFA uses one stored static let initialized through live(). Trace whether the getter creates a new graph on access.', appModelFile, lineOf(appModel, computedShared.index)));
+    }
     const sharedInitializer = /\bstatic\s+let\s+shared\s*(?::\s*(?:\w+\s*\.\s*)*AppModel\s*)?=/.exec(appMembers);
     if (sharedInitializer) {
       const initializer = appModel.slice(sharedInitializer.index + sharedInitializer[0].length);
