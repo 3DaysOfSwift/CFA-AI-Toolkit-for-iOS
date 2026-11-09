@@ -256,15 +256,16 @@ export async function inspect(project) {
     }
   }
 
-  // A typed dependency is evidence of a potential workflow, not a violation.
+  // A stored dependency is evidence of a potential workflow, not a violation.
   for (const [file, source] of sources) {
     for (const declaration of source.matchAll(/\bclass\s+(\w+Feature)\b[^{}]*\{/g)) {
       const bodyStart = declaration.index + declaration[0].length;
       const body = braceBody(source, bodyStart - 1);
       const members = memberSignatures(body);
-      for (const property of members.matchAll(/(?:^|(?<=;))[ \t]*(?:(?:private(?:\(set\))?|fileprivate|internal|public)\s+)?(?:let|var)\s+(\w+)\s*:\s*((?:\w+\s*\.\s*)*\w+Feature\b(?:\s*[?!])?)(?!\s*[.?!])/gm)) {
+      for (const property of members.matchAll(/(?:^|(?<=;))[ \t]*(?:(?:private(?:\(set\))?|fileprivate|internal|public)\s+)?(?:let|var)\s+(\w+)\s*(?::\s*((?:\w+\s*\.\s*)*\w+Feature\b(?:\s*[?!])?)(?!\s*[.?!])|=\s*((?:\w+\s*\.\s*)*\w+Feature)\b(?:\s*\.\s*init)?\s*\()/gm)) {
         if (hasComputedAccessor(body.slice(property.index + property[0].length))) continue;
-        const [, name, dependency] = property;
+        const [, name, declaredType, constructedType] = property;
+        const dependency = declaredType ?? constructedType;
         findings.push(finding('feature-coordination', 'review', `${declaration[1]} stores ${name}: ${dependency}. Trace the workflow and verify that coordination serves a business capability, preserves one owner per state and introduces no dependency cycle.`, file, lineOf(source, bodyStart + property.index)));
       }
     }

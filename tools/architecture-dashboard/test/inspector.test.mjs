@@ -749,11 +749,16 @@ test('surfaces a stored Feature dependency as coordination to review', async t =
 test('reviews Feature coordination in a flat source layout', async t => {
   const file = 'Application/UserProfileFeature.swift';
   const root = await fixture(t, {
-    [file]: 'final class UserProfileFeature { private let orders: OrdersFeature }'
+    [file]: `final class UserProfileFeature {
+      private let orders: OrdersFeature
+      private let favourites = AccountDomain.FavouritesFeature()
+      private let key = OrdersFeature.OrderID()
+      func clear() { let local = OrdersFeature() }
+    }`
   });
   const {findings} = await inspect(root);
   assert.deepEqual(findings.filter(item => item.code === 'feature-coordination')
-    .map(({file, line, severity}) => [file, line, severity]), [[file, 1, 'review']]);
+    .map(({file, line, severity}) => [file, line, severity]), [[file, 2, 'review'], [file, 3, 'review']]);
 });
 
 test('reports AppModel findings at the correct lines in CR-delimited source', async t => {
