@@ -345,12 +345,13 @@ skill from that toolkit before changing the project.
   separately. Force a local write failure and verify that it neither reports
   local success nor makes the edit eligible for upload. Fail sync after a
   successful local save, restart, and retry with the same edit identity.
-  Verify that the server applies one logical change, including when it
-  applied the edit before losing its reply. Check the agreed
+  Also simulate a lost reply after the server applies the edit. Verify that
+  retry confirms the original edit without applying it again. Check the agreed
   conflict and rejection outcomes. When changing
   existing sync code, verify that the updated app restores and safely retries
   a pending edit persisted by the previous implementation. Verify Apple-managed
-  sync and conflicting offline edits on supported devices when applicable.
+  sync and conflicting offline edits on supported devices with the required
+  capabilities, account and schema.
 - App.body declares scenes and app-wide presentation dependencies. Install a
   stable root View in each WindowGroup. Keep stored AppModel references out
   of App. Keep startup conditions, database access and Feature loading or

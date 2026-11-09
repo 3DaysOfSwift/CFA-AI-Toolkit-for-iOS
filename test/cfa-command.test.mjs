@@ -136,6 +136,7 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /publish confirmed changes only after required persistence succeeds/);
   assert.match(content, /identifiers once before launch finishes/);
   assert.match(content, /An ordinary Swift Task\s+grants no background runtime/);
+  assert.match(content, /retry confirms the original edit without applying it again/);
   assert.match(content, /stable root View in each WindowGroup/);
   assert.match(content, /each scene keeps its\s+root available while Features load or fail/);
   assert.match(content, /Call the AppModel launch signal directly\s+and synchronously from the application lifecycle callback/);
