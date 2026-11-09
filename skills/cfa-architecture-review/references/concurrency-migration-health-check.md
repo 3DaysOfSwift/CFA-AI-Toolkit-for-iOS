@@ -385,6 +385,12 @@ For each relevant operation, inspect:
   and pagination. Who decides whether to deduplicate, replace, queue or combine?
 - Lifetime: navigation away, observation ending, sign-out and account changes.
   Work may intentionally outlive a screen; establish its owner and purpose.
+- Background work: trace the system registration, scheduling request, delivery
+  callback and owning operation. For BGTaskScheduler, verify that each permitted
+  identifier is registered once before launch returns. Follow expiration through
+  cancellation and completion, and check that normal completion and expiration
+  cannot both report completion for the same delivery. Distinguish source evidence
+  from device evidence about whether the system actually delivers the work.
 - Account transitions: trace a request started in one session that completes
   after sign-out or after a different account signs in. Locate the account
   or session-generation check at publication, or establish how the design
