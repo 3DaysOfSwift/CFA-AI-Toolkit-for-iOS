@@ -12,10 +12,20 @@ proposing a change.
 For an audit scoped to guidance, skills, examples and tooling, regenerate copies
 with `node scripts/sync.mjs --skip-xcode-projects`, then run
 `node scripts/validate.mjs --skip-xcode-projects`. It checks source and bundled
-copies while skipping starter app and Xcode template checks. Use the full
-validation and test commands for release verification.
-The bundled dependency copies are committed so a source checkout remains complete;
-validation detects drift.
+copies while skipping starter app and Xcode template checks. For the same
+scope, run the toolkit suites explicitly:
+
+```sh
+node --test test/cfa-command.test.mjs test/explanations.test.mjs \
+  test/generated-target-groups.test.mjs test/ios-app-identity.test.mjs \
+  test/migration-evidence.test.mjs test/migration-playground.test.mjs \
+  test/spec-topics.test.mjs tools/architecture-dashboard/test/*.test.mjs
+```
+
+The distribution and orientation suites include checks that read bundled Xcode
+projects. Use the full validation and test commands for release verification.
+The bundled dependency copies are committed so validation can detect drift in a
+source checkout.
 
 Add regression tests for observable behaviour, especially packaging portability,
 non-destructive installation and report escaping. Do not add third-party dependencies
