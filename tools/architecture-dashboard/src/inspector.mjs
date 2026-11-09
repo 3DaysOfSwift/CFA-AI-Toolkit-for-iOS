@@ -351,12 +351,13 @@ export async function inspect(project) {
     const testName = `${viewModelName}Tests.swift`;
     const testCandidates = [...paths].filter(file => path.posix.basename(file) === testName);
     const testFile = testCandidates.length === 1 ? testCandidates[0] : null;
-    const statePattern = new RegExp(`@State\\s+private\\s+var\\s+([A-Za-z_]\\w*)(?:\\s*:\\s*${viewModelName})?\\s*=\\s*${viewModelName}\\s*\\(\\s*\\)`);
-    const typedStatePattern = new RegExp(`@State\\s+private\\s+var\\s+([A-Za-z_]\\w*)\\s*:\\s*${viewModelName}\\s*=\\s*\\.init\\s*\\(\\s*\\)`);
+    const viewModelTypePattern = `(?:(?:\\w+\\s*\\.\\s*)*${viewModelName})`;
+    const statePattern = new RegExp(`@State\\s+private\\s+var\\s+([A-Za-z_]\\w*)(?:\\s*:\\s*${viewModelTypePattern})?\\s*=\\s*${viewModelTypePattern}\\s*\\(\\s*\\)`);
+    const typedStatePattern = new RegExp(`@State\\s+private\\s+var\\s+([A-Za-z_]\\w*)\\s*:\\s*${viewModelTypePattern}\\s*=\\s*\\.init\\s*\\(\\s*\\)`);
     const inlineState = statePattern.exec(members) ?? typedStatePattern.exec(members);
     let ownedState = inlineState && { name: inlineState[1], index: inlineState.index };
     const typedStateProperties = [...members.matchAll(new RegExp(
-      `@State\\s+private\\s+var\\s+([A-Za-z_]\\w*)\\s*:\\s*${viewModelName}\\b`, 'g'
+      `@State\\s+private\\s+var\\s+([A-Za-z_]\\w*)\\s*:\\s*${viewModelTypePattern}\\b`, 'g'
     ))].map(match => ({ name: match[1], index: match.index }));
     const dependencies = [];
     if (viewModel) {
@@ -374,7 +375,7 @@ export async function inspect(project) {
         if (openingBody) {
           const initializerBody = braceBody(tail, openingBody[0].length - 1);
           const ownConstruction = typedStateProperties.find(({name: property}) => new RegExp(
-            `\\b_${property}\\s*=\\s*State(?:\\s*<\\s*${viewModelName}\\s*>)?\\s*\\(\\s*(?:initialValue|wrappedValue)\\s*:\\s*(?:${viewModelName}|\\.init)\\s*\\(`
+            `\\b_${property}\\s*=\\s*State(?:\\s*<\\s*${viewModelTypePattern}\\s*>)?\\s*\\(\\s*(?:initialValue|wrappedValue)\\s*:\\s*(?:${viewModelTypePattern}|\\.init)\\s*\\(`
           ).test(initializerBody));
           if (parameters.trim() && !injectedViewModel && ownConstruction) ownedState ??= ownConstruction;
           const statePropertyNames = typedStateProperties.map(property => property.name);
