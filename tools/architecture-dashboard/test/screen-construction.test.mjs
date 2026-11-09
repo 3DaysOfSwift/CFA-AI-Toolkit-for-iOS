@@ -10,6 +10,7 @@ const constructionCodes = new Set([
   'view-model-ownership',
   'screen-initializer-inputs',
   'view-stored-feature',
+  'view-model-input-storage',
   'view-stored-model-dependency',
   'view-model-initializer-construction'
 ]);
@@ -144,6 +145,27 @@ test('reviews stored model dependencies without requiring an explicit initialize
     ['view-stored-model-dependency', file, 2],
     ['view-stored-model-dependency', file, 3],
     ['view-stored-model-dependency', file, 4]
+  ]);
+});
+
+test('reviews supplied ViewModel storage without flagging screen-owned State', async t => {
+  const file = 'App/Presentation/Notes.swift';
+  const { findings } = await inspectView(t, '', {
+    [file]: `struct NoteRow: View {
+      let model: App.NotesViewModel
+      @Bindable var editor: EditorViewModel
+      let snapshot: NotesViewModel.Snapshot
+      var body: some View { Text("Note") }
+    }
+    struct NotesView: View {
+      @State private var viewModel: NotesViewModel
+      init() { _viewModel = State(initialValue: NotesViewModel()) }
+      var body: some View { Text("Notes") }
+    }`
+  });
+  assert.deepEqual(findings.map(item => [item.code, item.file, item.line]), [
+    ['view-model-input-storage', file, 2],
+    ['view-model-input-storage', file, 3]
   ]);
 });
 
