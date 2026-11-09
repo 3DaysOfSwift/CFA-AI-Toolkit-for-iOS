@@ -166,6 +166,15 @@ do {
             throw NSError(domain: "Inventory", code: 4, userInfo: [NSLocalizedDescriptionKey: "Source file is outside the project directory"])
         }
         let relative = String(resolved.path.dropFirst(root.path.count + 1))
+        guard let size = try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize else {
+            warnings.append("Could not determine the source size of \(relative)")
+            continue
+        }
+        // Match the lexical inventory's source size limit.
+        guard size <= 2_000_000 else {
+            warnings.append("Over 2 MB source limit: \(relative)")
+            continue
+        }
         guard let source = try? String(contentsOf: url, encoding: .utf8),
               !source.utf8.contains(0) else {
             warnings.append("Could not read \(relative) as UTF-8 Swift source")
