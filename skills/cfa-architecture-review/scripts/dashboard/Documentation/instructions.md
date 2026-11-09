@@ -11,8 +11,10 @@ Use the `cfa-architecture-review` skill to produce an Xcode Project Dashboard fo
 
 The Xcode Project Dashboard tool is at `/path/to/architecture-dashboard`.
 Read its root README, Documentation/OBSERVATIONS.md, Documentation/REVIEWS.md,
-and the repository's own instructions. Verify that the selected iOS target uses
-Swift Concurrency; this dashboard is not for GCD-only projects.
+the skill's dashboard workflow, and the repository's own instructions. Verify
+whether the selected target uses Swift Concurrency. For GCD-only scope, continue
+with the skill's manual ownership and concurrency review and report the dashboard
+as unavailable.
 
 Do not modify the application, commit changes, or publish its source or reports.
 Generate a local architecture dashboard describing the current codebase, rather
