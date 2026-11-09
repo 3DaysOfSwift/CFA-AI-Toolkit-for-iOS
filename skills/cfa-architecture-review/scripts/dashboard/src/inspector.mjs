@@ -185,10 +185,12 @@ export async function inspect(project) {
       name: 'AppModel.live()', file: appModelFile, source: appModel,
       opening: appModel.indexOf('{', factory.index + factory[0].length)
     }));
+    const initializerScopes = [{file: appModelFile, source: appModel, members: appMembers, start: 0}];
     for (const [file, source] of sources) {
       for (const extension of source.matchAll(/\bextension\s+AppModel\b(?!\s*\.)[^{}]*\{/g)) {
         const start = extension.index + extension[0].length;
         const members = memberSignatures(braceBody(source, start - 1));
+        initializerScopes.push({file, source, members, start});
         for (const factory of members.matchAll(liveFactoryPattern)) {
           const end = start + factory.index + factory[0].length;
           const body = /^\s*\{/.exec(source.slice(end));
@@ -196,11 +198,13 @@ export async function inspect(project) {
         }
       }
     }
-    for (const initializer of appMembers.matchAll(/(?<![.\w])init[?!]?\s*\(/g)) {
-      const closing = closingParenthesis(appModel, initializer.index + initializer[0].length - 1);
-      if (closing < 0) continue;
-      const body = /^\s*(?:(?:async|throws|rethrows)\s*)*\{/.exec(appModel.slice(closing + 1));
-      if (body) constructionBodies.push({name:'AppModel.init', file: appModelFile, source: appModel, opening:closing + body[0].length});
+    for (const {file, source, members, start} of initializerScopes) {
+      for (const initializer of members.matchAll(/(?<![.\w])init[?!]?\s*\(/g)) {
+        const closing = closingParenthesis(source, start + initializer.index + initializer[0].length - 1);
+        if (closing < 0) continue;
+        const body = /^\s*(?:(?:async|throws|rethrows)\s*)*\{/.exec(source.slice(closing + 1));
+        if (body) constructionBodies.push({name: 'AppModel.init', file, source, opening: closing + body[0].length});
+      }
     }
     for (const {name, file, source, opening} of constructionBodies) {
       const container = /\b(?:SwiftData\s*\.\s*)?ModelContainer\s*\(/.exec(braceBody(source, opening));

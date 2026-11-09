@@ -917,6 +917,24 @@ test('reviews storage construction in an AppModel factory extension', async t =>
   assert.deepEqual(storage.map(({file, line}) => [file, line]), [[file, 3]]);
 });
 
+test('reviews storage construction in AppModel convenience initializers declared in extensions', async t => {
+  const file = 'Application/AppModel+Storage.swift';
+  const root = await fixture(t, {
+    'Application/AppModel.swift': 'final class AppModel {}',
+    [file]: `extension AppModel {
+      convenience init(storeURL: URL) throws {
+        _ = try ModelContainer(for: Note.self)
+        self.init()
+      }
+      func unrelated() throws { _ = try ModelContainer(for: Note.self) }
+    }`
+  });
+  const {findings} = await inspect(root);
+  const storage = findings.filter(item => item.code === 'app-model-storage-construction');
+  assert.deepEqual(storage.map(({file, line}) => [file, line]), [[file, 3]]);
+  assert.match(storage[0].message, /AppModel\.init/);
+});
+
 test('reviews storage construction in a flat AppModel without treating placement as conventional', async t => {
   const file = 'Application/Composition.swift';
   const root = await fixture(t, {
