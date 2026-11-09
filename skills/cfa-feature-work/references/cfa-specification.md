@@ -1518,9 +1518,10 @@ A screen's `.task` is the normal, approved choice for that screen's own initial
 asynchronous work. If `refresh()` returns a Task handle, use
 `.task { await viewModel.refresh().value }` to wait for its result. If `refresh()`
 is itself an `async` method, use `.task { await viewModel.refresh() }` instead.
-Apply the same distinction to `.refreshable`: await the async method or the
-returned handle's value so the refresh indicator reflects the operation's
-completion. Keep the waiting policy separate from ownership of a shared refresh.
+Apply the same distinction to `.refreshable`. The refresh indicator stays
+active while the screen awaits the result. When the screen needs to stop
+waiting promptly on cancellation, use an async method that can end the
+screen's wait independently of the shared work.
 Awaiting an independently created Task's `value` does not make it a child of
 the screen task or automatically cancel it when the screen task is cancelled.
 The cancelled screen task can still wait for the shared result. If the
