@@ -315,7 +315,7 @@ export async function inspect(project) {
     const structuralRoot = name === 'ContentView' && /\bTabView\s*\{/.test(body) && !/\b(?:AppModel|\w+Feature)\b/.test(members);
     if (!viewModel && !structuralRoot) findings.push(finding('view-model-missing', 'review', `${name} has no adjacent ${viewModelName}. Verify whether it is a screen requiring a dedicated ViewModel or a reusable presentation component.`, viewFile, 1));
     else if (viewModel) {
-      if (!ownsViewModel) findings.push(finding('view-model-ownership', 'review', `${name} does not use the default inline ViewModel pattern. Verify private ownership; a detail View may construct its own State-backed ViewModel from selected value data.`, viewFile, lineOf(view, declaration.index)));
+      if (!ownsViewModel) findings.push(finding('view-model-ownership', 'review', `${name} has no recognized private @State ViewModel storage. Verify that the screen constructs and stores its ViewModel. Detail Views may initialize that stored state from selected value data. A computed property does not satisfy CFA screen ownership.`, viewFile, lineOf(view, declaration.index)));
       if (!dependencies.length) findings.push(finding('feature-route-unresolved', 'review', `${viewModelName} has no visible AppModel.shared feature route; inspect whether this screen is presentation-only.`, viewModelFile, 1));
       if (!testFile) findings.push(finding('view-model-tests-missing', 'review', `No ${testName} was found in the scanned directory. Check the project root and test target before concluding the test is missing.`, viewModelFile, 1));
     }

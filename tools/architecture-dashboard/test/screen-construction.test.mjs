@@ -107,7 +107,8 @@ for (const declaration of [
 for (const declaration of [
   '@State var viewModel = HomeViewModel()',
   '@State private var viewModel = HomeViewModel(homeFeature: feature)',
-  '@State private var viewModel = makeViewModel()'
+  '@State private var viewModel = makeViewModel()',
+  'private var viewModel: HomeViewModel { HomeViewModel() }'
 ]) {
   test('reports nonconforming ownership: ' + declaration, async t => {
     const { findings } = await inspectView(t, `struct HomeView: View {
