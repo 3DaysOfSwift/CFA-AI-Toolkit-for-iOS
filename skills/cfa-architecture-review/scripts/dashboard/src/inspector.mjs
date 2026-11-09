@@ -679,6 +679,9 @@ export async function inspect(project) {
     else if (viewModel) {
       if (!ownsViewModel) findings.push(finding('view-model-ownership', 'review', `${name} has no recognized private @State ViewModel storage. Verify that the screen constructs and stores its ViewModel. Detail Views may initialize that stored state from a selected immutable snapshot. A computed property does not satisfy CFA screen ownership.`, viewFile, lineOf(view, declaration.index)));
       if (!dependencies.length) findings.push(finding('feature-route-unresolved', 'review', `${viewModelName} has no visible AppModel.shared feature route; inspect whether this screen is presentation-only.`, viewModelFile, 1));
+      if (testFile && /(?:^|\/)1 - View\//.test(testFile)) {
+        findings.push(finding('view-model-test-placement', 'review', `${testName} appears in the View source tree. Verify that it belongs to the unit-test target and its ViewModel test group.`, testFile, 1));
+      }
       if (testCandidates.length > 1) findings.push(finding('view-model-tests-ambiguous', 'review', `Multiple files match ${testName}: ${testCandidates.join(', ')}. Verify which test target covers this ViewModel.`, viewModelFile, 1));
       if (!testCandidates.length) findings.push(finding('view-model-tests-missing', 'review', `No ${testName} was found in the scanned directory. Check the project root and test target before concluding the test is missing.`, viewModelFile, 1));
     }
