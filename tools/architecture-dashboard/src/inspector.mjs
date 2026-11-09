@@ -614,6 +614,8 @@ export async function inspect(project) {
   }
   const viewDeclarations = /\bstruct\s+(\w+)(?:\s*<[^{}]+>)?\s*:\s*(?:(?:\w+\s*\.\s*)*\w+\s*,\s*)*(?:SwiftUI\s*\.\s*)?View\b(?!\s*\.)[^{}]*\{/g;
   const viewConformances = /\bextension\s+(\w+)\s*:\s*(?:(?:\w+\s*\.\s*)*\w+\s*,\s*)*(?:SwiftUI\s*\.\s*)?View\b(?!\s*\.)[^{}]*\{/g;
+  const appDeclarations = /\bstruct\s+\w+\s*:\s*(?:SwiftUI\s*\.\s*)?App\b[^{}]*\{/g;
+  const sceneBodyPattern = /\bvar\s+body\s*:\s*some\s+(?:SwiftUI\s*\.\s*)?Scene\s*\{/;
   const rootViewNames = new Set(['ContentView', 'RootTabView', 'RootView']);
   const rootStorageGate = /(?<!#)\b(?:if|guard|switch)\s+[^{};]*\b\w*(?:container|database|storeReady|storageReady|startupError|launchError)\w*\b/i;
   function inspectRootNavigation(body, file, source, offset) {
@@ -633,6 +635,17 @@ export async function inspect(project) {
     for (const view of source.matchAll(viewConformances)) {
       viewNames.add(view[1]);
       extendedViews.add(view[1]);
+    }
+  }
+  for (const source of sources.values()) {
+    for (const app of source.matchAll(appDeclarations)) {
+      const appBody = braceBody(source, app.index + app[0].length - 1);
+      const scene = sceneBodyPattern.exec(appBody);
+      if (!scene) continue;
+      const body = braceBody(appBody, scene.index + scene[0].length - 1);
+      for (const root of body.matchAll(/\bWindowGroup\s*(?:\([^{}]*\)\s*)?\{\s*(\w+)\s*\(/g)) {
+        if (viewNames.has(root[1])) rootViewNames.add(root[1]);
+      }
     }
   }
   function declarationsForViews(source) {
@@ -704,16 +717,19 @@ export async function inspect(project) {
         }
         findings.push(finding('screen-task-handle', 'review', `${view[1]} declares ${match[1] ?? match[2]} with a possible Task handle. If it stores the handle, move task ownership to the ViewModel.`, file, lineOf(source, start + match.index)));
       }
-      if (isViewFile && rootViewNames.has(view[1])) continue;
+      if (rootViewNames.has(view[1])) {
+        inspectRootNavigation(body, file, source, start);
+        continue;
+      }
       const access = findFeatureAccess(body);
       if (access) {
         findings.push(finding('view-feature-access', 'review', 'This View appears to access a Feature directly. Trace the call and route intent and state through the owning screen and ViewModel.', file, lineOf(source, start + access.index)));
       }
     }
-    for (const app of source.matchAll(/\bstruct\s+\w+\s*:\s*(?:SwiftUI\s*\.\s*)?App\b[^{}]*\{/g)) {
+    for (const app of source.matchAll(appDeclarations)) {
       const start = app.index + app[0].length;
       const members = braceBody(source, start - 1);
-      const sceneBody = /\bvar\s+body\s*:\s*some\s+(?:SwiftUI\s*\.\s*)?Scene\s*\{/.exec(members);
+      const sceneBody = sceneBodyPattern.exec(members);
       if (sceneBody) {
         const bodyStart = sceneBody.index + sceneBody[0].length;
         const body = braceBody(members, bodyStart - 1);
@@ -752,14 +768,6 @@ export async function inspect(project) {
         }
       }
       continue;
-    }
-    // Known root conventions only: this is a review hint, not data-flow analysis.
-    // Keep feature-screen conditionals and unrelated adaptive layout out of this check.
-    for (const rootView of declarationsForViews(source)) {
-      if (!rootViewNames.has(rootView[1])) continue;
-      const bodyOffset = rootView.index + rootView[0].length;
-      const rootBody = braceBody(source, bodyOffset - 1);
-      inspectRootNavigation(rootBody, file, source, bodyOffset);
     }
     inspectLifecycleClosures(source, file, findings);
     const modelDeclaration = [...source.matchAll(/\b(?:let|var)\s+\w+\s*:\s*(?:\w+\s*\.\s*)*AppModel\b(?!\s*\.)/g)]

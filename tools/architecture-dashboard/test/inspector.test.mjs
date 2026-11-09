@@ -884,6 +884,22 @@ test('flags storage-gated conventional roots as review hints', async t => {
   assert.match(report.limitations.join(' '), /blocking overlays require manual/);
 });
 
+test('reviews a custom root directly constructed by the app scene', async t => {
+  const file = 'Application/Navigation/WorkspaceShell.swift';
+  const root = await fixture(t, {
+    'Application/ExampleApp.swift': 'struct ExampleApp: App { var body: some Scene { WindowGroup { WorkspaceShell() } } }',
+    [file]: `struct WorkspaceShell: View {
+      var body: some View {
+        if storageReady { Tabs() } else { ProgressView() }
+      }
+    }`,
+    'Application/Navigation/AccountScreen.swift': 'struct AccountScreen: View { var body: some View { if storageReady { AccountDetails() } } }'
+  });
+  const { findings } = await inspect(root);
+  assert.deepEqual(findings.filter(item => item.code === 'root-storage-gate')
+    .map(item => [item.file, item.line]), [[file, 3]]);
+});
+
 test('allows feature-scoped errors and unrelated root layout without storage-gate findings', async t => {
   const root = await fixture(t, {
     'Application/1 - View/ChatView.swift': 'struct ChatView: View { var body: some View { if let databaseError = viewModel.error { ErrorView() } else { MessagesView() } } }',
