@@ -636,7 +636,10 @@ export async function inspect(project) {
       }
     }
     inspectLifecycleClosures(source, file, findings);
-    if (/\b(?:let|var)\s+\w+\s*:\s*AppModel\b/.test(source)) findings.push(finding('stored-app-model', 'review', 'An AppModel-typed declaration appears in the View layer. Check whether a View or ViewModel retains it; this lexical match may be a local value or preview.', file, 1));
+    const modelDeclaration = /\b(?:let|var)\s+\w+\s*:\s*(?:\w+\s*\.\s*)*AppModel\b(?!\s*\.)/.exec(source);
+    if (modelDeclaration) {
+      findings.push(finding('stored-app-model', 'review', 'An AppModel-typed declaration appears in the View layer. Check whether a View or ViewModel retains it; this lexical match may be a local value or preview.', file, lineOf(source, modelDeclaration.index)));
+    }
     const storageAccess = [...source.matchAll(new RegExp(swiftDataAccess, 'g'))]
       .find(match => !previewRanges.some(({start, end}) => match.index >= start && match.index < end));
     if (storageAccess) {

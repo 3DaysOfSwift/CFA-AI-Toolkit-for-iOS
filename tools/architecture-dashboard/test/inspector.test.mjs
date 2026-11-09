@@ -257,11 +257,12 @@ test('does not identify a launch guard by the order of private Boolean propertie
 test('local and preview storage references are not asserted to be production violations', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
-    'Application/1 - View/PreviewSupport.swift': 'func makePreview() { let model: AppModel = AppModel.live(); let container: ModelContainer = previewContainer }'
+    'Application/1 - View/PreviewSupport.swift': 'import SwiftUI\nfunc makePreview() {\n let model: Example.AppModel = AppModel.live(); let container: ModelContainer = previewContainer\n}'
   });
   const findings = (await inspect(root)).findings;
   assert.equal(findings.find(item => item.code === 'stored-app-model').severity, 'review');
   assert.match(findings.find(item => item.code === 'stored-app-model').message, /local value or preview/);
+  assert.equal(findings.find(item => item.code === 'stored-app-model').line, 3);
   assert.equal(findings.find(item => item.code === 'view-swiftdata-access').severity, 'review');
   assert.match(findings.find(item => item.code === 'view-swiftdata-access').message, /previews retain the same CFA boundaries/);
 });
