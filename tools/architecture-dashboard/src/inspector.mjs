@@ -649,14 +649,23 @@ export async function inspect(project) {
         if (presentation) findings.push(finding('app-startup-presentation', 'review', 'App.body contains storage or loading presentation. Check whether database availability gates the interface; a lexical match alone cannot establish this.', file, lineOf(source, start + bodyStart + presentation.index)));
       }
     }
+    function swiftDataLines(scope, offset) {
+      const lines = new Set();
+      for (const match of scope.matchAll(new RegExp(swiftDataAccess, 'g'))) {
+        const index = offset + match.index;
+        if (!previewRanges.some(({start, end}) => index >= start && index < end)) {
+          lines.add(lineOf(source, index));
+        }
+      }
+      return lines;
+    }
     if (!isViewFile) {
       for (const view of declarationsForViews(source)) {
         const start = view.index + view[0].length;
         const body = braceBody(source, start - 1);
         inspectLifecycleClosures(body, file, findings, lineOf(source, start));
-        const storage = swiftDataAccess.exec(body);
-        if (storage) {
-          findings.push(finding('view-swiftdata-access', 'review', 'This SwiftUI View appears to access SwiftData directly. Verify that storage is reached through its ViewModel and Feature.', file, lineOf(source, start + storage.index)));
+        for (const line of swiftDataLines(body, start)) {
+          findings.push(finding('view-swiftdata-access', 'review', 'This SwiftUI View appears to access SwiftData directly. Verify that storage is reached through its ViewModel and Feature.', file, line));
         }
       }
       for (const extension of source.matchAll(/\bextension\s+(\w+)\b(?!\s*\.)[^{}]*\{/g)) {
@@ -664,9 +673,8 @@ export async function inspect(project) {
         const start = extension.index + extension[0].length;
         const body = braceBody(source, start - 1);
         inspectLifecycleClosures(body, file, findings, lineOf(source, start));
-        const storage = swiftDataAccess.exec(body);
-        if (storage) {
-          findings.push(finding('view-swiftdata-access', 'review', 'This SwiftUI View extension appears to access SwiftData directly. Verify that storage is reached through its ViewModel and Feature.', file, lineOf(source, start + storage.index)));
+        for (const line of swiftDataLines(body, start)) {
+          findings.push(finding('view-swiftdata-access', 'review', 'This SwiftUI View extension appears to access SwiftData directly. Verify that storage is reached through its ViewModel and Feature.', file, line));
         }
       }
       continue;
@@ -691,13 +699,7 @@ export async function inspect(project) {
     if (modelDeclaration) {
       findings.push(finding('stored-app-model', 'review', 'An AppModel-typed declaration appears in the View layer. Check whether a View or ViewModel retains it; this lexical match may be a local value or preview.', file, lineOf(source, modelDeclaration.index)));
     }
-    const storageLines = new Set();
-    for (const match of source.matchAll(new RegExp(swiftDataAccess, 'g'))) {
-      if (!previewRanges.some(({start, end}) => match.index >= start && match.index < end)) {
-        storageLines.add(lineOf(source, match.index));
-      }
-    }
-    for (const line of storageLines) {
+    for (const line of swiftDataLines(source, 0)) {
       findings.push(finding('view-swiftdata-access', 'review', 'SwiftData storage access may appear in a View-layer file. Check whether a View, ViewModel or preview accesses storage directly; previews retain the same CFA boundaries. A lexical match alone does not establish how the value is used.', file, line));
     }
   }

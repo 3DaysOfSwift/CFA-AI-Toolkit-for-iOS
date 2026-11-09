@@ -326,7 +326,7 @@ test('reviews SwiftData access in a SwiftUI View outside the CFA View folder', a
     'Application/Presentation/Notes.swift': [
       'struct NotesView: SwiftUI.View {',
       '  @Query var notes: [Note]',
-      '  var body: some View { Text("Notes") }',
+      '  var body: some View { Text("Notes").modelContainer(container) }',
       '}',
       'struct SummaryView: View { var body: some View { Text("Summary") } }',
       'actor NotesStore { let container: ModelContainer }'
@@ -341,7 +341,8 @@ test('reviews SwiftData access in a SwiftUI View outside the CFA View folder', a
   const findings = (await inspect(root)).findings.filter(item => item.code === 'view-swiftdata-access');
   assert.deepEqual(findings.map(({file, line, severity}) => [file, line, severity]).sort(), [
     ['Application/Presentation/Notes+Storage.swift', 2, 'review'],
-    ['Application/Presentation/Notes.swift', 2, 'review']
+    ['Application/Presentation/Notes.swift', 2, 'review'],
+    ['Application/Presentation/Notes.swift', 3, 'review']
   ]);
 });
 
