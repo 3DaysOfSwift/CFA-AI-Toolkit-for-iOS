@@ -136,7 +136,9 @@ the architecture:
     Feature-owned background capabilities register their own handlers. For
     BGTaskScheduler, register each permitted identifier once before launch
     finishes and schedule requests separately. Route app-level callbacks through
-    AppModel and honour expiration, cancellation and system completion.
+    AppModel. Verify that expiration cancels work and that success, failure
+    and expiration each complete the system callback exactly once. Verify actual
+    background execution on a supported device.
     Keep unrelated background capabilities with their owning Features. A Feature
     can keep work running after its screen closes. Continuing after the app
     itself enters the background requires an appropriate system mechanism.

@@ -125,6 +125,16 @@ trace that path too. For screen-only observation, check the screen or
 ViewModel lifetime instead. Record which behaviour is supported by source
 and which was exercised by tests.
 
+When reviewing scheduled background work, apply the
+[background-work rule](references/spec/rules/cfa-bg-01.md). Check that each
+identifier is permitted and registered once during synchronous startup, and
+trace request submission separately. Follow the system callback to the
+owning Feature. Check that expiration cancels the work and that success,
+failure and expiration each complete the system callback exactly once,
+including when expiration races normal completion. Distinguish work that
+outlives a screen from work allowed to continue after the app backgrounds.
+Record actual background execution only when supported by device evidence.
+
 When reviewing deep links or notification actions, apply the
 [deep-link rule](references/spec/rules/cfa-link-01.md). Trace each opening
 callback through DeepLinkingFeature to the receiving scene. Where the app
