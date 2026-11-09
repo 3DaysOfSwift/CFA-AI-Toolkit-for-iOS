@@ -48,8 +48,11 @@ existing product's history and navigation behaviour. Trace each changed
 opening callback to the receiving scene. When the product uses CFA's
 pending-request design, include the pending store in that trace. Verify that
 declining leaves the request pending and that retrying a failed removal
-does not navigate twice. Adding pending storage to an existing product
-requires a feature change that calls for it.
+does not navigate twice. For multi-window changes, apply the
+[scene navigation rule](references/spec/rules/cfa-link-02.md). Verify that
+an unavailable scene leaves the request pending and that one scene can open
+a different request while another scene is still deciding. Adding pending
+storage to an existing product requires a feature change that calls for it.
 
 When changing sign-out, account switching or session expiry, apply the
 [account lifecycle rule](references/spec/rules/cfa-account-01.md). Trace which

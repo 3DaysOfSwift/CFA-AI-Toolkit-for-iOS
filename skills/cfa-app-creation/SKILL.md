@@ -65,7 +65,11 @@ requests to `DeepLinkingFeature` for validation and durable pending storage.
 Let each scene decide whether to navigate and preserve its active edits or
 payment flow. Use the rule’s verification checklist for failed saves,
 competing scenes, and durable removal after navigation or explicit dismissal.
-Scheduling and delivery alone do not create pending requests.
+Scheduling and delivery alone do not create pending requests. For multi-window
+apps, apply the [scene navigation rule](references/spec/rules/cfa-link-02.md).
+Keep navigation state in each scene and allow either scene to open a shared
+pending request. Verify that one scene can open a different request while
+another scene is still deciding what to do with its own.
 Add a separate notification history or global navigation router only when
 the product requires one.
 
