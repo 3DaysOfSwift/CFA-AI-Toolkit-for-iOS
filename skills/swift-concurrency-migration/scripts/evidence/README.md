@@ -86,6 +86,12 @@ validator also rejects handoff evidence that names only unrelated targets. A pas
 record which affected app or extension targets the named test targets exercise.
 The validator cannot infer that relationship from test target names.
 
+For each affected system background capability, link the owning Feature and
+evidence that permitted identifiers, launch registration and scheduling match
+the baseline. Record controlled success, failure, expiration and expiration
+racing completion. Verify cancellation and exactly-once system completion.
+Record actual delivery on supported hardware separately from handler tests.
+
 Read the warnings from both `validate` and `digest`. For a failed run during
 or after migration, keep the failure record and link a passing rerun at the
 final commit for the same scenario, target, build configuration and OS.

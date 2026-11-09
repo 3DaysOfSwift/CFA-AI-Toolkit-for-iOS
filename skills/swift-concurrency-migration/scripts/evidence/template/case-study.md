@@ -33,6 +33,12 @@ changed and distinguish authorised product changes, confirmed defect fixes,
 and necessary platform differences from regressions or unexplained changes.
 Keep the migration open while a regression or unexplained change remains.
 
+For each affected system background capability, link the owning Feature and
+evidence that permitted identifiers, launch registration and scheduling match
+the baseline. Record controlled success, failure, expiration and expiration
+racing completion. Verify cancellation and exactly-once system completion.
+Record actual delivery on supported hardware separately from handler tests.
+
 For the final migration record, describe the hybrid paths reviewed and the
 reasons for retaining any legacy mechanisms. For each removed adapter or
 dependency, link the baseline behaviour and the same scenarios rerun on each
