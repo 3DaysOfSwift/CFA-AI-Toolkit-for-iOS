@@ -499,8 +499,14 @@ For each relevant operation, inspect:
   trace a retry that saves the removal without opening the destination again.
   Check what remains pending after restart and whether the other scene's
   navigation stays independent.
-- Suspension: what assumptions can change during await? Trace validation and
-  commit, actor reentrancy, stale results and cleanup of replaced task handles.
+- Suspension: apply the [stale-result rule](spec/rules/cfa-conc-02.md) when
+  reviewing CFA. For a replaceable operation, suspend the older request, let
+  the newer one publish, then complete the older request with success or
+  failure. Check that the old request cannot replace current data or surface an
+  obsolete error. In a separate case, complete the old request while its
+  replacement is still pending and verify the old cleanup leaves the new
+  task's handle and loading state intact. Include a cancelled request that
+  still returns. Use controlled completion order where feasible.
 - Optional download caches: when CFA applies, verify that a slow restore does
   not delay the remote request and that a restore arriving after a successful
   download cannot replace fresh data. Follow refresh through the caller's
