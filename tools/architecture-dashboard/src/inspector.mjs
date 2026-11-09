@@ -402,6 +402,19 @@ export async function inspect(project) {
       findings.push(finding('app-model-extra-boolean-state', 'review', `AppModel declares multiple private Boolean properties: ${booleanLocations.join(', ')}. CFA permits one launch guard. Check active compilation conditions and move unrelated state to its owner.`, appModelFile, lineOf(appModel, appModelDeclaration.index)));
     }
   }
+  const checkedFeatureIsolation = new Set();
+  function inspectFeatureIsolation({file, declaration}) {
+    if (checkedFeatureIsolation.has(declaration)) return;
+    checkedFeatureIsolation.add(declaration);
+    const source = sources.get(file);
+    for (const match of source.matchAll(/\bnonisolated\s+(?:(?:final|public|internal|private|fileprivate|package|open)\s+)*class\s+(\w+)/g)) {
+      const line = lineOf(source, match.index + match[0].lastIndexOf('class'));
+      if (match[1] === declaration.name && line === declaration.line) {
+        findings.push(finding('feature-isolation', 'review', `${declaration.name} declares nonisolated. Verify its role and effective isolation. CFA Feature owners use MainActor.`, file, line));
+        break;
+      }
+    }
+  }
   const checkedFeatureTests = new Set();
   function inspectFeatureTests(type, location, line) {
     if (checkedFeatureTests.has(type)) return;
@@ -461,14 +474,7 @@ export async function inspect(project) {
       if (declaration?.type === 'actor') {
         findings.push(finding('feature-isolation', 'review', `${property.type} is an actor exposed by AppModel. Verify its role. CFA Feature owners explicitly use MainActor, and worker actors belong behind the Feature boundary.`, declarationFile, declaration.line));
       }
-      if (declaration?.type === 'class') {
-        const featureSource = sources.get(declarationFile);
-        const explicitlyNonisolated = [...featureSource.matchAll(/\bnonisolated\s+(?:(?:final|public|internal|private|fileprivate|package|open)\s+)*class\s+(\w+)/g)]
-          .some(match => match[1] === property.type && lineOf(featureSource, match.index + match[0].lastIndexOf('class')) === declaration.line);
-        if (explicitlyNonisolated) {
-          findings.push(finding('feature-isolation', 'review', `${property.type} is exposed by AppModel and declares nonisolated. Verify its role and effective isolation. CFA Feature owners use MainActor.`, declarationFile, declaration.line));
-        }
-      }
+      if (declaration?.type === 'class') inspectFeatureIsolation(source);
       const featureFolder = path.posix.join(path.posix.dirname(appModelFile), 'Features');
       const relative = declarationFile && path.posix.relative(featureFolder, declarationFile);
       if (declaration?.type === 'class' && (relative.startsWith('../') || !relative.includes('/'))) {
@@ -482,7 +488,10 @@ export async function inspect(project) {
     if (!type.endsWith('Feature')) continue;
     const owner = candidates.find(({file, declaration}) =>
       declaration.type === 'class' && /(?:^|\/)2 - AppModel\/Features\//.test(file));
-    if (owner) inspectFeatureTests(type, owner.file, owner.declaration.line);
+    if (owner) {
+      inspectFeatureIsolation(owner);
+      inspectFeatureTests(type, owner.file, owner.declaration.line);
+    }
   }
 
   // A stored dependency is evidence of a potential workflow, not a violation.

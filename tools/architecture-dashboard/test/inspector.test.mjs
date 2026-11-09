@@ -103,8 +103,13 @@ test('reviews explicit nonisolated Feature declarations without inferring defaul
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { let settingsFeature: SettingsFeature }',
     [file]: 'nonisolated final\nclass SettingsFeature {}'
   });
-  const finding = (await inspect(root)).findings.find(item => item.code === 'feature-isolation');
+  const matches = (await inspect(root)).findings.filter(item => item.code === 'feature-isolation');
+  assert.equal(matches.length, 1);
+  const [finding] = matches;
   assert.deepEqual([finding?.file, finding?.line, finding?.severity], [file, 2, 'review']);
+  await fs.writeFile(path.join(root, 'Application/2 - AppModel/AppModel.swift'), 'final class AppModel {}');
+  await fs.writeFile(path.join(root, file), 'final nonisolated class SettingsFeature {}');
+  assert.equal((await inspect(root)).findings.find(item => item.code === 'feature-isolation')?.line, 1);
   await fs.writeFile(path.join(root, file), 'final class SettingsFeature {}');
   assert.ok(!(await inspect(root)).findings.some(item => item.code === 'feature-isolation'));
 });
