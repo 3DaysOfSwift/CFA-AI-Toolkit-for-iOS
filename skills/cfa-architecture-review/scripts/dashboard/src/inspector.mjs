@@ -74,7 +74,8 @@ function* viewInitializers(body) {
     const parameters = body.slice(opening + 1, closing);
     const injectedViewModel = /:\s*(?:any\s+)?(?:\w+\s*\.\s*)*\w*ViewModel\b(?!\s*\.)/.test(parameters);
     const injectedAppModel = /:\s*(?:\w+\s*\.\s*)*AppModel\b(?!\s*\.)/.test(parameters);
-    yield { index: initializer.index, closing, parameters, injectedViewModel, injectedAppModel };
+    const possibleModelDependency = /:\s*(?:(?:any|some)\s+)?(?:\w+\s*\.\s*)*(\w+(?:Feature|Repository))\b(?!\s*\.)/.exec(parameters)?.[1];
+    yield { index: initializer.index, closing, parameters, injectedViewModel, injectedAppModel, possibleModelDependency };
   }
 }
 
@@ -85,6 +86,9 @@ function inspectScreenInputs(name, body, source, start, file, findings) {
     }
     if (initializer.injectedAppModel) {
       findings.push(finding('screen-initializer-inputs', 'warning', `${name} appears to accept AppModel; CFA screens resolve Features through their own ViewModel.`, file, lineOf(source, start + initializer.index)));
+    }
+    if (initializer.possibleModelDependency) {
+      findings.push(finding('screen-initializer-inputs', 'review', `${name} accepts ${initializer.possibleModelDependency}. Verify whether this injects a Feature or repository into a screen.`, file, lineOf(source, start + initializer.index)));
     }
   }
 }
@@ -563,8 +567,8 @@ export async function inspect(project) {
       `@${stateTypePattern}\\s+private\\s+var\\s+([A-Za-z_]\\w*)\\s*:\\s*${viewModelTypePattern}\\b`, 'g'
     ))].map(match => ({ name: match[1], index: match.index }));
     const dependencies = [];
-    for (const { index, closing, parameters, injectedViewModel, injectedAppModel } of viewInitializers(body)) {
-      if (!injectedViewModel && !injectedAppModel && parameters.trim() && viewModel) {
+    for (const { index, closing, parameters, injectedViewModel, injectedAppModel, possibleModelDependency } of viewInitializers(body)) {
+      if (!injectedViewModel && !injectedAppModel && !possibleModelDependency && parameters.trim() && viewModel) {
         findings.push(finding('screen-initializer-inputs', 'review', `${name} accepts initializer inputs. Check that a detail screen receives selected immutable data and constructs its own ViewModel. Check for injected Features, repositories and navigation actions owned by another screen.`, viewFile, lineOf(view, bodyOffset + index)));
       }
       const tail = body.slice(closing + 1);

@@ -123,6 +123,22 @@ test('flags a direct AppModel initializer input without mistaking a nested value
   assert.match(findings[0].message, /appears to accept AppModel/);
 });
 
+test('reviews possible model dependencies in a flat View initializer', async t => {
+  const file = 'App/Detail.swift';
+  const { findings } = await inspectView(t, '', {
+    [file]: `struct Detail: View {
+      init(schedule: LaunchFeature) {}
+      init(repository: any MyApp.LaunchRepository) {}
+      init(snapshot: LaunchFeature.Snapshot) {}
+      var body: some View { Text("Detail") }
+    }`
+  });
+  assert.deepEqual(findings.map(item => [item.code, item.file, item.line, item.severity]), [
+    ['screen-initializer-inputs', file, 2, 'review'],
+    ['screen-initializer-inputs', file, 3, 'review']
+  ]);
+});
+
 test('maps a conventionally located screen with qualified View conformance', async t => {
   const {report} = await inspectView(t, `struct HomeView: SwiftUI.View {
     @State private var viewModel = HomeViewModel()
