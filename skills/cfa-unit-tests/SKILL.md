@@ -98,6 +98,14 @@ an open racing an explicit dismissal of the same request. Assert the outcomes
 against the pending list and the scene’s navigation state. Verify restoration
 without losing unrelated pending requests.
 
+For apps that exchange snapshots with a widget or another device target, apply
+the [multi-device rule](references/spec/rules/cfa-device-01.md). With controlled
+storage and a reload spy, verify that a successful widget snapshot write
+precedes the reload request and a failed write issues no reload request.
+For a receiving Feature, exercise missing, unreadable, delayed and stale
+snapshots according to the product's rules. Verify real WidgetKit or Watch
+Connectivity handoff separately on supported devices.
+
 For account changes, hold an old account's request open, switch accounts or
 sign out, then complete the old request. Verify that its data is never
 published into the new session. Exercise successful cleanup, sign-out
