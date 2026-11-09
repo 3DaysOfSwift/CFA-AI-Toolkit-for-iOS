@@ -21,6 +21,12 @@ For a growing ViewModel, ask: **is it arranging existing capabilities for this s
 
 The authoritative state distinction is also confirmed by Matthew Thomas. UserProfileFeature owns the current profile; its API adapter fetches values. PostFeedFeature owns the post collection and pagination policy; its provider returns pages. A service's private request tracking, cache or database machinery does not turn it into a business Feature. Avoid competing application-level copies of the same state.
 
+When a reusable business workflow genuinely spans Features, an existing
+Feature can own the coordination, or a distinct Feature can own the workflow.
+For example, a Today Feature can own the rules for selecting what belongs in
+a daily summary while the participating Features retain their own data.
+Trace dependencies for cycles and keep the authority for each value clear.
+
 ## Trade-offs and alternatives
 
 Editorial analysis: several Feature dependencies make a screen's needs explicit, but require clear presentation coordination and tests. A facade introduced solely to hide that count adds indirection without identifying a new capability. A focused presentation helper may be useful when device-specific coordination becomes complex.

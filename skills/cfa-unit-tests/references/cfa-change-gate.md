@@ -66,6 +66,10 @@ the architecture:
    or persistence snapshots use immutable `let` properties and contents, and
    are replaced after confirmed changes. Do not embed mutable reference state
    that undermines the snapshot; temporary editor drafts are presentation state.
+   Start with independent Features. For a reusable business workflow spanning
+   Features, use the [coordination rule](spec/rules/cfa-feature-02.md). Verify
+   an explicit, acyclic dependency direction and one owner for each shared
+   value. A screen that combines existing outputs can do so in its ViewModel.
 6. RootTabView is structural only. It presents tabs and navigation; it does not
    refresh features, interpret feature failures, or own feature loading state.
 7. Every concrete feature type ends in `Feature`, such as `SettingsFeature`.
