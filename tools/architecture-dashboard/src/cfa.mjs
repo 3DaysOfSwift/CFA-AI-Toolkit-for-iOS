@@ -279,9 +279,10 @@ skill from that toolkit before changing the project.
   server, follow its sync contract. Save each offline edit and its pending-sync
   metadata together before reporting local success. Report server confirmation
   separately. Force a local write failure and verify that it neither reports
-  local success nor makes the edit eligible for upload. Verify recovery after
-  failed sync and restart, duplicate-safe
-  retries, and the agreed conflict and rejection outcomes. When changing
+  local success nor makes the edit eligible for upload. Fail sync after a
+  successful local save, restart, and retry with the same edit identity.
+  Verify that the server applies one logical change. Check the agreed
+  conflict and rejection outcomes. When changing
   existing sync code, verify that the updated app restores and safely retries
   a pending edit persisted by the previous implementation. Verify Apple-managed
   sync and conflicting offline edits on supported devices when applicable.

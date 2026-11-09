@@ -142,8 +142,9 @@ the architecture:
     reporting local success. Report server confirmation separately. Force a
     local write failure and verify the app reports the failure without
     publishing local success or admitting a pending edit for upload. Verify
-    pending edits survive failed sync and restart, retries avoid duplicates,
-    and conflicting edits and server rejections follow the product policy.
+    pending edits survive failed sync and restart. Retry with the same edit
+    identity and verify one logical server change. Check that conflicting
+    edits and server rejections follow the product policy.
     If changing an existing sync implementation, start verification with
     an edit persisted by the previous implementation. Check that the updated
     app restores its identity and pending metadata and can retry it safely.
