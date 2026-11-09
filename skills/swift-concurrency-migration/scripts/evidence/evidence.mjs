@@ -192,6 +192,9 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
     }
   }
   if (record.result === 'completed') {
+    if (record.repository.beforeCommit && record.repository.beforeCommit === record.repository.afterCommit) {
+      errors.push('repository.afterCommit: a completed migration requires a revision distinct from beforeCommit');
+    }
     const affectedTargets = new Set(record.completionGate?.affectedTargets ?? []);
     const hasBehaviourBaseline = record.repository.beforeCommit && record.evidence.some(item => {
       if (item.phase !== 'before' || item.commit !== record.repository.beforeCommit) return false;

@@ -148,6 +148,20 @@ test('a reviewed migration requires the final diff in its after evidence', t => 
   assert.equal(inspectRecord(f.file).valid, true);
 });
 
+test('completion requires a revision distinct from the baseline', t => {
+  const f = reviewedFixture(t);
+  f.record.repository.afterCommit = f.record.repository.beforeCommit;
+  for (const item of f.record.evidence) {
+    if (item.phase === 'after') item.commit = f.record.repository.afterCommit;
+  }
+  f.seal(); // A partial attempt can leave the original revision unchanged.
+  f.record.result = 'completed';
+  f.write();
+  assert.ok(inspectRecord(f.file, {checkDigest: false}).errors.includes(
+    'repository.afterCommit: a completed migration requires a revision distinct from beforeCommit'
+  ));
+});
+
 test('completion is not inferred from a build pass or tests at a different commit', t => {
   const f = reviewedFixture(t);
   f.record.result = 'completed';

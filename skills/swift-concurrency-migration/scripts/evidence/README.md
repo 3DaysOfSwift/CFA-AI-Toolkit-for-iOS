@@ -48,8 +48,9 @@ each build in its `targets` array. Several records may cover the list. The build
 linked by `buildEvidenceId` must name at least one affected target. Older
 completed records need target names and renewed review. A check not run still has a planned command
 and a note explaining why. Commands are text: the helper never executes them.
-A `completed` record requires a pinned `repository.afterCommit` and passed
-evidence at that revision for every completion gate entry. Link the before/after
+A `completed` record requires a pinned `repository.afterCommit` distinct from
+`repository.beforeCommit`, with passed evidence at the final revision for every
+completion gate entry. Link the before/after
 navigator map from manual Xcode inspection, Feature and legacy primitive
 inventories, hybrid review, deployment compatibility, final CFA audit, build, tests, manual behaviour
 regression and human architecture review. Record an executed test or manual observation at `repository.beforeCommit`
