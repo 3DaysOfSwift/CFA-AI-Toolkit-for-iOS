@@ -171,6 +171,14 @@ test('completion is not inferred from a build pass or tests at a different commi
   f.record.evidence.find(item => item.id === 'after-behaviour-regression').outcome = 'passed';
   f.seal();
   assert.equal(inspectRecord(f.file).valid, true);
+
+  f.record.status = 'draft';
+  f.record.repository.afterCommit = null;
+  for (const item of f.record.evidence) {
+    if (item.phase === 'after') item.commit = null;
+  }
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.includes('result: completed requires a pinned afterCommit'));
 });
 
 test('review fingerprint catches edited record, case study and local evidence', t => {

@@ -163,6 +163,7 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
     }
   }
   if (record.result === 'completed') {
+    if (!record.repository.afterCommit) errors.push('result: completed requires a pinned afterCommit');
     for (const kind of ['build', 'test']) if (!record.evidence.some(item => item.kind === kind && item.phase === 'after' && item.outcome === 'passed' && item.commit === record.repository.afterCommit)) errors.push(`result: completed requires a passed after ${kind} at afterCommit; otherwise use partial`);
     const gate = record.completionGate;
     if (!gate) {
