@@ -1174,3 +1174,12 @@ test('reviews storage construction in AppModel init but not unrelated methods', 
   assert.deepEqual(storage.map(item => item.line), [3]);
   assert.match(storage[0].message, /AppModel\.init/);
 });
+
+test('reports unresolved Feature source without requiring a screen reference', async t => {
+  const file = 'Application/2 - AppModel/AppModel.swift';
+  const root = await fixture(t, {
+    [file]: 'final class AppModel {\n let telemetryFeature: TelemetryFeature\n}'
+  });
+  const {findings} = await inspect(root);
+  assert.deepEqual(findings.filter(item => item.code === 'feature-source-missing').map(item => [item.file, item.line]), [[file, 2]]);
+});

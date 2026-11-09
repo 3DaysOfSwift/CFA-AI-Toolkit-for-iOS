@@ -348,6 +348,9 @@ export async function inspect(project) {
     if (property.computed) {
       findings.push(finding('feature-computed-exposure', 'review', `AppModel exposes ${name} through a computed property. Trace it to the concrete Feature retained by the live graph and check that access does not construct a competing instance.`, appModelFile, property.line));
     }
+    if (!candidates.length) {
+      findings.push(finding('feature-source-missing', 'review', `${property.type} is exposed by AppModel, but the inspector could not locate its declaration. Check aliases, generated code and target membership.`, appModelFile, property.line));
+    }
     if (candidates.length > 1) {
       const locations = candidates.map(({file, declaration}) => `${file}:${declaration.line}`).sort();
       findings.push(finding('feature-source-ambiguous', 'review', `${property.type} has multiple declarations. Candidates: ${locations.join(', ')}. Verify which declaration belongs to the active target before assessing placement or collaborators.`, appModelFile, property.line));
@@ -743,7 +746,6 @@ export async function inspect(project) {
           .map(item => item[1]);
         dependencies.push({ property, featureType, featureFile, collaborators: [...new Set(collaborators)], sourceFile: file, line });
         if (!exposure) findings.push(finding('unresolved-feature', 'review', `${viewModelName} references AppModel.shared.${property}, but the inspector could not resolve it in the primary AppModel declaration. Check extensions, inferred types and target membership.`, file, line));
-        else if (!candidates.length) findings.push(finding('feature-source-missing', 'review', `${featureType} is exposed by AppModel, but the inspector could not locate its declaration. Check aliases, generated code and target membership.`, appModelFile, exposure.line));
         if (exposure && featureTypeSuffix.test(featureType)) {
           for (const local of viewModelMembers.matchAll(/\b(?:let|var)\s+(\w+)\s*:\s*(?:any\s+)?(\w+Feature(?:API)?)\b(?!\s*\.)/g)) {
             if (featurePropertyName(local[2]) === property && local[1] !== property) {
