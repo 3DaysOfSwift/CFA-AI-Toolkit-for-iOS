@@ -374,12 +374,14 @@ export async function inspect(project) {
       }
       continue;
     }
-    if (/\bstruct\s+\w+App\s*:\s*App\b/.test(source)) {
-      const sceneBody = /\bvar\s+body\s*:\s*some\s+Scene\s*\{/.exec(source);
+    for (const app of source.matchAll(/\bstruct\s+\w+\s*:\s*(?:SwiftUI\s*\.\s*)?App\b[^{}]*\{/g)) {
+      const start = app.index + app[0].length;
+      const members = braceBody(source, start - 1);
+      const sceneBody = /\bvar\s+body\s*:\s*some\s+(?:SwiftUI\s*\.\s*)?Scene\s*\{/.exec(members);
       if (sceneBody) {
-        const body = braceBody(source, sceneBody.index + sceneBody[0].length - 1);
-        if (/\b(?:if|switch)\b/.test(body)) findings.push(finding('conditional-app-body', 'review', 'App.body contains a conditional. Check whether it gates root navigation on storage or an unrelated condition.', file, lineOf(source, sceneBody.index)));
-        if (/\.modelContainer\s*\(|\b(?:ProgressView|ContentUnavailableView)\s*\(/.test(body)) findings.push(finding('app-startup-presentation', 'review', 'App.body contains storage or loading presentation. Check whether database availability gates the interface; a lexical match alone cannot establish this.', file, lineOf(source, sceneBody.index)));
+        const body = braceBody(members, sceneBody.index + sceneBody[0].length - 1);
+        if (/\b(?:if|switch)\b/.test(body)) findings.push(finding('conditional-app-body', 'review', 'App.body contains a conditional. Check whether it gates root navigation on storage or an unrelated condition.', file, lineOf(source, start + sceneBody.index)));
+        if (/\.modelContainer\s*\(|\b(?:ProgressView|ContentUnavailableView)\s*\(/.test(body)) findings.push(finding('app-startup-presentation', 'review', 'App.body contains storage or loading presentation. Check whether database availability gates the interface; a lexical match alone cannot establish this.', file, lineOf(source, start + sceneBody.index)));
       }
     }
     // Known root conventions only: this is a review hint, not data-flow analysis.

@@ -446,7 +446,7 @@ test('a SwiftData import in tests is a target-membership review, not an app defe
 test('flags conditional database startup presentation in App.body', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
-    'Application/1 - View/HabitApp.swift': 'import SwiftUI\nstruct HabitApp: App { var body: some Scene { WindowGroup { if ready { RootTabView().modelContainer(container) } else { ProgressView("Opening") } } } }'
+    'Application/1 - View/HabitApp.swift': 'import SwiftUI\nstruct Habit: SwiftUI.App { var body: some SwiftUI.Scene { WindowGroup { if ready { RootTabView().modelContainer(container) } else { ProgressView("Opening") } } } }'
   });
   const findings = (await inspect(root)).findings;
   const codes = findings.map(item => item.code);
