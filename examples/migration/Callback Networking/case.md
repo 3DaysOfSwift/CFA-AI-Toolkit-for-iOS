@@ -27,6 +27,7 @@ The playground’s URLProtocol exercises success and error handling with one
 request at a time. The automated check runs the same provider and
 NetworkingManager with a controlled transport. It holds the first request open,
 verifies an independent request completes, then cancels the held request and
-checks that the caller receives a cancellation error. Real transport timing,
+checks that the transport stops loading and the caller receives a cancellation
+error. Real transport timing,
 timeouts and retries are outside the example’s scope. Preserve deliberate
 ordering and rate limits when applying CFA-SPEC-NET-01.

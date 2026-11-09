@@ -176,6 +176,7 @@ test('Callback Networking starts an independent request while another is pending
 ${implementation}
 final class ControlledTransport: URLProtocol, @unchecked Sendable {
     static let heldRequestStarted = AsyncStream<Void>.makeStream(bufferingPolicy: .bufferingNewest(1))
+    static let heldRequestStopped = AsyncStream<Void>.makeStream(bufferingPolicy: .bufferingNewest(1))
 
     override class func canInit(with request: URLRequest) -> Bool { true }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
@@ -195,7 +196,11 @@ final class ControlledTransport: URLProtocol, @unchecked Sendable {
         client?.urlProtocolDidFinishLoading(self)
     }
 
-    override func stopLoading() {}
+    override func stopLoading() {
+        if request.url?.path == "/held" {
+            Self.heldRequestStopped.continuation.yield(())
+        }
+    }
 }
 
 @main struct Runner {
@@ -220,6 +225,9 @@ final class ControlledTransport: URLProtocol, @unchecked Sendable {
             _ = try await held.value
             preconditionFailure("The held request must finish with cancellation")
         } catch let error as URLError where error.code == .cancelled {}
+        var stops = ControlledTransport.heldRequestStopped.stream.makeAsyncIterator()
+        let stopped = await stops.next()
+        precondition(stopped != nil)
     }
 }`;
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfa-network-overlap-'));

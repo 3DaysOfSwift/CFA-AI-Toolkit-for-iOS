@@ -37,7 +37,8 @@ Concurrency is available in Swift 5.5 and later.
 
 - [Callback networking](Callback%20Networking/case.md) preserves a successful
   decode and three distinct failures when moving to async URLSession: HTTP 503,
-  malformed JSON and an offline transport error.
+  malformed JSON and an offline transport error. The automated test verifies
+  that independent requests overlap and cancellation reaches the transport.
 - [MainActor result handling](MainActor%20Result/case.md) preserves publication
   before completion and demonstrates failed refresh and retry in the playground.
   The source checkout's automated test covers overlapping calls and cancellation
@@ -45,5 +46,5 @@ Concurrency is available in Swift 5.5 and later.
 - [Observation migration](Observation%20Migration/case.md) preserves the current
   Feature value while showing how notification delivery differs from Combine.
 - [Serial weight saves](Serial%20Weight%20Saves/case.md) preserves distinct save
-  outcomes and verifies admission order across a failing command in the source
-  checkout's automated test.
+  outcomes. The automated test verifies admission order across a failing
+  command and confirms that identical admitted saves each take effect.
