@@ -1,8 +1,8 @@
 # CFA-SPEC-OBS-02: Keep unsaved field edits in the ViewModel
 
-**Applies when:** Editing a simple text field.
+**Applies when:** Editing unsaved field values on a screen.
 
-**Strength:** Default.
+**Strength:** Required.
 
 **Guidance:** Keep the unsaved field value in the screen ViewModel until a save succeeds or the user cancels; retain it after a failed save. Persisted values remain Feature-owned.
 
