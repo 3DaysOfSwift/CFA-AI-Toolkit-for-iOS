@@ -231,7 +231,8 @@ skill from that toolkit before changing the project.
   or a scheduled Task. AppModel signals the relevant Features and starts its
   required app-wide listeners before the callback returns. Features can start
   their own asynchronous work without delaying the callback for disk or network
-  completion.
+  completion. Verify that repeated callbacks leave Feature startup signals
+  and app-wide listeners unduplicated.
   Keep synchronous startup work brief. Task creation order gives no guarantee
   about when disk or network work begins. Measure launch and first-frame
   timing separately from completion of Feature work.
