@@ -185,8 +185,10 @@ Use deliberate passes:
    [refresh lifetime rule](references/spec/rules/cfa-task-02.md) while preserving
    the existing product's cancellation requirements. CFA's default keeps the
    Feature-owned refresh running when the last screen leaves and retains its
-   result. Verify that equivalent callers can join and that a screen that must
-   exit promptly can stop waiting independently of the refresh.
+   result. When this policy applies, verify completion with no waiters, a later
+   equivalent caller joining without a second request, and delivery to the
+   remaining waiters when one leaves. If a screen must exit promptly, verify
+   that its wait ends while the refresh is suspended.
 4. Re-run the relevant behaviour and concurrency tests. Record the remaining
    legacy primitives, completed feature milestones and verification gaps.
 5. As the scoped features take shape, reconcile their physical locations and

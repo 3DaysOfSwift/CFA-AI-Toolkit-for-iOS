@@ -123,9 +123,10 @@ If the project is already CFA, make the smallest complete vertical change:
    For shared refreshes, apply the
    [refresh lifetime rule](references/spec/rules/cfa-task-02.md). By default,
    the Feature keeps refreshing when the last screen leaves and retains the
-   result for later use. If a departing screen needs to return promptly,
-   test that cancelling its wait lets it return while the Feature's refresh
-   is still suspended.
+   result for later use. Verify separately that a later equivalent caller
+   joins without a second request and that cancelling one of several waiters
+   leaves the others able to receive the result. If a departing screen needs
+   to return promptly, test that its wait ends while the refresh is suspended.
 2. Give every new screen-level SwiftUI View its own adjacent, bespoke ViewModel.
    Reusable presentation components may take snapshots, bindings and action
    closures. Use those closures to forward intent to the owning screen's
