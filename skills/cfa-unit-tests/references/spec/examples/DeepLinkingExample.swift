@@ -263,6 +263,15 @@ final class DeepLinkingFeature {
         try await removalRetry.receive(request)
         try FileManager.default.moveItem(at: retryFolder, to: movedFolder)
         try Data().write(to: retryFolder) // A file blocks recreation of the directory.
+        // A failed insertion leaves the last confirmed list visible.
+        do {
+            try await removalRetry.receive(incoming)
+            throw ExampleFailure.expectedStorageError
+        } catch is ExampleFailure {
+            throw ExampleFailure.expectedStorageError
+        } catch {
+            precondition(removalRetry.pending == [request])
+        }
         do {
             try await removalRetry.open(id: request.id) { _ in true }
             throw ExampleFailure.expectedStorageError
@@ -273,6 +282,9 @@ final class DeepLinkingFeature {
         }
         try FileManager.default.removeItem(at: retryFolder)
         try FileManager.default.moveItem(at: movedFolder, to: retryFolder)
+        let restoredAfterFailure = DeepLinkingFeature(store: PendingRequestStore(fileURL: retryURL))
+        try await restoredAfterFailure.restore()
+        precondition(restoredAfterFailure.pending == [request])
         try await removalRetry.open(id: request.id) { _ in
             preconditionFailure("Retrying removal must not navigate again")
         }
