@@ -88,13 +88,17 @@ const excluded = new Set(['.git', '.build', '.swiftpm', 'Pods', 'Carthage', 'nod
 export async function analyse(root, { includeTests = false, excludedOutput } = {}) {
   root = await fs.realpath(root);
   if (!(await fs.stat(root)).isDirectory()) throw new Error('Repository path must be a directory.');
-  const files = [], skipped = [];
+  const files = [], skipped = [], excludedTestDirectories = [];
   async function walk(directory) {
     for (const entry of (await fs.readdir(directory, { withFileTypes: true })).sort((a,b) => a.name.localeCompare(b.name))) {
       const absolute = path.join(directory, entry.name);
       if (entry.isSymbolicLink()) continue;
       if (entry.isDirectory()) {
-        if (excluded.has(entry.name) || entry.name.startsWith('.') || (!includeTests && (/^[Tt]ests?$/.test(entry.name) || /Tests?$/.test(entry.name))) || absolute === excludedOutput) continue;
+        if (excluded.has(entry.name) || entry.name.startsWith('.') || absolute === excludedOutput) continue;
+        if (!includeTests && /(?:^tests?$|Tests?$)/.test(entry.name)) {
+          excludedTestDirectories.push(path.relative(root, absolute).split(path.sep).join('/'));
+          continue;
+        }
         await walk(absolute);
       } else if (entry.isFile() && entry.name.endsWith('.swift')) {
         const relative = path.relative(root, absolute).split(path.sep).join('/');
@@ -108,7 +112,7 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
   const sourceFingerprint = createHash('sha256').update(JSON.stringify(files.map(f=>[f.path,f.hash]))).digest('hex');
   return { schemaVersion: 3, sourceFingerprint, dashboard: dashboard(files), project: path.basename(root), generatedAt: new Date().toISOString(),
     method: 'Lexical source inventory — not compiler-resolved or runtime-observed',
-    scope: { includeTests, fileCount: files.length, skipped, targetMembership: 'Not resolved; inactive compilation branches may be included' },
+    scope: { includeTests, fileCount: files.length, skipped, excludedTestDirectories, targetMembership: 'Not resolved; inactive compilation branches may be included' },
     limitations: [
       'Matches are source matches: similarly named custom APIs may match; wrappers and unusual syntax may be missed.',
       'String interpolation bodies and Swift regex literals are not fully parsed. Source offsets use UTF-16 code units.',
