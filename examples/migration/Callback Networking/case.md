@@ -10,7 +10,7 @@ Both implementations return Artemis on success and report HTTP 503, malformed JS
 
 ## Migration
 
-The provider asks `NetworkingManager` for data using URLSession’s async API. The wrapper has no mutable request state. Copies of the wrapper still refer to the same configured session. The provider validates and decodes each response with request-local values. The continuation is used only by the legacy behaviour check.
+The provider asks `NetworkingManager` for data using URLSession’s async API. The wrapper has no mutable request state. Copies of the wrapper still refer to the same configured session. The provider validates each response, decodes it into a private response type and returns an immutable domain value. A change to the provider’s wire format can be handled inside the adapter while preserving the Feature’s domain contract. The continuation is used only by the legacy behaviour check.
 
 `Launch` is an immutable value with a `let` name. A Feature using this
 provider can replace its published snapshot when a current response arrives.

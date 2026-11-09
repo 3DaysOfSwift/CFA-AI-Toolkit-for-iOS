@@ -16,17 +16,20 @@ struct NetworkingManager: Sendable {
 
 // The provider checks and decodes each response using request-local values.
 struct LaunchAPI: Sendable {
+    private struct LaunchResponse: Decodable { let name: String }
+
     private let networkingManager: NetworkingManager
     init(networkingManager: NetworkingManager) { self.networkingManager = networkingManager }
     func download(from url: URL) async throws -> Launch {
         let (data, response) = try await networkingManager.downloadData(from: url)
         guard let response = response as? HTTPURLResponse else { throw DownloadError.invalidResponse }
         guard response.statusCode == 200 else { throw DownloadError.httpStatus(response.statusCode) }
-        return try JSONDecoder().decode(Launch.self, from: data)
+        let launchResponse = try JSONDecoder().decode(LaunchResponse.self, from: data)
+        return Launch(name: launchResponse.name)
     }
 }
 
-struct Launch: Decodable, Equatable, Sendable { let name: String }
+struct Launch: Equatable, Sendable { let name: String }
 enum DownloadError: Error, Equatable { case invalidResponse; case httpStatus(Int) }
 
 // MARK: - Test fixtures
