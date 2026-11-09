@@ -753,3 +753,16 @@ test('reviews ViewModels injected through the SwiftUI environment', async t => {
   assert.deepEqual(report.findings.filter(item => item.code === 'view-model-environment-input')
     .map(({line}) => line), [2, 3]);
 });
+
+test('points to a ViewModel constructed for environment injection', async t => {
+  const {report} = await inspectView(t, `struct HomeView: View {
+    var body: some View {
+      DetailsView()
+        .environment(Example.DetailsViewModel())
+        .environmentObject(LegacyViewModel.init())
+        .environment(Theme())
+    }
+  }`);
+  assert.deepEqual(report.findings.filter(item => item.code === 'view-model-environment-provider')
+    .map(({line}) => line), [4, 5]);
+});
