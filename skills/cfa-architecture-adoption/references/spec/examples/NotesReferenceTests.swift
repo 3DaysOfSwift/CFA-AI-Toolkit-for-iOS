@@ -125,6 +125,11 @@ actor HeldNotesLoad: NotesRepository {
         let retryRepository = RetryableNotes()
         let retryFeature = NotesFeature(repository: retryRepository)
         let retryModel = NotesEditorViewModel(notesFeature: retryFeature)
+        let cancelledLoad = Task { @MainActor in await retryModel.load() }
+        cancelledLoad.cancel()
+        await cancelledLoad.value
+        let attemptsAfterCancellation = await retryRepository.attempts
+        precondition(attemptsAfterCancellation == 0 && retryModel.loadError == nil)
         await retryModel.load()
         precondition(retryModel.loadError != nil && retryFeature.notes.isEmpty)
         let firstRetry = retryModel.retryLoad()

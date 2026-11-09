@@ -22,6 +22,7 @@ draft changed programmatically during the save, it stays in the editor. A queued
 save still completes when its predecessor fails, and each caller receives
 its own outcome. The checks also verify that two callers share one load
 and one caller's cancellation leaves the other able to receive the result.
+A screen load cancelled before entry starts no repository work.
 Saving during initial restoration preserves both the restored and new notes.
 The repository accepts one new note at a time. It reads the current file and
 atomically rewrites it within one actor turn, so callers never submit their
@@ -188,6 +189,7 @@ final class NotesEditorViewModel {
     }
 
     func load() async {
+        guard !Task.isCancelled else { return }
         do {
             try await notesFeature.loadIfNeeded()
         } catch {

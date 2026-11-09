@@ -132,6 +132,7 @@ final class NotesEditorViewModel {
     }
 
     func load() async {
+        guard !Task.isCancelled else { return }
         do {
             try await notesFeature.loadIfNeeded()
         } catch {
