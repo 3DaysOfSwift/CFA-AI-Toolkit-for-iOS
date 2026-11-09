@@ -14,7 +14,7 @@ confirmed saves and continues processing after failure.
 
 ## Migration
 
-The Feature sequences saves and delegates storage through the `WeightSaving` repository contract, implemented here by an in-memory actor. Callers await the Feature's async save directly. This example keeps the legacy success/failure Boolean so the comparison preserves what each caller receives. An admitted save runs to completion even if its caller is cancelled. The Feature owns the save task, and the caller awaits that task’s result. Cancelling the caller neither cancels that task nor ends its wait for the result. A screen that needs to leave promptly needs a separate cancellation path for its wait. Check that this lifetime and the change from a completion callback to an async return match the original app’s contract.
+The Feature sequences saves and delegates storage through the `WeightSaving` repository contract, implemented here by an in-memory actor. Callers await the Feature's async save directly. This example keeps the legacy success/failure Boolean so the comparison preserves what each caller receives. The legacy queue accepts every submission. To preserve that contract, the migrated Feature admits a save even when its caller is already cancelled. An admitted save runs to completion even if its caller is cancelled. The Feature owns the save task, and the caller awaits that task’s result. Cancelling the caller neither cancels that task nor ends its wait for the result. A screen that needs to leave promptly needs a separate cancellation path for its wait. Check that this lifetime and the change from a completion callback to an async return match the original app’s contract.
 
 The Feature exposes a typed failure. A screen ViewModel can turn it into
 user-facing text.

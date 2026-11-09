@@ -165,7 +165,11 @@ extension WeightLogFeature { var testSaveID: UUID? { lastSaveID } }
         precondition(a && !b && c && attempts == [80, -1, 80])
         precondition(feature.weights == [80, 80] && feature.saveFailure == nil)
         precondition(feature.testSaveID == nil)
-        let retried = await feature.save(82)
+        // The legacy queue accepted every submission. Even a caller that is
+        // cancelled before entering the Feature still submits its save here.
+        let retry = Task { @MainActor in await feature.save(82) }
+        retry.cancel()
+        let retried = await retry.value
         let attemptsAfterRetry = await storage.attempts
         precondition(retried && attemptsAfterRetry == [80, -1, 80, 82])
         precondition(feature.weights == [80, 80, 82] && feature.testSaveID == nil)
