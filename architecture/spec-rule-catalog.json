@@ -181,9 +181,9 @@
       "section": "Organize Behaviour into Cohesive Features",
       "applies": "Choosing or sharing lower-level services",
       "strength": "Default",
-      "rule": "Keep domain-specific services beside their Feature while that location describes their purpose, even when another Feature uses them. Move broadly applicable services to a shared location. Compose a shared dependency locally in AppModel.live() when common configuration or shared state warrants it, and inject it into its consumers.",
+      "rule": "Keep domain-specific services beside their Feature while that location describes their purpose, even when another Feature uses them. Move a broadly applicable service to a shared location when no single Feature naturally owns it. Compose a shared dependency locally in AppModel.live() when common configuration or shared state warrants it, and inject it into its consumers through their initializers. Otherwise use the simplest value or instances that meet the requirements.",
       "why": "Organizing code around capability makes it easier to find.",
-      "verify": "Inspect actual service users, mutable state, dependency injection and responsibilities.",
+      "verify": "Trace who uses the service and which capability its work belongs to. Check that file placement reflects that responsibility. Verify that a shared instance serves a concrete configuration or state need and reaches its consumers through initializer injection.",
       "example": "A launch-specific provider can stay in the schedule folder; a generic network wrapper may move to shared services.",
       "explanationIds": []
     },
