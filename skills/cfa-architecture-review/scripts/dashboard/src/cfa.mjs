@@ -52,10 +52,12 @@ skill from that toolkit before changing the project.
   Scheduling or delivery alone does not create a pending item. The receiving
   scene owns navigation and protects unsaved edits and active payments. Any
   scene can retry a pending request. Coordinate attempts to avoid opening it
-  twice, and remove it on actual navigation or explicit dismissal. Leave
-  declined, cancelled or failed requests pending. The destination owns its
-  content loading. Preserve existing link and notification history behaviour
-  during migration.
+  twice, and persist removal after actual navigation or explicit dismissal.
+  Leave requests pending when navigation is declined, cancelled before it opens,
+  or fails. If removal fails after navigation, report the storage error and
+  retry removal without navigating again. The request can reappear after restart
+  until removal is saved. The destination owns its content loading. Preserve
+  existing link and notification history behaviour during migration.
 - A normal preview constructs the View and follows the same ownership and
   storage boundaries. Keep SwiftData containers and contexts out of previews.
 - Keep Views declarative. Feature state and business decisions belong outside
