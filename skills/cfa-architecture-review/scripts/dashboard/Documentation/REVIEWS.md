@@ -279,6 +279,12 @@ write when its caller has left. In the `failure` scenario, trace what
 happens to the confirmed value and draft and whether the user can retry.
 Evaluate these outcomes against the operation's ownership policy.
 
+For commands that must each take effect, suspend the first admitted command
+and submit more, including two with identical inputs. Verify each required
+command executes in admission order and each caller receives its own outcome.
+Fail the first command and verify the queue still processes the rest. Compare
+the resulting state with the outcomes reported to callers.
+
 Trace repeated triggers, navigation or caller departure, older results arriving
 late, and failures through the actual state and task owners. Record the observed
 policy, test or reproduction separately from source-only reasoning. The report
