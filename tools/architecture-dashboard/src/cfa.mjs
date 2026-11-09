@@ -92,6 +92,8 @@ skill from that toolkit before changing the project.
   ending the session. Reconcile partial authentication changes with the actual
   session. Clear account-specific Feature state after successful sign-out and
   check the account or session generation before publishing in-flight results.
+  If the same account can sign back in before old work finishes, check the
+  session identity even when the earlier task was cancelled.
   If sign-out promises a fresh-install experience, clear account-specific
   memory, caches and locally stored files. Preserve independent purchases and
   user-owned documents. Handle unsynchronised work according to the product
