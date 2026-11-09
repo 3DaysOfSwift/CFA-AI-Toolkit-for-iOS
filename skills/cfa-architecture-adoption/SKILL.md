@@ -32,7 +32,7 @@ folders; do not relabel a flat app as CFA.
 
 Read [CFA specification](references/cfa-specification.md), [CFA change gate](references/cfa-change-gate.md), [reference feature](references/reference-feature.md) and [product behaviour contract](references/product-behaviour-contract.md).
 
-1. Identify the live target, dependency wiring and baseline build/tests. Map current screens, business decisions, state owners and persistence. Record existing failures separately.
+1. Identify the affected targets, dependency wiring and baseline build/tests. Map current screens, business decisions, state owners and persistence. Record existing failures separately.
 2. Define a bounded feature and its behaviour contract. Map each responsibility to its CFA destination before moving code. Inventory screens and tabs with their presentation owners and required concrete AppModel Features. For a SwiftUI screen, identify its dedicated ViewModel. For an existing UIKit screen, trace its actual presentation owner and preserve its UI within the agreed adoption scope. A screen can present several independent business capabilities; several screens can use the same Feature. Identify missing business owners, not missing tab wrappers, and give actual Features named tests. Keep shared business state under one authoritative owner. Preserve public interfaces with temporary adapters where needed.
 3. Separate screen presentation from feature rules. Introduce or align AppModel.shared as the composition root with Feature properties, its launch guard, and private task handles for app-wide listeners; its explicit initializer receives Features, and its single `static live()` builds production dependencies. AppModel owns app-wide listeners and forwards events to the relevant Feature. Move each authoritative value and its mutations to a named Feature. Route SwiftData through `SwiftDataManager` and networking through `NetworkingManager`. Call the AppModel launch signal directly and synchronously from the app lifecycle callback, without wrapping the call in a Task; Features may start asynchronous work without making launch wait for disk or network completion. Use SwiftUI's `.task` for screen-owned initial work, without assuming it completes before the screen appears.
 4. Migrate one end-to-end feature at a time, checking callers and live wiring. Keep data formats, navigation, errors, ordering and operation lifetimes stable. Remove superseded wiring only once all callers have moved.
@@ -43,6 +43,13 @@ Read [CFA specification](references/cfa-specification.md), [CFA change gate](ref
    against the actual source and tests. Explain remaining transitional
    components and identify unverified requirements. A whole-app CFA verdict
    requires evidence for every applicable checklist item across the app.
+
+When moving shared Model code used by an existing widget or another device
+target, apply the [multi-device rule](references/spec/rules/cfa-device-01.md).
+Record the existing target membership and data handoff before moving files.
+Preserve the handoff and its user-visible behaviour, including when a snapshot
+is unavailable. Verify affected targets can still build and exercise the
+handoff separately from source membership checks.
 
 Use this workflow for an architecture-only adoption when the application is
 already modern or the developer has explicitly limited the scope to structure.
