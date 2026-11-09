@@ -166,6 +166,18 @@ actor HeldNotesLoad: NotesRepository {
         precondition(model.text.isEmpty && model.saveError == nil)
         precondition(savedAfterDiscard == ["retry"] && feature.notes.map(\.text) == savedAfterDiscard)
 
+        // The task cannot enter save until this MainActor test suspends.
+        let cancelledBeforeAdmission = Task { @MainActor in
+            try await feature.save("cancelled before admission")
+        }
+        cancelledBeforeAdmission.cancel()
+        do {
+            try await cancelledBeforeAdmission.value
+            preconditionFailure("A cancelled caller must not submit a new save")
+        } catch is CancellationError {
+            precondition(feature.notes == confirmedBeforeFailure)
+        }
+
         let first = Task { try await feature.save("first") }
         await repository.waitForFirst()
         first.cancel() // A departing caller does not cancel the Feature-owned save.

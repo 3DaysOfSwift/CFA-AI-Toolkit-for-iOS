@@ -73,6 +73,7 @@ final class NotesFeature {
     // Every admitted save runs after the preceding save, even after a failure.
     // The Feature owns the work so a disappearing editor does not cancel it.
     func save(_ text: String) async throws {
+        try Task.checkCancellation()
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { throw NoteError.emptyText }
         let note = Note(id: UUID(), text: trimmed)
