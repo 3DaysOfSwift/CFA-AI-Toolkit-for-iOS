@@ -470,6 +470,7 @@ test('installed Health Check rescans source, surfaces gaps and rejects stale rev
     assert.match(problemHtml,/<summary><span class="indicator problem" aria-label="Problem">×<\/span>Start/);
     await fs.writeFile(reviewPath,JSON.stringify(review));
     const cfaDeviation = structuredClone(review);
+    cfaDeviation.operations[0].recommendation = "Name the stored property <viewModel>.";
     cfaDeviation.operations[0].checks.push({
       id:'view-model-property-name', title:'ViewModel property name', dimension:'cfa', status:'fail',
       reason:'The screen owns its ViewModel under another name.', verification:'Source inspection',
@@ -481,6 +482,7 @@ test('installed Health Check rescans source, surfaces gaps and rejects stale rev
     await finish(project, reviewPath, cfaOutput, undefined, syntax);
     const cfaHtml = await fs.readFile(cfaOutput, 'utf8');
     assert.match(cfaHtml, /aria-label="Stable">✓<\/span>Start <small>· CFA deviation/);
+    assert.match(cfaHtml, /Suggested change<\/h3><p>Name the stored property &lt;viewModel&gt;\./);
     assert.match(cfaHtml, /CFA alignment.*ViewModel property name.*CFA naming convention/s);
     assert.match(cfaHtml, /Frankenstein architecture detected.*No architectural conflicts/);
     await fs.writeFile(reviewPath, JSON.stringify(review));
