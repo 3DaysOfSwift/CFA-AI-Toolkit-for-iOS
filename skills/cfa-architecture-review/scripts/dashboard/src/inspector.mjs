@@ -11,6 +11,10 @@ function featurePropertyName(type) {
   return domain ? `${lowerCamelDomain}Feature` : null;
 }
 
+function hasComputedAccessor(suffix) {
+  return /^\s*\{(?!\s*(?:willSet|didSet)\b)/.test(suffix);
+}
+
 function lineOf(source, index) {
   return source.slice(0, index).split('\n').length;
 }
@@ -72,7 +76,11 @@ export async function inspect(project) {
     : '';
   const appProperties = new Map();
   for (const match of appMembers.matchAll(/\b(?:let|var)\s+(\w+)\s*:\s*(?:any\s+)?(\w+)/g)) {
-    appProperties.set(match[1], { type: match[2], line: lineOf(appModel, match.index) });
+    appProperties.set(match[1], {
+      type: match[2],
+      line: lineOf(appModel, match.index),
+      computed: hasComputedAccessor(appModel.slice(match.index + match[0].length))
+    });
   }
 
   const declarationsByName = new Map();
@@ -95,7 +103,7 @@ export async function inspect(project) {
       const [, privateModifier, name, type, defaultValue] = match;
       const suffix = appModel.slice(match.index + match[0].length);
       // A getter is not stored state. Property observers still belong to storage.
-      if (!defaultValue && /^\s*\{(?!\s*(?:willSet|didSet)\b)/.test(suffix)) continue;
+      if (!defaultValue && hasComputedAccessor(suffix)) continue;
       if (defaultValue) findings.push(finding('app-model-default-value', 'warning', `AppModel property ${name} has a default value; initialise it in the explicit initializer.`, appModelFile, lineOf(appModel, match.index)));
       if (type === 'Bool' && privateModifier) {
         // A declaration's order and type do not establish its purpose.
@@ -116,6 +124,9 @@ export async function inspect(project) {
     const declarationFile = source?.file;
     const isFeature = featureTypeSuffix.test(property.type) || /(?:^|\/)Features\/[^/]+\//.test(declarationFile ?? '');
     if (!isFeature) continue;
+    if (property.computed) {
+      findings.push(finding('feature-computed-exposure', 'review', `AppModel exposes ${name} through a computed property. Trace it to the concrete Feature retained by the live graph and check that access does not construct a competing instance.`, appModelFile, property.line));
+    }
     if (candidates.length > 1) {
       findings.push(finding('feature-source-ambiguous', 'review', `${property.type} has multiple declarations. Verify which declaration belongs to the active target before assessing placement or collaborators.`, appModelFile, property.line));
     }

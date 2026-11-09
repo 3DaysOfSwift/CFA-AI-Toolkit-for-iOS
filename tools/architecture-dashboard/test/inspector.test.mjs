@@ -507,3 +507,12 @@ test('distinguishes AppModel computed getters from stored properties with observ
   assert.equal(storage.length, 1);
   assert.match(storage[0].message, /storedValue/);
 });
+
+test('requires review of a computed AppModel Feature exposure', async t => {
+  const root = await fixture(t, {
+    'App/2 - AppModel/AppModel.swift': 'final class AppModel { var notesFeature: NotesFeature { NotesFeature() } }',
+    'App/2 - AppModel/Features/Notes/NotesFeature.swift': 'final class NotesFeature {}'
+  });
+  const { findings } = await inspect(root);
+  assert.equal(findings.find(item => item.code === 'feature-computed-exposure')?.severity, 'review');
+});
