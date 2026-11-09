@@ -127,10 +127,12 @@ skill from that toolkit before changing the project.
 - For additional device or extension targets, verify that each target includes
   the shared Model and only its own Views and ViewModels. Each process has its
   own AppModel and Feature instances. For an App Group widget snapshot, request
-  a timeline reload only after a successful write. Send the Watch a separate
-  snapshot through a suitable transfer, such as Watch Connectivity. Verify that
-  receiving Features refresh from their data sources and handle missing,
-  unreadable, delayed and stale snapshots.
+  a timeline reload only after a successful write. WidgetKit controls the
+  reload timing. Send the Watch a separate snapshot through a suitable transfer,
+  such as Watch Connectivity. Build each affected target and check API
+  availability. Separately verify the handoff on supported devices, including
+  how receiving Features refresh their state and handle missing, unreadable,
+  delayed and stale snapshots.
 - Keep Features explicitly on MainActor. Networking, persistence and expensive
   processing use an appropriate service isolation boundary off MainActor by
   default. Keep framework-required MainActor calls in a narrow adapter.

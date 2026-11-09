@@ -71,7 +71,10 @@ When adding or changing a widget or another device target, apply the
 Feature and shared Model source. Include only the target's own presentation
 files and compose the services available to its process. Trace data from the
 writer through the handoff to the receiving Feature. Build affected targets
-and verify source membership, API availability and snapshot behaviour.
+and verify source membership and API availability. Separately verify the
+handoff on supported devices, including missing, unreadable, delayed and
+stale snapshots. For an App Group widget snapshot, request a timeline reload
+only after the write succeeds. WidgetKit controls when the reload occurs.
 
 Fit new UI into the existing product design. Do not add themes, footers or
 branding merely because a new Feature is being created. In new-product
