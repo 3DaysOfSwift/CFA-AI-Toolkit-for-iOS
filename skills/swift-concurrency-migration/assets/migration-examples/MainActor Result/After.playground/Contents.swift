@@ -5,10 +5,10 @@ import PlaygroundSupport
 PlaygroundPage.current.needsIndefiniteExecution = true
 
 // MARK: - CFA implementation
-// Real providers perform their own I/O.
-actor LaunchProvider {
+// This stand-in has no shared state. A real provider performs its own I/O.
+struct LaunchProvider: Sendable {
     enum Failure: Error { case unavailable }
-    func download(available: Bool) throws -> String {
+    func download(available: Bool) async throws -> String {
         guard available else { throw Failure.unavailable }
         return "Artemis"
     }
