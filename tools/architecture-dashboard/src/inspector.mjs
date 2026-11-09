@@ -205,8 +205,16 @@ export async function inspect(project) {
   }
 
   function findFeatureAccess(source) {
-    return [...source.matchAll(/\bAppModel\s*\.\s*shared\s*\.\s*(\w+)/g)]
-      .find(match => match[1].endsWith('Feature') || featureProperties.has(match[1]));
+    const isFeature = name => name.endsWith('Feature') || featureProperties.has(name);
+    const direct = [...source.matchAll(/\bAppModel\s*\.\s*shared\s*\.\s*(\w+)/g)]
+      .find(match => isFeature(match[1]));
+    if (direct) return direct;
+    for (const alias of source.matchAll(/\blet\s+([A-Za-z_]\w*)(?:\s*:\s*AppModel)?\s*=\s*AppModel\s*\.\s*shared\b(?!\s*\.)/g)) {
+      const access = new RegExp(`(?<![.\\w])${alias[1]}\\s*\\.\\s*(\\w+)`, 'g');
+      access.lastIndex = alias.index + alias[0].length;
+      const use = [...source.matchAll(access)].find(match => isFeature(match[1]));
+      if (use) return use;
+    }
   }
 
   const screens = [];

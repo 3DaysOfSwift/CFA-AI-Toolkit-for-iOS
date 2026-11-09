@@ -622,11 +622,15 @@ test('reviews direct Feature access in a preview while leaving normal previews c
     [file]: `#Preview { HomeView() }
     #Preview("Direct access") {
       Text(AppModel.shared.homeFeature.title)
+    }
+    #Preview("Aliased access") {
+      let model = AppModel.shared
+      Text(model.homeFeature.title)
     }`
   });
   const { findings } = await inspect(root);
   assert.deepEqual(findings.filter(item => item.code === 'preview-feature-access')
-    .map(({file, line}) => [file, line]), [[file, 3]]);
+    .map(({file, line}) => [file, line]), [[file, 3], [file, 7]]);
 });
 
 test('surfaces a stored Feature dependency as coordination to review', async t => {
