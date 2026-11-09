@@ -193,9 +193,15 @@ export async function inspect(project) {
     findings.push(finding('swiftdata-manager-missing', 'review', 'SwiftData is imported, but no concrete SwiftDataManager declaration was found. Check whether the import belongs to an app target and whether an appropriate storage boundary exists; this scan also includes tests and does not resolve target membership.', null, null));
   }
   for (const [file, source] of sources) {
-    if (!file.endsWith('.swift') || path.posix.basename(file) === 'NetworkingManager.swift') continue;
-    if (/\bURLSession\s*\.|\bURLSession\s*\(/.test(source)) {
-      findings.push(finding('direct-url-session', 'review', 'URLSession appears outside NetworkingManager. Check whether this is a production network request that should use a NetworkingManager; shared configuration or instances are needed only when appropriate.', file, 1));
+    const managerBodies = [...source.matchAll(/\b(?:struct|class|actor|enum|extension)\s+NetworkingManager\b[^{}]*\{/g)]
+      .map(match => {
+        const start = match.index + match[0].length;
+        return {start, end: start + braceBody(source, start - 1).length};
+      });
+    const directAccess = [...source.matchAll(/\bURLSession\s*[.(]/g)]
+      .find(match => !managerBodies.some(({start, end}) => match.index >= start && match.index < end));
+    if (directAccess) {
+      findings.push(finding('direct-url-session', 'review', 'URLSession appears outside NetworkingManager. Check whether this is a production network request that should use a NetworkingManager; shared configuration or instances are needed only when appropriate.', file, lineOf(source, directAccess.index)));
     }
   }
   // Independent work may be scheduled here. Review only closures that

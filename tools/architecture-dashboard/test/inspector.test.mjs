@@ -584,15 +584,16 @@ test('an optional AppModel result does not satisfy the production factory check'
   assert.match(findings.find(item => item.code === 'app-model-live-factory')?.message, /Found 0/);
 });
 
-test('recognizes the storage declaration and networking file at the scan root', async t => {
+test('recognizes storage and networking declarations independently of filenames', async t => {
   const root = await fixture(t, {
     'Storage.swift': 'import SwiftData\nstruct SwiftDataManager {}',
-    'NetworkingManager.swift': 'struct NetworkingManager { let session = URLSession.shared }',
+    'Transport.swift': 'struct NetworkingManager { let session = URLSession.shared }',
+    'NetworkingManager.swift': 'extension NetworkingManager { static let fallback = URLSession.shared }\nstruct Bypass { let session = URLSession.shared }',
     'Client.swift': 'struct Client { let session = URLSession.shared }'
   });
   const {findings} = await inspect(root);
   assert.ok(!findings.some(item => item.code === 'swiftdata-manager-missing'));
-  assert.deepEqual(findings.filter(item => item.code === 'direct-url-session').map(item => item.file), ['Client.swift']);
+  assert.deepEqual(findings.filter(item => item.code === 'direct-url-session').map(({file, line}) => [file, line]), [['Client.swift', 1], ['NetworkingManager.swift', 2]]);
 });
 
 test('reviews direct Feature access in root tab navigation', async t => {
