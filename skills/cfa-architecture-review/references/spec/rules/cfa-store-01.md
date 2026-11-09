@@ -8,9 +8,7 @@
 
 **Why:** The UI must not claim that an unsaved change was saved.
 
-**Example:** A failed weight save leaves the saved collection unchanged and retains the entered value for retry.
-
-**Open-source code:** [Trend](https://github.com/3DaysOfSwift/Trend-iOS-App-Swift-Concurrency-CFA/blob/2a747bc222535e9fda01ed722e9c2c103fb98905/Trend/2%20-%20AppModel/Features/WeightLog/WeightLogFeature.swift). Inspect the specific behaviour; these projects may also contain older conventions.
+**Example:** In the bundled Habit Tracker, a failed count save leaves confirmed progress unchanged and TodayViewModel retains the entered value for retry.
 
 **Explanation:** [Why use record-level persistence boundaries in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/persistence-boundaries).
 

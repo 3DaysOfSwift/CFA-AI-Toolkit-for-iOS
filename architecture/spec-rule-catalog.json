@@ -209,7 +209,7 @@
       "rule": "Publish confirmed saved state only after required authoritative persistence succeeds; preserve input on failure.",
       "why": "The UI must not claim that an unsaved change was saved.",
       "verify": "Inject failed and successful writes; check state and retry behaviour.",
-      "example": "A failed weight save leaves the saved collection unchanged and retains the entered value for retry.",
+      "example": "In the bundled Habit Tracker, a failed count save leaves confirmed progress unchanged and TodayViewModel retains the entered value for retry.",
       "explanationIds": [
         "persistence-boundaries"
       ]
@@ -408,7 +408,7 @@
       "strength": "Required",
       "rule": "A single MainActor Feature owns each piece of authoritative shared application state; lower services may own implementation machinery.",
       "why": "Callers can identify which component decides the current business state.",
-      "example": "WeightLogFeature owns saved weight entries while a storage service handles persistence.",
+      "example": "In the bundled Habit Tracker, HabitsFeature owns saved habits while a repository handles persistence.",
       "verify": "Trace reads and writes through all screens and services and check for competing authorities.",
       "explanationIds": [
         "presentation-boundaries",

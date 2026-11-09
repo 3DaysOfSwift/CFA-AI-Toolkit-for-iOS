@@ -169,11 +169,15 @@ test('specification card identifiers do not collide with explanation rule identi
 test('published app examples link to pinned source and relevant rule cards', () => {
   const topics = specTopics(root);
   const index = topics.get('examples/open-source-apps.md');
-  assert.match(index, /Trend-iOS-App-Swift-Concurrency-CFA\/blob\/[a-f0-9]{40}\//);
+  assert.match(index, /Trend-iOS-App-Swift-Concurrency-CFA/);
   assert.match(index, /RocketLaunch-iOS-App-Swift-Concurrency\/blob\/[a-f0-9]{40}\//);
   assert.match(index, /\[Detail View\]\([^\n]*\/LaunchDetailView\.swift\)/);
   assert.match(index, /\[Detail ViewModel\]\([^\n]*\/LaunchDetailViewModel\.swift\)/);
   assert.match(topics.get('rules/cfa-cache-01.md'), /RocketLaunch-iOS-App-Swift-Concurrency\/blob\/[a-f0-9]{40}\//);
+  assert.match(topics.get('rules/cfa-state-01.md'), /bundled Habit Tracker/);
+  assert.match(topics.get('rules/cfa-store-01.md'), /bundled Habit Tracker/);
+  assert.doesNotMatch(topics.get('rules/cfa-state-01.md'), /Trend-iOS-App-Swift-Concurrency-CFA\/blob\//);
+  assert.doesNotMatch(topics.get('rules/cfa-store-01.md'), /Trend-iOS-App-Swift-Concurrency-CFA\/blob\//);
   assert.match(index, /older naming or differ from current CFA rules/);
 });
 

@@ -8,9 +8,7 @@
 
 **Why:** Callers can identify which component decides the current business state.
 
-**Example:** WeightLogFeature owns saved weight entries while a storage service handles persistence.
-
-**Open-source code:** [Trend](https://github.com/3DaysOfSwift/Trend-iOS-App-Swift-Concurrency-CFA/blob/2a747bc222535e9fda01ed722e9c2c103fb98905/Trend/2%20-%20AppModel/Features/WeightLog/WeightLogFeature.swift). Inspect the specific behaviour; these projects may also contain older conventions.
+**Example:** In the bundled Habit Tracker, HabitsFeature owns saved habits while a repository handles persistence.
 
 **Explanation:** [Why use a UI and model boundary in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/presentation-boundaries) · [Why use cohesive features in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/feature-ownership).
 

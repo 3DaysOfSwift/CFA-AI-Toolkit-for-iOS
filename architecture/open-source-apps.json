@@ -4,13 +4,8 @@
     {
       "name": "Trend",
       "repository": "https://github.com/3DaysOfSwift/Trend-iOS-App-Swift-Concurrency-CFA",
-      "revision": "2a747bc222535e9fda01ed722e9c2c103fb98905",
-      "sourcePath": "Trend/2 - AppModel/Features/WeightLog/WeightLogFeature.swift",
-      "description": "Weight records and Feature-owned state",
-      "ruleIds": [
-        "CFA-SPEC-STATE-01",
-        "CFA-SPEC-STORE-01"
-      ]
+      "description": "Weight tracking and progress",
+      "ruleIds": []
     },
     {
       "name": "Next Rocket Launch",
