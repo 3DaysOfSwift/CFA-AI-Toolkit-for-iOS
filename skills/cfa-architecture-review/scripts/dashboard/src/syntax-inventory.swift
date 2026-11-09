@@ -39,29 +39,33 @@ final class SourceInventory: SyntaxVisitor {
 
     override func visit(_ node: SourceFileSyntax) -> SyntaxVisitorContinueKind {
         if file.split(separator: "/").last == "main.swift" {
-            recordTopLevelStartup(in: node.statements)
+            _ = recordTopLevelStartup(in: node.statements)
         }
         return .visitChildren
     }
 
-    private func recordTopLevelStartup(in statements: CodeBlockItemListSyntax) {
+    private func recordTopLevelStartup(in statements: CodeBlockItemListSyntax) -> Bool {
         for statement in statements {
             if let conditional = statement.item.as(IfConfigDeclSyntax.self) {
                 // The source inventory does not select a build configuration.
+                var coversEveryBranch = conditional.clauses.last?.poundKeyword.text == "#else"
                 for clause in conditional.clauses {
-                    if let branch = clause.elements?.as(CodeBlockItemListSyntax.self) {
-                        recordTopLevelStartup(in: branch)
+                    let branch = clause.elements?.as(CodeBlockItemListSyntax.self)
+                    if branch.map({ recordTopLevelStartup(in: $0) }) != true {
+                        coversEveryBranch = false
                     }
                 }
+                if coversEveryBranch { return true }
             } else if let variable = statement.item.as(VariableDeclSyntax.self),
                       let initializer = variable.bindings.compactMap(\.initializer).first {
                 record("entry.main", "main.swift", initializer.value)
-                return
+                return true
             } else if statement.item.as(DeclSyntax.self) == nil {
                 record("entry.main", "main.swift", statement)
-                return
+                return true
             }
         }
+        return false
     }
 
     private func recordMain(_ name: String, _ node: some SyntaxProtocol, attributes: AttributeListSyntax) {

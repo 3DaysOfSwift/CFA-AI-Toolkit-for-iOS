@@ -22,7 +22,11 @@ test('compiled SwiftSyntax scanner inventories startup candidates', {
   const conditional = path.join(root, 'Conditional');
   await fs.mkdir(conditional);
   await fs.writeFile(path.join(conditional, 'main.swift'),
-    '#if DEBUG\nprint("debug")\nprint("next")\n#else\nprint("release")\n#endif\n');
+    '#if DEBUG\nprint("debug")\nprint("next")\n#else\nprint("release")\n#endif\nprint("after startup")\n');
+  const fallback = path.join(root, 'Fallback');
+  await fs.mkdir(fallback);
+  await fs.writeFile(path.join(fallback, 'main.swift'),
+    '#if DEBUG\nprint("debug")\n#endif\nprint("fallback")\n');
   await fs.writeFile(path.join(root, 'App.swift'), [
     '@available(*, deprecated, message: "Use @main") struct Old {}',
     '@main enum App { static func main() async {} }',
@@ -41,6 +45,8 @@ test('compiled SwiftSyntax scanner inventories startup candidates', {
     ['entry.launchCallback', 'application', 'App.swift', 5, 10],
     ['entry.main', 'main.swift', 'Conditional/main.swift', 2, 1],
     ['entry.main', 'main.swift', 'Conditional/main.swift', 5, 1],
+    ['entry.main', 'main.swift', 'Fallback/main.swift', 2, 1],
+    ['entry.main', 'main.swift', 'Fallback/main.swift', 4, 1],
     ['entry.main', 'main.swift', 'Initialized/main.swift', 2, 13],
     ['entry.main', 'main.swift', 'main.swift', 2, 1]
   ]);
