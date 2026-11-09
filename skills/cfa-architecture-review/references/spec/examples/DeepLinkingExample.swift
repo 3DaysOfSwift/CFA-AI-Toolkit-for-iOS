@@ -63,6 +63,9 @@ actor PendingRequestStore: PendingRequestRepository {
 
     private func commit(_ proposed: [DestinationRequest]) throws -> PendingSnapshot {
         let bytes = try JSONEncoder().encode(proposed)
+        try FileManager.default.createDirectory(
+            at: fileURL.deletingLastPathComponent(), withIntermediateDirectories: true
+        )
         try bytes.write(to: fileURL, options: .atomic)
         requests = proposed
         revision += 1
@@ -127,7 +130,6 @@ final class DeepLinkingFeature {
     enum ExampleFailure: Error { case expectedStorageError }
     @MainActor static func main() async throws {
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: folder) }
         let fileURL = folder.appendingPathComponent("pending.json")
         let initialRequest = DestinationRequest(id: "notification-1", title: "Next launch", launchID: "launch-42")
@@ -260,6 +262,7 @@ final class DeepLinkingFeature {
         let removalRetry = DeepLinkingFeature(store: PendingRequestStore(fileURL: retryURL))
         try await removalRetry.receive(request)
         try FileManager.default.moveItem(at: retryFolder, to: movedFolder)
+        try Data().write(to: retryFolder) // A file blocks recreation of the directory.
         do {
             try await removalRetry.open(id: request.id) { _ in true }
             throw ExampleFailure.expectedStorageError
@@ -268,13 +271,16 @@ final class DeepLinkingFeature {
         } catch {
             precondition(removalRetry.pending == [request])
         }
+        try FileManager.default.removeItem(at: retryFolder)
         try FileManager.default.moveItem(at: movedFolder, to: retryFolder)
         try await removalRetry.open(id: request.id) { _ in
             preconditionFailure("Retrying removal must not navigate again")
         }
         precondition(removalRetry.pending.isEmpty)
 
-        let badURL = folder.appendingPathComponent("missing-directory/pending.json")
+        let blockedDirectory = folder.appendingPathComponent("blocked-directory")
+        try Data().write(to: blockedDirectory)
+        let badURL = blockedDirectory.appendingPathComponent("pending.json")
         let unavailable = DeepLinkingFeature(store: PendingRequestStore(fileURL: badURL))
         do {
             try await unavailable.receive(request)
