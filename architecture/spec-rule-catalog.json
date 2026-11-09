@@ -740,7 +740,7 @@
       "section": "Make the Architecture Visible in the Folder Structure",
       "applies": "Adding Swift extensions or domain values",
       "strength": "Required",
-      "rule": "Follow the specification’s placement rules for extensions and keep domain types with their semantic owner.",
+      "rule": "Follow the specification’s placement rules for extensions. Keep domain types with the Feature that defines their meaning, even when they are Codable or persisted. Keep storage-only records inside the persistence implementation and transport-only payloads inside their provider or adapter.",
       "why": "Related types remain understandable independently of storage representation.",
       "example": "A launch snapshot belongs with the launch capability rather than being defined by its database schema.",
       "verify": "Review extension and type ownership against the full source section.",

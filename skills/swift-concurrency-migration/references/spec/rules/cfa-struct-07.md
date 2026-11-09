@@ -4,7 +4,7 @@
 
 **Strength:** Required.
 
-**Guidance:** Follow the specification’s placement rules for extensions and keep domain types with their semantic owner.
+**Guidance:** Follow the specification’s placement rules for extensions. Keep domain types with the Feature that defines their meaning, even when they are Codable or persisted. Keep storage-only records inside the persistence implementation and transport-only payloads inside their provider or adapter.
 
 **Why:** Related types remain understandable independently of storage representation.
 

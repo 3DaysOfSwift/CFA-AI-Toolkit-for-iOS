@@ -398,9 +398,11 @@ ownership reasoning applies to existing UIKit and mixed-UI projects.
 
 Domain values live with the feature that defines their meaning. A `WeightEntry`
 belongs to Weight Log even though a repository persists it. Storage-only
-representations—Codable documents, CloudKit field mappings, database records,
-and transport payloads—remain private to their storage implementation. Never
-place a domain type under storage merely because it is persisted.
+representations such as file documents, CloudKit field mappings and database
+records stay inside their persistence implementation. Transport-only payloads
+stay inside the provider or adapter that translates them into domain values.
+Keep domain types with their Feature even when they conform to Codable or are
+persisted.
 
 ## Maintain an Absolute UI and Model Boundary
 
