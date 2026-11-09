@@ -43,6 +43,12 @@ Read [CFA specification](references/cfa-specification.md), [CFA change gate](ref
 
 Deliver the Xcode project, a short explanation of feature ownership, and executed validation. Apply the specification’s review checklist to the created slice. Do not perform legacy migration as part of this skill.
 
+When adding a SwiftUI preview, construct the screen as usual, for example
+`#Preview { NotesEditorView() }`. The screen constructs its ViewModel and
+the ViewModel obtains its Feature through the normal dependency path. A detail
+preview may supply the same immutable selection as its production caller.
+Keep SwiftData access in the storage service and out of the preview.
+
 If the product includes paid capabilities, apply the
 [paid capability rule](references/spec/rules/cfa-pay-01.md). Give
 `PurchasesFeature` ownership of entitlement state. Check access in the
