@@ -354,7 +354,10 @@ skill from that toolkit before changing the project.
   stored data and meaningful interactions. Limit implementation changes to
   the agreed CFA and Swift Concurrency migration and supported platforms.
   Fix confirmed defects within scope, protect the intended behaviour with
-  tests, and record any necessary platform-driven differences. Before handoff,
+  tests, and record any necessary platform-driven differences. Compare the
+  migrated journeys and access to saved data with the baseline. Classify
+  observed differences and resolve regressions or unexplained changes before
+  calling the migration complete. Before handoff,
   trace remaining legacy and Swift Concurrency paths together. Identify
   remaining callers of legacy dependencies and record which adapters were
   removed or retained to preserve behaviour or platform support. Reconcile
