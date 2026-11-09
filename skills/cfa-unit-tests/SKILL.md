@@ -34,14 +34,16 @@ request, first establish the current test result and map real behaviour to
 tests. Do not create tests that only prove stored values can be read back from a
 struct or that an object can be constructed.
 
-Organise a test tree that exposes the application design:
+Organise tests by owner. The [folder map](references/spec/topics/12-make-the-architecture-visible-in-the-folder-structure.md)
+shows the core groups. Add the optional concurrency, persistence, integration
+and support groups when their contents need a separate home:
 
 ```text
 <App>Tests/
-├── AppModelTests/
-├── ViewModelTests/       # one named file for each production ViewModel
+├── AppModel tests/
+├── View model tests/     # one named file for each production ViewModel
 ├── FeatureTests/<Feature>/ # one <Feature>Tests.swift home per concrete Feature
-├── ConcurrencyTests/<Feature>/
+├── ConcurrencyTests/<Feature>/  # optional cross-boundary scenarios
 ├── PersistenceTests/
 ├── IntegrationTests/
 └── Support/
