@@ -109,6 +109,20 @@ test('flags explicit ViewModel inputs in extensions of recognized Views', async 
   ]);
 });
 
+test('flags a direct AppModel initializer input without mistaking a nested value for AppModel', async t => {
+  const { findings } = await inspectView(t, `struct HomeView: View {
+    @State private var viewModel = HomeViewModel()
+    init(model: MyApp.AppModel) {}
+    init(snapshot: AppModel.Snapshot) {}
+    var body: some View { Text("Home") }
+  }`);
+  assert.deepEqual(findings.map(item => [item.code, item.line, item.severity]), [
+    ['screen-initializer-inputs', 3, 'warning'],
+    ['screen-initializer-inputs', 4, 'review']
+  ]);
+  assert.match(findings[0].message, /appears to accept AppModel/);
+});
+
 test('maps a conventionally located screen with qualified View conformance', async t => {
   const {report} = await inspectView(t, `struct HomeView: SwiftUI.View {
     @State private var viewModel = HomeViewModel()

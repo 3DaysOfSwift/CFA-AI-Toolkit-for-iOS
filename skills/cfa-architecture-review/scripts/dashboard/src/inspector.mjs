@@ -73,14 +73,18 @@ function* viewInitializers(body) {
     if (closing < 0) continue;
     const parameters = body.slice(opening + 1, closing);
     const injectedViewModel = /:\s*(?:any\s+)?(?:\w+\s*\.\s*)*\w*ViewModel\b(?!\s*\.)/.test(parameters);
-    yield { index: initializer.index, closing, parameters, injectedViewModel };
+    const injectedAppModel = /:\s*(?:\w+\s*\.\s*)*AppModel\b(?!\s*\.)/.test(parameters);
+    yield { index: initializer.index, closing, parameters, injectedViewModel, injectedAppModel };
   }
 }
 
-function inspectViewModelInputs(name, body, source, start, file, findings) {
+function inspectScreenInputs(name, body, source, start, file, findings) {
   for (const initializer of viewInitializers(body)) {
     if (initializer.injectedViewModel) {
       findings.push(finding('screen-initializer-inputs', 'warning', `${name} appears to accept a ViewModel; CFA screens construct their own.`, file, lineOf(source, start + initializer.index)));
+    }
+    if (initializer.injectedAppModel) {
+      findings.push(finding('screen-initializer-inputs', 'warning', `${name} appears to accept AppModel; CFA screens resolve Features through their own ViewModel.`, file, lineOf(source, start + initializer.index)));
     }
   }
 }
@@ -461,7 +465,7 @@ export async function inspect(project) {
     for (const view of source.matchAll(viewDeclarations)) {
       const start = view.index + view[0].length;
       const body = braceBody(source, start - 1);
-      inspectViewModelInputs(view[1], body, source, start, file, findings);
+      inspectScreenInputs(view[1], body, source, start, file, findings);
       if (isViewFile && rootViewNames.has(view[1])) continue;
       const access = findFeatureAccess(body);
       if (access) {
@@ -559,8 +563,8 @@ export async function inspect(project) {
       `@${stateTypePattern}\\s+private\\s+var\\s+([A-Za-z_]\\w*)\\s*:\\s*${viewModelTypePattern}\\b`, 'g'
     ))].map(match => ({ name: match[1], index: match.index }));
     const dependencies = [];
-    for (const { index, closing, parameters, injectedViewModel } of viewInitializers(body)) {
-      if (!injectedViewModel && parameters.trim() && viewModel) {
+    for (const { index, closing, parameters, injectedViewModel, injectedAppModel } of viewInitializers(body)) {
+      if (!injectedViewModel && !injectedAppModel && parameters.trim() && viewModel) {
         findings.push(finding('screen-initializer-inputs', 'review', `${name} accepts initializer inputs. Verify that the detail input is a selected immutable snapshot and no ViewModel is injected.`, viewFile, lineOf(view, bodyOffset + index)));
       }
       const tail = body.slice(closing + 1);
@@ -634,7 +638,7 @@ export async function inspect(project) {
       if (!viewNames.has(extension[1])) continue;
       const start = extension.index + extension[0].length;
       const body = braceBody(source, start - 1);
-      inspectViewModelInputs(extension[1], body, source, start, file, findings);
+      inspectScreenInputs(extension[1], body, source, start, file, findings);
       const access = findFeatureAccess(body);
       if (access) {
         findings.push(finding('view-feature-access', 'review', 'This View extension appears to access a Feature directly. Trace the call and route it through the owning ViewModel.', file, lineOf(source, start + access.index)));
