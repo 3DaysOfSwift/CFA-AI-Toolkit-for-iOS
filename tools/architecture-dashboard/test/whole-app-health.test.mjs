@@ -424,6 +424,21 @@ test('installed Health Check rescans source, surfaces gaps and rejects stale rev
     assert.match(conflictHtml,/state-ownership<\/strong><p>Architectural conflict<\/p>/);
     assert.match(problemHtml,/<summary><span class="indicator problem" aria-label="Problem">×<\/span>Start/);
     await fs.writeFile(reviewPath,JSON.stringify(review));
+    const cfaDeviation = structuredClone(review);
+    cfaDeviation.operations[0].checks.push({
+      id:'view-model-property-name', title:'ViewModel property name', dimension:'cfa', status:'fail',
+      reason:'The screen owns its ViewModel under another name.', verification:'Source inspection',
+      consequence:'The property differs from the CFA naming convention.', problemKind:'cfa-deviation',
+      evidence:[{file:'App.swift',line:2,endLine:2}]
+    });
+    await fs.writeFile(reviewPath, JSON.stringify(cfaDeviation));
+    const cfaOutput = path.join(base, 'cfa-deviation.html');
+    await finish(project, reviewPath, cfaOutput, undefined, syntax);
+    const cfaHtml = await fs.readFile(cfaOutput, 'utf8');
+    assert.match(cfaHtml, /aria-label="Stable">✓<\/span>Start <small>· CFA deviation/);
+    assert.match(cfaHtml, /CFA alignment.*ViewModel property name.*CFA naming convention/s);
+    assert.match(cfaHtml, /Frankenstein architecture detected.*No architectural conflicts/);
+    await fs.writeFile(reviewPath, JSON.stringify(review));
     const result=await finish(project,reviewPath,output,undefined,syntax);
     assert.deepEqual(result.gaps,[]);
     const html=await fs.readFile(output,'utf8');
