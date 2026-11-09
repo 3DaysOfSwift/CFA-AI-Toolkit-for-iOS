@@ -46,6 +46,14 @@ opening callback through the pending store to the receiving scene. Verify
 that declining leaves the request pending and that retrying a failed removal
 does not navigate twice.
 
+When changing sign-out, account switching or session expiry, apply the
+[account lifecycle rule](references/spec/rules/cfa-account-01.md). Trace which
+Features own account data and coordinate their cleanup through explicit calls.
+If sign-out fails before the session ends, preserve that session and its data.
+After a session change, check the active account or session generation before
+publishing results from in-flight requests. Verify cleanup and retained data
+against the product's sign-out contract.
+
 When adding or changing a widget or another device target, apply the
 [multi-device rule](references/spec/rules/cfa-device-01.md). Reuse the owning
 Feature and shared Model source. Include only the target's own presentation
