@@ -38,6 +38,11 @@ test('installed inspect command reads a project without writing into it', (t) =>
   const view = path.join(project, 'App', '1 - View', 'Views', 'Chat', 'ChatView.swift');
   fs.mkdirSync(path.dirname(view), { recursive: true });
   fs.writeFileSync(view, 'import SwiftUI\nstruct ChatView: View { var body: some View { Text("Hi") } }');
+  const schedule = path.join(project, 'App', '1 - View', 'Views', 'Schedule');
+  fs.mkdirSync(schedule, { recursive: true });
+  fs.writeFileSync(path.join(schedule, 'ScheduleView.swift'),
+    'struct ScheduleView: View { @State private var schedule = ScheduleViewModel() }');
+  fs.writeFileSync(path.join(schedule, 'ScheduleViewModel.swift'), 'final class ScheduleViewModel {}');
   const before = fs.readdirSync(project, { recursive: true });
 
   const result = spawnSync(command, ['inspect', project, '--json'], { encoding: 'utf8' });
@@ -46,6 +51,10 @@ test('installed inspect command reads a project without writing into it', (t) =>
   const report = JSON.parse(result.stdout);
   assert.equal(report.screens[0].name, 'ChatView');
   assert.ok(report.findings.some(item => item.code === 'view-model-missing'));
+  const scheduleScreen = report.screens.find(screen => screen.name === 'ScheduleView');
+  assert.equal(scheduleScreen.ownsViewModel, true);
+  assert.ok(report.findings.some(item => item.code === 'view-model-property-name' && item.file === scheduleScreen.viewFile));
+  assert.ok(!report.findings.some(item => item.code === 'view-model-ownership' && item.file === scheduleScreen.viewFile));
   assert.deepEqual(fs.readdirSync(project, { recursive: true }), before);
 });
 
