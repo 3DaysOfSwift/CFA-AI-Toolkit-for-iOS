@@ -51,6 +51,12 @@ Read [CFA specification](references/cfa-specification.md), [CFA change gate](ref
    components and identify unverified requirements. A whole-app CFA verdict
    requires evidence for every applicable checklist item across the app.
 
+When moving networking behind the [networking rule](references/spec/rules/cfa-net-01.md),
+preserve intentional request limits and ordering. Verify that an independent
+request reaches the transport while another response is held open. If the
+manager is an actor, check for a real wait between requests before changing
+its isolation. Keep any shared mutable request policy isolated.
+
 For system background work in scope, apply the
 [background-work rule](references/spec/rules/cfa-bg-01.md). Keep registration
 and work with the owning Feature. Signal registration once during synchronous

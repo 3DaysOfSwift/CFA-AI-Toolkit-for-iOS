@@ -223,7 +223,9 @@ skill from that toolkit before changing the project.
 - Route URLSession requests through NetworkingManager. Composition code may
   configure and inject the session. In new apps, start with a stateless value type when it meets the session and concurrency requirements.
   Keep independent requests able to progress in parallel unless an explicit
-  policy limits them. When changing networking, hold one response open and
+  policy limits them. An actor can protect shared request state while another
+  request starts during a suspended call. Check for an actual wait before
+  changing the isolation. When changing networking, hold one response open and
   verify that an independent request reaches the transport before it completes.
 - Keep domain-specific microservices beside the Feature that naturally owns
   their responsibility, even when another Feature uses them. Move broadly
