@@ -192,6 +192,23 @@ test('reviews direct SwiftData preview and query usage without flagging a normal
   assert.ok(matches.some(item => item.file.endsWith('EnvironmentScreen.swift')));
 });
 
+test('reviews SwiftData access in a SwiftUI View outside the CFA View folder', async t => {
+  const root = await fixture(t, {
+    'Application/Presentation/Notes.swift': [
+      'struct NotesView: SwiftUI.View {',
+      '  @Query var notes: [Note]',
+      '  var body: some View { Text("Notes") }',
+      '}',
+      'struct SummaryView: View { var body: some View { Text("Summary") } }',
+      'actor NotesStore { let container: ModelContainer }'
+    ].join('\n')
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'view-swiftdata-access');
+  assert.deepEqual(findings.map(({file, line, severity}) => [file, line, severity]), [
+    ['Application/Presentation/Notes.swift', 2, 'review']
+  ]);
+});
+
 test('identifies a launch signal scheduled inside a delegate Task or dispatch queue without flagging independent work', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',

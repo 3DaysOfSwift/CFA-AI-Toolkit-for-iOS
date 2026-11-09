@@ -293,7 +293,16 @@ export async function inspect(project) {
         findings.push(finding('preview-feature-access', 'review', 'This preview appears to access a Feature directly. A normal CFA preview constructs the View and uses its usual ViewModel and Feature route.', file, lineOf(source, start + access.index)));
       }
     }
-    if (!isViewFile) continue;
+    if (!isViewFile) {
+      for (const view of source.matchAll(/\bstruct\s+\w+(?:\s*<[^{}]+>)?\s*:\s*(?:SwiftUI\s*\.\s*)?View\b[^{}]*\{/g)) {
+        const start = view.index + view[0].length;
+        const storage = swiftDataAccess.exec(braceBody(source, start - 1));
+        if (storage) {
+          findings.push(finding('view-swiftdata-access', 'review', 'This SwiftUI View appears to access SwiftData directly. Verify that storage is reached through its ViewModel and Feature.', file, lineOf(source, start + storage.index)));
+        }
+      }
+      continue;
+    }
     if (/\bstruct\s+\w+App\s*:\s*App\b/.test(source)) {
       const sceneBody = /\bvar\s+body\s*:\s*some\s+Scene\s*\{/.exec(source);
       if (sceneBody) {
