@@ -24,6 +24,8 @@ const outdatedAppModelGuidance = 'AppModel stores only shared, concrete Features
 const outdatedFeatureGuidance = 'managers use the Manager suffix';
 const outdatedServiceGuidance = 'SwiftData uses SwiftDataManager; URLSession calls use NetworkingManager.';
 const serviceGuidanceUpdate = 'Clarify SwiftDataManager ownership and keep independent network requests able to progress in parallel.';
+const outdatedScreenGuidance = 'Every screen owns a dedicated ViewModel. Declare it as @State private var';
+const screenGuidanceUpdate = 'Apply private @State ViewModel ownership to SwiftUI screens and trace the actual presentation owner for UIKit migrations.';
 const projectGuidance = `${guidanceMarker}
 # CFA project guidance
 
@@ -192,6 +194,9 @@ function doctor(projectArgument) {
       if (content.includes(outdatedServiceGuidance)) {
         console.log(`WARN outdated service guidance in ${file}. ${serviceGuidanceUpdate}`);
       }
+      if (content.includes(outdatedScreenGuidance)) {
+        console.log(`WARN outdated screen ownership guidance in ${file}. ${screenGuidanceUpdate}`);
+      }
       if (content.includes(outdatedAppModelGuidance)) {
         console.log(`WARN outdated AppModel guidance in ${file}; update the CFA guidance block to allow private task handles for app-wide listeners.`);
       }
@@ -241,6 +246,9 @@ function enableProject(values) {
     }
     if (existingGuidance.includes(outdatedServiceGuidance)) {
       console.log(`Update the existing CFA service guidance block. ${serviceGuidanceUpdate}`);
+    }
+    if (existingGuidance.includes(outdatedScreenGuidance)) {
+      console.log(`Update the existing CFA screen ownership guidance block. ${screenGuidanceUpdate}`);
     }
     if (existingGuidance.includes(outdatedAppModelGuidance)) {
       console.log('The existing AppModel guidance should allow private task handles for app-wide listeners. Edit only the CFA guidance block.');
