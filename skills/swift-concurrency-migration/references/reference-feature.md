@@ -45,7 +45,7 @@ protocol NotesRepository: Sendable {
 
 // A small JSON file is sufficient for this example's single collection.
 actor JSONNotesRepository: NotesRepository {
-    let file: URL
+    private let file: URL
     init(file: URL) { self.file = file }
 
     func load() throws -> [Note] {
@@ -109,7 +109,7 @@ final class NotesFeature {
         let id = UUID()
         let operation = Task { @MainActor in
             // A failed earlier save is reported to its caller, but does not block this save.
-            _ = try? await previous?.value
+            _ = await previous?.result
             try await loadIfNeeded()
             try await repository.save(note)
             notes.append(note)
