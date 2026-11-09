@@ -509,7 +509,9 @@ For each relevant operation, inspect:
   retry after a lost response cannot duplicate the change. For custom and
   Apple-managed sync, trace what happens when two devices edit the same item
   offline. Check the product's conflict policy and server rejection handling
-  where applicable. Record device evidence separately from source review.
+  where applicable. When reviewing a sync implementation change, check that a
+  pending edit persisted by the previous version retains its identity and retry
+  metadata after upgrade. Record device evidence separately from source review.
 - Operation results: trace how a caller identifies the record its operation
   created. Comparing a shared collection before and after an await can select
   another caller's insertion, even when persistence itself is serialized.
