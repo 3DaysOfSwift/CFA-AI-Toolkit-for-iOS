@@ -361,6 +361,7 @@ test('identifies a launch signal scheduled inside a delegate Task or dispatch qu
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
     'Application/AppDelegate.swift': 'class AppDelegate {\n func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool {\n Task { await AppModel.shared.applicationDidFinishLaunching() }\n return true\n }\n}',
     'Application/OtherDelegate.swift': 'class OtherDelegate { func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { AppModel.shared.applicationDidFinishLaunching(); Task { await refresh(); analytics.applicationDidFinishLaunching() }; return true } }',
+    'Application/UnrelatedDelegate.swift': 'class AppDelegate { func application(_ app: UIApplication, options didFinishLaunchingWithOptions: Bool) -> Bool { Task { AppModel.shared.applicationDidFinishLaunching() }; return true } }',
     'Application/DispatchDelegate.swift': 'class AppDelegate {\n func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool {\n DispatchQueue.main.async { AppModel.shared.applicationDidFinishLaunching() }\n return true\n }\n}'
   });
   const findings = (await inspect(root)).findings.filter(item => item.code === 'scheduled-app-model-launch');

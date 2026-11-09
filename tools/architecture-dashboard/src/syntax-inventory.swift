@@ -53,7 +53,7 @@ final class SourceInventory: SyntaxVisitor {
     override func visit(_ node: ExtensionDeclSyntax) -> SyntaxVisitorContinueKind { record("type.extension", node.extendedType.trimmedDescription, node); return .visitChildren }
     override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
         record("function", node.name.text, node)
-        if node.name.text == "application" && node.signature.parameterClause.trimmedDescription.contains("didFinishLaunchingWithOptions") {
+        if node.name.text == "application" && node.signature.parameterClause.parameters.dropFirst().first?.firstName.text == "didFinishLaunchingWithOptions" {
             record("entry.launchCallback", node.name.text, node.funcKeyword)
         }
         if node.name.text == "userNotificationCenter",
