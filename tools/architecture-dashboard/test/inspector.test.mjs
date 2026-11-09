@@ -478,7 +478,7 @@ test('a live factory in an extension is not reported as definitely absent', asyn
   assert.match(finding.message, /including extensions and active compilation conditions/);
 });
 
-test('a Feature exposed in an extension remains an unresolved review, not a missing-property claim', async t => {
+test('a Feature exposed in an AppModel extension resolves with a computed-exposure review', async t => {
   const root = await fixture(t, {
     'Application/1 - View/Views/Chat/ChatView.swift': 'struct ChatView: View { @State private var viewModel = ChatViewModel() }',
     'Application/1 - View/Views/Chat/ChatViewModel.swift': 'final class ChatViewModel { init(chatFeature: ChatFeature = AppModel.shared.chatFeature) {} }',
@@ -489,9 +489,10 @@ test('a Feature exposed in an extension remains an unresolved review, not a miss
   });
   const { findings } = await inspect(root);
   assert.ok(findings.some(item => item.code === 'app-model-shared-factory'));
-  const finding = findings.find(item => item.code === 'unresolved-feature');
-  assert.equal(finding.severity, 'review');
-  assert.match(finding.message, /Check extensions, inferred types and target membership/);
+  assert.ok(!findings.some(item => item.code === 'unresolved-feature'));
+  const finding = findings.find(item => item.code === 'feature-computed-exposure');
+  assert.equal(finding?.severity, 'review');
+  assert.equal(finding.file, 'Application/2 - AppModel/AppModel+Chat.swift');
 });
 
 test('requests review of an AppModel task without assuming its purpose', async t => {

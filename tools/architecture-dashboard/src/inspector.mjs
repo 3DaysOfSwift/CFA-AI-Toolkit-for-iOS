@@ -218,10 +218,30 @@ export async function inspect(project) {
   const appProperties = new Map();
   for (const match of appMembers.matchAll(/\b(?:let|var)\s+(\w+)\s*:\s*(?:any\s+)?(?:\w+\s*\.\s*)*(\w+)/g)) {
     appProperties.set(match[1], {
+      file: appModelFile,
       type: match[2],
       line: lineOf(appModel, match.index),
       computed: hasComputedAccessor(appModel.slice(match.index + match[0].length))
     });
+  }
+
+  if (appModelDeclaration) {
+    const extensionProperties = new Map();
+    for (const [file, source] of sources) {
+      for (const extension of source.matchAll(/\bextension\s+AppModel\b(?!\s*\.)[^{}]*\{/g)) {
+        const offset = extension.index + extension[0].length;
+        const body = braceBody(source, offset - 1);
+        for (const match of memberSignatures(body).matchAll(/(?:^|(?<=;))[ \t]*(?:(?:private|fileprivate|internal|package|public)\s+)?var\s+(\w+)\s*:\s*(?:\w+\s*\.\s*)*(\w+Feature)\b(?!\s*\.)/gm)) {
+          if (!hasComputedAccessor(body.slice(match.index + match[0].length))) continue;
+          const [, name, type] = match;
+          const property = {file, type, line: lineOf(source, offset + match.index), computed: true};
+          extensionProperties.set(name, extensionProperties.has(name) ? null : property);
+        }
+      }
+    }
+    for (const [name, property] of extensionProperties) {
+      if (property && !appProperties.has(name)) appProperties.set(name, property);
+    }
   }
 
   const declarationsByName = new Map();
@@ -346,18 +366,18 @@ export async function inspect(project) {
     if (!isFeature) continue;
     featureProperties.add(name);
     if (property.computed) {
-      findings.push(finding('feature-computed-exposure', 'review', `AppModel exposes ${name} through a computed property. Trace it to the concrete Feature retained by the live graph and check that access does not construct a competing instance.`, appModelFile, property.line));
+      findings.push(finding('feature-computed-exposure', 'review', `AppModel exposes ${name} through a computed property. Trace it to the concrete Feature retained by the live graph and check that access does not construct a competing instance.`, property.file, property.line));
     }
     if (!candidates.length) {
-      findings.push(finding('feature-source-missing', 'review', `${property.type} is exposed by AppModel, but the inspector could not locate its declaration. Check aliases, generated code and target membership.`, appModelFile, property.line));
+      findings.push(finding('feature-source-missing', 'review', `${property.type} is exposed by AppModel, but the inspector could not locate its declaration. Check aliases, generated code and target membership.`, property.file, property.line));
     }
     if (candidates.length > 1) {
       const locations = candidates.map(({file, declaration}) => `${file}:${declaration.line}`).sort();
-      findings.push(finding('feature-source-ambiguous', 'review', `${property.type} has multiple declarations. Candidates: ${locations.join(', ')}. Verify which declaration belongs to the active target before assessing placement or collaborators.`, appModelFile, property.line));
+      findings.push(finding('feature-source-ambiguous', 'review', `${property.type} has multiple declarations. Candidates: ${locations.join(', ')}. Verify which declaration belongs to the active target before assessing placement or collaborators.`, property.file, property.line));
     }
     const hasFeatureSuffix = featureTypeSuffix.test(property.type);
     if (!hasFeatureSuffix) {
-      findings.push(finding('feature-type-name', 'review', `${property.type} is declared in a Feature folder and exposed by AppModel. Verify its responsibility. Use the Feature suffix for a concrete Feature owner. Keep a supporting service behind the Feature.`, appModelFile, property.line));
+      findings.push(finding('feature-type-name', 'review', `${property.type} is declared in a Feature folder and exposed by AppModel. Verify its responsibility. Use the Feature suffix for a concrete Feature owner. Keep a supporting service behind the Feature.`, property.file, property.line));
     }
     const expected = featurePropertyName(hasFeatureSuffix
       ? property.type
@@ -366,7 +386,7 @@ export async function inspect(project) {
       const message = hasFeatureSuffix
         ? `${name} should use the same domain name as ${property.type}, ending in Feature (${expected}).`
         : `If ${property.type} is a Feature, use a matching Feature property name (${expected}).`;
-      findings.push(finding('feature-property-name', hasFeatureSuffix ? 'warning' : 'review', message, appModelFile, property.line));
+      findings.push(finding('feature-property-name', hasFeatureSuffix ? 'warning' : 'review', message, property.file, property.line));
     }
     if (featureTypeSuffix.test(property.type) && !property.type.endsWith('API')) {
       const declaration = source?.declaration;
@@ -378,10 +398,10 @@ export async function inspect(project) {
       const testName = `${property.type}Tests.swift`;
       const testCandidates = [...paths].filter(file => file.split('/').includes('FeatureTests') && path.posix.basename(file) === testName);
       if (testCandidates.length > 1) {
-        findings.push(finding('feature-tests-ambiguous', 'review', `Multiple files match ${testName}: ${testCandidates.join(', ')}. Verify which test target covers this Feature.`, appModelFile, property.line));
+        findings.push(finding('feature-tests-ambiguous', 'review', `Multiple files match ${testName}: ${testCandidates.join(', ')}. Verify which test target covers this Feature.`, property.file, property.line));
       }
       if (!testCandidates.length) {
-        findings.push(finding('feature-tests-missing', 'review', `No ${testName} was found under FeatureTests in the scanned directory. Check the project root and test target before concluding the test is missing.`, appModelFile, property.line));
+        findings.push(finding('feature-tests-missing', 'review', `No ${testName} was found under FeatureTests in the scanned directory. Check the project root and test target before concluding the test is missing.`, property.file, property.line));
       }
     }
   }
@@ -745,7 +765,7 @@ export async function inspect(project) {
         const collaborators = [...featureSource.matchAll(/\b(?:private\s+)?let\s+\w+\s*:\s*(?:any\s+)?(\w+(?:Repository|Provider|Responding|Client|Store|Service))\b/g)]
           .map(item => item[1]);
         dependencies.push({ property, featureType, featureFile, collaborators: [...new Set(collaborators)], sourceFile: file, line });
-        if (!exposure) findings.push(finding('unresolved-feature', 'review', `${viewModelName} references AppModel.shared.${property}, but the inspector could not resolve it in the primary AppModel declaration. Check extensions, inferred types and target membership.`, file, line));
+        if (!exposure) findings.push(finding('unresolved-feature', 'review', `${viewModelName} references AppModel.shared.${property}, but the inspector could not resolve it in the AppModel declarations. Check conditional extensions, inferred types and target membership.`, file, line));
         if (exposure && featureTypeSuffix.test(featureType)) {
           for (const local of viewModelMembers.matchAll(/\b(?:let|var)\s+(\w+)\s*:\s*(?:any\s+)?(\w+Feature(?:API)?)\b(?!\s*\.)/g)) {
             if (featurePropertyName(local[2]) === property && local[1] !== property) {
