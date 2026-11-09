@@ -126,14 +126,19 @@ Bindings, conditional content, `ForEach` and direct dismissal are declarative UI
 
 For app-wide startup, the UIKit launch callback calls
 `AppModel.shared.applicationDidFinishLaunching()` directly and synchronously.
-AppModel signals its Features before the callback returns. Features own their
+AppModel signals its Features and starts required app-wide listeners before
+the callback returns. Features own their
 asynchronous work, and the callback returns without waiting for disk or network
 completion. Task creation order does not guarantee I/O start order. Use a
 screen’s `.task` for screen-owned work, such as requesting a refresh through the
 Feature. Keep the shared AppModel launch signal in the application lifecycle.
 A save or refresh that needs to outlive its screen belongs to its Feature.
 
-When launch and a screen `.task` can request an equivalent refresh, the Feature owns the in-flight work. The first caller starts it; subsequent callers await the same outcome rather than starting duplicate work or returning early. Retain the appropriate task handle, expose accurate refresh status, and clear the handle after the outcome without letting an older completion clear newer work. The task's result and error types should match the operation. This Feature-owned work may outlive the screen. Use another documented policy only when the product contract genuinely differs. UIKit delegate and layout code belongs in a named presentation adapter when needed. Do not create extra layers just to move a trivial assignment.
+When launch and a screen `.task` can request an equivalent refresh, the Feature owns the in-flight work. The first caller starts it; subsequent callers await the same outcome rather than starting duplicate work or returning early. Retain the appropriate task handle, expose accurate refresh status, and clear the handle after the outcome without letting an older completion clear newer work. The task's result and error types should match the operation. By default, this Feature-owned refresh continues even if its only screen
+caller leaves. Awaiting the shared task handle can keep a cancelled caller
+waiting until completion. If the screen needs to return promptly, cancel its
+wait independently and let the Feature retain the result. Document the product
+or resource requirement for a different refresh lifetime. UIKit delegate and layout code belongs in a named presentation adapter when needed. Do not create extra layers just to move a trivial assignment.
 
 For a synchronous Button action that begins a refresh, the ViewModel also owns
 one screen interaction task. Its `refresh()` method returns the stored
