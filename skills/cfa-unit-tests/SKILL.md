@@ -118,6 +118,13 @@ open in a controlled transport. Verify that the second request reaches
 the transport before releasing the first. Test any intentional request
 limit separately.
 
+For apps that use a database, apply the
+[database availability rule](references/spec/rules/cfa-launch-02.md). Hold
+initial store opening in a controlled dependency, then fail it. Verify that
+the affected Feature exposes a recoverable error and can retry. Separately
+exercise launch and navigation while storage is slow or unavailable. Verify
+that the root appears and unaffected destinations remain accessible.
+
 For durable edits, hold the write open and verify that confirmed state stays
 unchanged until it succeeds. On failure, assert that the editor keeps its
 draft and can retry. For optional download caches, independently control disk
