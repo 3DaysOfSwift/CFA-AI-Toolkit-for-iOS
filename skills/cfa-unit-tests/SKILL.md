@@ -111,8 +111,11 @@ unchanged until it succeeds. On failure, assert that the editor keeps its
 draft and can retry. For optional download caches, independently control disk
 and network completion. Verify that a slow restore leaves refresh free to
 start, a late restore cannot replace fresh data, and a pending or failed cache
-write leaves the refresh result usable. Check that a failed refresh retains
-valid data and that delayed cache writes cannot replace a newer snapshot.
+write leaves the refresh result usable. When replacing a usable cache fails,
+reopen the cache to verify the previous snapshot survives, and verify that
+any offline availability indicator refers only to saved data. Check that a
+failed refresh retains valid displayed data and that delayed cache writes
+cannot replace a newer snapshot.
 
 For restored preferences, check that a supported saved value is restored and
 that a missing or obsolete non-critical value uses the product-defined
