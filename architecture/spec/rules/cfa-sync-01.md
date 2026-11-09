@@ -2,9 +2,9 @@
 
 **Applies when:** An app requires cross-device data or offline edits.
 
-**Strength:** Default.
+**Strength:** Default storage approach with required save and sync guarantees when applicable.
 
-**Guidance:** Add offline editing or cross-device sync only when the product needs it. For compatible Apple-device data, consider SwiftData with CloudKit or iCloud documents according to the data format. Keep live SwiftData stores out of iCloud Drive. For a custom server, follow its sync contract and use a dedicated sync service when needed. If that workflow supports offline edits, persist the edit and pending-sync metadata together before reporting local success. Report server confirmation separately. Preserve pending changes across failures and restarts, make retries safe against duplication, and define conflict and rejection outcomes with the developer. Apple-managed sync also needs a product decision when multiple devices can edit the same item offline.
+**Guidance:** Add offline editing or cross-device sync only when the product needs it. For compatible Apple-device data, consider SwiftData with CloudKit or iCloud documents according to the data format. Keep live SwiftData stores out of iCloud Drive. Apple-managed sync may be delayed, and local storage errors still need handling. For a custom server, follow its sync contract and use a dedicated sync service when needed. If that workflow supports offline edits, persist the edit and pending-sync metadata together before reporting local success. Report server confirmation separately. Preserve pending changes across failures and restarts, make retries safe against duplication, and define conflict and rejection outcomes with the developer. Decide how to resolve conflicting offline edits even with Apple-managed sync. A latest version may suit a preference, while user-created work may need both versions preserved or a user choice.
 
 **Why:** The simplest storage strategy depends on actual product requirements.
 
