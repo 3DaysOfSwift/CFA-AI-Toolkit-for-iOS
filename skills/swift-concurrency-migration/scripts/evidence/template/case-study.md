@@ -70,7 +70,9 @@ requirement with missing evidence keeps the audit open. Record the human
 architecture review outcome explicitly, including when it shares a document
 with the navigator inspection, final CFA audit or manual regression. In `record.json`, list every
 affected target in `completionGate.affectedTargets` and name the targets
-covered by each build in its `targets` array. Include affected extensions and
+covered by each build and the linked final test run in their `targets` arrays.
+If test targets have separate names, explain which app or extension targets
+they exercise. Include affected extensions and
 device targets, and link each changed data handoff in
 `completionGate.dataHandoffEvidenceIds` (empty only if none are affected). Record each
 affected target’s minimum OS and list the covered targets on the evidence
@@ -86,9 +88,12 @@ and record authorisation for any change.
 | Target and build configuration | Baseline bundle identifier and evidence ID | Final bundle identifier and evidence ID | Authorisation for a change |
 | --- | --- | --- | --- |
 
-Keep failed runs and record the matching passing rerun at the final commit.
-Use `rerunOf` on the passing evidence entry and explain how the scenario,
-target, build configuration and OS match the failed run.
+Keep failed runs and link each passing final-commit rerun with `rerunOf`.
+For failed builds, tests and manual checks, name the targets exercised and
+use the same environment description on both runs. Explain how the rerun
+covers the original scenario, targets, build configuration and OS. For
+checks that were recorded but never run, link equivalent final-commit
+evidence or explain why they fall outside required verification.
 Use the scoped feature record for earlier checkpoints.
 
 ## Transferable lesson
