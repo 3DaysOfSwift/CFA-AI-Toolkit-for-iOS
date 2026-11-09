@@ -37,9 +37,13 @@ an alternative, prove a performance improvement, or certify a migration outcome.
 Matthew Thomas authorised this documented-rationale/editorial-analysis distinction
 on 2026-10-27. That permission is not individual technical or historical approval.
 
-## Open question
+## Working example
 
-Choose a small approved inline-edit example showing failed persistence without losing the draft or visually dimming unrelated content.
+The bundled Habit Tracker's `TodayView` binds each count field to its
+`TodayViewModel`. The ViewModel retains an unsaved value after a failed write
+and offers retry; `TodayViewModelTests` checks that confirmed progress stays
+unchanged until the retry succeeds. The row displays its own save status and
+retry control, without disabling the whole screen.
 
 ## Publication
 
