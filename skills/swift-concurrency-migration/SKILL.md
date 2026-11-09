@@ -140,6 +140,11 @@ Use deliberate passes:
    a slow restore cannot delay refresh or overwrite fresh data, and that an
    optional write cannot hold up a successful refresh. Keep required
    persistence for user edits on the save path before reporting success.
+   When changing durable storage, preserve the shipped store location and
+   schema compatibility. If the migration requires changing either, verify
+   the upgrade with a representative existing store. Check that saved records
+   remain available after reopening and that an open or migration failure
+   surfaces without replacing the store with empty data.
    If preference restoration changes, test with values written by the old
    app. Apply the [preference recovery rule](references/spec/rules/cfa-pref-01.md)
    to distinguish a supported value, a missing or obsolete non-critical value,
