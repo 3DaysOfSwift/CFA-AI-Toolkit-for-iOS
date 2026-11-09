@@ -396,12 +396,18 @@ test('reviews a launch signal queued on a main or newly created OperationQueue',
         OperationQueue.main.addOperation { analytics.recordLaunch() }
         OperationQueue.main.addOperation { AppModel.shared.applicationDidFinishLaunching() }
         OperationQueue().addOperation { AppModel.shared.applicationDidFinishLaunching() }
+        let queue = OperationQueue.main
+        queue.addOperation { AppModel.shared.applicationDidFinishLaunching() }
+        let dispatcher: DispatchQueue = .main
+        dispatcher.async { AppModel.shared.applicationDidFinishLaunching() }
+        let unrelated = CustomQueue()
+        unrelated.async { AppModel.shared.applicationDidFinishLaunching() }
         return true
       }
     }`
   });
   const findings = (await inspect(root)).findings.filter(item => item.code === 'scheduled-app-model-launch');
-  assert.deepEqual(findings.map(item => item.line), [4, 5]);
+  assert.deepEqual(findings.map(item => item.line), [4, 5, 7, 9]);
   assert.match(findings[0].message, /OperationQueue\.addOperation/);
 });
 
