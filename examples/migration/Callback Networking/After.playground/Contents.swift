@@ -14,8 +14,8 @@ struct NetworkingManager: Sendable {
     }
 }
 
-// The provider checks and decodes its own response.
-actor LaunchAPI {
+// The provider checks and decodes each response using request-local values.
+struct LaunchAPI: Sendable {
     private let networkingManager: NetworkingManager
     init(networkingManager: NetworkingManager) { self.networkingManager = networkingManager }
     func download(from url: URL) async throws -> Launch {

@@ -10,7 +10,7 @@ Both implementations return Artemis on success and report HTTP 503 and malformed
 
 ## Migration
 
-The provider actor asks `NetworkingManager` for data using URLSession’s async API, checks the response and returns the decoded value. The continuation is used only by the legacy behaviour check.
+The stateless provider asks `NetworkingManager` for data using URLSession’s async API, checks the response and returns the decoded value. The provider keeps response validation and decoding local to each request. The continuation is used only by the legacy behaviour check.
 
 ## Run and verify
 
