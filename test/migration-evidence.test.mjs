@@ -396,6 +396,9 @@ test('completion is not inferred from a build pass or tests at a different commi
   f.write();
   const mismatch = 'the recorded environments differ or are missing';
   assert.ok(inspectRecord(f.file).warnings.some(warning => warning.includes(mismatch)));
+  assert.ok(inspectRecord(f.file).errors.includes(
+    'evidence.failed-regression: completion requires a passing rerun at afterCommit in the same recorded environment.'
+  ));
   rerun.environment = failedRegression.environment;
   f.write();
   assert.ok(!inspectRecord(f.file).warnings.some(warning => warning.includes(mismatch)));

@@ -210,11 +210,16 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
       if (item.phase === 'before' || item.outcome !== 'failed') continue;
       const timing = item.commit && item.commit === record.repository.afterCommit
         ? 'at the final commit' : 'during migration';
-      const rerun = record.evidence.find(candidate => candidate.rerunOf === item.id &&
+      const reruns = record.evidence.filter(candidate => candidate.rerunOf === item.id &&
         candidate.kind === item.kind && candidate.outcome === 'passed' &&
         candidate.phase === 'after' && candidate.commit === record.repository.afterCommit);
-      if (!rerun) {
+      const requiresEnvironment = ['build', 'test', 'manual'].includes(item.kind);
+      const rerun = reruns.find(candidate => !requiresEnvironment ||
+        (item.environment && item.environment.trim() === candidate.environment?.trim()));
+      if (!reruns.length) {
         errors.push(`evidence.${item.id}: failed ${timing}; link a passing rerun at afterCommit before marking the migration completed.`);
+      } else if (!rerun) {
+        errors.push(`evidence.${item.id}: completion requires a passing rerun at afterCommit in the same recorded environment.`);
       } else {
         warnings.push(`evidence.${item.id}: failed ${timing}; verify linked rerun ${rerun.id} covers the same scenario, target, build configuration and OS before accepting completion.`);
       }
