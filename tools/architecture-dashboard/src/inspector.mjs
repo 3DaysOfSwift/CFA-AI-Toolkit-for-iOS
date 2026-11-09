@@ -110,12 +110,12 @@ function* typeInitializers(body) {
     const types = initializerParameterTypes(parameters);
     const injectedViewModel = types.some(type => type.endsWith('ViewModel'));
     const injectedAppModel = types.includes('AppModel');
-    const possibleModelDependency = types.find(type => featureTypeSuffix.test(type) || serviceTypeSuffix.test(type));
+    const possibleModelDependencies = [...new Set(types.filter(type => featureTypeSuffix.test(type) || serviceTypeSuffix.test(type)))];
     const tail = body.slice(closing + 1);
     const openingBody = /^\s*(?:(?:async|throws|rethrows)\s*)*\{/.exec(tail);
     const bodyStart = openingBody ? closing + 1 + openingBody[0].length : null;
     const initializerBody = bodyStart === null ? null : braceBody(body, bodyStart - 1);
-    yield { index: initializer.index, parameters, types, injectedViewModel, injectedAppModel, possibleModelDependency, initializerBody, bodyStart };
+    yield { index: initializer.index, parameters, types, injectedViewModel, injectedAppModel, possibleModelDependencies, initializerBody, bodyStart };
   }
 }
 
@@ -135,8 +135,8 @@ function inspectScreenInputs(name, body, source, start, file, findings) {
     if (initializer.injectedAppModel) {
       findings.push(finding('screen-initializer-inputs', 'warning', `${name} appears to accept AppModel; CFA screens resolve Features through their own ViewModel.`, file, lineOf(source, start + initializer.index)));
     }
-    if (initializer.possibleModelDependency) {
-      findings.push(finding('screen-initializer-inputs', 'review', `${name} accepts ${initializer.possibleModelDependency}. Verify whether this injects a Feature or microservice into a View.`, file, lineOf(source, start + initializer.index)));
+    if (initializer.possibleModelDependencies.length) {
+      findings.push(finding('screen-initializer-inputs', 'review', `${name} accepts ${initializer.possibleModelDependencies.join(', ')}. Verify whether this injects a Feature or microservice into a View.`, file, lineOf(source, start + initializer.index)));
     }
   }
 }
@@ -782,8 +782,8 @@ export async function inspect(project) {
     const initializers = initializerLocations.flatMap(location =>
       [...typeInitializers(location.body)].map(initializer => ({...initializer, location}))
     );
-    for (const { index, parameters, injectedViewModel, injectedAppModel, possibleModelDependency, initializerBody, location } of initializers) {
-      if (!injectedViewModel && !injectedAppModel && !possibleModelDependency && parameters.trim() && viewModel) {
+    for (const { index, parameters, injectedViewModel, injectedAppModel, possibleModelDependencies, initializerBody, location } of initializers) {
+      if (!injectedViewModel && !injectedAppModel && !possibleModelDependencies.length && parameters.trim() && viewModel) {
         findings.push(finding('screen-initializer-inputs', 'review', `${name} accepts initializer inputs. Check that a detail screen receives selected immutable data and constructs its own ViewModel. Check for injected Features, repositories, service closures and actions owned by another screen. Reusable presentation components may receive action closures.`, location.file, lineOf(location.source, location.offset + index)));
       }
       if (initializerBody !== null) {

@@ -205,7 +205,7 @@ test('reviews possible model dependencies in a flat View initializer', async t =
   const { findings } = await inspectView(t, '', {
     [file]: `struct Detail: View {
       init(schedule: LaunchFeature) {}
-      init(repository: any MyApp.LaunchRepository) {}
+      init(repository: any MyApp.LaunchRepository, network: NetworkingManager) {}
       init(snapshot: LaunchFeature.Snapshot) {}
       init(snapshot: LaunchSnapshot = makeSnapshot(feature: LaunchFeature())) {}
       init(action: (feature: LaunchFeature) -> Void) {}
@@ -216,6 +216,7 @@ test('reviews possible model dependencies in a flat View initializer', async t =
     ['screen-initializer-inputs', file, 2, 'review'],
     ['screen-initializer-inputs', file, 3, 'review']
   ]);
+  assert.match(findings[1].message, /LaunchRepository, NetworkingManager/);
 });
 
 test('locates possible work started by a SwiftUI initializer', async t => {
