@@ -331,6 +331,13 @@ test('completion is not inferred from a build pass or tests at a different commi
     'evidence.after-behaviour-regression.rerunOf: rerun omits targets from failed-regression: Widget.'
   ));
   rerun.targets.push('Widget');
+  rerun.environment = 'App Release, newest supported OS';
+  f.write();
+  const mismatch = 'the recorded environments differ or are missing';
+  assert.ok(inspectRecord(f.file).warnings.some(warning => warning.includes(mismatch)));
+  rerun.environment = failedRegression.environment;
+  f.write();
+  assert.ok(!inspectRecord(f.file).warnings.some(warning => warning.includes(mismatch)));
   f.seal();
   assert.equal(inspectRecord(f.file).valid, true);
   assert.ok(!inspectRecord(f.file).warnings.some(warning => warning.includes('list the affected targets exercised by the manual regression')));
