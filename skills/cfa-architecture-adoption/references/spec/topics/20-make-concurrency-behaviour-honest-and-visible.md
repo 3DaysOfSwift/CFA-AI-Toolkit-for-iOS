@@ -10,7 +10,10 @@ by default. Use one handle per independently managed operation, or keyed handles
 when independent records need independent work. Equivalent repeated button
 actions reuse the existing execution rather than create another task. A
 synchronous button-facing method returns the existing/new handle; asynchronous
-callers and tests await that same handle's `value`. Do not create a new wrapper
+callers and tests await that same handle's `value` for completion. If a lifecycle
+task awaits an unstructured task this way, cancellation does not automatically
+pass to the awaited task. The task's owner applies the operation's cancellation
+policy. Do not create a new wrapper
 task for every tap just to wait, or silently return from an async operation
 while its requested work is still unfinished.
 

@@ -210,3 +210,7 @@ struct NotesEditorView: View {
     }
 }
 ```
+
+The editor’s lifecycle task awaits the ViewModel’s load handle for completion.
+The Feature owns the shared notes load, which can finish and retain its result
+after the editor closes. Cancelling the lifecycle task does not cancel the handle.
