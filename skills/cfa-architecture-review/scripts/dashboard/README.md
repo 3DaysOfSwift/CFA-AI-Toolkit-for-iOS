@@ -36,7 +36,9 @@ multiple AppModel files.
 
 Use the findings to verify source, target membership, and Xcode navigator
 placement. An intentional package boundary can explain a different physical
-location. A matching test filename identifies a candidate test file. The command
+location. A matching filename identifies a candidate test file. Placement and
+duplicate-name findings use physical paths. Check the Xcode navigator group,
+test target membership and the behaviour each test exercises. The command
 reads source and prints its findings without modifying the inspected project.
 
 For a service placement finding, trace who uses the service and which

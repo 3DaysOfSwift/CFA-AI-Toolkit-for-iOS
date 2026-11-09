@@ -900,7 +900,7 @@ export async function inspect(project) {
     limitations: [
       'This does not type-check Swift or resolve target membership, protocols, runtime behaviour, or test results.',
       'Unusual declarations, macros, generated code, and custom composition routes may be missed.',
-      'Screen ownership mapping uses conventionally named screen files and adjacent ViewModels. Explicit initializer input checks include recognized View extensions. Implicit memberwise inputs, aliases and actual call sites still need manual review.',
+      'Screen ownership mapping uses conventionally named screen files and adjacent ViewModels. Explicit initializer input checks include recognized View extensions. Stored-property checks can surface possible implicit memberwise inputs. Confirm aliases and actual call sites in source.',
       'Root storage-gate detection uses conventional root names and storage identifiers; aliases, helper functions, and blocking overlays require manual failure-path review.',
       'A visible route is not proof that business rules, concurrency, persistence, or UI behaviour are correct.'
     ]
