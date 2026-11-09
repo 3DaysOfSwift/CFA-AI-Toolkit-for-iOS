@@ -4,6 +4,7 @@ import {realpathSync} from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {importReview} from './review-import.mjs';
+import {missingTimingScenarios} from './operation-assessments.mjs';
 import {renderHealthReport} from './health-report.mjs';
 import {collectSyntax} from './syntax-evidence.mjs';
 import {collectProjectAnalysis} from './project-analysis.mjs';
@@ -25,8 +26,6 @@ const hasOpenChecks = operation => !operation.checks?.length ||
   operation.checks.some(check => ['unresolved', 'not-checked'].includes(check.status)) ||
   Boolean(operation.unknowns?.length) ||
   Boolean(operation.steps?.some(step => step.relation === 'unknown'));
-const missingTimingScenarios = operation => ['repeat', 'leave', 'late-result', 'failure']
-  .filter(id => !operation.scenarios?.some(scenario => scenario.id === id && scenario.status !== 'unresolved'));
 
 // Describe the next concrete review work without treating inventory as evidence.
 export function nextWork(report, review, limit = 8) {

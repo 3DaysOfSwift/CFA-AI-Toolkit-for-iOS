@@ -89,7 +89,8 @@ test('a CFA-only deviation leaves the operation concurrency result stable', () =
   const html = renderHealthReport({
     app:'App',summary:'Summary',verdict:'Clear ownership',scope:'Scope',conclusion:'Conclusion',
     criteria:[{title:'Clear ownership',detail:'Reviewed',status:'pass'}],
-    operations:[{title:'Save',checks:[
+    operations:[{title:'Save',steps:complete().operations[0].steps,
+      scenarios:complete().operations[0].scenarios,checks:[
       {dimension:'correctness',status:'pass',title:'Save owns its work'},
       {dimension:'cfa',status:'fail',title:'Naming differs from CFA'}
     ]}]

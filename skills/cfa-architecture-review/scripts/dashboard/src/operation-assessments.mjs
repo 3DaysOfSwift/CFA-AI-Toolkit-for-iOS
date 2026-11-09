@@ -1,3 +1,6 @@
+export const missingTimingScenarios = operation => ['repeat', 'leave', 'late-result', 'failure']
+  .filter(id => !operation.scenarios?.some(scenario => scenario.id === id && scenario.status !== 'unresolved'));
+
 const esc = v => String(v ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const labels={sound:'✅ Stable',problem:'❌ Problem',investigate:'⚠️ Needs investigation',unassessed:'➖ Not assessed'};
 const cfaLabels={sound:'✅ Pass',problem:'❌ Fail',investigate:'⚠️ Needs investigation',unassessed:'➖ Not assessed'};

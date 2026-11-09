@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import path from 'node:path';
+import {missingTimingScenarios} from './operation-assessments.mjs';
 import {fileURLToPath} from 'node:url';
 
 const escape = value => String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
@@ -23,7 +24,7 @@ function operationStatus(operation) {
   if (checks.some(check => check.status === 'fail') || scenarios.some(scenario => scenario.status === 'problem')) return 'problem';
   if (!checks.some(check => check.status === 'pass') ||
       checks.some(check => ['unresolved', 'not-checked'].includes(check.status)) ||
-      scenarios.some(scenario => scenario.status === 'unresolved') ||
+      !operation.steps?.length || missingTimingScenarios(operation).length ||
       operation.unknowns?.length || operation.steps?.some(step => step.relation === 'unknown')) return 'concern';
   return 'pass';
 }

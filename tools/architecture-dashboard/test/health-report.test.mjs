@@ -85,3 +85,16 @@ test('requires a visible finding for confirmed operation problems', () => {
   data.criteria.push({title:'Refresh ordering', detail:'A stale result can replace the latest result.', status:'problem'});
   assert.match(renderHealthReport(data), /Problems to address/);
 });
+
+test('withholds a stable workflow result until its trace and timing outcomes exist', () => {
+  const operation = {title:'Save',checks:[{dimension:'correctness',status:'pass'}]};
+  const data = {
+    app:'App',summary:'Summary',verdict:'Clear ownership',scope:'App',conclusion:'Conclusion',
+    criteria:[{title:'Ownership',detail:'Checked',status:'pass'}],operations:[operation]
+  };
+  assert.match(renderHealthReport(data), /aria-label="Needs investigation">\?<\/span>Save/);
+  operation.steps = [{id:'event',relation:'event',title:'Save'}];
+  assert.match(renderHealthReport(data), /aria-label="Needs investigation">\?<\/span>Save/);
+  operation.scenarios = ['repeat','leave','late-result','failure'].map(id => ({id,status:'not-applicable'}));
+  assert.match(renderHealthReport(data), /aria-label="Stable">✓<\/span>Save/);
+});
