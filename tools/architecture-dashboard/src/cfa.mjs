@@ -195,10 +195,13 @@ skill from that toolkit before changing the project.
   Keep independent requests able to progress in parallel unless an explicit
   policy limits them. When changing networking, hold one response open and
   verify that an independent request reaches the transport before it completes.
-  Keep domain-specific adapters with the Feature that naturally owns them.
-  Move broadly applicable services to a shared location when no Feature
-  naturally owns them. AppModel.live() can compose shared services locally and
-  inject them into Features or their providers.
+- Keep domain-specific microservices beside the Feature that naturally owns
+  their responsibility, even when another Feature uses them. Move broadly
+  applicable services to a shared location when no Feature naturally owns
+  them. When common configuration or shared state warrants one instance,
+  construct it locally in AppModel.live() and inject it through each
+  consumer's initializer. Otherwise use the simplest value or instances
+  that meet the requirements.
 - Call the AppModel launch signal directly
   and synchronously from the application lifecycle callback, never a View .task
   or a scheduled Task. AppModel signals the relevant Features and starts its
