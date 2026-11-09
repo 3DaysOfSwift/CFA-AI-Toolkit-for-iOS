@@ -216,8 +216,10 @@ skill from that toolkit before changing the project.
 - PurchasesFeature owns entitlement state. Screen ViewModels check current
   entitlement before presenting or calling a paid capability. Identify paid
   capabilities from the product requirements and entitlement policy. Trace
-  alternative screens and other callers to a check before paid presentation
-  or execution. Verify locked and entitled outcomes. Cite the source and
+  alternative screens, deep links, notification actions and additional targets
+  that reach the capability. A route that bypasses the screen checks current
+  entitlement in its own caller before invoking the capability. Verify locked
+  and entitled outcomes for each applicable route. Cite the source and
   consequence of confirmed unguarded paths, and mark unresolved paths as
   unverified. Keep pricing and entitlement checks out of the capability
   Feature so the product can change which capabilities it charges for.
