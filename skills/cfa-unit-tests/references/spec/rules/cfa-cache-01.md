@@ -4,7 +4,7 @@
 
 **Strength:** Required when using this cache pattern.
 
-**Guidance:** Start restoration and refresh independently where both are needed; a successful current response does not wait for an optional cache write and must not be overwritten by an older snapshot.
+**Guidance:** Start restoration and refresh independently where both are needed. A missing, incompatible or unreadable cache must not block the download. Publish a current response without waiting for the optional cache write. Reject older restores after fresh data arrives, and keep valid in-memory data if refresh fails.
 
 **Why:** Previously downloaded data can appear quickly without sacrificing fresher server data.
 
@@ -12,6 +12,6 @@
 
 **Explanation:** [Why use record-level persistence boundaries in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/persistence-boundaries).
 
-**Verify:** Test missing, corrupt, slow and failed cache operations and out-of-order completion.
+**Verify:** Verify refresh starts with a missing, incompatible or slow cache. Verify that cache write failure leaves fresh results usable, late restoration cannot replace them, and refresh failure retains valid in-memory data.
 
 **Full rule, context and examples:** [Keep Persistence Behind Repository Contracts](../topics/19-keep-persistence-behind-repository-contracts.md). This card is a reading aid; apply the complete canonical section.
