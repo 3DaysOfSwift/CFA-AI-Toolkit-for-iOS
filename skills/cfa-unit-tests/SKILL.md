@@ -149,6 +149,17 @@ any offline availability indicator refers only to saved data. Check that a
 failed refresh retains valid displayed data and that delayed cache writes
 cannot replace a newer snapshot.
 
+For offline edits sent to a custom server, apply the
+[sync rule](references/spec/rules/cfa-sync-01.md). Fail the local write and
+verify that neither local success nor a sendable pending edit is published.
+After a successful local write, fail sync, reconstruct the Feature from
+storage, and verify that the edit and its pending metadata survive together.
+Retry with the same edit identity and verify that it produces one logical
+server change. Exercise the product's conflict and rejection outcomes and
+verify that server confirmation is shown only after acceptance. For
+Apple-managed sync, verify the actual handoff and conflicting offline edits
+on supported devices separately from the unit tests.
+
 For restored preferences, check that a supported saved value is restored and
 that a missing or obsolete non-critical value uses the product-defined
 fallback. Where the old value should be retained, verify that restoration
