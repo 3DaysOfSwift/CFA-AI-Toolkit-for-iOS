@@ -680,6 +680,16 @@ test('surfaces a stored Feature dependency as coordination to review', async t =
   assert.match(findings[0].message, /business capability.*one owner per state.*dependency cycle/);
 });
 
+test('reviews Feature coordination in a flat source layout', async t => {
+  const file = 'Application/UserProfileFeature.swift';
+  const root = await fixture(t, {
+    [file]: 'final class UserProfileFeature { private let orders: OrdersFeature }'
+  });
+  const {findings} = await inspect(root);
+  assert.deepEqual(findings.filter(item => item.code === 'feature-coordination')
+    .map(({file, line, severity}) => [file, line, severity]), [[file, 1, 'review']]);
+});
+
 test('reports AppModel findings at the correct lines in CR-delimited source', async t => {
   const file = 'Application/2 - AppModel/AppModel.swift';
   const root = await fixture(t, {

@@ -193,7 +193,6 @@ export async function inspect(project) {
 
   // A typed dependency is evidence of a potential workflow, not a violation.
   for (const [file, source] of sources) {
-    if (!/(?:^|\/)Features\//.test(file)) continue;
     for (const declaration of source.matchAll(/\bclass\s+(\w+Feature)\b[^{}]*\{/g)) {
       const bodyStart = declaration.index + declaration[0].length;
       const body = braceBody(source, bodyStart - 1);
