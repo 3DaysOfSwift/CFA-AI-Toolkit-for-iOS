@@ -172,14 +172,16 @@ skill from that toolkit before changing the project.
   cancellation policy only for a specific product or resource requirement.
   Awaiting the shared task handle does not end the wait on caller cancellation.
   If the screen needs to stop waiting promptly, cancel its wait independently
-  while the Feature keeps refreshing.
+  while the Feature keeps refreshing. Verify separately that the last waiter
+  can leave without a replacement, that other waiters still receive the result
+  when one leaves, and that a later equivalent caller joins without a duplicate
+  request. Where prompt exit is required, verify it while the refresh is suspended.
 - Cancel superseded presentation work such as search. Cancel screen-only work
   on disappearance when continuing would have no value. Check cancellation
   before expensive work and before publishing, and protect current state
   against stale results after suspension.
 - At the Feature boundary, equivalent requests await one in-flight task and
-  receive its outcome. One caller cancelling must leave shared work running
-  when other callers still need it. Queue commands that must each take effect
+  receive its outcome. Queue commands that must each take effect
   in admission order, including across awaits, and return each caller's own
   outcome. Matching inputs alone do not make commands duplicates. Define how
   failure and cancellation affect queued work and when to clear task handles.
