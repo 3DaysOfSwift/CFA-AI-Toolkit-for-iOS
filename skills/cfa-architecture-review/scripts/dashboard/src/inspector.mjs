@@ -93,13 +93,13 @@ function labeledClosureOffset(argumentsText, label) {
 }
 
 function inspectLifecycleClosures(source, file, findings, firstLine = 1) {
-  for (const task of source.matchAll(/\.\s*(task|refreshable)\b\s*([({])/g)) {
+  for (const task of source.matchAll(/\.\s*(task|refreshable|onAppear|onChange|onReceive)\b\s*([({])/g)) {
     let opening = task.index + task[0].length - 1;
     if (task[2] === '(') {
       const closing = closingParenthesis(source, opening);
       if (closing < 0) continue;
       const argumentsText = source.slice(opening + 1, closing);
-      const label = task[1] === 'task' ? 'operation' : 'action';
+      const label = task[1] === 'task' ? 'operation' : task[1] === 'onAppear' ? 'perform' : 'action';
       const inlineClosure = labeledClosureOffset(argumentsText, label);
       if (inlineClosure >= 0) {
         opening += inlineClosure + 1;
@@ -112,9 +112,11 @@ function inspectLifecycleClosures(source, file, findings, firstLine = 1) {
     const modifier = `.${task[1]}`;
     const lifecycleBody = braceBody(source, opening);
     const bodyStartLine = firstLine + lineOf(source, opening + 1) - 1;
-    for (const site of scanSource(lifecycleBody, file).sites) {
-      if (site.kind !== 'task' && site.kind !== 'detached') continue;
-      findings.push(finding('task-inside-view-lifecycle', 'review', `A SwiftUI ${modifier} body appears to create an independent Task. Trace its lifetime and cancellation. In CFA, await lifecycle-bound work directly, let the ViewModel own independent screen work, and let the Feature own shared operations that may outlive the screen.`, file, bodyStartLine + site.line - 1));
+    if (task[1] === 'task' || task[1] === 'refreshable') {
+      for (const site of scanSource(lifecycleBody, file).sites) {
+        if (site.kind !== 'task' && site.kind !== 'detached') continue;
+        findings.push(finding('task-inside-view-lifecycle', 'review', `A SwiftUI ${modifier} body appears to create an independent Task. Trace its lifetime and cancellation. In CFA, await lifecycle-bound work directly, let the ViewModel own independent screen work, and let the Feature own shared operations that may outlive the screen.`, file, bodyStartLine + site.line - 1));
+      }
     }
     if (/(?<!\bfunc\s+)\bapplicationDidFinishLaunching\s*\(/.test(lifecycleBody)) {
       findings.push(finding('view-tied-app-launch', 'review', `A View-layer ${modifier} appears to call applicationDidFinishLaunching. Check whether this is production launch behavior rather than a preview or test, and use the app lifecycle callback for the shared launch signal.`, file, firstLine + lineOf(source, task.index) - 1));

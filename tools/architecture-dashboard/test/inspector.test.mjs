@@ -162,6 +162,24 @@ test('a launch call in preview code is a review hint, not a production assertion
   assert.equal(findings.filter(item => item.code === 'view-tied-app-launch').length, 2);
 });
 
+test('reviews app launch signals in synchronous SwiftUI callbacks', async t => {
+  const file = 'Application/StartupView.swift';
+  const root = await fixture(t, {
+    [file]: `struct StartupView: View {
+      var body: some View {
+        Text("Startup")
+          .onAppear(perform: { AppModel.shared.applicationDidFinishLaunching() })
+          .onChange(of: phase) { AppModel.shared.applicationDidFinishLaunching() }
+          .onReceive(events) { _ in AppModel.shared.applicationDidFinishLaunching() }
+      }
+    }`
+  });
+  const {findings} = await inspect(root);
+  assert.deepEqual(findings.filter(item => item.code === 'view-tied-app-launch')
+    .map(({file, line, severity}) => [file, line, severity]),
+    [[file, 4, 'review'], [file, 5, 'review'], [file, 6, 'review']]);
+});
+
 test('reports typed and inferred AppModel property defaults without flagging shared or local values', async t => {
   const file = 'Application/2 - AppModel/AppModel.swift';
   const root = await fixture(t, {
