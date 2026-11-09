@@ -87,6 +87,11 @@ failure before the session ends, and partial authentication or cleanup
 failure where supported. Assert the actual session and retained or deleted
 data against the product's sign-out contract.
 
+When independent network requests should overlap, hold the first response
+open in a controlled transport. Verify that the second request reaches
+the transport before releasing the first. Test any intentional request
+limit separately.
+
 For durable edits, hold the write open and verify that confirmed state stays
 unchanged until it succeeds. On failure, assert that the editor keeps its
 draft and can retry. For optional download caches, independently control disk

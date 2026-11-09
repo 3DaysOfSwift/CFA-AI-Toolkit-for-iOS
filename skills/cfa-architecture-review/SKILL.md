@@ -52,6 +52,13 @@ violations and unresolved requirements separately, and state what evidence
 would resolve each open requirement. For a focused review, report the scoped
 findings without issuing a whole-app conformance verdict.
 
+For independent network requests, trace each caller to transport initiation.
+Look for synchronous work before the first suspension, waits on another
+request, and deliberate request limits. An actor can accept another call
+while an earlier download awaits its response. Establish an unintended delay
+with source or timing evidence before reporting a bottleneck. Distinguish app
+scheduling from URLSession connection limits and server behaviour.
+
 Trace published snapshots from their authoritative owner to their consumers.
 Check stored properties and nested references for mutation, and follow writes
 through persistence to publication. A local draft or mutable value alone does
