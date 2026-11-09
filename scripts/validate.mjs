@@ -4,7 +4,7 @@ import { pathToFileURL } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { root, skills, cfaSkills, referenceFeatureSkills, behaviourContractSkills, iconSkills, starterIcon, migrationEvidenceFiles, explanationFiles, projectAnalysisFiles } from './sync.mjs';
 import { validateCatalogue, audit } from '../tools/explanations/explanations.mjs';
-import { files, hash, json } from './files.mjs';
+import { files, hash, isReleasePath, json } from './files.mjs';
 import { verifyXcodeTemplateStructure } from './verify-xcode-template-structure.mjs';
 import { verifyTemplateOrientations } from './verify-ios-orientations.mjs';
 import { specTopics } from './spec-topics.mjs';
@@ -35,9 +35,8 @@ export function validate(base=root,{source=true}={}) {
     if (width !== height || width < 48 || width > 4096) throw Error(`CFA ${field} must be a square image between 48 and 4096 pixels.`);
   }
   if(source) {
-    const isExampleContent = file => !file.includes('.playground/playground.xcworkspace/');
-    const sourceExamples = files(path.join(base,'examples/migration')).filter(isExampleContent).sort();
-    const bundledExamples = files(path.join(base,'skills/swift-concurrency-migration/assets/migration-examples')).filter(isExampleContent).sort();
+    const sourceExamples = files(path.join(base,'examples/migration')).filter(isReleasePath).sort();
+    const bundledExamples = files(path.join(base,'skills/swift-concurrency-migration/assets/migration-examples')).filter(isReleasePath).sort();
     if (JSON.stringify(sourceExamples) !== JSON.stringify(bundledExamples)) throw Error('Migration example files differ from the bundled skill. Run npm run sync.');
     for (const file of sourceExamples) if (hash(path.join(base,'examples/migration',file)) !== hash(path.join(base,'skills/swift-concurrency-migration/assets/migration-examples',file))) throw Error(`Stale migration example: ${file}`);
     if (JSON.stringify(files(path.join(base,'skills/swift-concurrency-migration/scripts/project-analysis')).sort()) !== JSON.stringify([...projectAnalysisFiles].sort())) throw Error('Unexpected or missing migration project analysis files.');

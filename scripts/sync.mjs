@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { files } from './files.mjs';
+import { files, isReleasePath } from './files.mjs';
 import { specTopics } from './spec-topics.mjs';
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const cfaSkills = ['cfa-app-creation', 'cfa-feature-work', 'cfa-architecture-adoption', 'swift-concurrency-migration', 'cfa-architecture-review', 'cfa-codebase-tidy', 'cfa-unit-tests'];
@@ -79,7 +79,7 @@ export function sync(base = root) {
     if (fs.lstatSync(migrationExamples).isSymbolicLink()) throw Error('Refusing to replace linked migration examples.');
     fs.rmSync(migrationExamples, {recursive:true});
   }
-  for (const file of files(path.join(base, 'examples/migration')).filter(file => !file.includes('.playground/playground.xcworkspace/'))) {
+  for (const file of files(path.join(base, 'examples/migration')).filter(isReleasePath)) {
     copy(`examples/migration/${file}`, `skills/swift-concurrency-migration/assets/migration-examples/${file}`);
   }
   const captureGuide = fs.readFileSync(path.join(base, 'architecture/migration-evidence.md'), 'utf8')
