@@ -154,3 +154,21 @@ test('allows a stateless graph snapshot initializer inside a compliant screen fi
   }`);
   assert.deepEqual(findings, []);
 });
+
+test('flags possible screen-owned task handles without flagging lifecycle tasks', async t => {
+  const { report } = await inspectView(t, `struct HomeView: View {
+    @State private var viewModel = HomeViewModel()
+    @State private var refreshTask: Task<Void, Never>?
+    private let otherTask = Task {}
+    var body: some View {
+      Text("Home").task {
+        let localTask = Task {}
+        await localTask.value
+      }
+    }
+  }`);
+  assert.deepEqual(
+    report.findings.filter(item => item.code === 'screen-task-handle').map(item => item.line),
+    [3, 4]
+  );
+});
