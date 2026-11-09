@@ -133,8 +133,9 @@ For durable edits, hold the write open and verify that confirmed state stays
 unchanged until it succeeds. On failure, assert that the editor keeps its
 draft and can retry. For optional download caches, independently control disk
 and network completion. Verify that a slow restore leaves refresh free to
-start, a late restore cannot replace fresh data, and a pending or failed cache
-write leaves the refresh result usable. When replacing a usable cache fails,
+start and a late restore cannot replace fresh data. Hold a cache write pending
+and verify both publication and caller completion before releasing it. Verify
+that a failed write leaves the refresh result usable. When replacing a usable cache fails,
 reopen the cache to verify the previous snapshot survives, and verify that
 any offline availability indicator refers only to saved data. Check that a
 failed refresh retains valid displayed data and that delayed cache writes

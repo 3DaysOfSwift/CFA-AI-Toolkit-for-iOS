@@ -92,8 +92,11 @@ If the project is already CFA, make the smallest complete vertical change:
    Keep unsaved editor values in the screen ViewModel.
    Publish a durable edit as saved only after required persistence succeeds.
    On failure, keep the draft available for retry and leave confirmed state
-   unchanged. For a replaceable download, publish current server data and let
-   optional caching finish independently.
+   unchanged. For a replaceable download, apply the
+   [optional snapshot rule](references/spec/rules/cfa-cache-01.md). Publish
+   current server data and return the refresh result while optional caching
+   proceeds independently. If changing this path, hold the cache write open
+   in a test and verify both publication and caller completion.
    For changed asynchronous operations, apply the
    [overlapping-call rule](references/spec/rules/cfa-task-01.md). Share one
    execution when it can satisfy equivalent callers. Queue commands that
