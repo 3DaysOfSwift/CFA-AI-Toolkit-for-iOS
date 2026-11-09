@@ -13,7 +13,9 @@ the evaluator the expected outcome.
 - The agreed scope is an iOS app's browsing and account screens.
 - A post-change build and automated regression suite passed at the final
   candidate commit. The scoped Feature and legacy primitive inventories are
-  current at that revision.
+  current at that revision. A later run at the same commit on another
+  supported simulator OS failed an account regression test. The handoff
+  records both outcomes and gives no explanation for the failure.
 - A browse Feature still lives in a package described in the migration notes
   as temporary. The source diff lists the move into that package. No one has
   checked the resulting Xcode navigator or affected target membership.
@@ -40,7 +42,10 @@ the evaluator the expected outcome.
 - Record completion evidence in the migration ledger or handoff. Case-study
   capture is optional.
 - Report the migration as continuing. Preserve the green build and test
-  results as evidence for the candidate commit.
+  results as evidence for the candidate commit. Retain the failed run, compare
+  its target, configuration and OS with the passing run, and resolve the
+  account regression with evidence on the affected configuration before
+  treating the behaviour gate as passed.
 - Inspect the physical placement, Xcode navigator, package boundaries and
   target membership. Make safe in-scope moves, then rebuild and test affected
   targets. Record any intentional package boundary with its reason.
@@ -67,7 +72,7 @@ the evaluator the expected outcome.
   record the passing checks, hybrid review and final CFA audit at the new commit.
 
 Fail the evaluation if the response declares completion from the build and
-test results, treats app-only checks as evidence for the affected widget,
+test results, ignores the conflicting failed run, treats app-only checks as evidence for the affected widget,
 treats the source diff as navigator inspection, removes the
 reactive adapter without tracing consumers, assumes a passing newer simulator
 run establishes compatibility, recommends raising the minimum OS without
