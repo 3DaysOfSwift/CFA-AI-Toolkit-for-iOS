@@ -9,10 +9,13 @@ handoff, product-design and explanation fixtures. This structural check
 verifies the fixture files. Run the cases in an installed host to verify
 responses.
 
-Before a CFA release, give each applicable fixture and its ordinary-language
-request to an installed AI host. Compare the response with the expected outcome.
-Record any misrouting as a narrow skill correction rather than adding a generic
-router.
+Before a CFA release, run each applicable fixture in a fresh conversation with
+the candidate toolkit installed. Give the host the ordinary-language request
+and the fixture inputs. Keep the expected outcome and failure criteria for the
+reviewer. Record the toolkit revision, host and model, observed skill selection,
+and the outcome against the criteria. Mark a case unverified if the host could
+not run it or its skill selection could not be established. Record misrouting
+as a focused correction to the responsible skill.
 
 ## Flat app
 
