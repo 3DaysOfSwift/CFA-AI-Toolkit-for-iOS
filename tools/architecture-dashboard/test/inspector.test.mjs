@@ -845,7 +845,16 @@ test('reviews requests through an injected URLSession outside NetworkingManager'
     'OptionalProvider.swift': 'struct OptionalProvider { let transport: URLSession?\n func load() async throws { _ = try await transport!.data(from: url) } }',
     'ReactiveProvider.swift': 'import Combine\nstruct ReactiveProvider { let transport: URLSession\n func load() { _ = transport.dataTaskPublisher(for: url) } }',
     'Manager.swift': 'struct NetworkingManager { let transport: URLSession\n func load() async throws { _ = try await transport.data(from: url) } }',
-    'Configuration.swift': 'struct Configuration { let transport: URLSession }'
+    'Configuration.swift': 'struct Configuration { let transport: URLSession }',
+    'ColocatedProvider.swift': `struct NetworkingManager {
+      private let session: URLSession
+      private let fallback = URLSession.shared
+    }
+    struct ColocatedProvider {
+      let session: FileStore
+      let fallback: FileStore
+      func load() { _ = session.data(); _ = fallback.data() }
+    }`
   });
   const {findings} = await inspect(root);
   assert.deepEqual(findings.filter(item => item.code === 'direct-url-session')
@@ -861,11 +870,11 @@ test('points to the URLSession request when the same file also configures a sess
     'ChainedProvider.swift': `struct ChainedProvider {
       let configured = URLSession(configuration: .ephemeral)
       func load() async throws {
-        _ = try await URLSession(configuration: makeConfiguration()).data(from: url)
+        _ = try await URLSession.init(configuration: makeConfiguration()).data(from: url)
       }
     }`,
     'ConfiguredProvider.swift': `struct ConfiguredProvider {
-      let session = Foundation.URLSession(configuration: .ephemeral)
+      let session = Foundation.URLSession.init(configuration: .ephemeral)
       func load() async throws { _ = try await session.data(from: url) }
     }`,
     'InferredProvider.swift': `struct InferredProvider {

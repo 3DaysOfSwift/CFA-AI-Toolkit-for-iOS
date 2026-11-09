@@ -579,8 +579,9 @@ export async function inspect(project) {
       });
     const outsideManager = match => !managerBodies.some(({start, end}) => match.index >= start && match.index < end);
     const sessionNames = new Set([...source.matchAll(/\b(\w+)\s*:\s*(?:Foundation(?:Networking)?\s*\.\s*)?URLSession\b(?!\s*\.)/g)]
-      .map(match => match[1]));
-    for (const alias of source.matchAll(/\b(?:let|var)\s+(\w+)\s*=\s*(?:Foundation(?:Networking)?\s*\.\s*)?URLSession\s*(?:\.\s*shared\b|\()/g)) {
+      .filter(outsideManager).map(match => match[1]));
+    for (const alias of source.matchAll(/\b(?:let|var)\s+(\w+)\s*=\s*(?:Foundation(?:Networking)?\s*\.\s*)?URLSession\s*(?:\.\s*shared\b|(?:\.\s*init\s*)?\()/g)) {
+      if (!outsideManager(alias)) continue;
       const end = alias.index + alias[0].length;
       const closing = alias[0].endsWith('(') ? closingParenthesis(source, end - 1) : end - 1;
       if (closing < 0) continue;
@@ -593,7 +594,7 @@ export async function inspect(project) {
     const requestOnReceiver = new RegExp(String.raw`\b(?:(URLSession\s*\.\s*shared)|(\w+))${requestCall.source}`, 'g');
     const directRequests = [...source.matchAll(requestOnReceiver)]
       .filter(match => (match[1] || sessionNames.has(match[2])) && outsideManager(match));
-    for (const constructor of source.matchAll(/\bURLSession\s*\(/g)) {
+    for (const constructor of source.matchAll(/\bURLSession\s*(?:\.\s*init\s*)?\(/g)) {
       if (!outsideManager(constructor)) continue;
       const closing = closingParenthesis(source, constructor.index + constructor[0].length - 1);
       if (closing >= 0 && source.slice(closing + 1).search(requestCall) === 0) directRequests.push(constructor);
