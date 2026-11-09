@@ -4,7 +4,7 @@
 
 **Strength:** Required.
 
-**Guidance:** Do not silently claim success; preserve user input and expose a recoverable error when required.
+**Guidance:** Report the outcome of the work the user requested. If a durable save fails, retain the draft and previously confirmed state and expose a recoverable error. If an optional cache write fails after a successful download, keep the fresh data visible and avoid claiming offline availability.
 
 **Why:** The user needs to know whether an operation succeeded.
 
