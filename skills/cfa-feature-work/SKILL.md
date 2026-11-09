@@ -1,6 +1,6 @@
 ---
 name: cfa-feature-work
-description: Add, change or remove a feature in an existing CFA SwiftUI iOS app. Use for feature work in a CFA project; when the app is not CFA, ask whether the developer wants Legacy GCD migration before introducing CFA structure.
+description: Add, change or remove a feature in an existing CFA SwiftUI iOS app. Use for feature work in a CFA project. In another architecture, preserve its existing boundaries unless the developer requests CFA adoption or migration.
 ---
 
 # CFA feature work
@@ -66,10 +66,11 @@ If the project is already CFA, make the smallest complete vertical change:
    run the affected test suite.
 
 If the project is not CFA, do not silently distribute CFA types throughout an
-unrelated architecture. Explain that CFA feature work needs an owned AppModel,
-feature boundary and ViewModel pairing, then ask whether the developer wants a
-Legacy GCD migration / CFA migration first. A small explicitly requested
-isolated fix remains within its requested architecture.
+unrelated architecture. An explicitly requested isolated fix stays within
+the existing architecture. If the developer requests CFA, use Architecture
+Adoption for structural work and Swift Concurrency Migration when the scope
+includes replacing legacy concurrency. Keep that decision separate from the
+original feature request.
 
 Deliver the changed user journey, ownership map and executed verification. Keep
 the change small, readable and reversible; do not refactor unrelated features.

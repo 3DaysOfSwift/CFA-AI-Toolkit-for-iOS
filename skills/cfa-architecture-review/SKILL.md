@@ -1,6 +1,6 @@
 ---
 name: cfa-architecture-review
-description: Review iOS feature ownership and CFA conformance without changing app code; also produce evidence-grounded Xcode architecture and concurrency dashboards when requested. Includes a Concurrency Migration Health Check for conflicting ownership and coordination after migration; works with legacy and non-CFA apps.
+description: Review iOS feature ownership and CFA conformance without changing app code; also produce evidence-grounded Xcode architecture and concurrency dashboards when requested. Includes a whole-app Swift Concurrency Health Check for current or migrated apps, including non-CFA apps.
 ---
 
 # CFA Architecture Review
