@@ -32,11 +32,12 @@ move and its concrete blocker rather than silently treating it as complete.
 
 After the scoped feature migration and placement and hybrid reviews, audit the
 actual first-party source, tests, targets, packages, filesystem and Xcode navigator
-against the CFA specification and change gate. Cover the agreed migration scope,
-including feature and state ownership, View/ViewModel boundaries, AppModel
-composition, concurrency, persistence, behaviour and project structure. Use
-the established scope and product constraints; an intentional, documented
-exception is not automatically a defect.
+against the CFA specification and change gate. Cover the agreed migration scope using the [CFA review checklist](spec/topics/29-review-checklist.md).
+Record evidence for each applicable requirement and a reason for each
+inapplicable one. For paid capabilities, include alternate entry points and
+locked and entitled outcomes. Record unresolved paths as unverified. Document
+any intentional exception against the product constraints and explain its
+effect on the scoped conformance verdict.
 
 For every misplaced file, compare its actual disk path and navigator group with
 the appropriate CFA location, including files temporarily placed in an existing
