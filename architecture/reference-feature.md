@@ -46,7 +46,7 @@ actor JSONNotesRepository: NotesRepository {
     let file: URL
     init(file: URL) { self.file = file }
 
-    func load() async throws -> [Note] {
+    func load() throws -> [Note] {
         do {
             return try JSONDecoder().decode([Note].self, from: Data(contentsOf: file))
         } catch let error as CocoaError where error.code == .fileReadNoSuchFile {
@@ -54,8 +54,9 @@ actor JSONNotesRepository: NotesRepository {
         }
     }
 
-    func save(_ note: Note) async throws {
-        let notes = try await load()
+    // Keep the read and replacement in one actor turn.
+    func save(_ note: Note) throws {
+        let notes = try load()
         let data = try JSONEncoder().encode(notes + [note])
         try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
         try data.write(to: file, options: .atomic)
