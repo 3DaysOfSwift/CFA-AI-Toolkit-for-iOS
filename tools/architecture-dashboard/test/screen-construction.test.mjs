@@ -742,3 +742,14 @@ test('reviews shared ViewModel storage on the View type', async t => {
     .map(({line}) => line), [2]);
   assert.ok(!report.findings.some(item => item.code === 'view-model-input-storage'));
 });
+
+test('reviews ViewModels injected through the SwiftUI environment', async t => {
+  const {report} = await inspectView(t, `struct HomeView: View {
+    @Environment(HomeViewModel.self) private var model: HomeViewModel
+    @SwiftUI.EnvironmentObject private var legacy: HomeViewModel
+    @Environment(\\.dismiss) private var dismiss: DismissAction
+    var body: some View { Text("Home") }
+  }`);
+  assert.deepEqual(report.findings.filter(item => item.code === 'view-model-environment-input')
+    .map(({line}) => line), [2, 3]);
+});

@@ -769,6 +769,10 @@ export async function inspect(project) {
         const code = isFeature ? 'view-stored-feature' : 'view-stored-model-dependency';
         findings.push(finding(code, 'review', `${view[1]} appears to store ${type} directly. Verify that Feature access goes through the screen-owned ViewModel.`, file, lineOf(source, start + index)));
       }
+      const environmentViewModel = /@(?:SwiftUI\s*\.\s*)?(?:Environment\s*\([^()]*\)|EnvironmentObject)\s+(?:(?:private|fileprivate|internal|package|public)\s+)?var\s+`?[\p{L}_][\p{L}\p{M}\p{N}_]*`?\s*:\s*(?:\w+\s*\.\s*)*(\w+ViewModel)\b(?!\s*\.)/gu;
+      for (const match of members.matchAll(environmentViewModel)) {
+        findings.push(finding('view-model-environment-input', 'review', `${view[1]} appears to receive ${match[1]} through the environment. Verify that the screen constructs and owns its own ViewModel.`, file, lineOf(source, start + match.index)));
+      }
       const viewModelInput = /(?:^|(?<=;))[ \t]*(?:@(?:SwiftUI\s*\.\s*)?(State|StateObject|ObservedObject|Bindable)\s+)?(?:(private|fileprivate|internal|package|public)\s+)?(?:(static)\s+)?(let|var)\s+`?[\p{L}_][\p{L}\p{M}\p{N}_]*`?\s*(?::\s*(?:\w+\s*\.\s*)*(\w+ViewModel)\b(?!\s*\.)(?:[ \t]*[?!])?|=\s*(?:\w+\s*\.\s*)*(\w+ViewModel)(?:\s*\.\s*init)?(?=\s*\())/gmu;
       for (const match of members.matchAll(viewModelInput)) {
         const [declaration, wrapper, access, typeStorage, binding, explicitType, inferredType] = match;
