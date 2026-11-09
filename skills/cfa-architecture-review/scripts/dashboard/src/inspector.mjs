@@ -7,7 +7,8 @@ const featureTypeSuffix = /Feature(?:API)?$/;
 
 function featurePropertyName(type) {
   const domain = type.replace(/Feature(?:API)?$/, '');
-  return domain ? `${domain[0].toLowerCase()}${domain.slice(1)}Feature` : null;
+  const lowerCamelDomain = domain.replace(/^[A-Z]+(?=[A-Z][a-z]|$)|^[A-Z]/, prefix => prefix.toLowerCase());
+  return domain ? `${lowerCamelDomain}Feature` : null;
 }
 
 function lineOf(source, index) {

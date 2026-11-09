@@ -456,3 +456,12 @@ test('does not treat a method-local Feature as a stored ViewModel dependency', a
   const findings = (await inspect(root)).findings;
   assert.ok(!findings.some(item => item.code === 'feature-reference-name'));
 });
+
+test('recognizes lower-camel-case Feature properties with leading acronyms', async t => {
+  const root = await fixture(t, {
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { let urlFeature: URLFeature; let apiAccessFeature: APIAccessFeature; let uRLImportFeature: URLImportFeature }'
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'feature-property-name');
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].message, /uRLImportFeature.*\(urlImportFeature\)/);
+});
