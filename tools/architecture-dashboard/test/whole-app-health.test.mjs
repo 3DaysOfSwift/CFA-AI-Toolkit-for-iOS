@@ -41,6 +41,8 @@ test('whole-app reviews require timing outcomes even if an old input disables th
   review.operations[0].scenarios=['repeat','leave','late-result','failure'].map(id=>({id,status:'not-applicable'}));
   assert.deepEqual(coverageGaps(report,review),[]);
   review.operations[0].scenarios[1].status='unresolved';
+  assert.equal(nextWork(report,review).pendingOperations,1);
+  assert.deepEqual(nextWork(report,review).nextOperations[0].missingTimingScenarios,['leave']);
   assert.match(coverageGaps(report,review).join(' '),/timing-scenario/);
 });
 

@@ -21,6 +21,12 @@ function pendingSourceFiles(report, review) {
     return status ? status === 'unassessed' || status === 'investigate' : !batched.has(path);
   }).map(file => file.path);
 }
+const hasOpenChecks = operation => !operation.checks?.length ||
+  operation.checks.some(check => ['unresolved', 'not-checked'].includes(check.status)) ||
+  Boolean(operation.unknowns?.length);
+const missingTimingScenarios = operation => ['repeat', 'leave', 'late-result', 'failure']
+  .filter(id => !operation.scenarios?.some(scenario => scenario.id === id && scenario.status !== 'unresolved'));
+
 // Describe the next concrete review work without treating inventory as evidence.
 export function nextWork(report, review, limit = 8) {
   const entries = new Set((review.entryPoints || []).map(item => item.siteId));
@@ -28,13 +34,21 @@ export function nextWork(report, review, limit = 8) {
   const pendingFiles = pendingSourceFiles(report, review);
   const pendingEntries = inventoryCandidates(report).filter(site => !entries.has(site.id));
   const pendingTasks = taskCandidates(report).filter(site => !tasks.has(site.id));
+  const pendingOperations = (review.operations || []).map(operation => ({
+    id: operation.id,
+    title: operation.title,
+    openChecks: hasOpenChecks(operation),
+    missingTimingScenarios: missingTimingScenarios(operation)
+  })).filter(operation => operation.openChecks || operation.missingTimingScenarios.length);
   return {
     pendingFiles: pendingFiles.length,
     pendingEntryPoints: pendingEntries.length,
     pendingTaskSites: pendingTasks.length,
+    pendingOperations: pendingOperations.length,
     nextFiles: pendingFiles.slice(0, limit),
     nextEntryPoints: pendingEntries.slice(0, limit),
     nextTaskSites: pendingTasks.slice(0, limit),
+    nextOperations: pendingOperations.slice(0, limit),
     gaps: coverageGaps(report, review)
   };
 }
@@ -79,10 +93,9 @@ export function coverageGaps(report, review) {
   const operations = review.operations || [];
   if (review.operationInventory?.coverage !== 'complete') gaps.push('The operation inventory has not been reconciled with the application entry points.');
   if (!operations.length) gaps.push('No application operations have been reviewed.');
-  const openOperations = operations.filter(op => !op.checks?.length || op.checks.some(c => ['unresolved','not-checked'].includes(c.status)) || op.unknowns?.length);
+  const openOperations = operations.filter(hasOpenChecks);
   if (openOperations.length) gaps.push(`${openOperations.length} operations have unresolved checks or boundaries.`);
-  const required = ['repeat','leave','late-result','failure'];
-  const incomplete = operations.filter(op => required.some(id => !op.scenarios?.some(s => s.id === id && s.status !== 'unresolved')));
+  const incomplete = operations.filter(op => missingTimingScenarios(op).length);
   if (incomplete.length) gaps.push(`${incomplete.length} operations need timing-scenario assessments.`);
   const entries = new Map();
   for (const entry of review.entryPoints || []) {
