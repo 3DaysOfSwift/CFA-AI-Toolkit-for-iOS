@@ -313,7 +313,9 @@ skill from that toolkit before changing the project.
 - Start remote refresh and optional cache restoration independently when both
   are needed. Publish current server data and complete the refresh for its
   callers without waiting for the cache write. A failed cache write leaves
-  fresh data visible and the refresh successful.
+  fresh data visible and the refresh successful. In a controlled test, hold
+  the cache write open and verify that the fresh data is visible and the
+  refresh caller has returned before releasing the write.
   Keep valid in-memory data if refresh fails, and prevent older restores from
   replacing fresher data from the same source. Let other independent sources
   restore their usable cached data. Bound cache-write retries, preserve the last usable

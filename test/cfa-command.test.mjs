@@ -126,6 +126,7 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /Deduplicate callbacks for the same opening event\. Keep separate\s+opening events distinct even when they point to the same destination/);
   assert.match(content, /route that bypasses the screen checks current\s+entitlement in its own caller/);
   assert.match(content, /same account can sign back in before old work finishes, check the\s+session identity/);
+  assert.match(content, /refresh caller has returned before releasing the write/);
   assert.match(content, /missing, incompatible or unreadable cache\s+supplies no restored data/);
   assert.match(content, /Instant Loading binary snapshots only\s+on request and for a sufficiently stable format with safe decoding/);
   assert.match(content, /Avoid\s+proposing binary snapshots during app creation or migration/);
