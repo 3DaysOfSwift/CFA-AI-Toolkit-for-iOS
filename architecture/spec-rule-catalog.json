@@ -47,7 +47,7 @@
       "section": "Give Every Unique Screen Its Own ViewModel",
       "applies": "Creating or reviewing a SwiftUI screen",
       "strength": "Required",
-      "rule": "A screen creates and retains its own private ViewModel in a property named `viewModel`. Do not pass or share ViewModels between Views.",
+      "rule": "A screen owns its dedicated `@State private var viewModel` and constructs it inline by default. A detail screen may initialise its own State-backed ViewModel from selected immutable value data in the View initializer. Do not pass or share ViewModels between Views.",
       "why": "Presentation state remains local to the screen.",
       "verify": "Inspect screen declarations, navigation destinations, previews and ViewModel construction.",
       "example": "NotesView declares its own private State-backed NotesViewModel.",

@@ -4,7 +4,7 @@
 
 **Strength:** Required.
 
-**Guidance:** A screen creates and retains its own private ViewModel in a property named `viewModel`. Do not pass or share ViewModels between Views.
+**Guidance:** A screen owns its dedicated `@State private var viewModel` and constructs it inline by default. A detail screen may initialise its own State-backed ViewModel from selected immutable value data in the View initializer. Do not pass or share ViewModels between Views.
 
 **Why:** Presentation state remains local to the screen.
 
