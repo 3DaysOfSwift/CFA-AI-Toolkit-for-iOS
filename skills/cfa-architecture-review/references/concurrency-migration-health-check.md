@@ -64,16 +64,21 @@ results in the report, rather than presenting scanner counts as findings.
 5. **Additional targets:** Assess whether existing business capabilities could be
    reused by another UI or extension. Inspect imports, target membership, platform
    availability, lifecycle, storage and process boundaries. A shared source folder
-   or singleton alone does not prove code compiles in a widget, watchOS or another
-   process. For an existing extension or companion app, trace how it obtains
-   fresh data in its own process. For a snapshot-backed widget, verify the write
-   completes before requesting a timeline reload and that a failed write issues
-   no reload request. For a Watch companion, trace the separate snapshot transfer
-   to the receiving Feature and verify how it updates its own observable state.
-   Check missing, unreadable, delayed and stale snapshots against the product's
-   policy. Report build and device evidence separately from source review.
-   For a proposed target, identify the code and dependencies that would need
-   adaptation.
+   or singleton alone does not establish target compatibility. For an existing
+   CFA widget or device target, apply the [multi-device rule](spec/rules/cfa-device-01.md).
+   Verify that each target includes the shared Model and only its own Views
+   and ViewModels. Trace each process's AppModel composition and confirm that
+   platform-specific dependencies leave business rules shared. Check a build
+   of every affected target and trace how each consumer obtains fresh data.
+   For an App Group widget snapshot, verify that the write completes before
+   the app requests a timeline reload and that a failed write issues no reload
+   request. WidgetKit controls reload timing. For a Watch companion, trace the
+   separate snapshot transfer to the receiving Feature and verify that it updates
+   its observable state. Check missing, unreadable, delayed and stale snapshots.
+   Where multiple targets can edit the same data, exercise the product's
+   conflict policy. Report source review, builds, controlled tests and
+   supported-device results separately. For a proposed target, identify the
+   code and dependencies that would need adaptation.
 6. **Actor design:** Identify actors' state, responsibilities, callers and
    isolation boundaries. Examine unnecessary hops, reentrancy and overlapping
    ownership where evidence warrants it. Neither an actor count nor similar names
