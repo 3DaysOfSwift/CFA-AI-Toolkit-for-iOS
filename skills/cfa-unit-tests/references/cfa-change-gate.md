@@ -335,8 +335,10 @@ do not claim that UI gating replaces server-side authorisation.
 - For changes to the pending deep-link flow, verify that invalid opening
   requests leave the pending list and its stored snapshot intact. Force the initial save to fail
   and verify that the failure is reported and the request is never presented as
-  saved. Verify that declining navigation leaves a saved request available
-  after restart. Exercise competing opens from two scenes and verify that
+  saved. Admit a request while restoration is suspended and verify that both
+  the restored and new requests survive restart. Verify that declining or
+  cancelling before navigation leaves a saved request available after restart.
+  Exercise competing opens from two scenes and verify that
   only one navigates. Race an open against dismissal of the same request and
   verify that the outcomes agree with the pending list and navigation state.
   Force a removal write to fail

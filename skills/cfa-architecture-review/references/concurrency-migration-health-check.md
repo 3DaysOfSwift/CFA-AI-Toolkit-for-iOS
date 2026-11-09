@@ -466,8 +466,11 @@ For each relevant operation, inspect:
 - Deep links and notification actions in CFA: apply the
   [pending destination rule](spec/rules/cfa-link-01.md) within the app's product
   scope. Trace the request from receipt through validation, durable admission
-  and scene navigation. Check a request arriving during restoration and two
-  scenes trying to open the same item. Verify refusal or cancellation before
+  and scene navigation. Invalid input should leave the pending list intact.
+  A failed initial save should report the error and leave the request out of
+  the pending list. Check that both saved and newly received requests survive
+  a restoration race and restart. Trace two scenes trying to open the same
+  item, and an open racing explicit dismissal. Verify refusal or cancellation before
   navigation preserves the request, and an opened destination counts as success
   independently of its content loading. If removal fails after navigation,
   trace a retry that saves the removal without opening the destination again.
