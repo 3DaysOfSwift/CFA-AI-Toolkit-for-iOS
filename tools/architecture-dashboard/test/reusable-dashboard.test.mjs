@@ -112,6 +112,7 @@ test('generic CLI imports reviewed ratings and test results without an example g
    const document={getElementById:node,querySelector:()=>node('nav'),querySelectorAll:()=>[],createElement:()=>node('created-'+id++)};
    vm.runInNewContext(html.match(/<script>([\s\S]*?)<\/script>/)[1],{document});
    assert.match(node('separation-gauge').innerHTML,/100%/);
+   assert.match(node('separation-gauge').afterChild.innerHTML, /Not verified against this source scan<\/p><details>/);
    assert.match(node('separation-gauge').afterChild.innerHTML,/9999 \/ 10000/);
    assert.match(node('separation-gauge').afterChild.innerHTML,/99\.9% passed/);
    assert.match(node('dashboard').innerHTML,/100 \/ 100/);
