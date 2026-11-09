@@ -5,9 +5,13 @@ import PlaygroundSupport
 PlaygroundPage.current.needsIndefiniteExecution = true
 
 // MARK: - CFA implementation
+protocol WeightSaving: Sendable {
+    func save(_ weight: Int) async throws
+}
+
 // Storage owns the saved data; the Feature owns the observable snapshot.
 // This actor represents the storage boundary, not a database implementation.
-actor WeightStorage {
+actor WeightStorage: WeightSaving {
     enum SaveError: Error { case invalidWeight }
     private var savedWeights: [Int] = []
 
@@ -21,13 +25,13 @@ actor WeightStorage {
 
 @MainActor @Observable
 final class WeightLogFeature {
-    @ObservationIgnored private let storage: WeightStorage
+    @ObservationIgnored private let storage: any WeightSaving
     @ObservationIgnored private var lastSave: Task<Bool, Never>?
     @ObservationIgnored private var lastSaveID: UUID?
     private(set) var weights: [Int] = []
     private(set) var saveError: String?
 
-    init(storage: WeightStorage) { self.storage = storage }
+    init(storage: any WeightSaving) { self.storage = storage }
 
     // Each save waits for the previous save, including a failed save.
     @discardableResult
