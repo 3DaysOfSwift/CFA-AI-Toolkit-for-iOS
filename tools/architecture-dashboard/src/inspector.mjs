@@ -133,7 +133,11 @@ export async function inspect(project) {
         findings.push(finding('feature-placement', 'review', `${property.type} is outside a named subfolder of ${featureFolder}. Verify the intended package and target placement before moving it.`, declarationFile, declaration.line));
       }
       const testName = `${property.type}Tests.swift`;
-      if (![...paths].some(file => file.split('/').includes('FeatureTests') && path.posix.basename(file) === testName)) {
+      const testCandidates = [...paths].filter(file => file.split('/').includes('FeatureTests') && path.posix.basename(file) === testName);
+      if (testCandidates.length > 1) {
+        findings.push(finding('feature-tests-ambiguous', 'review', `Multiple files match ${testName}: ${testCandidates.join(', ')}. Verify which test target covers this Feature.`, appModelFile, property.line));
+      }
+      if (!testCandidates.length) {
         findings.push(finding('feature-tests-missing', 'review', `No ${testName} was found under FeatureTests in the scanned directory. Check the project root and test target before concluding the test is missing.`, appModelFile, property.line));
       }
     }

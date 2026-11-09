@@ -480,3 +480,16 @@ test('does not choose a test file by basename when multiple targets have matches
   assert.ok(!report.findings.some(item => item.code === 'view-model-tests-missing'));
   assert.match(renderInspection(report), /multiple matching test files. Verify target/);
 });
+
+test('reports ambiguous Feature test filenames across targets', async t => {
+  const root = await fixture(t, {
+    'App/2 - AppModel/AppModel.swift': 'final class AppModel { let launchFeature: LaunchFeature }',
+    'App/2 - AppModel/Features/Launch/LaunchFeature.swift': 'final class LaunchFeature {}',
+    'PhoneTests/FeatureTests/LaunchFeatureTests.swift': 'struct LaunchFeatureTests {}',
+    'WatchTests/FeatureTests/LaunchFeatureTests.swift': 'struct LaunchFeatureTests {}'
+  });
+  const { findings } = await inspect(root);
+  const ambiguity = findings.find(item => item.code === 'feature-tests-ambiguous');
+  assert.match(ambiguity?.message, /PhoneTests.*WatchTests/);
+  assert.ok(!findings.some(item => item.code === 'feature-tests-missing'));
+});
