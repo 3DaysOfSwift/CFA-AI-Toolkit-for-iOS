@@ -704,13 +704,19 @@ export async function inspect(project) {
     const viewModel = viewModelDeclaration ? candidateViewModel : undefined;
     const viewModelBodyStart = viewModelDeclaration ? viewModelDeclaration.index + viewModelDeclaration[0].length : 0;
     const viewModelBody = viewModelDeclaration ? braceBody(viewModel, viewModelBodyStart - 1) : '';
-    for (const initializer of typeInitializers(viewModelBody)) {
-      inspectInitializerTask(viewModelName, initializer, viewModel, viewModelBodyStart, viewModelFile, findings);
-      const service = initializer.types.find(type =>
-        type === 'NetworkingManager' || type === 'SwiftDataManager' || type.endsWith('Repository')
-      );
-      if (service) {
-        findings.push(finding('view-model-non-feature-dependency', 'review', `${viewModelName} accepts ${service} in its initializer. Verify that the ViewModel calls a Feature and that the Feature owns the service dependency.`, viewModelFile, lineOf(viewModel, viewModelBodyStart + initializer.index)));
+    const dependencySources = viewModel ? [
+      {file: viewModelFile, source: viewModel, offset: viewModelBodyStart, body: viewModelBody},
+      ...(extensionsByName.get(viewModelName) ?? [])
+    ] : [];
+    for (const location of dependencySources) {
+      for (const initializer of typeInitializers(location.body)) {
+        inspectInitializerTask(viewModelName, initializer, location.source, location.offset, location.file, findings);
+        const service = initializer.types.find(type =>
+          type === 'NetworkingManager' || type === 'SwiftDataManager' || type.endsWith('Repository')
+        );
+        if (service) {
+          findings.push(finding('view-model-non-feature-dependency', 'review', `${viewModelName} accepts ${service} in its initializer. Verify that the ViewModel calls a Feature and that the Feature owns the service dependency.`, location.file, lineOf(location.source, location.offset + initializer.index)));
+        }
       }
     }
     const viewModelMembers = viewModelDeclaration
@@ -760,10 +766,6 @@ export async function inspect(project) {
       }
     }
     if (viewModel) {
-      const dependencySources = [
-        {file: viewModelFile, source: viewModel, offset: viewModelBodyStart, body: viewModelBody},
-        ...(extensionsByName.get(viewModelName) ?? [])
-      ];
       const references = dependencySources.flatMap(location =>
         [...location.body.matchAll(/\bAppModel\s*\.\s*shared\s*\.\s*(\w+)/g)]
           .map(match => ({property: match[1], file: location.file, line: lineOf(location.source, location.offset + match.index)}))
