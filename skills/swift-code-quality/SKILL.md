@@ -28,16 +28,16 @@ Identify, in plain language:
 4. Whether an existing type already owns the responsibility.
 5. Whether two types have the same properties and functions. If they represent the same information and behaviour without a meaningful enforced distinction, keep one type.
 
-For every new Feature, ViewModel, protocol, actor or persistence type, state one concrete ownership sentence: “This type owns …”. Do not create it if that sentence only says it forwards a call, groups files, or might be useful later.
+For every new Feature, ViewModel, protocol, actor or persistence type, state one concrete ownership sentence: “This type owns …”. A required architecture boundary counts as a responsibility. In other cases, forwarding a call, grouping files or possible future use is insufficient.
 
 ## Architecture and dependency rules
 
 - A feature owns a coherent capability and any authoritative application state associated with it. That state may be transient or durable; do not add persistence unless the product needs it. A feature does not exist merely to complete a CFA-shaped folder.
-- A ViewModel earns its existence by owning presentation state or an asynchronous/multi-step UI workflow. A pass-through ViewModel is a defect, not a pattern—unless the active architecture explicitly requires one dedicated ViewModel for every screen.
+- A ViewModel earns its existence by owning presentation state or an asynchronous/multi-step UI workflow. A pass-through ViewModel is a defect, not a pattern—unless the active architecture explicitly requires a dedicated presentation boundary, as CFA does for screen-level SwiftUI Views.
 - A protocol earns its existence only at a real substitution boundary—usually deterministic tests, multiple production implementations, or a public library contract.
 - An actor earns its existence through a concrete isolation or coordination requirement, such as protecting shared mutable state; it is not a generic “background work” marker.
 - Follow the active architecture's dependency route. In CFA, use the SwiftUI environment for app-wide presentation dependencies such as `ThemeManager`, not `AppModel` or Features. Other architectures may use the environment differently.
-- Keep dependency direction visible: View → optional ViewModel → feature → provider/storage. A View may call its feature directly for a trivial intent only when the active architecture permits it. CFA requires View → ViewModel → feature for every screen.
+- Keep dependency direction visible: View → optional ViewModel → feature → provider/storage. A View may call its feature directly for a trivial intent only when the active architecture permits it. CFA requires View → ViewModel → Feature for screen-level SwiftUI Views. During a UIKit migration, trace the existing presentation owner to its Features and preserve the agreed UI scope.
 - Name ViewModel methods for the work they perform, not for a UI gesture or lifecycle signal. Prefer `refresh()`, `save()` and `retry()` over `refreshTapped()`, `savePressed()` and `screenAppeared()`.
 
 ## Delivery gate
