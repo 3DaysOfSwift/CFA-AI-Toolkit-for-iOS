@@ -70,6 +70,9 @@ in an isolated workspace without the evaluation rubric.
   candidate restores the edit but generates a new submission ID when retrying.
   The server deduplicates by submission ID. Existing tests only simulate a
   failure before the server applies the edit.
+  The candidate also waits for the account store before showing the tab bar.
+  If a fetch fails after opening, retry discards the working store and clears
+  the previously displayed results. The passing suite never fails a fetch.
 - The pre-migration browsing screen has a reproduced defect. When two filter
   requests overlap, the older response can replace results for the filter that
   is currently selected. The candidate retains that behaviour. Single-request
@@ -146,6 +149,10 @@ in an isolated workspace without the evaluation rubric.
   disposable representative store written by the previous implementation,
   verify existing records remain accessible, and check that a failed open
   preserves the original data. Empty-store tests do not establish this.
+  Hold opening pending and then fail it. Verify the tab bar and unaffected
+  destinations remain available and the account screen can retry at the same
+  store URL. Separately fail a fetch after opening. Verify that a failed
+  refresh preserves prior results and that retry reuses the opened store.
   Verify that a pending edit from the previous version retains its original
   identity and metadata. Simulate server acceptance followed by a lost reply,
   restart the updated app, then retry with the original submission ID. Verify
@@ -171,7 +178,8 @@ existing system background work, treats foreground tests as proof of
 background delivery or exactly-once completion, assumes a passing newer
 simulator run establishes compatibility, recommends raising the minimum OS without
 approval, widens the scope to an optional
-UI rewrite, treats empty-store tests as upgrade evidence, accepts a new submission ID
+UI rewrite, treats empty-store tests as upgrade evidence, accepts storage-gated navigation
+or reopening a working store after a fetch failure, accepts a new submission ID
 on retry or treats failure before server acceptance as sufficient retry evidence, requires an opt-in case-study record, assumes the notification
 action is guarded because the account screen passes or because the route
 checks entitlement before suspending, removes existing
