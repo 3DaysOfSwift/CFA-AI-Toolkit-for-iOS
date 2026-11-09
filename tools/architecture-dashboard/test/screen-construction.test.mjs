@@ -225,6 +225,8 @@ for (const declaration of [
   '@State private var viewModel = HomeViewModel()',
   '@State private var viewModel: HomeViewModel = HomeViewModel()',
   '@State private var reminders = HomeViewModel()',
+  '@State private var `default` = HomeViewModel()',
+  '@State private var `viewModel`: HomeViewModel = .init()',
   '@State private var reminders: HomeViewModel = .init()',
   '@State private var reminders: MyApp.HomeViewModel = MyApp.HomeViewModel()',
   '@SwiftUI.State private var viewModel = HomeViewModel()',
@@ -239,7 +241,7 @@ for (const declaration of [
     assert.equal(report.screens[0].ownsViewModel, true);
     assert.deepEqual(findings, []);
     const naming = report.findings.find(item => item.code === 'view-model-property-name');
-    if (declaration.includes('reminders')) {
+    if (/reminders|`default`/.test(declaration)) {
       assert.equal(naming?.severity, 'warning');
       assert.equal(naming?.file, viewPath);
       assert.equal(naming?.line, 2);
