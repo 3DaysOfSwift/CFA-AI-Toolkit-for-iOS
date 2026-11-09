@@ -329,7 +329,7 @@
       "strength": "Required",
       "rule": "Give each ViewModel its own named test file and suite under View model tests. Give each concrete Feature a named API test file under FeatureTests. Test observable behaviour with isolated dependencies and keep AppModel tests separate from the production shared instance. Await Feature commands directly. Verify that equivalent requests share an outcome and separately admitted commands complete in order with individual outcomes. Cover cancellation, stale results and failure recovery where they affect correctness.",
       "why": "Tests establish behaviour rather than reproduce implementation details.",
-      "verify": "Run relevant tests and builds. Use controlled dependencies to verify ordering and outcomes across suspension. Record any checks that could not run.",
+      "verify": "Verify that test files belong to the intended unit-test target, then run the relevant tests and builds. Use deterministic clocks and controllable dependencies to hold work at suspension points. Verify ordering, cancellation cleanup and successful retry where applicable. Record which checks ran and which could not run.",
       "example": "A Feature test injects a failing storage dependency and verifies that the saved value stays unchanged.",
       "explanationIds": [
         "behavioural-testing"

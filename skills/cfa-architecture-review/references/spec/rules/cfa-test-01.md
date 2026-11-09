@@ -12,6 +12,6 @@
 
 **Explanation:** [Why use behavioural tests in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/behavioural-testing).
 
-**Verify:** Run relevant tests and builds. Use controlled dependencies to verify ordering and outcomes across suspension. Record any checks that could not run.
+**Verify:** Verify that test files belong to the intended unit-test target, then run the relevant tests and builds. Use deterministic clocks and controllable dependencies to hold work at suspension points. Verify ordering, cancellation cleanup and successful retry where applicable. Record which checks ran and which could not run.
 
 **Full rule, context and examples:** [Test the Same Boundaries the Architecture Advertises](../topics/26-test-the-same-boundaries-the-architecture-advertises.md). This card is a reading aid; apply the complete canonical section.
