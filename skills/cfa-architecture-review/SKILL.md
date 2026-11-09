@@ -91,6 +91,15 @@ access and the [persistence rules](references/spec/topics/19-keep-persistence-be
 to SwiftData access. A manager declaration identifies a candidate boundary.
 Confirm that the relevant requests actually go through it.
 
+For a suspected startup storage gate, apply the
+[database availability rule](references/spec/rules/cfa-launch-02.md). Trace
+from AppModel construction and root presentation to the first store-opening
+request. Check whether slow or failed opening can hide the root, block
+unaffected navigation, or move the error out of its owning Feature. Use
+existing runtime evidence or exercise a safe failure path within the agreed
+review scope. A mock fetch can verify Feature recovery, while a real
+store-opening and navigation check is needed to establish the launch outcome.
+
 For a dashboard or detailed concurrency analysis, read the [dashboard workflow](references/dashboard-workflow.md). The bundled tool is at `scripts/dashboard/src/cli.mjs` relative to this skill; it requires Node.js 20+. It inventories source patterns, not semantic correctness. Only use its concurrency dashboard when the selected scope contains Swift Concurrency. If the app uses only GCD, continue a manual ownership and concurrency review; mark the dashboard unavailable rather than refusing the review or inventing zero scores.
 
 A focused CFA review does not require an app-wide dashboard or numerical ratings. A requested full dashboard requires the complete source-evidence workflow. Do not infer testing evidence from source inspection or claim race freedom from a score.
