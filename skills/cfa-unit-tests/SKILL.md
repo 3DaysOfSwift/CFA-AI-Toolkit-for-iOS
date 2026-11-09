@@ -64,6 +64,14 @@ execute in admission order and receive their own outcomes, even when their input
 match. Cover cancellation, cleanup
 and later work after failure without losing or indefinitely suspending waiters.
 
+For durable edits, hold the write open and verify that confirmed state stays
+unchanged until it succeeds. On failure, assert that the editor keeps its
+draft and can retry. For optional download caches, independently control disk
+and network completion. Verify that a slow restore leaves refresh free to
+start, a late restore cannot replace fresh data, and a pending or failed cache
+write leaves the refresh result usable. Check that a failed refresh retains
+valid data and that delayed cache writes cannot replace a newer snapshot.
+
 Build AppModel tests from an isolated dependency graph. Do not call production
 `AppModel.shared` from a unit test. Give each production ViewModel a matching
 test file and test what its View can observe: loading/ready/error states,
