@@ -238,6 +238,11 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
     });
     await fs.writeFile(reviewPath,JSON.stringify(generalProblem));
     await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/Include confirmed source problems.*Confirmed issue/);
+    const invalidStatus = structuredClone(generalProblem);
+    invalidStatus.findings[0].status = 'Problem';
+    await fs.writeFile(reviewPath,JSON.stringify(invalidStatus));
+    await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/Whole-app finding status must be pass, concern or problem.*Confirmed issue/);
+    await assert.rejects(fs.access(output));
     generalProblem.presentation.criteria.push({
       title:'Confirmed issue',detail:'A late result can replace current state.',status:'problem',
       evidence:[{file:'Value.swift',line:1,endLine:1}]

@@ -233,6 +233,11 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
       throw Error('Each whole-app presentation criterion needs source evidence as file and line references.');
     }
   }
+  for (const finding of review.findings || []) {
+    if (!['pass', 'concern', 'problem'].includes(finding.status)) {
+      throw Error('Whole-app finding status must be pass, concern or problem: ' + finding.title);
+    }
+  }
   const sourceProblems = [
     ...(review.findings || []), ...(review.fileReviews || []), ...(review.typeReviews || [])
   ].filter(item => item.status === 'problem').flatMap(item => item.issues?.length ? item.issues : [item]);
