@@ -6,7 +6,12 @@ A MainActor ObservableObject publishes changes with Combine.
 
 ## Behaviour to preserve
 
-Both models record the first two completed days through separate calls. The Combine subscription notifies twice, while the first Observation registration notifies once. The migrated check then reads the latest value during re-registration and verifies that a third change notifies the new observer.
+Both models record two completed days and expose a count of two. This is the
+state behaviour the migration preserves. The legacy Combine subscription
+notifies twice. The migrated example's first tracking registration notifies
+once, then re-registering reads the current count and tracks a later change.
+This example preserves the count and the ability to observe current state.
+It does not preserve a notification for every mutation.
 
 ## Migration
 
@@ -27,4 +32,6 @@ Feature that records durable completions publishes the updated count after
 the required save succeeds. In an app, the View observes the Feature’s state
 through its screen ViewModel. The re-registration demonstrates reading the
 latest state. If an existing subscriber must process every completion event,
-preserve and verify that delivery contract separately.
+keep an event API that delivers every required occurrence. Test consecutive
+equal-valued events, ordering and cancellation separately from the final
+count displayed on screen.
