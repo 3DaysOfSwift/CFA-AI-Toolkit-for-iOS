@@ -159,8 +159,11 @@ the architecture:
     after success clear affected state and prevent old requests from republishing
     it. Check the current account or session generation before publishing an
     in-flight result, including when a request has been cancelled. Reconcile
-    partial authentication outcomes and handle cleanup failures
-    honestly; preserve user-owned or unsynchronised work according to the product.
+    partial authentication outcomes and handle cleanup failures honestly.
+    If sign-out promises a fresh-install experience, clear account-specific
+    in-memory state, caches and local files after successful sign-out. Preserve
+    independent purchases and user-owned documents, and handle unsynchronised
+    work according to the product contract.
 21. New-app visual starting points live in [new-app design defaults](new-app-design-defaults.md).
     Use them only where appropriate to the recorded workflow and current request;
     user-approved designs override defaults. Do not require palette counts or
