@@ -249,11 +249,19 @@ actor HeldNotesLoad: NotesRepository {
         await corruptEditor.load()
         precondition(corruptEditor.loadError != nil && corruptFeature.notes.isEmpty)
 
+        let savingEditor = NotesEditorViewModel(notesFeature: corruptFeature)
+        await savingEditor.load()
+        precondition(savingEditor.loadError != nil)
+        savingEditor.text = "Save after restoration"
+
         // Restore the known good file, then retry through the same screen and Feature.
         try JSONEncoder().encode(afterOverlap).write(to: url, options: .atomic)
         await corruptEditor.retryLoad().value
         precondition(corruptEditor.loadError == nil && corruptFeature.notes == afterOverlap)
         precondition(corruptEditor.text == "Keep this draft")
+        let recoveredSave = await savingEditor.save().value
+        precondition(recoveredSave && savingEditor.loadError == nil)
+        precondition(corruptFeature.notes.map(\.text) == afterOverlap.map(\.text) + ["Save after restoration"])
         // Fixed JSON represents an existing store independently of today's encoder.
         let existingStore = folder.appendingPathComponent("existing-notes.json")
         let existingJSON = #"[{"id":"00000000-0000-0000-0000-000000000001","text":"Existing note"}]"#

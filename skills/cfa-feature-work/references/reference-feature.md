@@ -201,6 +201,8 @@ final class NotesEditorViewModel {
             defer { self?.isSaving = false; self?.saveTask = nil }
             do {
                 try await notesFeature.save(submittedText)
+                // Saving also confirms that initial restoration succeeded.
+                self?.loadError = nil
                 if let self, text == submittedText {
                     text = ""
                 }
