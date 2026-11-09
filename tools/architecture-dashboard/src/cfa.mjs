@@ -201,6 +201,14 @@ skill from that toolkit before changing the project.
   supplies no restored data. Help apply Instant Loading binary snapshots only
   on request and for a sufficiently stable format with safe decoding. Avoid
   proposing binary snapshots during app creation or migration.
+- Add offline editing or cross-device sync when the product needs it. Choose
+  SwiftData with CloudKit or iCloud documents only when suitable for the data
+  and targets. Keep live SwiftData stores out of iCloud Drive. For a custom
+  server, follow its sync contract. Save each offline edit and its pending-sync
+  metadata together before reporting local success. Report server confirmation
+  separately. Verify recovery after failed sync and restart, duplicate-safe
+  retries, and the agreed conflict and rejection outcomes. Verify Apple-managed
+  sync and conflicting offline edits on supported devices when applicable.
 - App.body installs a stable root View and presentation modifiers only. Keep
   startup conditionals, database loading and feature error UI out of App and
   out of the root navigation View; feature screens present their own state.
