@@ -56,6 +56,11 @@ repeat while actionable deviations remain. Before calling the scoped migration
 complete, satisfy the [migration completion gate](cfa-change-gate.md#migration-progress-and-completion-language).
 The final source audit supplies evidence for that gate. The completion record
 also requires manual behaviour regression and a human architecture review.
+Compare the final app with the pre-migration baseline for each affected
+capability. Verify meaningful interactions and access to existing saved data.
+Separate confirmed defects corrected within scope from material differences
+caused by required platform or API changes. Explain those differences in the
+handoff and cite the regression evidence for preserved behaviour.
 Retain failed regression evidence. If runs disagree, compare their target,
 build configuration and OS, then verify the affected scenario on the
 configuration where it failed at the final commit. If an actual dependency, incompatible requirement or unavailable verification blocks

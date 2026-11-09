@@ -407,7 +407,11 @@ identifies all of the following:
   its effect on the conformance verdict. An applicable requirement with missing
   evidence remains unverified and keeps this checkpoint open;
 - passing builds for each affected target, plus relevant automated tests
-  and manual behaviour regression, all tied to the final commit. Include
+  and manual behaviour regression, all tied to the final commit. Compare
+  affected capabilities, meaningful interactions and access to existing saved
+  data with the pre-migration baseline. Record confirmed defects fixed in
+  scope and material differences introduced by required platform or API changes.
+  Include
   existing extension or device targets that consume changed shared code.
   Verify any affected data handoff separately from the build. If a relevant
   regression check fails, retain its evidence and reconcile differences in
