@@ -9,7 +9,9 @@ export function assess(criteria) {
   for (const c of criteria) {
     if (!c.title || !c.detail || !Object.hasOwn(weights, c.status)) throw Error('Each criterion needs a title, detail and a pass, concern or problem status.');
   }
-  return Math.round(criteria.reduce((sum, c) => sum + weights[c.status], 0) * 100 / criteria.length);
+  const points = criteria.reduce((sum, criterion) => sum + weights[criterion.status], 0);
+  if (points === criteria.length) return 100;
+  return Math.min(99, Math.round(points * 100 / criteria.length));
 }
 export function renderHealthReport(data, iconData = '') {
   if (!data.app || !data.summary || !data.verdict?.trim() || !data.scope || !data.conclusion) throw Error('Provide an app name, summary, substantive verdict, scope and conclusion.');

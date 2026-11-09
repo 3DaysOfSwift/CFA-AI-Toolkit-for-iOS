@@ -4,6 +4,8 @@ import {assess, renderHealthReport} from '../src/health-report.mjs';
 
 test('scores reviewed criteria and rejects unassessed or empty input', () => {
   assert.equal(assess([{title:'A', detail:'Evidence', status:'pass'}, {title:'B', detail:'Evidence', status:'concern'}]), 75);
+  const passes = Array.from({length: 99}, () => ({title:'Pass', detail:'Evidence', status:'pass'}));
+  assert.equal(assess([...passes, {title:'Concern', detail:'Evidence', status:'concern'}]), 99);
   assert.throws(() => assess([]));
   assert.throws(() => assess([{title:'A', detail:'Evidence', status:'unknown'}]));
 });
