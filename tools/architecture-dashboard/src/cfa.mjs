@@ -193,6 +193,11 @@ skill from that toolkit before changing the project.
   opening failures follow that request through Feature, ViewModel and screen,
   never an app-level launch error. Retry the request without discarding data.
   Verify initial open failure leaves the root and independent navigation usable.
+- During migration, preserve business behaviour, user-facing capabilities,
+  stored data and meaningful interactions. Limit implementation changes to
+  the agreed CFA and Swift Concurrency migration and supported platforms.
+  Fix confirmed defects within scope, protect the intended behaviour with
+  tests, and record any necessary platform-driven differences.
 - Do not call an app CFA merely because it has numbered folders. Trace real
   ownership, AppModel composition, and the focused tests for the changed work.
 

@@ -361,7 +361,9 @@ error delivery and the rule that an old request must not overwrite a new result.
 
 The Legacy GCD migration skill first records that existing behaviour. It then
 migrates the agreed scope to CFA and Swift Concurrency with clear feature
-boundaries. Before handoff, it checks file placement and target membership,
+boundaries. It preserves user-facing capabilities, stored data and meaningful
+interactions. It fixes confirmed defects within scope and records any necessary
+platform-driven differences. Before handoff, it checks file placement and target membership,
 reviews any remaining legacy mechanisms, and corrects issues within the agreed
 scope. Completion requires builds, tests and manual behaviour checks at the
 final revision, plus a human review of the resulting project structure. See the
