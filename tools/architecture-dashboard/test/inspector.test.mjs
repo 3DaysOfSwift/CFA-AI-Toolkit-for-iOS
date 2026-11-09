@@ -633,6 +633,7 @@ test('flags SwiftData without a manager and direct URLSession calls', async t =>
   assert.ok(codes.includes('direct-url-session'));
   assert.equal(findings.find(item => item.code === 'swiftdata-manager-missing').severity, 'review');
   assert.equal(findings.find(item => item.code === 'direct-url-session').severity, 'review');
+  assert.match(findings.find(item => item.code === 'direct-url-session').message, /Verify the receiver type and production target membership/);
 });
 
 test('a SwiftData import in tests is a target-membership review, not an app defect', async t => {
@@ -874,6 +875,7 @@ test('recognizes storage and networking declarations independently of filenames'
   const {findings} = await inspect(root);
   assert.ok(!findings.some(item => item.code === 'swiftdata-manager-missing'));
   assert.deepEqual(findings.filter(item => item.code === 'direct-url-session').map(({file, line}) => [file, line]), [['Client.swift', 1], ['NetworkingManager.swift', 2]]);
+  assert.match(findings.find(item => item.code === 'direct-url-session' && item.file === 'Client.swift')?.message, /configures a session for injection/);
 });
 
 test('reviews direct Feature access in reusable Views outside screen folders', async t => {

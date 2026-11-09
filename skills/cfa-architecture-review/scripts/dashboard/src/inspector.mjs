@@ -393,7 +393,10 @@ export async function inspect(project) {
       .find(match => (match[1] || sessionNames.has(match[2])) && outsideManager(match));
     const directAccess = directRequest ?? [...source.matchAll(/\bURLSession\s*[.(]/g)].find(outsideManager);
     if (directAccess) {
-      findings.push(finding('direct-url-session', 'review', 'URLSession appears outside NetworkingManager. Check whether this is a production network request that should use a NetworkingManager; shared configuration or instances are needed only when appropriate.', file, lineOf(source, directAccess.index)));
+      const message = directRequest
+        ? 'Possible URLSession request outside NetworkingManager. Verify the receiver type and production target membership before reporting a bypass.'
+        : 'URLSession is referenced outside NetworkingManager. Trace whether the reference configures a session for injection or leads to a production request that bypasses the manager.';
+      findings.push(finding('direct-url-session', 'review', message, file, lineOf(source, directAccess.index)));
     }
   }
   // Independent work may be scheduled here. Review only closures that
