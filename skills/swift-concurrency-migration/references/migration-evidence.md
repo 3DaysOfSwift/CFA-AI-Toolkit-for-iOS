@@ -68,9 +68,11 @@ recorded commands. A valid draft is not a reviewed lesson.
   the human-readable case study. Do not assign another person's name as reviewer
   or claim approval without their actual review. Record permitted reviewer
   attribution; validation cannot authenticate identity or factual correctness.
-- `reviewed` means examined; `approved` means explicitly accepted for potential
-  use as a precedent. Failed or partial migrations can teach useful lessons:
-  approval does not mean success. Approval is not permission to publish.
+- `reviewed` means examined. `approved` records explicit acceptance for the
+  stated use. A failed or partial case can document lessons or serve as a
+  negative example. Keep failed pilots out of successful migration precedents
+  and use the CFA change gate before calling a migration complete. Approval
+  alone does not grant permission to publish.
 - After reviewing, set status, reviewer, date, review notes, use decision and
   privacy state, then obtain the `digest` and put it in `review.digest`. The
   fingerprint binds all record fields except that fingerprint itself, plus the
