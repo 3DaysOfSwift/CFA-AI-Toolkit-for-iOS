@@ -274,6 +274,8 @@ from precedent use; do not reframe it as a completed partial migration.
 - For a shared refresh that should survive navigation, verify that it completes
   and keeps its result when its only screen waiter leaves. Also verify that
   cancelling one of several waiters leaves the other callers able to finish.
+  When a waiter must exit promptly, cancel it while the shared refresh is
+  suspended and verify that it returns before the refresh finishes.
 - Trace every affected screen to its ViewModel and required AppModel Features.
   Do not require a distinct Feature per tab or screen. Require named tests for
   each actual Feature; test shared data across screens without duplicating owners.

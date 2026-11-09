@@ -74,6 +74,12 @@ show the expected purchase or locked experience where applicable and never
 invoke the paid operation. Verify that entitled callers can proceed. Verify
 server-side authorisation separately for server-protected operations.
 
+For shared refreshes that should survive navigation, suspend the refresh and
+cancel its only screen waiter. Verify that the Feature still completes and
+retains the result. Test that cancelling one of several waiters leaves the
+others able to finish. If a cancelled waiter must exit promptly, verify that
+it returns before releasing the suspended refresh.
+
 For detail screens that keep a selected snapshot, construct two independent
 ViewModels with different snapshots and a shared Feature. Change the source
 list, including omitting a selected item, and verify each ViewModel retains
