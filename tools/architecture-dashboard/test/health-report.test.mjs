@@ -107,6 +107,20 @@ test('requires a visible finding for confirmed operation problems', () => {
   assert.match(renderHealthReport(data), /Problems to address/);
 });
 
+test('retains open questions and resolution steps in report previews', () => {
+  const html = renderHealthReport({
+    app:'App', summary:'Summary', verdict:'Clear ownership', scope:'App',
+    conclusion:'Conclusion', criteria:[{title:'Ownership', detail:'Checked', status:'pass'}],
+    operations:[{title:'Refresh', checks:[{
+      status:'unresolved', dimension:'correctness', title:'Cancellation',
+      reason:'A callback crosses the task boundary.', question:'Can <callback> arrive late?',
+      resolveBy:'Hold the callback open and cancel the caller.', verification:'Source inspection'
+    }]}]
+  });
+  assert.match(html, /Open question:<\/strong> Can &lt;callback&gt; arrive late\?/);
+  assert.match(html, /How to resolve:<\/strong> Hold the callback open and cancel the caller/);
+});
+
 test('preserves an operation-level defect even with unresolved evidence', () => {
   const data = {
     app:'App', summary:'Summary', verdict:'Needs attention', scope:'App', conclusion:'Conclusion',

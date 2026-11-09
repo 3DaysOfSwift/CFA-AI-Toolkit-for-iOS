@@ -88,7 +88,11 @@ export function renderHealthReport(data, iconData = '') {
     const rows = items => items.map(item => {
       const classification = item.status === 'problem' ? 'Timing defect'
         : item.status === 'fail' ? problemLabel(item.problemKind) : '';
-      return `<div class="behaviour-row"><strong>${labels[item.status] || '?'} ${escape(item.title)}</strong>${classification ? `<p>${classification}</p>` : ''}<p>${escape(item.reason || item.outcome)}</p>${item.consequence ? `<p><strong>Consequence:</strong> ${escape(item.consequence)}</p>` : ''}<p class="evidence">${escape(item.verification)}</p>${sourceLinks(item.evidence)}</div>`;
+      const question = item.status === 'unresolved' && item.question
+        ? `<p><strong>Open question:</strong> ${escape(item.question)}</p>` : '';
+      const resolution = item.status === 'unresolved' && item.resolveBy
+        ? `<p><strong>How to resolve:</strong> ${escape(item.resolveBy)}</p>` : '';
+      return `<div class="behaviour-row"><strong>${labels[item.status] || '?'} ${escape(item.title)}</strong>${classification ? `<p>${classification}</p>` : ''}<p>${escape(item.reason || item.outcome)}</p>${question}${resolution}${item.consequence ? `<p><strong>Consequence:</strong> ${escape(item.consequence)}</p>` : ''}<p class="evidence">${escape(item.verification)}</p>${sourceLinks(item.evidence)}</div>`;
     }).join('');
     const behaviourChecks = checks.filter(check => check.dimension !== 'cfa');
     const cfaChecks = checks.filter(check => check.dimension === 'cfa');
