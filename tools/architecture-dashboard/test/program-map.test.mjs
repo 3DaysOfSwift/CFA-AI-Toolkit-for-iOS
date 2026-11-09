@@ -16,7 +16,8 @@ test('joins calls by symbol identity and bounds cycles', () => {
     {file: 'App.swift', line: 1, column: 7, caller: 'application(_:didFinishLaunchingWithOptions:)', callerID: 'delegate', callee: 'start()', calleeID: 'one'},
     {file: 'Feature.swift', line: 2, caller: 'start()', callerID: 'one', callee: 'start()', calleeID: 'two'},
     {file: 'Other.swift', line: 3, caller: 'start()', callerID: 'two', callee: 'start()', calleeID: 'one'},
-    {file: 'App.swift', line: 1, column: 22, caller: 'application(_:didFinishLaunchingWithOptions:)', callerID: 'delegate', callee: 'scheduleRefresh()', calleeID: 'leaf'}
+    {file: 'App.swift', line: 1, column: 22, caller: 'application(_:didFinishLaunchingWithOptions:)', callerID: 'delegate', callee: 'scheduleRefresh()', calleeID: 'leaf'},
+    {file: 'Analytics.swift', line: 4, column: 8, caller: 'record(didFinishLaunchingWithOptions:)', callerID: 'analytics', callee: 'log()', calleeID: 'log'}
   ];
   const tree = launchTree(calls);
   assert.equal(tree.length, 1);

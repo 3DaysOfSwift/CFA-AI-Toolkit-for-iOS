@@ -38,7 +38,7 @@ export function launchTree(calls, maxDepth = 5) {
     if (!byCaller.has(call.callerID)) byCaller.set(call.callerID, []);
     byCaller.get(call.callerID).push(call);
   }
-  const roots = [...byCaller.entries()].filter(([, list]) => /didFinishLaunchingWithOptions/.test(list[0].caller || ''));
+  const roots = [...byCaller.entries()].filter(([, list]) => list[0].caller === 'application(_:didFinishLaunchingWithOptions:)');
   function children(id, seen, depth) {
     if (seen.has(id) || depth >= maxDepth) return [];
     const nextSeen = new Set([...seen, id]);
