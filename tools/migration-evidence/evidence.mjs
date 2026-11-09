@@ -216,9 +216,12 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
         const item = record.evidence.find(candidate => candidate.id === gate[field]);
         if (!item || !kinds.includes(item.kind) || item.phase !== 'after' || item.outcome !== 'passed' || item.commit !== record.repository.afterCommit) {
           errors.push(`completionGate.${field}: requires passed after evidence at afterCommit with kind ${kinds.join(' or ')}`);
-        } else if (field === 'manualBehaviourRegressionEvidenceId' &&
-                   !item.targets?.some(target => gate.affectedTargets.includes(target))) {
-          warnings.push(`evidence.${item.id}: the regression names no affected target. Record the targets exercised by the manual regression.`);
+        } else if (field === 'manualBehaviourRegressionEvidenceId') {
+          if (!item.targets?.length) {
+            warnings.push(`evidence.${item.id}: list the affected targets exercised by the manual regression.`);
+          } else if (!item.targets.some(target => gate.affectedTargets.includes(target))) {
+            errors.push(`completionGate.${field}: ${item.id} names only unrelated targets.`);
+          }
         } else if (field === 'deploymentCompatibilityEvidenceId') {
           const missing = gate.affectedTargets.filter(target => !item.targets?.includes(target));
           if (missing.length) {

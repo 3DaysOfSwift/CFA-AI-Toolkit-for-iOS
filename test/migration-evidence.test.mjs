@@ -280,13 +280,13 @@ test('completion is not inferred from a build pass or tests at a different commi
   f.record.completionGate.manualBehaviourRegressionEvidenceId = rerun.id;
   rerun.targets = ['Unrelated'];
   f.write();
-  assert.ok(inspectRecord(f.file).warnings.some(warning =>
-    warning.includes('evidence.after-behaviour-regression: the regression names no affected target')
+  assert.ok(inspectRecord(f.file).errors.some(error =>
+    error.includes('completionGate.manualBehaviourRegressionEvidenceId: after-behaviour-regression names only unrelated targets')
   ));
   rerun.targets = ['App', 'Widget'];
   f.seal();
   assert.equal(inspectRecord(f.file).valid, true);
-  assert.ok(!inspectRecord(f.file).warnings.some(warning => warning.includes('the regression names no affected target')));
+  assert.ok(!inspectRecord(f.file).warnings.some(warning => warning.includes('list the affected targets exercised by the manual regression')));
   assert.ok(inspectRecord(f.file).warnings.some(warning =>
     warning.includes('evidence.failed-regression: failed at the final commit')
   ));
