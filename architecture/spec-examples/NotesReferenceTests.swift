@@ -13,7 +13,7 @@ actor ControlledNotes: NotesRepository {
     func load() async throws -> [Note] { [] }
     func save(_ note: Note) async throws {
         if note.text == "fail" { throw CocoaError(.fileWriteNoPermission) }
-        if note.text == "first" || note.text == "fail after wait" {
+        if !started && (note.text == "first" || note.text == "fail after wait") {
             started = true
             firstStarted?.resume(); firstStarted = nil
             await withCheckedContinuation { releaseFirst = $0 }
@@ -92,6 +92,23 @@ actor RetryableNotes: NotesRepository {
         let saved = await repository.saved
         precondition(saved == ["retry", "first", "second", "second"])
         precondition(feature.notes.map(\.text) == saved)
+
+        let repeatedTapRepository = ControlledNotes()
+        let repeatedTapFeature = NotesFeature(repository: repeatedTapRepository)
+        let repeatedTapEditor = NotesEditorViewModel(notesFeature: repeatedTapFeature)
+        repeatedTapEditor.text = "first"
+        var dismissals = 0
+        let firstTap = repeatedTapEditor.save { dismissals += 1 }
+        await repeatedTapRepository.waitForFirst()
+        let secondTap = repeatedTapEditor.save { dismissals += 1 }
+        precondition(repeatedTapEditor.isSaving && repeatedTapFeature.notes.isEmpty)
+        await repeatedTapRepository.release()
+        let firstTapSucceeded = await firstTap.value
+        let secondTapSucceeded = await secondTap.value
+        let savedFromTaps = await repeatedTapRepository.saved
+        precondition(firstTapSucceeded && secondTapSucceeded)
+        precondition(savedFromTaps == ["first"] && dismissals == 1)
+        precondition(!repeatedTapEditor.isSaving)
 
         let failingRepository = ControlledNotes()
         let failingFeature = NotesFeature(repository: failingRepository)
