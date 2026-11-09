@@ -37,9 +37,13 @@ const hasOpenChecks = operation => !operation.checks?.length ||
   Boolean(operation.unknowns?.length) ||
   Boolean(operation.steps?.some(step => step.relation === 'unknown'));
 
-function hasTaskTrace(operation, site) {
+function hasTaskTrace(operation, site, sites) {
+  const sharesLine = sites.some(other =>
+    other.id !== site.id && other.file === site.file && other.line === site.line
+  );
   return operation?.steps?.some(step =>
-    step.relation !== 'event' && step.relation !== 'unknown' && step.evidence?.some(ref =>
+    step.relation !== 'event' && step.relation !== 'unknown' &&
+    (step.taskSiteId === undefined ? !sharesLine : step.taskSiteId === site.id) && step.evidence?.some(ref =>
       ref.file === site.file && ref.line <= site.line && ref.endLine >= site.line
     )
   );
@@ -62,9 +66,10 @@ export function nextWork(report, review, limit = 8) {
   const pendingFiles = pendingSourceFiles(report, review);
   const pendingTypes = pendingTypeReviews(review);
   const pendingEntries = inventoryCandidates(report).filter(site => !entries.has(site.id));
-  const pendingTasks = taskCandidates(report).filter(site => {
+  const sites = taskCandidates(report);
+  const pendingTasks = sites.filter(site => {
     const entry = tasks.get(site.id);
-    return !entry || (entry.operationId && !hasTaskTrace(operations.get(entry.operationId), site));
+    return !entry || (entry.operationId && !hasTaskTrace(operations.get(entry.operationId), site, sites));
   });
   const pendingOperations = (review.operations || []).map(operation => ({
     id: operation.id,
@@ -207,7 +212,7 @@ export function coverageGaps(report, review) {
       const op=operations.find(item=>item.id===entry.operationId);
       if (!op) throw Error(`Task site references an unknown operation: ${entry.operationId} → ${site.file}:${site.line}:${site.column}.`);
       if (!op.evidence.some(ref => ref.file === site.file && ref.line <= site.line && ref.endLine >= site.line)) throw Error(`Operation evidence must include its reconciled task site: ${op.id} → ${site.file}:${site.line}:${site.column}.`);
-      if (!hasTaskTrace(op, site)) untracedTasks.push(`${site.file}:${site.line}:${site.column} (${op.id})`);
+      if (!hasTaskTrace(op, site, tasks)) untracedTasks.push(`${site.file}:${site.line}:${site.column} (${op.id})`);
     }
     taskEntries.set(entry.siteId,entry);
   }

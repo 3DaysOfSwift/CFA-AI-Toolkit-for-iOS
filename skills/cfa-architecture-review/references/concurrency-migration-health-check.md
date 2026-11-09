@@ -201,7 +201,9 @@ actual target membership before confirming that they contain only test sources. 
 specific `excludedReason`. The matching operation evidence must include the
 entry point. Reconcile every entry in `task-map.json` in `taskSites` using the
 same `siteId` / `operationId` or `excludedReason` structure; operation evidence
-must include the associated task site. Add a `presentation` object with app, summary, verdict, conclusion and
+must include the associated task site. If multiple task sites share a source
+line, give each corresponding workflow step its exact `taskSiteId` from the
+task map as well as a source range. Add a `presentation` object with app, summary, verdict, conclusion and
 criteria for the concise report. Each criterion needs title, detail, status
 (`pass`, `concern`, `problem`) and an `evidence` array of
 `{file, line, endLine}` source ranges. Cite the code that supports the claim,

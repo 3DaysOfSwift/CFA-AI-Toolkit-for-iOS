@@ -128,6 +128,17 @@ test('reconciled task sites must be cited in a workflow step', () => {
   review.operations[0].steps.push({id:'load',parentId:'trigger',relation:'unstructured-task',evidence});
   assert.deepEqual(coverageGaps(inventory,review), []);
   assert.deepEqual(nextWork(inventory, review).nextTaskSites, []);
+
+  inventory.syntax.items.push({kind:'concurrency.task',file:'App.swift',line:3,column:25});
+  const [, second] = taskCandidates(inventory);
+  review.taskSites.push({siteId:second.id,operationId:'launch'});
+  assert.deepEqual(nextWork(inventory, review).nextTaskSites, [site, second]);
+  review.operations[0].steps[1].taskSiteId = site.id;
+  assert.deepEqual(nextWork(inventory, review).nextTaskSites, [second]);
+  review.operations[0].steps.push({
+    id:'second-load',parentId:'trigger',relation:'unstructured-task',taskSiteId:second.id,evidence
+  });
+  assert.deepEqual(coverageGaps(inventory,review), []);
 });
 
 test('unknown operations and target membership cannot yield a pass score', () => {
