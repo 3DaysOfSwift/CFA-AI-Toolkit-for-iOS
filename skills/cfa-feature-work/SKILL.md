@@ -56,8 +56,10 @@ If the project is already CFA, make the smallest complete vertical change:
    Reusable presentation components may take snapshots, bindings and action
    closures. Use those closures to forward intent to the owning screen's
    ViewModel. Keep service calls and business decisions in the model.
-3. Wire dependencies through AppModel. Do not create global singletons or add
-   generic manager layers.
+3. Keep AppModel.shared as the production composition root. Construct shared
+   services locally in AppModel.live() and inject them into the Features that
+   need them. Keep service references with their consumers. Avoid additional
+   global singletons and generic manager layers.
 4. For a removal request, establish whether it removes a screen, an operation
    or the whole Feature. Trace remaining callers across screens, targets and system entry
    points. Remove only the routes, Views, ViewModels, APIs, tests and Xcode
