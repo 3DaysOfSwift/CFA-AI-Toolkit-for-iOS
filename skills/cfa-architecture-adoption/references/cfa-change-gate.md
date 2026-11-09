@@ -24,10 +24,10 @@ the responsibility is not already owned by an existing type.
 Preserve these CFA invariants unless the developer explicitly asks to change
 the architecture:
 
-1. Each screen owns a dedicated ViewModel in a private property named `viewModel`.
-   Construct it inline by default.
-   A detail View may construct its own State-backed ViewModel in its initializer
-   from selected value data. Never pass in or share a ViewModel.
+1. Each screen owns a dedicated ViewModel in private `@State` named `viewModel`.
+   Construct it at the declaration by default. A detail View may initialize
+   its stored ViewModel from selected value data. A computed property or a
+   ViewModel passed in or shared by another View violates screen ownership.
    Previews use the same ownership and storage boundaries. A normal preview
    constructs the View, which creates its ViewModel and resolves its Feature
    through the normal default. Do not attach SwiftData to a View or preview.
