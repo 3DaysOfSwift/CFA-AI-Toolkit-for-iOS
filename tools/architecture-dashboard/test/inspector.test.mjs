@@ -568,13 +568,17 @@ test('identifies a launch signal deferred by DispatchQueue.asyncAfter', async t 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
           AppModel.shared.applicationDidFinishLaunching()
         }
+        DispatchQueue(label: "startup").async {
+          AppModel.shared.applicationDidFinishLaunching()
+        }
         return true
       }
     }`
   });
   const findings = (await inspect(root)).findings.filter(item => item.code === 'scheduled-app-model-launch');
-  assert.deepEqual(findings.map(item => item.line), [3]);
+  assert.deepEqual(findings.map(item => item.line), [3, 6]);
   assert.match(findings[0].message, /DispatchQueue\.asyncAfter/);
+  assert.match(findings[1].message, /DispatchQueue\.async\b/);
 });
 
 test('reviews a launch signal queued on a main or newly created OperationQueue', async t => {
