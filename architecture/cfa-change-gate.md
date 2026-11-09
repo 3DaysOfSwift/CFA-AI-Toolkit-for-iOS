@@ -373,8 +373,11 @@ identifies all of the following:
   changed paths at that minimum. Check API availability separately from
   Swift language mode. Preserve existing deployment support unless the
   developer approves a change;
-- the final CFA audit across the agreed scope, including the resolution of
-  actionable deviations and re-verification after corrections;
+- the final CFA audit across the agreed scope, with evidence for each applicable
+  requirement and reasons for requirements that do not apply. Resolve actionable
+  deviations and re-verify after corrections. Record any agreed exception and
+  its effect on the conformance verdict. An applicable requirement with missing
+  evidence remains unverified and keeps this checkpoint open;
 - passing builds for each affected target, plus relevant automated tests
   and manual behaviour regression, all tied to the final commit. Include
   existing extension or device targets that consume changed shared code.
