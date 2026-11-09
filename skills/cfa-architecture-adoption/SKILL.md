@@ -108,6 +108,12 @@ published and refresh callers are released while the optional write is pending.
 A late restore must leave newer data for the same source intact. Exercise a
 failed cache write and a failed durable edit save separately.
 
+Apply the [project identity rule](references/spec/rules/cfa-id-01.md) when
+changing project structure or build settings. Compare the resolved app and
+test target bundle identifiers before and after the change across affected
+build configurations. Preserve existing identifiers unless the developer
+explicitly requests a change.
+
 When moving durable storage ownership, preserve the existing store location,
 schema compatibility and saved records. Verify against a disposable store written
 by the previous version with representative synthetic records, including

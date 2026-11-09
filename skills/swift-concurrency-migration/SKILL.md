@@ -249,6 +249,12 @@ Keep migrated operations directly awaitable. Use structured child tasks for work
 
 Verify language mode, concurrency checking, default isolation and relevant SDK annotations instead of assuming async means off-main. Record the minimum OS version of each affected target. Preserve supported deployment targets unless the developer approves a change. If an API is unavailable at the existing minimum, use a compatible implementation, or explain the specific compatibility decision required before changing it. The Swift 6 migration playgrounds demonstrate their selected language mode. Choose language mode and API availability separately for the project. Do not hide diagnostics with unjustified unchecked annotations. Preserve required ordering across suspension points and prevent obsolete results from overwriting newer state.
 
+Apply the [project identity rule](references/spec/rules/cfa-id-01.md) when
+changing project structure or build settings. Compare the resolved app and
+test target bundle identifiers before and after the change across affected
+build configurations. Preserve existing identifiers unless the developer
+explicitly requests a change.
+
 Completion requires an updated primitive inventory, relevant build/tests and
 evidence that behaviour was preserved. Record remaining legacy mechanisms and
 why they remain. A pure GCD application is a valid starting point; CFA is the

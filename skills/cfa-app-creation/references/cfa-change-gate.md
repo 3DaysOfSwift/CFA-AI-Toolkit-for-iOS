@@ -539,6 +539,10 @@ identifies all of the following:
   changes, evidence of target membership, build compatibility and preserved
   data handoff. Verify the receiving target separately from the app build,
   including snapshot write and reload ordering where applicable;
+- the existing app and test target bundle identifiers across affected build
+  configurations. Check the final values against the baseline and record any
+  explicitly requested change under the
+  [project identity rule](spec/rules/cfa-id-01.md);
 - the minimum OS for each affected target and compatibility evidence for
   changed paths at that minimum. Check API availability separately from
   Swift language mode. Preserve existing deployment support unless the
