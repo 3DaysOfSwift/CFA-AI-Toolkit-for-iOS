@@ -176,10 +176,13 @@ When sign-out, account switching or session expiry is in scope, apply the
 [account lifecycle rule](references/spec/rules/cfa-account-01.md). Trace when
 the session actually ends, which Feature coordinates cleanup, and what each
 affected Feature clears or retains. Follow an old session's request across
-its suspension points to the final state update. Verify that cancellation
-and session checks prevent a late result from repopulating cleared state or
-appearing under a different account. Distinguish a sign-out failure that
-leaves the session intact from cleanup failure after the session has ended.
+its suspension points to the final state update. Verify that a late result
+cannot repopulate cleared state or enter a new session, even if the old task
+was cancelled. If the same account can sign back in while earlier work is
+pending, hold an old request open through sign-out and sign-in. Verify that
+the final state update checks session identity, since both sessions have the
+same account ID. Distinguish failed sign-out with an intact session from
+cleanup failure after the session has ended.
 
 When reviewing a widget or another device target, apply the
 [multi-device rule](references/spec/rules/cfa-device-01.md). Inspect each
