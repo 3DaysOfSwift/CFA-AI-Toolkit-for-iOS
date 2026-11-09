@@ -13,8 +13,11 @@ Before a CFA release, run each applicable fixture in a fresh conversation with
 the candidate toolkit installed. Give the host the ordinary-language request
 and the fixture inputs. Keep the expected outcome and failure criteria for the
 reviewer. Record the toolkit revision, host and model, observed skill selection,
-and the outcome against the criteria. Mark a case unverified if the host could
-not run it or its skill selection could not be established. Record misrouting
+and the outcome against the criteria. Record which skill copy the host loaded
+when an older installation also exists. A package staged on disk establishes
+file delivery. Record host execution separately, and mark the case unverified
+if the candidate skill could not be loaded or its selection could not be
+established. Record misrouting
 as a focused correction to the responsible skill.
 
 ## Flat app

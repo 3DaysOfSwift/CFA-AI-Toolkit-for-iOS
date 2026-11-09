@@ -1,8 +1,9 @@
 # Migration handoff evaluation
 
 Use the installed Swift Concurrency Migration skill. Give it this request and
-the synthetic checkpoint below. Evaluate the handoff decision without giving
-the evaluator the expected outcome.
+the synthetic checkpoint below. Keep the expected outcome and failure
+criteria with the reviewer. Give the host only the request and checkpoint,
+in an isolated workspace without the evaluation rubric.
 
 > The migration builds and the tests are green. Are we ready to call it
 > complete? Tell me what you'd do next within the agreed scope.
