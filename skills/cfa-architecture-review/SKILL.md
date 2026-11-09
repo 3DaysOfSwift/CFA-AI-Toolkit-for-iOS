@@ -99,8 +99,11 @@ through the Feature to the screen ViewModel. Check that the ViewModel owns
 screen-specific error text and that it distinguishes failure of the requested
 operation from failure of an optional cache write.
 
-When known paid capabilities fall within the review scope, identify their
-entitlement policy and trace each identifiable entry point to its check. Report
+When known paid capabilities fall within the review scope, apply the
+[paid entry point rule](references/spec/rules/cfa-pay-01.md). Identify the
+product’s entitlement policy and verify that PurchasesFeature owns its state.
+Trace each identifiable entry point to the check in its ViewModel or alternate
+caller, keeping pricing and entitlement decisions outside the capability. Report
 an established unguarded call or exposure with source evidence; identify paths
 that cannot be resolved as unverified. Do not assume a capability is paid from
 its name, or claim a UI check provides server-side authorisation. Look for
