@@ -427,7 +427,7 @@ export async function inspect(project) {
   for (const source of sources.values()) {
     for (const view of source.matchAll(viewDeclarations)) viewNames.add(view[1]);
   }
-  const swiftDataAccess = /\b(?:ModelContainer|ModelContext)\b|@(?:SwiftData\s*\.\s*)?Query\b|\.modelContainer\s*\(|@Environment\s*\(\s*\\\s*\.\s*modelContext\b/;
+  const swiftDataAccess = /\b(?:ModelContainer|ModelContext)\b|@(?:SwiftData\s*\.\s*)?Query\b|\.modelContainer\s*\(|@(?:SwiftUI\s*\.\s*)?Environment\s*\(\s*\\\s*(?:(?:SwiftUI\s*\.\s*)?EnvironmentValues\s*)?\.\s*modelContext\b/;
   for (const [file, source] of sources) {
     const isViewFile = /(?:^|\/)1 - View\//.test(file);
     const previewRanges = [];
