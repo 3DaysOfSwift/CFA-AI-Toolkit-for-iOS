@@ -544,7 +544,7 @@ examples and verification criteria.
 - Give each ViewModel a named test file and suite under `View model tests` and each concrete Feature a named API test file under `FeatureTests`. Use isolated AppModel graphs and controlled dependencies to test timing and overlap.
 - Preserve an established product's design. Themes, footers and branding are defaults for new apps only.
 - Migrate the agreed scope to CFA and Swift Concurrency while preserving existing capabilities, data and meaningful interactions. Keep optional redesigns and unrelated modernisation separate. Describe feature checkpoints at their actual scope.
-- Apply the relevant change-gate and Review Checklist checks. For app changes, build the affected targets and run relevant tests. Report any checks that could not run. A completed migration requires passing builds, tests and manual behaviour verification tied to the final commit, plus a human architecture review.
+- Apply the relevant change-gate and Review Checklist checks. For app changes, build the affected targets and run relevant tests. Report any checks that could not run. For a migration handoff, apply the [full migration completion gate](architecture/cfa-change-gate.md#migration-progress-and-completion-language). It requires a hybrid implementation review, a final CFA audit, and a human architecture review alongside passing builds, tests and manual behaviour verification tied to the final commit.
 
 **Further reading**
 
