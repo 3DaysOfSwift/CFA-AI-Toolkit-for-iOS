@@ -157,6 +157,9 @@ the architecture:
 16. The app delegate calls `AppModel.shared.applicationDidFinishLaunching()`
     directly and synchronously. Features may start asynchronous work without
     making the callback await disk or network completion.
+    Keep synchronous startup work brief. Task creation order does not establish
+    disk or network start order. Measure launch and first-frame timing
+    separately from Feature readiness.
     No View `.task` performs app launch, and no App, delegate, or View stores an
     AppModel reference. ViewModels retain only the narrow Features needed by their screen.
 17. The SwiftUI `App.body` declares a stable root View and app-wide presentation

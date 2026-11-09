@@ -107,6 +107,9 @@ skill from that toolkit before changing the project.
   and synchronously from the application lifecycle callback, never a View .task
   or a scheduled Task. Features can start their own asynchronous work without
   delaying the callback for disk or network completion.
+  Keep synchronous startup work brief. Task creation order gives no guarantee
+  about when disk or network work begins. Measure launch and first-frame
+  timing separately from completion of Feature work.
 - A Feature-owned shared refresh normally continues when a screen leaves;
   preserve its result for later callers unless a specific product or resource
   requirement calls for another cancellation policy.
