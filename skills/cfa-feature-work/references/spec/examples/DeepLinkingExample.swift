@@ -261,6 +261,7 @@ final class DeepLinkingFeature {
         let retryURL = retryFolder.appendingPathComponent("pending.json")
         let removalRetry = DeepLinkingFeature(store: PendingRequestStore(fileURL: retryURL))
         try await removalRetry.receive(request)
+        try await removalRetry.receive(retained)
         try FileManager.default.moveItem(at: retryFolder, to: movedFolder)
         try Data().write(to: retryFolder) // A file blocks recreation of the directory.
         // A failed insertion leaves the last confirmed list visible.
@@ -270,7 +271,7 @@ final class DeepLinkingFeature {
         } catch is ExampleFailure {
             throw ExampleFailure.expectedStorageError
         } catch {
-            precondition(removalRetry.pending == [request])
+            precondition(removalRetry.pending == [request, retained])
         }
         do {
             try await removalRetry.open(id: request.id) { _ in true }
@@ -278,17 +279,20 @@ final class DeepLinkingFeature {
         } catch is ExampleFailure {
             throw ExampleFailure.expectedStorageError
         } catch {
-            precondition(removalRetry.pending == [request])
+            precondition(removalRetry.pending == [request, retained])
         }
         try FileManager.default.removeItem(at: retryFolder)
         try FileManager.default.moveItem(at: movedFolder, to: retryFolder)
         let restoredAfterFailure = DeepLinkingFeature(store: PendingRequestStore(fileURL: retryURL))
         try await restoredAfterFailure.restore()
-        precondition(restoredAfterFailure.pending == [request])
+        precondition(restoredAfterFailure.pending == [request, retained])
         try await removalRetry.open(id: request.id) { _ in
             preconditionFailure("Retrying removal must not navigate again")
         }
-        precondition(removalRetry.pending.isEmpty)
+        precondition(removalRetry.pending == [retained])
+        let restoredAfterRetry = DeepLinkingFeature(store: PendingRequestStore(fileURL: retryURL))
+        try await restoredAfterRetry.restore()
+        precondition(restoredAfterRetry.pending == [retained])
 
         let blockedDirectory = folder.appendingPathComponent("blocked-directory")
         try Data().write(to: blockedDirectory)
