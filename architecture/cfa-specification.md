@@ -1631,7 +1631,9 @@ For paid capabilities, `PurchasesFeature` owns entitlement state. The screen's
 ViewModel combines it with the relevant capability Feature and checks the
 current entitlement before presenting or calling a paid capability; otherwise
 it presents the appropriate locked or purchase experience. Apply this to every
-relevant entry point, including alternative screens and other callers. Keep
+relevant entry point. If a deep link, notification action or additional target
+can invoke the capability without passing through a screen ViewModel, its
+caller checks current entitlement before invoking the capability. Keep
 pricing and purchase checks out of the capability Feature so its behaviour can
 be reused as the product's pricing changes. Payment-provider services can be
 owned by the purchase capability. Server-protected operations still require

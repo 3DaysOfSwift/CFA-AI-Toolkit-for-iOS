@@ -4,7 +4,7 @@
 
 **Strength:** Required when applicable.
 
-**Guidance:** PurchasesFeature owns entitlement state. The screen ViewModel checks current entitlement before presenting or calling the paid capability and otherwise presents the locked or purchase experience. Apply the check at every relevant entry point, including alternative screens and other callers. Keep pricing and entitlement checks out of the capability Feature. Server-protected operations enforce their own authorisation.
+**Guidance:** PurchasesFeature owns entitlement state. The screen ViewModel checks current entitlement before presenting or calling the paid capability and otherwise presents the locked or purchase experience. Apply the check at every relevant entry point. When a route bypasses a screen ViewModel, its caller checks current entitlement before invoking the capability. Keep pricing and entitlement checks out of the capability Feature. Server-protected operations enforce their own authorisation.
 
 **Why:** Pricing changes remain separate from capability behaviour.
 
