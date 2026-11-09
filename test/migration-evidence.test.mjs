@@ -405,6 +405,22 @@ test('completion is not inferred from a build pass or tests at a different commi
   assert.ok(inspectRecord(f.file).errors.includes('result: completed requires a pinned afterCommit'));
 });
 
+test('flags a linked test rerun with a different command for review', t => {
+  const f = reviewedFixture(t);
+  const rerun = f.record.evidence.find(item => item.id === 'after-test');
+  const failed = {...rerun, id: 'failed-test', phase: 'during', outcome: 'failed'};
+  f.record.evidence.push(failed);
+  rerun.outcome = 'passed';
+  rerun.rerunOf = failed.id;
+  rerun.command = failed.command + ' -only-testing:AppTests/OtherTest';
+  f.seal();
+  const warning = 'evidence.after-test.rerunOf: verify the command covers the failed check failed-test; the recorded commands differ.';
+  assert.ok(inspectRecord(f.file).warnings.includes(warning));
+  rerun.command = failed.command;
+  f.seal();
+  assert.ok(!inspectRecord(f.file).warnings.includes(warning));
+});
+
 test('review fingerprint catches edited record, case study and local evidence', t => {
   const f = reviewedFixture(t);
   assert.equal(inspectRecord(f.file).valid, true);

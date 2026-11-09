@@ -100,7 +100,9 @@ or after migration, keep the failure record and link a passing rerun at the
 final commit for the same scenario, target, build configuration and OS.
 For a completed record, each failure during or after migration requires a
 passing final-commit evidence entry whose `rerunOf` names the failed check. The rerun must name every target listed by the failed check. Missing or differing environment descriptions
-receive a review warning because the descriptions are free text. Explain how the rerun resolves the failure. Check that minimum-OS evidence
+receive a review warning because the descriptions are free text. Differing build
+or test commands also trigger a warning. Verify that the new command still
+exercises the failed check, and explain how the rerun resolves the failure. Check that minimum-OS evidence
 lists every affected target. Navigator and human architecture reviews can
 cover the whole project without a target list. When they name targets, the
 validator rejects a list containing only unrelated targets. If evidence is

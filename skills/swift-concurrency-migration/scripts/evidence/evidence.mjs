@@ -132,6 +132,9 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
         errors.push(`evidence.${item.id}.rerunOf: rerun omits targets from ${failed.id}: ${missing.join(', ')}.`);
       }
     }
+    if (['build', 'test'].includes(item.kind) && item.command?.trim() !== failed.command?.trim()) {
+      warnings.push(`evidence.${item.id}.rerunOf: verify the command covers the failed check ${failed.id}; the recorded commands differ.`);
+    }
     if (!failed.environment || !item.environment || failed.environment.trim() !== item.environment.trim()) {
       warnings.push(`evidence.${item.id}.rerunOf: verify the build configuration, OS and device or simulator match ${failed.id}; the recorded environments differ or are missing.`);
     }
