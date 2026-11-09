@@ -71,7 +71,7 @@
       "repository": "https://github.com/3DaysOfSwift/metro-mate-ios",
       "revision": "5c3f21df0381eedba55dc45a9fd267d7da84cde7",
       "sourcePath": "Metronome/MetronomeManager.swift",
-      "description": "Metronome audio implementation; compare its existing structure with the current specification",
+      "description": "Metronome audio and timing migration example using AVAudioEngine, Timer and DispatchSourceTimer",
       "ruleIds": []
     },
     {

@@ -23,7 +23,7 @@ These real projects illustrate different capabilities and migration contexts. Th
 - **[123 Calc](https://github.com/3DaysOfSwift/123-Calc)** — Calculator.
 - **[Phone Drive](https://github.com/3DaysOfSwift/Phone-Drive)** — File library and local sharing.
 - **[Cuentiva: Word Leap](https://github.com/3DaysOfSwift/Cuentiva-2-Word-Leap)** — Game capability and retained tasks. [View source](https://github.com/3DaysOfSwift/Cuentiva-2-Word-Leap/blob/ae936234171dd617f7a2affb093d3eca4ea3db84/CuentivaWordLeap/2%20-%20AppModel/Features/Word%20Leap/WordLeapFeature.swift).
-- **[Metro Mate](https://github.com/3DaysOfSwift/metro-mate-ios)** — Metronome audio implementation; compare its existing structure with the current specification. [View source](https://github.com/3DaysOfSwift/metro-mate-ios/blob/5c3f21df0381eedba55dc45a9fd267d7da84cde7/Metronome/MetronomeManager.swift).
+- **[Metro Mate](https://github.com/3DaysOfSwift/metro-mate-ios)** — Metronome audio and timing migration example using AVAudioEngine, Timer and DispatchSourceTimer. [View source](https://github.com/3DaysOfSwift/metro-mate-ios/blob/5c3f21df0381eedba55dc45a9fd267d7da84cde7/Metronome/MetronomeManager.swift).
 - **[Upcoming Movies](https://github.com/3DaysOfSwift/Legacy-GCD-Migration-iOS-App-UpcomingMovies)** — Legacy app migration.
 - **[CleanStore](https://github.com/3DaysOfSwift/Legacy-GCD-Migration-iOS-App-CleanStore)** — Legacy app migration; see the migration branch for CFA work.
 - **[Kickstarter](https://github.com/3DaysOfSwift/Legacy-GCD-Migration-iOS-App-Kickstarter)** — Ongoing legacy migration.
