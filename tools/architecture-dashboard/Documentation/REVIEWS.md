@@ -263,12 +263,14 @@ or missing scenarios block a new whole-app report until assessed. When resuming 
 generating a new whole-app report. Any existing flag is ignored.
 
 For a shared refresh, distinguish the caller's wait from the operation's
-lifetime in the `leave` scenario. Trace what happens when the only screen
-leaves, when another caller is still waiting, and when a later caller returns.
-For CFA, continued Feature-owned work is the default. Check separately whether
-a screen that needs a prompt exit can end its wait before the refresh finishes.
-For other architectures, judge the observed behaviour against the app's
-ownership and cancellation policy.
+lifetime in the `leave` scenario. For CFA's default policy, cancel the only
+screen waiter and verify the Feature completes the refresh and retains the
+result without a replacement waiter. Separately, join a later equivalent
+caller while the refresh is suspended. Verify one underlying request and the
+same outcome for the remaining callers when another waiter leaves. Where a
+screen needs a prompt exit, verify that its wait ends while the refresh is
+still suspended. For other architectures, judge the observed behaviour
+against the app's ownership and cancellation policy.
 
 For a durable edit, distinguish discarding an unsaved draft from leaving
 after the operation is accepted. In the `leave` scenario, record whether
