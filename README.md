@@ -379,11 +379,11 @@ cfa inspect /path/to/your-xcode-project
 cfa inspect /path/to/your-xcode-project --json
 ```
 
-It maps each screen to its adjacent ViewModel, visible `AppModel.shared`
-feature route, and named tests. It flags missing links for review without
-changing the project. This is a lexical source check, not a compiler, test run,
-or automatic CFA certification. The CFA Architecture Review skill uses its
-output as a starting map and checks important decisions in the actual code.
+The inspector looks for conventionally placed SwiftUI screens and maps the
+ViewModels, `AppModel.shared` Feature routes, and named tests it can identify.
+It flags gaps for review. A source scan can miss screens and routes that use
+different layouts or indirect wiring. The CFA Architecture Review skill uses
+the map to guide source inspection and verify findings.
 Existing app code is not renamed automatically; `cfa doctor` warns if an
 earlier installed project-guidance block still requires the old Manager suffix.
 
