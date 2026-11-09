@@ -503,14 +503,16 @@ export async function inspect(project) {
         sessionNames.add(alias[1]);
       }
     }
-    const directRequest = [...source.matchAll(/\b(?:(URLSession\s*\.\s*shared)|(\w+))\s*\??\.\s*(?:data|bytes|download|upload|dataTask|dataTaskPublisher|downloadTask|uploadTask|webSocketTask|streamTask)\s*\(/g)]
-      .find(match => (match[1] || sessionNames.has(match[2])) && outsideManager(match));
-    const directAccess = directRequest ?? [...source.matchAll(/\bURLSession\s*[.(]/g)].find(outsideManager);
-    if (directAccess) {
-      const message = directRequest
-        ? 'Possible URLSession request outside NetworkingManager. Verify the receiver type and production target membership before reporting a bypass.'
-        : 'URLSession is referenced outside NetworkingManager. Trace whether the reference configures a session for injection or leads to a production request that bypasses the manager.';
-      findings.push(finding('direct-url-session', 'review', message, file, lineOf(source, directAccess.index)));
+    const directRequests = [...source.matchAll(/\b(?:(URLSession\s*\.\s*shared)|(\w+))\s*\??\.\s*(?:data|bytes|download|upload|dataTask|dataTaskPublisher|downloadTask|uploadTask|webSocketTask|streamTask)\s*\(/g)]
+      .filter(match => (match[1] || sessionNames.has(match[2])) && outsideManager(match));
+    for (const request of directRequests) {
+      findings.push(finding('direct-url-session', 'review', 'Possible URLSession request outside NetworkingManager. Verify the receiver type and production target membership before reporting a bypass.', file, lineOf(source, request.index)));
+    }
+    if (!directRequests.length) {
+      const reference = [...source.matchAll(/\bURLSession\s*[.(]/g)].find(outsideManager);
+      if (reference) {
+        findings.push(finding('direct-url-session', 'review', 'URLSession is referenced outside NetworkingManager. Trace whether the reference configures a session for injection or leads to a production request that bypasses the manager.', file, lineOf(source, reference.index)));
+      }
     }
   }
   // Independent work may be scheduled here. Review only closures that

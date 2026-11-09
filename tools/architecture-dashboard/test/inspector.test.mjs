@@ -688,11 +688,12 @@ test('points to the URLSession request when the same file also configures a sess
     'SharedProvider.swift': `struct SharedProvider {
       let configured = URLSession(configuration: .ephemeral)
       func load() async throws { _ = try await URLSession.shared.data(from: url) }
+      func retry() async throws { _ = try await configured.data(from: url) }
     }`
   });
   const {findings} = await inspect(root);
   assert.deepEqual(findings.filter(item => item.code === 'direct-url-session')
-    .map(({file, line}) => [file, line]), [['ConfiguredProvider.swift', 3], ['InferredProvider.swift', 3], ['Provider.swift', 3], ['SharedProvider.swift', 3]]);
+    .map(({file, line}) => [file, line]), [['ConfiguredProvider.swift', 3], ['InferredProvider.swift', 3], ['Provider.swift', 3], ['SharedProvider.swift', 3], ['SharedProvider.swift', 4]]);
 });
 
 test('flags SwiftData without a manager and direct URLSession calls', async t => {
