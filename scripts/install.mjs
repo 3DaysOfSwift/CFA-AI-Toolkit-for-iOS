@@ -45,7 +45,8 @@ function checkCommandTarget(target) {
 function writeCommand(target,dashboardCommand,nodeExecutable=process.execPath) {
   fs.mkdirSync(path.dirname(target),{recursive:true});
   const temp=`${target}.${crypto.randomUUID()}.tmp`;
-  const script=`#!/bin/sh\n${COMMAND_MARKER}\nexec ${JSON.stringify(nodeExecutable)} ${JSON.stringify(dashboardCommand)} "$@"\n`;
+  const shellLiteral = value => `'${value.replaceAll("'", "'\"'\"'")}'`;
+  const script=`#!/bin/sh\n${COMMAND_MARKER}\nexec ${shellLiteral(nodeExecutable)} ${shellLiteral(dashboardCommand)} "$@"\n`;
   try {
     fs.writeFileSync(temp,script,{mode:0o755,flag:'wx'});
     fs.renameSync(temp,target);

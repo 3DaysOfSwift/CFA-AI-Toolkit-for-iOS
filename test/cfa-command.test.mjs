@@ -13,15 +13,15 @@ function sandbox(t) {
   return directory;
 }
 
-function installedCommand(t) {
+function installedCommand(t, destination = 'customer') {
   const directory = sandbox(t);
   const source = stageSkillsPackage(path.join(directory, 'ios-app-development-cfa'));
-  const result = install({ source, destination: path.join(directory, 'customer'), mode: 'skills' });
+  const result = install({ source, destination: path.join(directory, destination), mode: 'skills' });
   return { directory, command: result.command };
 }
 
 test('doctor verifies installed skills without requiring optional project guidance', (t) => {
-  const { directory, command } = installedCommand(t);
+  const { directory, command } = installedCommand(t, "customer's $workspace");
   const project = path.join(directory, 'project');
   fs.mkdirSync(project);
 
