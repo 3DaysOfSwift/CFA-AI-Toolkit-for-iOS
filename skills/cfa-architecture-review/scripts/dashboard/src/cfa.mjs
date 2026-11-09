@@ -421,11 +421,20 @@ function doctor(projectArgument) {
   const missingSkills = skillsRoot
     ? cfaSkillNames.filter((name) => !fs.existsSync(path.join(skillsRoot, name, 'SKILL.md')))
     : cfaSkillNames;
+  const missingReferences = skillsRoot ? cfaSkillNames
+    .filter(name => !missingSkills.includes(name))
+    .flatMap(name => {
+      const references = ['swift-coding-guide.md'];
+      if (name !== 'swift-code-quality') references.push('cfa-specification.md', 'cfa-change-gate.md', 'spec/README.md');
+      return references.map(file => path.join(name, 'references', file))
+        .filter(file => !fs.statSync(path.join(skillsRoot, file), { throwIfNoEntry: false })?.isFile());
+    }) : [];
 
-  if (missingSkills.length === 0) {
+  if (missingSkills.length === 0 && missingReferences.length === 0) {
     console.log(`PASS CFA skills are installed: ${skillsRoot}`);
   } else if (skillsRoot) {
-    console.log(`WARN missing CFA skills: ${missingSkills.join(', ')}`);
+    if (missingSkills.length) console.log(`WARN missing CFA skills: ${missingSkills.join(', ')}`);
+    for (const file of missingReferences) console.log(`WARN missing CFA reference: ${file}`);
   } else {
     console.log('WARN this CFA command is not running from an installed CFA skill.');
   }
@@ -468,7 +477,7 @@ function doctor(projectArgument) {
     console.log(`Run: cfa enable-project ${JSON.stringify(project)}`);
   }
 
-  if (missingSkills.length > 0) process.exitCode = 1;
+  if (missingSkills.length || missingReferences.length) process.exitCode = 1;
 }
 
 function parseEnableProjectArguments(values) {

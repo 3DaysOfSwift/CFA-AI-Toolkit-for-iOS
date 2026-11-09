@@ -32,6 +32,18 @@ test('doctor verifies installed skills without requiring optional project guidan
   assert.match(result.stdout, /INFO no optional CFA project guidance/);
 });
 
+test('doctor reports an installed skill missing its specification', (t) => {
+  const { directory, command } = installedCommand(t);
+  const reference = 'cfa-feature-work/references/cfa-specification.md';
+  fs.unlinkSync(path.join(directory, 'customer/.agents/skills', reference));
+
+  const result = spawnSync(command, ['doctor', directory], { encoding: 'utf8' });
+
+  assert.equal(result.status, 1, result.stderr);
+  assert.ok(result.stdout.includes(`WARN missing CFA reference: ${reference}`));
+  assert.doesNotMatch(result.stdout, /PASS CFA skills are installed/);
+});
+
 test('installed inspect command reads a project without writing into it', (t) => {
   const { directory, command } = installedCommand(t);
   const project = path.join(directory, 'project');
