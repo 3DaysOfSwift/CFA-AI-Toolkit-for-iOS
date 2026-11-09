@@ -102,8 +102,9 @@ visible for investigation.
 Reconcile the current inventory against the production targets, files, types and
 operation entry points, then use `node src/whole-app-health.mjs report
 <project-root> <review.json> <new-report.html> [app-icon.png]`. The report is
-generated only after the review evidence is checked against the current source;
-unresolved coverage is shown as an investigation and does not receive a score.
+generated after the current source and review evidence pass the coverage
+checks. If coverage is unresolved, the command lists the remaining checks in
+the terminal. Use `next` to resume the review before generating the report.
 The scanner cannot establish target membership or discover every event by itself.
 
 The review's `presentation` contains `app`, `summary`, `conclusion` and
