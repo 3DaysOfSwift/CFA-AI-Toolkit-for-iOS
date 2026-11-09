@@ -1753,8 +1753,12 @@ Before accepting a change, answer every question:
 5. Is each business decision owned by its Feature? Can supporting Model
    helpers perform calculations or infrastructure work without becoming a
    competing authority for that decision or its state?
-6. Would an Apple Watch app be able to reuse the decision without copying UI
-   code?
+6. Can another target reuse the business decision without copying UI code?
+   If the scope includes additional targets, verify shared Model membership,
+   target-specific presentation, API availability and lifecycle. For snapshot
+   sharing, test missing, unreadable, delayed and stale data on supported
+   devices. When an iPhone app writes an App Group snapshot for a widget,
+   verify that it requests a timeline reload only after a successful write.
 7. Does each ViewModel depend on the smallest coherent set of concrete
    Features needed by its screen?
 8. Does AppModel assemble and expose Features, own app-wide listener tasks,
