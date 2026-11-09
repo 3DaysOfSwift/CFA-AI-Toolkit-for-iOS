@@ -1,8 +1,10 @@
 ## Coordinated Application Flow
 
-The coordination between SwiftUI, ViewModels, features, repositories,
-and lower-level device APIs separates the application's execution paths and
-behavioural responsibilities into one understandable flow through a layered
-system. Together, these parts exist to make a real-world commercial application
-simpler.
+Trace each business operation from its entry point to the Feature that owns
+it. For a screen action, the View passes intent to its ViewModel, which calls
+the Feature. The Feature applies the business rules, calls internal
+microservices when needed and publishes the state the screen observes. For
+example, a schedule refresh reaches the schedule Feature before it reaches
+a network provider. The Feature owns the schedule and decides when to
+publish the new snapshot.
 
