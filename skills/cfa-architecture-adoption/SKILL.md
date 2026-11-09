@@ -65,9 +65,9 @@ success, failure and expiration each complete the system callback exactly once,
 including when expiration races normal completion. Verify that expiration
 cancels the owned work. Verify actual delivery separately on a supported device.
 
-When moving shared Model code used by an existing widget or another device
+When changing shared Model code or services used by a widget or another device
 target, apply the [multi-device rule](references/spec/rules/cfa-device-01.md).
-Record the existing target membership and data handoff before moving files.
+Record existing target membership and data handoff before making changes.
 Preserve the handoff and its user-visible behaviour, including when a snapshot
 is missing, unreadable, delayed or stale. Verify affected targets still build
 and check membership and API availability. Exercise transfer and receiving

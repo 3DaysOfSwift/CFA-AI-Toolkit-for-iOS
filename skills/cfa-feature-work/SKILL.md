@@ -117,7 +117,8 @@ success, failure and expiration each complete the system callback exactly once,
 including when expiration races normal completion. Verify that expiration
 cancels the owned work. Verify actual delivery separately on a supported device.
 
-When adding or changing a widget or another device target, apply the
+When adding or changing a widget or another device target, or changing shared
+Model code or services it uses, apply the
 [multi-device rule](references/spec/rules/cfa-device-01.md). Reuse the owning
 Feature and shared Model source. Include only the target's own presentation
 files and compose the services available to its process. Trace data from the

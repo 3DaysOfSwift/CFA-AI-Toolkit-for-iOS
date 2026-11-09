@@ -65,6 +65,12 @@ Verify that repeated startup leaves one listener, delivery works without a
 relevant screen, and any supported replacement survives the old listener's
 cleanup.
 
+When tidying shared Model code or services used by a widget or another
+device target, apply the [multi-device rule](references/spec/rules/cfa-device-01.md).
+Identify the affected targets before changing code. Verify source membership,
+API availability and builds. Check that the existing data handoff still works
+on supported devices, including the receiving Feature’s state update.
+
 When tidying system background work, apply the
 [background-work rule](references/spec/rules/cfa-bg-01.md). Preserve the
 owning Feature, permitted identifiers and once-only registration during
