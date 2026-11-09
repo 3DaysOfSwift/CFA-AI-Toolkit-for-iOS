@@ -812,7 +812,8 @@ export async function inspect(project) {
     }
     const testName = `${viewModelName}Tests.swift`;
     const testCandidates = [...paths].filter(file => path.posix.basename(file) === testName);
-    const testFile = testCandidates.length === 1 ? testCandidates[0] : null;
+    const hasCompetingViewModels = (declarationsByName.get(viewModelName)?.length ?? 0) > 1;
+    const testFile = testCandidates.length === 1 && !hasCompetingViewModels ? testCandidates[0] : null;
     const viewModelTypePattern = `(?:(?:\\w+\\s*\\.\\s*)*${viewModelName})`;
     const stateTypePattern = `(?:SwiftUI\\s*\\.\\s*)?State`;
     const statePattern = new RegExp(`@${stateTypePattern}\\s+private\\s+var\\s+${propertyNamePattern}(?:\\s*:\\s*${viewModelTypePattern})?\\s*=\\s*${viewModelTypePattern}(?:\\s*\\.\\s*init)?\\s*\\(\\s*\\)(?!\\s*\\.)`, 'u');
@@ -909,6 +910,9 @@ export async function inspect(project) {
         }
       }
       if (testCandidates.length > 1) findings.push(finding('view-model-tests-ambiguous', 'review', `Multiple files match ${testName}: ${testCandidates.join(', ')}. Verify which test target covers this ViewModel.`, viewModelFile, 1));
+      if (testCandidates.length === 1 && hasCompetingViewModels) {
+        findings.push(finding('view-model-tests-ambiguous', 'review', `${testCandidates[0]} matches multiple declarations named ${viewModelName}. Verify which declaration the test target covers.`, viewModelFile, 1));
+      }
       if (!testCandidates.length) findings.push(finding('view-model-tests-missing', 'review', `No ${testName} was found in the scanned directory. Check the project root and test target before concluding the test is missing.`, viewModelFile, 1));
     }
     screens.push({ name, viewFile, viewModelFile: viewModel ? viewModelFile : null, ownsViewModel, structuralRoot, testFile, testCandidates, dependencies });
@@ -963,7 +967,8 @@ export function renderInspection(report) {
     const ownership = screen.ownsViewModel ? 'private @State recognized' : 'ownership needs review';
     const tests = screen.testFile ? 'matching test file found'
       : screen.testCandidates?.length > 1 ? 'multiple matching test files. Verify target'
-        : 'no matching test file found';
+        : screen.testCandidates?.length === 1 ? 'matching test file needs target verification'
+          : 'no matching test file found';
     lines.push(`${screen.name}: ${viewModel} → ${routes.join(', ') || 'no visible feature route'} · ${ownership} · ${tests}`);
   }
   if (report.findings.length) {
