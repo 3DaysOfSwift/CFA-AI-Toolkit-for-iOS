@@ -58,12 +58,21 @@ test('syntax entry points join the inventory without duplicating lexical finding
   combined.syntax={status:'available',files:['App.swift'],warnings:[],items:[
     {kind:'entry.launchCallback',file:'App.swift',line:2,column:1},
     {kind:'entry.main',file:'App.swift',line:1,column:1},
+    {kind:'entry.backgroundHandler',file:'App.swift',line:3,column:1},
     {kind:'concurrency.task',file:'App.swift',line:3,column:1}
   ]};
   const candidates=inventoryCandidates(combined);
-  assert.equal(candidates.length,2);
+  assert.equal(candidates.length,3);
   assert.equal(candidates.filter(c=>c.kind==='launch-callback').length,1);
   assert.equal(candidates.filter(c=>c.kind==='main').length,1);
+  const background = candidates.find(c=>c.kind==='background-handler');
+  assert.ok(background);
+  const review = complete();
+  review.operations[0].evidence[0].line = 1;
+  review.entryPoints.push({siteId:candidates.find(c=>c.kind==='main').id, operationId:'launch'});
+  assert.deepEqual(nextWork(combined,review).nextEntryPoints,[background]);
+  review.entryPoints.push({siteId:background.id, excludedReason:'Registration belongs to a test-only target.'});
+  assert.deepEqual(nextWork(combined,review).nextEntryPoints,[]);
   assert.match(coverageGaps(combined,complete()).join(' '),/entry points/);
   assert.equal(taskCandidates(combined).length,1);
   assert.match(coverageGaps(combined,complete()).join(' '),/task sites/);
