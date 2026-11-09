@@ -61,9 +61,13 @@ test('conclusion uses ticks while concerns remain marked in findings', () => {
 });
 
 test('groups distinct actions under their capability without merging them', () => {
-  const op = (title, group) => ({title,group,path:'Screen to Feature',stateOwner:'Feature',taskOwner:'Feature',isolation:'MainActor',reason:'Reviewed'});
+  const op = (title, group) => ({
+    title,group,path:'Screen to Feature',stateOwner:'Feature',taskOwner:'Feature',isolation:'MainActor',reason:'Reviewed',
+    steps:[{title:'Start save',relation:'unstructured-task',detail:'The Feature owns the task.',taskLocation:'Save & Load.swift:9:21'}]
+  });
   const html=renderHealthReport({app:'Launch & Watch',summary:'Summary',verdict:'Clear ownership',scope:'App',conclusion:'Conclusion',criteria:[{title:'Ownership',detail:'Checked',status:'pass'}],operations:[op('Set reminder','Reminders'),op('Open launch','Navigation'),op('Remove reminder','Reminders')]});
   assert.match(html, /<h2>Launch &amp; Watch App Workflow<\/h2>/);
+  assert.match(html, /Task site: Save &amp; Load.swift:9:21/);
   assert.ok(html.lastIndexOf('<section') === html.indexOf('<section class="conclusion">'));
   assert.equal((html.match(/class="operation-group">Reminders/g) || []).length,1);
   assert.ok(html.indexOf('Set reminder') < html.indexOf('Remove reminder'));

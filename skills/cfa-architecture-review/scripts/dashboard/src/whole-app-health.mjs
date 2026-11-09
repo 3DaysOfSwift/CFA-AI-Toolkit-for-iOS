@@ -371,6 +371,15 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
   }
   const data = {...presentation, scope:review.scope};
   data.operations = (review.operations || []).map(op=>({group:op.group,title:op.title,path:op.path,stateOwner:op.stateOwner,taskOwner:op.taskOwner,isolation:op.isolation,reason:op.reason,unknowns:op.unknowns,steps:op.steps,checks:op.checks,scenarios:op.scenarios,problemKind:op.problemKind}));
+  const taskSites = new Map(taskCandidates(report).map(site => [site.id, site]));
+  const taskOwners = new Map((review.taskSites || []).map(entry => [entry.siteId, entry.operationId]));
+  for (const [index, operation] of data.operations.entries()) {
+    operation.steps = operation.steps.map(step => {
+      const site = taskSites.get(step.taskSiteId);
+      if (!site || taskOwners.get(site.id) !== review.operations[index].id) return step;
+      return {...step, taskLocation: `${site.file}:${site.line}:${site.column}`};
+    });
+  }
   data.architecturalConflict = review.operations.some(op => op.problemKind === 'architectural-conflict');
   const selectedIcon = icon || await appIcon(root);
   const iconData = selectedIcon ? `data:image/png;base64,${(await fs.readFile(selectedIcon)).toString('base64')}` : '';
