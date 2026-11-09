@@ -42,10 +42,10 @@ export function launchTree(calls, maxDepth = 5) {
   function children(id, seen, depth) {
     if (seen.has(id) || depth >= maxDepth) return [];
     const nextSeen = new Set([...seen, id]);
-    return (byCaller.get(id) || []).filter(call => byCaller.has(call.calleeID)).map(call => ({
+    return (byCaller.get(id) || []).map(call => ({
       name: call.callee, file: call.file, line: call.line,
       children: children(call.calleeID, nextSeen, depth + 1),
-      truncated: depth + 1 >= maxDepth || nextSeen.has(call.calleeID)
+      truncated: byCaller.has(call.calleeID) && (depth + 1 >= maxDepth || nextSeen.has(call.calleeID))
     }));
   }
   return roots.map(([id, list]) => ({name: list[0].caller, file: list[0].file, line: list[0].line, children: children(id, new Set(), 0)}));
