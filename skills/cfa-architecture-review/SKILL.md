@@ -99,6 +99,13 @@ through the Feature to the screen ViewModel. Check that the ViewModel owns
 screen-specific error text and that it distinguishes failure of the requested
 operation from failure of an optional cache write.
 
+When reviewing preference restoration, apply the
+[preference recovery rule](references/spec/rules/cfa-pref-01.md). Trace a
+supported value, a missing value and an obsolete value in a recognised
+format. Verify that fallback leaves the stored value intact where required.
+Check genuine durable read and write failures separately and trace their
+outcomes through the Feature and ViewModel.
+
 When known paid capabilities fall within the review scope, apply the
 [paid entry point rule](references/spec/rules/cfa-pay-01.md). Identify the
 product’s entitlement policy and verify that PurchasesFeature owns its state.

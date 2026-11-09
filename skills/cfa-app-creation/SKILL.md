@@ -108,6 +108,12 @@ the draft intact and leaves the last confirmed value unchanged. A successful
 retry publishes the replacement only after persistence succeeds. Verify that
 Cancel discards the unsaved draft without writing to storage.
 
+When restoring a non-critical preference, apply the
+[preference recovery rule](references/spec/rules/cfa-pref-01.md). Define a
+safe fallback for missing values or obsolete values in a recognised format,
+such as system appearance for a retired theme. Keep unreadable or corrupt
+durable storage and failed writes visible as errors.
+
 If the product requires offline edits or cross-device data, apply the
 [sync rule](references/spec/rules/cfa-sync-01.md). Choose storage and transfer
 according to the target capabilities and the product's data contract. Agree

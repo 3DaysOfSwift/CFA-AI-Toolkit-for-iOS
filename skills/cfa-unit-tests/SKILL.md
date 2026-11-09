@@ -212,9 +212,10 @@ opens it at the intended location and can reopen the saved records. Exercise
 a failed open or upgrade and confirm that it preserves the existing data.
 Keep these storage checks separate from tests that start with an empty store.
 
-For restored preferences, check that a supported saved value is restored and
-that a missing or obsolete non-critical value uses the product-defined
-fallback. Where the old value should be retained, verify that restoration
+For restored preferences, apply the
+[preference recovery rule](references/spec/rules/cfa-pref-01.md). Verify that
+a supported saved value is restored. Test a missing value and an obsolete
+non-critical value in a recognised format against the product-defined fallback. Where the old value should be retained, verify that restoration
 leaves it in storage. Exercise unreadable or corrupt durable storage and
 failed writes separately, and verify that the Feature reports the error
 without publishing a successful save.
