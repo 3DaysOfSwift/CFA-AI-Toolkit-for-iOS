@@ -14,8 +14,16 @@ const escape = value => String(value).replaceAll('&', '&amp;').replaceAll('<', '
 
 export function buildMap(records, root) {
   const unique = new Map();
+  const resolvedFiles = new Map();
   for (const record of records) {
-    const relative = path.relative(root, record.file);
+    if (!resolvedFiles.has(record.file)) {
+      let resolved = record.file;
+      try { resolved = realpathSync(record.file); } catch {
+        // Keep the recorded path when a source file is no longer available.
+      }
+      resolvedFiles.set(record.file, resolved);
+    }
+    const relative = path.relative(root, resolvedFiles.get(record.file));
     if (!relative || relative.startsWith('..' + path.sep) || path.isAbsolute(relative)) continue;
     const item = {...record, file: relative};
     unique.set(JSON.stringify(item), item);

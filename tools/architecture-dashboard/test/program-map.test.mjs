@@ -1,5 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import {buildMap, launchTree} from '../src/program-map.mjs';
 
 test('keeps only project calls and deduplicates index records', () => {
@@ -18,4 +21,17 @@ test('joins calls by symbol identity and bounds cycles', () => {
   assert.equal(tree[0].children[0].file, 'App.swift');
   assert.equal(tree[0].children[0].children[0].file, 'Feature.swift');
   assert.equal(tree[0].children[0].children[0].children[0].truncated, true);
+});
+
+test('keeps indexed calls when the compiler records a project path alias', t => {
+  const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'cfa-index-alias-'));
+  t.after(() => fs.rmSync(temporary, {recursive: true, force: true}));
+  const root = fs.realpathSync(temporary);
+  const project = path.join(root, 'project');
+  const alias = path.join(root, 'alias');
+  fs.mkdirSync(project);
+  fs.symlinkSync(project, alias, 'dir');
+  fs.writeFileSync(path.join(project, 'A.swift'), '');
+  const call = {file: path.join(alias, 'A.swift'), line: 1, column: 1};
+  assert.deepEqual(buildMap([call], project), [{...call, file: 'A.swift'}]);
 });
