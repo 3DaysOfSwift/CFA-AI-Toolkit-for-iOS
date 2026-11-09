@@ -158,7 +158,9 @@ entry point. Reconcile every entry in `task-map.json` in `taskSites` using the
 same `siteId` / `operationId` or `excludedReason` structure; operation evidence
 must include the associated task site. Add a `presentation` object with app, summary, verdict, conclusion and
 criteria for the concise report. Each criterion needs title, detail, status
-(`pass`, `concern`, `problem`) and source evidence. Use the app's own PNG icon
+(`pass`, `concern`, `problem`) and an `evidence` array of
+`{file, line, endLine}` source ranges. Cite the code that supports the claim,
+and carry confirmed operation problems into the visible findings. Use the app's own PNG icon
 when available. Keep the inventory and working review outside the app source tree. Save the final report in `reports/health-check/` at the app repository root, outside the app target’s source directory.
 
 After review, run:
