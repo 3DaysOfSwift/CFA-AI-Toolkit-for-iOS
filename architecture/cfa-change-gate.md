@@ -288,10 +288,12 @@ the architecture:
 ## Before delivery
 
 Review the changed source as one feature slice, not as isolated files.
-When the scope includes a paid capability, establish its entitlement policy and
-trace every identifiable entry point to a check of current entitlement before
-paid presentation or execution. Flag established unguarded paths and report
-unresolved paths as unverified. Test locked and entitled paths. If entitlement
+When the scope includes a paid capability, establish its entitlement policy.
+Check that PurchasesFeature owns entitlement state and that the screen
+ViewModel checks it before paid presentation or execution. Trace each
+alternate entry point that bypasses the screen to its caller's own check.
+Keep pricing and entitlement checks outside the capability Feature. Flag
+established unguarded paths and report unresolved paths as unverified. Test locked and entitled paths. If entitlement
 can change during a suspension before use, change it while the route is
 suspended and verify the resumed route checks again. Server-protected
 operations enforce authorisation independently.
