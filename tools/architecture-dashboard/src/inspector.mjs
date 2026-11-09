@@ -284,16 +284,16 @@ export async function inspect(project) {
   }
   if (appModelFile) {
     const liveFactoryPattern = /\bstatic\s+func\s+live\s*\(\s*\)\s*->\s*(?:\w+\s*\.\s*)*AppModel\b/g;
-    const initializerScopes = [{file: appModelFile, source: appModel, members: appMembers, start: 0}];
+    const appModelScopes = [{file: appModelFile, source: appModel, members: appMembers, start: 0}];
     for (const [file, source] of sources) {
       for (const extension of source.matchAll(/\bextension\s+AppModel\b(?!\s*\.)[^{}]*\{/g)) {
         const start = extension.index + extension[0].length;
         const members = memberSignatures(braceBody(source, start - 1));
-        initializerScopes.push({file, source, members, start});
+        appModelScopes.push({file, source, members, start});
       }
     }
     const constructionBodies = [];
-    for (const {file, source, members, start} of initializerScopes) {
+    for (const {file, source, members, start} of appModelScopes) {
       for (const factory of members.matchAll(liveFactoryPattern)) {
         const end = start + factory.index + factory[0].length;
         const body = /^\s*\{/.exec(source.slice(end));
@@ -301,7 +301,7 @@ export async function inspect(project) {
       }
     }
     if (constructionBodies.length !== 1) findings.push(finding('app-model-live-factory', 'review', `Found ${constructionBodies.length} static live() -> AppModel candidates across AppModel and its extensions. Verify the single production factory against active targets and compilation conditions.`, appModelFile, 1));
-    for (const {file, source, members, start} of initializerScopes) {
+    for (const {file, source, members, start} of appModelScopes) {
       for (const initializer of members.matchAll(/(?<![.\w])init[?!]?\s*\(/g)) {
         const closing = closingParenthesis(source, start + initializer.index + initializer[0].length - 1);
         if (closing < 0) continue;
@@ -315,23 +315,25 @@ export async function inspect(project) {
         findings.push(finding('app-model-storage-construction', 'review', `${name} references a ModelContainer initializer. Trace whether it opens storage during graph construction. CFA opens the store within the storage owner’s data request.`, file, lineOf(source, opening + 1 + container.index)));
       }
     }
-    for (const match of appMembers.matchAll(/\bstatic[ \t]+(let|var)[ \t]+(\w+)[ \t]*(?::\s*[^;=\n]+)?\s*=(?!=)/g)) {
-      const [, binding, name] = match;
-      if (name === 'shared') {
-        if (binding === 'var') findings.push(finding('app-model-mutable-shared', 'warning', 'AppModel.shared is mutable. Declare the production graph with static let shared and construct it through live().', appModelFile, lineOf(appModel, match.index)));
-        continue;
+    for (const {file, source, members, start} of appModelScopes) {
+      for (const match of members.matchAll(/\bstatic[ \t]+(let|var)[ \t]+(\w+)[ \t]*(?::\s*[^;=\n]+)?\s*=(?!=)/g)) {
+        const [, binding, name] = match;
+        if (name === 'shared') {
+          if (binding === 'var') findings.push(finding('app-model-mutable-shared', 'warning', 'AppModel.shared is mutable. Declare the production graph with static let shared and construct it through live().', file, lineOf(source, start + match.index)));
+          continue;
+        }
+        findings.push(finding('app-model-static-state', 'warning', `AppModel declares static stored property ${name}; CFA reserves static storage in AppModel for the shared production graph.`, file, lineOf(source, start + match.index)));
       }
-      findings.push(finding('app-model-static-state', 'warning', `AppModel declares static stored property ${name}; CFA reserves static storage in AppModel for the shared production graph.`, appModelFile, lineOf(appModel, match.index)));
-    }
-    const computedShared = /\bstatic\s+var\s+shared\s*:\s*(?:\w+\s*\.\s*)*AppModel\b/.exec(appMembers);
-    if (computedShared && hasComputedAccessor(appModel.slice(computedShared.index + computedShared[0].length))) {
-      findings.push(finding('app-model-computed-shared', 'warning', 'AppModel.shared is computed. CFA uses one stored static let initialized through live(). Trace whether the getter creates a new graph on access.', appModelFile, lineOf(appModel, computedShared.index)));
-    }
-    const sharedInitializer = /\bstatic\s+let\s+shared\s*(?::\s*(?:\w+\s*\.\s*)*AppModel\s*)?=/.exec(appMembers);
-    if (sharedInitializer) {
-      const initializer = appModel.slice(sharedInitializer.index + sharedInitializer[0].length);
-      if (!/^\s*(?:(?:\w+\s*\.\s*)*(?:AppModel|Self)\s*\.\s*)?live\s*\(\s*\)/.test(initializer)) {
-        findings.push(finding('app-model-shared-factory', 'review', 'AppModel.shared does not visibly call live(). Trace its initializer and verify the production graph comes from the single live factory.', appModelFile, lineOf(appModel, sharedInitializer.index)));
+      const computedShared = /\bstatic\s+var\s+shared\s*:\s*(?:\w+\s*\.\s*)*AppModel\b/.exec(members);
+      if (computedShared && hasComputedAccessor(source.slice(start + computedShared.index + computedShared[0].length))) {
+        findings.push(finding('app-model-computed-shared', 'warning', 'AppModel.shared is computed. CFA uses one stored static let initialized through live(). Trace whether the getter creates a new graph on access.', file, lineOf(source, start + computedShared.index)));
+      }
+      const sharedInitializer = /\bstatic\s+let\s+shared\s*(?::\s*(?:\w+\s*\.\s*)*AppModel\s*)?=/.exec(members);
+      if (sharedInitializer) {
+        const initializer = source.slice(start + sharedInitializer.index + sharedInitializer[0].length);
+        if (!/^\s*(?:(?:\w+\s*\.\s*)*(?:AppModel|Self)\s*\.\s*)?live\s*\(\s*\)/.test(initializer)) {
+          findings.push(finding('app-model-shared-factory', 'review', 'AppModel.shared does not visibly call live(). Trace its initializer and verify the production graph comes from the single live factory.', file, lineOf(source, start + sharedInitializer.index)));
+        }
       }
     }
     for (const match of appMembers.matchAll(/(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(?:(?:private(?:\(set\))?|fileprivate|internal|public|package)[ \t]+)?(?:let|var)[ \t]+(\w+)\s*=(?!=)/gm)) {

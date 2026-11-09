@@ -262,6 +262,26 @@ test('flags extra static AppModel storage while allowing shared and computed pro
     .map(({file, line}) => [file, line]), [[file, 3]]);
 });
 
+test('checks static AppModel storage in an extension at its source location', async t => {
+  const file = 'Application/2 - AppModel/AppModel+Graph.swift';
+  const root = await fixture(t, {
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel {}',
+    [file]: `extension AppModel {
+      static let shared = AppModel()
+      static let alternateGraph = AppModel()
+      static func live() -> AppModel { AppModel() }
+    }`
+  });
+  const {findings} = await inspect(root);
+  const storageFindings = findings.filter(item =>
+    ['app-model-static-state', 'app-model-shared-factory'].includes(item.code)
+  );
+  assert.deepEqual(storageFindings.map(item => [item.code, item.file, item.line]), [
+    ['app-model-static-state', file, 3],
+    ['app-model-shared-factory', file, 2]
+  ]);
+});
+
 test('flags a mutable shared AppModel graph', async t => {
   const file = 'Application/2 - AppModel/AppModel.swift';
   const root = await fixture(t, {
