@@ -105,6 +105,9 @@ the architecture:
     for genuinely structured, queryable, growing, or relational local data.
     Do not persist the same snapshot through both a database and a file cache.
     Publish durable user edits as saved only after required persistence succeeds.
+    For simple preferences, update `UserDefaults` before publishing the value.
+    Its setter confirms the in-memory update only. Use a storage API that
+    reports the write outcome when the product requires confirmed persistence.
     When both restoration and refresh are needed, start them independently.
     A missing, incompatible or unreadable optional cache must leave the download
     free to proceed. Publish current server data without waiting for the cache

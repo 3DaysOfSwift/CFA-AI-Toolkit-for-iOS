@@ -4,7 +4,7 @@
 
 **Strength:** Required.
 
-**Guidance:** Publish confirmed saved state only after required authoritative persistence succeeds; preserve input on failure.
+**Guidance:** Publish confirmed saved state only after required authoritative persistence succeeds. Preserve input on failure. For simple preferences, update `UserDefaults` before publishing the value. The setter does not confirm a disk write. Use a storage API that reports the write outcome when the product requires confirmed persistence.
 
 **Why:** The UI must not claim that an unsaved change was saved.
 
