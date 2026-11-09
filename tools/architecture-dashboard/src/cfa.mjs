@@ -225,8 +225,9 @@ skill from that toolkit before changing the project.
   For simple preferences, update UserDefaults before publishing the value. Its
   setter confirms the in-memory update only. Use a storage API that reports
   write outcomes when the product requires confirmed persistence.
-- Use the product-defined fallback for a missing or obsolete non-critical
-  preference, such as system appearance for a retired theme. Replace an old
+- Use the product-defined fallback when a non-critical preference is missing
+  or its recognised stored format contains an obsolete value. For example,
+  use system appearance for a retired theme. Replace an old
   saved value only through an intentional migration or a successful user choice.
   Report unreadable or corrupt durable storage and failed durable writes as errors.
 - Start remote refresh and optional cache restoration independently when both

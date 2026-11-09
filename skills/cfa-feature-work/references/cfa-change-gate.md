@@ -137,8 +137,8 @@ the architecture:
     app restores its identity and pending metadata and can retry it safely.
     Verify Apple-managed sync and cross-device conflicts on supported devices
     when applicable, separately from tests using controlled dependencies.
-    When a non-critical preference is missing or obsolete, use its
-    product-defined safe fallback. Preserve the old value where appropriate.
+    Use the product-defined safe fallback when a non-critical preference is
+    missing or when its recognised stored format contains an obsolete value. Preserve the old value where appropriate.
     Replace it through an intentional migration or a successful user choice.
     Treat unreadable or corrupt durable storage and failed durable writes as errors. A fallback must never imply that user
     records loaded or saved successfully.
