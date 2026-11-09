@@ -459,7 +459,7 @@ test('flags storage-gated conventional roots as review hints', async t => {
   const root = await fixture(t, {
     'Application/1 - View/ContentView.swift': 'struct ContentView: View {\n var body: some View {\n if sessionIsReady,\n let container = storage.container { RootTabView() } else { ProgressView() } } }',
     'Application/1 - View/RootTabView.swift': 'struct RootTabView: View { var body: some View { switch databaseState { case .ready: Tabs(); default: ProgressView() } } }',
-    'Application/1 - View/RootView.swift': 'struct RootView: View { var body: some View { if isStoreReady { Tabs() } else { ErrorView() } } }'
+    'Application/1 - View/RootView.swift': 'struct RootView: SwiftUI.View { var body: some View { if isStoreReady { Tabs() } else { ErrorView() } } }'
   });
   const report = await inspect(root);
   const gates = report.findings.filter(item => item.code === 'root-storage-gate');
@@ -677,7 +677,7 @@ test('reviews direct Feature access in reusable Views outside screen folders', a
 
 test('reviews direct Feature access in root tab navigation', async t => {
   const root = await fixture(t, {
-    'Application/1 - View/Views/ContentView.swift': `struct ContentView: View {
+    'Application/1 - View/Views/ContentView.swift': `struct ContentView: SwiftUI.View {
       var body: some View {
         TabView { PracticeView() }.task { await AppModel.shared.practiceFeature.refresh() }
       }
@@ -686,6 +686,7 @@ test('reviews direct Feature access in root tab navigation', async t => {
   const report = await inspect(root);
   assert.equal(report.screens[0].structuralRoot, false);
   assert.equal(report.findings.find(item => item.code === 'root-feature-access')?.line, 3);
+  assert.ok(!report.findings.some(item => item.code === 'view-feature-access'));
 });
 
 test('reviews direct Feature access in a preview while leaving normal previews clear', async t => {

@@ -324,6 +324,7 @@ export async function inspect(project) {
     }
   }
   const viewDeclarations = /\bstruct\s+(\w+)(?:\s*<[^{}]+>)?\s*:\s*(?:SwiftUI\s*\.\s*)?View\b[^{}]*\{/g;
+  const rootViewNames = new Set(['ContentView', 'RootTabView', 'RootView']);
   const viewNames = new Set();
   for (const source of sources.values()) {
     for (const view of source.matchAll(viewDeclarations)) viewNames.add(view[1]);
@@ -344,7 +345,7 @@ export async function inspect(project) {
       }
     }
     for (const view of source.matchAll(viewDeclarations)) {
-      if (isViewFile && /^struct\s+(?:ContentView|RootTabView|RootView)\s*:\s*View\b/.test(view[0])) continue;
+      if (isViewFile && rootViewNames.has(view[1])) continue;
       const start = view.index + view[0].length;
       const access = findFeatureAccess(braceBody(source, start - 1));
       if (access) {
@@ -383,7 +384,8 @@ export async function inspect(project) {
     }
     // Known root conventions only: this is a review hint, not data-flow analysis.
     // Keep feature-screen conditionals and unrelated adaptive layout out of this check.
-    for (const rootView of source.matchAll(/\bstruct\s+(?:ContentView|RootTabView|RootView)\s*:\s*View\b[^\{]*\{/g)) {
+    for (const rootView of source.matchAll(viewDeclarations)) {
+      if (!rootViewNames.has(rootView[1])) continue;
       const bodyOffset = rootView.index + rootView[0].length;
       const rootBody = braceBody(source, bodyOffset - 1);
       const featureAccess = findFeatureAccess(rootBody);
