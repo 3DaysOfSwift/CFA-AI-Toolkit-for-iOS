@@ -193,6 +193,23 @@ test('CFA App template publishes fresh data without waiting for its optional cac
   } finally { fs.rmSync(directory, {recursive: true, force: true}); }
 });
 
+test('CFA App verifier rejects launch signals inside priority or detached tasks', {skip: process.platform !== 'darwin'}, t => {
+  const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/CFA App.xctemplate');
+  const directory = temporary(t);
+  const copy = path.join(directory, 'CFA App.xctemplate');
+  fs.cpSync(source, copy, {recursive: true});
+  const app = path.join(copy, 'Source/Application/1 - View/___PACKAGENAME:identifier___App.swift');
+  const original = fs.readFileSync(app, 'utf8');
+  const signal = 'AppModel.shared.applicationDidFinishLaunching()';
+  assert.ok(original.includes(signal));
+  for (const task of ['Task(priority: .high)', 'Task.detached(priority: .background)', 'Task<Void, Never>']) {
+    fs.writeFileSync(app, original.replace(signal, `${task} { ${signal} }`));
+    const result = spawnSync('node', [path.join(root, 'scripts/verify-xcode-template-structure.mjs'), copy], {encoding: 'utf8'});
+    assert.notEqual(result.status, 0, task);
+    assert.match(result.stderr, /launch method directly/, task);
+  }
+});
+
 test('CFA App includes a separate unit-test template component', {skip: process.platform !== 'darwin'}, () => {
   const template = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/CFA App.xctemplate');
   const info = JSON.parse(execFileSync('plutil', ['-convert', 'json', '-o', '-', path.join(template, 'TemplateInfo.plist')], {encoding: 'utf8'}));

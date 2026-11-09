@@ -64,7 +64,7 @@ export function verifyXcodeTemplateStructure(templateDirectory = defaultTemplate
     fail('Application launch must be signalled from the app delegate, not a View .task.');
   }
   if (!/AppModel\.shared\.applicationDidFinishLaunching\(\)/.test(appSource) ||
-      /Task\s*\{[^}]*applicationDidFinishLaunching/s.test(appSource) ||
+      /\bTask\s*(?:<[^{}\n]*>\s*)?(?:\.\s*detached\s*)?(?:\([^{}]*\)\s*)?\{[^}]*applicationDidFinishLaunching/s.test(appSource) ||
       !/func\s+applicationDidFinishLaunching\(\)\s*\{/.test(appModelSource)) {
     fail('The app delegate must call the synchronous AppModel launch method directly.');
   }
