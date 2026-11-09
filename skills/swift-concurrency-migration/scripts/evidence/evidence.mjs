@@ -173,7 +173,7 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
       if (['unreviewed', 'prohibited'].includes(record.repository.allowedUse)) errors.push('repository.allowedUse: establish permitted use before review');
       if (record.result !== 'blocked' && !record.repository.afterCommit) errors.push('repository.afterCommit: pin the resulting implementation');
       if (!record.evidence.some(item => item.kind === 'source' && item.phase === 'before' && item.commit === record.repository.beforeCommit)) errors.push('evidence: baseline source must identify beforeCommit');
-      if (record.repository.afterCommit && !record.evidence.some(item => item.kind === 'diff' && item.commit === record.repository.afterCommit)) errors.push('evidence: link the change at afterCommit');
+      if (record.repository.afterCommit && !record.evidence.some(item => item.kind === 'diff' && item.phase === 'after' && item.commit === record.repository.afterCommit)) errors.push('evidence: link the final diff as after evidence at afterCommit');
       for (const kind of ['build', 'test']) {
         for (const phase of ['before', 'after']) {
           const commit = phase === 'before' ? record.repository.beforeCommit : record.repository.afterCommit;

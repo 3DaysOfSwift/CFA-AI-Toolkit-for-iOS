@@ -135,6 +135,19 @@ test('partial cases and failures can be approved without inventing success, but 
   assert.ok(inspectRecord(f.file).errors.some(e => e.startsWith('limitations:')));
 });
 
+test('a reviewed migration requires the final diff in its after evidence', t => {
+  const f = reviewedFixture(t);
+  const diff = f.record.evidence.find(item => item.id === 'diff');
+  diff.phase = 'during';
+  f.write();
+  assert.ok(inspectRecord(f.file, { checkDigest: false }).errors.includes(
+    'evidence: link the final diff as after evidence at afterCommit'
+  ));
+  diff.phase = 'after';
+  f.seal();
+  assert.equal(inspectRecord(f.file).valid, true);
+});
+
 test('completion is not inferred from a build pass or tests at a different commit', t => {
   const f = reviewedFixture(t);
   f.record.result = 'completed';
