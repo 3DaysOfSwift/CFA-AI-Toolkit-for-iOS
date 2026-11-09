@@ -207,6 +207,20 @@ actor HeldNotesLoad: NotesRepository {
         precondition(savedFromTaps == ["first"] && dismissals == 1)
         precondition(!repeatedTapEditor.isSaving)
 
+        let changedDraftRepository = ControlledNotes()
+        let changedDraftFeature = NotesFeature(repository: changedDraftRepository)
+        let changedDraftEditor = NotesEditorViewModel(notesFeature: changedDraftFeature)
+        changedDraftEditor.text = "first"
+        let submittedDraft = changedDraftEditor.save {
+            preconditionFailure("A newer draft must keep the editor open")
+        }
+        await changedDraftRepository.waitForFirst()
+        changedDraftEditor.text = "Newer draft"
+        await changedDraftRepository.release()
+        let submittedDraftSaved = await submittedDraft.value
+        precondition(submittedDraftSaved && changedDraftFeature.notes.map(\.text) == ["first"])
+        precondition(changedDraftEditor.text == "Newer draft" && !changedDraftEditor.isSaving)
+
         let failingRepository = ControlledNotes()
         let failingFeature = NotesFeature(repository: failingRepository)
         let delayedFailure = Task { try await failingFeature.save("fail after wait") }

@@ -15,7 +15,8 @@ verify failure recovery, discard without a write, publication after persistence,
 ordered independent saves, JSON storage and fresh editor state. Repeated Save
 taps share one result and invoke the dismissal callback once. A failed save
 leaves the draft intact without invoking the callback. A successful save
-publishes the note and clears the submitted draft before invoking it. A queued
+publishes the note and clears the submitted draft before invoking it. If the
+draft changed programmatically during the save, it stays in the editor. A queued
 save still completes when its predecessor fails, and each caller receives
 its own outcome. The checks also verify that two callers share one load
 and one caller's cancellation leaves the other able to receive the result.
@@ -217,8 +218,8 @@ final class NotesEditorViewModel {
                 self?.loadError = nil
                 if let self, text == submittedText {
                     text = ""
+                    onSuccess()
                 }
-                onSuccess()
                 return true
             } catch NoteError.emptyText {
                 self?.saveError = "Enter a note before saving."

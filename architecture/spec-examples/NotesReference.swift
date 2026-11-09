@@ -165,8 +165,8 @@ final class NotesEditorViewModel {
                 self?.loadError = nil
                 if let self, text == submittedText {
                     text = ""
+                    onSuccess()
                 }
-                onSuccess()
                 return true
             } catch NoteError.emptyText {
                 self?.saveError = "Enter a note before saving."
