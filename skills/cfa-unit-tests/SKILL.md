@@ -160,6 +160,12 @@ verify that server confirmation is shown only after acceptance. For
 Apple-managed sync, verify the actual handoff and conflicting offline edits
 on supported devices separately from the unit tests.
 
+For durable storage compatibility, use a disposable representative store
+written by the previous implementation. Verify that the changed implementation
+opens it at the intended location and can reopen the saved records. Exercise
+a failed open or upgrade and confirm that it preserves the existing data.
+Keep these storage checks separate from tests that start with an empty store.
+
 For restored preferences, check that a supported saved value is restored and
 that a missing or obsolete non-critical value uses the product-defined
 fallback. Where the old value should be retained, verify that restoration
