@@ -118,6 +118,14 @@ and any offline-availability claim describes the snapshot actually saved.
 Trace required saves for user edits separately and verify that a failed write
 leaves the last confirmed value unchanged.
 
+When offline edits or cross-device sync are in scope, apply the
+[sync rule](references/spec/rules/cfa-sync-01.md). Trace local persistence,
+pending sync and server confirmation separately. For a custom server, verify
+that the edit and its pending-sync metadata are saved together before local
+success is reported. Review failed sync, restart, retries, and the product's
+conflict and rejection policy. Check real-device evidence separately for
+Apple-managed sync and concurrent offline edits across devices.
+
 For a suspected startup storage gate, apply the
 [database availability rule](references/spec/rules/cfa-launch-02.md). Trace
 from AppModel construction and root presentation to the first store-opening
