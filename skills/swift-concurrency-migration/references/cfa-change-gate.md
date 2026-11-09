@@ -518,6 +518,10 @@ identifies all of the following:
   intentionally retained to preserve behaviour or platform support. Where a
   consumer needs every event, verify repeated values, ordering and cancellation
   separately from the latest UI state;
+- for existing widgets and device targets affected by Model or service
+  changes, evidence of target membership, build compatibility and preserved
+  data handoff. Verify the receiving target separately from the app build,
+  including snapshot write and reload ordering where applicable;
 - the minimum OS for each affected target and compatibility evidence for
   changed paths at that minimum. Check API availability separately from
   Swift language mode. Preserve existing deployment support unless the

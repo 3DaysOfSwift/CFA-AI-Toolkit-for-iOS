@@ -28,10 +28,15 @@ target. Keep an intentional package placement when it is required or explicitly
 agreed, explain why it differs from the default map, and report an unresolved
 move and its concrete blocker rather than silently treating it as complete.
 
-If an existing widget or device target uses Model code that moves, apply the
-[multi-device rule](spec/rules/cfa-device-01.md). Verify the affected target
-still compiles with its shared Model and target-specific presentation. Preserve
-its existing data handoff and verify changed paths within the migration scope.
+If a changed Model or service is used by an existing widget or device target,
+apply the [multi-device rule](spec/rules/cfa-device-01.md), including when files
+stay in place. Verify target membership, API availability and the existing
+data handoff. If the target reads an App Group snapshot, verify that a
+successful write precedes the reload request and a failed write issues no
+reload. Exercise the receiving target's handling of missing or stale data when
+the path changes. Record build evidence and supported-device transfer evidence
+separately. Preserve the existing handoff unless an in-scope change requires
+adapting it.
 
 ## Final CFA audit and correction
 
