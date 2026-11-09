@@ -181,7 +181,10 @@ skill from that toolkit before changing the project.
   and that events still reach the Feature with no relevant screen open.
   If cancellation is supported, verify that the cancelled listener stops
   forwarding events. If replacement is supported, also verify that cleanup
-  of the old listener leaves the replacement running. Stop isolated listeners after tests.
+  of the old listener leaves the replacement running. For observer-backed
+  streams that support resubscription, deliver a late event from the old
+  registration and verify it cannot update the replacement. Verify delayed
+  teardown removes only the old registration. Stop isolated listeners after tests.
 - Features own their background capabilities. During synchronous launch,
   AppModel can ask each Feature to register its permitted BGTaskScheduler
   identifiers once before launch finishes. Schedule work separately. The system

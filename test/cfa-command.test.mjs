@@ -138,6 +138,7 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /Instant Loading binary snapshots only\s+on request and for a sufficiently stable format with safe decoding/);
   assert.match(content, /Avoid\s+proposing binary snapshots during app creation or migration/);
   assert.match(content, /publish confirmed changes only after required persistence succeeds/);
+  assert.match(content, /teardown removes only the old registration/);
   assert.match(content, /identifiers once before launch finishes/);
   assert.match(content, /An ordinary Swift Task\s+grants no background runtime/);
   assert.match(content, /retry confirms the original edit without applying it again/);
