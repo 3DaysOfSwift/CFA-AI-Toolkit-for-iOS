@@ -122,8 +122,9 @@ private(set) var refreshError: (any Error)?
 
 `refresh()` is an explicit feature command. It may display a saved snapshot
 while requesting newer data. When the server is authoritative and local storage
-is only a replaceable cache, publish a successful current response without waiting
-for the optional cache write; an older cache restore must not replace that response.
+is only a replaceable cache, publish the current response and return to the
+refresh callers without waiting for the cache write. An older cache restore
+must not replace that response.
 User edits that require durable storage follow the separate save-before-publish
 rule. Reading a property must not secretly begin asynchronous work. A ViewModel
 exposes these values as presentation-ready properties; its View shows loading,

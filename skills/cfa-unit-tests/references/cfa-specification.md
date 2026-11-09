@@ -1157,8 +1157,9 @@ appropriate storage API that provides those results instead. Apple documents
 and says [`synchronize()` is unnecessary and should not be used](https://developer.apple.com/documentation/foundation/userdefaults/synchronize()).
 
 A replaceable local cache of data already obtained from an authoritative remote
-source is different: publish a successful, current response without waiting for
-the optional cache write. Attempt caching independently, use a bounded retry,
+source is different. Publish a successful, current response and complete the
+refresh for its callers without waiting for the optional cache write. Attempt
+caching independently, use a bounded retry,
 and do not misrepresent an unsaved cache as available offline. A cache failure
 must not turn the successful remote response into a failed download or discard
 the data. Preserve an existing good cache when a replacement fails and prevent
@@ -1484,8 +1485,9 @@ private(set) var refreshError: (any Error)?
 
 `refresh()` is an explicit feature command. It may display a saved snapshot
 while requesting newer data. When the server is authoritative and local storage
-is only a replaceable cache, publish a successful current response without waiting
-for the optional cache write; an older cache restore must not replace that response.
+is only a replaceable cache, publish the current response and return to the
+refresh callers without waiting for the cache write. An older cache restore
+must not replace that response.
 User edits that require durable storage follow the separate save-before-publish
 rule. Reading a property must not secretly begin asynchronous work. A ViewModel
 exposes these values as presentation-ready properties; its View shows loading,
