@@ -392,3 +392,11 @@ any launch timing. The structural-conflict verdict comes from the classified ope
 checks. For an older review, update its findings and add the corresponding
 `appChecks` before regenerating the report. Use `progress` or `next` to list
 missing questions before rendering.
+
+When the app uses system background work, trace once-only registration during
+launch, separate scheduling, and delivery to the owning Feature. Record
+controlled evidence that expiration cancels the work and that success, failure,
+and expiration each complete the system callback once. Include the race between
+expiration and normal completion. Record actual background execution on a
+supported device separately. A controlled handler test establishes how the app
+responds when called by the system.
