@@ -262,9 +262,7 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
           }
         } else if (field === 'deploymentCompatibilityEvidenceId') {
           const missing = gate.affectedTargets.filter(target => !item.targets?.includes(target));
-          if (!item.targets?.length) {
-            warnings.push(`evidence.${item.id}: list the affected targets covered by the minimum-OS evidence.`);
-          } else if (missing.length) {
+          if (missing.length) {
             errors.push(`completionGate.${field}: ${item.id} omits affected targets: ${missing.join(', ')}.`);
           }
         }

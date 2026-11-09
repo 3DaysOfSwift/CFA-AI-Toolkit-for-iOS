@@ -197,7 +197,7 @@ test('completion is not inferred from a build pass or tests at a different commi
   assert.ok(inspectRecord(f.file).errors.some(error => error.includes('deploymentCompatibilityEvidenceId')));
   f.record.completionGate.deploymentCompatibilityEvidenceId = 'after-deployment-compatibility';
   const compatibility = f.record.evidence.find(item => item.id === 'after-deployment-compatibility');
-  for (const targets of [['App'], ['Unrelated']]) {
+  for (const targets of [undefined, [], ['App'], ['Unrelated']]) {
     compatibility.targets = targets;
     f.write();
     assert.ok(inspectRecord(f.file).errors.some(error =>
