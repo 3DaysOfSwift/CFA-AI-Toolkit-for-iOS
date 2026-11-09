@@ -373,6 +373,12 @@ For each relevant operation, inspect:
   and pagination. Who decides whether to deduplicate, replace, queue or combine?
 - Lifetime: navigation away, observation ending, sign-out and account changes.
   Work may intentionally outlive a screen; establish its owner and purpose.
+- Account transitions: trace a request started in one session that completes
+  after sign-out or after a different account signs in. Locate the account
+  or session-generation check at publication, or establish how the design
+  prevents the stale result from reaching the current account. For CFA,
+  distinguish a failed sign-out that leaves the session intact from a partial
+  authentication change that requires checking the actual session state.
 - State authority: which object accepts results and controls mutations? Look for
   independent writers or conflicting cached state, not harmless value snapshots.
 - Suspension: what assumptions can change during await? Trace validation and
