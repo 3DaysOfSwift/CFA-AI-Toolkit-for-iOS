@@ -99,6 +99,7 @@ for (const declaration of [
   '@State private var reminders = HomeViewModel()',
   '@State private var reminders: HomeViewModel = .init()',
   '@State private var reminders: MyApp.HomeViewModel = MyApp.HomeViewModel()',
+  '@SwiftUI.State private var viewModel = HomeViewModel()',
   '@State private var viewModel =\n HomeViewModel()'
 ]) {
   test('accepts private inline no-argument ownership: ' + declaration, async t => {
@@ -213,9 +214,9 @@ test('an unrelated property named viewModel does not imply ViewModel state assig
 
 test('recognizes typed State construction with a contextual detail ViewModel initializer', async t => {
   const { report, findings } = await inspectView(t, `struct HomeView: View {
-    @State private var viewModel: MyApp.HomeViewModel
+    @SwiftUI.State private var viewModel: MyApp.HomeViewModel
     init(launch: LaunchSnapshot) {
-      self._viewModel = State<MyApp.HomeViewModel>(wrappedValue: .init(launch: launch))
+      self._viewModel = SwiftUI.State<MyApp.HomeViewModel>(wrappedValue: .init(launch: launch))
     }
     var body: some View { Text("Home") }
   }`);
