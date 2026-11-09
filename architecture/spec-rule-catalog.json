@@ -207,9 +207,9 @@
       "section": "Keep Persistence Behind Repository Contracts",
       "applies": "Saving a user edit or other durable command",
       "strength": "Required",
-      "rule": "Publish confirmed saved state only after required authoritative persistence succeeds. Preserve input on failure. For simple preferences, update `UserDefaults` before publishing the value. The setter does not confirm a disk write. Use a storage API that reports the write outcome when the product requires confirmed persistence.",
+      "rule": "Publish confirmed saved state only after required authoritative persistence succeeds. Preserve input on failure. Persist individual record changes by stable identity and reserve whole-dataset replacement for explicit operations with their own integrity rules. For simple preferences, update `UserDefaults` before publishing the value. The setter does not confirm a disk write. Use a storage API that reports the write outcome when the product requires confirmed persistence.",
       "why": "The UI must not claim that an unsaved change was saved.",
-      "verify": "Inject failed and successful writes; check state and retry behaviour.",
+      "verify": "Inject failed and successful writes, then check state and retry behaviour. Reopen storage and verify that overlapping writes to different records preserve both changes.",
       "example": "In the bundled Habit Tracker, a failed count save leaves confirmed progress unchanged and TodayViewModel retains the entered value for retry.",
       "explanationIds": [
         "persistence-boundaries"

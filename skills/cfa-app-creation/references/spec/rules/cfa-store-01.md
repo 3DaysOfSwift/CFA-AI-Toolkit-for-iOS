@@ -4,7 +4,7 @@
 
 **Strength:** Required.
 
-**Guidance:** Publish confirmed saved state only after required authoritative persistence succeeds. Preserve input on failure. For simple preferences, update `UserDefaults` before publishing the value. The setter does not confirm a disk write. Use a storage API that reports the write outcome when the product requires confirmed persistence.
+**Guidance:** Publish confirmed saved state only after required authoritative persistence succeeds. Preserve input on failure. Persist individual record changes by stable identity and reserve whole-dataset replacement for explicit operations with their own integrity rules. For simple preferences, update `UserDefaults` before publishing the value. The setter does not confirm a disk write. Use a storage API that reports the write outcome when the product requires confirmed persistence.
 
 **Why:** The UI must not claim that an unsaved change was saved.
 
@@ -12,6 +12,6 @@
 
 **Explanation:** [Why use record-level persistence boundaries in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/persistence-boundaries).
 
-**Verify:** Inject failed and successful writes; check state and retry behaviour.
+**Verify:** Inject failed and successful writes, then check state and retry behaviour. Reopen storage and verify that overlapping writes to different records preserve both changes.
 
 **Full rule, context and examples:** [Keep Persistence Behind Repository Contracts](../topics/19-keep-persistence-behind-repository-contracts.md). This card is a reading aid; apply the complete canonical section.
