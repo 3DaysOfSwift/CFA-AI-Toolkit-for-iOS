@@ -265,7 +265,7 @@ test('syntax entry points join the inventory without duplicating lexical finding
   assert.deepEqual(nextWork(combined,review).nextEntryPoints,[background,...openingSites]);
   review.entryPoints.push({siteId:background.id, excludedReason:'Registration belongs to a test-only target.'});
   for (const site of openingSites) review.entryPoints.push({siteId:site.id, operationId:'launch'});
-  assert.throws(()=>coverageGaps(combined,review),/evidence must include its reconciled entry point/);
+  assert.throws(()=>coverageGaps(combined,review),/reconciled entry point: launch → App\.swift:3:2 \(incoming-link\)/);
   review.operations[0].evidence[0].endLine = 3;
   assert.deepEqual(nextWork(combined,review).nextEntryPoints,[]);
   assert.match(coverageGaps(combined,complete()).join(' '),/entry points/);
