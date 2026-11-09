@@ -53,7 +53,8 @@ evidence at that revision for every completion gate entry. Link the before/after
 navigator map from manual Xcode inspection, Feature and legacy primitive
 inventories, hybrid review, deployment compatibility, final CFA audit, build, tests, manual behaviour
 regression and human architecture review. Record an executed test or manual observation at `repository.beforeCommit`
-for the behaviour baseline. Compare that evidence with the final regression
+for the behaviour baseline. If a manual baseline names targets, it must cover
+at least one affected target. Compare that evidence with the final regression
 checks. Use
 `completionGate.deploymentCompatibilityEvidenceId` to link the minimum OS of
 each affected target and the evidence that changed paths support it. The

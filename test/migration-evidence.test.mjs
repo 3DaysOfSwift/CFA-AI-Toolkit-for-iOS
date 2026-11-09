@@ -187,6 +187,11 @@ test('completion is not inferred from a build pass or tests at a different commi
     manualBehaviourRegressionEvidenceId: 'after-behaviour-regression',
     manualArchitectureReviewEvidenceId: 'after-architecture-review'
   };
+  baseline.targets = ['Unrelated'];
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.includes('requires recorded before behaviour evidence')));
+  baseline.targets = ['App', 'Widget'];
+
   testEvidence.targets = ['AppTests'];
   f.write();
   const testTargetWarning = 'link the named test targets to the affected application targets';

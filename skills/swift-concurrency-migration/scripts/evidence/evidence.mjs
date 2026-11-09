@@ -184,9 +184,14 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
     }
   }
   if (record.result === 'completed') {
-    const hasBehaviourBaseline = record.repository.beforeCommit && record.evidence.some(item =>
-      ['manual', 'test'].includes(item.kind) && item.phase === 'before' &&
-      item.commit === record.repository.beforeCommit && item.outcome !== 'not-run');
+    const affectedTargets = new Set(record.completionGate?.affectedTargets ?? []);
+    const hasBehaviourBaseline = record.repository.beforeCommit && record.evidence.some(item => {
+      if (item.phase !== 'before' || item.commit !== record.repository.beforeCommit) return false;
+      // A test target can have a different name from the app it exercises.
+      if (item.kind === 'test') return ['passed', 'failed'].includes(item.outcome);
+      return item.kind === 'manual' && item.outcome !== 'not-run' &&
+        (!affectedTargets.size || !item.targets?.length || item.targets.some(target => affectedTargets.has(target)));
+    });
     if (!hasBehaviourBaseline) {
       errors.push('result: completed requires recorded before behaviour evidence at beforeCommit; otherwise use partial');
     }
