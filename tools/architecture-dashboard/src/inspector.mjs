@@ -221,9 +221,12 @@ export async function inspect(project) {
         findings.push(finding('app-model-storage-construction', 'review', `${name} references a ModelContainer initializer. Trace whether it opens storage during graph construction. CFA opens the store within the storage owner’s data request.`, file, lineOf(source, opening + 1 + container.index)));
       }
     }
-    for (const match of appMembers.matchAll(/\bstatic[ \t]+(?:let|var)[ \t]+(\w+)[ \t]*(?::[^;=\n]+)?=(?!=)/g)) {
-      const name = match[1];
-      if (name === 'shared') continue;
+    for (const match of appMembers.matchAll(/\bstatic[ \t]+(let|var)[ \t]+(\w+)[ \t]*(?::[^;=\n]+)?=(?!=)/g)) {
+      const [, binding, name] = match;
+      if (name === 'shared') {
+        if (binding === 'var') findings.push(finding('app-model-mutable-shared', 'warning', 'AppModel.shared is mutable. Declare the production graph with static let shared and construct it through live().', appModelFile, lineOf(appModel, match.index)));
+        continue;
+      }
       findings.push(finding('app-model-static-state', 'warning', `AppModel declares static stored property ${name}; CFA reserves static storage in AppModel for the shared production graph.`, appModelFile, lineOf(appModel, match.index)));
     }
     const sharedInitializer = /\bstatic\s+let\s+shared\s*(?::\s*(?:\w+\s*\.\s*)*AppModel\s*)?=/.exec(appMembers);

@@ -214,6 +214,20 @@ test('flags extra static AppModel storage while allowing shared and computed pro
     .map(({file, line}) => [file, line]), [[file, 3]]);
 });
 
+test('flags a mutable shared AppModel graph', async t => {
+  const file = 'Application/2 - AppModel/AppModel.swift';
+  const root = await fixture(t, {
+    [file]: `final class AppModel {
+      private(set) static var shared: AppModel = live()
+      static func live() -> AppModel { AppModel() }
+    }`
+  });
+  const { findings } = await inspect(root);
+  const warning = findings.find(item => item.code === 'app-model-mutable-shared');
+  assert.equal(warning?.file, file);
+  assert.equal(warning?.line, 2);
+});
+
 test('does not identify a launch guard by the order of private Boolean properties', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel {\n    private var unrelatedFlag: Bool = false\n    private var didFinishLaunching: Bool\n    static func live() -> AppModel { AppModel() }\n}'
