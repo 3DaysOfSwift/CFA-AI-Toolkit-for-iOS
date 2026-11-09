@@ -679,7 +679,14 @@ export async function inspect(project) {
   const viewConformances = /\bextension\s+(\w+)\s*:\s*(?:(?:\w+\s*\.\s*)*\w+\s*,\s*)*(?:SwiftUI\s*\.\s*)?View\b(?!\s*\.)[^{}]*\{/g;
   const appDeclarations = /\bstruct\s+(\w+)\s*:\s*(?:(?:\w+\s*\.\s*)*\w+\s*,\s*)*(?:SwiftUI\s*\.\s*)?App\b(?!\s*\.)[^{}]*\{/g;
   const appConformances = /\bextension\s+(\w+)\s*:\s*(?:(?:\w+\s*\.\s*)*\w+\s*,\s*)*(?:SwiftUI\s*\.\s*)?App\b(?!\s*\.)[^{}]*\{/g;
-  const sceneBodyPattern = /\bvar\s+body\s*:\s*some\s+(?:SwiftUI\s*\.\s*)?Scene\s*\{/;
+  const sceneBodyPattern = /\bvar\s+body\s*:\s*some\s+(?:SwiftUI\s*\.\s*)?Scene\b/;
+  function sceneBodyStart(body, signatures = memberSignatures(body)) {
+    const scene = sceneBodyPattern.exec(signatures);
+    if (!scene) return null;
+    const signatureEnd = scene.index + scene[0].length;
+    const opening = /^\s*\{/.exec(body.slice(signatureEnd));
+    return opening ? signatureEnd + opening[0].length : null;
+  }
   const rootViewNames = new Set(['ContentView', 'RootTabView', 'RootView']);
   const rootStorageGate = /(?<!#)\b(?:if|guard|switch)\s+[^{};]*\b\w*(?:container|database|storeReady|storageReady|startupError|launchError)\w*\b/i;
   const rootStartupGate = /(?<!#)\b(?:if|guard|switch)\s+[^{};]*\b\w*(?:isStartingUp|isLaunching|isInitializing|hasLaunched|hasFinishedLaunching|startupPhase|launchPhase|startupState|launchState|startupReady|launchReady)\w*\b/i;
@@ -732,15 +739,15 @@ export async function inspect(project) {
   for (const [file, source] of sources) {
     for (const app of appScopes(source)) {
       const appBody = braceBody(source, app.index + app[0].length - 1);
-      const scene = sceneBodyPattern.exec(appBody);
-      if (!scene) continue;
-      const body = braceBody(appBody, scene.index + scene[0].length - 1);
+      const bodyStart = sceneBodyStart(appBody);
+      if (bodyStart === null) continue;
+      const body = braceBody(appBody, bodyStart - 1);
       for (const root of body.matchAll(/\bWindowGroup\s*(?:\([^{}]*\)\s*)?\{\s*(?:\w+\s*\.\s*)*(\w+)\s*\(/g)) {
         const name = root[1];
         if (!viewNames.has(name)) continue;
         if ((declarationsByName.get(name)?.length ?? 0) > 1) {
           rootViewNames.delete(name);
-          const index = app.index + app[0].length + scene.index + scene[0].length + root.index;
+          const index = app.index + app[0].length + bodyStart + root.index;
           findings.push(finding('scene-root-ambiguous', 'review', `WindowGroup constructs ${name}, which matches multiple declarations. Verify the root View in the active target before assessing navigation.`, file, lineOf(source, index)));
           continue;
         }
@@ -854,9 +861,8 @@ export async function inspect(project) {
         reviewedAppModelDeclarations.add(start + index);
         findings.push(finding('stored-app-model', 'review', 'This SwiftUI App appears to retain AppModel. Keep App structural and signal the shared model from the application lifecycle callback.', file, lineOf(source, start + index)));
       }
-      const sceneBody = sceneBodyPattern.exec(members);
-      if (sceneBody) {
-        const bodyStart = sceneBody.index + sceneBody[0].length;
+      const bodyStart = sceneBodyStart(members, signatures);
+      if (bodyStart !== null) {
         const body = braceBody(members, bodyStart - 1);
         inspectEnvironmentProviders('App.body', body, file, source, start + bodyStart, members);
         const conditional = /(?<!#)\b(?:if|switch)\b/.exec(body);

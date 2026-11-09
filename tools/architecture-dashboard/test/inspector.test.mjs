@@ -1079,6 +1079,24 @@ test('reviews the App declaration and scene body when conformance is in an exten
   assert.ok(findings.some(item => item.code === 'app-startup-presentation' && item.file === scene && item.line === 4));
 });
 
+test('checks the app scene body even when a nested scene declares body first', async t => {
+  const file = 'Application/ExampleApp.swift';
+  const root = await fixture(t, {
+    [file]: `struct ExampleApp: App {
+      struct NestedScene: Scene {
+        var body: some Scene { WindowGroup { Text("Nested") } }
+      }
+      var body: some Scene {
+        if ready { WindowGroup { ContentView() } }
+        else { WindowGroup { ProgressView() } }
+      }
+    }`
+  });
+  const {findings} = await inspect(root);
+  assert.ok(findings.some(item => item.code === 'conditional-app-body' && item.file === file && item.line === 6));
+  assert.ok(findings.some(item => item.code === 'app-startup-presentation' && item.file === file && item.line === 7));
+});
+
 test('flags conditional database startup presentation in App.body', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
