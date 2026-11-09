@@ -56,8 +56,8 @@ export async function collectIndexedCalls(root, index, moduleName) {
   const temporary = await fs.mkdtemp(path.join(os.tmpdir(), 'cfa-index-map-'));
   let stdout;
   try {
-    const developer = (await run('xcode-select', ['-p'])).stdout.trim();
-    const lib = path.join(developer, 'Toolchains/XcodeDefault.xctoolchain/usr/lib/libIndexStore.dylib');
+    const compiler = (await run('xcrun', ['--find', 'swiftc'])).stdout.trim();
+    const lib = path.resolve(path.dirname(compiler), '../lib/libIndexStore.dylib');
     const binary = path.join(temporary, 'index-program-map');
     await run('xcrun', ['clang', path.join(here, 'index-program-map.c'), lib, '-Wl,-rpath,' + path.dirname(lib), '-o', binary]);
     ({stdout} = await run(binary, [index, moduleName], {maxBuffer: 100 * 1024 * 1024}));
