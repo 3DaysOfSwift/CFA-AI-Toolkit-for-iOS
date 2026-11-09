@@ -228,6 +228,15 @@ test('completion is not inferred from a build pass or tests at a different commi
   f.write();
   assert.ok(inspectRecord(f.file).errors.some(error => error.startsWith('completionGate.dataHandoffEvidenceIds')));
   f.record.completionGate.dataHandoffEvidenceIds = [handoff.id];
+  f.write();
+  assert.ok(inspectRecord(f.file).warnings.some(warning =>
+    warning.includes('evidence.after-widget-handoff: identify the producing and receiving targets')
+  ));
+  handoff.targets = ['App', 'Widget'];
+  f.write();
+  assert.ok(!inspectRecord(f.file).warnings.some(warning =>
+    warning.includes('evidence.after-widget-handoff: identify the producing and receiving targets')
+  ));
 
   const failedRegression = {
     ...afterEvidence('failed-regression', 'manual'),
