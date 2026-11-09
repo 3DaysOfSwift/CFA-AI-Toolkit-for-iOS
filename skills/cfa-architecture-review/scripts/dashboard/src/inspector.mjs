@@ -226,23 +226,24 @@ export async function inspect(project) {
         findings.push(finding('root-storage-gate', 'review', 'Root navigation may gate the interface on storage availability. Open storage within a Feature data request and present its error in the feature screen, never a root wrapper or app-wide blocking overlay.', file, lineOf(source, rootView.index)));
       }
     }
-    for (const task of source.matchAll(/\.task\b\s*([({])/g)) {
+    for (const task of source.matchAll(/\.\s*(task\b\s*([({])|refreshable\b\s*\{)/g)) {
       let opening = task.index + task[0].length - 1;
-      if (task[1] === '(') {
+      if (task[2] === '(') {
         const closing = closingParenthesis(source, opening);
         if (closing < 0) continue;
         const closure = /^\s*\{/.exec(source.slice(closing + 1));
         if (!closure) continue;
         opening = closing + closure[0].length;
       }
+      const modifier = task[1].startsWith('task') ? '.task' : '.refreshable';
       const lifecycleBody = braceBody(source, opening);
       const bodyStartLine = lineOf(source, opening + 1);
       for (const site of scanSource(lifecycleBody, file).sites) {
         if (site.kind !== 'task' && site.kind !== 'detached') continue;
-        findings.push(finding('task-inside-view-lifecycle', 'review', 'A SwiftUI .task body appears to create an independent Task. Trace its lifetime and cancellation. In CFA, await lifecycle-bound work directly, let the ViewModel own independent screen work, and let the Feature own shared operations that may outlive the screen.', file, bodyStartLine + site.line - 1));
+        findings.push(finding('task-inside-view-lifecycle', 'review', `A SwiftUI ${modifier} body appears to create an independent Task. Trace its lifetime and cancellation. In CFA, await lifecycle-bound work directly, let the ViewModel own independent screen work, and let the Feature own shared operations that may outlive the screen.`, file, bodyStartLine + site.line - 1));
       }
       if (/(?<!\bfunc\s+)\bapplicationDidFinishLaunching\s*\(/.test(lifecycleBody)) {
-        findings.push(finding('view-tied-app-launch', 'review', 'A View-layer .task appears to call applicationDidFinishLaunching. Check whether this is production launch behavior rather than a preview or test, and use the app lifecycle callback for the shared launch signal.', file, lineOf(source, task.index)));
+        findings.push(finding('view-tied-app-launch', 'review', `A View-layer ${modifier} appears to call applicationDidFinishLaunching. Check whether this is production launch behavior rather than a preview or test, and use the app lifecycle callback for the shared launch signal.`, file, lineOf(source, task.index)));
       }
     }
     if (/\b(?:let|var)\s+\w+\s*:\s*AppModel\b/.test(source)) findings.push(finding('stored-app-model', 'review', 'An AppModel-typed declaration appears in the View layer. Check whether a View or ViewModel retains it; this lexical match may be a local value or preview.', file, 1));

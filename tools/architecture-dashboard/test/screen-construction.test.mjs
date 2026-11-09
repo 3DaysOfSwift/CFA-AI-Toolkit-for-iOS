@@ -219,3 +219,18 @@ test('comparing a ViewModel in init does not count as assigning its state', asyn
   assert.equal(report.screens[0].ownsViewModel, true);
   assert.deepEqual(findings, []);
 });
+
+test('reviews independent Tasks inside SwiftUI refresh callbacks', async t => {
+  const { report } = await inspectView(t, `struct HomeView: View {
+    @State private var viewModel = HomeViewModel()
+    var body: some View {
+      Text("Home").refreshable {
+        await viewModel.refresh()
+        Task(operation: { await viewModel.refresh() })
+      }
+    }
+  }`);
+  const findings = report.findings.filter(item => item.code === 'task-inside-view-lifecycle');
+  assert.deepEqual(findings.map(item => item.line), [6]);
+  assert.match(findings[0].message, /\.refreshable/);
+});
