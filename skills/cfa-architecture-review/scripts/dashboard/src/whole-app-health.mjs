@@ -182,7 +182,7 @@ export function coverageGaps(report, review) {
     const entry = entries.get(site.id);
     if (!entry?.operationId) continue;
     const op = operations.find(item => item.id === entry.operationId);
-    if (!op.evidence.some(ref => ref.file === site.file && ref.line <= site.line && ref.endLine >= site.line)) throw Error('Operation evidence must include its reconciled entry point.');
+    if (!op.evidence.some(ref => ref.file === site.file && ref.line <= site.line && ref.endLine >= site.line)) throw Error(`Operation evidence must include its reconciled entry point: ${op.id} → ${site.file}:${site.line}.`);
   }
   const missingEntries = candidates.filter(site => !entries.has(site.id));
   if (missingEntries.length) gaps.push(`${missingEntries.length} detected entry points still need reconciliation.`);

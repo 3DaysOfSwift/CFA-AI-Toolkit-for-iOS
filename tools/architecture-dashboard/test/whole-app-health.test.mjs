@@ -104,7 +104,7 @@ test('refuses stale entry IDs and unsupported caller links', () => {
   const stale=complete(); stale.entryPoints[0].siteId='old';
   assert.throws(()=>coverageGaps(report,stale),/current inventory/);
   const wrong=complete(); wrong.operations[0].evidence[0].line=3;
-  assert.throws(()=>coverageGaps(report,wrong),/evidence/);
+  assert.throws(()=>nextWork(report,wrong), /reconciled entry point: launch → App\.swift:2/);
 });
 
 test('reconciled task sites must be cited in a workflow step', () => {
