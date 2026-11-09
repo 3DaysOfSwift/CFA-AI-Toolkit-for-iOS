@@ -127,6 +127,12 @@ operation. For each one, determine:
 - which caller needs the result and on which actor state is published; and
 - how errors and cancellation currently behave.
 
+For existing system background work, record the registration identifiers,
+submission policy and callback path in the baseline. Use the
+[background-work rule](spec/rules/cfa-bg-01.md) to verify expiration and
+system completion. Keep controlled handler evidence separate from actual
+background delivery on a supported device.
+
 Maintain a concurrency inventory alongside the migration ledger. For every
 legacy primitive in scope, record the guarantee it currently provides, its
 intended Swift Concurrency replacement or the concrete reason it must remain,

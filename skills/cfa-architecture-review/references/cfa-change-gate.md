@@ -508,6 +508,11 @@ identifies all of the following:
 - a current concurrency inventory showing every scoped GCD, callback,
   OperationQueue, timer, lock, or delegate route as migrated or explicitly
   retained with a reason;
+- for each migrated system background capability, evidence that the permitted
+  identifiers, launch registration and scheduling behaviour still match the
+  baseline. Record the owning Feature and controlled results for success,
+  failure, expiration and the expiration/completion race. Report actual
+  delivery on supported hardware separately from handler tests;
 - the hybrid implementation review, identifying remaining users of legacy
   mechanisms and dependencies and recording which adapters were removed or
   intentionally retained to preserve behaviour or platform support. Where a
