@@ -46,9 +46,11 @@ For CFA conformance, read the [CFA specification](references/cfa-specification.m
 
 For a whole-app CFA conformance audit, apply the complete [review checklist](references/spec/topics/29-review-checklist.md)
 to the actual source and live wiring. Record evidence for each applicable
-requirement and a reason for each inapplicable one. Keep unresolved behaviour
-unverified. For a focused review, report the scoped findings without issuing a
-whole-app conformance verdict.
+requirement and a reason for each inapplicable one. A whole-app conformance
+pass requires evidence for every applicable requirement. Report verified
+violations and unresolved requirements separately, and state what evidence
+would resolve each open requirement. For a focused review, report the scoped
+findings without issuing a whole-app conformance verdict.
 
 Trace published snapshots from their authoritative owner to their consumers.
 Check stored properties and nested references for mutation, and follow writes
