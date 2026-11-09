@@ -243,6 +243,14 @@ test('completion is not inferred from a build pass or tests at a different commi
     warning.includes('evidence.after-widget-handoff: identify the producing and receiving targets')
   ));
 
+  const architectureReview = f.record.completionGate.manualArchitectureReviewEvidenceId;
+  f.record.completionGate.manualArchitectureReviewEvidenceId = f.record.completionGate.navigatorEvidenceId;
+  f.write();
+  assert.ok(inspectRecord(f.file).warnings.some(warning =>
+    warning.includes('manualArchitectureReviewEvidenceId: shared evidence')
+  ));
+  f.record.completionGate.manualArchitectureReviewEvidenceId = architectureReview;
+
   const failedRegression = {
     ...afterEvidence('failed-regression', 'manual'),
     outcome: 'failed',

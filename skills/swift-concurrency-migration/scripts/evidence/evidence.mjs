@@ -193,6 +193,10 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
         ['manualBehaviourRegressionEvidenceId', ['manual']],
         ['manualArchitectureReviewEvidenceId', ['manual']]
       ];
+      if ([gate.finalCfaAuditEvidenceId, gate.navigatorEvidenceId, gate.manualBehaviourRegressionEvidenceId]
+        .includes(gate.manualArchitectureReviewEvidenceId)) {
+        warnings.push('completionGate.manualArchitectureReviewEvidenceId: shared evidence must explicitly record the human architecture review and its outcome separately from other checks.');
+      }
       if (!gate.dataHandoffEvidenceIds) {
         errors.push('completionGate.dataHandoffEvidenceIds: list evidence for affected handoffs, or use an empty list if none are affected');
       }

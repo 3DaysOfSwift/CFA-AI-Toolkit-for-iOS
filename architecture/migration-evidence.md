@@ -133,7 +133,9 @@ evidence and verdict for each applicable CFA requirement at the final commit.
 Explain why any requirement does not apply and how any agreed exception affects
 the conformance verdict. An unresolved applicable requirement keeps the audit
 open. The validator checks the audit link, revision and recorded outcome. The
-reviewer checks the audit’s coverage and evidence. A failed run at the final
+reviewer checks the audit’s coverage and evidence. Record the human architecture
+review and its outcome explicitly, even when it shares an evidence document
+with the navigator inspection, final audit or manual behaviour regression. A failed run at the final
 commit is flagged for review. Verify that a passing rerun covers the same
 scenario, target, build configuration and OS before accepting completion.
 
