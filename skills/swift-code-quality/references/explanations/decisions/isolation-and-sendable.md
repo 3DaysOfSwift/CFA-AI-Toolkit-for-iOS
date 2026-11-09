@@ -7,7 +7,14 @@ Status: documented basis with editorial analysis; not a founder-approved histori
 
 ## Rule
 
-Keep ViewModels and Features on MainActor, put networking, persistence and expensive processing behind appropriately isolated services, send suitable values across boundaries, and inspect suspension points. Do not use unchecked annotations or detached tasks merely to silence diagnostics.
+Keep ViewModels and Features on MainActor. Underlying microservices avoid
+MainActor isolation by default. Keep framework-required MainActor calls in a
+narrow adapter and give networking, persistence and expensive processing
+an appropriate isolation boundary. A separate type or an `async` declaration
+alone does not move work off MainActor. Pass suitable values across boundaries
+and inspect suspension points. Use unchecked annotations only when the
+underlying safety contract can be verified, and avoid detached tasks used
+merely to silence diagnostics.
 
 ## Problem
 
