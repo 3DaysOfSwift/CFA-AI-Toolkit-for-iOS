@@ -66,7 +66,12 @@ export function renderHealthReport(data, iconData = '') {
     const checks = (op.checks || []).filter(check => check.status !== 'not-applicable');
     const scenarios = (op.scenarios || []).filter(scenario => scenario.status !== 'not-applicable');
     const labels = {pass:'✓', fail:'×', problem:'×', unresolved:'?', 'not-checked':'?'};
-    const rows = items => items.map(item => `<div class="behaviour-row"><strong>${labels[item.status] || '?'} ${escape(item.title)}</strong><p>${escape(item.reason || item.outcome)}</p>${item.consequence ? `<p><strong>Consequence:</strong> ${escape(item.consequence)}</p>` : ''}<p class="evidence">${escape(item.verification)}</p>${sourceLinks(item.evidence)}</div>`).join('');
+    const problemLabels = {
+      'architectural-conflict': 'Architectural conflict',
+      'local-defect': 'Local defect',
+      'cfa-deviation': 'CFA deviation'
+    };
+    const rows = items => items.map(item => `<div class="behaviour-row"><strong>${labels[item.status] || '?'} ${escape(item.title)}</strong>${problemLabels[item.problemKind] ? `<p>${problemLabels[item.problemKind]}</p>` : ''}<p>${escape(item.reason || item.outcome)}</p>${item.consequence ? `<p><strong>Consequence:</strong> ${escape(item.consequence)}</p>` : ''}<p class="evidence">${escape(item.verification)}</p>${sourceLinks(item.evidence)}</div>`).join('');
     const behaviourChecks = checks.filter(check => check.dimension !== 'cfa');
     const cfaChecks = checks.filter(check => check.dimension === 'cfa');
     return `${behaviourChecks.length ? `<h3>Behaviour checks</h3>${rows(behaviourChecks)}` : ''}${cfaChecks.length ? `<h3>CFA alignment</h3>${rows(cfaChecks)}` : ''}${scenarios.length ? `<h3>When timing changes</h3>${rows(scenarios)}` : ''}`;

@@ -304,7 +304,9 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
     await fs.writeFile(reviewPath,JSON.stringify(checkProblem));
     const conflictOutput = path.join(base,'conflict.html');
     await finish(project,reviewPath,conflictOutput,undefined,syntax);
-    assert.match(await fs.readFile(conflictOutput,'utf8'),/Frankenstein architecture detected.*Yes. Architectural conflicts/);
+    const conflictHtml = await fs.readFile(conflictOutput,'utf8');
+    assert.match(conflictHtml,/Frankenstein architecture detected.*Yes. Architectural conflicts/);
+    assert.match(conflictHtml,/state-ownership<\/strong><p>Architectural conflict<\/p>/);
     assert.match(problemHtml,/<summary><span class="indicator problem" aria-label="Problem">×<\/span>Start/);
     await fs.writeFile(reviewPath,JSON.stringify(review));
     const result=await finish(project,reviewPath,output,undefined,syntax);
