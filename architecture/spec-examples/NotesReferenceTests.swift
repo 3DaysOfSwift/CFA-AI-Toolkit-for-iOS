@@ -173,6 +173,7 @@ actor HeldNotesLoad: NotesRepository {
         let before = await repository.saved
         precondition(before == ["retry"])
         precondition(feature.notes.map(\.text) == before, "Publish only after the pending write succeeds")
+        let earlierSnapshot = feature.notes
         await repository.release()
         try await first.value
         try await second.value
@@ -180,6 +181,7 @@ actor HeldNotesLoad: NotesRepository {
         let saved = await repository.saved
         precondition(saved == ["retry", "first", "second", "second"])
         precondition(feature.notes.map(\.text) == saved)
+        precondition(earlierSnapshot == confirmedBeforeFailure, "A reader keeps its earlier snapshot after new saves")
 
         let repeatedTapRepository = ControlledNotes()
         let repeatedTapFeature = NotesFeature(repository: repeatedTapRepository)
