@@ -28,7 +28,13 @@ final class LaunchFeature {
     func refresh(available: Bool) async -> Bool {
         let previous = refreshTask
         let id = UUID()
-        let task = Task { @MainActor in
+        let task = Task {
+            defer {
+                if refreshID == id {
+                    refreshTask = nil
+                    refreshID = nil
+                }
+            }
             _ = await previous?.value
             do {
                 let downloadedName = try await provider.download(available: available)
@@ -42,12 +48,7 @@ final class LaunchFeature {
         }
         refreshTask = task
         refreshID = id
-        let succeeded = await task.value
-        if refreshID == id {
-            refreshTask = nil
-            refreshID = nil
-        }
-        return succeeded
+        return await task.value
     }
 }
 
