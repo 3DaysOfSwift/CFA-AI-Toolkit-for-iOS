@@ -747,9 +747,17 @@ export async function inspect(project) {
     const viewModelMembers = viewModelDeclaration
       ? viewModel.slice(0, viewModelBodyStart).replace(/[^\n]/g, ' ') + memberSignatures(viewModelBody)
       : '';
-    const retainedAppModel = inferredAppModelStorage.exec(viewModelMembers);
-    if (retainedAppModel) {
-      findings.push(finding('stored-app-model', 'review', 'This ViewModel appears to retain AppModel.shared in a stored property. Keep only the concrete Features this screen needs.', viewModelFile, lineOf(viewModel, retainedAppModel.index)));
+    const typedAppModelStorage = /\b(?:let|var)\s+`?\w+`?\s*:\s*(?:\w+\s*\.\s*)*AppModel\b(?!\s*\.)(?:[ \t]*[?!])?/g;
+    const retainedAppModels = [...viewModelMembers.matchAll(typedAppModelStorage)].filter(match =>
+      !hasComputedAccessor(viewModel.slice(match.index + match[0].length)));
+    const inferredModel = inferredAppModelStorage.exec(viewModelMembers);
+    if (inferredModel) retainedAppModels.push(inferredModel);
+    for (const match of retainedAppModels) {
+      const line = lineOf(viewModel, match.index);
+      const existing = findings.findIndex(item => item.code === 'stored-app-model' && item.file === viewModelFile && item.line === line);
+      const findingForStorage = finding('stored-app-model', 'review', 'This ViewModel appears to retain AppModel in a stored property. Keep only the concrete Features this screen needs.', viewModelFile, line);
+      if (existing < 0) findings.push(findingForStorage);
+      else findings[existing] = findingForStorage;
     }
     const testName = `${viewModelName}Tests.swift`;
     const testCandidates = [...paths].filter(file => path.posix.basename(file) === testName);
