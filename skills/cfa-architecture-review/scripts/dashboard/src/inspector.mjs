@@ -394,6 +394,8 @@ export async function inspect(project) {
     }
     if (namedTests.length > 1) {
       findings.push(finding('feature-tests-ambiguous', 'review', `Multiple files match ${testName}: ${namedTests.join(', ')}. Verify which test target covers this Feature.`, location, line));
+    } else if (namedTests.length === 1 && (declarationsByName.get(type)?.length ?? 0) > 1) {
+      findings.push(finding('feature-tests-ambiguous', 'review', `${namedTests[0]} matches multiple declarations named ${type}. Verify which declaration the test target covers.`, location, line));
     }
     if (!namedTests.length) {
       findings.push(finding('feature-tests-missing', 'review', `No ${testName} was found in the scanned directory. Check the project root and test target before concluding the test is missing.`, location, line));

@@ -1018,6 +1018,18 @@ test('reviews matching ViewModel tests in production source trees', async t => {
   assert.ok(placement.every(item => item.severity === 'review' && /unit-test target/.test(item.message)));
 });
 
+test('reviews a single test filename that matches competing Feature declarations', async t => {
+  const root = await fixture(t, {
+    'App/2 - AppModel/Features/Launch/LaunchFeature.swift': 'final class LaunchFeature {}',
+    'Other/2 - AppModel/Features/Launch/LaunchFeature.swift': 'final class LaunchFeature {}',
+    'AppTests/FeatureTests/LaunchFeatureTests.swift': 'struct LaunchFeatureTests {}'
+  });
+  const {findings} = await inspect(root);
+  const ambiguity = findings.filter(item => item.code === 'feature-tests-ambiguous');
+  assert.equal(ambiguity.length, 1);
+  assert.match(ambiguity[0].message, /matches multiple declarations named LaunchFeature/);
+});
+
 test('reports ambiguous Feature test filenames across targets', async t => {
   const root = await fixture(t, {
     'App/2 - AppModel/AppModel.swift': 'final class AppModel { let launchFeature: LaunchFeature }',
