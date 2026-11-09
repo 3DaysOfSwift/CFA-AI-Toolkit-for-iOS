@@ -270,7 +270,7 @@ export async function inspect(project) {
       const bodyStart = declaration.index + declaration[0].length;
       const body = braceBody(source, bodyStart - 1);
       const members = memberSignatures(body);
-      for (const property of members.matchAll(/(?:^|(?<=;))[ \t]*(?:(?:private(?:\(set\))?|fileprivate|internal|public)\s+)?(?:let|var)\s+(\w+)\s*(?::\s*((?:\w+\s*\.\s*)*\w+Feature\b(?:\s*[?!])?)(?!\s*[.?!])|=\s*((?:\w+\s*\.\s*)*\w+Feature)\b(?:\s*\.\s*init)?\s*\()/gm)) {
+      for (const property of members.matchAll(/(?:^|(?<=;))[ \t]*(?:(?:private(?:\(set\))?|fileprivate|internal|public|package|lazy|weak|unowned(?:\((?:safe|unsafe)\))?)[ \t]+)*(?:let|var)\s+(\w+)\s*(?::\s*((?:\w+\s*\.\s*)*\w+Feature\b(?:\s*[?!])?)(?!\s*[.?!])|=\s*((?:\w+\s*\.\s*)*\w+Feature)\b(?:\s*\.\s*init)?\s*\()/gm)) {
         const end = property.index + property[0].length;
         const [, name, declaredType, constructedType] = property;
         if (declaredType && hasComputedAccessor(body.slice(end))) continue;

@@ -786,11 +786,13 @@ test('surfaces a stored Feature dependency as coordination to review', async t =
       var computed: OrdersFeature { orders }
       var optionalComputed: OrdersFeature? { orders }
       private var optionalOrders: OrdersFeature?
+      private weak var backupOrders: OrdersFeature?
+      private lazy var deferredOrders = OrdersFeature()
       func signOut() { let local: OrdersFeature = orders }
     }`
   });
   const findings = (await inspect(root)).findings.filter(item => item.code === 'feature-coordination');
-  assert.deepEqual(findings.map(({file, line, severity}) => [file, line, severity]), [[file, 2, 'review'], [file, 4, 'review'], [file, 8, 'review']]);
+  assert.deepEqual(findings.map(({file, line, severity}) => [file, line, severity]), [[file, 2, 'review'], [file, 4, 'review'], [file, 8, 'review'], [file, 9, 'review'], [file, 10, 'review']]);
   assert.match(findings[1].message, /AccountDomain\.FavouritesFeature/);
   assert.match(findings[0].message, /business capability.*one owner per state.*dependency cycle/);
 });
