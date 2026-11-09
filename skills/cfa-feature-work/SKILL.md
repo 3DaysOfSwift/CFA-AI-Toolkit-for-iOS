@@ -46,6 +46,13 @@ opening callback through the pending store to the receiving scene. Verify
 that declining leaves the request pending and that retrying a failed removal
 does not navigate twice.
 
+When adding or changing a widget or another device target, apply the
+[multi-device rule](references/spec/rules/cfa-device-01.md). Reuse the owning
+Feature and shared Model source. Include only the target's own presentation
+files and compose the services available to its process. Trace data from the
+writer through the handoff to the receiving Feature. Build affected targets
+and verify source membership, API availability and snapshot behaviour.
+
 Fit new UI into the existing product design. Do not add themes, footers or
 branding merely because a new Feature is being created. In new-product
 development, App Creation guides product shaping without expanding this task.
