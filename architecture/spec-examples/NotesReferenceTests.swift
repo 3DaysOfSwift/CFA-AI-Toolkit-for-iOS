@@ -39,9 +39,9 @@ actor RetryableNotes: NotesRepository {
         let retryRepository = RetryableNotes()
         let retryFeature = NotesFeature(repository: retryRepository)
         let retryModel = NotesEditorViewModel(notesFeature: retryFeature)
-        await retryModel.load().value
+        await retryModel.load()
         precondition(retryModel.loadError != nil && retryFeature.notes.isEmpty)
-        await retryModel.load().value
+        await retryModel.load()
         precondition(retryModel.loadError == nil && retryFeature.notes.map(\.text) == ["Previously saved"])
 
         let repository = ControlledNotes()

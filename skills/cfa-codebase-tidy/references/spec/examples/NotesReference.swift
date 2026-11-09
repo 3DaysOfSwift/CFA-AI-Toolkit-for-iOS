@@ -126,16 +126,21 @@ final class NotesEditorViewModel {
         self.notesFeature = notesFeature
     }
 
-    @discardableResult
-    func load() -> Task<Void, Never> {
-        if let loadTask { return loadTask }
-        let task = Task { @MainActor in
-            defer { loadTask = nil }
-            do { try await notesFeature.loadIfNeeded(); loadError = nil }
-            catch { loadError = "Notes could not be loaded. Please try again." }
+    func load() async {
+        do {
+            try await notesFeature.loadIfNeeded()
+            if !Task.isCancelled { loadError = nil }
+        } catch {
+            if !Task.isCancelled { loadError = "Notes could not be loaded. Please try again." }
         }
-        loadTask = task
-        return task
+    }
+
+    func retryLoad() {
+        guard loadTask == nil else { return }
+        loadTask = Task {
+            defer { loadTask = nil }
+            await load()
+        }
     }
 
     @discardableResult
@@ -174,7 +179,7 @@ struct NotesEditorView: View {
             if let error = viewModel.saveError { Text(error) }
             if let error = viewModel.loadError {
                 Text(error)
-                Button("Try again") { viewModel.load() }
+                Button("Try again") { viewModel.retryLoad() }
             }
             Button("Save") { viewModel.save { dismiss() } }
                 .disabled(viewModel.isSaving)
@@ -182,6 +187,6 @@ struct NotesEditorView: View {
                 .disabled(viewModel.isSaving)
         }
         .interactiveDismissDisabled(viewModel.isSaving)
-        .task { await viewModel.load().value }
+        .task { await viewModel.load() }
     }
 }
