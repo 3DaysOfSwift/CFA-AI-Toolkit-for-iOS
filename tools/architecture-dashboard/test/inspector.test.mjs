@@ -388,18 +388,19 @@ test('identifies a launch signal deferred by DispatchQueue.asyncAfter', async t 
   assert.match(findings[0].message, /DispatchQueue\.asyncAfter/);
 });
 
-test('reviews a launch signal queued on OperationQueue.main', async t => {
+test('reviews a launch signal queued on a main or newly created OperationQueue', async t => {
   const root = await fixture(t, {
     'Application/AppDelegate.swift': `class Delegate {
       func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool {
         OperationQueue.main.addOperation { analytics.recordLaunch() }
         OperationQueue.main.addOperation { AppModel.shared.applicationDidFinishLaunching() }
+        OperationQueue().addOperation { AppModel.shared.applicationDidFinishLaunching() }
         return true
       }
     }`
   });
   const findings = (await inspect(root)).findings.filter(item => item.code === 'scheduled-app-model-launch');
-  assert.deepEqual(findings.map(item => item.line), [4]);
+  assert.deepEqual(findings.map(item => item.line), [4, 5]);
   assert.match(findings[0].message, /OperationQueue\.addOperation/);
 });
 
