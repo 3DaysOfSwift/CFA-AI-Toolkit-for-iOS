@@ -984,7 +984,7 @@ test('reviews direct Feature access in a preview while leaving normal previews c
       Text(AppModel.shared.homeFeature.title)
     }
     #Preview("Aliased access") {
-      let model = AppModel.shared
+      let model: Example.AppModel = Example.AppModel.shared
       Text(model.homeFeature.title)
     }
     #Preview("Separate local bindings") {
