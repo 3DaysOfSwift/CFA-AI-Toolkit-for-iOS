@@ -104,7 +104,7 @@ Read the warnings from both `validate` and `digest`. For a failed run during
 or after migration, keep the failure record and link a passing rerun at the
 final commit for the same scenario, target, build configuration and OS.
 For a completed record, each failure during or after migration requires a
-passing final-commit evidence entry whose `rerunOf` names the failed check. The rerun must name every target listed by the failed check. For a completed record, the failed build, test or manual run and at least one
+passing final-commit evidence entry whose `rerunOf` names the failed check. Name the targets exercised by each failed build, test or manual check. The rerun must name every target listed by the failed check. For a completed record, the failed build, test or manual run and at least one
 passing final-commit rerun must use the same non-empty environment description.
 Use a consistent description for the build configuration, OS and device or
 simulator. Differing build or test commands still trigger a review warning. Verify that the new command still

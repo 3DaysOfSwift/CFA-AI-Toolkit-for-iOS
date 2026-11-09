@@ -214,6 +214,9 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
         candidate.kind === item.kind && candidate.outcome === 'passed' &&
         candidate.phase === 'after' && candidate.commit === record.repository.afterCommit);
       const requiresEnvironment = ['build', 'test', 'manual'].includes(item.kind);
+      if (requiresEnvironment && !item.targets?.length) {
+        errors.push(`evidence.${item.id}: name the targets exercised by the failed check before marking the migration completed.`);
+      }
       const rerun = reruns.find(candidate => !requiresEnvironment ||
         (item.environment && item.environment.trim() === candidate.environment?.trim()));
       if (!reruns.length) {

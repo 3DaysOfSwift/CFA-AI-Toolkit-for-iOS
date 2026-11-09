@@ -416,6 +416,11 @@ test('completion is not inferred from a build pass or tests at a different commi
   assert.ok(inspectRecord(f.file).errors.some(error => error.startsWith('evidence.rerun-earlier-regression.rerunOf:')));
   assert.ok(inspectRecord(f.file).errors.some(error => error.startsWith('evidence.earlier-regression:')));
   earlierRerun.phase = 'after';
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.includes(
+    'evidence.earlier-regression: name the targets exercised by the failed check before marking the migration completed.'
+  ));
+  f.record.evidence.find(item => item.id === 'earlier-regression').targets = ['Widget'];
   f.seal();
   assert.equal(inspectRecord(f.file).valid, true);
   assert.ok(!inspectRecord(f.file).errors.some(error => error.includes('list the affected targets exercised by the manual regression')));
