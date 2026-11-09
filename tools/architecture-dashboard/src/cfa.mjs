@@ -29,7 +29,8 @@ const serviceGuidanceUpdate = 'Clarify SwiftDataManager ownership and keep indep
 const outdatedScreenGuidance = 'Every screen owns a dedicated ViewModel. Declare it as @State private var';
 const screenGuidanceUpdate = 'Apply private @State ViewModel ownership to SwiftUI screens and trace the actual presentation owner for UIKit migrations.';
 const outdatedDeepLinkGuidance = 'remove it on actual navigation or explicit dismissal';
-const deepLinkGuidanceUpdate = 'Explain how to retry a failed pending-request removal without navigating again.';
+const outdatedPendingSaveGuidance = 'Persist only the safe data needed to identify and present each request.';
+const deepLinkGuidanceUpdate = 'Confirm pending requests only after persistence succeeds, and retry failed removal without navigating again.';
 const outdatedSnapshotGuidance = 'Published domain snapshots use immutable properties and contents';
 const snapshotGuidanceUpdate = 'Use let properties and check nested values for mutable references.';
 const outdatedSharedWaitGuidance = 'A departing screen may stop waiting while the Feature keeps refreshing.';
@@ -74,7 +75,10 @@ skill from that toolkit before changing the project.
   calls for them.
 - In a new app with deep links or notification actions, DeepLinkingFeature
   validates opening requests and owns the durable pending list shown in Settings.
-  Persist only the safe data needed to identify and present each request.
+  Save the safe data needed to identify and present each request before adding
+  it to the visible pending list or confirming it was kept. Surface an initial
+  save failure and leave the pending list unchanged. If a request arrives
+  during restoration, preserve both the saved requests and the new request.
   Handle expired or unavailable destinations clearly. Record incoming URLs
   and user actions on local or push notifications.
   Scheduling or delivery alone does not create a pending item. The receiving
@@ -354,7 +358,7 @@ function doctor(projectArgument) {
       if (content.includes(outdatedScreenGuidance)) {
         console.log(`WARN outdated screen ownership guidance in ${file}. ${screenGuidanceUpdate}`);
       }
-      if (content.includes(outdatedDeepLinkGuidance)) {
+      if (content.includes(outdatedDeepLinkGuidance) || content.includes(outdatedPendingSaveGuidance)) {
         console.log(`WARN outdated deep-link guidance in ${file}. ${deepLinkGuidanceUpdate}`);
       }
       if (content.includes(outdatedSnapshotGuidance)) {
@@ -423,7 +427,7 @@ function enableProject(values) {
     if (block.includes(outdatedScreenGuidance)) {
       console.log(`Update the existing CFA screen ownership guidance block. ${screenGuidanceUpdate}`);
     }
-    if (block.includes(outdatedDeepLinkGuidance)) {
+    if (block.includes(outdatedDeepLinkGuidance) || block.includes(outdatedPendingSaveGuidance)) {
       console.log(`Update the existing CFA deep-link guidance block. ${deepLinkGuidanceUpdate}`);
     }
     if (block.includes(outdatedSnapshotGuidance)) {

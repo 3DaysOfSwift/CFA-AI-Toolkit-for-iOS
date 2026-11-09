@@ -84,6 +84,9 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /nested values and collection elements for references that can change\s+in place/);
   assert.match(content, /read observable Feature state through the ViewModel/);
   assert.match(content, /draft available for retry if saving fails/);
+  assert.match(content, /Save the safe data needed to identify and present each request before adding\s+it to the visible pending list/);
+  assert.match(content, /Surface an initial\s+save failure and leave the pending list unchanged/);
+  assert.match(content, /during restoration, preserve both the saved requests and the new request/);
   assert.match(content, /same account can sign back in before old work finishes, check the\s+session identity/);
   assert.match(content, /missing, incompatible or unreadable cache\s+supplies no restored data/);
   assert.match(content, /Instant Loading binary snapshots only\s+on request and for a sufficiently stable format with safe decoding/);
