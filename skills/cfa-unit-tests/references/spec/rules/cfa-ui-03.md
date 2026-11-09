@@ -4,7 +4,7 @@
 
 **Strength:** Permitted exception.
 
-**Guidance:** A detail View may receive a selected immutable snapshot and use it to construct its own State-backed ViewModel in the View initializer. The snapshot is initial input for that destination identity. A changed input does not automatically replace its State-backed ViewModel. Keep each scene’s selection in its presentation, while the Feature owns the authoritative data. Preserve the displayed snapshot and navigation when the source list changes. Use explicit refresh where appropriate. Live updates are a product choice.
+**Guidance:** A detail View may receive a selected immutable snapshot and use it to construct its own State-backed ViewModel in the View initializer. The snapshot is initial input for that destination identity. A changed input does not automatically replace its State-backed ViewModel. Keep each scene’s selection in its presentation, while the Feature owns the authoritative data. Preserve the displayed snapshot and navigation when the source list changes. Omission from a refreshed list does not establish deletion. Prefer explicit refresh where it meets the product need. Automatic adoption of newer snapshots is a product choice. If several consumers need updates for a specific item, prefer a focused Feature API by item identity and define its lifetime and missing-item behaviour.
 
 **Why:** Each destination can preserve its selection independently.
 
