@@ -79,7 +79,8 @@ export function validate(base=root,{source=true}={}) {
     // catches a common metadata mistake; it is not a complete YAML parser.
     const frontmatter = text.match(/^---\s*\n([\s\S]*?)\n---(?:\s|$)/)?.[1] ?? '';
     const description = frontmatter.match(/^description:\s+(.+)$/m)?.[1];
-    if (description && !/^["'|>]/.test(description) && /:\s/.test(description)) {
+    const plainDescription = description?.replace(/\s+#.*$/, '');
+    if (description && !/^["'|>]/.test(description) && /:\s/.test(plainDescription)) {
       throw Error(`Unquoted colon in skill description: ${name}`);
     }
     if (referenceFeatureSkills.includes(name)) {

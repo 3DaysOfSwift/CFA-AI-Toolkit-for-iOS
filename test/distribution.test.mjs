@@ -158,6 +158,8 @@ test('release validation rejects an unquoted colon in a skill description', t =>
  const original=fs.readFileSync(entry,'utf8');
  fs.writeFileSync(entry,original.replace(/^description: .*$/m,'description: Legacy migration: migrate an app'));
  assert.throws(()=>validate(source,{source:false}),/Unquoted colon in skill description: swift-concurrency-migration/);
+ fs.writeFileSync(entry,original.replace(/^description: .*$/m,'description: Legacy migration # Note: a valid comment'));
+ assert.doesNotThrow(()=>validate(source,{source:false}));
  fs.writeFileSync(entry,original);
  assert.doesNotThrow(()=>validate(source,{source:false}));
 });
