@@ -118,7 +118,7 @@
       "section": "Define Features by Business Capability, Not by Screen or Tab",
       "applies": "Sign-out, account switching or session expiration affects other Features",
       "strength": "Default",
-      "rule": "UserProfileFeature may call affected Features directly; if sign-out fails before the session ends, retain the session and account data. After success clear affected state and prevent stale requests republishing old data. If sign-out promises a fresh-install experience, also clear account-specific memory, caches and locally stored files. Handle unsynchronised work transparently and preserve independent purchases and user-owned documents.",
+      "rule": "UserProfileFeature may call affected Features directly; if sign-out fails before the session ends, retain the session and account data. After success, clear affected state and check the current account or session generation before publishing an in-flight result, including when the request has been cancelled. If sign-out promises a fresh-install experience, also clear account-specific memory, caches and locally stored files. Handle unsynchronised work transparently and preserve independent purchases and user-owned documents.",
       "why": "A visible direct workflow avoids unnecessary event infrastructure while protecting account data.",
       "verify": "Test failed and successful sign-out, account switch, in-flight requests and partial authentication outcomes.",
       "example": "After successful sign-out, UserProfileFeature asks OrdersFeature and FavouritesFeature to clear account data.",

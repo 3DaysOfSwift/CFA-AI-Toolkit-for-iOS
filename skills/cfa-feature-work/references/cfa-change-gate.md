@@ -150,7 +150,9 @@ the architecture:
     When account changes affect other Features, coordinate the real workflow
     explicitly. If sign-out fails before the session ends, retain account state;
     after success clear affected state and prevent old requests from republishing
-    it. Reconcile partial authentication outcomes and handle cleanup failures
+    it. Check the current account or session generation before publishing an
+    in-flight result, including when a request has been cancelled. Reconcile
+    partial authentication outcomes and handle cleanup failures
     honestly; preserve user-owned or unsynchronised work according to the product.
 21. New-app visual starting points live in [new-app design defaults](new-app-design-defaults.md).
     Use them only where appropriate to the recorded workflow and current request;
