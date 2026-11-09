@@ -602,11 +602,13 @@ export async function inspect(project) {
         const code = featureTypeSuffix.test(match[1]) ? 'view-stored-feature' : 'view-stored-model-dependency';
         findings.push(finding(code, 'review', `${view[1]} appears to store ${match[1]} directly. Verify that Feature access goes through the screen-owned ViewModel.`, file, lineOf(source, start + match.index)));
       }
-      const viewModelInput = /(?:\blet|@(?:SwiftUI\s*\.\s*)?(?:ObservedObject|Bindable)\s+(?:(?:private|fileprivate)\s+)?var)\s+`?\w+`?\s*:\s*(?:\w+\s*\.\s*)*(\w+ViewModel)\b(?!\s*\.)\s*[?!]?/g;
+      const viewModelInput = /(?:^|(?<=;))[ \t]*(?:@(?:SwiftUI\s*\.\s*)?(State|StateObject|ObservedObject|Bindable)\s+)?(?:(?:private|fileprivate|internal|package|public)\s+)?(?:let|var)\s+`?\w+`?\s*:\s*(?:\w+\s*\.\s*)*(\w+ViewModel)\b(?!\s*\.)(?:[ \t]*[?!])?/gm;
       for (const match of members.matchAll(viewModelInput)) {
-        const suffix = body.slice(match.index + match[0].length);
+        const [declaration, wrapper, type] = match;
+        if (wrapper === 'State' || wrapper === 'StateObject') continue;
+        const suffix = body.slice(match.index + declaration.length);
         if (hasComputedAccessor(suffix) || /^\s*=/.test(suffix)) continue;
-        findings.push(finding('view-model-input-storage', 'review', `${view[1]} declares ${match[1]} storage without an inline value. Trace its initialization to check whether another View supplies the ViewModel.`, file, lineOf(source, start + match.index)));
+        findings.push(finding('view-model-input-storage', 'review', `${view[1]} declares ${type} storage without an inline value. Trace its initialization to check whether another View supplies the ViewModel.`, file, lineOf(source, start + match.index)));
       }
       const storedModel = inferredAppModelStorage.exec(members);
       if (storedModel) {

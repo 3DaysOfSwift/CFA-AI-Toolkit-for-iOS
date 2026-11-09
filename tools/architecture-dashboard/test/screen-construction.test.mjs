@@ -152,7 +152,7 @@ test('reviews supplied ViewModel storage without flagging screen-owned State', a
   const file = 'App/Presentation/Notes.swift';
   const { findings } = await inspectView(t, '', {
     [file]: `struct NoteRow: View {
-      let model: App.NotesViewModel
+      var model: App.NotesViewModel
       @Bindable var editor: EditorViewModel
       let snapshot: NotesViewModel.Snapshot
       var body: some View { Text("Note") }
