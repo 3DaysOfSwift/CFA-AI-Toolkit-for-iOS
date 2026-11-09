@@ -369,6 +369,9 @@ do not claim that UI gating replaces server-side authorisation.
   startup signals. Verify a single listener forwards events to the owning
   Feature with no screen present. Exercise supported cancellation or replacement
   and shut down isolated listeners during test cleanup.
+- For changed observer-backed streams that support resubscription, verify that
+  a late event from the old registration cannot update the replacement and
+  that delayed teardown removes only the old registration.
 - Inspect AppModel's stored properties, initializer, and `live()`; then search
   for `AppModel.shared` stored elsewhere, View-tied launch calls,
   `ModelContainer` outside the storage boundary, and direct `URLSession` calls.

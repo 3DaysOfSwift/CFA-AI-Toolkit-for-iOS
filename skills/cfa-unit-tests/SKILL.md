@@ -186,6 +186,12 @@ repeated startup signals start each listener once and that events reach the
 Feature without a screen. Where cancellation or replacement is supported,
 exercise it and shut down isolated listeners during test cleanup.
 
+For a changed observer-backed stream that supports resubscription, hold the
+old registration's teardown pending and register its replacement. Deliver a
+late event from the old source, then release the old teardown. Verify that
+the late event cannot update the new consumer and that the replacement still
+receives its own events. Control teardown explicitly instead of using sleeps.
+
 For system background work, use a controlled scheduler to verify that launch
 registers each applicable handler once and that scheduling happens separately.
 Drive the handler through success, failure and expiration. Verify that the
