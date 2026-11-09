@@ -99,8 +99,11 @@ skill from that toolkit before changing the project.
 - Features own authoritative application state. Microservices can own internal
   request bookkeeping, caches or database machinery under suitable isolation.
   Check whether any service becomes a second authority for the same business state.
-- Start with independent Features; compose them only for a genuine business
-  responsibility, without duplicating authoritative state or creating cycles.
+- Start with independent Features. A ViewModel can arrange existing capabilities
+  for its screen. When a reusable business workflow genuinely spans Features,
+  put its decisions in the Feature that owns the workflow, or introduce a
+  coordinating Feature for a distinct capability. Trace dependencies for
+  cycles and keep one authoritative owner for each value.
 - For sign-out, account switching or external session expiry, let the owning
   Feature coordinate explicit cleanup calls. Trace each supported entry point
   and reconcile the outcome with the actual session. Preserve the session and
