@@ -66,7 +66,8 @@ When removing an adapter or dependency, record the consumer scenarios as
 rerun as `after` evidence at `repository.afterCommit`. List the affected
 targets on the evidence and cite both sets of IDs in the hybrid review. If
 a consumer needs every event, verify repeated equal values, delivery order
-and cancellation separately from the latest state shown by the UI.
+and cancellation separately from the latest state shown by the UI. If the
+existing contract specifies buffering, verify what reaches a slow consumer.
 The reviewer compares the scenarios and outcomes across revisions.
 The final CFA audit gives each applicable requirement a verdict backed by
 evidence at the final commit. Explain inapplicability and the effect of agreed
