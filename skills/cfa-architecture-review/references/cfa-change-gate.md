@@ -357,6 +357,10 @@ do not claim that UI gating replaces server-side authorisation.
   values once in a purpose-named enum. Keep Feature-specific values with
   their owner and use bundle metadata and localization resources where
   they are authoritative. Keep secrets out of app constants.
+- For changed app-wide listeners, drive a controlled event source after repeated
+  startup signals. Verify a single listener forwards events to the owning
+  Feature with no screen present. Exercise supported cancellation or replacement
+  and shut down isolated listeners during test cleanup.
 - Inspect AppModel's stored properties, initializer, and `live()`; then search
   for `AppModel.shared` stored elsewhere, View-tied launch calls,
   `ModelContainer` outside the storage boundary, and direct `URLSession` calls.

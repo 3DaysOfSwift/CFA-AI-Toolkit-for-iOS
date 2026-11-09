@@ -127,7 +127,8 @@ skill from that toolkit before changing the project.
   replaced when needed, including in isolated tests. A listener intended to
   run for the app's lifetime may run until termination. The Feature interprets
   events and owns the resulting state. Screen-only observation follows the
-  screen's lifetime.
+  screen's lifetime. Verify that repeated startup signals leave one listener
+  and that events still reach the Feature with no relevant screen open.
 - Features own their background capabilities. During synchronous launch,
   AppModel can ask each Feature to register its permitted BGTaskScheduler
   identifiers once. Schedule work separately and route app-level callbacks
