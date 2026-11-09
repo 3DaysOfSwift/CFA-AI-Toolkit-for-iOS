@@ -209,8 +209,10 @@ Never infer a complete app assessment from a matching count or scanner output.
 
 For shared refreshes in a CFA app, apply the
 [shared refresh rule](spec/rules/cfa-task-02.md). Verify the task owner and
-trace the last screen leaving, another waiter remaining and a later caller
-joining or reading the result. If a screen requires prompt cancellation,
+trace three distinct cases: the last screen leaves and the Feature retains
+the result with no waiter; one of several waiters leaves and the others still
+receive the outcome; and an equivalent caller joins the in-flight request
+without starting a second one. If a screen requires prompt cancellation,
 verify that its wait can end while the Feature's task continues. For non-CFA
 apps, assess the intended lifetime and its effects using the app's own policy.
 

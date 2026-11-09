@@ -254,11 +254,14 @@ do not claim that UI gating replaces server-side authorisation.
   and return their own outcomes. Test failure/cancellation cleanup and a later
   retry using controlled dependencies, not sleeps; record exceptions explicitly.
 
-- For a shared refresh that should survive navigation, verify that it completes
-  and keeps its result when its only screen waiter leaves. Also verify that
-  cancelling one of several waiters leaves the other callers able to finish.
-  When a waiter must exit promptly, cancel it while the shared refresh is
-  suspended and verify that it returns before the refresh finishes.
+- For a shared refresh that should survive navigation, cancel its only screen
+  waiter while the request is suspended. Let the request complete with no
+  replacement waiter and verify that the Feature retains the result. In a
+  separate case, admit an equivalent caller while the request is still in flight
+  and verify that it receives the shared outcome without a second request.
+  Verify that cancelling one of several waiters leaves the others able to finish.
+  When a waiter must exit promptly, verify that it returns before releasing the
+  suspended refresh.
 - Trace every affected screen to its ViewModel and required AppModel Features.
   Do not require a distinct Feature per tab or screen. Require named tests for
   each actual Feature; test shared data across screens without duplicating owners.
