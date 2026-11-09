@@ -8,12 +8,12 @@ export function auditEntitlements(analysis, policy) {
   if (!Array.isArray(policy?.capabilities) || !policy.capabilities.length) throw Error('Supply at least one explicitly identified paid capability.');
   const identifiers = new Set();
   for (const capability of policy.capabilities) {
-    if (typeof capability.name !== 'string' || !capability.name.trim() || !Array.isArray(capability.writtenCalls) || !capability.writtenCalls.length || capability.writtenCalls.some(value => typeof value !== 'string' || !value.trim())) throw Error('Each capability requires a name and one or more exact writtenCalls.');
+    if (typeof capability?.name !== 'string' || !capability.name.trim() || !Array.isArray(capability.writtenCalls) || !capability.writtenCalls.length || capability.writtenCalls.some(value => typeof value !== 'string' || !value.trim())) throw Error('Each capability requires a name and one or more exact writtenCalls.');
     if (identifiers.has(capability.name)) throw Error(`Duplicate capability: ${capability.name}`);
     identifiers.add(capability.name);
   }
-  const calls = Array.isArray(analysis?.callCandidates) ? analysis.callCandidates : [];
   if (!Array.isArray(analysis?.callCandidates)) throw Error('Analysis does not contain callCandidates.');
+  const calls = analysis.callCandidates;
   const indexed = analysis.compilerIndex?.status === 'available' ? analysis.compilerIndex.calls || [] : [];
   function possibleCallers(matches) {
     const enclosingIDs = new Set(matches.map(match => match.callerID).filter(Boolean));

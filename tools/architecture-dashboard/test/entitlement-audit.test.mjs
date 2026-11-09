@@ -20,6 +20,7 @@ test('no matches and missing syntax cannot be reported as a pass',()=>{
 });
 test('requires explicit nonempty capability names and call spellings',()=>{
   assert.throws(()=>auditEntitlements(analysis,{capabilities:[]}));
+  assert.throws(()=>auditEntitlements(analysis,{capabilities:[null]}), /Each capability requires a name/);
   assert.throws(()=>auditEntitlements(analysis,{capabilities:[{name:'Export',writtenCalls:[]}]}));
   assert.throws(()=>auditEntitlements(analysis,{capabilities:[{name:'A',writtenCalls:['a']},{name:'A',writtenCalls:['b']}]}));
 });
