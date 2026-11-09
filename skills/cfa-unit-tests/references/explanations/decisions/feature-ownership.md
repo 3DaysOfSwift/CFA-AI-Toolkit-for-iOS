@@ -7,7 +7,7 @@ Status: Feature definition, state ownership, screen/Feature relationship and ext
 
 ## Rule
 
-A CFA Feature owns the authoritative application state for a business capability and exposes the operations that manage it. Features are isolated to the main actor and made available through AppModel. A screen can present several independent business capabilities. Features follow business responsibilities, not a one-to-one screen or tab mapping. Each screen owns its dedicated ViewModel, which uses the Features it needs.
+A CFA Feature owns the authoritative application state for a business capability and exposes the operations that manage it. Features are isolated to the main actor and made available through AppModel. A screen can present several independent business capabilities. Features follow business responsibilities, not a one-to-one screen or tab mapping. Each screen-level SwiftUI View owns its dedicated ViewModel, which uses the Features it needs.
 
 ## Problem
 
