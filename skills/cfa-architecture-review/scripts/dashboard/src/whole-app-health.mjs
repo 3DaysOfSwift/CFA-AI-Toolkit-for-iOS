@@ -39,6 +39,13 @@ export function nextWork(report, review, limit = 8) {
     id: operation.id,
     title: operation.title,
     openChecks: hasOpenChecks(operation),
+    pendingChecks: (operation.checks || [])
+      .filter(check => check.status === 'unresolved' || check.status === 'not-checked')
+      .map(({id, status, question, resolveBy}) => ({id, status, question, resolveBy})),
+    unknowns: operation.unknowns || [],
+    unresolvedSteps: (operation.steps || [])
+      .filter(step => step.relation === 'unknown')
+      .map(({id, title, detail}) => ({id, title, detail})),
     missingTimingScenarios: missingTimingScenarios(operation)
   })).filter(operation => operation.openChecks || operation.missingTimingScenarios.length);
   return {

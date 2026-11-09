@@ -64,11 +64,14 @@ test('an unresolved task relationship keeps an operation pending', () => {
   const review = complete();
   review.operations[0].steps = [
     { id: 'trigger', relation: 'event' },
-    { id: 'work', parentId: 'trigger', relation: 'unknown' }
+    { id: 'work', title: 'Load schedule', detail: 'Caller ownership is unclear.', parentId: 'trigger', relation: 'unknown' }
   ];
   const work = nextWork(report, review);
   assert.match(work.gaps.join(' '), /1 operations have unresolved checks or boundaries/);
   assert.equal(work.nextOperations[0].id, 'launch');
+  assert.deepEqual(work.nextOperations[0].unresolvedSteps, [
+    { id: 'work', title: 'Load schedule', detail: 'Caller ownership is unclear.' }
+  ]);
   review.operations[0].steps[1].relation = 'same-task';
   assert.deepEqual(nextWork(report, review).gaps, []);
 });
