@@ -129,6 +129,11 @@ test('withholds a stable workflow result until its trace and timing outcomes exi
     title:'Older result arrives late', outcome:'The operation never suspends.',
     verification:'Traced the synchronous update.'
   });
+  assert.match(renderHealthReport(data), /aria-label="Needs investigation">\?<\/span>Save/);
+  const clarity = {dimension:'clarity', status:'not-applicable'};
+  operation.checks.push(clarity);
+  assert.match(renderHealthReport(data), /aria-label="Needs investigation">\?<\/span>Save/);
+  clarity.status = 'pass';
   const html = renderHealthReport(data);
   assert.match(html, /aria-label="Stable">✓<\/span>Save/);
   assert.match(html, /Timing scenarios that don’t apply.*— Older result arrives late.*The operation never suspends/);

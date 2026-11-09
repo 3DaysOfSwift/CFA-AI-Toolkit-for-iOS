@@ -126,6 +126,7 @@ test('a CFA-only deviation leaves the operation concurrency result stable', () =
     operations:[{title:'Save',steps:complete().operations[0].steps,
       scenarios:complete().operations[0].scenarios,checks:[
       {dimension:'correctness',status:'pass',title:'Save owns its work'},
+      {dimension:'clarity',status:'pass',title:'Save path is clear'},
       {dimension:'cfa',status:'fail',title:'Naming differs from CFA'}
     ]}]
   });
