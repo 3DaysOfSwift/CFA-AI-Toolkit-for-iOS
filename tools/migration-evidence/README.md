@@ -81,7 +81,11 @@ names only unrelated targets or lacks target names or an environment. If evidenc
 or failed, use `partial` and explain the gap. Validation checks the recorded
 links and outcomes. The reviewer compares the declared affected targets with
 the actual consumers of the changed code, checks the behaviour contract,
-and verifies any affected handoff. List the final-commit test or manual
+and verifies any affected handoff. Use the case study's behaviour table to
+compare baseline and final evidence for each in-scope requirement. The
+reviewer must resolve unknown outcomes and regressions before accepting
+completion. The validator checks the structured evidence references and
+cannot assess the behaviour described in the table. List the final-commit test or manual
 evidence IDs in `completionGate.dataHandoffEvidenceIds`. Use an empty list
 only when the reviewer confirms no data handoff is affected. List the
 producing and receiving targets and the environment used to exercise the
