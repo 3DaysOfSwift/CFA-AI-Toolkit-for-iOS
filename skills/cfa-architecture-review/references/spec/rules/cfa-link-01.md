@@ -12,6 +12,6 @@
 
 [Run the deep-linking example](../examples/README.md).
 
-**Verify:** Test request reception, durable restoration, refusal, successful navigation, multiple requests, storage failure and scene isolation.
+**Verify:** Test request reception before restoration completes, preserving both the saved and new requests across restart. Verify refusal, successful navigation, dismissal of one request while others remain, storage failure and scene isolation.
 
 **Full rule, context and examples:** [Keep Screen Initializers Clean](../topics/15-keep-screen-initializers-clean.md). This card is a reading aid; apply the complete canonical section.
