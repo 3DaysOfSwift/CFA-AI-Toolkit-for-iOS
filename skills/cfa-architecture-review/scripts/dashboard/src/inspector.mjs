@@ -484,7 +484,7 @@ export async function inspect(project) {
       }
     }
   }
-  const viewDeclarations = /\bstruct\s+(\w+)(?:\s*<[^{}]+>)?\s*:\s*(?:SwiftUI\s*\.\s*)?View\b[^{}]*\{/g;
+  const viewDeclarations = /\bstruct\s+(\w+)(?:\s*<[^{}]+>)?\s*:\s*(?:(?:\w+\s*\.\s*)*\w+\s*,\s*)*(?:SwiftUI\s*\.\s*)?View\b(?!\s*\.)[^{}]*\{/g;
   const rootViewNames = new Set(['ContentView', 'RootTabView', 'RootView']);
   const viewNames = new Set();
   for (const source of sources.values()) {
