@@ -157,9 +157,12 @@ Use deliberate passes:
    If the app already supports offline editing or cross-device sync, apply the
    [sync rule](references/spec/rules/cfa-sync-01.md). Inventory pending edits,
    their on-disk metadata and the existing conflict and rejection policy before
-   changing storage or task ownership. Verify that pending edits survive a
-   failed sync and restart, retries do not duplicate them, and local success
-   remains distinct from server confirmation. Preserve the existing sync contract.
+   changing storage or task ownership. Start with a pending edit persisted by
+   the previous implementation when replacing sync or its storage. Verify that
+   the migrated app recovers the edit with its original identity and pending
+   metadata, and that retry produces one logical server change. Verify that
+   pending edits survive failed sync and restart, and that local success remains
+   distinct from server confirmation. Preserve the existing sync contract.
 3. Convert that feature’s asynchronous model work into directly awaitable
    Swift Concurrency. ViewModels retain handles for the unstructured tasks
    they create by default. Equivalent repeated button actions return the same

@@ -62,9 +62,12 @@ When changing offline editing or cross-device synchronization, apply the
 [offline editing and sync rule](references/spec/rules/cfa-sync-01.md). Define
 what counts as locally saved and what counts as server-confirmed. For offline
 edits sent to a custom server, save the edit and its pending-sync metadata
-together. Verify recovery after failure and restart, duplicate-safe retries,
-and the agreed conflict and rejection outcomes. For Apple-managed sync,
-verify capability, account and schema behaviour on supported devices.
+together before reporting local success. Verify that a failed local write
+leaves no edit ready to send. Test recovery after failed sync and restart,
+duplicate-safe retries with the same edit identity, and the agreed conflict
+and rejection outcomes. When replacing the sync implementation, include a
+pending edit saved by the previous version. For Apple-managed sync, verify
+capability, account and schema behaviour on supported devices.
 
 When adding or changing a widget or another device target, apply the
 [multi-device rule](references/spec/rules/cfa-device-01.md). Reuse the owning
