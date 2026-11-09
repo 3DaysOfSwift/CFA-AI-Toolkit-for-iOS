@@ -154,16 +154,18 @@ Identify any product or resource requirement that justifies a different
 lifetime.
 
 When reviewing an optional download cache, apply the
-[optional snapshot rule](references/spec/rules/cfa-cache-01.md). Trace three
-separate points: when refresh can start, when the caller receives its result,
-and when the replacement cache becomes durable. Verify that refresh can start
-with restoration pending and that a caller can receive fresh data with the
-optional write pending. Verify that a late restore cannot replace fresher
-data for the same source and that sources still waiting for refresh can
-restore their own usable data. Check that a failed refresh keeps valid
-in-memory data and that an older write cannot replace a newer cache. For a failed replacement, verify
-that the previous cache remains readable, the fresh response stays usable,
-and any offline-availability claim describes the snapshot actually saved.
+[optional snapshot rule](references/spec/rules/cfa-cache-01.md). Trace when
+refresh starts, when the caller receives its result and when the replacement
+cache becomes durable. Verify that refresh starts while restoration is pending
+and can proceed with a missing, incompatible or unreadable cache. Hold the
+optional write open and verify the Feature publishes the fresh response and
+returns to the caller. Check that a late restore cannot replace fresher data
+for the same source and that other sources can restore their usable snapshots.
+Verify that a failed refresh keeps valid in-memory data. If the cache write
+fails, check that retries are bounded, the previous cache remains readable,
+and the caller still receives a successful refresh. Any claim of offline
+availability must describe the snapshot that was saved. Check that a delayed
+older write cannot replace a newer cache.
 Trace required saves for user edits separately and verify that a failed write
 leaves the last confirmed value unchanged.
 
