@@ -145,7 +145,10 @@ skill from that toolkit before changing the project.
   A separate type or async declaration alone does not move work off MainActor.
 - SwiftDataManager owns container and context creation. Keep SwiftData records
   and contexts inside the storage boundary and give Features narrow load and
-  save operations.
+  save operations that return immutable Sendable domain values. Use a
+  dedicated @ModelActor for non-trivial production database work. Verify
+  where the context is created and that expensive work executes off MainActor.
+  Keep any deliberately UI-owned context limited to work proven short.
 - Route URLSession calls through NetworkingManager. In new apps, start with a
   stateless value type when it meets the session and concurrency requirements.
   Keep independent requests able to progress in parallel unless an explicit
