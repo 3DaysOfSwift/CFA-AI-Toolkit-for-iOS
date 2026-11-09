@@ -276,6 +276,9 @@ skill from that toolkit before changing the project.
   unverified. Keep pricing and entitlement checks out of the capability
   Feature so the product can change which capabilities it charges for.
   Protected server operations enforce their own access policy.
+- Keep failure outcomes in the Feature and screen-specific error text in
+  the ViewModel. A failed optional cache write leaves a successful refresh
+  usable. Only saved data counts as available offline.
 - Publish durable user edits as saved only after required persistence succeeds.
   Persist individual changes by stable record identity. Reserve whole-dataset
   replacement for explicit operations with their own integrity rules.

@@ -83,7 +83,10 @@ the [draft rule](references/spec/rules/cfa-ui-04.md). Verify that the screen
 ViewModel owns the unsaved input and submits it to the owning Feature. Trace
 failed saves to retained input and unchanged confirmed state, and Cancel to
 discarding the draft without a write. Check that success publishes only after
-required persistence succeeds.
+required persistence succeeds. Trace storage, network and business failures
+through the Feature to the screen ViewModel. Check that the ViewModel owns
+screen-specific error text and that it distinguishes failure of the requested
+operation from failure of an optional cache write.
 
 When known paid capabilities fall within the review scope, identify their
 entitlement policy and trace each identifiable entry point to its check. Report
