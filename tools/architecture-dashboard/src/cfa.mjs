@@ -122,6 +122,10 @@ skill from that toolkit before changing the project.
   snapshot through a suitable transfer, such as Watch Connectivity. Verify that
   receiving Features refresh from their data sources and handle missing,
   unreadable, delayed and stale snapshots.
+- Keep Features explicitly on MainActor. Networking, persistence and expensive
+  processing use an appropriate service isolation boundary off MainActor by
+  default. Keep framework-required MainActor calls in a narrow adapter.
+  A separate type or async declaration alone does not move work off MainActor.
 - SwiftDataManager owns container and context creation. Keep SwiftData records
   and contexts inside the storage boundary and give Features narrow load and
   save operations.
