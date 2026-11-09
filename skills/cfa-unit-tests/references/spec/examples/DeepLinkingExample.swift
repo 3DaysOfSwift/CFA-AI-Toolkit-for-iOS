@@ -136,7 +136,7 @@ final class DeepLinkingFeature {
 
         let firstRun = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
         try await firstRun.receive(initialRequest)
-        try await firstRun.receive(initialRequest) // Repeated delivery does not add a duplicate.
+        try await firstRun.receive(initialRequest) // A repeated opening callback does not add a duplicate.
         precondition(firstRun.pending == [initialRequest])
         try await firstRun.open(id: initialRequest.id) { _ in false } // User keeps editing.
         precondition(firstRun.pending == [initialRequest])
