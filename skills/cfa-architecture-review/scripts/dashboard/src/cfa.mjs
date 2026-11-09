@@ -123,7 +123,9 @@ skill from that toolkit before changing the project.
 - A Feature-owned shared refresh normally continues when a screen leaves;
   preserve its result for later callers unless a specific product or resource
   requirement calls for another cancellation policy.
-  A departing screen may stop waiting while the Feature keeps refreshing.
+  Awaiting the shared task handle does not end the wait on caller cancellation.
+  If the screen needs to stop waiting promptly, cancel its wait independently
+  while the Feature keeps refreshing.
 - Cancel superseded presentation work such as search. Cancel screen-only work
   on disappearance when continuing would have no value. Check cancellation
   before expensive work and before publishing, and protect current state
@@ -141,6 +143,9 @@ skill from that toolkit before changing the project.
   which capabilities it charges for. Protected server operations enforce their
   own access policy.
 - Publish durable user edits as saved only after required persistence succeeds.
+  For simple preferences, update UserDefaults before publishing the value. Its
+  setter confirms the in-memory update only. Use a storage API that reports
+  write outcomes when the product requires confirmed persistence.
 - Use the product-defined fallback for a missing or obsolete non-critical
   preference, such as system appearance for a retired theme. Replace an old
   saved value only through an intentional migration or a successful user choice.
