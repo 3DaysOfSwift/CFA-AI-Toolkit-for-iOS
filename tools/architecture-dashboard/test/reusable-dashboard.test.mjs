@@ -43,6 +43,8 @@ test('overall failure is retained even when every reported test passed',()=>{
  assert.equal(importTestResults({...run,result:'Failed'}).outcome,'failed');
  assert.equal(importTestResults({...run,result:'Passed'}).outcome,'passed');
  assert.equal(importTestResults(run).outcome,'unknown');
+ assert.equal(importTestResults({...run,passedTests:0,skippedTests:4,result:'Passed'}).outcome,'unknown');
+ assert.equal(importTestResults({...run,passedTests:0,skippedTests:4,result:'Failed'}).outcome,'failed');
  assert.equal(importTestResults({...run,passedTests:3,failedTests:1,result:'Passed'}).outcome,'failed');
 });
 
