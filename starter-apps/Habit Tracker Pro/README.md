@@ -43,7 +43,8 @@ No app-owned Boolean in UserDefaults grants access.
 | Settings | SettingsViewModel | SettingsFeature |
 | Trends paywall | TrendsPaywallViewModel | PurchasesFeature |
 
-TrendsFeature enforces access before exposing paid calculations.
+TrendsViewModel checks access before exposing trends or retrying a load;
+TrendsFeature owns the trend calculations.
 PurchasesFeature owns entitlement and purchase policy. Its StoreKitManager
 handles products, verified transactions, updates, finishing transactions and
 App Store synchronisation. PurchaseStore is a testable **external-service**
