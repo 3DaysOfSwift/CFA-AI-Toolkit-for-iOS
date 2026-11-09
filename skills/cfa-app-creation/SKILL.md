@@ -81,6 +81,14 @@ at the configured location. Separately fail a fetch after the store opens and
 verify retry reuses that store. Verify actual store opening and navigation
 separately from controlled tests.
 
+When a replaceable download needs a cache, apply the
+[optional snapshot rule](references/spec/rules/cfa-cache-01.md). Use JSON
+by default for a simple cache. Start refresh independently of restoration,
+then publish the current response and complete the refresh without waiting
+for the cache write. Hold the cache write open in a test to verify both outcomes.
+For durable user edits, publish the replacement as saved only after
+authoritative persistence succeeds.
+
 If the product requires offline edits or cross-device data, apply the
 [sync rule](references/spec/rules/cfa-sync-01.md). Choose storage and transfer
 according to the target capabilities and the product's data contract. Agree

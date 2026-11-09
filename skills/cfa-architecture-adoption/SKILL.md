@@ -87,6 +87,13 @@ verification checklist. Keep root navigation available during slow or failed
 opening. Verify Feature-scoped retry and reuse of the working store after a
 fetch failure.
 
+When moving a replaceable download cache into a new ownership boundary, apply
+the [optional snapshot rule](references/spec/rules/cfa-cache-01.md). Trace
+refresh, restoration and cache writes separately. Verify that fresh data is
+published and refresh callers are released while the optional write is pending.
+A late restore must leave newer data for the same source intact. Exercise a
+failed cache write and a failed durable edit save separately.
+
 When moving durable storage ownership, preserve the existing store location,
 schema compatibility and saved records. Verify against a disposable store written
 by the previous version with representative synthetic records, including
