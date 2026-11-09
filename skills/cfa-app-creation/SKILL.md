@@ -86,8 +86,14 @@ When a replaceable download needs a cache, apply the
 by default for a simple cache. Start refresh independently of restoration,
 then publish the current response and complete the refresh without waiting
 for the cache write. Hold the cache write open in a test to verify both outcomes.
-For durable user edits, publish the replacement as saved only after
-authoritative persistence succeeds.
+For durable user edits, apply the
+[local draft rule](references/spec/rules/cfa-ui-04.md) and the
+[recoverable failure rule](references/spec/rules/cfa-error-01.md).
+Keep the editable draft in the screen's ViewModel and submit the proposed
+value to its Feature. Verify that a failed save leaves the editor open with
+the draft intact and leaves the last confirmed value unchanged. A successful
+retry publishes the replacement only after persistence succeeds. Verify that
+Cancel discards the unsaved draft without writing to storage.
 
 If the product requires offline edits or cross-device data, apply the
 [sync rule](references/spec/rules/cfa-sync-01.md). Choose storage and transfer
