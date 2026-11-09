@@ -41,9 +41,15 @@ an alternative, prove a performance improvement, or certify a migration outcome.
 Matthew Thomas authorised this documented-rationale/editorial-analysis distinction
 on 2026-10-27. On 2026-10-29 he explicitly approved replacing the one-Feature-per-screen rule and the two statements in the rationale above. This records that decision without publishing his raw working notes or claiming broader historical approval.
 
-## Open question
+## Working example
 
-Gather real examples of a screen combining independent Features and of a new business capability extracted from a ViewModel; distinguish the latter from a presentation-only helper.
+In the bundled Habit Tracker Pro, `TrendsViewModel` combines `TrendsFeature`
+and `PurchasesFeature`: it checks access before exposing or refreshing trends.
+In Habit Tracker, `TodayFeature` provides daily progress and completion
+behaviour using `HabitsFeature`, which remains the owner of saved habits.
+The adjacent `TodayViewModel` handles presentation and routes actions. These
+examples show the resulting responsibilities; they do not claim a particular
+history of extracting code from a ViewModel.
 
 ## Publication
 
