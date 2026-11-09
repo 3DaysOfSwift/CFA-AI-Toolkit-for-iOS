@@ -440,7 +440,8 @@ test('flags possible screen-owned task handles without flagging lifecycle tasks'
     private let \`repeat\` = Task {}
     private let cancellation = Task.isCancelled
     private let typedCancellation = Task<Never, Never>.isCancelled
-    private let tâche = Task<Void, Never>.detached {}
+    private let tâche = _Concurrency.Task<Void, Never>.detached {}
+    @State private var qualified: _Concurrency.Task<Void, Never>?
     var body: some View {
       Text("Home").task {
         let localTask = Task {}
@@ -450,11 +451,11 @@ test('flags possible screen-owned task handles without flagging lifecycle tasks'
   }`);
   assert.deepEqual(
     report.findings.filter(item => item.code === 'screen-task-handle').map(item => item.line),
-    [3, 4, 7]
+    [3, 4, 7, 8]
   );
   assert.deepEqual(
     report.findings.filter(item => item.code === 'task-inside-view-lifecycle').map(item => item.line),
-    [10]
+    [11]
   );
 });
 

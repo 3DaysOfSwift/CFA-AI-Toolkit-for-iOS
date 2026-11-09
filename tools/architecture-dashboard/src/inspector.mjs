@@ -657,7 +657,7 @@ export async function inspect(project) {
         findings.push(finding('stored-app-model', 'review', 'This View appears to retain AppModel.shared in a stored property. Resolve the required Features through its ViewModel.', file, lineOf(source, start + storedModel.index)));
       }
 
-      for (const match of members.matchAll(new RegExp(`\\b(?:let|var)\\s+${propertyNamePattern}\\s*(?::\\s*(?:Swift\\s*\\.\\s*)?Task\\s*<|(=\\s*(?:Swift\\s*\\.\\s*)?Task\\b))`, 'gu'))) {
+      for (const match of members.matchAll(new RegExp(`\\b(?:let|var)\\s+${propertyNamePattern}\\s*(?::\\s*(?:(?:Swift|_Concurrency)\\s*\\.\\s*)?Task\\s*<|(=\\s*(?:(?:Swift|_Concurrency)\\s*\\.\\s*)?Task\\b))`, 'gu'))) {
         const suffix = body.slice(match.index + match[0].length);
         if (match[3]) {
           const genericStart = /^\s*</.exec(suffix);
