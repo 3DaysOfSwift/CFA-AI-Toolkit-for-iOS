@@ -87,9 +87,12 @@ Use deliberate passes:
    network completion. Do not move GCD
    syntax mechanically during this pass.
 3. Convert that feature’s asynchronous model work into directly awaitable
-   Swift Concurrency. ViewModels retain created task handles by default and
-   equivalent repeated actions await the shared execution. Each Feature
-   independently shares equivalent in-flight requests or queues commands that
+   Swift Concurrency. ViewModels retain handles for the unstructured tasks
+   they create by default. Equivalent repeated button actions return the same
+   handle, and asynchronous callers await its value. Keep structured children
+   and framework-owned SwiftUI tasks with their existing owners without
+   creating wrapper tasks. Each Feature independently shares equivalent
+   in-flight requests or queues commands that
    must each execute sequentially across awaits. Determine equivalence from the
    product behaviour: matching inputs alone do not make two user commands the
    same action, and required repeated writes must not be coalesced. Preserve required product semantics;
