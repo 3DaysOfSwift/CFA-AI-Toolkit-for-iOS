@@ -139,6 +139,15 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
     await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/invalid evidence lines/);
     review.presentation.criteria[0].evidence = [{file:'App.swift',line:1,endLine:2}];
     await fs.writeFile(reviewPath,JSON.stringify(review));
+    const sourceProblem = structuredClone(review);
+    sourceProblem.fileReviews = [{
+      file:'Value.swift',status:'problem',reason:'Confirmed issue',verification:'Source inspection',
+      evidence:[{file:'Value.swift',line:1,endLine:1}]
+    }];
+    await fs.writeFile(reviewPath,JSON.stringify(sourceProblem));
+    await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/Include confirmed file or type problems/);
+    await assert.rejects(fs.access(output));
+    await fs.writeFile(reviewPath,JSON.stringify(review));
     const result=await finish(project,reviewPath,output,undefined,syntax);
     assert.deepEqual(result.gaps,[]);
     const html=await fs.readFile(output,'utf8');

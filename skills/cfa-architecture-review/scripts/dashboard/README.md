@@ -117,7 +117,7 @@ concurrency design. Each criterion has a `title`, `detail`, `status` (`pass`,
 `concern` or `problem`) and source `evidence` ranges (an array of `{file, line, endLine}` objects). The
 importer checks ranges against the scanned source. Older reviews can still use
 non-empty evidence text, which requires manual verification. Include confirmed
-operation problems among the report criteria. The renderer weights criteria
+operation, file and type problems among the report criteria. The renderer weights criteria
 equally (1, ½ or 0 respectively) to choose the assessment label. The score
 reaches 100% only when every reviewed criterion passes. Set `qualitativeOnly`
 to show the Result without a percentage. Coverage comes from the whole-app

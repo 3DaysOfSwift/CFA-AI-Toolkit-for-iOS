@@ -192,6 +192,11 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
       throw Error('Each whole-app presentation criterion needs source evidence.');
     }
   }
+  const hasSourceProblem = [...(review.fileReviews || []), ...(review.typeReviews || [])]
+    .some(item => item.status === 'problem');
+  if (hasSourceProblem && !presentation.criteria.some(criterion => criterion.status === 'problem')) {
+    throw Error('Include confirmed file or type problems in the report criteria before rendering.');
+  }
   const data = {...presentation, scope:review.scope};
   data.operations = (review.operations || []).map(op=>({group:op.group,title:op.title,path:op.path,stateOwner:op.stateOwner,taskOwner:op.taskOwner,isolation:op.isolation,reason:op.reason,unknowns:op.unknowns,steps:op.steps,checks:op.checks,scenarios:op.scenarios}));
   data.coverageGaps = gaps;
