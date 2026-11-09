@@ -181,6 +181,9 @@ Report files contain source paths and symbols; review them before sharing.
   to distinguish selected immutable detail data from injected dependencies.
   Reusable components can receive action closures that forward UI intent to
   their screen. Review synthesized initializers and type aliases in source.
+- Flags explicit Task creation in recognizable View initializers and mapped
+  screen ViewModel initializers. Trace helper calls and deferred closures to
+  establish whether construction actually starts work.
 - Records scan scope and fingerprints scanned Swift files and local build definitions.
 - Runs offline, without analytics, external fonts, scripts or CDN assets.
 - Lists scanned files and detected types as unassessed until a source-backed

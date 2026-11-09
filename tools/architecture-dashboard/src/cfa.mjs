@@ -44,8 +44,11 @@ skill from that toolkit before changing the project.
 - Preserve the CFA call path: View → ViewModel → Feature → Microservices (such as providers, storage or device API adapters).
 - Every screen-level SwiftUI View owns a dedicated ViewModel. Declare it as
   @State private var viewModel and construct it inline by default. Keep View
-  and ViewModel initializers free of work-starting side effects. For existing UIKit screens
-  in a migration, map the actual presentation owner to its Features and tests.
+  and ViewModel initializers and View body construction free of blocking work
+  and asynchronous side effects. Use SwiftUI's .task for initial work tied to
+  the screen's lifetime. The first frame may appear before that work completes.
+  For existing UIKit screens in a migration, map the actual presentation owner
+  to its Features and tests.
 - A concrete feature owner uses the
   Feature suffix; its AppModel property, ViewModel dependency and initializer
   label use the matching lower-camel-case Feature name. Use concrete features
