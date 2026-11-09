@@ -173,6 +173,7 @@ test('published app examples link to pinned source and relevant rule cards', () 
   assert.match(index, /RocketLaunch-iOS-App-Swift-Concurrency\/blob\/[a-f0-9]{40}\//);
   assert.match(index, /\[Detail View\]\([^\n]*\/LaunchDetailView\.swift\)/);
   assert.match(index, /\[Detail ViewModel\]\([^\n]*\/LaunchDetailViewModel\.swift\)/);
+  assert.equal((index.match(/LaunchDetailView\.swift\)/g) ?? []).length, 1);
   assert.match(topics.get('rules/cfa-cache-01.md'), /bundled CFA App template.*GitReposFeature/);
   assert.doesNotMatch(topics.get('rules/cfa-cache-01.md'), /RocketLaunch-iOS-App-Swift-Concurrency\/blob\//);
   assert.match(topics.get('rules/cfa-state-01.md'), /bundled Habit Tracker/);

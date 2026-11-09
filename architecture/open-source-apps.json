@@ -12,11 +12,8 @@
       "repository": "https://github.com/3DaysOfSwift/RocketLaunch-iOS-App-Swift-Concurrency",
       "revision": "3ecaa30c76428bd8a6f5db8fd5506b6c20b846f7",
       "sourcePath": "Swift Concurrency Project/RocketLaunch/1 - View/Views/Operators/LaunchDetail/LaunchDetailView.swift",
+      "sourceLabel": "Detail View",
       "additionalSources": [
-        {
-          "label": "Detail View",
-          "path": "Swift Concurrency Project/RocketLaunch/1 - View/Views/Operators/LaunchDetail/LaunchDetailView.swift"
-        },
         {
           "label": "Detail ViewModel",
           "path": "Swift Concurrency Project/RocketLaunch/1 - View/Views/Operators/LaunchDetail/LaunchDetailViewModel.swift"
