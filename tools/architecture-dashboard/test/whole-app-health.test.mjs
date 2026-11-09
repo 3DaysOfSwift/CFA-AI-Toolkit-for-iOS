@@ -35,6 +35,12 @@ test('coverage requires source files and detected entry points, without individu
   }
 });
 
+test('an explicitly unassessed type keeps the whole-app review open', () => {
+  const review = complete();
+  review.typeReviews[0].status = 'unassessed';
+  assert.match(coverageGaps(report, review).join(' '), /Recorded types still need review: App \(App.swift:1\)/);
+});
+
 test('whole-app reviews require timing outcomes even if an old input disables the flag', () => {
   const review=complete(); review.behaviourScenariosRequired=false; review.operations[0].scenarios=[];
   assert.match(coverageGaps(report,review).join(' '),/timing-scenario/);

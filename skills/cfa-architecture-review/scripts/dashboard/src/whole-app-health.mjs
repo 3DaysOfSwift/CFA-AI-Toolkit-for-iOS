@@ -109,7 +109,11 @@ export function coverageGaps(report, review) {
   }
   const missingFiles = pendingSourceFiles(report, review);
   if (missingFiles.length) gaps.push(`${missingFiles.length} Swift files still need review: ${missingFiles.join(', ')}.`);
-  if ((review.typeReviews || []).some(item => item.status === 'investigate')) gaps.push('Some recorded type findings still need investigation.');
+  const openTypes = (review.typeReviews || []).filter(item => ['investigate', 'unassessed'].includes(item.status));
+  if (openTypes.length) {
+    const locations = openTypes.map(item => `${item.name} (${item.file}:${item.line})`);
+    gaps.push(`Recorded types still need review: ${locations.join(', ')}.`);
+  }
   const operations = review.operations || [];
   if (review.operationInventory?.coverage !== 'complete') gaps.push('The operation inventory has not been reconciled with the application entry points.');
   if (!operations.length) gaps.push('No application operations have been reviewed.');
