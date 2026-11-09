@@ -522,6 +522,13 @@ For each relevant operation, inspect:
   preferences, check the update before publication and treat it as an
   in-memory update. When confirmed persistence is required, look for a
   storage API that reports the write outcome.
+- Preference restoration: apply the [safe fallback rule](spec/rules/cfa-pref-01.md)
+  in CFA. Check that a supported value is restored and that a missing or
+  obsolete non-critical value in a recognised format uses the product's safe
+  default. Verify when the stored value is retained or deliberately replaced.
+  Trace unreadable or corrupt durable storage and failed writes as errors.
+  Check that fallback never makes missing user records appear successfully
+  loaded or saved.
 - Offline edits and cross-device sync: apply the
   [sync rule](spec/rules/cfa-sync-01.md) when the product supports these paths.
   For a custom server, trace the edit and pending-sync metadata through one
