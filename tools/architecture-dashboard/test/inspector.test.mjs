@@ -213,12 +213,16 @@ test('inspects AppModel properties regardless of indentation', async t => {
 
 test('inspects annotated AppModel properties without treating a private task as a verified listener', async t => {
   const root = await fixture(t, {
-    'Application/2 - AppModel/AppModel.swift': 'final class AppModel {\n    @ObservationIgnored private var updateTask: Task<Void, Never>?\n    @ObservationIgnored private var secretCache: String\n    @ObservationIgnored\n    private var backupTask: Task<Void, Never>?\n    static func live() -> AppModel { AppModel() }\n}'
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel {\n    @ObservationIgnored private var updateTask: Task<Void, Never>? = nil\n    private var hasLaunched: Bool = false\n    @ObservationIgnored private var secretCache: String\n    @ObservationIgnored\n    private var backupTask: Task<Void, Never>?\n    static func live() -> AppModel { AppModel() }\n}'
   });
   const report = await inspect(root);
   const checks = report.findings.filter(item => item.code === 'app-model-task-purpose');
   assert.equal(checks.length, 2);
   assert.ok(checks.every(item => item.severity === 'review'));
+  const defaults = report.findings.filter(item => item.code === 'app-model-default-value');
+  assert.equal(defaults.length, 2);
+  assert.match(defaults[0].message, /updateTask/);
+  assert.match(defaults[1].message, /hasLaunched/);
   assert.ok(report.findings.some(item => item.code === 'app-model-non-feature-state' && /secretCache/.test(item.message)));
 });
 
