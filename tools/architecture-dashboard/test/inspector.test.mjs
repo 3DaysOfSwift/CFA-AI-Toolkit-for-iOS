@@ -634,12 +634,13 @@ test('asks whether a View without a ViewModel is a screen or reusable component'
 test('reviews requests through an injected URLSession outside NetworkingManager', async t => {
   const root = await fixture(t, {
     'Provider.swift': 'struct Provider { let transport: Foundation.URLSession\n func load() async throws { _ = try await transport.data(from: url) } }',
+    'ReactiveProvider.swift': 'import Combine\nstruct ReactiveProvider { let transport: URLSession\n func load() { _ = transport.dataTaskPublisher(for: url) } }',
     'Manager.swift': 'struct NetworkingManager { let transport: URLSession\n func load() async throws { _ = try await transport.data(from: url) } }',
     'Configuration.swift': 'struct Configuration { let transport: URLSession }'
   });
   const {findings} = await inspect(root);
   assert.deepEqual(findings.filter(item => item.code === 'direct-url-session')
-    .map(({file, line, severity}) => [file, line, severity]), [['Provider.swift', 2, 'review']]);
+    .map(({file, line, severity}) => [file, line, severity]), [['Provider.swift', 2, 'review'], ['ReactiveProvider.swift', 3, 'review']]);
 });
 
 test('points to the URLSession request when the same file also configures a session', async t => {

@@ -460,7 +460,7 @@ export async function inspect(project) {
         sessionNames.add(alias[1]);
       }
     }
-    const directRequest = [...source.matchAll(/\b(?:(URLSession\s*\.\s*shared)|(\w+))\s*\??\.\s*(?:data|bytes|download|upload|dataTask|downloadTask|uploadTask|webSocketTask|streamTask)\s*\(/g)]
+    const directRequest = [...source.matchAll(/\b(?:(URLSession\s*\.\s*shared)|(\w+))\s*\??\.\s*(?:data|bytes|download|upload|dataTask|dataTaskPublisher|downloadTask|uploadTask|webSocketTask|streamTask)\s*\(/g)]
       .find(match => (match[1] || sessionNames.has(match[2])) && outsideManager(match));
     const directAccess = directRequest ?? [...source.matchAll(/\bURLSession\s*[.(]/g)].find(outsideManager);
     if (directAccess) {
