@@ -74,8 +74,10 @@ skill from that toolkit before changing the project.
   Leave requests pending when navigation is declined, cancelled before it opens,
   or fails. If removal fails after navigation, report the storage error and
   retry removal without navigating again. The request can reappear after restart
-  until removal is saved. The destination owns its content loading. Preserve
-  existing link and notification history behaviour during migration.
+  until removal is saved. The destination owns its content loading. Add a
+  separate notification history or global navigation router only when the
+  product requires one. Preserve existing deep-link, notification and history
+  behaviour during migration.
 - A normal preview constructs the View and follows the same ownership and
   storage boundaries. Keep SwiftData containers and contexts out of previews.
 - Keep Views declarative. Feature state and business decisions belong outside

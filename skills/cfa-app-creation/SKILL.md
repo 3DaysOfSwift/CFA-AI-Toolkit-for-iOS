@@ -63,6 +63,8 @@ requests to `DeepLinkingFeature` for validation and durable pending storage.
 Let each scene decide whether to navigate and preserve its active edits or
 payment flow. Verify failed saves, competing scenes and removal after actual
 navigation. Scheduling and delivery alone do not create pending requests.
+Add a separate notification history or global navigation router only when
+the product requires one.
 
 When persistence is used, apply the specification's mandatory database-availability
 rule: storage never gates the root interface. Exercise initial store-opening
