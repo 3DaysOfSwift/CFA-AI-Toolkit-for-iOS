@@ -612,3 +612,17 @@ test('rejects a malformed review scope before scanning', async t => {
     await assert.rejects(next(base,draft,syntax), /schema-version 1 Health Check review with a source fingerprint/);
   }
 });
+
+test('rejects malformed entry and task reconciliation records before scanning', async t => {
+  const base = await fs.mkdtemp(path.join(os.tmpdir(), 'whole-health-invalid-reconciliation-'));
+  t.after(() => fs.rm(base, {recursive:true, force:true}));
+  const draft = path.join(base, 'review.json');
+  const syntax = async () => assert.fail('Malformed reconciliation should be rejected before scanning');
+  for (const [key, value] of [['entryPoints', {}], ['taskSites', [null]]]) {
+    await fs.writeFile(draft, JSON.stringify({schemaVersion:1, sourceFingerprint:'snapshot', [key]:value}));
+    const message = new RegExp(`Review ${key} must be a list of reconciliation records`);
+    await assert.rejects(progress(base, draft, syntax), message);
+    await assert.rejects(next(base, draft, syntax), message);
+    await assert.rejects(finish(base, draft, path.join(base, 'report.html'), undefined, syntax), message);
+  }
+});
