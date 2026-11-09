@@ -37,7 +37,8 @@ the evaluator the expected outcome.
   targets. Record any intentional package boundary with its reason.
 - Trace the adapter's actual consumers before deciding whether to simplify
   or retain it. Preserve existing behaviour and platform support.
-- Keep the existing browsing behaviour and presentation scope. Replace a UI
+- Record the UIKit screen’s actual presentation owner and its Feature dependencies.
+  Keep the existing browsing behaviour and presentation scope. Replace a UI
   component only when the migration requires it, and verify that its existing
   behaviour survives the replacement. Treat an optional UIKit-to-SwiftUI
   rewrite as separate work.

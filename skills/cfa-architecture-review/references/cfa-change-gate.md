@@ -9,14 +9,17 @@ designs unless the current request authorizes a change.
 
 ## Before implementation
 
-Write down the affected route for every screen in scope:
+Write down the affected route for every screen in scope. For SwiftUI screens,
+use this map:
 
 ```text
 Screen View → Screen ViewModel → Feature → Microservices
 ```
 
 `AppModel.shared` composes and exposes the Features; microservices include
-providers, storage and device API adapters when needed.
+providers, storage and device API adapters when needed. For an existing UIKit
+screen in a migration, map its actual presentation owner to the Features and
+services it uses. Preserve the existing UI within the agreed migration scope.
 
 For every proposed new or changed type, state: “This type owns …”. Confirm that
 the responsibility is not already owned by an existing type.
@@ -24,7 +27,8 @@ the responsibility is not already owned by an existing type.
 Preserve these CFA invariants unless the developer explicitly asks to change
 the architecture:
 
-1. Each screen owns a dedicated ViewModel in private `@State` named `viewModel`.
+1. Each screen-level SwiftUI View owns a dedicated ViewModel in private `@State`
+   named `viewModel`.
    Construct it at the declaration by default. A detail View may initialize
    its stored ViewModel from selected value data. A computed property or a
    ViewModel passed in or shared by another View violates screen ownership.
@@ -227,7 +231,8 @@ identifies all of the following:
   record intentional package boundaries or unresolved blockers, and verify
   target membership and affected builds after moves;
 - the feature inventory, including every scoped tab or screen, its concrete
-  Feature dependencies, dedicated ViewModel, composition owner, named tests, and any
+  Feature dependencies, presentation owner (the dedicated ViewModel for a
+  screen-level SwiftUI View), composition owner, named tests, and any
   intentionally retained legacy boundary;
 - a current concurrency inventory showing every scoped GCD, callback,
   OperationQueue, timer, lock, or delegate route as migrated or explicitly

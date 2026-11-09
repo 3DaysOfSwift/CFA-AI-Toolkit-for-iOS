@@ -11,8 +11,10 @@ starter app. It owns saved habits and is used by both `HabitsViewModel` and
 
 During creation or migration, main screens are useful clues for discovering
 capabilities, not a requirement to create one Feature per screen or tab. Record
-each route as screen → dedicated ViewModel → required AppModel Features → named
-Feature tests. Several routes may use the same Feature, and a route may use
+each SwiftUI screen route as screen → dedicated ViewModel → required AppModel
+Features → named Feature tests. For an existing UIKit screen in a migration,
+record its actual presentation owner and trace the same Feature and test
+boundaries. Several routes may use the same Feature, and a route may use
 several Features. Do not create empty tab owners or duplicate state to satisfy
 a one-to-one mapping.
 
