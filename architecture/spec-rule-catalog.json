@@ -35,8 +35,8 @@
       "strength": "Required",
       "rule": "Views render and forward intent. A reusable presentation component may receive an action closure that forwards intent to its owning screen and ViewModel. Features own domain decisions and authoritative state.",
       "why": "A different device can reuse the same business capability.",
-      "verify": "Trace validation, calculations and persistence from the screen to their model owner.",
-      "example": "A weight screen forwards Save to its ViewModel, which calls the Feature. The Feature validates the value and saves it through its storage service.",
+      "verify": "Trace reusable component actions to the owning screen and its ViewModel. Verify that the component neither retains a ViewModel nor calls a Feature or service directly. Trace validation, calculations and persistence to their Model owner.",
+      "example": "A weight screen forwards Save to its ViewModel, which calls the Feature. The Feature validates the value and saves it through its storage service. A reusable RefreshButton can forward the tap through its action closure to the owning screen’s ViewModel.",
       "explanationIds": [
         "presentation-boundaries"
       ]
