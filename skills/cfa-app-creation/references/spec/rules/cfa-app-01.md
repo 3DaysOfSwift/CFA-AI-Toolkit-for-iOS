@@ -4,7 +4,7 @@
 
 **Strength:** Required.
 
-**Guidance:** AppModel constructs and exposes concrete Features through an explicit graph and contains no UI navigation or Feature business rules.
+**Guidance:** Use one static live() factory to construct production dependencies for AppModel.shared. The explicit initializer assigns supplied concrete Features, sets the launch guard to false, and sets any listener handles to nil. Keep UI navigation and Feature business rules outside AppModel.
 
 **Why:** The Model has one visible entry point within each process.
 
@@ -12,6 +12,6 @@
 
 **Explanation:** [Why use AppModel in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/appmodel-composition).
 
-**Verify:** Review live composition, initializer dependencies and isolated test graphs.
+**Verify:** Verify the shared instance uses live(), and check for inline stored-property defaults other than shared. Confirm that tests supply isolated Features through the explicit initializer.
 
 **Full rule, context and examples:** [Use AppModel as the Composition Root and Feature Facade](../topics/17-use-appmodel-as-the-composition-root-and-feature-facade.md). This card is a reading aid; apply the complete canonical section.
