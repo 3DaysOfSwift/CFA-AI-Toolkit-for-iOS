@@ -116,7 +116,9 @@ export function coverageGaps(report, review) {
   const gaps = [];
   if (!review.productionTargets?.length || review.productionTargets.some(t => typeof t !== 'string' || !t.trim())) gaps.push('Production targets and local packages have not been accounted for.');
   if (review.targetInventoryVerified !== true) gaps.push('Production target membership and excluded sources need verification.');
-  if (report.scope.skipped.length) gaps.push(`${report.scope.skipped.length} source files could not be scanned.`);
+  for (const {file, reason} of report.scope.skipped) {
+    gaps.push(`Source file could not be scanned: ${file} (${reason}).`);
+  }
   if (report.syntax?.status === 'unavailable') gaps.push(report.syntax.reason);
   if (report.syntax?.warnings?.length) gaps.push(`${report.syntax.warnings.length} Swift files have parser warnings requiring investigation.`);
   if (report.syntax?.status === 'available') {

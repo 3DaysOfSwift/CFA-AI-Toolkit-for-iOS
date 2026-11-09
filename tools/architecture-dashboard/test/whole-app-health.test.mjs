@@ -35,6 +35,14 @@ test('coverage requires source files and detected entry points, without individu
   }
 });
 
+test('identifies skipped files and reasons in the next review checkpoint', () => {
+  const inventory = structuredClone(report);
+  inventory.scope.skipped.push({file:'Generated/Large.swift', reason:'Over 2 MB source limit'});
+  assert.deepEqual(nextWork(inventory,complete()).gaps,[
+    'Source file could not be scanned: Generated/Large.swift (Over 2 MB source limit).'
+  ]);
+});
+
 test('an explicitly unassessed type keeps the whole-app review open', () => {
   const review = complete();
   review.typeReviews[0].status = 'unassessed';
