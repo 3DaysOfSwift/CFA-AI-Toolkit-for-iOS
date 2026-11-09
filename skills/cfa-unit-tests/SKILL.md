@@ -88,7 +88,9 @@ the intended destination. Use a UI or manual test to verify that both scenes
 retain their navigation and that a source refresh does not dismiss either.
 
 For deep links and notification actions, drive scene outcomes through a
-controlled handler. Verify that refusal or cancellation before navigation
+controlled handler. Force the initial save to fail and verify that the caller
+receives the error and the pending list does not publish an unsaved request.
+Verify that refusal or cancellation before navigation
 leaves the request pending and that navigation consumes it even if cancellation
 follows. Simulate a failed removal after navigation, then retry the write and
 verify that the handler is called only once. Exercise competing scenes and
