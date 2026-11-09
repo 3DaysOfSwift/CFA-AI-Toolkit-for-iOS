@@ -463,6 +463,22 @@ test('a ViewModel inside a Features folder is still presentation state', async t
   assert.ok(!findings.some(item => item.code === 'feature-property-name' && item.file === file));
 });
 
+test('CFA infrastructure inside a Features folder is still service storage', async t => {
+  const file = 'App/2 - AppModel/AppModel.swift';
+  const root = await fixture(t, {
+    [file]: `final class AppModel {
+      let networking: NetworkingManager
+      let storage = SwiftDataManager()
+    }`,
+    'App/2 - AppModel/Features/Notes/NetworkingManager.swift': 'struct NetworkingManager {}',
+    'App/2 - AppModel/Features/Notes/SwiftDataManager.swift': 'struct SwiftDataManager {}'
+  });
+  const { findings } = await inspect(root);
+  assert.deepEqual(findings.filter(item => item.code === 'app-model-non-feature-state')
+    .map(({line, severity}) => [line, severity]).sort(), [[2, 'warning'], [3, 'review']]);
+  assert.ok(!findings.some(item => item.code === 'feature-property-name' && item.file === file));
+});
+
 test('inspects AppModel properties regardless of indentation', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel {\n  private var twoSpaceTask: Task<Void, Never>?\n\tprivate var tabTask: Task<Void, Never>?\n        private var unexpectedCache: String\n    static func live() -> AppModel { AppModel() }\n}'

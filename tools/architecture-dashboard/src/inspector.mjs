@@ -7,8 +7,8 @@ const screenPath = /(?:^|\/)1 - View\/Views\/.*View\.swift$/;
 const featureTypeSuffix = /Feature(?:API)?$/;
 
 function isFeatureCandidate(type, file = '') {
-  return featureTypeSuffix.test(type) ||
-    (!type.endsWith('ViewModel') && /(?:^|\/)Features\/[^/]+\//.test(file));
+  if (type.endsWith('ViewModel') || type === 'NetworkingManager' || type === 'SwiftDataManager') return false;
+  return featureTypeSuffix.test(type) || /(?:^|\/)Features\/[^/]+\//.test(file);
 }
 
 function featurePropertyName(type) {
