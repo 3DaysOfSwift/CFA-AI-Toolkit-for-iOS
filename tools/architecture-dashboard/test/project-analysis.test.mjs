@@ -15,6 +15,10 @@ test('compiled SwiftSyntax scanner inventories startup candidates', {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cfa-startup-inventory-'));
   t.after(() => fs.rm(root, {recursive:true, force:true}));
   await fs.writeFile(path.join(root, 'main.swift'), 'import Foundation\nprint("start")\nprint("finish")\n');
+  const initialized = path.join(root, 'Initialized');
+  await fs.mkdir(initialized);
+  await fs.writeFile(path.join(initialized, 'main.swift'),
+    'var computed: Int { 1 }\nlet value = start()\nprint(value)\n');
   const conditional = path.join(root, 'Conditional');
   await fs.mkdir(conditional);
   await fs.writeFile(path.join(conditional, 'main.swift'),
@@ -37,6 +41,7 @@ test('compiled SwiftSyntax scanner inventories startup candidates', {
     ['entry.launchCallback', 'application', 'App.swift', 5, 10],
     ['entry.main', 'main.swift', 'Conditional/main.swift', 2, 1],
     ['entry.main', 'main.swift', 'Conditional/main.swift', 5, 1],
+    ['entry.main', 'main.swift', 'Initialized/main.swift', 2, 13],
     ['entry.main', 'main.swift', 'main.swift', 2, 1]
   ]);
 });

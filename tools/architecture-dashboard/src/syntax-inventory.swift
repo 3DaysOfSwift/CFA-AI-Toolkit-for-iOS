@@ -53,6 +53,10 @@ final class SourceInventory: SyntaxVisitor {
                         recordTopLevelStartup(in: branch)
                     }
                 }
+            } else if let variable = statement.item.as(VariableDeclSyntax.self),
+                      let initializer = variable.bindings.compactMap(\.initializer).first {
+                record("entry.main", "main.swift", initializer.value)
+                return
             } else if statement.item.as(DeclSyntax.self) == nil {
                 record("entry.main", "main.swift", statement)
                 return
