@@ -65,7 +65,13 @@ results in the report, rather than presenting scanner counts as findings.
    reused by another UI or extension. Inspect imports, target membership, platform
    availability, lifecycle, storage and process boundaries. A shared source folder
    or singleton alone does not prove code compiles in a widget, watchOS or another
-   process; identify what is verified and what would require adaptation.
+   process. For an existing extension or companion app, trace how it obtains
+   fresh data in its own process. For a snapshot-backed widget, verify the write
+   completes before requesting a timeline reload. For a Watch companion, trace
+   the transfer and check how the receiver handles missing, delayed or obsolete
+   snapshots. Report build and device evidence separately from source review.
+   For a proposed target, identify the code and dependencies that would need
+   adaptation.
 6. **Actor design:** Identify actors' state, responsibilities, callers and
    isolation boundaries. Examine unnecessary hops, reentrancy and overlapping
    ownership where evidence warrants it. Neither an actor count nor similar names
