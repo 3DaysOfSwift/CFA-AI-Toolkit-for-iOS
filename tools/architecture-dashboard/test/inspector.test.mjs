@@ -883,7 +883,7 @@ test('ignores fake dependencies in comments and strings and flags unresolved pro
     'Application/1 - View/Views/Chat/ChatView.swift': 'import SwiftUI\nstruct ChatView: View { @State private var viewModel = ChatViewModel(); var body: some View { Text("AppModel.shared.fakeFeature") } }',
     'Application/1 - View/Views/Chat/ChatViewModel.swift': '// AppModel.shared.fakeFeature\nfinal class ChatViewModel { init(chatsFeature: any ChatsFeatureAPI = AppModel.shared.missingFeature) {} }',
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
-    'ApplicationTests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}'
+    'ApplicationTests/ViewModelTests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}'
   });
   const report = await inspect(root);
   assert.deepEqual(report.screens[0].dependencies.map(item => item.property), ['missingFeature']);
@@ -896,7 +896,7 @@ test('reports old feature-owner types and mismatched feature references', async 
     'Application/1 - View/Views/Chat/ChatViewModel.swift': 'final class ChatViewModel { private let chats: ChatsManager; init(chats: ChatsManager = AppModel.shared.chatsManager) { self.chats = chats } }',
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static let shared = live(); static func live() -> AppModel { AppModel() }; let chatsManager: ChatsManager }',
     'Application/2 - AppModel/Features/Chats/ChatsManager.swift': 'final class ChatsManager {}',
-    'ApplicationTests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}'
+    'ApplicationTests/ViewModelTests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}'
   });
   const report = await inspect(root);
   assert.deepEqual(report.findings.map(item => item.code), ['feature-type-name', 'feature-property-name']);
@@ -976,11 +976,12 @@ test('reviews matching ViewModel tests in production source trees', async t => {
     'App/1 - View/Views/Home/HomeViewModel.swift': 'final class HomeViewModel {}',
     'App/2 - AppModel/HomeViewModelTests.swift': 'struct HomeViewModelTests {}',
     'AppTests/HomeViewModelTests.swift': 'struct HomeViewModelTests {}',
+    'OtherTests/View model tests/HomeViewModelTests.swift': 'struct HomeViewModelTests {}',
     [file]: 'struct HomeViewModelTests {}'
   });
   const {findings} = await inspect(root);
   const placement = findings.filter(item => item.code === 'view-model-test-placement');
-  assert.deepEqual(placement.map(item => item.file), [file, 'App/2 - AppModel/HomeViewModelTests.swift']);
+  assert.deepEqual(placement.map(item => item.file), [file, 'App/2 - AppModel/HomeViewModelTests.swift', 'AppTests/HomeViewModelTests.swift']);
   assert.ok(placement.every(item => item.severity === 'review' && /unit-test target/.test(item.message)));
 });
 
