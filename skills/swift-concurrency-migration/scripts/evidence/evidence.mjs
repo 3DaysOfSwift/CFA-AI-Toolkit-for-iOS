@@ -188,7 +188,10 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
         ['manualBehaviourRegressionEvidenceId', ['manual']],
         ['manualArchitectureReviewEvidenceId', ['manual']]
       ];
-      for (const id of gate.dataHandoffEvidenceIds) {
+      if (!gate.dataHandoffEvidenceIds) {
+        errors.push('completionGate.dataHandoffEvidenceIds: list evidence for affected handoffs, or use an empty list if none are affected');
+      }
+      for (const id of gate.dataHandoffEvidenceIds ?? []) {
         const item = record.evidence.find(candidate => candidate.id === id);
         if (!item || !['test', 'manual'].includes(item.kind) || item.phase !== 'after' ||
             item.outcome !== 'passed' || item.commit !== record.repository.afterCommit) {

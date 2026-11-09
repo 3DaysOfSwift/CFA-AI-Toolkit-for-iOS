@@ -203,6 +203,18 @@ test('completion is not inferred from a build pass or tests at a different commi
   f.write();
   assert.ok(inspectRecord(f.file).errors.some(error => error.includes('missing passed build at afterCommit for Widget')));
   widgetBuild.commit = f.record.repository.afterCommit;
+  delete f.record.completionGate.dataHandoffEvidenceIds;
+  f.record.status = 'draft';
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.startsWith('completionGate.dataHandoffEvidenceIds')));
+  f.record.result = 'partial';
+  f.record.limitations.push('Cross-target handoff evidence is pending.');
+  f.write();
+  assert.equal(inspectRecord(f.file).valid, true);
+  f.record.limitations.pop();
+  f.record.result = 'completed';
+  f.record.status = 'approved';
+  f.record.completionGate.dataHandoffEvidenceIds = ['after-widget-handoff'];
   const handoff = f.record.evidence.find(item => item.id === 'after-widget-handoff');
   handoff.commit = f.record.repository.beforeCommit;
   f.write();

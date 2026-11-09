@@ -90,7 +90,7 @@
     }},
     "completionGate": {
       "type": ["object", "null"], "additionalProperties": false,
-      "required": ["affectedTargets", "dataHandoffEvidenceIds", "navigatorEvidenceId", "featureInventoryEvidenceId", "primitiveInventoryEvidenceId", "hybridReviewEvidenceId", "deploymentCompatibilityEvidenceId", "finalCfaAuditEvidenceId", "buildEvidenceId", "testEvidenceId", "manualBehaviourRegressionEvidenceId", "manualArchitectureReviewEvidenceId"],
+      "required": ["affectedTargets", "navigatorEvidenceId", "featureInventoryEvidenceId", "primitiveInventoryEvidenceId", "hybridReviewEvidenceId", "deploymentCompatibilityEvidenceId", "finalCfaAuditEvidenceId", "buildEvidenceId", "testEvidenceId", "manualBehaviourRegressionEvidenceId", "manualArchitectureReviewEvidenceId"],
       "properties": {
         "affectedTargets": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/text"}},
         "dataHandoffEvidenceIds": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/identifier"}},
