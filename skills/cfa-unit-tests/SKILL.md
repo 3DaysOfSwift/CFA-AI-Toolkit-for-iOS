@@ -51,8 +51,10 @@ For each public Feature API operation and meaningful ViewModel behaviour,
 consider applicable success, validation/boundary, failure/retry, duplicate,
 cancellation and overlapping-operation scenarios. Assert observable results,
 state transitions and side effects rather than private implementation details.
-Use injected repositories, clocks, clients and controllable continuations; do
-not use live services, arbitrary sleeps or scheduler luck.
+Await async Feature commands directly. Use injected repositories, clocks,
+clients and controllable continuations to exercise stale results, actor
+reentrancy and partial failure wherever they affect correctness. Avoid live
+services, arbitrary sleeps and assumptions about task scheduling.
 
 For retained ViewModel tasks, prove that repeated actions share one execution
 only when the same result satisfies each action, including failure and retry.
