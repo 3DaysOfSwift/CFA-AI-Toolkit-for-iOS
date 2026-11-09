@@ -152,8 +152,11 @@ When reviewing deep links or notification actions, apply the
 callback through DeepLinkingFeature to the receiving scene. Where the app
 uses the pending-request design, check that invalid requests cannot change the
 pending list or saved snapshot. Check that a valid request is saved before it
-is shown as pending, and that a refusal or cancellation before navigation
-keeps it available. Verify that either scene can open the request without
+is shown as pending. On initial save failure, check that the caller receives
+the error and that the unsaved request stays out of the list. Verify that
+a request arriving before restoration finishes is preserved alongside the
+restored entries across restart. A refusal, cancellation before opening,
+or failed navigation keeps the request available. Verify that either scene can open the request without
 changing another scene's destination, and that competing attempts open it
 only once. Confirm that opening the destination completes navigation even
 while its content loads. If saving removal fails after navigation, follow
