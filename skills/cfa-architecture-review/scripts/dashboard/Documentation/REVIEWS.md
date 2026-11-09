@@ -408,10 +408,18 @@ or warm launch, and what the measurement ends at. Report first-frame timing
 separately from disk restoration or Feature refresh completion. Otherwise,
 describe the startup path and state that timing was unavailable.
 
-The inspector flags some direct synchronous reads in the delegate callback,
-AppModel construction and the launch signal. Trace branches and helper calls
-on the synchronous launch path to check for other blocking I/O. Identify work
-started inside a Feature-owned task separately from work the delegate waits for.
+The inspector flags some direct synchronous reads and file opens in the
+delegate callback, AppModel construction and the launch signal. Trace branches
+and helper calls on the synchronous launch path to check for other blocking
+I/O. Identify work started inside a Feature-owned task separately from work
+the delegate waits for.
+
+Check that each active SwiftUI scene can install its normal root while
+Features start or recover from failure. The inspector can trace roots directly
+constructed by a WindowGroup, including value-driven groups, and flag possible
+startup gates in App.body or the root. Confirm which compilation branch and
+target contain the finding. Follow helper-built roots and verify whether an
+early return actually prevents navigation or access to unaffected destinations.
 
 When reviewing CFA conformance, record whether AppModel signals Feature
 startup and creates and retains required asynchronous listener tasks before
