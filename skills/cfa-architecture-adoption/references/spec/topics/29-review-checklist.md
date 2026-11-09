@@ -106,7 +106,8 @@ Before accepting a change, answer every question:
     state and storage according to the product contract? Verify that old
     requests cannot publish after sign-out, account switching or external
     session expiry, including when the same account signs back in. Verify that
-    partial failures are reconciled against the actual session. If the session
+    external session expiry reaches its owner when the account screen is closed.
+    Verify that partial failures are reconciled against the actual session. If the session
     ended and cleanup failed, verify that the app stays signed out, reports
     the failure and keeps old account data out of the signed-out experience.
 

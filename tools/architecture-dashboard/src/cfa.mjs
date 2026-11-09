@@ -128,8 +128,10 @@ skill from that toolkit before changing the project.
   cycles and keep one authoritative owner for each value.
 - For sign-out, account switching or external session expiry, let the owning
   Feature coordinate explicit cleanup calls. Trace each supported entry point
-  and reconcile the outcome with the actual session. Preserve the session and
-  its data when sign-out fails before ending the session. Clear the ended
+  and reconcile the outcome with the actual session, including partial
+  authentication failures. Verify that external expiry reaches its owner
+  with the account screen closed. Preserve the session and its data when
+  sign-out fails before ending the session. Clear the ended
   session's Feature state and report cleanup failures accurately. A cleanup
   failure after sign-out does not restore the session. During a switch, keep
   the previous session's data out of the new session. Check the account or
