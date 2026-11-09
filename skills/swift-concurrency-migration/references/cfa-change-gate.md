@@ -126,10 +126,13 @@ the architecture:
     When both restoration and refresh are needed, start them independently.
     A missing, incompatible or unreadable optional cache must leave the download
     free to proceed. Publish current server data and complete the refresh for
-    its callers without waiting for the cache write. Retry within a bounded
-    policy, preserve a good cache if
-    replacement fails, and prevent older writes or restores from replacing
-    newer data. Report offline availability only for a saved cache.
+    its callers without waiting for the cache write. Keep valid in-memory
+    results if refresh fails. Retry cache writes within a bounded policy,
+    preserve a good cache if replacement fails, and prevent older writes or
+    restores from replacing newer data. Report offline availability only
+    for a saved cache. Verify that fresh data is visible and refresh returns
+    while the cache write is still pending, and that a failed cache write
+    leaves the fresh results usable.
     Use JSON by default. Leave Instant Loading binary snapshots out of app
     creation and migration proposals. Help apply them on request for a
     sufficiently stable format with safe rejection of incompatible data.
