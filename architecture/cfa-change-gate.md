@@ -125,6 +125,9 @@ the architecture:
     BGTaskScheduler, register each permitted identifier once before launch
     finishes and schedule requests separately. Route app-level callbacks through
     AppModel and honour expiration, cancellation and system completion.
+    Keep unrelated background capabilities with their owning Features. A Feature
+    can keep work running after its screen closes. Continuing after the app
+    itself enters the background requires an appropriate system mechanism.
     For additional device or extension targets, include the appropriate shared
     Model source and target-specific presentation. Each process has its own
     AppModel and Feature instances; synchronize data through an appropriate
