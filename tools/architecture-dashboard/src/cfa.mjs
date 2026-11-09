@@ -51,7 +51,9 @@ skill from that toolkit before changing the project.
   describe their actual jobs.
 - A detail View may receive selected immutable value data and construct its own
   State-backed ViewModel in its initializer. Do not inject or share ViewModels;
-  keep each scene's selection in presentation, not in a shared Feature.
+  keep each scene's selection in presentation, not in a shared Feature. The
+  supplied snapshot seeds the destination identity. A changed input does not
+  automatically replace its State-backed ViewModel.
   Keep the selected snapshot and navigation stable when the source list changes.
   Use explicit refresh where appropriate and adopt live updates when the product
   calls for them.
@@ -77,7 +79,9 @@ skill from that toolkit before changing the project.
   closures and other screens' ViewModel actions out of screen inputs.
 - Published domain snapshots use immutable properties and contents, without
   mutable reference state that undermines them; replace them after confirmed
-  changes. The screen ViewModel owns temporary unsaved editor values.
+  changes. The screen ViewModel owns temporary unsaved editor values. Keep the
+  draft available for retry if saving fails. Discard it when the user cancels
+  editing, and publish confirmed changes only after required persistence succeeds.
 - Start with independent Features; compose them only for a genuine business
   responsibility, without duplicating authoritative state or creating cycles.
 - For sign-out or account switching, let the owning Feature coordinate explicit

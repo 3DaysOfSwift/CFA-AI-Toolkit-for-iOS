@@ -78,6 +78,9 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /SwiftDataManager owns container and context creation/);
   assert.match(content, /NetworkingManager\. In new apps, start with a\s+stateless value type/);
   assert.match(content, /independent requests able to progress in parallel/);
+  assert.match(content, /A changed input does not\s+automatically replace its State-backed ViewModel/);
+  assert.match(content, /draft available for retry if saving fails/);
+  assert.match(content, /publish confirmed changes only after required persistence succeeds/);
   assert.match(content, /Call the AppModel launch signal directly\s+and synchronously from the application lifecycle callback/);
   assert.match(content, /AppModel signals the relevant Features and starts its\s+required app-wide listeners before the callback returns/);
   assert.equal((content.match(/CFA Toolkit project guidance/g) ?? []).length, 1);
