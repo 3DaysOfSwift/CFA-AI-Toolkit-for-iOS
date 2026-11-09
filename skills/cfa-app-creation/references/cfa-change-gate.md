@@ -232,8 +232,8 @@ the architecture:
 
 Review the changed source as one feature slice, not as isolated files.
 When the scope includes a paid capability, establish its entitlement policy and
-trace every identifiable entry point to its guard. Flag established unguarded
-calls and report unresolved paths as unverified. Test locked and entitled paths;
+trace every identifiable entry point to a check of current entitlement before
+paid presentation or execution. Flag established unguarded paths and report unresolved paths as unverified. Test locked and entitled paths;
 do not claim that UI gating replaces server-side authorisation.
 
 ## Migration progress and completion language

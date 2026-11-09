@@ -71,7 +71,9 @@ For paid capabilities, exercise locked and entitled outcomes at each relevant
 entry point, including alternate screens or system actions that can invoke the
 capability. Supply controlled entitlement state and verify that locked paths
 show the expected purchase or locked experience where applicable and never
-invoke the paid operation. Verify that entitled callers can proceed. Verify
+invoke the paid operation. Verify that entitled callers can proceed. If
+entitlement can change while the screen stays open, change it after initial
+presentation and verify that a later action checks the current value. Verify
 server-side authorisation separately for server-protected operations.
 
 For shared refreshes that should survive navigation, suspend the refresh and

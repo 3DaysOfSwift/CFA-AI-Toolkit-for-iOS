@@ -159,8 +159,8 @@ skill from that toolkit before changing the project.
   in admission order, including across awaits, and return each caller's own
   outcome. Matching inputs alone do not make commands duplicates. Define how
   failure and cancellation affect queued work and when to clear task handles.
-- PurchasesFeature owns entitlement state. Screen ViewModels check access before
-  presenting or calling a paid capability. Trace every other entry point to its
+- PurchasesFeature owns entitlement state. Screen ViewModels check current
+  entitlement before presenting or calling a paid capability. Trace every other entry point to its
   own guard and verify both locked and entitled outcomes. Keep pricing and
   entitlement checks out of the capability Feature so the product can change
   which capabilities it charges for. Protected server operations enforce their
