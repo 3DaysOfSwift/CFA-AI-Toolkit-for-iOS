@@ -18,8 +18,14 @@
       "revision": "3ecaa30c76428bd8a6f5db8fd5506b6c20b846f7",
       "sourcePath": "Swift Concurrency Project/RocketLaunch/2 - AppModel/Features/Launch Schedule/LaunchScheduleFeature.swift",
       "additionalSources": [
-        {"label": "Detail View", "path": "Swift Concurrency Project/RocketLaunch/1 - View/Views/Operators/LaunchDetail/LaunchDetailView.swift"},
-        {"label": "Detail ViewModel", "path": "Swift Concurrency Project/RocketLaunch/1 - View/Views/Operators/LaunchDetail/LaunchDetailViewModel.swift"}
+        {
+          "label": "Detail View",
+          "path": "Swift Concurrency Project/RocketLaunch/1 - View/Views/Operators/LaunchDetail/LaunchDetailView.swift"
+        },
+        {
+          "label": "Detail ViewModel",
+          "path": "Swift Concurrency Project/RocketLaunch/1 - View/Views/Operators/LaunchDetail/LaunchDetailViewModel.swift"
+        }
       ],
       "description": "Schedule ownership, provider refresh and optional cache",
       "ruleIds": [
@@ -40,17 +46,13 @@
     {
       "name": "Personal API",
       "repository": "https://github.com/3DaysOfSwift/Personal-API-iOS-App-Swift-Concurrency-CFA",
-      "revision": "b737865cedea92d3d85c2b8c0fd3eb7274dcc2a4",
-      "sourcePath": "PersonalAPI/2 - AppModel/AppModel.swift",
-      "description": "Application composition and Feature access",
+      "description": "Personal knowledge and conversations",
       "ruleIds": []
     },
     {
       "name": "Amigos",
       "repository": "https://github.com/3DaysOfSwift/Amigos",
-      "revision": "96a3878f6218b9d3e811309eb8469f845d3df6f2",
-      "sourcePath": "Amigos/2 - AppModel/AppModel.swift",
-      "description": "Application composition and conversation capabilities",
+      "description": "Spanish conversation practice",
       "ruleIds": []
     },
     {
@@ -66,17 +68,13 @@
     {
       "name": "123 Calc",
       "repository": "https://github.com/3DaysOfSwift/123-Calc",
-      "revision": "edebdcc9495dbe5d75088d161274499bfbfbfb3c",
-      "sourcePath": "123 Calc/2 - AppModel/AppModel.swift",
-      "description": "Calculator composition",
+      "description": "Calculator",
       "ruleIds": []
     },
     {
       "name": "Phone Drive",
       "repository": "https://github.com/3DaysOfSwift/Phone-Drive",
-      "revision": "81854fb55bfdbd62381d79c579856fa0f1a5af98",
-      "sourcePath": "Phone Drive/2 - AppModel/AppModel.swift",
-      "description": "File library and local-sharing composition",
+      "description": "File library and local sharing",
       "ruleIds": []
     },
     {
