@@ -397,7 +397,10 @@ identifies all of the following:
 - passing builds for each affected target, plus relevant automated tests
   and manual behaviour regression, all tied to the final commit. Include
   existing extension or device targets that consume changed shared code.
-  Verify any affected data handoff separately from the build; and
+  Verify any affected data handoff separately from the build. If a relevant
+  regression check fails, retain its evidence and reconcile differences in
+  target, build configuration and OS. Verify the affected scenario on the
+  configuration where it failed before accepting the handoff; and
 - a human architecture review confirming that the navigator communicates the
   agreed structure.
 
