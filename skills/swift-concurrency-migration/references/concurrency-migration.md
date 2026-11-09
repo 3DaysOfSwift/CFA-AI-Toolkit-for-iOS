@@ -44,6 +44,15 @@ locked and entitled outcomes. Record unresolved paths as unverified. Document
 any intentional exception against the product constraints and explain its
 effect on the scoped conformance verdict.
 
+For affected account transitions, reconcile the original sign-out, account
+switch and external session expiry paths with the migrated ones. Verify that
+expiry still reaches its owner without an account screen. When authentication
+and cleanup can fail separately, verify the actual session and which data
+remains accessible. If the session ended, a cleanup error must leave the
+app signed out. Complete an old request after the transition, including
+after signing back in to the same account where supported, and verify that
+its result cannot publish into the new session.
+
 For every misplaced file, compare its actual disk path and navigator group with
 the appropriate CFA location, including files temporarily placed in an existing
 package. Apply the placement checks above. Correct identified, safe in-scope
