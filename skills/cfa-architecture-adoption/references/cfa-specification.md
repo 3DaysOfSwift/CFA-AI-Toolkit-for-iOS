@@ -1898,8 +1898,10 @@ Before accepting a change, answer every question:
 20. Are domain types stored with the feature that owns their meaning?
 21. For each paid capability in scope, does every identified entry point check
     current entitlement before presenting or invoking it? Have locked and
-    entitled outcomes been tested, including alternate entry points? Record
-    unresolved paths as unverified. Verify server-side authorisation separately
+    entitled outcomes been tested, including alternate entry points? If
+    entitlement can change during a suspension before use, verify that the
+    resumed route checks again before presenting or invoking the capability.
+    Record unresolved paths as unverified. Verify server-side authorisation separately
     where the operation is protected by the server.
 22. For account changes in scope, does failed sign-out preserve the session
     when it remains active? Does successful sign-out clear account-specific

@@ -86,7 +86,9 @@ an established unguarded call or exposure with source evidence; identify paths
 that cannot be resolved as unverified. Do not assume a capability is paid from
 its name, or claim a UI check provides server-side authorisation. Look for
 behavioural evidence of both locked and entitled outcomes on alternate entry
-points as well as the usual screen.
+points as well as the usual screen. Where access can change during a suspension
+before use, look for a fresh check after resumption and test evidence that a
+revocation prevents the paid presentation or call.
 For scanner-assisted leads, use the [entitlement review workflow](scripts/dashboard/Documentation/entitlement-review.md).
 The scanner finds candidates, not verified guards or violations; trace them and
 inspect alternative entry points before recording a finding.
