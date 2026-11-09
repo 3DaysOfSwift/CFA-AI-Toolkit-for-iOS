@@ -106,6 +106,13 @@ export async function inspect(project) {
     const liveFactories = [...appMembers.matchAll(/\bstatic\s+func\s+live\s*\(\s*\)\s*->\s*AppModel\b/g)]
       .filter(match => /^\s*\{/.test(appModel.slice(match.index + match[0].length)));
     if (liveFactories.length !== 1) findings.push(finding('app-model-live-factory', 'review', `Found ${liveFactories.length} static live() -> AppModel declarations directly inside AppModel. Verify the single production factory, including extensions and active compilation conditions.`, appModelFile, 1));
+    for (const factory of liveFactories) {
+      const opening = appModel.indexOf('{', factory.index + factory[0].length);
+      const container = /\b(?:SwiftData\s*\.\s*)?ModelContainer\s*\(/.exec(braceBody(appModel, opening));
+      if (container) {
+        findings.push(finding('app-model-storage-construction', 'review', 'AppModel.live() references a ModelContainer initializer. Trace whether it opens storage during graph construction. CFA opens the store within the storage owner’s data request.', appModelFile, lineOf(appModel, opening + 1 + container.index)));
+      }
+    }
     const sharedInitializer = /\bstatic\s+let\s+shared\s*(?::\s*AppModel\s*)?=/.exec(appMembers);
     if (sharedInitializer) {
       const initializer = appModel.slice(sharedInitializer.index + sharedInitializer[0].length);

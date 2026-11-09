@@ -682,3 +682,14 @@ test('shows skipped source and unfollowed links in the text inspection', async t
   assert.match(output, /Skipped Invalid\.swift: Source is not valid UTF-8/);
   assert.match(output, /Symbolic link not followed: Linked\.swift/);
 });
+
+test('reviews direct container construction in the AppModel factory at its source line', async t => {
+  const file = 'Application/2 - AppModel/AppModel.swift';
+  const root = await fixture(t, {
+    [file]: 'final class AppModel {\n  static func live() -> AppModel {\n    let store = try SwiftData.ModelContainer(for: Note.self)\n    return AppModel()\n  }\n}',
+    'Application/2 - AppModel/SwiftDataManager.swift': 'actor SwiftDataManager { func open() throws { _ = try ModelContainer(for: Note.self) } }'
+  });
+  const {findings} = await inspect(root);
+  const storage = findings.filter(item => item.code === 'app-model-storage-construction');
+  assert.deepEqual(storage.map(item => [item.severity, item.file, item.line]), [['review',file,3]]);
+});
