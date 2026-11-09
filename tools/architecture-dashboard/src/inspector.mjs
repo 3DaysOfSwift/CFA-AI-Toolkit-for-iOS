@@ -565,7 +565,7 @@ export async function inspect(project) {
     const dependencies = [];
     for (const { index, closing, parameters, injectedViewModel, injectedAppModel } of viewInitializers(body)) {
       if (!injectedViewModel && !injectedAppModel && parameters.trim() && viewModel) {
-        findings.push(finding('screen-initializer-inputs', 'review', `${name} accepts initializer inputs. Verify that the detail input is a selected immutable snapshot and no ViewModel is injected.`, viewFile, lineOf(view, bodyOffset + index)));
+        findings.push(finding('screen-initializer-inputs', 'review', `${name} accepts initializer inputs. Check that a detail screen receives selected immutable data and constructs its own ViewModel. Check for injected Features, repositories and navigation actions owned by another screen.`, viewFile, lineOf(view, bodyOffset + index)));
       }
       const tail = body.slice(closing + 1);
       const openingBody = /^\s*(?:(?:async|throws|rethrows)\s*)*\{/.exec(tail);

@@ -175,6 +175,10 @@ Report files contain source paths and symbols; review them before sharing.
   possible child creation sites and framework callbacks.
 - Provides filters, file drill-down, source excerpts and review questions.
 - Finds limited GCD, blocking-work and UI-responsibility warnings.
+- Flags explicit ViewModel and AppModel initializer inputs in recognizable
+  SwiftUI Views. For other inputs, trace screen callers to distinguish selected
+  immutable detail data from injected dependencies or another screen's actions.
+  Review synthesized initializers and type aliases in source.
 - Records scan scope and fingerprints scanned Swift files and local build definitions.
 - Runs offline, without analytics, external fonts, scripts or CDN assets.
 - Lists scanned files and detected types as unassessed until a source-backed
