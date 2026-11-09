@@ -229,6 +229,9 @@ test('CFA App includes a separate unit-test template component', {skip: process.
   const testInfo = JSON.parse(execFileSync('plutil', ['-convert', 'json', '-o', '-', path.join(component, 'TemplateInfo.plist')], {encoding: 'utf8'}));
   const option = info.Options.find(item => item.Identifier === 'cfaUnitTests');
   assert.equal(option.Units.Include.Components[0].Identifier, testInfo.Identifier);
+  assert.equal(info.Targets.length, 1);
+  assert.equal(testInfo.Targets[0].TargetIdentifierToBeTested, 'com.apple.dt.cocoaTouchApplicationTarget');
+  assert.ok(info.Nodes.every(node => !node.endsWith('Tests.swift')), 'Test files must not be included in the app component');
   const testFiles = ['AppModelTests/AppModelTests.swift', 'FeatureTests/GitReposFeatureTests.swift', 'FeatureTests/SettingsFeatureTests.swift', 'NetworkingTests/NetworkingManagerTests.swift', 'ViewModelTests/GitReposViewModelTests.swift', 'ViewModelTests/SettingsViewModelTests.swift', 'ViewModelTests/RootTabViewModelTests.swift', 'Support/TestDependencies.swift'];
   for (const file of testFiles) {
     assert.ok(testInfo.Nodes.includes(file), `Missing test source ${file}`);
