@@ -145,3 +145,12 @@ test('an unknown task relationship prevents a stable dashboard verdict', () => {
   assert.match(result.verdict, /Inconclusive/);
   assert.match(result.html, /<summary>⚠️ Needs investigation.*Callback: Task owner could not be established/s);
 });
+
+test('a confirmed local defect does not hide unresolved architectural clarity', () => {
+  const result = operationAssessments({
+    operationInventory: {coverage:'complete'},
+    operations: [{...op, correctness:'problem', clarity:'investigate', problemKind:'local-defect'}]
+  });
+  assert.equal(result.counts.problem, 1);
+  assert.match(result.verdict, /Inconclusive/);
+});

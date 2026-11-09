@@ -52,7 +52,9 @@ export function operationAssessments(review) {
   const counts=Object.fromEntries(Object.keys(labels).map(s=>[s,operations.filter(o=>operationStatus(o)===s).length]));
   const inventory=review?.operationInventory;
   const cfaCounts=Object.fromEntries(Object.keys(cfaLabels).map(status=>[status,operations.filter(op=>checkOutcome(op.checks??[],'cfa')===status).length]));
-  const complete=inventory?.coverage==='complete' && operations.length>0 && !counts.investigate && !counts.unassessed;
+  const complete = inventory?.coverage === 'complete' && operations.length > 0 &&
+    operations.every(op => [op.correctness, op.clarity].every(status => status === 'sound' || status === 'problem') &&
+      !op.unknowns?.length && !op.steps?.some(step => step.relation === 'unknown'));
   const conflicts=operations.filter(o=>operationStatus(o)==='problem'&&o.problemKind==='architectural-conflict');
   const verdict=conflicts.length?'Yes — architectural conflicts identified':complete?'No architectural conflicts identified in the assessed scope':'Inconclusive — assessment coverage is incomplete';
   const correctnessProblems=operations.filter(o=>o.correctness==='problem').length;
