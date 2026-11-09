@@ -10,7 +10,7 @@ Both examples publish Artemis on MainActor before reporting completion. The migr
 
 ## Migration
 
-The Feature awaits its provider and publishes observable state on MainActor. This fixture queues every refresh in admission order, including requests with different inputs. Callers await their own refresh through publication.
+The Feature awaits its provider and publishes observable state on MainActor. This fixture queues every refresh in admission order, including requests with different inputs. Each caller receives its own success or failure after the Feature publishes the outcome.
 
 ## Run and verify
 

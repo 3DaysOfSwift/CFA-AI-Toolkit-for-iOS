@@ -18,33 +18,36 @@ actor LaunchProvider {
 @MainActor @Observable
 final class LaunchFeature {
     @ObservationIgnored private let provider: LaunchProvider
-    @ObservationIgnored private var refreshTask: Task<Void, Never>?
+    @ObservationIgnored private var refreshTask: Task<Bool, Never>?
     @ObservationIgnored private var refreshID: UUID?
     private(set) var name = "No launch loaded"
     private(set) var errorMessage: String?
     init(provider: LaunchProvider) { self.provider = provider }
 
     // Requests may have different inputs, so each is processed in order.
-    func refresh(available: Bool) async {
+    func refresh(available: Bool) async -> Bool {
         let previous = refreshTask
         let id = UUID()
         let task = Task { @MainActor in
-            await previous?.value
+            _ = await previous?.value
             do {
                 let downloadedName = try await provider.download(available: available)
                 name = downloadedName
                 errorMessage = nil
+                return true
             } catch {
                 errorMessage = "The launch could not be loaded."
+                return false
             }
         }
         refreshTask = task
         refreshID = id
-        await task.value
+        let succeeded = await task.value
         if refreshID == id {
             refreshTask = nil
             refreshID = nil
         }
+        return succeeded
     }
 }
 
@@ -53,12 +56,12 @@ final class LaunchFeature {
 @MainActor
 func runExample() async {
     let feature = LaunchFeature(provider: LaunchProvider())
-    await feature.refresh(available: true)
-    precondition(feature.name == "Artemis")
-    await feature.refresh(available: false)
-    precondition(feature.name == "Artemis" && feature.errorMessage != nil)
-    await feature.refresh(available: true)
-    precondition(feature.name == "Artemis" && feature.errorMessage == nil)
+    let loaded = await feature.refresh(available: true)
+    precondition(loaded && feature.name == "Artemis")
+    let failedRefreshSucceeded = await feature.refresh(available: false)
+    precondition(!failedRefreshSucceeded && feature.name == "Artemis" && feature.errorMessage != nil)
+    let retried = await feature.refresh(available: true)
+    precondition(retried && feature.name == "Artemis" && feature.errorMessage == nil)
     print("Passed: MainActor publication, failure retention and retry.")
 }
 

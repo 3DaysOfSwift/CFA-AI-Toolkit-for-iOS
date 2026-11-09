@@ -34,7 +34,7 @@ for (const name of examples) for (const [side, version] of [['Before','5'], ['Af
   });
 }
 
-test('MainActor Result queues overlapping refreshes and keeps the later result', {skip:process.platform !== 'darwin', timeout:120000}, () => {
+test('MainActor Result returns each queued refresh outcome and publishes the latest result', {skip:process.platform !== 'darwin', timeout:120000}, () => {
   const page = fs.readFileSync(path.join(root, 'examples/migration/MainActor Result/After.playground/Contents.swift'), 'utf8');
   const feature = page.slice(page.indexOf('// AFTER:'), page.indexOf('// MARK: - Test fixtures'));
   assert.match(feature, /final class LaunchFeature/);
@@ -81,8 +81,9 @@ extension LaunchFeature {
         let callsBeforeRelease = await provider.calls
         precondition(callsBeforeRelease == [false])
         await provider.releaseFirst()
-        await first.value
-        await second.value
+        let firstSucceeded = await first.value
+        let secondSucceeded = await second.value
+        precondition(!firstSucceeded && secondSucceeded)
         let calls = await provider.calls
         precondition(calls == [false, true])
         precondition(feature.name == "Artemis" && feature.errorMessage == nil)
