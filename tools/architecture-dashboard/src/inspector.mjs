@@ -742,7 +742,7 @@ export async function inspect(project) {
       const bodyStart = sceneBodyStart(appBody);
       if (bodyStart === null) continue;
       const body = braceBody(appBody, bodyStart - 1);
-      for (const root of body.matchAll(/\bWindowGroup\s*(?:\([^{}]*\)\s*)?\{\s*(?:\w+\s*\.\s*)*(\w+)\s*\(/g)) {
+      for (const root of body.matchAll(/\bWindowGroup\s*(?:\([^{}]*\)\s*)?\{\s*(?:\$?\w+\s+in\s*)?(?:\w+\s*\.\s*)*(\w+)\s*\(/g)) {
         const name = root[1];
         if (!viewNames.has(name)) continue;
         if ((declarationsByName.get(name)?.length ?? 0) > 1) {

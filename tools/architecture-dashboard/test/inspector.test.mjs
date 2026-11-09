@@ -1185,6 +1185,28 @@ test('reviews a custom root directly constructed by the app scene', async t => {
     .map(item => [item.file, item.line]), [[file, 3]]);
 });
 
+test('reviews the root of a value-driven WindowGroup', async t => {
+  const file = 'Application/Navigation/DetailShell.swift';
+  const root = await fixture(t, {
+    'Application/ExampleApp.swift': `struct ExampleApp: App {
+      var body: some Scene {
+        WindowGroup(for: String.self) { route in
+          DetailShell(route: route)
+        }
+      }
+    }`,
+    [file]: `struct DetailShell: View {
+      let route: Binding<String?>
+      var body: some View {
+        if storageReady { Details() } else { ProgressView() }
+      }
+    }`
+  });
+  const {findings} = await inspect(root);
+  assert.deepEqual(findings.filter(item => item.code === 'root-storage-gate')
+    .map(item => [item.file, item.line]), [[file, 4]]);
+});
+
 for (const name of ['WorkspaceShell', 'ContentView']) {
   test(`leaves competing ${name} scene roots for target-aware review`, async t => {
     const app = 'Application/ExampleApp.swift';
