@@ -399,11 +399,19 @@ each one. For launch performance, report the measurement conditions and result
 when available. Identify the device or simulator, build configuration, cold
 or warm launch, and what the measurement ends at. Report first-frame timing
 separately from disk restoration or Feature refresh completion. Otherwise,
-describe the startup path and state that timing was unavailable. When reviewing CFA conformance, also record whether AppModel
-signals Feature startup and starts required app-wide listeners before the
-launch callback returns. Trace duplicate prevention and delivery to the owning
-Feature with no relevant screen visible. Record those checks independently of
-any launch timing. The structural-conflict verdict comes from the classified operation
+describe the startup path and state that timing was unavailable.
+
+When reviewing CFA conformance, record whether AppModel signals Feature
+startup and creates and retains required asynchronous listener tasks before
+the launch callback returns. Record event consumption separately from task
+creation and launch timing. With a controlled source, signal launch more than
+once and verify that one listener forwards events to the owning Feature
+without a relevant screen mounted. For a replaceable listener, check that
+cancellation stops the old listener from forwarding events and that delayed
+cleanup leaves the replacement active. Screen-only observation follows the
+lifetime of its screen or ViewModel.
+
+The structural-conflict verdict comes from the classified operation
 checks. For an older review, update its findings and add the corresponding
 `appChecks` before regenerating the report. Use `progress` or `next` to list
 missing questions before rendering.
