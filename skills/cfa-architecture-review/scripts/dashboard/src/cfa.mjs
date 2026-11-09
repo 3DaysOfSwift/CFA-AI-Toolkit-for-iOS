@@ -187,6 +187,13 @@ This project guidance supplements the developer's request; it does not replace
 the installed CFA skills or authorise unrelated changes.
 `;
 
+function bundledGuidance(content) {
+  const start = content.indexOf(guidanceMarker);
+  if (start < 0) return '';
+  const end = content.indexOf('the installed CFA skills or authorise unrelated changes.', start);
+  return content.slice(start, end < 0 ? undefined : end);
+}
+
 function usage() {
   console.log(`CFA AI Toolkit for iOS — cfa command
 
@@ -249,7 +256,7 @@ function doctor(projectArgument) {
   if (guidance.length > 0) {
     console.log(`INFO CFA project guidance found: ${guidance.join(', ')}`);
     for (const file of guidance) {
-      const content = fs.readFileSync(file, 'utf8');
+      const content = bundledGuidance(fs.readFileSync(file, 'utf8'));
       if (content.includes(outdatedFeatureGuidance)) {
         console.log(`WARN outdated feature naming guidance in ${file}; update the CFA guidance block to use concrete *Feature types and matching *Feature properties.`);
       }
@@ -313,30 +320,31 @@ function enableProject(values) {
           : codexFile;
 
   const existingGuidance = fs.existsSync(guidanceFile) ? fs.readFileSync(guidanceFile, 'utf8') : '';
-  if (existingGuidance.includes(guidanceMarker)) {
+  const block = bundledGuidance(existingGuidance);
+  if (block) {
     console.log(`CFA project guidance is already enabled: ${guidanceFile}`);
-    if (existingGuidance.includes(outdatedFeatureGuidance)) {
+    if (block.includes(outdatedFeatureGuidance)) {
       console.log('The existing guidance still uses the old Manager rule. Edit only the CFA guidance block; the command will not overwrite project instructions.');
     }
-    if (existingGuidance.includes(outdatedServiceGuidance)) {
+    if (block.includes(outdatedServiceGuidance)) {
       console.log(`Update the existing CFA service guidance block. ${serviceGuidanceUpdate}`);
     }
-    if (existingGuidance.includes(outdatedScreenGuidance)) {
+    if (block.includes(outdatedScreenGuidance)) {
       console.log(`Update the existing CFA screen ownership guidance block. ${screenGuidanceUpdate}`);
     }
-    if (existingGuidance.includes(outdatedDeepLinkGuidance)) {
+    if (block.includes(outdatedDeepLinkGuidance)) {
       console.log(`Update the existing CFA deep-link guidance block. ${deepLinkGuidanceUpdate}`);
     }
-    if (existingGuidance.includes(outdatedSnapshotGuidance)) {
+    if (block.includes(outdatedSnapshotGuidance)) {
       console.log(`Update the existing CFA snapshot guidance block. ${snapshotGuidanceUpdate}`);
     }
-    if (existingGuidance.includes(outdatedSharedWaitGuidance)) {
+    if (block.includes(outdatedSharedWaitGuidance)) {
       console.log(`Update the existing CFA shared-refresh guidance block. ${sharedWaitGuidanceUpdate}`);
     }
-    if (existingGuidance.includes(outdatedStartupGuidance)) {
+    if (block.includes(outdatedStartupGuidance)) {
       console.log(`Update the existing CFA startup guidance block. ${startupGuidanceUpdate}`);
     }
-    if (existingGuidance.includes(outdatedAppModelGuidance)) {
+    if (block.includes(outdatedAppModelGuidance)) {
       console.log('The existing AppModel guidance should allow private task handles for app-wide listeners. Edit only the CFA guidance block.');
     }
     return;
