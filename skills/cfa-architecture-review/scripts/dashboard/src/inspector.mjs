@@ -72,10 +72,10 @@ function inspectSynchronousLaunchReads(name, file, source, opening, findings) {
 }
 
 function* storedTypedMembers(members, body) {
-  const property = /\b(?:let|var)\s+`?[\p{L}_][\p{L}\p{M}\p{N}_]*`?\s*:\s*(?:\(\s*any\s+((?:\w+\s*\.\s*)*\w+)\s*\)\s*\?|(?:(?:any|some)\s+)?((?:\w+\s*\.\s*)*\w+)\b(?!\s*\.)(?:[ \t]*[?!])?)/gu;
+  const property = /\b(?:let|var)\s+`?([\p{L}_][\p{L}\p{M}\p{N}_]*)`?\s*:\s*(?:\(\s*any\s+((?:\w+\s*\.\s*)*\w+)\s*\)\s*\?|(?:(?:any|some)\s+)?((?:\w+\s*\.\s*)*\w+)\b(?!\s*\.)(?:[ \t]*[?!])?)/gu;
   for (const match of members.matchAll(property)) {
     if (hasComputedAccessor(body.slice(match.index + match[0].length))) continue;
-    yield { index: match.index, type: (match[1] ?? match[2]).split('.').at(-1).trim() };
+    yield { index: match.index, name: match[1], type: (match[2] ?? match[3]).split('.').at(-1).trim() };
   }
 }
 
@@ -684,8 +684,16 @@ export async function inspect(project) {
   const rootStartupGate = /(?<!#)\b(?:if|guard|switch)\s+[^{};]*\b\w*(?:isStartingUp|isLaunching|isInitializing|hasLaunched|hasFinishedLaunching|startupPhase|launchPhase|startupState|launchState|startupReady|launchReady)\w*\b/i;
   function inspectEnvironmentProviders(owner, body, file, source, offset) {
     const suppliedViewModel = /\.\s*(?:environment|environmentObject)\s*\(\s*(?:\w+\s*\.\s*)*(\w+ViewModel)(?:\s*\.\s*init)?\s*\(/g;
-    for (const match of body.matchAll(suppliedViewModel)) {
-      findings.push(finding('view-model-environment-provider', 'review', `${owner} appears to put ${match[1]} in the environment. Trace its consumers and verify each screen owns its own ViewModel.`, file, lineOf(source, offset + match.index)));
+    const memberTypes = new Map(storedTypedMembers(memberSignatures(body), body)
+      .filter(({type}) => type.endsWith('ViewModel')).map(({name, type}) => [name, type]));
+    const suppliedMember = /\.\s*(?:environment|environmentObject)\s*\(\s*self\s*\.\s*(\w+)\s*\)/g;
+    const providers = [...body.matchAll(suppliedViewModel)].map(match => ({index: match.index, type: match[1]}));
+    for (const match of body.matchAll(suppliedMember)) {
+      const type = memberTypes.get(match[1]);
+      if (type) providers.push({index: match.index, type});
+    }
+    for (const {index, type} of providers.sort((a, b) => a.index - b.index)) {
+      findings.push(finding('view-model-environment-provider', 'review', `${owner} appears to put ${type} in the environment. Trace its consumers and verify each screen owns its own ViewModel.`, file, lineOf(source, offset + index)));
     }
   }
   function inspectRootNavigation(body, file, source, offset) {

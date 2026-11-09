@@ -792,3 +792,15 @@ test('reviews ViewModel environment injection in a separate View extension', asy
   assert.deepEqual(report.findings.filter(item => item.code === 'view-model-environment-provider')
     .map(item => [item.file, item.line]), [[file, 3]]);
 });
+
+test('points to environment injection from a typed ViewModel property', async t => {
+  const {report} = await inspectView(t, `struct HomeView: View {
+    private let model: HomeViewModel = HomeViewModel()
+    private let theme: Theme = Theme()
+    var body: some View {
+      DetailsView().environment(self.model).environment(self.theme)
+    }
+  }`);
+  assert.deepEqual(report.findings.filter(item => item.code === 'view-model-environment-provider')
+    .map(({line}) => line), [5]);
+});
