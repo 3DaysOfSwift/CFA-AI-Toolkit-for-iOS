@@ -356,6 +356,11 @@ test('portable installation carries the complete evidence tool and creates cases
   const target = path.join(f.directory, 'portable-case');
   const creation = spawnSync(process.execPath, [cli, 'init', target, '--project', f.project, '--id', 'portable-case', '--migration-id', 'portable-migration', '--date', '2026-10-25'], { encoding: 'utf8', cwd: f.project });
   assert.equal(creation.status, 0, creation.stderr);
+  const installedGuide = fs.readFileSync(path.join(path.dirname(cli), 'README.md'), 'utf8');
+  assert.match(installedGuide, /Read the warnings from both `validate` and `digest`/);
+  const caseStudy = fs.readFileSync(path.join(target, 'case-study.md'), 'utf8');
+  assert.match(caseStudy, /record the producing and receiving targets and the verification environment/);
+  assert.match(caseStudy, /list the covered targets on the evidence/);
   const check = spawnSync(process.execPath, [cli, 'validate', path.join(target, 'record.json')], { encoding: 'utf8', cwd: f.project });
   assert.equal(check.status, 0, check.stderr);
   assert.equal(JSON.parse(check.stdout).valid, true);
