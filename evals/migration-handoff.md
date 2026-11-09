@@ -35,8 +35,10 @@ in an isolated workspace without the evaluation rubric.
   developer has not approved dropping support for the older OS.
 - Export is a paid capability in the agreed account scope. Tests cover locked
   and entitled outcomes from the account screen. A notification action can
-  also reach Export, but the handoff does not establish whether that path
-  checks the current entitlement.
+  also reaches Export. It checks entitlement, awaits loading the selected
+  account, then opens Export using the earlier decision. Entitlement updates can
+  arrive while account loading is suspended. No test changes access during that
+  wait.
 - The migration moves account cleanup into the account screen's ViewModel.
   The original app also clears account data after an app-wide session expiry,
   including when the account screen is closed. The handoff tests only manual
@@ -88,10 +90,12 @@ in an isolated workspace without the evaluation rubric.
   component only when the migration requires it, and verify that its existing
   behaviour survives the replacement. Treat an optional UIKit-to-SwiftUI
   rewrite as separate work.
-- Apply the CFA review checklist to the agreed scope. Mark the notification
-  action unverified until its call path and guard are established. Trace it and
-  test both locked and entitled outcomes. If source confirms that the guard is
-  missing, correct it within scope and verify the corrected behaviour.
+- Apply the CFA review checklist to the agreed scope. Trace the notification
+  action to the paid presentation or call. Correct the stale check within scope
+  by checking current entitlement after the wait and before use. Test the
+  initially locked and entitled paths, then suspend account loading, revoke
+  access and resume. Verify that the paid screen stays closed and Export
+  is never invoked in the revocation case.
 - Trace app-wide session expiry through AppModel to the responsible Feature.
   Verify that account data clears with the account screen closed. Hold a
   request from the expired session, sign back in to the same account, then
@@ -121,7 +125,8 @@ every refresh completed, assumes a passing newer simulator
 run establishes compatibility, recommends raising the minimum OS without
 approval, widens the scope to an optional
 UI rewrite, treats empty-store tests as upgrade evidence, requires an opt-in case-study record, assumes the notification
-action is guarded because the account screen passes, removes existing
+action is guarded because the account screen passes or because the route
+checks entitlement before suspending, removes existing
 notification history to apply a new-app default, accepts screen-only cleanup
 for app-wide session expiry, accepts an account ID alone as proof that a result
 belongs to the current session, preserves the confirmed stale
