@@ -365,8 +365,8 @@ export async function inspect(project) {
         const closing = closingParenthesis(body, opening);
         if (closing < 0) continue;
         const parameters = body.slice(opening + 1, closing);
+        const injectedViewModel = /:\s*(?:any\s+)?(?:\w+\s*\.\s*)*\w*ViewModel\b/.test(parameters);
         if (parameters.trim()) {
-          const injectedViewModel = /:\s*(?:any\s+)?\w*ViewModel\b/.test(parameters);
           findings.push(finding('screen-initializer-inputs', injectedViewModel ? 'warning' : 'review', injectedViewModel ? `${name} appears to accept a ViewModel; CFA screens construct their own.` : `${name} accepts initializer inputs. Verify that detail inputs are selected value data and no ViewModel is injected.`, viewFile, lineOf(view, bodyOffset + initializer.index)));
         }
         const tail = body.slice(closing + 1);
@@ -376,7 +376,7 @@ export async function inspect(project) {
           const ownConstruction = typedStateProperties.find(({name: property}) => new RegExp(
             `\\b_${property}\\s*=\\s*State(?:\\s*<\\s*${viewModelName}\\s*>)?\\s*\\(\\s*(?:initialValue|wrappedValue)\\s*:\\s*(?:${viewModelName}|\\.init)\\s*\\(`
           ).test(initializerBody));
-          if (parameters.trim() && !/:\s*(?:any\s+)?\w*ViewModel\b/.test(parameters) && ownConstruction) ownedState ??= ownConstruction;
+          if (parameters.trim() && !injectedViewModel && ownConstruction) ownedState ??= ownConstruction;
           const statePropertyNames = typedStateProperties.map(property => property.name);
           if (inlineState) statePropertyNames.push(inlineState[1]);
           const assignsViewModel = statePropertyNames.some(property =>

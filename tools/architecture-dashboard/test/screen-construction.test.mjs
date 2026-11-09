@@ -49,6 +49,20 @@ struct HomeView: View {
   assert.equal(findings[0].severity, 'warning');
 });
 
+test('flags a module-qualified ViewModel initializer input', async t => {
+  const { report, findings } = await inspectView(t, `struct HomeView: View {
+    @State private var viewModel: HomeViewModel
+    init(model: MyApp.HomeViewModel) {
+      _viewModel = State(initialValue: model)
+    }
+    var body: some View { Text("Home") }
+  }`);
+  assert.equal(report.screens[0].ownsViewModel, false);
+  const input = findings.find(item => item.code === 'screen-initializer-inputs');
+  assert.equal(input?.severity, 'warning');
+  assert.match(input.message, /appears to accept a ViewModel/);
+});
+
 test('selected detail data and owned State are reviewed rather than rejected', async t => {
   const { report, findings } = await inspectView(t, `struct HomeView: View {
     @State private var reminders: HomeViewModel
