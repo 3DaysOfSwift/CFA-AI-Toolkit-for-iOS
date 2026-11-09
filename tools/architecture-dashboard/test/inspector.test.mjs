@@ -511,6 +511,13 @@ test('reviews a launch signal queued on a main or newly created OperationQueue',
 
 test('reviews a deferred AppModel launch through a local alias', async t => {
   const root = await fixture(t, {
+    'Application/SeparateScopeDelegate.swift': `class Delegate {
+      func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool {
+        if shouldInspect { let model = AppModel.shared; inspect(model) }
+        Task { model.applicationDidFinishLaunching() }
+        return true
+      }
+    }`,
     'Application/AppDelegate.swift': `class Delegate {
       func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool {
         let model: Example.AppModel = Example.AppModel.shared

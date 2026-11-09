@@ -588,7 +588,8 @@ export async function inspect(project) {
           if (!queueDeclaration.test(localDeclarations)) continue;
         }
         const scheduledBody = braceBody(body, scheduled.index + scheduled[0].length - 1);
-        const precedingSource = body.slice(0, scheduled.index) + '\n' + scheduledBody;
+        // A binding in a sibling closure is not visible to the scheduled work.
+        const precedingSource = memberSignatures(body.slice(0, scheduled.index)) + '\n' + memberSignatures(scheduledBody);
         const aliases = [...precedingSource.matchAll(/\b(?:let|var)\s+(\w+)(?:\s*:\s*(?:\w+\s*\.\s*)*AppModel)?\s*=\s*(?:\w+\s*\.\s*)*AppModel\s*\.\s*shared\b(?!\s*\.)/g)]
           .map(match => match[1]);
         const captures = /^\s*(?:@MainActor\s+)?\[([^\]]*)\]/.exec(scheduledBody);
