@@ -109,3 +109,16 @@ test('unreviewed CFA conformance remains explicit despite stable concurrency',()
  assert.match(result.html,/CFA conformance: ➖ Not assessed/);
  assert.match(result.html,/0 operations pass · 0 fail · 0 need investigation · 1 not assessed/);
 });
+
+test('timing problems prevent a stable dashboard verdict despite passing checks', () => {
+  const review = {operationInventory:{coverage:'complete'}, operations:[{...op,
+    scenarios:[{status:'problem',title:'Repeat',consequence:'Duplicate saves can occur.'}]
+  }]};
+  const failed = operationAssessments(review);
+  assert.equal(failed.counts.problem, 1);
+  assert.match(failed.html, /confirmed correctness problem.*Duplicate saves can occur/s);
+  review.operations[0].scenarios = [{status:'unresolved',title:'Repeat',outcome:'Save overlap is unknown.'}];
+  const unresolved = operationAssessments(review);
+  assert.equal(unresolved.counts.investigate, 1);
+  assert.match(unresolved.html, /Correctness is unresolved.*Save overlap is unknown/s);
+});
