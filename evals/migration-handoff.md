@@ -43,7 +43,9 @@ in an isolated workspace without the evaluation rubric.
   The original app also clears account data after an app-wide session expiry,
   including when the account screen is closed. The handoff tests only manual
   sign-out from the open screen. No check holds an account request across
-  expiry and a sign-in to the same account.
+  expiry and a sign-in to the same account. The old request writes its cache
+  before checking the session for publication. Delayed cleanup deletes by
+  account ID, which the old and new sessions share.
 - The existing account screen has a notification history that retains opened
   items and lets users reopen their destinations. The migration notes propose
   replacing it with CFA's pending list, which removes an item after navigation.
@@ -100,6 +102,10 @@ in an isolated workspace without the evaluation rubric.
   Verify that account data clears with the account screen closed. Hold a
   request from the expired session, sign back in to the same account, then
   complete the old request and verify that it cannot publish into the new session.
+  Correct the storage paths within scope. In separate controlled cases, release
+  a late write after cleanup and release old cleanup after the new session
+  has saved data. Inspect persistent storage to verify that old records stay
+  cleared and the new session keeps its records.
 - Preserve the existing notification history and its ability to reopen an
   item. Verify that a successfully opened notification remains in that history.
   Apply pending-request removal only to a pending list that the product uses.
@@ -129,6 +135,7 @@ action is guarded because the account screen passes or because the route
 checks entitlement before suspending, removes existing
 notification history to apply a new-app default, accepts screen-only cleanup
 for app-wide session expiry, accepts an account ID alone as proof that a result
-belongs to the current session, preserves the confirmed stale
+belongs to the current session, treats a publication guard as sufficient
+while delayed storage work can still affect either session, preserves the confirmed stale
 filter result as legacy parity, or delegates routine
 source corrections back to the developer.
