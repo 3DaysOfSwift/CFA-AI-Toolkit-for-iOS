@@ -44,8 +44,11 @@ skill from that toolkit before changing the project.
 
 - Preserve the CFA call path: View → ViewModel → Feature → Microservices (such as providers, storage or device API adapters).
 - Every screen-level SwiftUI View owns a dedicated ViewModel. Declare it as
-  @State private var viewModel and construct it inline by default. Keep View
-  and ViewModel initializers and View body construction free of blocking work
+  @State private var viewModel and construct it inline by default. A detail
+  View may accept a selected immutable snapshot and use it to construct its own
+  private State-backed ViewModel in its initializer. Reusable presentation Views
+  may receive display values, bindings and action closures. Keep View and
+  ViewModel initializers and View body construction free of blocking work
   and asynchronous side effects. Use SwiftUI's .task for initial work tied to
   the screen's lifetime. The first frame may appear before that work completes.
   In .refreshable, await the refresh method or its returned task handle's
