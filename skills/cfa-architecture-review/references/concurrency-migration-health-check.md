@@ -596,6 +596,12 @@ For each relevant operation, inspect:
   propagation through bridges and continuation completion on all relevant paths.
   Cancellation is cooperative; cancelling a request alone does not prove a stale
   result cannot commit. Check identity/generation or equivalent ordering logic.
+- Callback bridges: trace registration, callback completion and cancellation
+  to the single outcome received by the awaiting caller. Check cancellation
+  before registration and while work is pending, including a callback arriving
+  after cancellation wins. Verify that the bridge cannot resume twice or leave
+  the caller suspended. Where the API supports cancellation, trace whether the
+  ownership policy cancels the underlying work or only ends the caller's wait.
 - Cancellation before side effects: a check before an await does not cover
   cancellation during that await. Trace the interval between preparation or access
   checks and starting a payment, write or other external effect. Check cancellation
