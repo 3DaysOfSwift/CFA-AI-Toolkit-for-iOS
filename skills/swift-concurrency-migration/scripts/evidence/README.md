@@ -75,9 +75,11 @@ evidence at the final commit. Explain inapplicability and the effect of agreed
 exceptions. An applicable requirement with missing evidence keeps the audit
 open. Record the regression under
 `completionGate.manualBehaviourRegressionEvidenceId` and name the affected
-targets exercised by that regression. Record the build configuration, OS and
-device or simulator in its environment. The validator rejects evidence that
-names only unrelated targets or lacks target names or an environment. If evidence is missing
+targets exercised by that regression. The linked record must cover every
+affected target. If verification took multiple runs, link their results from
+one manual regression record and list the build configuration, OS and device
+or simulator used for each. The validator rejects omitted targets or a
+missing environment. If evidence is missing
 or failed, use `partial` and explain the gap. Validation checks the recorded
 links and outcomes. The reviewer compares the declared affected targets with
 the actual consumers of the changed code, checks the behaviour contract,

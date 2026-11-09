@@ -300,6 +300,11 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
             errors.push(`evidence.${item.id}: list the affected targets exercised by the manual regression.`);
           } else if (!item.targets.some(target => gate.affectedTargets.includes(target))) {
             errors.push(`completionGate.${field}: ${item.id} names only unrelated targets.`);
+          } else {
+            const missing = gate.affectedTargets.filter(target => !item.targets.includes(target));
+            if (missing.length) {
+              errors.push(`completionGate.${field}: ${item.id} omits affected targets: ${missing.join(', ')}.`);
+            }
           }
         } else if (field === 'deploymentCompatibilityEvidenceId') {
           const missing = gate.affectedTargets.filter(target => !item.targets?.includes(target));

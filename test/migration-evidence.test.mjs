@@ -380,6 +380,11 @@ test('completion is not inferred from a build pass or tests at a different commi
   assert.ok(inspectRecord(f.file).errors.some(error =>
     error.includes('completionGate.manualBehaviourRegressionEvidenceId: after-behaviour-regression names only unrelated targets')
   ));
+  rerun.targets = ['App'];
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.includes(
+    'completionGate.manualBehaviourRegressionEvidenceId: after-behaviour-regression omits affected targets: Widget.'
+  ));
   rerun.targets = ['App', 'Widget'];
   rerun.rerunOf = 'after-build';
   f.write();
