@@ -137,7 +137,7 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
     review.presentation.criteria[0].evidence = [{file:'App.swift',line:99,endLine:99}];
     await fs.writeFile(reviewPath,JSON.stringify(review));
     await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/invalid evidence lines/);
-    review.presentation.criteria[0].evidence = [{file:'App.swift',line:1,endLine:1}];
+    review.presentation.criteria[0].evidence = [{file:'App.swift',line:1,endLine:2}];
     await fs.writeFile(reviewPath,JSON.stringify(review));
     const result=await finish(project,reviewPath,output,undefined,syntax);
     assert.deepEqual(result.gaps,[]);
@@ -145,7 +145,7 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
     assert.match(html,/100%/);
     assert.match(html,/When timing changes/);
     assert.match(html,/The owner handles this case/);
-    assert.match(html,/App\.swift:1/);
+    assert.match(html,/App\.swift:1–2/);
     assert.doesNotMatch(html,/What still needs checking/);
     await fs.writeFile(path.join(project,'App.swift'),'struct Changed {}\n');
     await assert.rejects(finish(project,reviewPath,path.join(base,'stale.html'),undefined,syntax),/fingerprint mismatch/);

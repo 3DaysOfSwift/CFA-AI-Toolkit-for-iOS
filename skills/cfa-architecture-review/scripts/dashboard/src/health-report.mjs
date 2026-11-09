@@ -3,6 +3,10 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 const escape = value => String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
+const sourceLocation = ({file, line, endLine}) =>
+  `${file}:${line}${endLine > line ? `–${endLine}` : ''}`;
+const evidenceText = evidence =>
+  Array.isArray(evidence) ? evidence.map(sourceLocation).join(' · ') : evidence;
 const weights = {pass: 1, concern: 0.5, problem: 0};
 export function assess(criteria) {
   if (!Array.isArray(criteria) || !criteria.length) throw Error('Provide at least one reviewed criterion.');
@@ -27,7 +31,7 @@ export function renderHealthReport(data, iconData = '') {
     const rows = data.criteria.filter(c => c.status === status);
     if (!rows.length) return '';
     const title = {pass:'What is working well',concern:'Worth a closer look',problem:'Problems to address'}[status];
-    return `<section><h2>${title}</h2>${rows.map(c => `<article class="finding"><span class="indicator ${status}" aria-label="${status}">${{pass:'✓',concern:'!',problem:'×'}[status]}</span><div><h3>${escape(c.title)}</h3><p>${escape(c.detail)}</p>${c.evidence ? `<p class="evidence">Evidence: ${escape(c.evidence)}</p>` : ''}</div></article>`).join('')}</section>`;
+    return `<section><h2>${title}</h2>${rows.map(c => `<article class="finding"><span class="indicator ${status}" aria-label="${status}">${{pass:'✓',concern:'!',problem:'×'}[status]}</span><div><h3>${escape(c.title)}</h3><p>${escape(c.detail)}</p>${c.evidence ? `<p class="evidence">Evidence: ${escape(evidenceText(c.evidence))}</p>` : ''}</div></article>`).join('')}</section>`;
   }).join('');
   const stamp = score === 100 ? 'Strong concurrency design' : score >= 75 ? 'Good foundation' : 'Needs attention';
   const stampClass = score >= 75 ? 'positive' : 'negative';
@@ -40,7 +44,7 @@ export function renderHealthReport(data, iconData = '') {
   const conclusionList = `<ul class="conclusion-list">${conclusionItems.map(item => `<li><span class="conclusion-tick ${conclusionStatus}" aria-hidden="true">${conclusionSymbol}</span><span>${escape(item)}</span></li>`).join('')}</ul>`;
   const icon = iconData ? `<img class="icon" src="${escape(iconData)}" alt="${escape(data.app)} app icon">` : '<div class="icon placeholder" aria-hidden="true">⌘</div>';
 
-  const sourceLinks = refs => refs?.length ? `<p class="evidence">Evidence: ${refs.map(ref=>escape(`${ref.file}:${ref.line}`)).join(' · ')}</p>` : '';
+  const sourceLinks = refs => refs?.length ? `<p class="evidence">Evidence: ${escape(evidenceText(refs))}</p>` : '';
   const outcomes = op => {
     const checks = (op.checks || []).filter(check => check.status !== 'not-applicable');
     const scenarios = (op.scenarios || []).filter(scenario => scenario.status !== 'not-applicable');
@@ -48,7 +52,7 @@ export function renderHealthReport(data, iconData = '') {
     const rows = items => items.map(item => `<div class="behaviour-row"><strong>${labels[item.status] || '?'} ${escape(item.title)}</strong><p>${escape(item.reason || item.outcome)}</p>${item.consequence ? `<p><strong>Consequence:</strong> ${escape(item.consequence)}</p>` : ''}<p class="evidence">${escape(item.verification)}</p>${sourceLinks(item.evidence)}</div>`).join('');
     return `${checks.length ? `<h3>Behaviour checks</h3>${rows(checks)}` : ''}${scenarios.length ? `<h3>When timing changes</h3>${rows(scenarios)}` : ''}`;
   };
-  const renderOperation = op => `<details class="finding"><summary>${escape(op.title)}</summary><div><p><strong>Path:</strong> ${escape(op.path)}</p><p><strong>State ownership:</strong> ${escape(op.stateOwner || "Not recorded")}</p><p><strong>Task ownership:</strong> ${escape(op.taskOwner)}</p><p><strong>Isolation:</strong> ${escape(op.isolation)}</p><p>${escape(op.reason)}</p>${op.steps?.length ? `<ol>${op.steps.map(step => `<li><strong>${escape(step.title)}</strong> · ${escape(step.relation)}${step.parentId ? ` · parent: ${escape(op.steps.find(parent => parent.id === step.parentId)?.title || step.parentId)}` : ''}<br>${escape(step.detail)}${step.evidence?.length ? `<br><span class="evidence">${step.evidence.map(ref=>escape(`${ref.file}:${ref.line}`)).join(' · ')}</span>` : ''}</li>`).join('')}</ol>` : ''}${outcomes(op)}${op.unknowns?.length ? `<p><strong>To investigate:</strong> ${op.unknowns.map(escape).join('; ')}</p>` : ''}</div></details>`;
+  const renderOperation = op => `<details class="finding"><summary>${escape(op.title)}</summary><div><p><strong>Path:</strong> ${escape(op.path)}</p><p><strong>State ownership:</strong> ${escape(op.stateOwner || "Not recorded")}</p><p><strong>Task ownership:</strong> ${escape(op.taskOwner)}</p><p><strong>Isolation:</strong> ${escape(op.isolation)}</p><p>${escape(op.reason)}</p>${op.steps?.length ? `<ol>${op.steps.map(step => `<li><strong>${escape(step.title)}</strong> · ${escape(step.relation)}${step.parentId ? ` · parent: ${escape(op.steps.find(parent => parent.id === step.parentId)?.title || step.parentId)}` : ''}<br>${escape(step.detail)}${step.evidence?.length ? `<br><span class="evidence">${escape(evidenceText(step.evidence))}</span>` : ''}</li>`).join('')}</ol>` : ''}${outcomes(op)}${op.unknowns?.length ? `<p><strong>To investigate:</strong> ${op.unknowns.map(escape).join('; ')}</p>` : ''}</div></details>`;
   const groups = new Map();
   for (const op of data.operations || []) {
     const name = op.group || '';
