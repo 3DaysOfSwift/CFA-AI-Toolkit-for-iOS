@@ -1142,6 +1142,12 @@ from the model actor into a feature, ViewModel, or View. A small,
 deliberately UI-owned context may be main-actor isolated when its work is proven
 short, but that is an exception—not the default commercial persistence design.
 
+For an individual create, update or delete, write the change by stable record
+identity. Replacing the collection from a caller's snapshot can overwrite
+unrelated changes made since that snapshot was read. Reserve whole-dataset
+replacement for explicit operations such as import or restore, with their own
+integrity rules.
+
 Publish user edits and other durable commands as saved only after the required
 authoritative persistence succeeds. Keep an editable draft on failure and report
 the error; do not present unsaved changes as saved. Loading and error
@@ -1827,6 +1833,8 @@ Before accepting a change, answer every question:
       value unchanged and the draft available for retry. Check that a successful
       retry publishes the replacement. Cancel an unsaved edit and verify that
       it leaves the confirmed and stored values unchanged.
+    - For record-level writes, verify that overlapping edits to different
+      records preserve both changes after reopening the store.
     - For changes to existing durable storage, open a disposable store
       written by the previous version with representative synthetic records.
       Verify that those records remain

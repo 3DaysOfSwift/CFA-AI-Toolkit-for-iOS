@@ -81,6 +81,8 @@ Before accepting a change, answer every question:
       value unchanged and the draft available for retry. Check that a successful
       retry publishes the replacement. Cancel an unsaved edit and verify that
       it leaves the confirmed and stored values unchanged.
+    - For record-level writes, verify that overlapping edits to different
+      records preserve both changes after reopening the store.
     - For changes to existing durable storage, open a disposable store
       written by the previous version with representative synthetic records.
       Verify that those records remain

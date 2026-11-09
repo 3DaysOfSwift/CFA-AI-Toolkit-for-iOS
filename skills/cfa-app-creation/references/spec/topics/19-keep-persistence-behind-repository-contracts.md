@@ -20,6 +20,12 @@ from the model actor into a feature, ViewModel, or View. A small,
 deliberately UI-owned context may be main-actor isolated when its work is proven
 short, but that is an exception—not the default commercial persistence design.
 
+For an individual create, update or delete, write the change by stable record
+identity. Replacing the collection from a caller's snapshot can overwrite
+unrelated changes made since that snapshot was read. Reserve whole-dataset
+replacement for explicit operations such as import or restore, with their own
+integrity rules.
+
 Publish user edits and other durable commands as saved only after the required
 authoritative persistence succeeds. Keep an editable draft on failure and report
 the error; do not present unsaved changes as saved. Loading and error
