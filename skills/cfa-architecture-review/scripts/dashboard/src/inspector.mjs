@@ -282,6 +282,10 @@ export async function inspect(project) {
     if (!declaration) continue;
     const bodyOffset = declaration.index + declaration[0].length;
     const body = braceBody(view, bodyOffset - 1);
+    const featureAccess = /\bAppModel\s*\.\s*shared\s*\.\s*\w+Feature\b/.exec(body);
+    if (featureAccess && name !== 'ContentView' && name !== 'RootView') {
+      findings.push(finding('view-feature-access', 'review', 'This View appears to access a Feature directly. Trace the call and route screen intent and state through the owning ViewModel.', viewFile, lineOf(view, bodyOffset + featureAccess.index)));
+    }
     const members = memberSignatures(body);
     for (const match of members.matchAll(/\b(?:let|var)\s+(\w+)\s*(?::\s*Task\s*<|(=\s*Task\b))/g)) {
       if (match[2] && !/^\s*[<.{(]/.test(body.slice(match.index + match[0].length))) continue;

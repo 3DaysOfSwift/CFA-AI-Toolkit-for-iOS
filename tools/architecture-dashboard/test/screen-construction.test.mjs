@@ -250,3 +250,14 @@ test('rejects a screen changed between inventory and inspection', async t => {
     var body: some View { Text("Home") }
   }`), /Source changed during inspection: .*HomeView\.swift/);
 });
+
+test('reviews a direct Feature call even when the screen owns a ViewModel', async t => {
+  const {report} = await inspectView(t, `struct HomeView: View {
+    @State private var viewModel = HomeViewModel()
+    var body: some View {
+      Text("Home").task { await AppModel.shared.homeFeature.refresh() }
+    }
+  }`);
+  assert.equal(report.screens[0].ownsViewModel, true);
+  assert.equal(report.findings.find(item => item.code === 'view-feature-access')?.line, 4);
+});
