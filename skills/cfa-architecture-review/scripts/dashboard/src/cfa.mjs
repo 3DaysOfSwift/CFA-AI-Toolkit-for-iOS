@@ -64,6 +64,12 @@ skill from that toolkit before changing the project.
   changes. The screen ViewModel owns temporary unsaved editor values.
 - Start with independent Features; compose them only for a genuine business
   responsibility, without duplicating authoritative state or creating cycles.
+- For sign-out or account switching, let the owning Feature coordinate explicit
+  cleanup calls. Preserve the session and its data when sign-out fails before
+  ending the session. Reconcile partial authentication changes with the actual
+  session. Clear account-specific Feature state after successful sign-out and
+  guard publication against results from the old session. Apply the product's
+  retention policy to locally saved data.
 - AppModel stores shared, concrete Features, one private launch guard and any
   private task handles needed to own app-wide listeners.
   AppModel starts those listeners and forwards events to the responsible Feature.
