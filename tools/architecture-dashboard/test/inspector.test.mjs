@@ -819,6 +819,8 @@ test('reports old feature-owner types and mismatched feature references', async 
   });
   const report = await inspect(root);
   assert.deepEqual(report.findings.map(item => item.code), ['feature-type-name', 'feature-property-name']);
+  assert.ok(report.findings.every(item => item.severity === 'review'));
+  assert.match(report.findings[0].message, /supporting service behind the Feature/);
   assert.equal(report.screens[0].dependencies[0].featureType, 'ChatsManager');
 });
 

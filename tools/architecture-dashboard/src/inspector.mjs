@@ -329,14 +329,18 @@ export async function inspect(project) {
     if (candidates.length > 1) {
       findings.push(finding('feature-source-ambiguous', 'review', `${property.type} has multiple declarations. Verify which declaration belongs to the active target before assessing placement or collaborators.`, appModelFile, property.line));
     }
-    if (!featureTypeSuffix.test(property.type)) {
-      findings.push(finding('feature-type-name', 'warning', `${property.type} is exposed as a feature; new concrete feature owners use the Feature suffix.`, appModelFile, property.line));
+    const hasFeatureSuffix = featureTypeSuffix.test(property.type);
+    if (!hasFeatureSuffix) {
+      findings.push(finding('feature-type-name', 'review', `${property.type} is declared in a Feature folder and exposed by AppModel. Verify its responsibility. Use the Feature suffix for a concrete Feature owner. Keep a supporting service behind the Feature.`, appModelFile, property.line));
     }
-    const expected = featurePropertyName(featureTypeSuffix.test(property.type)
+    const expected = featurePropertyName(hasFeatureSuffix
       ? property.type
       : `${property.type.replace(/Manager$/, '')}Feature`);
     if (name !== expected) {
-      findings.push(finding('feature-property-name', 'warning', `${name} should use the same domain name as ${property.type}, ending in Feature${featureTypeSuffix.test(property.type) ? ` (${expected})` : ''}.`, appModelFile, property.line));
+      const message = hasFeatureSuffix
+        ? `${name} should use the same domain name as ${property.type}, ending in Feature (${expected}).`
+        : `If ${property.type} is a Feature, use a matching Feature property name (${expected}).`;
+      findings.push(finding('feature-property-name', hasFeatureSuffix ? 'warning' : 'review', message, appModelFile, property.line));
     }
     if (featureTypeSuffix.test(property.type) && !property.type.endsWith('API')) {
       const declaration = source?.declaration;
