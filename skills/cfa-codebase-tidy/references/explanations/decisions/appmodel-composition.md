@@ -21,7 +21,8 @@ Constructing unrelated graphs in different scenes can create conflicting owners 
 
 The specification explicitly chooses shared production composition to keep scenes connected to the same underlying state. It limits AppModel to Features and lifecycle coordination so composition does not become business logic. The app delegate calls AppModel directly and synchronously at startup. Before
 the delegate returns, AppModel invokes the Feature startup methods and starts
-its app-wide listeners. Features own the asynchronous refresh and restoration
+each required app-wide listener once. Screen-only observation follows the
+screen or ViewModel lifetime. Features own the asynchronous refresh and restoration
 work. Disk and network work can finish after the delegate returns, and task
 creation order alone gives no guarantee about when either begins. AppModel
 forwards listener events to the Feature responsible for the business response.
@@ -36,7 +37,11 @@ A singleton is not a concurrency mechanism. Isolation protects mutable state. Do
 
 ## Verification
 
-Trace live wiring, ensure dependencies are required by the explicit initializer, and run tests against independent graphs. Check that scenes in the same process share the graph. A widget or Watch app running in a separate process has its own graph and uses the product’s data-sharing mechanism. For app-wide listeners, verify that AppModel owns the task lifetime and forwards events to the Feature.
+Trace live wiring, ensure dependencies are required by the explicit initializer, and run tests against independent graphs. Check that scenes in the same process share the graph. A widget or Watch app running in a separate process has its own graph and uses the product’s data-sharing mechanism. For app-wide listeners, call startup twice with an isolated graph and a
+controlled event source. Verify one listener starts, events reach the Feature
+without a screen, and the test can end its listener. Inspect the actual
+application callback to confirm it calls AppModel directly before returning.
+A successful simulator launch alone does not establish that call path.
 
 ## Evidence and provenance
 
