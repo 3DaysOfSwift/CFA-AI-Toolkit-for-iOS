@@ -236,53 +236,6 @@ trace every identifiable entry point to a check of current entitlement before
 paid presentation or execution. Flag established unguarded paths and report unresolved paths as unverified. Test locked and entitled paths;
 do not claim that UI gating replaces server-side authorisation.
 
-## Migration progress and completion language
-
-During a migration, default to reporting the next concrete milestone: for
-example, **“Continuing migration: moving the Movies feature into the visible
-CFA ownership structure.”** Do not use “migration complete”, “finished with
-migration”, or equivalent whole-project language for a route-level refactor,
-a source-only check, or a pre-change test baseline.
-
-A route may be described as a **verified feature checkpoint** only after its
-post-change build/tests and behaviour checks pass. It remains part of a
-continuing migration until the agreed project scope is complete.
-
-Before calling a CFA migration complete, capture a completion record that
-identifies all of the following:
-
-- the before/after Xcode navigator map, showing the agreed CFA folders and
-  feature ownership visibly—not just source paths on disk. Reconcile temporary
-  package placements and move files into their intended locations when safe;
-  record intentional package boundaries or unresolved blockers, and verify
-  target membership and affected builds after moves;
-- the feature inventory, including every scoped tab or screen, its concrete
-  Feature dependencies, presentation owner (the dedicated ViewModel for a
-  screen-level SwiftUI View), composition owner, named tests, and any
-  intentionally retained legacy boundary;
-- a current concurrency inventory showing every scoped GCD, callback,
-  OperationQueue, timer, lock, or delegate route as migrated or explicitly
-  retained with a reason;
-- the hybrid implementation review, identifying remaining users of legacy
-  mechanisms and dependencies and recording which adapters were removed or
-  intentionally retained to preserve behaviour or platform support;
-- the minimum OS for each affected target and compatibility evidence for
-  changed paths at that minimum. Check API availability separately from
-  Swift language mode. Preserve existing deployment support unless the
-  developer approves a change;
-- the final CFA audit across the agreed scope, including the resolution of
-  actionable deviations and re-verification after corrections;
-- passing builds for each affected target, plus relevant automated tests
-  and manual behaviour regression, all tied to the final commit. Include
-  existing extension or device targets that consume changed shared code.
-  Verify any affected data handoff separately from the build; and
-- a human architecture review confirming that the navigator communicates the
-  agreed structure.
-
-If any item is absent, failed, or only inferred, say **“Continuing migration”**
-and name the missing checkpoint. Record a failed pilot honestly and block it
-from precedent use; do not reframe it as a completed partial migration.
-
 - Where one execution satisfies equivalent ViewModel actions or Feature calls,
   verify those callers share its completion. Do not coalesce distinct commands
   that must each take effect. Verify queued commands execute in admission order
@@ -377,3 +330,50 @@ from precedent use; do not reframe it as a completed partial migration.
   toolchain honestly; do not turn missing verification into a pass.
 
 If any invariant fails, correct the plan before expanding the implementation.
+
+## Migration progress and completion language
+
+During a migration, default to reporting the next concrete milestone: for
+example, **“Continuing migration: moving the Movies feature into the visible
+CFA ownership structure.”** Do not use “migration complete”, “finished with
+migration”, or equivalent whole-project language for a route-level refactor,
+a source-only check, or a pre-change test baseline.
+
+A route may be described as a **verified feature checkpoint** only after its
+post-change build/tests and behaviour checks pass. It remains part of a
+continuing migration until the agreed project scope is complete.
+
+Before calling a CFA migration complete, capture a completion record that
+identifies all of the following:
+
+- the before/after Xcode navigator map, showing the agreed CFA folders and
+  feature ownership visibly—not just source paths on disk. Reconcile temporary
+  package placements and move files into their intended locations when safe;
+  record intentional package boundaries or unresolved blockers, and verify
+  target membership and affected builds after moves;
+- the feature inventory, including every scoped tab or screen, its concrete
+  Feature dependencies, presentation owner (the dedicated ViewModel for a
+  screen-level SwiftUI View), composition owner, named tests, and any
+  intentionally retained legacy boundary;
+- a current concurrency inventory showing every scoped GCD, callback,
+  OperationQueue, timer, lock, or delegate route as migrated or explicitly
+  retained with a reason;
+- the hybrid implementation review, identifying remaining users of legacy
+  mechanisms and dependencies and recording which adapters were removed or
+  intentionally retained to preserve behaviour or platform support;
+- the minimum OS for each affected target and compatibility evidence for
+  changed paths at that minimum. Check API availability separately from
+  Swift language mode. Preserve existing deployment support unless the
+  developer approves a change;
+- the final CFA audit across the agreed scope, including the resolution of
+  actionable deviations and re-verification after corrections;
+- passing builds for each affected target, plus relevant automated tests
+  and manual behaviour regression, all tied to the final commit. Include
+  existing extension or device targets that consume changed shared code.
+  Verify any affected data handoff separately from the build; and
+- a human architecture review confirming that the navigator communicates the
+  agreed structure.
+
+If any item is absent, failed, or only inferred, say **“Continuing migration”**
+and name the missing checkpoint. Record a failed pilot honestly and block it
+from precedent use; do not reframe it as a completed partial migration.
