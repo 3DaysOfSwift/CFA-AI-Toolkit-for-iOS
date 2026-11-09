@@ -230,3 +230,17 @@ test('installed guidance predating the isolation rule is identified and preserve
   }
   assert.equal(fs.readFileSync(agents, 'utf8'), previous);
 });
+
+test('both guidance commands identify the previous microservices wording without rewriting it', t => {
+  const { directory, command } = installedCommand(t);
+  const agents = path.join(directory, 'AGENTS.md');
+  const original = '<!-- CFA Toolkit project guidance -->\n- Preserve the CFA call path: View → ViewModel → Feature → Microservices (such as providers, storage or device API adapters).\n';
+  fs.writeFileSync(agents, original);
+
+  for (const action of ['doctor', 'enable-project']) {
+    const result = spawnSync(command, [action, directory], { encoding: 'utf8' });
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /dependency guidance.*A Feature calls internal microservices only when its work needs them/);
+  }
+  assert.equal(fs.readFileSync(agents, 'utf8'), original);
+});

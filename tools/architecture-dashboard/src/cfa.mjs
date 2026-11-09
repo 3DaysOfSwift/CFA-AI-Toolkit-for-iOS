@@ -24,6 +24,8 @@ const outdatedStartupGuidance = 'or a scheduled Task. Features can start their o
 const startupGuidanceUpdate = 'AppModel must signal Features and start required app-wide listeners before the launch callback returns.';
 const outdatedAppModelGuidance = 'AppModel stores only shared, concrete Features, and one private launch guard.';
 const outdatedFeatureGuidance = 'managers use the Manager suffix';
+const outdatedDependencyFlow = 'Preserve the CFA call path: View → ViewModel → Feature → Microservices';
+const dependencyFlowUpdate = 'A Feature calls internal microservices only when its work needs them.';
 const outdatedServiceGuidance = 'SwiftData uses SwiftDataManager; URLSession calls use NetworkingManager.';
 const serviceGuidanceUpdate = 'Clarify SwiftDataManager ownership and keep independent network requests able to progress in parallel.';
 const outdatedScreenGuidance = 'Every screen owns a dedicated ViewModel. Declare it as @State private var';
@@ -456,6 +458,9 @@ function doctor(projectArgument) {
       if (content.includes(outdatedFeatureGuidance)) {
         console.log(`WARN outdated feature naming guidance in ${file}; update the CFA guidance block to use concrete *Feature types and matching *Feature properties.`);
       }
+      if (content.includes(outdatedDependencyFlow)) {
+        console.log(`WARN outdated CFA dependency guidance in ${file}. ${dependencyFlowUpdate}`);
+      }
       if (content.includes(outdatedServiceGuidance)) {
         console.log(`WARN outdated service guidance in ${file}. ${serviceGuidanceUpdate}`);
       }
@@ -524,6 +529,9 @@ function enableProject(values) {
     }
     if (block.includes(outdatedFeatureGuidance)) {
       console.log('The existing guidance still uses the old Manager rule. Edit only the CFA guidance block; the command will not overwrite project instructions.');
+    }
+    if (block.includes(outdatedDependencyFlow)) {
+      console.log(`Update the existing CFA dependency guidance block. ${dependencyFlowUpdate}`);
     }
     if (block.includes(outdatedServiceGuidance)) {
       console.log(`Update the existing CFA service guidance block. ${serviceGuidanceUpdate}`);
