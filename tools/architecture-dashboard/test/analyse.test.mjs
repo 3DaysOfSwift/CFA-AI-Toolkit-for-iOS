@@ -163,3 +163,10 @@ test('reports invalid Swift source instead of scanning replacement characters', 
     {file:'Null.swift', reason:'Source contains a null byte'}
   ]);
 });
+
+test('preserves evidence line numbers and comment boundaries for mixed line endings', () => {
+  const source = '// Task {}\rstruct Example {}\r\nTask {}\nTask {}';
+  const report = scanSource(source, 'Example.swift');
+  assert.equal(report.declarations[0].line, 2);
+  assert.deepEqual(report.sites.filter(site => site.kind === 'task').map(site => site.line), [3,4]);
+});

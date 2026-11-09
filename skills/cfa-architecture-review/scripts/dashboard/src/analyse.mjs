@@ -12,7 +12,7 @@ export function maskSwift(source) {
   while (i < source.length) {
     const start = i;
     if (source.startsWith('//', i)) {
-      while (i < source.length && source[i] !== '\n') i++;
+      while (i < source.length && source[i] !== '\n' && source[i] !== '\r') i++;
       hide(start, i);
     } else if (source.startsWith('/*', i)) {
       let depth = 1; i += 2;
@@ -56,10 +56,10 @@ const rules = [
 ];
 
 export function scanSource(source, file) {
-  const masked = maskSwift(source), lines = source.split('\n');
+  const masked = maskSwift(source), lines = source.split(/\r\n|\n|\r/);
   const isUI = /(?:View|ViewModel)\.swift$/.test(file) || /(?:^|\/)1 - View\//.test(file);
   const evidence = (index) => {
-    const line = masked.slice(0, index).split('\n').length;
+    const line = masked.slice(0, index).split(/\r\n|\n|\r/).length;
     return { file, line, excerpt: lines.slice(Math.max(0, line - 3), line + 4).join('\n') };
   };
   const sites = [];
@@ -131,7 +131,7 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
             skipped.push({file:relative, reason:'Source contains a null byte'});
             continue;
           }
-          files.push({ path: relative, hash, lineCount: source.split('\n').length, ...scanSource(source, relative) });
+          files.push({ path: relative, hash, lineCount: source.split(/\r\n|\n|\r/).length, ...scanSource(source, relative) });
         }
       }
     }
