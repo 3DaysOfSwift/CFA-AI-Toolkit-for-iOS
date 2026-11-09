@@ -521,3 +521,12 @@ test('reviews Feature access when a View declares its conformance in an extensio
   assert.deepEqual(report.findings.filter(item => item.code === 'view-feature-access').map(item => item.file).sort(),
     ['App/1 - View/Views/Home/HomeView.swift', 'App/Presentation/HomeView+Actions.swift', extensionFile]);
 });
+
+test('recognizes detail ViewModel ownership when the initializer is in an extension', async t => {
+  const file = 'App/Presentation/HomeView+Init.swift';
+  const {report} = await inspectView(t, 'struct HomeView: View { @State private var viewModel: HomeViewModel; var body: some View { Text("Home") } }', {
+    [file]: 'extension HomeView { init(snapshot: HomeSnapshot) { _viewModel = State(initialValue: HomeViewModel(snapshot: snapshot)) } }'
+  });
+  assert.equal(report.screens[0].ownsViewModel, true);
+  assert.equal(report.findings.find(item => item.code === 'view-model-initializer-construction')?.file, file);
+});

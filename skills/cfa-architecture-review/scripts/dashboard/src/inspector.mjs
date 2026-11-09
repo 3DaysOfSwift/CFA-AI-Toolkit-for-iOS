@@ -636,6 +636,16 @@ export async function inspect(project) {
       findings.push(finding('view-swiftdata-access', 'review', 'SwiftData storage access may appear in a View-layer file. Check whether a View, ViewModel or preview accesses storage directly; previews retain the same CFA boundaries. A lexical match alone does not establish how the value is used.', file, lineOf(source, storageAccess.index)));
     }
   }
+  const viewExtensions = new Map();
+  for (const [file, source] of sources) {
+    for (const extension of source.matchAll(/\bextension\s+(\w+)\b(?!\s*\.)[^{}]*\{/g)) {
+      const name = extension[1];
+      if (!viewNames.has(name)) continue;
+      const offset = extension.index + extension[0].length;
+      if (!viewExtensions.has(name)) viewExtensions.set(name, []);
+      viewExtensions.get(name).push({file, source, offset, body: braceBody(source, offset - 1)});
+    }
+  }
   for (const viewFile of [...paths].filter(file => screenPath.test(file) && !file.endsWith('/RootTabView.swift')).sort()) {
     const view = sources.get(viewFile);
     const name = screenName(viewFile);
@@ -669,9 +679,16 @@ export async function inspect(project) {
       `@${stateTypePattern}\\s+private\\s+var\\s+${propertyNamePattern}\\s*:\\s*${viewModelTypePattern}\\b`, 'gu'
     ))].map(match => ({ name: match[1] ?? match[2], index: match.index }));
     const dependencies = [];
-    for (const { index, parameters, injectedViewModel, injectedAppModel, possibleModelDependency, initializerBody } of typeInitializers(body)) {
+    const initializerLocations = [
+      {file: viewFile, source: view, offset: bodyOffset, body},
+      ...(viewExtensions.get(name) ?? [])
+    ];
+    const initializers = initializerLocations.flatMap(location =>
+      [...typeInitializers(location.body)].map(initializer => ({...initializer, location}))
+    );
+    for (const { index, parameters, injectedViewModel, injectedAppModel, possibleModelDependency, initializerBody, location } of initializers) {
       if (!injectedViewModel && !injectedAppModel && !possibleModelDependency && parameters.trim() && viewModel) {
-        findings.push(finding('screen-initializer-inputs', 'review', `${name} accepts initializer inputs. Check that a detail screen receives selected immutable data and constructs its own ViewModel. Check for injected Features, repositories, service closures and actions owned by another screen. Reusable presentation components may receive action closures.`, viewFile, lineOf(view, bodyOffset + index)));
+        findings.push(finding('screen-initializer-inputs', 'review', `${name} accepts initializer inputs. Check that a detail screen receives selected immutable data and constructs its own ViewModel. Check for injected Features, repositories, service closures and actions owned by another screen. Reusable presentation components may receive action closures.`, location.file, lineOf(location.source, location.offset + index)));
       }
       if (initializerBody !== null) {
         const ownConstruction = typedStateProperties.find(({name: property}) => new RegExp(
@@ -684,7 +701,7 @@ export async function inspect(project) {
           new RegExp(`(?<![\\p{L}\\p{M}\\p{N}_])_?${property}\\s*=(?!=)`, 'u').test(initializerBody)
         );
         if (assignsViewModel) {
-          findings.push(finding('view-model-initializer-construction', 'review', `${name} assigns ViewModel state in init. Verify it constructs its own ViewModel from a selected immutable snapshot and does not accept an injected ViewModel.`, viewFile, lineOf(view, bodyOffset + index)));
+          findings.push(finding('view-model-initializer-construction', 'review', `${name} assigns ViewModel state in init. Verify it constructs its own ViewModel from a selected immutable snapshot and does not accept an injected ViewModel.`, location.file, lineOf(location.source, location.offset + index)));
         }
       }
     }
@@ -739,15 +756,12 @@ export async function inspect(project) {
     screens.push({ name, viewFile, viewModelFile: viewModel ? viewModelFile : null, ownsViewModel, structuralRoot, testFile, testCandidates, dependencies });
   }
 
-  for (const [file, source] of sources) {
-    for (const extension of source.matchAll(/\bextension\s+(\w+)\b(?!\s*\.)[^{}]*\{/g)) {
-      if (!viewNames.has(extension[1])) continue;
-      const start = extension.index + extension[0].length;
-      const body = braceBody(source, start - 1);
-      inspectScreenInputs(extension[1], body, source, start, file, findings);
+  for (const [name, extensions] of viewExtensions) {
+    for (const {file, source, offset, body} of extensions) {
+      inspectScreenInputs(name, body, source, offset, file, findings);
       const access = findFeatureAccess(body);
       if (access) {
-        findings.push(finding('view-feature-access', 'review', 'This View extension appears to access a Feature directly. Trace the call and route it through the owning ViewModel.', file, lineOf(source, start + access.index)));
+        findings.push(finding('view-feature-access', 'review', 'This View extension appears to access a Feature directly. Trace the call and route it through the owning ViewModel.', file, lineOf(source, offset + access.index)));
       }
     }
   }
