@@ -1,4 +1,10 @@
-# Codebase Tidy integration — 16 September 2026
+# Historical toolkit validation
+
+These dated records describe earlier revisions. For the current release
+checks and the installed-host evaluation procedure, see the
+[maintainer release procedure](PUBLISHING.md#maintainer-release-procedure).
+
+## Codebase Tidy integration — 16 September 2026
 
 - All 33 toolkit tests pass, including five-skill installation in a temporary destination.
 - Source manifests, bundled references and standalone package validation pass.
@@ -6,7 +12,7 @@
 - The npm script commands were executed directly with bundled Node because npm is unavailable in this environment.
 - This is an unreleased local change; no remote publication or global installation was performed.
 
-# Validation evidence — 0.2.0-beta.1
+## Validation evidence — 0.2.0-beta.1
 
 - All 33 tests passed, including four-skill standalone installation, bundled scanner
   execution, managed upgrades and refusal of conflicting legacy skill folders.

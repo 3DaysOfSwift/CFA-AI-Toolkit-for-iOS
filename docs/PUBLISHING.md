@@ -38,7 +38,9 @@ need Python 3. Compatible Codex installation requires `codex plugin add` support
    and `tools/architecture-dashboard/package.json`. Synchronisation updates the
    bundled dashboard copy. Update the changelog and add `docs/RELEASE-vVERSION.md`.
 2. Run `node scripts/sync.mjs`, `npm test`, `npm run validate` and `npm run evals`.
-   Use the [manual fixtures](../evals/README.md) to check installed-host responses.
+   The evals command checks fixture structure. Run the
+   [manual fixtures](../evals/README.md) in the installed host and record their
+   outcomes separately against the candidate revision.
 3. Run `python3 scripts/release.py --out dist/VERSION` with a fresh directory.
    It repeats validation and tests, then builds plugin and source ZIPs and SHA256SUMS.
 4. Extract the plugin ZIP into a clean directory. Follow INSTALLATION.md to test
