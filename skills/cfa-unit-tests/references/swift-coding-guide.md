@@ -134,6 +134,12 @@ screen’s `.task` for screen-owned work, such as requesting a refresh through t
 Feature. Keep the shared AppModel launch signal in the application lifecycle.
 A save or refresh that needs to outlive its screen belongs to its Feature.
 
+In CFA, a ViewModel retains handles for unstructured tasks it creates for the
+screen. Keep these handles out of the View's stored properties and `@State`.
+Framework-owned `.task` work and structured child tasks already have owners.
+Clear retained handles after success, failure or cancellation. When a task
+can be replaced, guard cleanup so an older task cannot clear the newer handle.
+
 When launch and a screen `.task` can request an equivalent refresh, the Feature owns the in-flight work. The first caller starts it; subsequent callers await the same outcome rather than starting duplicate work or returning early. Retain the appropriate task handle, expose accurate refresh status, and clear the handle after the outcome without letting an older completion clear newer work. The task's result and error types should match the operation. By default, this Feature-owned refresh continues even if its only screen
 caller leaves. Awaiting the shared task handle can keep a cancelled caller
 waiting until completion. If the screen needs to return promptly, cancel its
