@@ -89,7 +89,7 @@ cannot assess the behaviour described in the table. List the final-commit test o
 evidence IDs in `completionGate.dataHandoffEvidenceIds`. Use an empty list
 only when the reviewer confirms no data handoff is affected. List the
 producing and receiving targets and the environment used to exercise the
-handoff. Completion requires both target names and the environment. The
+handoff. Use the exact Xcode target names, with no surrounding whitespace. Completion requires both target names and the environment. The
 validator also rejects handoff evidence that names only unrelated targets. A passing build establishes compilation only. For automated test evidence,
 record which affected app or extension targets the named test targets exercise.
 The validator cannot infer that relationship from test target names.

@@ -308,6 +308,9 @@ test('completion is not inferred from a build pass or tests at a different commi
   assert.ok(inspectRecord(f.file).errors.some(error =>
     error.includes('evidence.after-widget-handoff: identify the producing and receiving targets')
   ));
+  handoff.targets = ['App', 'App '];
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.includes('.targets[1]: invalid text format')));
   handoff.targets = ['AnotherApp', 'AnotherWidget'];
   f.write();
   assert.ok(inspectRecord(f.file).errors.includes(

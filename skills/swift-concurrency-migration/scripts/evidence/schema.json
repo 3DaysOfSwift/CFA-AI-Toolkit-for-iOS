@@ -78,7 +78,7 @@
         "id": {"$ref": "#/$defs/identifier"},
         "kind": {"enum": ["source", "diff", "build", "test", "manual", "correction", "license"]},
         "rerunOf": {"$ref": "#/$defs/identifier"},
-        "targets": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/text"}},
+        "targets": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/targetName"}},
         "phase": {"enum": ["before", "after", "during"]},
         "reference": {"$ref": "#/$defs/text"},
         "summary": {"$ref": "#/$defs/text"},
@@ -93,7 +93,7 @@
       "type": ["object", "null"], "additionalProperties": false,
       "required": ["affectedTargets", "navigatorEvidenceId", "featureInventoryEvidenceId", "primitiveInventoryEvidenceId", "hybridReviewEvidenceId", "deploymentCompatibilityEvidenceId", "finalCfaAuditEvidenceId", "buildEvidenceId", "testEvidenceId", "manualBehaviourRegressionEvidenceId", "manualArchitectureReviewEvidenceId"],
       "properties": {
-        "affectedTargets": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/text"}},
+        "affectedTargets": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/targetName"}},
         "dataHandoffEvidenceIds": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/identifier"}},
         "navigatorEvidenceId": {"$ref": "#/$defs/identifier"},
         "featureInventoryEvidenceId": {"$ref": "#/$defs/identifier"},
@@ -131,6 +131,7 @@
     "identifier": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "maxLength": 100},
     "text": {"type": "string", "minLength": 1, "pattern": "\\S"},
     "unknownText": {"type": ["string", "null"], "minLength": 1, "pattern": "\\S"},
+    "targetName": {"type": "string", "pattern": "^\\S(?:[^\\r\\n]*\\S)?(?![\\s\\S])"},
     "texts": {"type": "array", "items": {"$ref": "#/$defs/text"}},
     "commit": {"type": ["string", "null"], "pattern": "^[a-f0-9]{40}(?:[a-f0-9]{24})?$"}
   }
