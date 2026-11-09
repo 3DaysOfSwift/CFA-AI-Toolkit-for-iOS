@@ -37,9 +37,9 @@ an alternative, prove a performance improvement, or certify a migration outcome.
 Matthew Thomas authorised this documented-rationale/editorial-analysis distinction
 on 2026-10-27. That permission is not individual technical or historical approval.
 
-## Open question
+## Working example
 
-Document a minimal test example showing the real Feature plus a repository double, including failure—not just successful construction.
+The full toolkit includes `architecture/spec-examples/NotesReference.swift`, which uses a concrete Feature and a repository boundary. `NotesReferenceTests.swift` checks a failing repository, retry and overlapping saves.
 
 ## Publication
 

@@ -87,9 +87,10 @@ export function validateCatalogue(catalogue, directory, { sourceRoot } = {}) {
       !fs.lstatSync(notePath).isSymbolicLink(), 'Linked notes are not distributable');
     const note = fs.readFileSync(notePath, 'utf8');
     for (const section of ['Rule', 'Problem', 'Documented rationale', 'Trade-offs and alternatives',
-      'Scope and exceptions', 'Verification', 'Evidence and provenance', 'Open question', 'Publication']) {
+      'Scope and exceptions', 'Verification', 'Evidence and provenance', 'Publication']) {
       requireValue(headings(note).includes(section), `Incomplete decision note: ${topic.id}/${section}`);
     }
+    requireValue(['Open question', 'Working example', 'Runnable examples'].some(section => headings(note).includes(section)), `Incomplete decision note: ${topic.id}/follow-up`);
     requireValue(Array.isArray(topic.sources) && topic.sources.length > 0, 'Topic needs canonical sources');
     topic.sources.forEach(validateSource);
     const priority = topic.priority;

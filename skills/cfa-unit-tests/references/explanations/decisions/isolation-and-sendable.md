@@ -37,9 +37,9 @@ an alternative, prove a performance improvement, or certify a migration outcome.
 Matthew Thomas authorised this documented-rationale/editorial-analysis distinction
 on 2026-10-27. That permission is not individual technical or historical approval.
 
-## Open question
+## Runnable examples
 
-Which supported toolchain configurations should the first public examples cover? Document the exact settings beside runnable examples rather than promise one snippet works everywhere.
+The migration playgrounds use Swift 5 language mode for their legacy examples and Swift 6 for the migrated examples; they target macOS. Their [guide](https://github.com/3DaysOfSwift/CFA-AI-Toolkit-for-iOS/tree/main/examples/migration) describes the settings and test command. Verify the actual project’s toolchain and deployment target separately.
 
 ## Publication
 
