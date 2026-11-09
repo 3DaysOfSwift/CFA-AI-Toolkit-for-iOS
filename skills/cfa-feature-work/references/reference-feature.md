@@ -11,8 +11,11 @@ entry, Save, Cancel and interactive sheet dismissal.
 
 The code below is also available as [NotesReference.swift](spec/examples/NotesReference.swift).
 The accompanying [executable checks](spec/examples/NotesReferenceTests.swift)
-verify failure recovery, discard without a write, publication after persistence, repeated Save taps,
-ordered independent saves, JSON storage and fresh editor state. A queued
+verify failure recovery, discard without a write, publication after persistence,
+ordered independent saves, JSON storage and fresh editor state. Repeated Save
+taps share one result and invoke the dismissal callback once. A failed save
+leaves the draft intact without invoking the callback. A successful save
+publishes the note and clears the submitted draft before invoking it. A queued
 save still completes when its predecessor fails, and each caller receives
 its own outcome. The checks also verify that two callers share one load
 and one caller's cancellation leaves the other able to receive the result.
