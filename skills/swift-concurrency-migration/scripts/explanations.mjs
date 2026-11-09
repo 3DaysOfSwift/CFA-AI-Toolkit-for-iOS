@@ -114,6 +114,16 @@ export function validateCatalogue(catalogue, directory, { sourceRoot } = {}) {
       validatePublication(lesson);
     }
   }
+  for (const topic of catalogue.topics) {
+    const related = topic.ruleRelatedTopics;
+    if (related === undefined) continue;
+    requireValue(related && typeof related === 'object' && !Array.isArray(related), 'Invalid rule-related topics');
+    for (const [rule, links] of Object.entries(related)) {
+      requireValue(topic.ruleIds.includes(rule) && Array.isArray(links) && links.length > 0 &&
+        new Set(links).size === links.length && links.every(id => id !== topic.id && ids.has(id)),
+      `Invalid related explanation topics for ${rule}`);
+    }
+  }
   requireValue(Array.isArray(catalogue.exclusions), 'Missing audit exclusions');
   const excluded = new Set();
   for (const source of catalogue.exclusions) {
@@ -134,7 +144,15 @@ export function validateCatalogue(catalogue, directory, { sourceRoot } = {}) {
 export function lookup(catalogue, key) {
   const topic = catalogue.topics.find(t => t.id === key || t.ruleIds.includes(key));
   if (!topic) throw Error(`Unknown explanation key: ${key}`);
+  const related = Object.hasOwn(topic.ruleRelatedTopics ?? {}, key)
+    ? topic.ruleRelatedTopics[key]
+    : [];
   const candidates = [{ title: topic.title, ...topic.publication }, ...topic.relatedLessons];
+  for (const id of related) {
+    const linked = catalogue.topics.find(candidate => candidate.id === id);
+    if (!linked) throw Error(`Unknown related explanation topic: ${id}`);
+    candidates.push({ title: linked.title, ...linked.publication });
+  }
   candidates.forEach(validatePublication);
   const seen = new Set();
   const links = candidates.filter(item => item.status === 'published').flatMap(item => {

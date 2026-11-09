@@ -41,8 +41,10 @@ test('canonical rule cards with explanation links resolve to a linked catalogue 
     if (!explanation) continue;
     const [, rule] = /^# (CFA-SPEC-[A-Z]+-\d{2}):/.exec(card);
     const result = lookup(catalogue, rule);
-    assert.ok(result.links.length > 0, rule);
-    assert.ok(explanation.includes(`(${result.links[0].url})`), rule);
+    const expected = [...explanation.matchAll(/\((https:[^)]*)\)/g)].map(match => match[1]);
+    for (const url of expected) {
+      assert.ok(result.links.some(link => link.url === url), `${rule}: ${url}`);
+    }
   }
 });
 

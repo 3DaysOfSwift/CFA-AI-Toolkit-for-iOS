@@ -125,6 +125,12 @@
           "websiteCommit": "d83657f"
         }
       },
+      "ruleRelatedTopics": {
+        "CFA-SPEC-API-01": [
+          "feature-ownership",
+          "concrete-features"
+        ]
+      },
       "relatedLessons": []
     },
     {
@@ -262,6 +268,14 @@
           "websiteCommit": "d83657f"
         }
       },
+      "ruleRelatedTopics": {
+        "CFA-SPEC-APP-03": [
+          "appmodel-composition"
+        ],
+        "CFA-SPEC-UI-03": [
+          "presentation-boundaries"
+        ]
+      },
       "relatedLessons": []
     },
     {
@@ -358,6 +372,14 @@
           "tutorialHTMLSHA256": "b81aa195a506b1b89a1d0c9dae8bd0c6966642826e9fff9d3fb676a779b65de8",
           "websiteCommit": "d83657f"
         }
+      },
+      "ruleRelatedTopics": {
+        "CFA-SPEC-FEATURE-01": [
+          "concrete-features"
+        ],
+        "CFA-SPEC-STATE-01": [
+          "presentation-boundaries"
+        ]
       },
       "relatedLessons": []
     },
@@ -589,6 +611,11 @@
           "websiteCommit": "d83657f"
         }
       },
+      "ruleRelatedTopics": {
+        "CFA-SPEC-TASK-03": [
+          "overlapping-requests"
+        ]
+      },
       "relatedLessons": []
     },
     {
@@ -678,6 +705,14 @@
           "tutorialHTMLSHA256": "9273981fec176527a87d014a1d28d29d29398df046a85a996a6888fb9df206aa",
           "websiteCommit": "d83657f"
         }
+      },
+      "ruleRelatedTopics": {
+        "CFA-SPEC-TASK-01": [
+          "unstructured-tasks"
+        ],
+        "CFA-SPEC-TASK-02": [
+          "task-cancellation"
+        ]
       },
       "relatedLessons": []
     },
@@ -1038,6 +1073,11 @@
           "tutorialHTMLSHA256": "8fcc03f2c308f37c5160eee3185a22cda5a43c4e0932b098ff95eeb06f195833",
           "websiteCommit": "d83657f"
         }
+      },
+      "ruleRelatedTopics": {
+        "CFA-SPEC-ERROR-01": [
+          "storage-failures"
+        ]
       },
       "relatedLessons": []
     }
