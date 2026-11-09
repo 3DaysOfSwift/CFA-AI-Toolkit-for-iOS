@@ -135,9 +135,12 @@ actor HeldNotesLoad: NotesRepository {
         model.text = "retry"
         let success = await model.save().value
         precondition(success && model.text.isEmpty && feature.notes.map(\.text) == ["retry"])
+        let confirmedBeforeFailure = feature.notes
         model.text = "fail"
         let failedBeforeDiscard = await model.save().value
         precondition(!failedBeforeDiscard && model.saveError != nil)
+        precondition(model.text == "fail", "The failed save keeps the draft available for retry")
+        precondition(feature.notes == confirmedBeforeFailure, "A failed save preserves confirmed notes")
         model.discardDraft()
         let savedAfterDiscard = await repository.saved
         precondition(model.text.isEmpty && model.saveError == nil)
