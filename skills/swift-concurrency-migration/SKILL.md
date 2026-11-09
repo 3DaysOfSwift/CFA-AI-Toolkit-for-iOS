@@ -140,6 +140,11 @@ Use deliberate passes:
    a slow restore cannot delay refresh or overwrite fresh data, and that an
    optional write cannot hold up a successful refresh. Keep required
    persistence for user edits on the save path before reporting success.
+   If preference restoration changes, test with values written by the old
+   app. Apply the [preference recovery rule](references/spec/rules/cfa-pref-01.md)
+   to distinguish a supported value, a missing or obsolete non-critical value,
+   and unreadable storage. Verify that fallback respects the product's policy
+   for retaining the old value and that failed writes still surface as errors.
    If the app already supports offline editing or cross-device sync, apply the
    [sync rule](references/spec/rules/cfa-sync-01.md). Inventory pending edits,
    their on-disk metadata and the existing conflict and rejection policy before
