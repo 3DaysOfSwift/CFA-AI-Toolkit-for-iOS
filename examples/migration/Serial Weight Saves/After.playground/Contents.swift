@@ -74,15 +74,14 @@ func runExample() async {
     precondition(finalSaved && feature.weights == [70, 72] && stored == feature.weights)
     precondition(feature.saveError == nil)
 
-    // Start three callers before awaiting their results. One submits an invalid value.
+    // Run three callers as child tasks. The Feature controls the save order
+    // after admission, and this example waits for every outcome.
     let queuedStorage = WeightStorage()
     let queuedFeature = WeightLogFeature(storage: queuedStorage)
-    let firstQueued = Task { await queuedFeature.save(80) }
-    let rejectedQueued = Task { await queuedFeature.save(-1) }
-    let lastQueued = Task { await queuedFeature.save(82) }
-    let firstResult = await firstQueued.value
-    let rejectedResult = await rejectedQueued.value
-    let lastResult = await lastQueued.value
+    async let firstQueued = queuedFeature.save(80)
+    async let rejectedQueued = queuedFeature.save(-1)
+    async let lastQueued = queuedFeature.save(82)
+    let (firstResult, rejectedResult, lastResult) = await (firstQueued, rejectedQueued, lastQueued)
     let queuedStored = await queuedStorage.read()
     precondition(firstResult && !rejectedResult && lastResult)
     // Scheduling can change the admission order. Both valid saves must persist.
