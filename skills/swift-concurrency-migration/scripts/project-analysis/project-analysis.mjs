@@ -24,10 +24,10 @@ export async function collectProjectAnalysis(root, options = {}, providers = {})
       const records = await (providers.index || collectIndexedCalls)(root, options.indexStore, options.module);
       const sourceFiles = new Set(before.files.map(file => file.path));
       const calls = records.filter(call => sourceFiles.has(call.file));
-      if (!calls.length) throw Error('No indexed calls match the scanned source files.');
-      compilerIndex = {status:'available', module:options.module, indexFreshness:'unverified', calls,
+      compilerIndex = {status:calls.length ? 'available' : 'unavailable', module:options.module, indexFreshness:'unverified', calls,
         excludedCalls:records.length-calls.length,
-        reason:'Index freshness, configuration and target completeness are not verified.'};
+        reason:calls.length ? 'Index freshness, configuration and target completeness are not verified.'
+          : 'No indexed calls match the scanned source files.'};
     } catch (error) {
       compilerIndex = {status:'unavailable', module:options.module, calls:[], reason:String(error.message)};
     }

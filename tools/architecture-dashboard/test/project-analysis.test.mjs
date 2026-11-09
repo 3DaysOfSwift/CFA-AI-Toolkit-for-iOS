@@ -28,6 +28,16 @@ test('combines syntax and index evidence without treating calls as runtime trace
   } finally { await fs.rm(root,{recursive:true,force:true}); }
 });
 
+test('retains excluded call counts when the index has no in-scope calls', async () => {
+  const result = await analyseProject(os.tmpdir(), {indexStore:'/index',module:'App'}, {
+    analyse:async()=>inventory(), syntax,
+    index:async()=>[{file:'Excluded.swift',line:1,caller:'test',callee:'refresh'}]
+  });
+  assert.equal(result.compilerIndex.status, 'unavailable');
+  assert.equal(result.compilerIndex.excludedCalls, 1);
+  assert.deepEqual(result.callCandidates[0].possibleIndexMatches, []);
+});
+
 test('reports index failures and rejects a source change during analysis', async () => {
   const root=await fs.mkdtemp(path.join(os.tmpdir(),'project-analysis-test-'));
   try {
