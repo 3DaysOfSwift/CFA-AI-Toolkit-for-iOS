@@ -150,7 +150,8 @@ export async function inspect(project) {
       for (const scheduled of body.matchAll(/\b(?:Task\s*(?:<[^{}\n]*>\s*)?(?:\.\s*detached\s*)?|DispatchQueue\s*\.\s*(?:main|global\s*\([^{}()]*\))\s*\.\s*async\s*)(?:\([^{}]*\)\s*)?\{/g)) {
         const scheduledBody = braceBody(body, scheduled.index + scheduled[0].length - 1);
         if (/(?<!\bfunc\s+)\bapplicationDidFinishLaunching\s*\(/.test(scheduledBody)) {
-          findings.push(finding('scheduled-app-model-launch', 'review', 'The launch callback appears to defer the AppModel launch signal. Check whether the app-wide startup signal should be called synchronously; Feature-owned asynchronous work can still start its own tasks.', file, lineOf(source, start + 1 + scheduled.index)));
+          const scheduler = scheduled[0].startsWith('DispatchQueue') ? 'DispatchQueue.async' : 'Task';
+          findings.push(finding('scheduled-app-model-launch', 'review', `The launch callback appears to defer the AppModel launch signal through ${scheduler}. Check whether the callback can signal AppModel synchronously while Features own their asynchronous work.`, file, lineOf(source, start + 1 + scheduled.index)));
         }
       }
     }

@@ -160,6 +160,8 @@ test('identifies a launch signal scheduled inside a delegate Task or dispatch qu
     ['Application/AppDelegate.swift', 3, 'review'],
     ['Application/DispatchDelegate.swift', 3, 'review']
   ]);
+  assert.match(findings[0].message, /through Task/);
+  assert.match(findings[1].message, /through DispatchQueue\.async/);
 });
 
 test('identifies priority and explicitly typed Tasks scheduling the launch signal', async t => {
