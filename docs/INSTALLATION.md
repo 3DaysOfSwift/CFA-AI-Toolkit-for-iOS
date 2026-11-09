@@ -90,8 +90,9 @@ tests, run `cfa inspect` in the project folder (or pass its path). Add `--json`
 for machine-readable output. The inspector does not edit the app, run tests,
 or certify architectural correctness.
 
-The same command can confirm the installed CFA skills and optional project
-guidance:
+Use `cfa doctor` to check that the skill entry files and core references are
+present and see whether the project has optional CFA guidance. Confirm skill
+discovery and execution separately in the AI host.
 
 ```sh
 cfa doctor

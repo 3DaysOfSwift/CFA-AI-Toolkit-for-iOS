@@ -44,6 +44,20 @@ test('doctor reports an installed skill missing its specification', (t) => {
   assert.doesNotMatch(result.stdout, /PASS CFA skills are installed/);
 });
 
+test('doctor identifies a missing review skill entry and a directory masquerading as one', (t) => {
+  const { directory, command } = installedCommand(t);
+  const skills = path.join(directory, 'customer/.agents/skills');
+  fs.unlinkSync(path.join(skills, 'cfa-architecture-review/SKILL.md'));
+  const featureEntry = path.join(skills, 'cfa-feature-work/SKILL.md');
+  fs.unlinkSync(featureEntry);
+  fs.mkdirSync(featureEntry);
+
+  const result = spawnSync(command, ['doctor', directory], { encoding: 'utf8' });
+
+  assert.equal(result.status, 1, result.stderr);
+  assert.match(result.stdout, /WARN missing CFA skills: cfa-feature-work, cfa-architecture-review/);
+});
+
 test('installed inspect command reads a project without writing into it', (t) => {
   const { directory, command } = installedCommand(t);
   const project = path.join(directory, 'project');

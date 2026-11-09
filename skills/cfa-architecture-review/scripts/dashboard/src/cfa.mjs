@@ -395,6 +395,7 @@ Examples:
 function installedSkillsRoot() {
   let current = scriptDirectory;
   while (current !== path.dirname(current)) {
+    if (path.basename(current) === 'cfa-architecture-review') return path.dirname(current);
     if (fs.existsSync(path.join(current, 'SKILL.md'))) return path.dirname(current);
     current = path.dirname(current);
   }
@@ -419,7 +420,7 @@ function doctor(projectArgument) {
   const project = projectDirectory(projectArgument);
   const skillsRoot = installedSkillsRoot();
   const missingSkills = skillsRoot
-    ? cfaSkillNames.filter((name) => !fs.existsSync(path.join(skillsRoot, name, 'SKILL.md')))
+    ? cfaSkillNames.filter(name => !fs.statSync(path.join(skillsRoot, name, 'SKILL.md'), { throwIfNoEntry: false })?.isFile())
     : cfaSkillNames;
   const missingReferences = skillsRoot ? cfaSkillNames
     .filter(name => !missingSkills.includes(name))
