@@ -66,15 +66,35 @@ function closingParenthesis(source, opening) {
   return -1;
 }
 
+// Inspect the first top-level colon in each parameter, skipping labels in
+// default calls and closure signatures.
+function initializerParameterTypes(parameters) {
+  const types = [];
+  let depth = 0;
+  let foundType = false;
+  for (const {0: token, index} of parameters.matchAll(/[()[\]{},:]/g)) {
+    if ('([{'.includes(token)) depth++;
+    else if (')]}'.includes(token)) depth--;
+    else if (depth === 0 && token === ',') foundType = false;
+    else if (depth === 0 && token === ':' && !foundType) {
+      const type = /^\s*(?:(?:any|some)\s+)?((?:\w+\s*\.\s*)*\w+)/.exec(parameters.slice(index + 1));
+      if (type) types.push(type[1].split('.').at(-1).trim());
+      foundType = true;
+    }
+  }
+  return types;
+}
+
 function* viewInitializers(body) {
   for (const initializer of memberSignatures(body).matchAll(/(?<![.\w])init[?!]?\s*\(/g)) {
     const opening = initializer.index + initializer[0].length - 1;
     const closing = closingParenthesis(body, opening);
     if (closing < 0) continue;
     const parameters = body.slice(opening + 1, closing);
-    const injectedViewModel = /:\s*(?:any\s+)?(?:\w+\s*\.\s*)*\w*ViewModel\b(?!\s*\.)/.test(parameters);
-    const injectedAppModel = /:\s*(?:\w+\s*\.\s*)*AppModel\b(?!\s*\.)/.test(parameters);
-    const possibleModelDependency = /:\s*(?:(?:any|some)\s+)?(?:\w+\s*\.\s*)*(\w+(?:Feature|Repository))\b(?!\s*\.)/.exec(parameters)?.[1];
+    const types = initializerParameterTypes(parameters);
+    const injectedViewModel = types.some(type => type.endsWith('ViewModel'));
+    const injectedAppModel = types.includes('AppModel');
+    const possibleModelDependency = types.find(type => /\w+(?:Feature|Repository)$/.test(type));
     yield { index: initializer.index, closing, parameters, injectedViewModel, injectedAppModel, possibleModelDependency };
   }
 }

@@ -130,6 +130,8 @@ test('reviews possible model dependencies in a flat View initializer', async t =
       init(schedule: LaunchFeature) {}
       init(repository: any MyApp.LaunchRepository) {}
       init(snapshot: LaunchFeature.Snapshot) {}
+      init(snapshot: LaunchSnapshot = makeSnapshot(feature: LaunchFeature())) {}
+      init(action: (feature: LaunchFeature) -> Void) {}
       var body: some View { Text("Detail") }
     }`
   });
