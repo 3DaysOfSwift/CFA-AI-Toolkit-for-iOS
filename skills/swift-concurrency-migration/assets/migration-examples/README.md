@@ -23,7 +23,12 @@ this suite's target for the migrated examples, not a prerequisite for CFA itself
 
 ## Migration cases
 
-- [Callback networking](Callback%20Networking/case.md)
-- [MainActor result handling](MainActor%20Result/case.md)
-- [Observation migration](Observation%20Migration/case.md)
-- [Serial weight saves](Serial%20Weight%20Saves/case.md)
+- [Callback networking](Callback%20Networking/case.md) preserves a successful
+  decode, an HTTP 503 error and a malformed JSON error when moving to async URLSession.
+- [MainActor result handling](MainActor%20Result/case.md) preserves publication
+  before completion and demonstrates failed refresh, retry and overlapping calls.
+- [Observation migration](Observation%20Migration/case.md) preserves the current
+  Feature value while showing how notification delivery differs from Combine.
+- [Serial weight saves](Serial%20Weight%20Saves/case.md) preserves distinct save
+  outcomes and verifies admission order across a failing command in the source
+  checkout's automated test.
