@@ -122,7 +122,12 @@ results in the report, rather than presenting scanner counts as findings.
    still reach the app with the relevant screen absent. In CFA, AppModel owns
    the listener and forwards events to the responsible Feature, which interprets
    them and owns the resulting state. Trace screen-only observation separately
-   against the screen's lifetime.
+   against the screen's lifetime. For a stream backed by a registered observer,
+   trace who owns registration, who ends consumption, and how the producer
+   removes the observer. Exercise events arriving during teardown and immediate
+   resubscription. Check that an old registration cannot publish to the new
+   consumer or remove its replacement. If cleanup is scheduled separately,
+   establish what can happen before it runs.
 8. **Launch performance:** Trace startup and its loading signals, then measure
    launch using available tooling when feasible. State the measurement definition,
    device or simulator, build configuration, cold or warm conditions, sample count
