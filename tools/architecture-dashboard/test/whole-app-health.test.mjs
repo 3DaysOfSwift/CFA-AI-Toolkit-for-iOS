@@ -408,6 +408,14 @@ test('installed Health Check rescans source, surfaces gaps and rejects stale rev
     await fs.writeFile(buildSettings, initialSettings);
     await fs.writeFile(path.join(project,'App.swift'),'struct Changed {}\n');
     await assert.rejects(finish(project,reviewPath,path.join(base,'stale.html'),undefined,mustNotParse),/fingerprint mismatch/);
+    await fs.writeFile(path.join(project,'App.swift'),'struct App {\r\n}\r\n');
+    await fs.writeFile(path.join(project,'Unreadable.swift'), Buffer.from([0xff]));
+    const rescanned = await prepare(project, path.join(base,'unreadable-inventory'), syntax);
+    review.sourceFingerprint = rescanned.sourceFingerprint;
+    await fs.writeFile(reviewPath,JSON.stringify(review));
+    const incompleteOutput = path.join(base,'unreadable.html');
+    await assert.rejects(finish(project,reviewPath,incompleteOutput,undefined,syntax), /Source file could not be scanned: Unreadable.swift/);
+    await assert.rejects(fs.access(incompleteOutput));
   } finally { await fs.rm(base,{recursive:true,force:true}); }
 });
 
