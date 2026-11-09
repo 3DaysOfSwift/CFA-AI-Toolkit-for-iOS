@@ -31,7 +31,7 @@ This is a CFA convention, not a SwiftUI requirement. One Feature may support sev
 
 ## Verification
 
-Map each screen to its dedicated ViewModel, required Features and behavioural tests. Accept multiple Features per screen and multiple screens per Feature. Locate the authority for each business value separately from storage/cache representations. Exercise cross-screen consistency, outdated pagination responses and failed updates; check that new business rules have a model owner while presentation decisions remain in presentation. Do not infer ownership from names alone.
+Map each screen-level SwiftUI View to its dedicated ViewModel, required Features and behavioural tests. For retained UIKit screens, trace the existing presentation owner to its Features and tests. Accept multiple Features per screen and multiple screens per Feature. Locate the authority for each business value separately from storage/cache representations. Exercise cross-screen consistency, outdated pagination responses and failed updates; check that new business rules have a model owner while presentation decisions remain in presentation. Do not infer ownership from names alone.
 
 ## Evidence and provenance
 
