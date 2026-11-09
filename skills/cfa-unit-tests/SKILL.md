@@ -66,6 +66,9 @@ shareable requests receive the shared outcome; commands that must each take effe
 execute in admission order and receive their own outcomes, even when their inputs
 match. Cover cancellation, cleanup
 and later work after failure without losing or indefinitely suspending waiters.
+When a replacement can start before the previous task exits, hold the previous
+task open, start the replacement, then finish the previous task. Verify its
+result and cleanup leave the replacement's state and handle intact.
 
 For paid capabilities, exercise locked and entitled outcomes at each relevant
 entry point, including alternate screens or system actions that can invoke the
@@ -73,8 +76,11 @@ capability. Supply controlled entitlement state and verify that locked paths
 show the expected purchase or locked experience where applicable and never
 invoke the paid operation. Verify that entitled callers can proceed. If
 entitlement can change while the screen stays open, change it after initial
-presentation and verify that a later action checks the current value. Verify
-server-side authorisation separately for server-protected operations.
+presentation and verify that a later action checks the current value. If access
+can change between a check and its use, suspend the route after its first check,
+revoke access, then resume it. Verify that it neither presents paid content nor
+invokes the paid operation. Verify server-side authorisation separately for
+server-protected operations.
 
 For shared refreshes that should survive navigation, suspend the request and
 cancel its only screen waiter. Release the request with no replacement waiter
