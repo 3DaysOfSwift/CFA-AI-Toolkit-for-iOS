@@ -417,7 +417,13 @@ export async function inspect(project) {
         findings.push(finding('feature-placement', 'review', `${property.type} is outside a named subfolder of ${featureFolder}. Verify the intended package and target placement before moving it.`, declarationFile, declaration.line));
       }
       const testName = `${property.type}Tests.swift`;
-      const testCandidates = [...paths].filter(file => file.split('/').includes('FeatureTests') && path.posix.basename(file) === testName);
+      const namedTests = [...paths].filter(file => path.posix.basename(file) === testName);
+      const testCandidates = namedTests.filter(file => file.split('/').includes('FeatureTests'));
+      for (const file of namedTests) {
+        if (/(?:^|\/)(?:1 - View|2 - AppModel)\//.test(file)) {
+          findings.push(finding('feature-test-placement', 'review', `${testName} appears in a production source tree. Verify that it belongs to the unit-test target and its FeatureTests group.`, file, 1));
+        }
+      }
       if (testCandidates.length > 1) {
         findings.push(finding('feature-tests-ambiguous', 'review', `Multiple files match ${testName}: ${testCandidates.join(', ')}. Verify which test target covers this Feature.`, property.file, property.line));
       }

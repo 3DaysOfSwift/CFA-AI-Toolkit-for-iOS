@@ -98,6 +98,18 @@ test('reports a missing named feature test file', async t => {
   assert.match(report.findings[0].message, /scanned directory/);
 });
 
+test('reviews Feature tests placed within a production source tree', async t => {
+  const file = 'Application/2 - AppModel/FeatureTests/SettingsFeatureTests.swift';
+  const root = await fixture(t, {
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() }; let settingsFeature: SettingsFeature }',
+    'Application/2 - AppModel/Features/Settings/SettingsFeature.swift': 'final class SettingsFeature {}',
+    [file]: 'struct SettingsFeatureTests {}'
+  });
+  const {findings} = await inspect(root);
+  const placement = findings.find(item => item.code === 'feature-test-placement');
+  assert.deepEqual([placement?.file, placement?.line, placement?.severity], [file, 1, 'review']);
+});
+
 test('reports test search scope when tests are beside the scanned app folder', async t => {
   const root = await fixture(t, {
     'Application/1 - View/Views/Chat/ChatView.swift': 'struct ChatView: View { @State private var viewModel = ChatViewModel() }',
