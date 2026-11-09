@@ -84,6 +84,7 @@ actor RetryableNotes: NotesRepository {
         thirdStarted.continuation.finish()
         let before = await repository.saved
         precondition(before == ["retry"])
+        precondition(feature.notes.map(\.text) == before, "Publish only after the pending write succeeds")
         await repository.release()
         try await first.value
         try await second.value
