@@ -41,6 +41,7 @@ actor PendingRequestStore: PendingRequestRepository {
     }
 
     func insert(_ request: DestinationRequest) throws -> PendingSnapshot {
+        guard request.isValid else { throw PendingRequestError.invalidDestination }
         try loadIfNeeded()
         guard !resolvedIDs.contains(request.id),
               !requests.contains(where: { $0.id == request.id }) else { return try snapshot() }
@@ -183,13 +184,22 @@ private actor DelayedRestoreRepository: PendingRequestRepository {
         let fileURL = folder.appendingPathComponent("pending.json")
         let initialRequest = DestinationRequest(id: "notification-1", title: "Next launch", launchID: "launch-42")
 
-        let firstRun = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
+        let store = PendingRequestStore(fileURL: fileURL)
+        let firstRun = DeepLinkingFeature(store: store)
         try await firstRun.receive(initialRequest)
         do {
             try await firstRun.receive(DestinationRequest(id: "invalid", title: "Missing launch", launchID: " "))
             preconditionFailure("A request without a destination must be rejected")
         } catch PendingRequestError.invalidDestination {
             precondition(firstRun.pending == [initialRequest])
+        }
+        // The store also protects its file when called without the Feature.
+        do {
+            _ = try await store.insert(DestinationRequest(id: " ", title: "Missing event", launchID: "launch-42"))
+            preconditionFailure("The store must reject an invalid event identifier")
+        } catch PendingRequestError.invalidDestination {
+            let snapshot = try await store.snapshot()
+            precondition(snapshot.requests == [initialRequest])
         }
         let restoredAfterInvalidRequest = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
         try await restoredAfterInvalidRequest.restore()
