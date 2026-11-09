@@ -59,10 +59,6 @@ actor RetryableNotes: NotesRepository {
         model.text = "fail"
         let failure = await model.save().value
         precondition(!failure && model.text == "fail" && model.saveError != nil && feature.notes.isEmpty)
-        let cancelledEditor = NotesEditorViewModel(notesFeature: feature)
-        cancelledEditor.text = "discarded"
-        let replacementEditor = NotesEditorViewModel(notesFeature: feature)
-        precondition(replacementEditor.text.isEmpty && feature.notes.isEmpty)
         model.text = "retry"
         let success = await model.save().value
         precondition(success && model.text.isEmpty && feature.notes.map(\.text) == ["retry"])
@@ -146,6 +142,19 @@ actor RetryableNotes: NotesRepository {
         try await disk.save(item)
         let restored = try JSONDecoder().decode([Note].self, from: Data(contentsOf: url))
         precondition(restored == [item])
+
+        let editingFeature = NotesFeature(repository: disk)
+        do {
+            // Model the sheet's Cancel path by ending the editor's lifetime.
+            let editor = NotesEditorViewModel(notesFeature: editingFeature)
+            await editor.load()
+            editor.text = "Discard this unsaved note"
+        }
+        let replacementEditor = NotesEditorViewModel(notesFeature: editingFeature)
+        precondition(replacementEditor.text.isEmpty)
+        precondition(editingFeature.notes == [item])
+        let storedAfterDiscard = try await disk.load()
+        precondition(storedAfterDiscard == [item])
 
         let firstNote = Note(id: UUID(), text: "First concurrent save")
         let secondNote = Note(id: UUID(), text: "Second concurrent save")
