@@ -322,6 +322,13 @@ criterion. If the same route also has a confirmed behavioural defect, record
 that separately under correctness or clarity with its own consequence and
 source evidence, and include it in the report criteria.
 
+Treat inspector findings as starting points for source review, including
+findings marked warning. For example, a conditional in App.body becomes a
+CFA deviation only after tracing the active configuration and confirming that
+startup replaces the normal root or blocks unaffected navigation. If that
+trace cannot resolve an applicable requirement, record an unresolved check
+with the evidence needed to decide it.
+
 The importer derives operation correctness and clarity from these checks. An
 unresolved check preserves all other verified passes; row summaries show their
 counts. Legacy reviews without checks retain their original coarse assessments.
