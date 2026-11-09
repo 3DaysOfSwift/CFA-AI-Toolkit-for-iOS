@@ -474,9 +474,11 @@ acquire a Feature or ViewModel, or implement business rules.
 **CFA screen ownership:** A screen owns its dedicated private ViewModel.
 Name the screen’s ViewModel property `viewModel`. By default, construct it inline: `@State private var viewModel = HomeViewModel()`.
 A detail screen may receive selected value data and initialise its own private
-State-backed ViewModel in its View initializer using that value. Never accept,
-share, inject or compute a ViewModel supplied by another View. Keep initializers
-cheap and free of work-starting side effects. Stateless display components may
+State-backed ViewModel in its View initializer using that value. Store the
+ViewModel in `@State`. Keep it private to the screen and construct it there.
+A computed ViewModel property, a shared ViewModel and a ViewModel supplied by
+another View each violate screen ownership. Keep initializers cheap and free
+of work-starting side effects. Stateless display components may
 also receive snapshots.
 
 The supplied snapshot is initial input, not automatically refreshed state.
