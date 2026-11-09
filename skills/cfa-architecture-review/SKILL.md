@@ -147,6 +147,17 @@ and session checks prevent a late result from repopulating cleared state or
 appearing under a different account. Distinguish a sign-out failure that
 leaves the session intact from cleanup failure after the session has ended.
 
+When reviewing a widget or another device target, apply the
+[multi-device rule](references/spec/rules/cfa-device-01.md). Inspect each
+target's source membership and AppModel composition. Check that it reuses
+the shared Model, includes only its own Views and ViewModels, and uses APIs
+available to that target. Trace the writer, the storage or transfer boundary,
+and the receiving Feature's state update. For an App Group widget snapshot,
+verify the write succeeds before the app requests a timeline reload. For a
+Watch on another device, verify that a separate copy reaches the receiving
+data source. Report the build and device evidence separately, including
+what happens when the snapshot is missing, unreadable, delayed or stale.
+
 For a dashboard or detailed concurrency analysis, read the [dashboard workflow](references/dashboard-workflow.md). The bundled tool is at `scripts/dashboard/src/cli.mjs` relative to this skill; it requires Node.js 20+. It inventories source patterns, not semantic correctness. Only use its concurrency dashboard when the selected scope contains Swift Concurrency. If the app uses only GCD, continue a manual ownership and concurrency review; mark the dashboard unavailable rather than refusing the review or inventing zero scores.
 
 A focused CFA review does not require an app-wide dashboard or numerical ratings. A requested full dashboard requires the complete source-evidence workflow. Do not infer testing evidence from source inspection or claim race freedom from a score.
