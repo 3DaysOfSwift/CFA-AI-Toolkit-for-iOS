@@ -117,8 +117,10 @@ skill from that toolkit before changing the project.
   inject them into Features or their providers.
 - Call the AppModel launch signal directly
   and synchronously from the application lifecycle callback, never a View .task
-  or a scheduled Task. Features can start their own asynchronous work without
-  delaying the callback for disk or network completion.
+  or a scheduled Task. AppModel signals the relevant Features and starts its
+  required app-wide listeners before the callback returns. Features can start
+  their own asynchronous work without delaying the callback for disk or network
+  completion.
   Keep synchronous startup work brief. Task creation order gives no guarantee
   about when disk or network work begins. Measure launch and first-frame
   timing separately from completion of Feature work.
