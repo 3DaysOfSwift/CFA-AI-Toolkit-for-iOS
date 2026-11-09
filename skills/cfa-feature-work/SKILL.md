@@ -56,14 +56,17 @@ If the project is already CFA, make the smallest complete vertical change:
    ViewModel. Keep service calls and business decisions in the model.
 3. Wire dependencies through AppModel. Do not create global singletons or add
    generic manager layers.
-4. Establish whether the request removes a screen, an operation or the whole
-   Feature. Trace remaining callers across screens, targets and system entry
+4. For a removal request, establish whether it removes a screen, an operation
+   or the whole Feature. Trace remaining callers across screens, targets and system entry
    points. Remove only the routes, Views, ViewModels, APIs, tests and Xcode
    memberships that belong exclusively to the removed scope. Keep shared
    capabilities and the tests that cover their remaining callers. Remove stored
    data only when its retention requirements permit it.
-5. Add or revise meaningful feature and ViewModel tests, build the target and
-   run the affected test suite.
+5. Give each new ViewModel and concrete Feature its own named test file and
+   suite. For existing types, extend their suites to cover changed observable
+   behaviour at the owning boundary. A new screen using an existing Feature
+   needs its own ViewModel tests and can reuse that Feature’s API tests.
+   Build the target and run the affected suites.
 
 If the project is not CFA, do not silently distribute CFA types throughout an
 unrelated architecture. An explicitly requested isolated fix stays within
