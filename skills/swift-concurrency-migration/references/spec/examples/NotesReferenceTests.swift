@@ -96,7 +96,16 @@ actor RetryableNotes: NotesRepository {
         let failingFeature = NotesFeature(repository: failingRepository)
         let delayedFailure = Task { try await failingFeature.save("fail after wait") }
         await failingRepository.waitForFirst()
-        let laterSave = Task { try await failingFeature.save("after failure") }
+        let laterStarted = AsyncStream<Void>.makeStream()
+        let laterSave = Task { @MainActor in
+            laterStarted.continuation.yield(())
+            try await failingFeature.save("after failure")
+        }
+        var laterSignal = laterStarted.stream.makeAsyncIterator()
+        await laterSignal.next()
+        laterStarted.continuation.finish()
+        let savedBeforeFailure = await failingRepository.saved
+        precondition(savedBeforeFailure.isEmpty)
         await failingRepository.release()
         do {
             try await delayedFailure.value
