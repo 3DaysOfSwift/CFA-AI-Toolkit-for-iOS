@@ -679,13 +679,13 @@ export async function inspect(project) {
   const viewConformances = /\bextension\s+(\w+)\s*:\s*(?:(?:\w+\s*\.\s*)*\w+\s*,\s*)*(?:SwiftUI\s*\.\s*)?View\b(?!\s*\.)[^{}]*\{/g;
   const appDeclarations = /\bstruct\s+(\w+)\s*:\s*(?:(?:\w+\s*\.\s*)*\w+\s*,\s*)*(?:SwiftUI\s*\.\s*)?App\b(?!\s*\.)[^{}]*\{/g;
   const appConformances = /\bextension\s+(\w+)\s*:\s*(?:(?:\w+\s*\.\s*)*\w+\s*,\s*)*(?:SwiftUI\s*\.\s*)?App\b(?!\s*\.)[^{}]*\{/g;
-  const sceneBodyPattern = /\bvar\s+body\s*:\s*some\s+(?:SwiftUI\s*\.\s*)?Scene\b/;
-  function sceneBodyStart(body, signatures = memberSignatures(body)) {
-    const scene = sceneBodyPattern.exec(signatures);
-    if (!scene) return null;
-    const signatureEnd = scene.index + scene[0].length;
-    const opening = /^\s*\{/.exec(body.slice(signatureEnd));
-    return opening ? signatureEnd + opening[0].length : null;
+  const sceneBodyPattern = /\bvar\s+body\s*:\s*some\s+(?:SwiftUI\s*\.\s*)?Scene\b/g;
+  function* sceneBodyStarts(body, signatures = memberSignatures(body)) {
+    for (const scene of signatures.matchAll(sceneBodyPattern)) {
+      const signatureEnd = scene.index + scene[0].length;
+      const opening = /^\s*\{/.exec(body.slice(signatureEnd));
+      if (opening) yield signatureEnd + opening[0].length;
+    }
   }
   const rootViewNames = new Set(['ContentView', 'RootTabView', 'RootView']);
   const rootStorageGate = /(?<!#)\b(?:if|guard|switch)\s+[^{};]*\b\w*(?:container|database|storeReady|storageReady|startupError|launchError)\w*\b/i;
@@ -739,19 +739,19 @@ export async function inspect(project) {
   for (const [file, source] of sources) {
     for (const app of appScopes(source)) {
       const appBody = braceBody(source, app.index + app[0].length - 1);
-      const bodyStart = sceneBodyStart(appBody);
-      if (bodyStart === null) continue;
-      const body = braceBody(appBody, bodyStart - 1);
-      for (const root of body.matchAll(/\bWindowGroup\s*(?:\([^{}]*\)\s*)?\{\s*(?:\$?\w+\s+in\s*)?(?:\w+\s*\.\s*)*(\w+)\s*\(/g)) {
-        const name = root[1];
-        if (!viewNames.has(name)) continue;
-        if ((declarationsByName.get(name)?.length ?? 0) > 1) {
-          rootViewNames.delete(name);
-          const index = app.index + app[0].length + bodyStart + root.index;
-          findings.push(finding('scene-root-ambiguous', 'review', `WindowGroup constructs ${name}, which matches multiple declarations. Verify the root View in the active target before assessing navigation.`, file, lineOf(source, index)));
-          continue;
+      for (const bodyStart of sceneBodyStarts(appBody)) {
+        const body = braceBody(appBody, bodyStart - 1);
+        for (const root of body.matchAll(/\bWindowGroup\s*(?:\([^{}]*\)\s*)?\{\s*(?:\$?\w+\s+in\s*)?(?:\w+\s*\.\s*)*(\w+)\s*\(/g)) {
+          const name = root[1];
+          if (!viewNames.has(name)) continue;
+          if ((declarationsByName.get(name)?.length ?? 0) > 1) {
+            rootViewNames.delete(name);
+            const index = app.index + app[0].length + bodyStart + root.index;
+            findings.push(finding('scene-root-ambiguous', 'review', `WindowGroup constructs ${name}, which matches multiple declarations. Verify the root View in the active target before assessing navigation.`, file, lineOf(source, index)));
+            continue;
+          }
+          rootViewNames.add(name);
         }
-        rootViewNames.add(name);
       }
     }
   }
@@ -861,8 +861,7 @@ export async function inspect(project) {
         reviewedAppModelDeclarations.add(start + index);
         findings.push(finding('stored-app-model', 'review', 'This SwiftUI App appears to retain AppModel. Keep App structural and signal the shared model from the application lifecycle callback.', file, lineOf(source, start + index)));
       }
-      const bodyStart = sceneBodyStart(members, signatures);
-      if (bodyStart !== null) {
+      for (const bodyStart of sceneBodyStarts(members, signatures)) {
         const body = braceBody(members, bodyStart - 1);
         inspectEnvironmentProviders('App.body', body, file, source, start + bodyStart, members);
         const conditional = /(?<!#)\b(?:if|switch)\b/.exec(body);

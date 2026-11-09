@@ -1097,6 +1097,25 @@ test('checks the app scene body even when a nested scene declares body first', a
   assert.ok(findings.some(item => item.code === 'app-startup-presentation' && item.file === file && item.line === 7));
 });
 
+test('checks App scene bodies across compilation branches', async t => {
+  const file = 'Application/ExampleApp.swift';
+  const root = await fixture(t, {
+    [file]: `struct ExampleApp: App {
+      #if DEBUG
+      var body: some Scene { WindowGroup { DebugShell() } }
+      #else
+      var body: some Scene { WindowGroup { ReleaseShell() } }
+      #endif
+    }`,
+    'Application/ReleaseShell.swift': `struct ReleaseShell: View {
+      var body: some View { if storageReady { Tabs() } else { ProgressView() } }
+    }`
+  });
+  const {findings} = await inspect(root);
+  assert.deepEqual(findings.filter(item => item.code === 'root-storage-gate')
+    .map(item => [item.file, item.line]), [['Application/ReleaseShell.swift', 2]]);
+});
+
 test('flags conditional database startup presentation in App.body', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
