@@ -450,7 +450,14 @@ remain pending and preclude a completed whole-app assessment.
 For each relevant operation, inspect:
 
 - Repetition and ordering: overlapping refreshes, changing search queries, writes
-  and pagination. Who decides whether to deduplicate, replace, queue or combine?
+  and pagination. Locate the owner of the overlap policy. For CFA, apply the
+  [overlapping-call rule](spec/rules/cfa-task-01.md) at the Feature boundary.
+  Check whether one execution really satisfies equivalent callers. Where each
+  command must take effect, submit two identical inputs and verify that both
+  execute in admission order across suspension and return their own outcomes.
+  Check that failure or cancellation of a predecessor follows the documented
+  policy and leaves later calls and task cleanup consistent. Record the product
+  reason for policies such as latest-request-wins.
 - Lifetime: navigation away, observation ending, sign-out and account changes.
   Work may intentionally outlive a screen; establish its owner and purpose.
 - Background work: trace registration, scheduling, system delivery and the
