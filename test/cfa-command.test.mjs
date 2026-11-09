@@ -108,7 +108,8 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /Verify that existing data handoffs still work/);
   assert.match(content, /Route URLSession requests through NetworkingManager/);
   assert.match(content, /Composition code may\s+configure and inject the session/);
-  assert.match(content, /In new apps, start with a stateless value type/);
+  assert.match(content, /Keep response validation and decoding\s+with each Feature-specific API adapter/);
+  assert.match(content, /In new apps, start with a stateless\s+value type/);
   assert.match(content, /independent requests able to progress in parallel/);
   assert.match(content, /#Preview \{ NotesEditorView\(\) \}/);
   assert.match(content, /default Feature dependency comes\s+from AppModel\.shared/);

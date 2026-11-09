@@ -227,11 +227,13 @@ skill from that toolkit before changing the project.
   where the context is created and that expensive work executes off MainActor.
   Keep any deliberately UI-owned context limited to work proven short.
 - Route URLSession requests through NetworkingManager. Composition code may
-  configure and inject the session. In new apps, start with a stateless value type when it meets the session and concurrency requirements.
+  configure and inject the session. Keep response validation and decoding
+  with each Feature-specific API adapter. In new apps, start with a stateless
+  value type when it meets the session and concurrency requirements.
   Keep independent requests able to progress in parallel unless an explicit
   policy limits them. An actor can protect shared request state while another
-  request starts during a suspended call. Check for an actual wait before
-  changing the isolation. When changing networking, hold one response open and
+  request starts during a suspended call. Check request limits and session
+  configuration and measure the suspected wait before changing isolation. When changing networking, hold one response open and
   verify that an independent request reaches the transport before it completes.
 - Keep domain-specific microservices beside the Feature that naturally owns
   their responsibility, even when another Feature uses them. Move broadly
