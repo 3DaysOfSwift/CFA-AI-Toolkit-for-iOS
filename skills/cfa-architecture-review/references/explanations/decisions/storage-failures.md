@@ -7,7 +7,9 @@ Status: documented basis with editorial analysis; not a founder-approved histori
 
 ## Rule
 
-Present the stable root interface independently of storage readiness. Open storage lazily within a data request and report failure through the owning Feature and screen, with intentional retry.
+Present the stable root interface independently of storage readiness. Open storage lazily within a data request and report failure through the owning Feature and screen, with intentional retry. If a recognised saved preference contains an obsolete
+non-critical value, use the product’s safe fallback without interrupting the
+user. For example, a retired colour theme can fall back to system appearance.
 
 ## Problem
 
@@ -15,7 +17,11 @@ An app-level launch-error gate makes Settings and unrelated capabilities disappe
 
 ## Documented rationale
 
-The specification explicitly confines the failure to the request that needs the data and keeps independent navigation usable. The storage owner—not the View—owns directory preparation and opening.
+The specification explicitly confines the failure to the request that needs the data and keeps independent navigation usable. The storage owner handles directory preparation and opening. An obsolete theme
+in a readable store is a compatibility case. Preserve the saved value where
+appropriate until an intentional migration or a successful user choice
+replaces it. Report unreadable or corrupt storage and failed writes through
+the affected workflow.
 
 ## Trade-offs and alternatives
 
@@ -34,6 +40,9 @@ the same root and previously saved data. Separately fail a refresh and verify
 that already loaded content remains usable. Report which runtime checks ran
 and which were unavailable. A fake fetch establishes only the behaviour of
 the layers it exercises.
+
+Separately restore a retired theme from a valid store and check that system
+appearance is applied without an error or an unintended write.
 
 ## Evidence and provenance
 
