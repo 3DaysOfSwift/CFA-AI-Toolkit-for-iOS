@@ -46,6 +46,9 @@ function braceBody(source, openingBrace) {
   return source.slice(openingBrace + 1);
 }
 
+const identifier = '[\\p{L}_][\\p{L}\\p{M}\\p{N}_]*';
+const propertyNamePattern = '(?:`(' + identifier + ')`|(' + identifier + '))';
+
 // Keep only direct member signatures. Mask method/nested-type bodies without
 // changing offsets, so a nested example cannot satisfy the screen's ownership.
 function memberSignatures(body) {
@@ -526,9 +529,9 @@ export async function inspect(project) {
       const start = view.index + view[0].length;
       const body = braceBody(source, start - 1);
       inspectScreenInputs(view[1], body, source, start, file, findings);
-      for (const match of memberSignatures(body).matchAll(/\b(?:let|var)\s+(\w+)\s*(?::\s*(?:Swift\s*\.\s*)?Task\s*<|(=\s*(?:Swift\s*\.\s*)?Task\b))/g)) {
+      for (const match of memberSignatures(body).matchAll(new RegExp(`\\b(?:let|var)\\s+${propertyNamePattern}\\s*(?::\\s*(?:Swift\\s*\\.\\s*)?Task\\s*<|(=\\s*(?:Swift\\s*\\.\\s*)?Task\\b))`, 'gu'))) {
         const suffix = body.slice(match.index + match[0].length);
-        if (match[2]) {
+        if (match[3]) {
           const genericStart = /^\s*</.exec(suffix);
           const close = genericStart ? closingGenericArguments(suffix, genericStart[0].length - 1) : -1;
           const call = suffix.slice(close + 1);
@@ -537,7 +540,7 @@ export async function inspect(project) {
           const close = closingGenericArguments(body, match.index + match[0].length - 1);
           if (close >= 0 && hasComputedAccessor(body.slice(close + 1).replace(/^\s*[?!]/, ''))) continue;
         }
-        findings.push(finding('screen-task-handle', 'review', `${view[1]} declares ${match[1]} with a possible Task handle. If it stores the handle, move task ownership to the ViewModel.`, file, lineOf(source, start + match.index)));
+        findings.push(finding('screen-task-handle', 'review', `${view[1]} declares ${match[1] ?? match[2]} with a possible Task handle. If it stores the handle, move task ownership to the ViewModel.`, file, lineOf(source, start + match.index)));
       }
       if (isViewFile && rootViewNames.has(view[1])) continue;
       const access = findFeatureAccess(body);
@@ -628,8 +631,6 @@ export async function inspect(project) {
     const testFile = testCandidates.length === 1 ? testCandidates[0] : null;
     const viewModelTypePattern = `(?:(?:\\w+\\s*\\.\\s*)*${viewModelName})`;
     const stateTypePattern = `(?:SwiftUI\\s*\\.\\s*)?State`;
-    const identifier = '[\\p{L}_][\\p{L}\\p{M}\\p{N}_]*';
-    const propertyNamePattern = '(?:`(' + identifier + ')`|(' + identifier + '))';
     const statePattern = new RegExp(`@${stateTypePattern}\\s+private\\s+var\\s+${propertyNamePattern}(?:\\s*:\\s*${viewModelTypePattern})?\\s*=\\s*${viewModelTypePattern}(?:\\s*\\.\\s*init)?\\s*\\(\\s*\\)(?!\\s*\\.)`, 'u');
     const typedStatePattern = new RegExp(`@${stateTypePattern}\\s+private\\s+var\\s+${propertyNamePattern}\\s*:\\s*${viewModelTypePattern}\\s*=\\s*\\.init\\s*\\(\\s*\\)(?!\\s*\\.)`, 'u');
     const inlineState = statePattern.exec(members) ?? typedStatePattern.exec(members);

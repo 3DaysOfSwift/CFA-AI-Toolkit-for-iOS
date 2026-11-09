@@ -377,10 +377,10 @@ test('flags possible screen-owned task handles without flagging lifecycle tasks'
   const { report } = await inspectView(t, `struct HomeView: View {
     @State private var viewModel = HomeViewModel()
     @State private var refreshTask: Task<Void, Never>?
-    private let otherTask = Task {}
+    private let \`repeat\` = Task {}
     private let cancellation = Task.isCancelled
     private let typedCancellation = Task<Never, Never>.isCancelled
-    private let detachedTask = Task<Void, Never>.detached {}
+    private let tâche = Task<Void, Never>.detached {}
     var body: some View {
       Text("Home").task {
         let localTask = Task {}
