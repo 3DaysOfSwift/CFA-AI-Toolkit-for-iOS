@@ -46,8 +46,10 @@ approve routine moves. Update target membership and references, preserve the
 product and verify the affected builds and tests.
 
 Re-audit the changed areas and the full scoped placement map after corrections;
-repeat while actionable deviations remain. Finish when no known in-scope,
-correctable deviations remain and required verification is complete. If an
+repeat while actionable deviations remain. Before calling the scoped migration
+complete, satisfy the [migration completion gate](cfa-change-gate.md#migration-progress-and-completion-language).
+The final source audit supplies evidence for that gate. The completion record
+also requires manual behaviour regression and a human architecture review. If an
 actual dependency, incompatible requirement or unavailable verification blocks
 completion, continue independent work and state the specific remaining issue
 and evidence. Do not claim whole-project compliance beyond what was inspected
