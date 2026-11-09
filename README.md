@@ -508,7 +508,7 @@ This section is for AI coding assistants (Codex, Claude Code, Cursor and others)
 
 **Canonical sources, in this order**
 
-1. [`architecture/cfa-specification.md`](architecture/cfa-specification.md): the canonical architecture.
+1. [`architecture/cfa-specification.md`](architecture/cfa-specification.md): the canonical architecture. The [reading map](architecture/spec/README.md) points to generated topics, rule summaries and working examples.
 2. [`architecture/swift-coding-guide.md`](architecture/swift-coding-guide.md): Swift standards.
 3. [`architecture/cfa-change-gate.md`](architecture/cfa-change-gate.md): the invariants to keep and the completion record a change needs.
 4. [`architecture/project-workflow.md`](architecture/project-workflow.md): commit existing work first, and record the workflow mode once.
@@ -519,7 +519,7 @@ This section is for AI coding assistants (Codex, Claude Code, Cursor and others)
 **Rules to keep in every change**
 
 - Path: View → dedicated ViewModel → Feature → Microservices. These supporting services can include repositories, networking and device API adapters. Views never receive ViewModels, Features, AppModel or repositories.
-- Each screen owns a private ViewModel, created inline with `@State` by default. A detail View may initialise its own State-backed ViewModel from selected value data. The ViewModel defaults its narrow Feature dependencies from `AppModel.shared`.
+- Each screen owns its ViewModel in a private `@State` property named `viewModel`, created inline by default. A detail View may initialise its own State-backed ViewModel from selected value data. The ViewModel defaults its narrow Feature dependencies from `AppModel.shared`.
 - Features are concrete `@MainActor` classes named `…Feature`, with no matching protocol. Use `@Observable` when a Feature exposes UI-observed state. Features are never called Managers.
 - Features keep domain data, operation state and errors as separate values. Never use a `LoadState` enum that carries all three.
 - Each Feature defines its overlapping-call policy: share requests when one execution satisfies every caller; queue commands that must each take effect, even if their inputs match. Keep task ownership and completion explicit.
