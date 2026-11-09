@@ -220,6 +220,9 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
                    !item.targets.some(target => gate.affectedTargets.includes(target))) {
           warnings.push(`evidence.${item.id}: link the named test targets to the affected application targets they exercise.`);
         } else if (field === 'manualBehaviourRegressionEvidenceId') {
+          if (!item.environment) {
+            warnings.push(`evidence.${item.id}: record the manual regression build configuration, OS and device or simulator.`);
+          }
           if (!item.targets?.length) {
             warnings.push(`evidence.${item.id}: list the affected targets exercised by the manual regression.`);
           } else if (!item.targets.some(target => gate.affectedTargets.includes(target))) {

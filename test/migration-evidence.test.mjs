@@ -276,7 +276,13 @@ test('completion is not inferred from a build pass or tests at a different commi
     environment: 'App Debug, oldest supported OS'
   };
   const rerun = f.record.evidence.find(item => item.id === 'after-behaviour-regression');
+  rerun.environment = null;
+  f.write();
+  const environmentWarning = 'record the manual regression build configuration, OS and device or simulator';
+  assert.ok(inspectRecord(f.file).warnings.some(warning => warning.includes(environmentWarning)));
   rerun.environment = failedRegression.environment;
+  f.write();
+  assert.ok(!inspectRecord(f.file).warnings.some(warning => warning.includes(environmentWarning)));
   f.record.evidence.push(failedRegression);
   f.record.evidence.push({
     ...failedRegression, id:'earlier-regression', phase:'during', commit:'c'.repeat(40)
