@@ -207,7 +207,18 @@ export async function inspect(project) {
       }
     }
     for (const match of appMembers.matchAll(/(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(?:(?:private(?:\(set\))?|fileprivate|internal|public|package)[ \t]+)?(?:let|var)[ \t]+(\w+)[ \t]*=(?!=)/gm)) {
-      findings.push(finding('app-model-default-value', 'warning', `AppModel property ${match[1]} has a default value; initialise it in the explicit initializer.`, appModelFile, lineOf(appModel, match.index)));
+      const line = lineOf(appModel, match.index);
+      findings.push(finding('app-model-default-value', 'warning', `AppModel property ${match[1]} has a default value; initialise it in the explicit initializer.`, appModelFile, line));
+      const start = match.index + match[0].length;
+      const constructor = /^[ \t]*(?:\w+\s*\.\s*)*([A-Z]\w*)\s*\(/.exec(appModel.slice(start));
+      if (!constructor) continue;
+      const close = closingParenthesis(appModel, start + constructor[0].length - 1);
+      if (close < 0 || /^\s*(?:[.\[]|as[?!]?\b)/.test(appModel.slice(close + 1))) continue;
+      const type = constructor[1];
+      const declarations = declarationsByName.get(type) || [];
+      if (declarations.length !== 1 || featureTypeSuffix.test(type) ||
+          /(?:^|\/)Features\/[^/]+\//.test(declarations[0].file)) continue;
+      findings.push(finding('app-model-non-feature-state', 'review', `AppModel appears to store ${match[1]} from ${type} construction. Verify the inferred type and keep lower-level services local to live() and injected into Features.`, appModelFile, line));
     }
     for (const match of appMembers.matchAll(/(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(private[ \t]+)?(?:(?:private\(set\)|fileprivate|internal|public|package)[ \t]+)?(?:let|var)[ \t]+(\w+)[ \t]*:[ \t]*(?:any[ \t]+)?(?:\w+[ \t]*\.[ \t]*)*(\w+)(?:<[^;\n=]*>)?[?!]?([ \t]*=(?!=))?/gm)) {
       const [, privateModifier, name, type, defaultValue] = match;

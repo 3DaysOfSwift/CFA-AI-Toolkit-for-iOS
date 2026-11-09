@@ -414,6 +414,22 @@ test('requests review of an AppModel task without assuming its purpose', async t
   assert.match(listener.message, /stops or is replaced/);
 });
 
+test('reviews directly constructed services stored in AppModel with inferred types', async t => {
+  const file = 'Application/2 - AppModel/AppModel.swift';
+  const root = await fixture(t, {
+    [file]: `final class AppModel {
+      private let networking = Transport.NetworkingManager()
+      private let settingsFeature = SettingsFeature()
+      private let derived = NetworkingManager().feature
+      static func live() -> AppModel { let service = NetworkingManager(); return AppModel() }
+    }`,
+    'Application/NetworkingManager.swift': 'struct NetworkingManager {}',
+    'Application/SettingsFeature.swift': 'final class SettingsFeature {}'
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'app-model-non-feature-state');
+  assert.deepEqual(findings.map(({file, line, severity}) => [file, line, severity]), [[file, 2, 'review']]);
+});
+
 test('inspects AppModel properties regardless of indentation', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel {\n  private var twoSpaceTask: Task<Void, Never>?\n\tprivate var tabTask: Task<Void, Never>?\n        private var unexpectedCache: String\n    static func live() -> AppModel { AppModel() }\n}'
