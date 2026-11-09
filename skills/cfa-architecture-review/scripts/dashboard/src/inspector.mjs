@@ -666,8 +666,9 @@ export async function inspect(project) {
     const members = memberSignatures(body);
     const viewModelName = `${name}Model`;
     const viewModelFile = viewFile.replace(/View\.swift$/, 'ViewModel.swift');
-    const viewModel = sources.get(viewModelFile);
-    const viewModelDeclaration = viewModel && new RegExp(`\\bclass\\s+${viewModelName}\\b[^\\{]*\\{`).exec(viewModel);
+    const candidateViewModel = sources.get(viewModelFile);
+    const viewModelDeclaration = candidateViewModel && new RegExp(`\\bclass\\s+${viewModelName}\\b[^\\{]*\\{`).exec(candidateViewModel);
+    const viewModel = viewModelDeclaration ? candidateViewModel : undefined;
     const viewModelBodyStart = viewModelDeclaration ? viewModelDeclaration.index + viewModelDeclaration[0].length : 0;
     const viewModelBody = viewModelDeclaration ? braceBody(viewModel, viewModelBodyStart - 1) : '';
     for (const initializer of typeInitializers(viewModelBody)) {
@@ -720,7 +721,7 @@ export async function inspect(project) {
       }
     }
     if (viewModel) {
-      for (const match of viewModel.matchAll(/\bAppModel\s*\.\s*shared\s*\.\s*(\w+)/g)) {
+      for (const match of viewModelBody.matchAll(/\bAppModel\s*\.\s*shared\s*\.\s*(\w+)/g)) {
         const property = match[1];
         const exposure = appProperties.get(property);
         const featureType = exposure?.type ?? null;
@@ -729,8 +730,8 @@ export async function inspect(project) {
         const featureSource = featureFile ? sources.get(featureFile) : '';
         const collaborators = [...featureSource.matchAll(/\b(?:private\s+)?let\s+\w+\s*:\s*(?:any\s+)?(\w+(?:Repository|Provider|Responding|Client|Store|Service))\b/g)]
           .map(item => item[1]);
-        dependencies.push({ property, featureType, featureFile, collaborators: [...new Set(collaborators)], line: lineOf(viewModel, match.index) });
-        if (!exposure) findings.push(finding('unresolved-feature', 'review', `${viewModelName} references AppModel.shared.${property}, but the inspector could not resolve it in the primary AppModel declaration. Check extensions, inferred types and target membership.`, viewModelFile, lineOf(viewModel, match.index)));
+        dependencies.push({ property, featureType, featureFile, collaborators: [...new Set(collaborators)], line: lineOf(viewModel, viewModelBodyStart + match.index) });
+        if (!exposure) findings.push(finding('unresolved-feature', 'review', `${viewModelName} references AppModel.shared.${property}, but the inspector could not resolve it in the primary AppModel declaration. Check extensions, inferred types and target membership.`, viewModelFile, lineOf(viewModel, viewModelBodyStart + match.index)));
         else if (!candidates.length) findings.push(finding('feature-source-missing', 'review', `${featureType} is exposed by AppModel, but the inspector could not locate its declaration. Check aliases, generated code and target membership.`, appModelFile, exposure.line));
         if (exposure && featureTypeSuffix.test(featureType)) {
           for (const local of viewModelMembers.matchAll(/\b(?:let|var)\s+(\w+)\s*:\s*(?:any\s+)?(\w+Feature(?:API)?)\b(?!\s*\.)/g)) {
