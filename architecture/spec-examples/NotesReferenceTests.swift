@@ -123,7 +123,9 @@ actor HeldNotesLoad: NotesRepository {
         precondition(retryModel.loadError == nil && retryFeature.notes.map(\.text) == ["Previously saved"])
 
         let repository = ControlledNotes()
-        let feature = NotesFeature(repository: repository)
+        let isolatedAppModel = AppModel(notesFeature: NotesFeature(repository: repository))
+        let secondAppModel = AppModel(notesFeature: NotesFeature(repository: ControlledNotes()))
+        let feature = isolatedAppModel.notesFeature
         let model = NotesEditorViewModel(notesFeature: feature)
         model.text = "  "
         let empty = await model.save().value
@@ -135,6 +137,7 @@ actor HeldNotesLoad: NotesRepository {
         model.text = "retry"
         let success = await model.save().value
         precondition(success && model.text.isEmpty && feature.notes.map(\.text) == ["retry"])
+        precondition(secondAppModel.notesFeature.notes.isEmpty, "An isolated AppModel owns a separate Feature graph")
         let confirmedBeforeFailure = feature.notes
         model.text = "fail"
         let failedBeforeDiscard = await model.save().value
