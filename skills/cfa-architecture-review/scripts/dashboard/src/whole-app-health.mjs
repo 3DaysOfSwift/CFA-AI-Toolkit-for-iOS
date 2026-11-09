@@ -270,7 +270,7 @@ export async function prepare(root, output, syntaxProvider = collectSyntax, opti
     },
     files: report.files.map(file=>({file:file.path,status:'pending'})),
     entryPoints: inventoryCandidates(report).map(site=>({siteId:site.id,file:site.file,line:site.line,column:site.column,kind:site.kind,status:'pending'})),
-    taskSites: taskCandidates(report).map(site=>({siteId:site.id,file:site.file,line:site.line,kind:site.kind,status:'pending'})),
+    taskSites: taskCandidates(report).map(site=>({siteId:site.id,file:site.file,line:site.line,column:site.column,kind:site.kind,status:'pending'})),
     operations: {status:'pending', note:'Discover and trace user actions and system events, including operations the scanner cannot detect.'}
   };
   await fs.writeFile(path.join(output,'checklist.json'),JSON.stringify(checklist,null,2)+'\n',{flag:'wx'});

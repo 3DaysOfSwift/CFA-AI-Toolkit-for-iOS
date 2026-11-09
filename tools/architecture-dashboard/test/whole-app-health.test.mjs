@@ -507,12 +507,14 @@ test('retains test-named directories in subsequent scans when explicitly include
   await fs.writeFile(path.join(project,helper),'struct ProductionHelper {}\n');
   const syntax = async (_root, {includeTests}) => ({
     status:'available', files:includeTests ? ['App.swift',helper] : ['App.swift'],
-    items:[], warnings:[]
+    items:includeTests ? [5, 15].map(column => ({kind:'concurrency.task',file:helper,line:1,column})) : [], warnings:[]
   });
   const output = path.join(base,'inventory');
   const inventory = await prepare(project,output,syntax,{includeTests:true});
   assert.deepEqual(inventory.scope.excludedTestDirectories,[]);
   assert.ok(inventory.files.some(file => file.path === helper));
+  const checklist = JSON.parse(await fs.readFile(path.join(output,'checklist.json'),'utf8'));
+  assert.deepEqual(checklist.taskSites.map(site => site.column), [5, 15]);
   const work = await next(project,path.join(output,'review-draft.json'),syntax);
   assert.ok(work.nextFiles.includes(helper));
   assert.ok(!work.gaps.some(gap => gap.includes('different files')));
