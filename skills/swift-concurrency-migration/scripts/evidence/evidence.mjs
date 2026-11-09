@@ -189,8 +189,11 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
       const rerun = record.evidence.find(candidate => candidate.rerunOf === item.id &&
         candidate.kind === item.kind && candidate.outcome === 'passed' &&
         candidate.phase === 'after' && candidate.commit === record.repository.afterCommit);
-      const check = rerun ? `verify linked rerun ${rerun.id}` : 'identify a passing rerun';
-      warnings.push(`evidence.${item.id}: failed ${timing}; ${check} at the final commit for the same scenario, target, build configuration and OS before accepting completion.`);
+      if (!rerun) {
+        errors.push(`evidence.${item.id}: failed ${timing}; link a passing rerun at afterCommit before marking the migration completed.`);
+      } else {
+        warnings.push(`evidence.${item.id}: failed ${timing}; verify linked rerun ${rerun.id} covers the same scenario, target, build configuration and OS before accepting completion.`);
+      }
     }
     if (!record.repository.afterCommit) errors.push('result: completed requires a pinned afterCommit');
     for (const kind of ['build', 'test']) if (!record.evidence.some(item => item.kind === kind && item.phase === 'after' && item.outcome === 'passed' && item.commit === record.repository.afterCommit)) errors.push(`result: completed requires a passed after ${kind} at afterCommit; otherwise use partial`);

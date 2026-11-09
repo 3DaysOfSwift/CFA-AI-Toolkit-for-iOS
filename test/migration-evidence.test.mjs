@@ -343,6 +343,15 @@ test('completion is not inferred from a build pass or tests at a different commi
   rerun.environment = failedRegression.environment;
   f.write();
   assert.ok(!inspectRecord(f.file).warnings.some(warning => warning.includes(mismatch)));
+  assert.ok(inspectRecord(f.file).errors.includes(
+    'evidence.earlier-regression: failed during migration; link a passing rerun at afterCommit before marking the migration completed.'
+  ));
+  const earlierRerun = {...rerun, id: 'rerun-earlier-regression', rerunOf: 'earlier-regression'};
+  f.record.evidence.push(earlierRerun);
+  earlierRerun.commit = 'c'.repeat(40);
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.startsWith('evidence.earlier-regression:')));
+  earlierRerun.commit = f.record.repository.afterCommit;
   f.seal();
   assert.equal(inspectRecord(f.file).valid, true);
   assert.ok(!inspectRecord(f.file).warnings.some(warning => warning.includes('list the affected targets exercised by the manual regression')));
