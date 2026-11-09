@@ -44,8 +44,9 @@ development, App Creation guides product shaping without expanding this task.
 
 If the project is already CFA, make the smallest complete vertical change:
 
-1. Add or change the feature-owned domain behaviour in its Feature and
-   repository boundary. Keep unsaved editor values in the screen ViewModel.
+1. Add or change the domain behaviour in its owning Feature. Use the
+   Feature's microservices for networking, storage or device APIs as needed.
+   Keep unsaved editor values in the screen ViewModel.
    Publish a durable edit as saved only after required persistence succeeds.
    On failure, keep the draft available for retry and leave confirmed state
    unchanged. For a replaceable download, publish current server data and let
