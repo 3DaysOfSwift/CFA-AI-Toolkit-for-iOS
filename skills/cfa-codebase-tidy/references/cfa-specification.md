@@ -1902,6 +1902,8 @@ Before accepting a change, answer every question:
       surfaces the failure and preserves the original data.
     - For replaceable downloads, can refresh proceed independently of cache
       restoration and complete without waiting for an optional cache write?
+      For independent sources, finish one source’s refresh before restoring
+      and verify that another source can still restore its usable cached data.
       Verify that a late restore or delayed write cannot replace fresher data,
       that a failed refresh keeps valid displayed data, and that a failed cache
       write preserves the last usable cache without claiming the new data is

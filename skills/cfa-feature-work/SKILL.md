@@ -111,7 +111,9 @@ If the project is already CFA, make the smallest complete vertical change:
    [optional snapshot rule](references/spec/rules/cfa-cache-01.md). Publish
    current server data and return the refresh result while optional caching
    proceeds independently. If changing this path, hold the cache write open
-   in a test and verify both publication and caller completion.
+   in a test and verify both publication and caller completion. For independent
+   sources, complete one refresh before restoration and verify that cached
+   data from other sources remains usable.
    For changed asynchronous operations, apply the
    [overlapping-call rule](references/spec/rules/cfa-task-01.md). Share one
    execution when it can satisfy equivalent callers. Queue commands that
