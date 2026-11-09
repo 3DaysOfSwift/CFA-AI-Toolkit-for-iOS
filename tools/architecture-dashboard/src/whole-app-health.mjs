@@ -139,7 +139,7 @@ export function coverageGaps(report, review) {
       const op=operations.find(item=>item.id===entry.operationId);
       if (!op || !op.evidence.some(ref=>ref.file===site.file && ref.line<=site.line && ref.endLine>=site.line)) throw Error('Operation evidence must include its reconciled task site.');
       const traced = op.steps?.some(step =>
-        step.relation !== 'unknown' && step.evidence?.some(ref =>
+        step.relation !== 'event' && step.relation !== 'unknown' && step.evidence?.some(ref =>
           ref.file === site.file && ref.line <= site.line && ref.endLine >= site.line
         )
       );

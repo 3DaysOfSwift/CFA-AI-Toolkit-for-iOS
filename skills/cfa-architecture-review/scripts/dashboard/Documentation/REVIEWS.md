@@ -281,8 +281,9 @@ synchronous action can have a single event step if it completes there. Every ste
 and relation `same-task`, `child-task`, `unstructured-task`, `framework-task`,
 or `unknown`. These are reviewer-authored relationships, not an inferred call
 graph. Cite each task site assigned to an operation in that operation’s workflow
-steps as well as its overall evidence. Include synchronous events and preserve
-unknown boundaries.
+steps as well as its overall evidence. When a task site is also the trigger,
+cite it in both the event step and a subsequent step that explains how the
+work runs. Include synchronous events and preserve unknown boundaries.
 
 ## Whole-app Health Check file batches
 
