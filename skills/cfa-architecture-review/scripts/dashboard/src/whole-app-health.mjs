@@ -141,7 +141,7 @@ export function inventoryCandidates(report) {
     if (!kind) continue;
     const key=JSON.stringify([item.file,item.line,kind]);
     if (available.get(key)) { available.set(key,available.get(key)-1); continue; }
-    candidates.push({id:`syntax:${item.file}:${item.line}:${item.column}:${kind}`,kind,file:item.file,line:item.line,label:`SwiftSyntax ${item.kind}`});
+    candidates.push({id:`syntax:${item.file}:${item.line}:${item.column}:${kind}`,kind,file:item.file,line:item.line,column:item.column,label:`SwiftSyntax ${item.kind}`});
   }
   return candidates;
 }
@@ -255,7 +255,7 @@ export async function prepare(root, output, syntaxProvider = collectSyntax, opti
       buildDefinitionPaths: report.scope.buildDefinitionPaths
     },
     files: report.files.map(file=>({file:file.path,status:'pending'})),
-    entryPoints: inventoryCandidates(report).map(site=>({siteId:site.id,file:site.file,line:site.line,kind:site.kind,status:'pending'})),
+    entryPoints: inventoryCandidates(report).map(site=>({siteId:site.id,file:site.file,line:site.line,column:site.column,kind:site.kind,status:'pending'})),
     taskSites: taskCandidates(report).map(site=>({siteId:site.id,file:site.file,line:site.line,kind:site.kind,status:'pending'})),
     operations: {status:'pending', note:'Discover and trace user actions and system events, including operations the scanner cannot detect.'}
   };

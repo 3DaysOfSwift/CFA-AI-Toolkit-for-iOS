@@ -233,6 +233,7 @@ test('syntax entry points join the inventory without duplicating lexical finding
   review.entryPoints.push({siteId:candidates.find(c=>c.kind==='main').id, operationId:'launch'});
   const openingSites = candidates.filter(c=>['incoming-link','notification-response'].includes(c.kind));
   assert.equal(openingSites.length,2);
+  assert.deepEqual(openingSites.map(site => site.column), [2, 3]);
   assert.deepEqual(nextWork(combined,review).nextEntryPoints,[background,...openingSites]);
   review.entryPoints.push({siteId:background.id, excludedReason:'Registration belongs to a test-only target.'});
   for (const site of openingSites) review.entryPoints.push({siteId:site.id, operationId:'launch'});
