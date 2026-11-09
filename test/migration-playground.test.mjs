@@ -168,3 +168,70 @@ extension WeightLogFeature { var testSaveID: UUID? { lastSaveID } }
     assert.equal(run.status, 0, run.stderr || run.error?.message);
   } finally { fs.rmSync(dir, {recursive:true, force:true}); }
 });
+
+test('Callback Networking starts an independent request while another is pending', {skip:process.platform !== 'darwin', timeout:120000}, () => {
+  const page = fs.readFileSync(path.join(root, 'examples/migration/Callback Networking/After.playground/Contents.swift'), 'utf8');
+  const implementation = page.slice(page.indexOf('struct NetworkingManager'), page.indexOf('// MARK: - Test fixtures'));
+  const source = `import Foundation
+${implementation}
+final class ControlledTransport: URLProtocol, @unchecked Sendable {
+    static let heldRequestStarted = AsyncStream<Void>.makeStream(bufferingPolicy: .bufferingNewest(1))
+
+    override class func canInit(with request: URLRequest) -> Bool { true }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+
+    override func startLoading() {
+        guard let url = request.url else {
+            client?.urlProtocol(self, didFailWithError: URLError(.badURL))
+            return
+        }
+        if url.path == "/held" {
+            Self.heldRequestStarted.continuation.yield(())
+            return
+        }
+        let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
+        client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+        client?.urlProtocol(self, didLoad: Data(#"{"name":"Artemis"}"#.utf8))
+        client?.urlProtocolDidFinishLoading(self)
+    }
+
+    override func stopLoading() {}
+}
+
+@main struct Runner {
+    static func main() async throws {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [ControlledTransport.self]
+        configuration.timeoutIntervalForRequest = 60
+        let session = URLSession(configuration: configuration)
+        defer { session.invalidateAndCancel() }
+
+        let api = LaunchAPI(networkingManager: NetworkingManager(session: session))
+        let held = Task { try await api.download(from: URL(string: "https://example.invalid/held")!) }
+        defer { held.cancel() }
+        var starts = ControlledTransport.heldRequestStarted.stream.makeAsyncIterator()
+        _ = await starts.next()
+
+        let independent = try await api.download(from: URL(string: "https://example.invalid/independent")!)
+        precondition(independent.name == "Artemis")
+
+        held.cancel()
+        do {
+            _ = try await held.value
+            preconditionFailure("The held request must finish with cancellation")
+        } catch let error as URLError where error.code == .cancelled {}
+    }
+}`;
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfa-network-overlap-'));
+  try {
+    const input = path.join(dir, 'Example.swift');
+    fs.writeFileSync(input, source);
+    const executable = path.join(dir, 'example');
+    const build = spawnSync('xcrun', ['swiftc', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(dir, 'cache'), input, '-o', executable], {encoding:'utf8', timeout:90000});
+    assert.equal(build.status, 0, build.stderr || build.error?.message);
+    const run = spawnSync(executable, [], {encoding:'utf8', timeout:15000});
+    assert.equal(run.status, 0, run.stderr || run.error?.message);
+  } finally {
+    fs.rmSync(dir, {recursive:true, force:true});
+  }
+});

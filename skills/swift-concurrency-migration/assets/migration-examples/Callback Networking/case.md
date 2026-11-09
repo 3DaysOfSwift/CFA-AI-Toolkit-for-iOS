@@ -23,9 +23,10 @@ Open and run `Before.playground` and `After.playground`. Each prints `Passed:` a
 
 ## Boundaries
 
-The local URLProtocol exercises success and error handling with one request at
-a time. For independent requests in a real migration, hold the first response
-open in a controlled transport and verify that the second request reaches the
-transport before the first completes. Preserve deliberate ordering and rate
-limits. See the CFA independent-request rule (`CFA-SPEC-NET-01`). This fixture
-does not exercise cancellation, timeouts or retries.
+The playground’s URLProtocol exercises success and error handling with one
+request at a time. The automated check runs the same provider and
+NetworkingManager with a controlled transport. It holds the first request open,
+verifies an independent request completes, then cancels the held request and
+checks that the caller receives a cancellation error. Real transport timing,
+timeouts and retries are outside the example’s scope. Preserve deliberate
+ordering and rate limits when applying CFA-SPEC-NET-01.
