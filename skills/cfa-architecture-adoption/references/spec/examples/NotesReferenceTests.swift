@@ -132,7 +132,9 @@ actor HeldNotesLoad: NotesRepository {
         precondition(!empty && model.text == "  " && model.saveError == "Enter a note before saving.")
         precondition(feature.notes.isEmpty)
         model.text = "fail"
-        let failure = await model.save().value
+        let failure = await model.save {
+            preconditionFailure("A failed save must leave the editor open")
+        }.value
         precondition(!failure && model.text == "fail" && model.saveError != nil && feature.notes.isEmpty)
         model.text = "retry"
         let success = await model.save().value
@@ -188,10 +190,15 @@ actor HeldNotesLoad: NotesRepository {
         let repeatedTapEditor = NotesEditorViewModel(notesFeature: repeatedTapFeature)
         repeatedTapEditor.text = "first"
         var dismissals = 0
-        let firstTap = repeatedTapEditor.save { dismissals += 1 }
+        let firstTap = repeatedTapEditor.save {
+            precondition(repeatedTapFeature.notes.map(\.text) == ["first"])
+            precondition(repeatedTapEditor.text.isEmpty)
+            dismissals += 1
+        }
         await repeatedTapRepository.waitForFirst()
         let secondTap = repeatedTapEditor.save { dismissals += 1 }
         precondition(repeatedTapEditor.isSaving && repeatedTapFeature.notes.isEmpty)
+        precondition(dismissals == 0 && repeatedTapEditor.text == "first")
         await repeatedTapRepository.release()
         let firstTapSucceeded = await firstTap.value
         let secondTapSucceeded = await secondTap.value
