@@ -271,7 +271,7 @@ export async function inspect(project) {
           const statePropertyNames = typedStateProperties.map(property => property.name);
           if (inlineState) statePropertyNames.push(inlineState[1]);
           const assignsViewModel = statePropertyNames.some(property =>
-            new RegExp(`\\b_?${property}\\s*=`).test(initializerBody)
+            new RegExp(`\\b_?${property}\\s*=(?!=)`).test(initializerBody)
           );
           if (assignsViewModel) {
             findings.push(finding('view-model-initializer-construction', 'review', `${name} assigns ViewModel state in init. Verify it constructs its own ViewModel from selected detail data and does not accept an injected ViewModel.`, viewFile, lineOf(view, bodyOffset + initializer.index)));

@@ -209,3 +209,13 @@ test('recognizes typed State construction with a contextual detail ViewModel ini
     'screen-initializer-inputs', 'view-model-initializer-construction'
   ]);
 });
+
+test('comparing a ViewModel in init does not count as assigning its state', async t => {
+  const { report, findings } = await inspectView(t, `struct HomeView: View {
+    @State private var viewModel = HomeViewModel()
+    init() { _ = viewModel === HomeViewModel() }
+    var body: some View { Text("Home") }
+  }`);
+  assert.equal(report.screens[0].ownsViewModel, true);
+  assert.deepEqual(findings, []);
+});
