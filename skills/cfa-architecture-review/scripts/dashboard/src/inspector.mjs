@@ -681,10 +681,15 @@ export async function inspect(project) {
   const sceneBodyPattern = /\bvar\s+body\s*:\s*some\s+(?:SwiftUI\s*\.\s*)?Scene\s*\{/;
   const rootViewNames = new Set(['ContentView', 'RootTabView', 'RootView']);
   const rootStorageGate = /(?<!#)\b(?:if|guard|switch)\s+[^{};]*\b\w*(?:container|database|storeReady|storageReady|startupError|launchError)\w*\b/i;
+  const rootStartupGate = /(?<!#)\b(?:if|guard|switch)\s+[^{};]*\b\w*(?:isStartingUp|isLaunching|isInitializing|hasLaunched|hasFinishedLaunching|startupPhase|launchPhase|startupState|launchState|startupReady|launchReady)\w*\b/i;
   function inspectRootNavigation(body, file, source, offset) {
     const featureAccess = findFeatureAccess(body);
     if (featureAccess) {
       findings.push(finding('root-feature-access', 'review', 'Root navigation appears to access a Feature directly. Keep refresh and Feature state presentation in the owning screen and its ViewModel.', file, lineOf(source, offset + featureAccess.index)));
+    }
+    const startupGate = rootStartupGate.exec(body);
+    if (startupGate) {
+      findings.push(finding('root-startup-gate', 'review', 'Root navigation branches on possible launch progress. Verify that the root remains available while Features load and that screens present their own loading state.', file, lineOf(source, offset + startupGate.index)));
     }
     const gate = rootStorageGate.exec(body);
     if (gate) {
@@ -990,7 +995,7 @@ export async function inspect(project) {
     const rootScopes = [body, ...(extensionsByName.get(name) ?? []).map(extension => extension.body)];
     const structuralRoot = rootViewNames.has(name)
       && rootScopes.some(scope => /\bTabView\s*[(\{]/.test(scope))
-      && !rootScopes.some(scope => findFeatureAccess(scope) || rootStorageGate.test(scope) || swiftDataAccess.test(scope));
+      && !rootScopes.some(scope => findFeatureAccess(scope) || rootStorageGate.test(scope) || rootStartupGate.test(scope) || swiftDataAccess.test(scope));
     if (!viewModel && !structuralRoot) findings.push(finding('view-model-missing', 'review', `${name} has no adjacent ${viewModelName}. Verify whether it is a screen requiring a dedicated ViewModel or a reusable presentation component.`, viewFile, 1));
     else if (viewModel) {
       if (!ownsViewModel) findings.push(finding('view-model-ownership', 'review', `${name} has no recognized private @State ViewModel storage. Verify that the screen constructs and stores its ViewModel. Detail Views may initialize that stored state from a selected immutable snapshot. A computed property does not satisfy CFA screen ownership.`, viewFile, lineOf(view, declaration.index)));
@@ -1049,7 +1054,7 @@ export async function inspect(project) {
       'This does not type-check Swift or resolve target membership, protocols, runtime behaviour, or test results.',
       'Unusual declarations, macros, generated code, and custom composition routes may be missed.',
       'Screen ownership mapping uses conventionally named screen files and adjacent ViewModels. Explicit initializer input checks include recognized View extensions. Stored-property checks can surface possible implicit memberwise inputs. Confirm aliases and actual call sites in source.',
-      'Root storage-gate detection uses conventional root names and storage identifiers; aliases, helper functions, and blocking overlays require manual failure-path review.',
+      'Root gate detection uses recognised roots and conventional storage and startup identifiers; aliases, helper functions, and blocking overlays require manual failure-path review.',
       'A visible route is not proof that business rules, concurrency, persistence, or UI behaviour are correct.'
     ]
   };

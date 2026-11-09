@@ -1040,6 +1040,23 @@ test('flags storage-gated conventional roots as review hints', async t => {
   assert.match(report.limitations.join(' '), /blocking overlays require manual/);
 });
 
+test('reviews startup progress branches in scene roots only', async t => {
+  const file = 'Application/1 - View/Views/WorkspaceShellView.swift';
+  const root = await fixture(t, {
+    'Application/ExampleApp.swift': 'struct ExampleApp: App { var body: some Scene { WindowGroup { WorkspaceShellView() } } }',
+    [file]: `struct WorkspaceShellView: View {
+      var body: some View {
+        switch startupPhase { case .ready: TabView { ScheduleScreen() }; default: ProgressView() }
+      }
+    }`,
+    'Application/ScheduleScreen.swift': 'struct ScheduleScreen: View { var body: some View { if isLaunching { ProgressView() } } }'
+  });
+  const { findings, screens } = await inspect(root);
+  assert.deepEqual(findings.filter(item => item.code === 'root-startup-gate')
+    .map(item => [item.file, item.line, item.severity]), [[file, 3, 'review']]);
+  assert.equal(screens.find(item => item.name === 'WorkspaceShellView')?.structuralRoot, false);
+});
+
 test('reviews a custom root directly constructed by the app scene', async t => {
   const file = 'Application/Navigation/WorkspaceShell.swift';
   const root = await fixture(t, {
