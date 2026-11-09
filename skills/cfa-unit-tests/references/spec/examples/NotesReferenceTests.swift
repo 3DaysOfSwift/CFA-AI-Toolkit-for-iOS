@@ -269,8 +269,10 @@ actor HeldNotesLoad: NotesRepository {
         await corruptEditor.retryLoad().value
         precondition(corruptEditor.loadError == nil && corruptFeature.notes == afterOverlap)
         precondition(corruptEditor.text == "Keep this draft")
+        let snapshotBeforeSave = corruptFeature.notes
         let recoveredSave = await savingEditor.save().value
         precondition(recoveredSave && savingEditor.loadError == nil)
+        precondition(snapshotBeforeSave == afterOverlap, "An earlier reader keeps its confirmed snapshot")
         precondition(corruptFeature.notes.map(\.text) == afterOverlap.map(\.text) + ["Save after restoration"])
         // Fixed JSON represents an existing store independently of today's encoder.
         let existingStore = folder.appendingPathComponent("existing-notes.json")
