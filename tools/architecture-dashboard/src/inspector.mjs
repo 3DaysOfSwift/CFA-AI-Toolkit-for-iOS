@@ -456,7 +456,7 @@ export async function inspect(project) {
     project: path.basename(root),
     sourceFingerprint: inventory.sourceFingerprint,
     method: 'Lexical source inspection; verify findings against Swift semantics and target membership.',
-    scope: { swiftFiles: inventory.scope.fileCount, screens: screens.length, skipped: inventory.scope.skipped },
+    scope: { swiftFiles: inventory.scope.fileCount, screens: screens.length, skipped: inventory.scope.skipped, symbolicLinkPaths: inventory.scope.symbolicLinkPaths },
     appModelFile: appModelFile ?? null,
     screens,
     findings,
@@ -493,6 +493,8 @@ export function renderInspection(report) {
     for (const item of report.findings) lines.push(`- ${item.severity.toUpperCase()} ${item.code}: ${item.message}${item.file ? ` (${item.file}:${item.line})` : ''}`);
   }
   lines.push('', 'Source scan limits:');
+  for (const {file, reason} of report.scope.skipped ?? []) lines.push(`- Skipped ${file}: ${reason}.`);
+  for (const file of report.scope.symbolicLinkPaths ?? []) lines.push(`- Symbolic link not followed: ${file}. Verify target membership.`);
   for (const limitation of report.limitations) lines.push('- ' + limitation);
   lines.push('Use this map to guide source review. No tests were run.');
   return lines.join('\n');

@@ -669,3 +669,16 @@ test('reports AppModel findings at the correct lines in CR-delimited source', as
   assert.equal(warning?.file, file);
   assert.equal(warning?.line, 2);
 });
+
+test('shows skipped source and unfollowed links in the text inspection', async t => {
+  const root = await fixture(t, {
+    'App.swift': 'struct App {}',
+    'Invalid.swift': Buffer.from([0xff])
+  });
+  await fs.symlink('App.swift', path.join(root,'Linked.swift'));
+  const report = await inspect(root);
+  assert.deepEqual(report.scope.symbolicLinkPaths, ['Linked.swift']);
+  const output = renderInspection(report);
+  assert.match(output, /Skipped Invalid\.swift: Source is not valid UTF-8/);
+  assert.match(output, /Symbolic link not followed: Linked\.swift/);
+});
