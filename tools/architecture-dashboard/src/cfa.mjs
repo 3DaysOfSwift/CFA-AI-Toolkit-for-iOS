@@ -171,14 +171,14 @@ skill from that toolkit before changing the project.
   the shared Model and only its own Views and ViewModels. Each process has its
   own AppModel and Feature instances. Adapt composition and platform services
   for each target while reusing the same business rules. For an App Group
-  widget snapshot, request a timeline reload only after a successful write. Verify a failed write issues
-  no request. WidgetKit controls the
-  reload timing. Send the Watch a separate snapshot through a suitable transfer,
-  such as Watch Connectivity. Build each affected target and check API
-  availability and lifecycle requirements. Separately verify the handoff on
-  supported devices, including
-  how receiving Features refresh their state and handle missing, unreadable,
-  delayed and stale snapshots.
+  widget snapshot, request a timeline reload only after a successful write.
+  Verify that a failed write issues no request. WidgetKit controls reload timing.
+  Send the Watch a separate snapshot through a suitable transfer, such as
+  Watch Connectivity. Build each affected target and check API availability
+  and lifecycle requirements. Separately verify the handoff on supported
+  devices, including how receiving Features refresh their state and handle
+  missing, unreadable, delayed and stale snapshots. If multiple targets can
+  edit the same data, verify the product's conflict policy.
 - Keep Features explicitly on MainActor. Networking, persistence and expensive
   processing use an appropriate service isolation boundary off MainActor by
   default. Keep framework-required MainActor calls in a narrow adapter.
