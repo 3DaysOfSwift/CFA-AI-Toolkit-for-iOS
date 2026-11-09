@@ -18,6 +18,9 @@ current response without waiting for the cache. Try the cache write with a
 bounded retry, preserve any previous good cache on failure, and do not imply the
 new data is available offline unless it was saved. Keep writes ordered so an
 older snapshot cannot replace a newer one.
+Start cache restoration and remote refresh independently when both are needed.
+A late restore cannot replace a newer server response, and a refresh failure
+leaves valid in-memory data available.
 
 Published snapshot structs for API or persisted data use `let` properties and
 represent immutable values. Replace them with newly constructed confirmed

@@ -389,6 +389,11 @@ domain snapshot as needed; encode and decode that snapshot at the cache
 boundary. Do not add SwiftData alongside a JSON cache merely to
 store the same downloaded data.
 
+When both restoration and refresh are needed, start them independently. Allow a
+missing, incompatible or unreadable cache to fall through to the normal
+download. Apply restored data only if a fresher response has not already been
+accepted. Keep valid in-memory data when a refresh fails.
+
 Instant Loading binary snapshots are an advanced opt-in for a sufficiently
 stable format, not a suggestion to make during app creation or migration. Help
 apply them when requested, and safely handle incompatible or corrupt files.
