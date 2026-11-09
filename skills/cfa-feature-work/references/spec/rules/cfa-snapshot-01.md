@@ -10,6 +10,6 @@
 
 **Example:** See the immutable RocketLaunch and nested value types in [Next Rocket Launch](../examples/open-source-apps.md#open-source-ios-apps). The [Notes example](../examples/README.md#notes-reference-feature) shows a confirmed write publishing a new Note.
 
-**Verify:** Inspect stored properties and nested values for mutable references. Trace durable changes through Feature commands and verify that a failed write leaves the published snapshot intact.
+**Verify:** Check that each stored snapshot property is declared with `let`. Inspect nested values and collection elements for references that can change in place. Trace durable changes through the owning Feature. Verify that a failed write leaves the existing snapshot intact and that a successful write publishes a replacement without changing an earlier snapshot held by a reader.
 
 **Full rule, context and examples:** [Give Every Unique Screen Its Own ViewModel](../topics/14-give-every-unique-screen-its-own-viewmodel.md). This card is a reading aid; apply the complete canonical section.
