@@ -67,9 +67,11 @@ results in the report, rather than presenting scanner counts as findings.
    or singleton alone does not prove code compiles in a widget, watchOS or another
    process. For an existing extension or companion app, trace how it obtains
    fresh data in its own process. For a snapshot-backed widget, verify the write
-   completes before requesting a timeline reload. For a Watch companion, trace
-   the transfer and check how the receiver handles missing, delayed or obsolete
-   snapshots. Report build and device evidence separately from source review.
+   completes before requesting a timeline reload and that a failed write issues
+   no reload request. For a Watch companion, trace the separate snapshot transfer
+   to the receiving Feature and verify how it updates its own observable state.
+   Check missing, unreadable, delayed and stale snapshots against the product's
+   policy. Report build and device evidence separately from source review.
    For a proposed target, identify the code and dependencies that would need
    adaptation.
 6. **Actor design:** Identify actors' state, responsibilities, callers and
