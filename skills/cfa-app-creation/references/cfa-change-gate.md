@@ -211,10 +211,13 @@ the architecture:
     and app-wide blocking overlays. Construct the root independently of storage;
     open storage lazily inside a Feature's data request. Before opening a
     file-backed store, its owner prepares the parent directory at the configured
-    store URL. Directory and opening failures follow the request's error path
-    through Feature → ViewModel → feature screen,
-    never a launch/startup error. Retry the domain request, preserve saved data,
-    and keep independent navigation usable.
+    store URL. Directory, opening and fetch failures follow the request's
+    error path through Feature → ViewModel → feature screen. Verify that an
+    initial fetch failure is visible and a failed refresh preserves previously
+    loaded results. Retry the same domain request, reusing an already-open
+    store after a fetch failure. Preserve the configured location and saved
+    data, and verify independent navigation while storage is pending or has
+    failed.
 19. ViewModel methods name the work they perform, not the UI gesture or
     lifecycle signal that triggered it. Use `refresh()`, `save()` or `retry()`;
     never `refreshTapped()`, `savePressed()` or `screenAppeared()`.
