@@ -57,6 +57,22 @@ function closingParenthesis(source, opening) {
   return -1;
 }
 
+function labeledClosureOffset(argumentsText, label) {
+  let depth = 0;
+  let argumentStart = 0;
+  for (const token of argumentsText.matchAll(/[()[\]{},]/g)) {
+    const character = token[0];
+    if (character === '{' && depth === 0 &&
+        argumentsText.slice(argumentStart, token.index).trim().replace(/\s*:\s*$/, ':') === label + ':') {
+      return token.index;
+    }
+    if ('([{'.includes(character)) depth++;
+    if (')]}'.includes(character)) depth--;
+    if (character === ',' && depth === 0) argumentStart = token.index + 1;
+  }
+  return -1;
+}
+
 /** A lexical route inventory, not a Swift compiler or proof of CFA conformance. */
 export async function inspect(project) {
   const root = await fs.realpath(project);
@@ -330,9 +346,10 @@ export async function inspect(project) {
         const closing = closingParenthesis(source, opening);
         if (closing < 0) continue;
         const argumentsText = source.slice(opening + 1, closing);
-        const inlineClosure = /^\s*(?:operation|action)\s*:\s*\{/.exec(argumentsText);
-        if (inlineClosure) {
-          opening += inlineClosure[0].length;
+        const label = task[1] === 'task' ? 'operation' : 'action';
+        const inlineClosure = labeledClosureOffset(argumentsText, label);
+        if (inlineClosure >= 0) {
+          opening += inlineClosure + 1;
         } else {
           const trailingClosure = /^\s*\{/.exec(source.slice(closing + 1));
           if (!trailingClosure) continue;

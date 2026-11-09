@@ -262,7 +262,7 @@ test('reviews independent Tasks inside SwiftUI refresh callbacks', async t => {
       .refreshable(action: {
         Task { await viewModel.refresh() }
       })
-      .task(operation: {
+      .task(id: selection(operation: { Task {} }), priority: .userInitiated, operation: {
         Task { await viewModel.refresh() }
       })
     }
