@@ -584,11 +584,13 @@ test('resolves dependencies from the screen ViewModel and its extensions', async
   const extensionFile = 'App/Presentation/HomeViewModel+History.swift';
   const {report} = await inspectView(t, 'struct HomeView: View { @State private var viewModel = HomeViewModel(); var body: some View { Text("Home") } }', {
     [file]: 'final class HomeViewModel { let home = AppModel.shared.homeFeature }\nfinal class OtherViewModel { let settings = AppModel.shared.settingsFeature }',
-    [extensionFile]: 'extension HomeViewModel {\n func showHistory() { AppModel.shared.historyFeature.load() }\n}',
-    'App/2 - AppModel/AppModel.swift': 'final class AppModel { let homeFeature: HomeFeature; let settingsFeature: SettingsFeature; let historyFeature: HistoryFeature }'
+    [extensionFile]: 'extension HomeViewModel {\n func showHistory() { AppModel.shared.historyFeature.load() }\n func load() { AppModel.shared.networking.request() }\n}',
+    'App/2 - AppModel/AppModel.swift': 'final class AppModel { let homeFeature: HomeFeature; let settingsFeature: SettingsFeature; let historyFeature: HistoryFeature; let networking: NetworkingManager }'
   });
   assert.deepEqual(report.screens[0].dependencies.map(({property, sourceFile, line}) => [property, sourceFile, line]), [
     ['homeFeature', file, 1],
     ['historyFeature', extensionFile, 2]
   ]);
+  const service = report.findings.find(item => item.code === 'view-model-non-feature-dependency');
+  assert.deepEqual([service?.file, service?.line], [extensionFile, 3]);
 });

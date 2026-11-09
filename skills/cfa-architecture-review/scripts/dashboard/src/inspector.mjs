@@ -730,6 +730,10 @@ export async function inspect(project) {
       );
       for (const {property, file, line} of references) {
         const exposure = appProperties.get(property);
+        if (exposure && isKnownNonFeatureType(exposure.type)) {
+          findings.push(finding('view-model-non-feature-dependency', 'review', `${viewModelName} accesses ${exposure.type} through AppModel.shared.${property}. Verify that the ViewModel uses a concrete Feature for this capability.`, file, line));
+          continue;
+        }
         const featureType = exposure?.type ?? null;
         const candidates = declarationsByName.get(featureType) || [];
         const featureFile = candidates.length === 1 ? candidates[0].file : null;
