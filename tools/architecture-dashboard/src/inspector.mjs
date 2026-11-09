@@ -364,7 +364,12 @@ export async function inspect(project) {
       for (const extension of source.matchAll(/\bextension\s+(\w+)\b(?!\s*\.)[^{}]*\{/g)) {
         if (!viewNames.has(extension[1])) continue;
         const start = extension.index + extension[0].length;
-        inspectLifecycleClosures(braceBody(source, start - 1), file, findings, lineOf(source, start));
+        const body = braceBody(source, start - 1);
+        inspectLifecycleClosures(body, file, findings, lineOf(source, start));
+        const storage = swiftDataAccess.exec(body);
+        if (storage) {
+          findings.push(finding('view-swiftdata-access', 'review', 'This SwiftUI View extension appears to access SwiftData directly. Verify that storage is reached through its ViewModel and Feature.', file, lineOf(source, start + storage.index)));
+        }
       }
       continue;
     }
