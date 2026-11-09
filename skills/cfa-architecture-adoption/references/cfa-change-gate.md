@@ -437,7 +437,9 @@ do not claim that UI gating replaces server-side authorisation.
   that delayed teardown removes only the old registration.
 - Inspect AppModel's stored properties, initializer, and `live()`; then search
   for `AppModel.shared` stored elsewhere, View-tied launch calls,
-  `ModelContainer` outside the storage boundary, and direct `URLSession` calls.
+  `ModelContainer` outside the storage boundary, and requests started directly
+  through `URLSession` outside `NetworkingManager`. Verify whether other
+  `URLSession` references only configure or inject the session.
 - Confirm that storage work does not leak SwiftData `@Model` objects across an
   actor boundary, and that a `@ModelActor` is used where database work is not
   deliberately small and UI-owned.

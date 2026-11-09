@@ -108,10 +108,12 @@ Check initializer wiring and indirect calls before drawing a conclusion.
 
 For a service-boundary finding, trace the actual caller to the networking or
 storage service and confirm production target membership. Apply the
-[networking rule](references/spec/rules/cfa-net-01.md) to direct URLSession
-access and the [persistence rules](references/spec/topics/19-keep-persistence-behind-repository-contracts.md)
+[networking rule](references/spec/rules/cfa-net-01.md) to requests started
+directly through URLSession and the [persistence rules](references/spec/topics/19-keep-persistence-behind-repository-contracts.md)
 to SwiftData access. A manager declaration identifies a candidate boundary.
-Confirm that the relevant requests actually go through it.
+Confirm that the relevant requests actually go through it. A URLSession
+reference may only configure or inject the session. Follow it to the call
+that starts the request before reporting a bypass.
 For SwiftData, trace the context and managed records through the storage
 owner, including the repository's returned values and nested contents.
 Verify that Features receive immutable Sendable domain values. For non-trivial
