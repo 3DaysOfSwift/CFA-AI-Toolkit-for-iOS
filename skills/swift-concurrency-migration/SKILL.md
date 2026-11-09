@@ -137,6 +137,12 @@ Use deliberate passes:
    same action, and required repeated writes must not be coalesced. Preserve required product semantics;
    document exceptions such as latest-request-wins or independent work rather
    than silently dropping inputs. Give root Tasks explicit cancellation owners.
+   For a shared refresh, apply the
+   [refresh lifetime rule](references/spec/rules/cfa-task-02.md) while preserving
+   the existing product's cancellation requirements. CFA's default keeps the
+   Feature-owned refresh running when the last screen leaves and retains its
+   result. Verify that equivalent callers can join and that a screen that must
+   exit promptly can stop waiting independently of the refresh.
 4. Re-run the relevant behaviour and concurrency tests. Record the remaining
    legacy primitives, completed feature milestones and verification gaps.
 5. As the scoped features take shape, reconcile their physical locations and
