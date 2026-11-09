@@ -213,6 +213,18 @@ the optional `group` text to the capability name, such as `Reminders`, to displa
 related actions together. Do not collapse setting and removing a reminder into
 one verdict just because they use the same Feature.
 
+### Test-named source directories
+
+If a directory listed under `productionTargets.excludedTestDirectories`
+contains shipping Swift source, prepare a new inventory with
+`--include-tests` as the last argument. Review the shipping files and their
+operations normally. Group verified test-only files in a separate
+`fileBatches` entry. Cite each file and record the target-membership evidence
+and reason for excluding it from the production assessment. For detected
+entry points and task sites in those files, provide a specific
+`excludedReason` instead of assigning a production operation. A directory
+name alone cannot establish membership.
+
 ### Individual checks
 
 New health checks supply an operation's `checks` array. Each check has `id`,
