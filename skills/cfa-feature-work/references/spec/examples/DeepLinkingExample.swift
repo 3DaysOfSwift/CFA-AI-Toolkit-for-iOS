@@ -74,6 +74,7 @@ actor PendingRequestStore: PendingRequestRepository {
 }
 
 enum PendingRequestError: Error {
+    case invalidDestination
     case operationInProgress
 }
 
@@ -90,6 +91,10 @@ final class DeepLinkingFeature {
     func restore() async throws { publish(try await store.snapshot()) }
 
     func receive(_ request: DestinationRequest) async throws {
+        guard !request.id.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+              !request.launchID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw PendingRequestError.invalidDestination
+        }
         publish(try await store.insert(request))
     }
 
@@ -136,6 +141,16 @@ final class DeepLinkingFeature {
 
         let firstRun = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
         try await firstRun.receive(initialRequest)
+        do {
+            try await firstRun.receive(DestinationRequest(id: "invalid", title: "Missing launch", launchID: " "))
+            preconditionFailure("A request without a destination must be rejected")
+        } catch PendingRequestError.invalidDestination {
+            precondition(firstRun.pending == [initialRequest])
+        }
+        let restoredAfterInvalidRequest = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
+        try await restoredAfterInvalidRequest.restore()
+        precondition(restoredAfterInvalidRequest.pending == [initialRequest])
+
         try await firstRun.receive(initialRequest) // A repeated opening callback does not add a duplicate.
         precondition(firstRun.pending == [initialRequest])
         try await firstRun.open(id: initialRequest.id) { _ in false } // User keeps editing.
