@@ -20,7 +20,7 @@ export function auditEntitlements(analysis, policy) {
     const leads = new Map();
     for (const call of indexed) {
       if (!enclosingIDs.has(call.calleeID)) continue;
-      const lead = {caller:call.caller, file:call.file, line:call.line};
+      const lead = {caller:call.caller, file:call.file, line:call.line, column:call.column};
       leads.set(JSON.stringify(lead), lead);
     }
     return [...leads.values()];
