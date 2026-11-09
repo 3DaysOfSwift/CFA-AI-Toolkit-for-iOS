@@ -66,6 +66,13 @@ execute in admission order and receive their own outcomes, even when their input
 match. Cover cancellation, cleanup
 and later work after failure without losing or indefinitely suspending waiters.
 
+For paid capabilities, exercise locked and entitled outcomes at each relevant
+entry point, including alternate screens or system actions that can invoke the
+capability. Supply controlled entitlement state and verify that locked paths
+show the expected purchase or locked experience where applicable and never
+invoke the paid operation. Verify that entitled callers can proceed. Verify
+server-side authorisation separately for server-protected operations.
+
 For durable edits, hold the write open and verify that confirmed state stays
 unchanged until it succeeds. On failure, assert that the editor keeps its
 draft and can retry. For optional download caches, independently control disk
