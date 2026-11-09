@@ -50,6 +50,12 @@ One store is a CFA choice, not a SwiftData limit. Keep each context and managed 
 
 Exercise fresh directory preparation, concurrent first requests, isolated test stores, failed saves, reopening and retry. Verify record updates preserve unrelated records. Record runtime/toolchain and preserve shipped paths and schema.
 
+For optional caches, hold restoration and writes independently in tests.
+Confirm refresh starts while restoration is pending and callers receive fresh
+results while the write is pending. Verify a late restore or delayed write
+cannot replace newer data, and a failed replacement preserves the last good
+cache.
+
 ## Evidence and provenance
 
 Canonical source sections are listed in this topic's entry in [the catalogue](../catalogue.json).
