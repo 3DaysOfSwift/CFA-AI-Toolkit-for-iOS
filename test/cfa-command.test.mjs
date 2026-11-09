@@ -78,6 +78,8 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /Missing optional themes, branding or a CFA footer\s+do not count as architecture findings/);
   assert.match(content, /View → ViewModel → Feature → Microservices/);
   assert.match(content, /SwiftDataManager owns container and context creation/);
+  assert.match(content, /changing shared Model code or\s+services used by an existing target/);
+  assert.match(content, /Verify that existing data handoffs still work/);
   assert.match(content, /Route URLSession requests through NetworkingManager/);
   assert.match(content, /Composition code may\s+configure and inject the session/);
   assert.match(content, /In new apps, start with a stateless value type/);

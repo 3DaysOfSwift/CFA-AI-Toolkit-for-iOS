@@ -179,7 +179,8 @@ skill from that toolkit before changing the project.
   may outlive a screen, but continuing after iOS backgrounds the app requires
   a system mechanism. Record actual background delivery on a supported device
   separately from controlled handler tests.
-- For additional device or extension targets, verify that each target includes
+- When adding a device or extension target or changing shared Model code or
+  services used by an existing target, verify that each affected target includes
   the shared Model and only its own Views and ViewModels. Each process has its
   own AppModel and Feature instances. Adapt composition and platform services
   for each target while reusing the same business rules. For an App Group
@@ -187,7 +188,8 @@ skill from that toolkit before changing the project.
   Verify that a failed write issues no request. WidgetKit controls reload timing.
   Send the Watch a separate snapshot through a suitable transfer, such as
   Watch Connectivity. Build each affected target and check API availability
-  and lifecycle requirements. Separately verify the handoff on supported
+  and lifecycle requirements. Verify that existing data handoffs still work.
+  Separately verify the handoff on supported
   devices, including how receiving Features refresh their state and handle
   missing, unreadable, delayed and stale snapshots. If multiple targets can
   edit the same data, verify the product's conflict policy.
