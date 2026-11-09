@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {coverageGaps, inventoryCandidates, taskCandidates, nextWork} from '../src/whole-app-health.mjs';
 import {renderHealthReport} from '../src/health-report.mjs';
-import {prepare, finish, progress} from '../src/whole-app-health.mjs';
+import {prepare, finish, progress, next} from '../src/whole-app-health.mjs';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -230,6 +230,8 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
     const missingClarity = structuredClone(review);
     missingClarity.operations[0].checks.find(check => check.id === 'architectural-clarity').status = 'not-applicable';
     await fs.writeFile(reviewPath,JSON.stringify(missingClarity));
+    const pendingClarity = await next(project,reviewPath,syntax);
+    assert.deepEqual(pendingClarity.nextOperations[0].pendingDimensions,['clarity']);
     await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/operations have unresolved checks or boundaries/);
     await assert.rejects(fs.access(output));
     const sourceProblem = structuredClone(review);

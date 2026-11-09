@@ -22,9 +22,12 @@ function pendingSourceFiles(report, review) {
     return status ? status === 'unassessed' || status === 'investigate' : !batched.has(path);
   }).map(file => file.path);
 }
+const pendingDimensions = operation => ['correctness', 'clarity']
+  .filter(dimension => ['unassessed', 'investigate'].includes(operation[dimension]));
+
 const hasOpenChecks = operation => !operation.checks?.length ||
   operation.checks.some(check => ['unresolved', 'not-checked'].includes(check.status)) ||
-  [operation.correctness, operation.clarity].some(status => status === 'unassessed' || status === 'investigate') ||
+  pendingDimensions(operation).length > 0 ||
   Boolean(operation.unknowns?.length) ||
   Boolean(operation.steps?.some(step => step.relation === 'unknown'));
 
@@ -55,6 +58,7 @@ export function nextWork(report, review, limit = 8) {
     id: operation.id,
     title: operation.title,
     openChecks: hasOpenChecks(operation),
+    pendingDimensions: pendingDimensions(operation),
     missingTrace: !operation.steps?.length,
     pendingChecks: (operation.checks || [])
       .filter(check => check.status === 'unresolved' || check.status === 'not-checked')
