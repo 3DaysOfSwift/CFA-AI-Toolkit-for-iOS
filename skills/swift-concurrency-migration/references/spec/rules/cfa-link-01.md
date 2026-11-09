@@ -12,6 +12,6 @@
 
 [Run the deep-linking example](../examples/README.md).
 
-**Verify:** Force an initial save to fail and verify the caller receives the error without an unsaved request appearing in the pending list. Test request reception before restoration completes, preserving both the saved and new requests across restart. Verify refusal, cancellation before and after navigation, competing opens, and dismissal of one request while others remain. Simulate a failed removal after navigation and verify that retry persists the removal without navigating again. Check that one scene opening a request leaves other scenes’ destinations unchanged.
+**Verify:** Reject invalid destinations before saving. Force an initial save to fail and verify the caller receives the error without an unsaved request appearing in the pending list. Test request reception before restoration completes, preserving both the saved and new requests across restart. Verify refusal, cancellation before and after navigation, competing opens, and dismissal of one request while others remain. Simulate a failed removal after navigation and verify that retry persists the removal without navigating again. Check that one scene opening a request leaves other scenes’ destinations unchanged.
 
 **Full rule, context and examples:** [Keep Screen Initializers Clean](../topics/15-keep-screen-initializers-clean.md). This card is a reading aid; apply the complete canonical section.
