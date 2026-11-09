@@ -127,6 +127,7 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /draft available for retry, preserve previously confirmed state\s+and present a recoverable error/);
   assert.match(content, /Save the safe data needed to identify and present each request before adding\s+it to the visible pending list/);
   assert.match(content, /Surface an initial\s+save failure and leave the pending list unchanged/);
+  assert.match(content, /Resume accepting durable requests only after the list can be read or the\s+product’s explicit recovery flow resolves the failure/);
   assert.match(content, /during restoration, preserve both the saved requests and the new request/);
   assert.match(content, /delayed restore must leave opened requests removed and unrelated requests\s+available/);
   assert.match(content, /Deduplicate callbacks for the same opening event\. Keep separate\s+opening events distinct even when they point to the same destination/);

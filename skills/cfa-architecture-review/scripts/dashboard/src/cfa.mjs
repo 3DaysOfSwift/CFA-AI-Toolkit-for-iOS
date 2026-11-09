@@ -96,7 +96,9 @@ skill from that toolkit before changing the project.
   A delayed restore must leave opened requests removed and unrelated requests
   available.
   If the saved list is unreadable, report the error and preserve the file.
-  Verify that a retry after recovery saves the new request alongside existing ones.
+  Resume accepting durable requests only after the list can be read or the
+  product’s explicit recovery flow resolves the failure. Verify that a retry
+  after recovery saves the new request alongside existing ones.
   Handle expired or unavailable destinations clearly. Record incoming URLs
   and user actions on local or push notifications.
   Scheduling or delivery alone does not create a pending item. The receiving
