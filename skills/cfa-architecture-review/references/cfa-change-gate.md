@@ -194,10 +194,10 @@ the architecture:
     default. Equivalent repeated button actions return the same handle, and
     asynchronous callers await its value. SwiftUI lifecycle tasks and structured
     child tasks keep their existing owners without stored wrappers. Each Feature
-    operation independently shares
-    equivalent in-flight work or queues commands that must each execute
-    sequentially across suspension points. Record input identity, cleanup, cancellation and any
-    product-required exception. Never lose a required edit as a duplicate, even
+    operation shares equivalent in-flight work and returns its outcome to all
+    callers, or queues commands that must each execute in admission order
+    across suspension points and returns each caller its own outcome. Record
+    input identity, cleanup, cancellation and any product-required exception. Never lose a required edit as a duplicate, even
     when its input matches another command.
 
 23. The branded Settings About/footer is a new-app default, not a CFA invariant.
@@ -327,8 +327,11 @@ from precedent use; do not reframe it as a completed partial migration.
 - Confirm that storage work does not leak SwiftData `@Model` objects across an
   actor boundary, and that a `@ModelActor` is used where database work is not
   deliberately small and UI-owned.
-- Remove abandoned files, duplicate state owners, placeholder naming and
-  speculative abstractions created during the change.
+- After replacing a route, check callers, target membership, tests and system
+  entry points before removing superseded methods, stored state or files.
+  Preserve code that still serves another route. Remove duplicate state owners
+  and speculative abstractions introduced by the change, and correct placeholder
+  names.
 - Build and run focused tests when available. Report an unavailable runtime or
   toolchain honestly; do not turn missing verification into a pass.
 
