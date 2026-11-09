@@ -1818,9 +1818,11 @@ Before accepting a change, answer every question:
     the same routing capability while the receiving scene owns navigation?
     Where the app uses CFA's pending-request design, verify that declining
     navigation preserves the request across restart, either scene can open
-    it, and successful navigation or explicit dismissal removes it. During
-    migration, verify that existing notification and history capabilities
-    are preserved.
+    it, and successful navigation or explicit dismissal removes it. Verify
+    that competing scene requests open the destination once. If saving the
+    removal fails after navigation, verify that the failure is surfaced and
+    retrying the removal does not navigate again. During migration, verify
+    that existing notification and history capabilities are preserved.
 
 Every applicable answer must be yes. Marking a question not applicable requires
 a short explanation. Otherwise, the change is not architecturally complete.
