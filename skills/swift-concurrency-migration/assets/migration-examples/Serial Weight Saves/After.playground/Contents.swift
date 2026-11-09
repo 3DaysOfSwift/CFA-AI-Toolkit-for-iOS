@@ -40,7 +40,10 @@ final class WeightLogFeature {
         let id = UUID()
         let task = Task {
             defer {
-                if lastSaveID == id { lastSave = nil; lastSaveID = nil }
+                if lastSaveID == id {
+                    lastSave = nil
+                    lastSaveID = nil
+                }
             }
             _ = await previous?.value
             do {

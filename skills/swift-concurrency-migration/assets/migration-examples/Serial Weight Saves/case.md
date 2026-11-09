@@ -6,7 +6,11 @@ A serial Dispatch queue accepts weight saves and invokes completion on its queue
 
 ## Behaviour to preserve
 
-Valid saves remain in the order admitted by the serial queue or Feature; invalid values are rejected. The runnable check uses three structured child tasks and awaits all three outcomes. Their declaration order does not guarantee the order in which they reach the Feature. The CFA Feature publishes only confirmed saves and can continue after failure.
+Valid saves remain in the order admitted by the serial queue or Feature; invalid values are rejected. The Before check submits three callbacks to the serial queue in a known order.
+The After check first saves sequentially, then uses three structured child
+tasks and awaits every outcome. The children can reach the Feature in a
+different order from their declarations. The CFA Feature publishes only
+confirmed saves and continues processing after failure.
 
 ## Migration
 
