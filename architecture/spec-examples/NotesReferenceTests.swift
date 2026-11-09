@@ -254,6 +254,19 @@ actor HeldNotesLoad: NotesRepository {
         await corruptEditor.retryLoad().value
         precondition(corruptEditor.loadError == nil && corruptFeature.notes == afterOverlap)
         precondition(corruptEditor.text == "Keep this draft")
+        // Fixed JSON represents an existing store independently of today's encoder.
+        let existingStore = folder.appendingPathComponent("existing-notes.json")
+        let existingJSON = #"[{"id":"00000000-0000-0000-0000-000000000001","text":"Existing note"}]"#
+        try Data(existingJSON.utf8).write(to: existingStore, options: .atomic)
+        let existingFeature = NotesFeature(repository: JSONNotesRepository(file: existingStore))
+        try await existingFeature.loadIfNeeded()
+        let existingNotes = existingFeature.notes
+        precondition(existingNotes.map(\.text) == ["Existing note"])
+        try await existingFeature.save("Added note")
+        let reopenedNotes = try await JSONNotesRepository(file: existingStore).load()
+        precondition(reopenedNotes.first == existingNotes.first)
+        precondition(reopenedNotes.map(\.text) == ["Existing note", "Added note"])
+
         print("Notes reference: failed save, retry, ordered overlap and JSON storage passed")
     }
 }
