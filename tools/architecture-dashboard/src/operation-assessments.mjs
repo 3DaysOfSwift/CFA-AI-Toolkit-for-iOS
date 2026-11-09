@@ -40,7 +40,8 @@ export function operationAssessments(review) {
     if (scenarios.some(scenario => scenario.status === 'problem')) {
       return {...operation, correctness:'problem', problemKind:operation.problemKind || 'local-defect'};
     }
-    if (operation.correctness === 'sound' && scenarios.some(scenario => scenario.status === 'unresolved')) {
+    const timingReviewStarted = operation.scenarios !== undefined || review.behaviourScenariosRequired === true;
+    if (operation.correctness === 'sound' && timingReviewStarted && missingTimingScenarios(operation).length) {
       return {...operation, correctness:'investigate'};
     }
     return operation;
@@ -69,6 +70,10 @@ export function operationAssessments(review) {
       : status==='investigate' ? op.unknowns : [];
     const cfaAttention=(op.checks??[]).filter(c=>c.dimension==='cfa' && ['fail','unresolved','not-checked'].includes(c.status)).map(c=>'CFA · '+c.title+': '+(c.status==='fail'?c.consequence:c.status==='unresolved'?c.question:c.reason));
     const timingAttention=(op.scenarios??[]).filter(scenario=>['problem','unresolved'].includes(scenario.status)).map(scenario=>scenario.title+': '+(scenario.consequence || scenario.outcome));
+    const unreviewedTiming = (op.scenarios !== undefined || review.behaviourScenariosRequired === true)
+      ? missingTimingScenarios(op).filter(id => !op.scenarios?.some(scenario => scenario.id === id))
+      : [];
+    if (unreviewedTiming.length) timingAttention.push('Timing scenarios still to assess: '+unreviewedTiming.join(', '));
     const attentionSummary=[...attention,...timingAttention,...cfaAttention].map(text=>'<span style="display:block;font-weight:400;margin:6px 0;overflow-wrap:anywhere">'+esc(text)+'</span>').join('');
     return '<details class="review"><summary>'+labels[status]+' · '+esc(op.title)+'<span style="display:block;font-weight:400;margin:6px 0;overflow-wrap:anywhere">'+esc(checkSummary)+'</span>'+attentionSummary+'<span style="display:block;font-weight:400;margin:6px 0">Concurrency correctness: '+labels[op.correctness]+' · Architectural clarity: '+labels[op.clarity]+' · CFA conformance: '+cfaLabels[cfaStatus]+'</span></summary>'+renderChecks(op.checks)+field('Assessment',op.reason)+field('Correctness',labels[op.correctness])+field('Architectural clarity',labels[op.clarity])+(status==='problem'?field('Problem type',op.problemKind):'')+'<h3>What the code currently does</h3>'+[['Trigger',op.trigger],['Execution path',op.path],['Application state owner',op.stateOwner],['Task owner and lifetime',op.taskOwner],['Actor boundaries',op.isolation],['Verification performed',op.verification]].map(([k,v])=>field(k,v)).join('')+renderSteps(op.steps)+(op.unknowns.length?field('Unresolved boundaries',op.unknowns.join('; ')):'')+'<h3>Source evidence</h3>'+sources+(op.recommendation?'<h3>Suggested change</h3><p>'+esc(op.recommendation)+'</p>':'')+'</details>';
   }).join('');

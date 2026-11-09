@@ -122,3 +122,13 @@ test('timing problems prevent a stable dashboard verdict despite passing checks'
   assert.equal(unresolved.counts.investigate, 1);
   assert.match(unresolved.html, /Correctness is unresolved.*Save overlap is unknown/s);
 });
+
+test('a started timing review stays unresolved until all four scenarios are assessed', () => {
+  const operation = {...op, scenarios:[{id:'repeat',status:'pass'}]};
+  const review = {operationInventory:{coverage:'complete'},operations:[operation]};
+  const pending = operationAssessments(review);
+  assert.equal(pending.counts.investigate, 1);
+  assert.match(pending.html, /Timing scenarios still to assess: leave, late-result, failure/);
+  operation.scenarios.push(...['leave','late-result','failure'].map(id => ({id,status:'not-applicable'})));
+  assert.equal(operationAssessments(review).counts.sound, 1);
+});
