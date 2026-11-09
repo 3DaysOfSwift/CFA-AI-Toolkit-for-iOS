@@ -165,7 +165,8 @@ Use deliberate passes:
    changing storage or task ownership. Start with a pending edit persisted by
    the previous implementation when replacing sync or its storage. Verify that
    the migrated app recovers the edit with its original identity and pending
-   metadata, and that retry produces one logical server change. Verify that
+   metadata. Simulate the server applying an edit but losing its reply, then
+   retry with the original identity and verify one logical server change. Verify that
    pending edits survive failed sync and restart, and that local success remains
    distinct from server confirmation. Preserve the existing sync contract.
 3. Convert that feature’s asynchronous model work into directly awaitable

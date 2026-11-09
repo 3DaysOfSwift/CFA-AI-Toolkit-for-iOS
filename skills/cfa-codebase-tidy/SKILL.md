@@ -67,7 +67,9 @@ When tidying existing offline edits or sync, follow the
 [sync rule](references/spec/rules/cfa-sync-01.md). Preserve pending edit
 identities, their persisted metadata and the existing conflict and rejection
 policy. Verify that moving storage or task ownership leaves pending edits
-recoverable after failure and restart and safe to retry. Keep locally saved
+recoverable after failure and restart and safe to retry. If the server can
+apply an edit before losing its reply, verify that retry with the saved identity
+does not apply it again. Keep locally saved
 and server-confirmed outcomes distinct.
 
 Keep cancellation and ordering tests in the named ViewModel or Feature suite when they exercise that owner. Use a dedicated concurrency test group for cross-boundary scenarios that need one. Use controllable continuations/barriers to pause reads, writes and workers; release in adverse order and assert externally observable results. Cover overlapping operations, stale completion, cancellation, failed commits, edit/delete during processing and retry where applicable. Never depend on sleep duration or scheduler luck. Bound arrival waits with test timeouts and always release barriers during cleanup. Add a watchdog when a blocked operation could otherwise prevent completion. Describe coverage and remaining cases; no finite suite proves 100% race freedom.

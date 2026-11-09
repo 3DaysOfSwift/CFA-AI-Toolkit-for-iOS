@@ -70,7 +70,8 @@ When moving ownership of data that already syncs, apply the
 format, pending edit identities and metadata, and the product's conflict and
 rejection policy. Verify that edits already pending before adoption survive
 a failed sync and restart after the change. Confirm that retry still produces
-one logical server change and that local save and server confirmation remain
+one logical server change, including when the server applied the edit before
+losing its reply. Verify that local save and server confirmation remain
 distinct. Verify affected Apple-managed sync on supported devices.
 
 Use this workflow for an architecture-only adoption when the application is
