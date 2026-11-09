@@ -38,4 +38,5 @@ the required save succeeds. The SwiftUI screen demonstrates the observation rout
 latest state. If an existing subscriber must process every completion event,
 keep an event API that delivers every required occurrence. Test consecutive
 equal-valued events, ordering and cancellation separately from the final
-count displayed on screen.
+count displayed on screen. If the original event contract specifies buffering,
+hold the consumer back and verify which events it receives when it resumes.
