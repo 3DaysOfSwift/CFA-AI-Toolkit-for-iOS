@@ -843,16 +843,17 @@ unsynchronised user work transparently and do not treat independent purchases
 or user-owned documents as disposable account caches. Keep the signed-out
 experience and cleanup failures truthful.
 
+Trace every account-change entry point, including sign-out, account switching
+and external session expiry. Before publishing an in-flight result, verify that
+its account or session is still current, even if cancellation was requested.
+When earlier work can overlap a new sign-in to the same account, compare a
+session generation or equivalent session identity because both sessions have
+the same account ID.
+
 During migration, inspect whether an existing account-change event system can
-be simplified into explicit calls without losing behaviour. Trace every sign-out
-and account-switch entry point, including external session expiry. Define what
-happens when authentication or cleanup fails, and prevent work started under an
-old account from republishing its data after a switch. Cancellation alone does
-not guarantee that work has stopped; validate the current account or a session
-generation before publishing results. If the same account can sign in again
-while earlier work is still finishing, compare the session generation or an
-equivalent session identity. Both sessions have the same account ID. Preserve the product's privacy and
-storage requirements, and test these behaviours before removing observers.
+be simplified into explicit calls. Before removing observers, verify that the
+replacement still handles every entry point, preserves the product's privacy
+and storage requirements, and handles authentication and cleanup failures.
 
 Business requirements also determine how many instances of a domain entity
 exist. For a simple shopping app, start with one shared `ShoppingCartFeature`
