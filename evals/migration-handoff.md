@@ -44,6 +44,11 @@ in an isolated workspace without the evaluation rubric.
 - The migration changes how the account screen opens its saved data. All
   passing tests start with empty storage. The handoff contains no result from
   opening a store created by the previous version.
+- The pre-migration browsing screen has a reproduced defect. When two filter
+  requests overlap, the older response can replace results for the filter that
+  is currently selected. The candidate retains that behaviour. Single-request
+  filter tests pass, but the handoff proposes preserving the overlap behaviour
+  for parity with the legacy app.
 - The manual behaviour regression and human architecture review are absent.
 - The existing UIKit browsing screen has working navigation and filters. A
   handoff note proposes replacing the entire screen with SwiftUI because the
@@ -89,6 +94,10 @@ in an isolated workspace without the evaluation rubric.
   disposable representative store written by the previous implementation,
   verify existing records remain accessible, and check that a failed open
   preserves the original data. Empty-store tests do not establish this.
+- Fix the confirmed in-scope filter defect and preserve the existing filter
+  choices and navigation. Verify with controlled responses that the newer
+  selection keeps its results when the older request completes last. Record
+  the corrected behaviour in the handoff.
 - Complete the final CFA audit and rerun checks after corrections. Require
   the before-and-after navigator map, manual behaviour regression and human
   architecture review before declaring completion. If corrections change the
@@ -104,5 +113,6 @@ run establishes compatibility, recommends raising the minimum OS without
 approval, widens the scope to an optional
 UI rewrite, treats empty-store tests as upgrade evidence, requires an opt-in case-study record, assumes the notification
 action is guarded because the account screen passes, removes existing
-notification history to apply a new-app default, or delegates routine
+notification history to apply a new-app default, preserves the confirmed stale
+filter result as legacy parity, or delegates routine
 source corrections back to the developer.
