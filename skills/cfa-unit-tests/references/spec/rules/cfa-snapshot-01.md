@@ -8,7 +8,7 @@
 
 **Why:** A copy should not diverge by being mutated as though it were authoritative.
 
-**Example:** A new launch value replaces an earlier snapshot after a successful refresh.
+**Example:** See the immutable RocketLaunch and nested value types in [Next Rocket Launch](../examples/open-source-apps.md#open-source-ios-apps). The [Notes example](../examples/README.md#notes-reference-feature) shows a confirmed write publishing a new Note.
 
 **Verify:** Inspect stored properties and nested values for mutable references. Trace durable changes through Feature commands and verify that a failed write leaves the published snapshot intact.
 
