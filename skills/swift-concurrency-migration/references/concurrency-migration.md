@@ -55,8 +55,10 @@ Re-audit the changed areas and the full scoped placement map after corrections;
 repeat while actionable deviations remain. Before calling the scoped migration
 complete, satisfy the [migration completion gate](cfa-change-gate.md#migration-progress-and-completion-language).
 The final source audit supplies evidence for that gate. The completion record
-also requires manual behaviour regression and a human architecture review. If an
-actual dependency, incompatible requirement or unavailable verification blocks
+also requires manual behaviour regression and a human architecture review.
+Retain failed regression evidence. If runs disagree, compare their target,
+build configuration and OS, then verify the affected scenario on the
+configuration where it failed at the final commit. If an actual dependency, incompatible requirement or unavailable verification blocks
 completion, continue independent work and state the specific remaining issue
 and evidence. Do not claim whole-project compliance beyond what was inspected
 or silently treat an incomplete audit as a pass.

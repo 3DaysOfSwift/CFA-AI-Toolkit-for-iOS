@@ -68,9 +68,10 @@ and verifies any affected handoff. List the final-commit test or manual
 evidence IDs in `completionGate.dataHandoffEvidenceIds`. Use an empty list
 only when the reviewer confirms no data handoff is affected. A passing build entry for a target does
 not establish that its data handoff worked. When runs disagree at the final
-commit, compare their target, configuration and environment. Preserve failed
-runs and explain how each relevant failure was resolved. Keep the migration
-partial while a required failure remains unresolved. The validator checks
+commit, compare their target, build configuration and OS. Preserve failed
+runs, link the final-commit check on the affected configuration, and explain
+how it resolves the failure. Keep the migration partial while a required
+failure remains unresolved. The validator checks
 the recorded evidence links. It cannot determine whether one run supersedes
 another.
 
