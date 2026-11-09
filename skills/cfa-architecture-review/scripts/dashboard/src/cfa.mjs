@@ -84,7 +84,9 @@ skill from that toolkit before changing the project.
   Scheduling or delivery alone does not create a pending item. The receiving
   scene owns navigation and protects unsaved edits and active payments. Any
   scene can open a shared pending request without changing another scene’s
-  navigation. Coordinate attempts so only one scene opens the request. Persist
+  navigation. Deduplicate callbacks for the same opening event. Keep separate
+  opening events distinct even when they point to the same destination.
+  Coordinate competing opens and dismissals for each pending request. Persist
   removal after actual navigation or explicit dismissal. Leave requests pending
   when navigation is declined, cancelled before it opens, or fails. Cancellation
   after navigation still counts as an open. If removal fails after navigation,
