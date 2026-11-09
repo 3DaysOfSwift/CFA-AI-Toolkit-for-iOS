@@ -365,11 +365,13 @@ export async function inspect(project) {
   const swiftDataAccess = /\b(?:ModelContainer|ModelContext)\b|@Query\b|\.modelContainer\s*\(|@Environment\s*\(\s*\\\s*\.\s*modelContext\b/;
   for (const [file, source] of sources) {
     const isViewFile = /(?:^|\/)1 - View\//.test(file);
+    const previewRanges = [];
     for (const preview of source.matchAll(/(?:#Preview\b\s*(?:\([^{}]*?\)\s*)?|\b(?:struct|enum|class|extension)\s+\w+\s*:[^{}]*?\bPreviewProvider\b[^{}]*)\{/g)) {
       const start = preview.index + preview[0].length;
       const previewBody = braceBody(source, start - 1);
+      previewRanges.push({start, end: start + previewBody.length});
       const access = findFeatureAccess(previewBody);
-      const storage = !isViewFile && swiftDataAccess.exec(previewBody);
+      const storage = swiftDataAccess.exec(previewBody);
       if (storage) {
         findings.push(finding('view-swiftdata-access', 'review', 'This preview appears to access SwiftData directly. Preview construction follows the same CFA storage boundary as the app.', file, lineOf(source, start + storage.index)));
       }
@@ -439,7 +441,8 @@ export async function inspect(project) {
     }
     inspectLifecycleClosures(source, file, findings);
     if (/\b(?:let|var)\s+\w+\s*:\s*AppModel\b/.test(source)) findings.push(finding('stored-app-model', 'review', 'An AppModel-typed declaration appears in the View layer. Check whether a View or ViewModel retains it; this lexical match may be a local value or preview.', file, 1));
-    const storageAccess = swiftDataAccess.exec(source);
+    const storageAccess = [...source.matchAll(new RegExp(swiftDataAccess, 'g'))]
+      .find(match => !previewRanges.some(({start, end}) => match.index >= start && match.index < end));
     if (storageAccess) {
       findings.push(finding('view-swiftdata-access', 'review', 'SwiftData storage access may appear in a View-layer file. Check whether a View, ViewModel or preview accesses storage directly; previews retain the same CFA boundaries. A lexical match alone does not establish how the value is used.', file, lineOf(source, storageAccess.index)));
     }
