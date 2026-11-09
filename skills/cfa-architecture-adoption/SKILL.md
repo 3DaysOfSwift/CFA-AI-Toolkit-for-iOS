@@ -51,6 +51,13 @@ Read [CFA specification](references/cfa-specification.md), [CFA change gate](ref
    components and identify unverified requirements. A whole-app CFA verdict
    requires evidence for every applicable checklist item across the app.
 
+For system background work in scope, apply the
+[background-work rule](references/spec/rules/cfa-bg-01.md). Keep registration
+and work with the owning Feature. Signal registration once during synchronous
+launch and schedule separately. Verify that expiration cancels owned work
+and that the system callback completes once, including when expiration and
+normal completion race. Verify actual delivery separately on a supported device.
+
 When moving shared Model code used by an existing widget or another device
 target, apply the [multi-device rule](references/spec/rules/cfa-device-01.md).
 Record the existing target membership and data handoff before moving files.

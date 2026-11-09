@@ -74,6 +74,13 @@ agreed conflict and rejection outcomes. When replacing the sync implementation, 
 pending edit saved by the previous version. For Apple-managed sync, verify
 capability, account and schema behaviour on supported devices.
 
+For system background work in scope, apply the
+[background-work rule](references/spec/rules/cfa-bg-01.md). Keep registration
+and work with the owning Feature. Signal registration once during synchronous
+launch and schedule separately. Verify that expiration cancels owned work
+and that the system callback completes once, including when expiration and
+normal completion race. Verify actual delivery separately on a supported device.
+
 When adding or changing a widget or another device target, apply the
 [multi-device rule](references/spec/rules/cfa-device-01.md). Reuse the owning
 Feature and shared Model source. Include only the target's own presentation
