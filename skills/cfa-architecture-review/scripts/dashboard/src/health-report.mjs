@@ -30,7 +30,10 @@ function operationStatus(operation) {
 }
 
 export function renderHealthReport(data, iconData = '') {
-  if (!data.app || !data.summary || !data.verdict?.trim() || !data.scope || !data.conclusion) throw Error('Provide an app name, summary, substantive verdict, scope and conclusion.');
+  const headings = [data.app, data.summary, data.verdict, data.scope];
+  if (headings.some(value => typeof value !== 'string' || !value.trim()) || !data.conclusion) {
+    throw Error('Provide an app name, summary, substantive verdict, scope and conclusion.');
+  }
   const score = assess(data.criteria);
   const hasOperationProblem = data.architecturalConflict === true ||
     (data.operations || []).some(operation => operationStatus(operation) === 'problem');

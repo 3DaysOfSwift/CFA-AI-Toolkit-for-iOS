@@ -145,6 +145,16 @@ test('reconciled task sites must be cited in a workflow step', () => {
   assert.match(coverageGaps(inventory,review).join(' '), /launch\/stale-link must cite its reconciled task site/);
 });
 
+test('rejects blank or non-text Health Check headings', () => {
+  const report = {app:'App',summary:'Summary',verdict:'Clear ownership',scope:'Scope',
+    conclusion:'Conclusion',criteria:[{title:'Ownership',detail:'Checked',status:'pass'}]};
+  for (const heading of ['app', 'summary', 'verdict', 'scope']) {
+    for (const value of [' ', 1]) {
+      assert.throws(() => renderHealthReport({...report, [heading]:value}), /Provide an app name, summary, substantive verdict/);
+    }
+  }
+});
+
 test('unknown operations and target membership cannot yield a pass score', () => {
   const review=complete(); review.targetInventoryVerified=false; review.operations[0].unknowns=['Unresolved callback'];
   assert.equal(coverageGaps(report,review).length,2);

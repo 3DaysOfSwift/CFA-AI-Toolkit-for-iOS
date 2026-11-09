@@ -351,7 +351,7 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
   const gaps = coverageGaps(report,review);
   if (gaps.length) throw Error('Health Check is not complete; no report was generated. Complete the review checklist:\n- ' + gaps.join('\n- '));
   const presentation = review.presentation;
-  if (!presentation?.app || !presentation.summary || !presentation.verdict?.trim() || !presentation.conclusion || !Array.isArray(presentation.criteria) || !presentation.criteria.length) throw Error('Provide presentation app, summary, verdict, conclusion and criteria.');
+  if (!presentation?.app || !presentation.summary || typeof presentation.verdict !== 'string' || !presentation.verdict.trim() || !presentation.conclusion || !Array.isArray(presentation.criteria) || !presentation.criteria.length) throw Error('Provide presentation app, summary, verdict, conclusion and criteria.');
   for (const criterion of presentation.criteria) {
     if (!Array.isArray(criterion?.evidence) || !criterion.evidence.length) {
       throw Error('Each whole-app presentation criterion needs source evidence as file and line references.');
