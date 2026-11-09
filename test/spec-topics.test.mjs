@@ -6,6 +6,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { specTopics } from '../scripts/spec-topics.mjs';
 import { root, cfaSkills } from '../scripts/sync.mjs';
+import { lookup } from '../tools/explanations/explanations.mjs';
 
 test('topic reading edition retains every canonical section and is bundled consistently', () => {
   const expected = specTopics(root);
@@ -207,7 +208,7 @@ test('published explanations appear in the index and relevant rule cards', () =>
   assert.match(topics.get('rules/cfa-conc-03.md'), /cfa\/explanation\/task-cancellation/);
 });
 
-test('withdrawn explanations are never included in generated links', () => {
+test('withdrawn explanations keep local routing and missing rule mappings fail generation', () => {
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'cfa-explanations-'));
   try {
     fs.cpSync(path.join(root, 'architecture'), path.join(base, 'architecture'), { recursive: true });
@@ -220,5 +221,12 @@ test('withdrawn explanations are never included in generated links', () => {
     const topics = specTopics(base);
     assert.equal(topics.get('explanations.md').includes(url), false);
     assert.equal(topics.get('rules/cfa-app-01.md').includes(url), false);
+    const local = lookup(catalogue, 'CFA-SPEC-APP-01');
+    assert.equal(local.note, target.note);
+    assert.ok(local.links.every(link => link.url !== url));
+
+    target.ruleIds = target.ruleIds.filter(id => id !== 'CFA-SPEC-APP-01');
+    fs.writeFileSync(file, JSON.stringify(catalogue));
+    assert.throws(() => specTopics(base), /No linked explanation resolves canonical rule CFA-SPEC-APP-01/);
   } finally { fs.rmSync(base, { recursive: true, force: true }); }
 });
