@@ -73,8 +73,7 @@ open. Record the regression under
 `completionGate.manualBehaviourRegressionEvidenceId` and name the affected
 targets exercised by that regression. Record the build configuration, OS and
 device or simulator in its environment. The validator rejects evidence that
-names only unrelated targets and flags older evidence without target names
-for review. If evidence is missing
+names only unrelated targets or lacks target names or an environment. If evidence is missing
 or failed, use `partial` and explain the gap. Validation checks the recorded
 links and outcomes. The reviewer compares the declared affected targets with
 the actual consumers of the changed code, checks the behaviour contract,

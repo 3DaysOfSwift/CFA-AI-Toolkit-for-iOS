@@ -317,11 +317,14 @@ test('completion is not inferred from a build pass or tests at a different commi
   const rerun = f.record.evidence.find(item => item.id === 'after-behaviour-regression');
   rerun.environment = null;
   f.write();
-  const environmentWarning = 'record the manual regression build configuration, OS and device or simulator';
-  assert.ok(inspectRecord(f.file).warnings.some(warning => warning.includes(environmentWarning)));
+  const environmentError = 'record the manual regression build configuration, OS and device or simulator';
+  assert.ok(inspectRecord(f.file).errors.some(error => error.includes(environmentError)));
+  assert.ok(inspectRecord(f.file).errors.some(error =>
+    error.includes('list the affected targets exercised by the manual regression')));
+  rerun.targets = ['App', 'Widget'];
   rerun.environment = failedRegression.environment;
   f.write();
-  assert.ok(!inspectRecord(f.file).warnings.some(warning => warning.includes(environmentWarning)));
+  assert.ok(!inspectRecord(f.file).errors.some(error => error.includes(environmentError)));
   f.record.evidence.push(failedRegression);
   f.record.evidence.push({
     ...failedRegression, id:'earlier-regression', phase:'during', commit:'c'.repeat(40)
@@ -376,7 +379,7 @@ test('completion is not inferred from a build pass or tests at a different commi
   earlierRerun.phase = 'after';
   f.seal();
   assert.equal(inspectRecord(f.file).valid, true);
-  assert.ok(!inspectRecord(f.file).warnings.some(warning => warning.includes('list the affected targets exercised by the manual regression')));
+  assert.ok(!inspectRecord(f.file).errors.some(error => error.includes('list the affected targets exercised by the manual regression')));
   assert.ok(inspectRecord(f.file).warnings.some(warning =>
     warning.includes('evidence.failed-regression: failed at the final commit; verify linked rerun after-behaviour-regression')
   ));
