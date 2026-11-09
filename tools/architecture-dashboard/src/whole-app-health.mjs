@@ -407,7 +407,7 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
     if (!covered) throw Error('Include source concerns in the report criteria before rendering: ' + concern.title);
   }
   const data = {...presentation, scope:review.scope};
-  data.operations = (review.operations || []).map(op=>({group:op.group,title:op.title,trigger:op.trigger,verification:op.verification,path:op.path,stateOwner:op.stateOwner,taskOwner:op.taskOwner,isolation:op.isolation,reason:op.reason,unknowns:op.unknowns,steps:op.steps,checks:op.checks,scenarios:op.scenarios,problemKind:op.problemKind,recommendation:op.recommendation}));
+  data.operations = (review.operations || []).map(op=>({group:op.group,title:op.title,trigger:op.trigger,verification:op.verification,evidence:op.evidence,path:op.path,stateOwner:op.stateOwner,taskOwner:op.taskOwner,isolation:op.isolation,reason:op.reason,unknowns:op.unknowns,steps:op.steps,checks:op.checks,scenarios:op.scenarios,problemKind:op.problemKind,recommendation:op.recommendation}));
   const taskSites = new Map(taskCandidates(report).map(site => [site.id, site]));
   const taskOwners = new Map((review.taskSites || []).map(entry => [entry.siteId, entry.operationId]));
   for (const [index, operation] of data.operations.entries()) {

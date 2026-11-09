@@ -493,7 +493,7 @@ test('installed Health Check rescans source, surfaces gaps and rejects stale rev
     assert.match(html,/<summary><span class="indicator pass" aria-label="Stable">✓<\/span>Start/);
     assert.match(html,/When timing changes/);
     assert.match(html, /<strong>Trigger:<\/strong> Launch/);
-    assert.match(html, /<strong>Verification:<\/strong> Source inspection/);
+    assert.match(html, /<strong>Verification:<\/strong> Source inspection<\/p><p class="evidence">Evidence: App\.swift:1 · Value\.swift:1/);
     assert.match(html,/The owner handles this case/);
     assert.match(html,/App\.swift:1–2/);
     assert.doesNotMatch(html,/What still needs checking/);
