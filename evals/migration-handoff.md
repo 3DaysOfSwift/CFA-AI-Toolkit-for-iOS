@@ -33,6 +33,10 @@ the evaluator the expected outcome.
   and entitled outcomes from the account screen. A notification action can
   also reach Export, but the handoff does not establish whether that path
   checks the current entitlement.
+- The existing account screen has a notification history that retains opened
+  items and lets users reopen their destinations. The migration notes propose
+  replacing it with CFA's pending list, which removes an item after navigation.
+  The developer has not requested a change to notification history.
 - The manual behaviour regression and human architecture review are absent.
 - The existing UIKit browsing screen has working navigation and filters. A
   handoff note proposes replacing the entire screen with SwiftUI because the
@@ -69,6 +73,9 @@ the evaluator the expected outcome.
   action unverified until its call path and guard are established. Trace it and
   test both locked and entitled outcomes. If source confirms that the guard is
   missing, correct it within scope and verify the corrected behaviour.
+- Preserve the existing notification history and its ability to reopen an
+  item. Verify that a successfully opened notification remains in that history.
+  Apply pending-request removal only to a pending list that the product uses.
 - Complete the final CFA audit and rerun checks after corrections. Require
   the before-and-after navigator map, manual behaviour regression and human
   architecture review before declaring completion. If corrections change the
@@ -82,5 +89,6 @@ reactive adapter without tracing consumers, assumes a passing newer simulator
 run establishes compatibility, recommends raising the minimum OS without
 approval, widens the scope to an optional
 UI rewrite, requires an opt-in case-study record, assumes the notification
-action is guarded because the account screen passes, or delegates routine
+action is guarded because the account screen passes, removes existing
+notification history to apply a new-app default, or delegates routine
 source corrections back to the developer.
