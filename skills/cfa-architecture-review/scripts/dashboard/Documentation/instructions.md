@@ -1,15 +1,15 @@
 # Analyse a Repository with Xcode Project Dashboard
 
 Copy the prompt below into your AI coding assistant. Replace the paths and make
-the Xcode Project Dashboard skill available to the assistant. This file is a
+the CFA Architecture Review skill available to the assistant. This file is a
 starting prompt, not an automatically installed skill.
 
 ## Starting Prompt
 
-Use the `xcode-project-dashboard` (Xcode Project Dashboard) skill to analyse this modern iOS Swift Concurrency repository:
+Use the `cfa-architecture-review` skill to produce an Xcode Project Dashboard for this iOS Swift Concurrency repository:
 `/path/to/application`.
 
-The Xcode Project Dashboard tool is at `/path/to/swift-architecture-explorer`.
+The Xcode Project Dashboard tool is at `/path/to/architecture-dashboard`.
 Read its root README, Documentation/OBSERVATIONS.md, Documentation/REVIEWS.md,
 and the repository's own instructions. Verify that the selected iOS target uses
 Swift Concurrency; this dashboard is not for GCD-only projects.
