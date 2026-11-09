@@ -58,6 +58,12 @@ Preserve the handoff and its user-visible behaviour, including when a snapshot
 is unavailable. Verify affected targets can still build and exercise the
 handoff separately from source membership checks.
 
+When moving durable storage ownership, preserve the existing store location,
+schema compatibility and saved records. Verify against a representative
+existing store, including reopening after the change. An isolated empty store
+can verify fresh setup. Use the existing-store check to catch upgrade failures,
+and preserve the original data if opening or migration fails.
+
 When moving ownership of data that already syncs, apply the
 [sync rule](references/spec/rules/cfa-sync-01.md). Record the current storage
 format, pending edit identities and metadata, and the product's conflict and

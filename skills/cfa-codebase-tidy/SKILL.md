@@ -56,6 +56,12 @@ has a different policy, verify that the Feature keeps the result even if its
 only screen waiter leaves. Where a screen must exit promptly, verify its wait
 ends before the suspended refresh completes.
 
+When moving durable storage ownership, preserve the existing store location,
+schema compatibility and saved records. Verify against a representative
+existing store, including reopening after the change. An isolated empty store
+can verify fresh setup. Use the existing-store check to catch upgrade failures,
+and preserve the original data if opening or migration fails.
+
 When tidying existing offline edits or sync, follow the
 [sync rule](references/spec/rules/cfa-sync-01.md). Preserve pending edit
 identities, their persisted metadata and the existing conflict and rejection
