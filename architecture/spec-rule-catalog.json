@@ -437,10 +437,10 @@
       "section": "Organize Behaviour into Cohesive Features",
       "applies": "Defining a CFA Feature",
       "strength": "Required",
-      "rule": "Isolate Feature owners to MainActor; give underlying work an appropriate isolation strategy and avoid expensive blocking work on MainActor.",
+      "rule": "Isolate Feature owners to MainActor. Underlying microservices use an appropriate isolation boundary off MainActor by default. Keep framework-required MainActor calls in a narrow adapter. A separate type or an async declaration alone does not move work off MainActor.",
       "why": "Observable state is coordinated while substantial processing remains responsive.",
       "example": "A Feature publishes a decoded schedule returned by a suitably isolated provider.",
-      "verify": "Inspect isolation annotations and run responsiveness checks where appropriate.",
+      "verify": "Trace expensive work to its execution boundary using the project’s Swift language mode, default isolation and relevant SDK annotations. Run responsiveness checks where appropriate.",
       "explanationIds": [
         "isolation-and-sendable"
       ]
