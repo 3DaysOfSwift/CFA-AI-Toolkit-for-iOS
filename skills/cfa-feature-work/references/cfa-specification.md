@@ -1514,15 +1514,15 @@ cached, empty, or error state while the work continues. Use the app lifecycle, n
 begin with launch. A refresh that only needs to outlive its initiating screen
 can start when requested; the Feature owns its lifetime.
 
-When the launch lifecycle and one or more screen `.task` modifiers can request
-the same Feature refresh, the Feature stores one in-flight `Task<Void, Never>`.
-The first caller creates it; every later caller awaits that task's `value`.
-They therefore receive the result of the same refresh rather than starting a
-second request or returning before the first finishes. Derive `isRefreshing`
-from the stored task and clear it with `defer` inside the task after publishing
-its outcome. This task belongs to the Feature—not to the View task that first
-requested it—because the shared refresh may outlive any one screen. A different
-policy needs a documented product reason and dedicated tests.
+When launch and one or more screens can request the same refresh, the Feature
+retains one in-flight task. A synchronous launch signal can start it and
+return immediately. Later callers join the same work. Callers that need its
+outcome can await the shared task directly, or use a separately cancellable
+wait when they need to return promptly after cancellation. Publish the
+outcome and clear the retained handle when the refresh finishes. The task
+belongs to the Feature because the result remains useful after the initiating
+screen leaves. A different lifetime needs a documented product or resource
+reason and dedicated tests.
 Airplane Mode, a temporary API failure, unavailable iCloud, and lost
 connectivity are legitimate user flows, not exceptional states to conceal.
 Retrying asks the same feature to refresh again; the View does not
