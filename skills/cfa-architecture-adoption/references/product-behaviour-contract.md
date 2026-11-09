@@ -36,6 +36,14 @@ changes where possible, and requests that finish after the account changes.
 Before removing an observer, verify that the replacement still covers each
 entry point and prevents old results from reaching the current account.
 
+If the app syncs existing data, inventory the storage format, pending edit
+identities and metadata, and the user-visible difference between a local save
+and remote confirmation. Record what happens after failed sync, restart,
+retry, conflicting edits and server rejection where applicable. Include a
+baseline with an edit already pending so that migration verification covers
+existing stored work as well as new edits. Record device or account
+requirements separately from behaviour verified with test doubles.
+
 Run the existing test suite and record which tests pass, fail, or cannot run in
 the baseline environment. A pre-existing failure is evidence to investigate,
 not permission to ignore the covered behaviour.
