@@ -258,10 +258,11 @@ the shared Model, includes only its own Views and ViewModels, and uses APIs
 available to that target. Trace the writer, the storage or transfer boundary,
 and the receiving Feature's state update. For an App Group widget snapshot,
 verify a successful write precedes the timeline reload request and a failed
-write issues no request. For a
-Watch on another device, verify that a separate copy reaches the receiving
-data source. Report the build and device evidence separately, including
-what happens when the snapshot is missing, unreadable, delayed or stale.
+write issues no request. For a Watch on another device, verify that a separate
+copy reaches the receiving data source. When multiple targets can edit the same
+data, check their behaviour against the product’s conflict policy. Report the
+build and device evidence separately, including what happens when the snapshot
+is missing, unreadable, delayed or stale.
 
 For a dashboard or detailed concurrency analysis, read the [dashboard workflow](references/dashboard-workflow.md). The bundled tool is at `scripts/dashboard/src/cli.mjs` relative to this skill; it requires Node.js 20+. It inventories source patterns, not semantic correctness. Only use its concurrency dashboard when the selected scope contains Swift Concurrency. If the app uses only GCD, continue a manual ownership and concurrency review; mark the dashboard unavailable rather than refusing the review or inventing zero scores.
 
