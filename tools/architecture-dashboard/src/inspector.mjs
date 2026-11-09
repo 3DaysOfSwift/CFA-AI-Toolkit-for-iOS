@@ -251,7 +251,7 @@ export async function inspect(project) {
   const swiftDataAccess = /\b(?:ModelContainer|ModelContext)\b|@Query\b|\.modelContainer\s*\(|@Environment\s*\(\s*\\\s*\.\s*modelContext\b/;
   for (const [file, source] of sources) {
     const isViewFile = /(?:^|\/)1 - View\//.test(file);
-    for (const preview of source.matchAll(/#Preview\b\s*(?:\([^{}]*?\)\s*)?\{/g)) {
+    for (const preview of source.matchAll(/(?:#Preview\b\s*(?:\([^{}]*?\)\s*)?|\b(?:struct|enum|class|extension)\s+\w+\s*:[^{}]*?\bPreviewProvider\b[^{}]*)\{/g)) {
       const start = preview.index + preview[0].length;
       const previewBody = braceBody(source, start - 1);
       const access = findFeatureAccess(previewBody);
