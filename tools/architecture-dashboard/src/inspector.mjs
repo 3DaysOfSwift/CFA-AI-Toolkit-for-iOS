@@ -60,7 +60,8 @@ export async function inspect(project) {
     sources.set(file.path, maskSwift(await fs.readFile(path.join(root, file.path), 'utf8')));
   }
   const paths = new Set(sources.keys());
-  const appModelFile = [...paths].find(file => /(?:^|\/)2 - AppModel\/AppModel\.swift$/.test(file));
+  const appModelFiles = [...paths].filter(file => /(?:^|\/)2 - AppModel\/AppModel\.swift$/.test(file));
+  const appModelFile = appModelFiles.length === 1 ? appModelFiles[0] : null;
   const appModel = appModelFile ? sources.get(appModelFile) : '';
   const appModelDeclaration = /\bclass\s+AppModel\b[^\{]*\{/.exec(appModel);
   const appModelBodyStart = appModelDeclaration ? appModelDeclaration.index + appModelDeclaration[0].length : 0;
@@ -82,7 +83,10 @@ export async function inspect(project) {
   }
 
   const findings = [];
-  if (!appModelFile) findings.push(finding('app-model-missing', 'warning', 'No AppModel.swift was found under 2 - AppModel.', null, null));
+  if (!appModelFiles.length) findings.push(finding('app-model-missing', 'warning', 'No AppModel.swift was found under 2 - AppModel.', null, null));
+  if (appModelFiles.length > 1) {
+    findings.push(finding('app-model-ambiguous', 'review', `Multiple AppModel files were found: ${appModelFiles.join(', ')}. Verify target membership or inspect one app directory at a time before attributing Feature routes.`, null, null));
+  }
   if (appModelFile) {
     const liveFactories = [...appMembers.matchAll(/\bstatic\s+func\s+live\s*\(/g)];
     if (liveFactories.length !== 1) findings.push(finding('app-model-live-factory', 'review', `Found ${liveFactories.length} static live() declarations directly inside AppModel. Verify the single production factory, including extensions and active compilation conditions.`, appModelFile, 1));

@@ -44,6 +44,20 @@ test('maps a complete screen to AppModel, feature, collaborator and named tests'
 
 });
 
+test('leaves AppModel routes unresolved when multiple app roots are scanned', async t => {
+  const root = await fixture(t, {
+    'First/2 - AppModel/AppModel.swift': 'final class AppModel { let feedFeature: FeedFeature }',
+    'Second/2 - AppModel/AppModel.swift': 'final class AppModel { let feedFeature: OtherFeature }',
+    'Second/1 - View/Views/Feed/FeedView.swift': 'struct FeedView: View { @State private var viewModel = FeedViewModel() }',
+    'Second/1 - View/Views/Feed/FeedViewModel.swift': 'final class FeedViewModel { let feedFeature = AppModel.shared.feedFeature }'
+  });
+  const report = await inspect(root);
+  assert.equal(report.appModelFile, null);
+  assert.equal(report.screens[0].dependencies[0].featureType, null);
+  assert.ok(report.findings.some(item => item.code === 'app-model-ambiguous'));
+  assert.ok(!report.findings.some(item => item.code === 'app-model-missing'));
+});
+
 test('reviews Feature placement outside the AppModel feature folders', async t => {
   const featureFile = 'Packages/Feed/Sources/Features/Feed/FeedFeature.swift';
   const root = await fixture(t, {
