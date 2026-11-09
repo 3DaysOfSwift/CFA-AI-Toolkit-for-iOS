@@ -222,8 +222,11 @@ Record each required check against the final commit in the migration ledger or
 handoff, including the hybrid review and final CFA audit. Reconcile the affected
 target list with every consumer of the changed code, including extensions.
 Identify which targets each passed build covers and link separate evidence for
-affected cross-target data handoffs. If a check is missing, report the work as
-continuing and name that checkpoint. Record failed pilots as
+affected cross-target data handoffs. Preserve any relevant failed run from
+during or after migration. Before completion, verify the same scenario on
+the affected target, build configuration and OS at the final commit.
+If a required check is missing or a failure remains unresolved, report the
+work as continuing and name that checkpoint. Record failed pilots as
 blocked evidence and exclude them from migration precedents.
 
 ## Continuation contract
