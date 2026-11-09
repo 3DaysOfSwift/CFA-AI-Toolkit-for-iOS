@@ -115,10 +115,12 @@ func save() -> Task<Void, Never> {
 
 The example assumes a main-actor ViewModel, a stored `Task<Void, Never>?` named
 `saveTask`, an explicit `notesFeature` dependency and an unchanged editor draft while
-saving. Repeated taps reuse the handle; async callers and tests use
-`await viewModel.save().value`. If input changes during saving, queue that
-distinct edit rather than silently treating it as a duplicate. A persistent
-save need not be cancelled on navigation. Business rules remain in the Feature.
+saving. In this editor, repeated taps represent the same pending save and reuse
+the handle; async callers and tests use `await viewModel.save().value`. Queue a
+distinct edit instead of silently treating it as a duplicate. Other workflows
+may require every command to take effect, even when inputs match; choose the
+policy from the intended behaviour. A persistent save need not be cancelled on
+navigation. Business rules remain in the Feature.
 
 Bindings, conditional content, `ForEach` and direct dismissal are declarative UI work. A View `.task` is lifecycle-bound work: SwiftUI starts it before the View appears and may cancel it after the View disappears. Use it confidently for a screen's initial refresh or other work that belongs to that screen's lifetime. It is not a completion barrier: render a useful observed loading, cached, empty, or error state while the asynchronous operation continues.
 
