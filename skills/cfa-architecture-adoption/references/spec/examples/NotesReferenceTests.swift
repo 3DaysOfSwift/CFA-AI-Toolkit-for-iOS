@@ -266,6 +266,11 @@ actor HeldNotesLoad: NotesRepository {
         await savingEditor.load()
         precondition(savingEditor.loadError != nil)
         savingEditor.text = "Save after restoration"
+        let originalLoadError = savingEditor.loadError
+        let saveWhileLoadIsFailed = await savingEditor.save().value
+        precondition(!saveWhileLoadIsFailed && savingEditor.saveError != nil)
+        precondition(savingEditor.loadError == originalLoadError)
+        precondition(savingEditor.text == "Save after restoration" && corruptFeature.notes.isEmpty)
 
         // Restore the known good file, then retry through the same screen and Feature.
         try JSONEncoder().encode(afterOverlap).write(to: url, options: .atomic)
@@ -274,7 +279,7 @@ actor HeldNotesLoad: NotesRepository {
         precondition(corruptEditor.text == "Keep this draft")
         let snapshotBeforeSave = corruptFeature.notes
         let recoveredSave = await savingEditor.save().value
-        precondition(recoveredSave && savingEditor.loadError == nil)
+        precondition(recoveredSave && savingEditor.loadError == nil && savingEditor.saveError == nil)
         precondition(snapshotBeforeSave == afterOverlap, "An earlier reader keeps its confirmed snapshot")
         precondition(corruptFeature.notes.map(\.text) == afterOverlap.map(\.text) + ["Save after restoration"])
         // Fixed JSON represents an existing store independently of today's encoder.
