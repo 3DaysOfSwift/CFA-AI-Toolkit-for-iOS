@@ -110,12 +110,12 @@ append `CLAUDE.md` instead. Project guidance is optional: installed skill
 descriptions remain the mechanism that matches ordinary iOS prompts across the
 computer.
 
-For an existing guidance block, `cfa doctor` and `cfa enable-project` can flag
-known older wording, including Feature naming, AppModel listener ownership,
-service boundaries, screen ownership, deep links and shared refresh
-cancellation. A block being found only confirms that the project has one.
-Use any warning to update the marked CFA guidance while preserving your
-project's own instructions. Both commands leave the existing block in place.
+For an existing guidance block, `cfa doctor` and `cfa enable-project` report
+when its wording differs from the copy shipped with the installed toolkit.
+A difference may come from an older toolkit or from project-specific edits.
+Known older rules also get focused update hints. Compare the marked CFA block
+with the installed guidance and keep your project's own instructions. Both
+commands preserve the existing block.
 
 If `cfa` is not found, add its folder to zsh's path once and open a new Terminal:
 
