@@ -5,13 +5,13 @@ ViewModel, Feature and JSON persistence service. The screen ViewModel owns the
 unsaved text. The Feature queues admitted saves in order, persists each note
 before publication, and continues owned work if the awaiting caller is cancelled.
 The caller still awaits the admitted save’s outcome. A failed save leaves the
-editor open with its text available for retry. Cancel
+editor open with its text available for retry. Cancel clears the draft and
 closes the editor without saving. During a save, the editor disables text
 entry, Save, Cancel and interactive sheet dismissal.
 
 The code below is also available as [NotesReference.swift](spec/examples/NotesReference.swift).
 The accompanying [executable checks](spec/examples/NotesReferenceTests.swift)
-verify failure recovery, publication after persistence, repeated Save taps,
+verify failure recovery, discard without a write, publication after persistence, repeated Save taps,
 ordered independent saves, JSON storage and fresh editor state. A queued
 save still completes when its predecessor fails, and each caller receives
 its own outcome. The checks also verify that two callers share one load
@@ -195,6 +195,11 @@ final class NotesEditorViewModel {
         return task
     }
 
+    func discardDraft() {
+        text = ""
+        saveError = nil
+    }
+
     @discardableResult
     func save(onSuccess: @escaping @MainActor () -> Void = {}) -> Task<Bool, Never> {
         if let saveTask { return saveTask }
@@ -240,7 +245,10 @@ struct NotesEditorView: View {
             }
             Button("Save") { viewModel.save { dismiss() } }
                 .disabled(viewModel.isSaving)
-            Button("Cancel", role: .cancel) { dismiss() }
+            Button("Cancel", role: .cancel) {
+                viewModel.discardDraft()
+                dismiss()
+            }
                 .disabled(viewModel.isSaving)
         }
         .interactiveDismissDisabled(viewModel.isSaving)

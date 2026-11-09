@@ -146,6 +146,11 @@ final class NotesEditorViewModel {
         return task
     }
 
+    func discardDraft() {
+        text = ""
+        saveError = nil
+    }
+
     @discardableResult
     func save(onSuccess: @escaping @MainActor () -> Void = {}) -> Task<Bool, Never> {
         if let saveTask { return saveTask }
@@ -191,7 +196,10 @@ struct NotesEditorView: View {
             }
             Button("Save") { viewModel.save { dismiss() } }
                 .disabled(viewModel.isSaving)
-            Button("Cancel", role: .cancel) { dismiss() }
+            Button("Cancel", role: .cancel) {
+                viewModel.discardDraft()
+                dismiss()
+            }
                 .disabled(viewModel.isSaving)
         }
         .interactiveDismissDisabled(viewModel.isSaving)

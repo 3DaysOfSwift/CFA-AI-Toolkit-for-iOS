@@ -135,6 +135,14 @@ actor HeldNotesLoad: NotesRepository {
         model.text = "retry"
         let success = await model.save().value
         precondition(success && model.text.isEmpty && feature.notes.map(\.text) == ["retry"])
+        model.text = "fail"
+        let failedBeforeDiscard = await model.save().value
+        precondition(!failedBeforeDiscard && model.saveError != nil)
+        model.discardDraft()
+        let savedAfterDiscard = await repository.saved
+        precondition(model.text.isEmpty && model.saveError == nil)
+        precondition(savedAfterDiscard == ["retry"] && feature.notes.map(\.text) == savedAfterDiscard)
+
         let first = Task { try await feature.save("first") }
         await repository.waitForFirst()
         first.cancel() // A departing caller does not cancel the Feature-owned save.
