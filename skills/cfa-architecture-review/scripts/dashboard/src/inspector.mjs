@@ -298,7 +298,7 @@ export async function inspect(project) {
       const line = lineOf(appModel, match.index);
       findings.push(finding('app-model-default-value', 'warning', `AppModel property ${match[1]} has a default value; initialise it in the explicit initializer.`, appModelFile, line));
       const start = match.index + match[0].length;
-      const constructor = /^[ \t]*(?:\w+\s*\.\s*)*([A-Z]\w*)\s*\(/.exec(appModel.slice(start));
+      const constructor = /^\s*(?:\w+\s*\.\s*)*([A-Z]\w*)\s*\(/.exec(appModel.slice(start));
       if (!constructor) continue;
       const close = closingParenthesis(appModel, start + constructor[0].length - 1);
       if (close < 0 || /^\s*(?:[.\[]|as[?!]?\b)/.test(appModel.slice(close + 1))) continue;

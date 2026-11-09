@@ -552,7 +552,8 @@ test('reviews inferred AppModel service storage from another module and allows f
   const file = 'App/2 - AppModel/AppModel.swift';
   const root = await fixture(t, {
     [file]: `final class AppModel {
-      let stored = Infrastructure.NetworkingManager()
+      let stored =
+        Infrastructure.NetworkingManager()
       static func live() -> AppModel {
         let local = Infrastructure.SwiftDataManager()
         return AppModel()
