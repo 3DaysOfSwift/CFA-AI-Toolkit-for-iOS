@@ -88,7 +88,7 @@ const excluded = new Set(['.git', '.build', '.swiftpm', 'Pods', 'Carthage', 'nod
 export async function analyse(root, { includeTests = false, excludedOutput } = {}) {
   root = await fs.realpath(root);
   if (!(await fs.stat(root)).isDirectory()) throw new Error('Repository path must be a directory.');
-  const files = [], skipped = [], excludedTestDirectories = [];
+  const files = [], skipped = [], excludedTestDirectories = [], buildDefinitions = [];
   async function walk(directory) {
     for (const entry of (await fs.readdir(directory, { withFileTypes: true })).sort((a,b) => a.name.localeCompare(b.name))) {
       const absolute = path.join(directory, entry.name);
@@ -100,6 +100,10 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
           continue;
         }
         await walk(absolute);
+      } else if (entry.isFile() && /(?:\.(?:pbxproj|xcconfig|xcscheme)$|^(?:contents\.xcworkspacedata|Package\.resolved)$)/.test(entry.name)) {
+        const relative = path.relative(root, absolute).split(path.sep).join('/');
+        const hash = createHash('sha256').update(await fs.readFile(absolute)).digest('hex');
+        buildDefinitions.push([relative, hash]);
       } else if (entry.isFile() && entry.name.endsWith('.swift')) {
         const relative = path.relative(root, absolute).split(path.sep).join('/');
         if ((await fs.stat(absolute)).size > 2_000_000) { skipped.push({ file: relative, reason: 'Over 2 MB source limit' }); continue; }
@@ -111,6 +115,8 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
   await walk(root);
   const fingerprint = createHash('sha256').update(JSON.stringify(files.map(file => [file.path, file.hash])));
   if (excludedTestDirectories.length) fingerprint.update(JSON.stringify(excludedTestDirectories));
+  if (buildDefinitions.length) fingerprint.update(JSON.stringify(buildDefinitions));
+  if (skipped.length) fingerprint.update(JSON.stringify(skipped));
   const sourceFingerprint = fingerprint.digest('hex');
   return { schemaVersion: 3, sourceFingerprint, dashboard: dashboard(files), project: path.basename(root), generatedAt: new Date().toISOString(),
     method: 'Lexical source inventory — not compiler-resolved or runtime-observed',

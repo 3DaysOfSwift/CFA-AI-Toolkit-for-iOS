@@ -70,3 +70,18 @@ test('report escapes repository text and embeds data without script injection',(
   assert.equal((html.match(/<script>/g)||[]).length,1);
   assert.ok(html.includes("connect-src 'none'"));
 });
+
+test('changing Xcode target definitions invalidates source review evidence', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cfa-target-definition-'));
+  t.after(() => fs.rm(root, {recursive:true, force:true}));
+  await fs.writeFile(path.join(root, 'App.swift'), 'struct App {}');
+  const project = path.join(root, 'App.xcodeproj');
+  await fs.mkdir(project);
+  const definition = path.join(project, 'project.pbxproj');
+  await fs.writeFile(definition, 'First target membership');
+  const before = await analyse(root);
+  await fs.writeFile(definition, 'Changed target membership');
+  const after = await analyse(root);
+  assert.deepEqual(after.files, before.files);
+  assert.notEqual(after.sourceFingerprint, before.sourceFingerprint);
+});
