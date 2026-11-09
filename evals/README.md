@@ -19,3 +19,9 @@ router.
 persistence and business work. A correct CFA response selects architecture
 adoption and proposes real ownership boundaries before changing behaviour. It
 must not describe the app as CFA merely because folders could be added.
+
+## Migration handoff
+
+Use the [migration handoff case](migration-handoff.md) to check that an installed
+host follows the completion gate when builds pass but placement, hybrid paths
+and manual verification still need attention.
