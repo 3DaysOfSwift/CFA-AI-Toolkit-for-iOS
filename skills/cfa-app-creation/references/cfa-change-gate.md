@@ -129,9 +129,12 @@ the architecture:
     can keep work running after its screen closes. Continuing after the app
     itself enters the background requires an appropriate system mechanism.
     For additional device or extension targets, include the appropriate shared
-    Model source and target-specific presentation. Each process has its own
-    AppModel and Feature instances; synchronize data through an appropriate
-    platform mechanism rather than assuming shared memory.
+    Model source and target-specific presentation. Verify target membership,
+    API availability and lifecycle requirements. Each process has its own
+    AppModel and Feature instances. Transfer immutable snapshots through an
+    appropriate platform mechanism and refresh observable state at the receiving
+    Feature. Save a widget's shared snapshot before requesting a timeline reload.
+    Test missing, delayed and stale data on supported devices.
 15. SwiftData access goes through `SwiftDataManager`; every `URLSession` call
     goes through `NetworkingManager`. Features own those lower-level
     collaborators. Keep domain-specific services beside their owning Feature
