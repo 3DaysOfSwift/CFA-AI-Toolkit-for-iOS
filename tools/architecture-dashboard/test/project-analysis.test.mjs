@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {analyseProject} from '../src/project-analysis.mjs';
+import {auditEntitlements} from '../src/entitlement-audit.mjs';
 import {collectSyntax} from '../src/syntax-evidence.mjs';
 import fs from 'node:fs/promises';
 import os from 'node:os';
@@ -134,4 +135,34 @@ test('keeps syntax and call candidates inside the inventoried source scope', asy
   assert.equal(result.syntax.excludedItems, 1);
   assert.deepEqual(result.syntax.items.map(item => item.file), ['App.swift']);
   assert.deepEqual(result.callCandidates.map(call => call.file), ['App.swift']);
+});
+
+
+test('project analysis carries indexed caller links into entitlement review', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cfa-entitlement-project-'));
+  t.after(() => fs.rm(root, {recursive:true, force:true}));
+  await fs.writeFile(path.join(root, 'Export.swift'), [
+    'func export() { exportFeature.export() }',
+    'func route() { export() }',
+    'func shortcut() { route() }'
+  ].join('\n'));
+  const analysis = await analyseProject(root, {indexStore:'/index', module:'App'}, {
+    syntax: async () => ({status:'available', files:['Export.swift'], items:[
+      {kind:'call.expression', name:'exportFeature.export', file:'Export.swift', line:1, column:17}
+    ]}),
+    index: async () => [
+      {file:'Export.swift', line:1, column:31, callerID:'export', calleeID:'paid', caller:'export'},
+      {file:'Export.swift', line:2, column:16, callerID:'route', calleeID:'export', caller:'route'},
+      {file:'Export.swift', line:3, column:19, callerID:'shortcut', calleeID:'route', caller:'shortcut'},
+      {file:'Unscanned.swift', line:1, column:1, callerID:'excluded', calleeID:'route', caller:'excluded'}
+    ]
+  });
+  const report = auditEntitlements(analysis, {
+    capabilities:[{name:'Export', writtenCalls:['exportFeature.export']}]
+  });
+  const [match] = report.capabilities[0].calls;
+  assert.deepEqual(match.possibleIndexedCallers.map(call => call.caller), ['route']);
+  assert.deepEqual(match.possibleIndexedUpstreamCallers.map(call => call.caller), ['shortcut']);
+  assert.equal(report.indexExcludedCalls, 1);
+  assert.equal(match.status, 'review-required');
 });

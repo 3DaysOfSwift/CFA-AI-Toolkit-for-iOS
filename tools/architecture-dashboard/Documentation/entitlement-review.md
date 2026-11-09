@@ -34,7 +34,13 @@ Run:
 node src/entitlement-audit.mjs --analysis /tmp/project-analysis.json --policy /tmp/paid-capabilities.json --out /tmp/entitlement-review.json
 ```
 
-Inspect every candidate and any indexed caller leads, verify the source revision,
+Inspect every candidate. The report lists immediate callers in
+`possibleIndexedCallers` and call sites reached through additional indexed
+hops in `possibleIndexedUpstreamCallers`. An upstream lead can point to a
+shortcut or other entry route that calls through several helpers. Verify
+each hop in the selected build and trace routes that the index omits.
+
+Verify the source revision,
 and trace the actual entry point and entitlement check. Use the report’s source scope to see which files or directories were excluded.
 Confirm target membership separately. Review presentation separately: a screen can expose paid data or controls without making a call
 listed in the policy. Trace alternate screens and other callers, including
