@@ -74,6 +74,11 @@ verification checklist. Keep root navigation available during slow or failed
 opening. Verify Feature-scoped retry and reuse of the working store after a
 fetch failure.
 
+If the change affects durable storage, reopen a disposable store created by
+the previous version with representative synthetic records. Verify that the
+configured location and saved records remain usable and that a failed open or
+upgrade preserves the original data. Verify fresh setup separately.
+
 When changing how a non-critical preference is restored, apply the
 [preference recovery rule](references/spec/rules/cfa-pref-01.md). Verify the
 product-defined fallback for a missing or obsolete value in a recognised

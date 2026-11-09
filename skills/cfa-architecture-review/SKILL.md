@@ -105,6 +105,11 @@ decision to where the Feature reads its clock. Check whether a date captured
 during initialization would go stale. Review transient visual timers
 separately from business decisions.
 
+For durable storage changes, check upgrade evidence from a disposable store
+created by the previous version. Verify that the configured location and saved
+records remain usable and that a failed open or upgrade preserves the original
+data. A fresh-store test covers initial setup only.
+
 When reviewing preference restoration, apply the
 [preference recovery rule](references/spec/rules/cfa-pref-01.md). Trace a
 supported value, a missing value and an obsolete value in a recognised
