@@ -465,3 +465,18 @@ test('recognizes lower-camel-case Feature properties with leading acronyms', asy
   assert.equal(findings.length, 1);
   assert.match(findings[0].message, /uRLImportFeature.*\(urlImportFeature\)/);
 });
+
+test('does not choose a test file by basename when multiple targets have matches', async t => {
+  const root = await fixture(t, {
+    'App/1 - View/Views/Home/HomeView.swift': 'struct HomeView: View { @State private var viewModel = HomeViewModel() }',
+    'App/1 - View/Views/Home/HomeViewModel.swift': 'final class HomeViewModel {}',
+    'PhoneTests/HomeViewModelTests.swift': 'struct HomeViewModelTests {}',
+    'WatchTests/HomeViewModelTests.swift': 'struct HomeViewModelTests {}'
+  });
+  const report = await inspect(root);
+  assert.equal(report.screens[0].testFile, null);
+  assert.equal(report.screens[0].testCandidates.length, 2);
+  assert.ok(report.findings.some(item => item.code === 'view-model-tests-ambiguous'));
+  assert.ok(!report.findings.some(item => item.code === 'view-model-tests-missing'));
+  assert.match(renderInspection(report), /multiple matching test files. Verify target/);
+});

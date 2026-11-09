@@ -241,7 +241,8 @@ export async function inspect(project) {
       ? viewModel.slice(0, viewModelBodyStart).replace(/[^\n]/g, ' ') + memberSignatures(braceBody(viewModel, viewModelBodyStart - 1))
       : '';
     const testName = `${viewModelName}Tests.swift`;
-    const testFile = [...paths].find(file => path.posix.basename(file) === testName) ?? null;
+    const testCandidates = [...paths].filter(file => path.posix.basename(file) === testName);
+    const testFile = testCandidates.length === 1 ? testCandidates[0] : null;
     const statePattern = new RegExp(`@State\\s+private\\s+var\\s+([A-Za-z_]\\w*)(?:\\s*:\\s*${viewModelName})?\\s*=\\s*${viewModelName}\\s*\\(\\s*\\)`);
     const typedStatePattern = new RegExp(`@State\\s+private\\s+var\\s+([A-Za-z_]\\w*)\\s*:\\s*${viewModelName}\\s*=\\s*\\.init\\s*\\(\\s*\\)`);
     const inlineState = statePattern.exec(members) ?? typedStatePattern.exec(members);
@@ -319,9 +320,10 @@ export async function inspect(project) {
     else if (viewModel) {
       if (!ownsViewModel) findings.push(finding('view-model-ownership', 'review', `${name} has no recognized private @State ViewModel storage. Verify that the screen constructs and stores its ViewModel. Detail Views may initialize that stored state from selected value data. A computed property does not satisfy CFA screen ownership.`, viewFile, lineOf(view, declaration.index)));
       if (!dependencies.length) findings.push(finding('feature-route-unresolved', 'review', `${viewModelName} has no visible AppModel.shared feature route; inspect whether this screen is presentation-only.`, viewModelFile, 1));
-      if (!testFile) findings.push(finding('view-model-tests-missing', 'review', `No ${testName} was found in the scanned directory. Check the project root and test target before concluding the test is missing.`, viewModelFile, 1));
+      if (testCandidates.length > 1) findings.push(finding('view-model-tests-ambiguous', 'review', `Multiple files match ${testName}: ${testCandidates.join(', ')}. Verify which test target covers this ViewModel.`, viewModelFile, 1));
+      if (!testCandidates.length) findings.push(finding('view-model-tests-missing', 'review', `No ${testName} was found in the scanned directory. Check the project root and test target before concluding the test is missing.`, viewModelFile, 1));
     }
-    screens.push({ name, viewFile, viewModelFile: viewModel ? viewModelFile : null, ownsViewModel, structuralRoot, testFile, dependencies });
+    screens.push({ name, viewFile, viewModelFile: viewModel ? viewModelFile : null, ownsViewModel, structuralRoot, testFile, testCandidates, dependencies });
   }
 
   return {
@@ -356,7 +358,9 @@ export function renderInspection(report) {
     });
     const viewModel = screen.viewModelFile ? screenName(screen.viewModelFile) : 'no adjacent ViewModel; review screen role';
     const ownership = screen.ownsViewModel ? 'private @State recognized' : 'ownership needs review';
-    const tests = screen.testFile ? 'matching test file found' : 'no matching test file found';
+    const tests = screen.testFile ? 'matching test file found'
+      : screen.testCandidates?.length > 1 ? 'multiple matching test files. Verify target'
+        : 'no matching test file found';
     lines.push(`${screen.name}: ${viewModel} → ${routes.join(', ') || 'no visible feature route'} · ${ownership} · ${tests}`);
   }
   if (report.findings.length) {
