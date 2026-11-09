@@ -1,6 +1,7 @@
 import Foundation
 import Observation
 import PlaygroundSupport
+import SwiftUI
 
 PlaygroundPage.current.needsIndefiniteExecution = true
 
@@ -13,15 +14,30 @@ final class HabitFeature {
     func recordCompletedDay() { completedDays += 1 }
 }
 
+@MainActor
+final class AppModel {
+    static let shared = AppModel()
+    let habitFeature = HabitFeature()
+}
+
 @MainActor @Observable
 final class HabitViewModel {
     private let habitFeature: HabitFeature
 
-    init(habitFeature: HabitFeature) {
+    init(habitFeature: HabitFeature = AppModel.shared.habitFeature) {
         self.habitFeature = habitFeature
     }
 
     var completedDays: Int { habitFeature.completedDays }
+}
+
+@MainActor
+struct HabitView: View {
+    @State private var viewModel = HabitViewModel()
+
+    var body: some View {
+        Text("Completed days: \(viewModel.completedDays)")
+    }
 }
 
 // MARK: - Test fixtures

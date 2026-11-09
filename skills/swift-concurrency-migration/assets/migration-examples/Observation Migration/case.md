@@ -16,7 +16,9 @@ It does not preserve a notification for every mutation.
 ## Migration
 
 The Feature and ViewModel use `@Observable` and are isolated to `@MainActor`.
-The runnable check reads the count through the ViewModel’s computed property,
+`HabitView` constructs its own private State-backed ViewModel. The ViewModel
+defaults to the Feature from AppModel. The runnable check injects a fresh
+Feature and reads the count through the ViewModel’s computed property,
 then verifies that a new tracking registration receives a later change. SwiftUI normally
 establishes observation as it evaluates the properties a View reads; manual
 re-registration is shown here to make one-shot tracking visible.
@@ -29,8 +31,7 @@ Open and run `Before.playground` and `After.playground`. Each prints `Passed:` a
 
 Observation needs iOS 17/macOS 14 or newer. The counter is in memory. A
 Feature that records durable completions publishes the updated count after
-the required save succeeds. In an app, the View observes the Feature’s state
-through its screen ViewModel. The re-registration demonstrates reading the
+the required save succeeds. The SwiftUI screen demonstrates the observation route. The runnable check exercises that route from the ViewModel without rendering the screen. The re-registration demonstrates reading the
 latest state. If an existing subscriber must process every completion event,
 keep an event API that delivers every required occurrence. Test consecutive
 equal-valued events, ordering and cancellation separately from the final
