@@ -470,12 +470,13 @@ For each relevant operation, inspect:
 - Cancellation before side effects: a check before an await does not cover
   cancellation during that await. Trace the interval between preparation or access
   checks and starting a payment, write or other external effect. Check cancellation
-  again at the dispatch boundary when the operation is meant to stop. For queued
-  work, inspect cancellation after admission and before performing new I/O.
-  Distinguish this from a write that has already succeeded: suppressing publication
-  after a durable commit can leave application state inconsistent with storage.
-  Establish the operation's intended policy; do not require every shared or
-  app-owned operation to stop when one caller cancels.
+  again at the dispatch boundary when the operation is meant to stop. For
+  queued work, identify admission and verify the policy on each side of it.
+  In CFA, cancelling an unsaved draft discards its input. An admitted durable
+  save normally remains Feature-owned and completes even if the screen leaves.
+  After a durable commit, verify that confirmed state reflects the write even
+  if the caller was cancelled. Check screen-only feedback separately from
+  Feature publication.
 - Responsiveness: blocking waits and expensive processing on an executor needed
   by other work, including MainActor. Measure before asserting a measured slowdown.
 
