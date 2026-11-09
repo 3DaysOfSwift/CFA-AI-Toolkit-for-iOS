@@ -2,9 +2,9 @@
 
 **Applies when:** Sign-out, account switching or session expiration affects other Features.
 
-**Strength:** Default.
+**Strength:** Default coordination pattern with required session safeguards.
 
-**Guidance:** UserProfileFeature may call affected Features directly; if sign-out fails before the session ends, retain the session and account data. If authentication reports a partial failure, reconcile the actual session. When a session ends, clear that session’s affected state and report any cleanup failure. After sign-out, a cleanup failure does not restore the ended session. When switching accounts, keep the previous session’s data out of the new session. Check the current account or session generation before publishing an in-flight result, including when the request has been cancelled. Use session identity if a new session for the same account can overlap earlier work. If sign-out promises a fresh-install experience, also clear account-specific memory, caches and locally stored files. Handle unsynchronised work transparently and preserve independent purchases and user-owned documents.
+**Guidance:** UserProfileFeature may call affected Features directly through injected dependencies. Each Feature owns the data it clears, and dependencies stay acyclic. If sign-out fails before the session ends, retain the session and account data and report the failure so the user can retry. If authentication reports a partial failure, reconcile the actual session. When a session ends, clear that session’s affected state and report any cleanup failure. After sign-out, a cleanup failure does not restore the ended session. When switching accounts, keep the previous session’s data out of the new session. Check the current account or session generation before publishing an in-flight result, including when the request has been cancelled. Use session identity if a new session for the same account can overlap earlier work. If sign-out promises a fresh-install experience, also clear account-specific memory, caches and locally stored files. Handle unsynchronised work transparently and preserve independent purchases and user-owned documents.
 
 **Why:** A visible direct workflow avoids unnecessary event infrastructure while protecting account data.
 
