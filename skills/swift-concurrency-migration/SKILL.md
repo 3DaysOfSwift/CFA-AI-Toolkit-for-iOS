@@ -149,8 +149,9 @@ Use deliberate passes:
    caller waits for another request's response before starting its own.
    When migrating an existing cache of replaceable downloads, apply the
    [optional snapshot rule](references/spec/rules/cfa-cache-01.md). Verify that
-   a slow restore cannot delay refresh or overwrite fresh data for the same
-   source. Other sources can still restore usable cached data. Hold the
+   a missing, incompatible, unreadable or slow cache cannot delay refresh.
+   A late restore cannot overwrite fresh data for the same source. Other
+   sources can still restore usable cached data. Hold the
    optional write open and verify that fresh data publishes and the caller
    completes. Force cache replacement to fail and verify retries stop within
    the configured limit, the refresh remains successful, and the previous

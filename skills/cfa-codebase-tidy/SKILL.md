@@ -59,7 +59,9 @@ leaves the others able to receive the result. Where a screen must exit
 promptly, verify its wait ends before the suspended refresh completes.
 
 When tidying a cache for replaceable downloads, apply the
-[optional snapshot rule](references/spec/rules/cfa-cache-01.md). Hold the
+[optional snapshot rule](references/spec/rules/cfa-cache-01.md), including its
+verification checklist. Confirm that refresh proceeds while restoration is
+pending and when the cache is missing, incompatible or unreadable. Hold the
 optional write pending and verify that fresh data is published and the caller
 completes. Force a replacement failure and reopen storage to verify that the
 previous usable snapshot survives. Verify that late restores and writes

@@ -117,8 +117,9 @@ If the project is already CFA, make the smallest complete vertical change:
    unchanged. For a replaceable download, apply the
    [optional snapshot rule](references/spec/rules/cfa-cache-01.md). Publish
    current server data and return the refresh result while optional caching
-   proceeds independently. If changing this path, hold the cache write open
-   in a test and verify both publication and caller completion. For independent
+   proceeds independently. If changing this path, verify that refresh proceeds
+   during a slow restore and with a missing, incompatible or unreadable cache.
+   Hold the cache write open and verify both publication and caller completion. For independent
    sources, complete one refresh before restoration and verify that cached
    data from other sources remains usable.
    Verify that a failed refresh keeps valid data visible. If cache replacement
