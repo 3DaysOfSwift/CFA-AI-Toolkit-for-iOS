@@ -250,8 +250,11 @@ late event from the old source, then release the old teardown. Verify that
 the late event cannot update the new consumer and that the replacement still
 receives its own events. Control teardown explicitly instead of using sleeps.
 
-For system background work, use a controlled scheduler to verify that launch
-registers each applicable handler once and that scheduling happens separately.
+For system background work, apply the
+[background-work rule](references/spec/rules/cfa-bg-01.md). Compare registered
+identifiers with the app’s permitted identifiers. Use a controlled scheduler
+to verify that repeated launch signals register each applicable handler once
+and that scheduling happens separately.
 Drive the handler through success, failure and expiration. Verify that the
 owning Feature cancels the work on expiration. Hold the work at completion
 and deliver expiration before releasing it. Verify that the race still

@@ -65,6 +65,15 @@ Verify that repeated startup leaves one listener, delivery works without a
 relevant screen, and any supported replacement survives the old listener's
 cleanup.
 
+When tidying system background work, apply the
+[background-work rule](references/spec/rules/cfa-bg-01.md). Preserve the
+owning Feature, permitted identifiers and once-only registration during
+launch. Keep scheduling separate from registration. Verify that expiration
+cancels the owned work and that success, failure, expiration and an expiration
+racing normal completion each complete the system callback exactly once.
+Verify actual background delivery on a supported device separately from
+controlled handler tests.
+
 When tidying a cache for replaceable downloads, apply the
 [optional snapshot rule](references/spec/rules/cfa-cache-01.md), including its
 verification checklist. Confirm that refresh proceeds while restoration is
