@@ -95,7 +95,9 @@ If the project is already CFA, make the smallest complete vertical change:
    state that could change a published snapshot in place. Submit edits through
    the owning Feature and publish a replacement value after the required save.
    Keep unsaved editor values in the screen ViewModel.
-   Publish a durable edit as saved only after required persistence succeeds.
+   Apply the [durable save rule](references/spec/rules/cfa-store-01.md).
+   Persist each record change by stable identity and publish it as saved
+   only after required persistence succeeds.
    On failure, keep the draft available for retry and leave confirmed state
    unchanged. For a replaceable download, apply the
    [optional snapshot rule](references/spec/rules/cfa-cache-01.md). Publish

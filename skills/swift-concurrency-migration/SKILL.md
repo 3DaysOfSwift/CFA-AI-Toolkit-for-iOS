@@ -140,6 +140,9 @@ Use deliberate passes:
    a slow restore cannot delay refresh or overwrite fresh data, and that an
    optional write cannot hold up a successful refresh. Keep required
    persistence for user edits on the save path before reporting success.
+   Apply the [durable save rule](references/spec/rules/cfa-store-01.md) to
+   individual record changes. Preserve explicit import or restore behaviour
+   and verify that unrelated records survive overlapping writes.
    When changing durable storage, preserve the shipped store location and
    schema compatibility. If the migration requires changing either, verify
    the upgrade with a disposable store written by the previous version with
