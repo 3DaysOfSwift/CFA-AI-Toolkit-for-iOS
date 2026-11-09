@@ -258,7 +258,8 @@
       "classification": "cfa-choice",
       "ruleIds": [
         "CFA-GRAPH-01",
-        "CFA-GRAPH-02"
+        "CFA-GRAPH-02",
+        "CFA-SPEC-LAUNCH-01"
       ],
       "note": "decisions/appmodel-composition.md",
       "rationaleStatus": "documented-basis-editorial-analysis",
@@ -462,7 +463,8 @@
       "classification": "cfa-choice",
       "ruleIds": [
         "CFA-LAUNCH-01",
-        "CFA-ERROR-01"
+        "CFA-ERROR-01",
+        "CFA-SPEC-LAUNCH-02"
       ],
       "note": "decisions/storage-failures.md",
       "rationaleStatus": "documented-basis-editorial-analysis",

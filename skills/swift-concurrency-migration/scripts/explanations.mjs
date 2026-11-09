@@ -78,7 +78,7 @@ export function validateCatalogue(catalogue, directory, { sourceRoot } = {}) {
     requireValue(topic.rationaleStatus === 'documented-basis-editorial-analysis', 'Unrecognised rationale provenance');
     requireValue(Array.isArray(topic.ruleIds) && topic.ruleIds.length > 0, 'Topic needs rule IDs');
     for (const id of topic.ruleIds) {
-      requireValue(/^CFA-[A-Z]+-\d{2}$/.test(id) && !rules.has(id), 'Invalid or duplicate rule ID');
+      requireValue(/^CFA-(?:SPEC-)?[A-Z]+-\d{2}$/.test(id) && !rules.has(id), 'Invalid or duplicate rule ID');
       rules.add(id);
     }
     requireValue(topic.note === `decisions/${topic.id}.md`, 'Invalid note path');
