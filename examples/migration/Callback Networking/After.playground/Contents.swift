@@ -43,6 +43,10 @@ final class FixtureURLProtocol: URLProtocol, @unchecked Sendable {
             client?.urlProtocol(self, didFailWithError: URLError(.badURL))
             return
         }
+        if url.path == "/offline" {
+            client?.urlProtocol(self, didFailWithError: URLError(.notConnectedToInternet))
+            return
+        }
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
         let payload = url.path == "/malformed" ? "{" : #"{"name":"Artemis"}"#
         client?.urlProtocol(self, didLoad: Data(payload.utf8))
@@ -59,6 +63,7 @@ func runExample() async throws {
     defer { session.invalidateAndCancel() }
     guard let success = URL(string: "https://example.invalid/launch"),
           let failure = URL(string: "https://example.invalid/failure"),
+          let offline = URL(string: "https://example.invalid/offline"),
           let malformed = URL(string: "https://example.invalid/malformed") else { throw URLError(.badURL) }
     let api = LaunchAPI(networkingManager: NetworkingManager(session: session))
     let launch = try await api.download(from: success)
@@ -71,7 +76,11 @@ func runExample() async throws {
         _ = try await api.download(from: malformed)
         preconditionFailure("Invalid JSON must not be reported as success")
     } catch DecodingError.dataCorrupted {}
-    print("Passed: Artemis downloaded; HTTP 503 and invalid JSON reported.")
+    do {
+        _ = try await api.download(from: offline)
+        preconditionFailure("Transport failure must not be reported as success")
+    } catch let error as URLError where error.code == .notConnectedToInternet {}
+    print("Passed: Artemis downloaded; HTTP 503, invalid JSON and offline errors reported.")
 }
 
 // MARK: - Run after example
