@@ -1897,12 +1897,15 @@ Before accepting a change, answer every question:
     Verify that an opening request received during restoration survives a
     restart alongside the previously saved requests.
 25. For offline edits or cross-device sync in scope, does the app distinguish
-    local success from server confirmation? For a custom server, verify
-    that the edit and pending metadata are saved together, survive failed
-    sync and restart, and retry without duplicating the change. When replacing
-    an existing implementation, verify recovery of a previously saved pending
-    edit. Exercise conflict and rejection outcomes where applicable. Verify
-    Apple-managed sync on supported devices.
+    local success from server confirmation? For a custom server, fail the local
+    write and verify that it reports failure without admitting an edit for upload.
+    Verify that the edit and pending metadata are saved together, survive failed
+    sync and restart, and retry with the same edit identity to produce one logical
+    server change. When replacing an existing implementation, verify recovery and
+    retry of an edit saved by the previous version. Exercise conflict and rejection
+    outcomes where applicable. Verify Apple-managed sync, including conflicting
+    offline edits, on supported devices with the required capabilities, account
+    and schema.
 
 Every applicable answer must be yes. Marking a question not applicable requires
 a short explanation. Otherwise, the change is not architecturally complete.
