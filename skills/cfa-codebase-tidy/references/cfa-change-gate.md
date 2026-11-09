@@ -394,6 +394,9 @@ operations enforce authorisation independently.
   leaves the old value intact where the product requires it. Test unreadable
   or corrupt durable storage and failed writes separately and verify that the
   app exposes the failure.
+- For changed failure paths, trace the Feature outcome through the ViewModel.
+  Verify that the ViewModel owns screen-specific error text and that the
+  screen presents the outcome of the requested operation.
 - For changes to durable editing, hold the save pending and verify that
   confirmed state stays unchanged. Fail the save and verify the screen
   presents a recoverable error and its ViewModel retains the draft for retry.

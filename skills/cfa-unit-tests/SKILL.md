@@ -154,7 +154,9 @@ limit separately.
 For apps that use a database, apply the
 [database availability rule](references/spec/rules/cfa-launch-02.md). Hold
 initial store opening in a controlled dependency, then fail it. Verify that
-the affected Feature exposes a recoverable error and can retry. Separately
+the affected Feature exposes a recoverable failure and can retry. Verify
+that the screen ViewModel exposes the corresponding error text and clears
+it on successful recovery. Separately
 exercise launch and navigation while storage is slow or unavailable. Verify
 that the root appears and unaffected destinations remain accessible.
 For file-backed storage, use a disposable configured store URL. Verify that

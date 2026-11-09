@@ -14,6 +14,6 @@
 
 **Related reading:** [Why use recoverable storage requests in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/storage-failures).
 
-**Verify:** Inject failures and verify displayed outcomes and state.
+**Verify:** Inject failures and trace the Feature outcome to screen-specific error text owned by the ViewModel. Verify confirmed state, retry and the distinction between a failed operation and a failed optional cache write.
 
 **Full rule, context and examples:** [Keep Persistence Behind Repository Contracts](../topics/19-keep-persistence-behind-repository-contracts.md). This card is a reading aid; apply the complete canonical section.

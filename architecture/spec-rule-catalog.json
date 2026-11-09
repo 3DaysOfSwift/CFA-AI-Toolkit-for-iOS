@@ -566,7 +566,7 @@
       "rule": "Report the outcome of the work the user requested. If a durable save fails, retain the draft and previously confirmed state and expose a recoverable error. If an optional cache write fails after a successful download, keep the fresh data visible and avoid claiming offline availability.",
       "why": "The user needs to know whether an operation succeeded.",
       "example": "An unsuccessful durable save leaves the editor available for retry.",
-      "verify": "Inject failures and verify displayed outcomes and state.",
+      "verify": "Inject failures and trace the Feature outcome to screen-specific error text owned by the ViewModel. Verify confirmed state, retry and the distinction between a failed operation and a failed optional cache write.",
       "explanationIds": [
         "storage-failures",
         "honest-errors-and-editing"
