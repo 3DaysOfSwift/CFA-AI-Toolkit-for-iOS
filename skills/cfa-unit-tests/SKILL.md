@@ -73,6 +73,13 @@ show the expected purchase or locked experience where applicable and never
 invoke the paid operation. Verify that entitled callers can proceed. Verify
 server-side authorisation separately for server-protected operations.
 
+For deep links and notification actions, drive scene outcomes through a
+controlled handler. Verify that refusal or cancellation before navigation
+leaves the request pending and that navigation consumes it even if cancellation
+follows. Simulate a failed removal after navigation, then retry the write and
+verify that the handler is called only once. Exercise competing scenes and
+restoration without losing unrelated pending requests.
+
 For account changes, hold an old account's request open, switch accounts or
 sign out, then complete the old request. Verify that its data is never
 published into the new session. Exercise successful cleanup, sign-out
