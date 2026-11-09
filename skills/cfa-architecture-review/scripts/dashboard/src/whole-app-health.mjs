@@ -373,7 +373,9 @@ if (process.argv[1] && existsSync(process.argv[1]) && realpathSync(process.argv[
       console.log(`Inventoried ${result.files.length} Swift files and ${inventoryCandidates(result).length} possible entry points. Review inventory.json before producing the report.`);
       if (output) {
         const analysis = JSON.parse(await fs.readFile(path.join(input,'project-analysis.json'),'utf8'));
-        console.log(`Compiler index: ${analysis.compilerIndex.status}${analysis.compilerIndex.status === 'unavailable' ? ` — ${analysis.compilerIndex.reason}` : ''}.`);
+        const {status, module, reason} = analysis.compilerIndex;
+        console.log(`Compiler index: ${status}${module ? ` (module ${module})` : ''}`);
+        if (reason) console.log(reason);
       }
     } else if (mode === 'progress' && root && input && args.length === 3) {
       const result = await progress(root,input);
