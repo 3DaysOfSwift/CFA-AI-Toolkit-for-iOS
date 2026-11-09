@@ -31,9 +31,10 @@ the evaluator the expected outcome.
 - Trace the adapter's actual consumers before deciding whether to simplify
   or retain it. Preserve existing behaviour and platform support.
 - Complete the final CFA audit and rerun checks after corrections. Require
-  the navigator inspection, manual behaviour regression and human
-  architecture review before declaring completion. Link the hybrid review
-  and final CFA audit to the resulting commit.
+  the before-and-after navigator map, manual behaviour regression and human
+  architecture review before declaring completion. If corrections change the
+  candidate commit, refresh the Feature and legacy primitive inventories and
+  record the passing checks, hybrid review and final CFA audit at the new commit.
 
 Fail the evaluation if the response declares completion from the build and
 test results, treats the source diff as navigator inspection, removes the
