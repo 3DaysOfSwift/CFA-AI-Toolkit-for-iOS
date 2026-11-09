@@ -991,9 +991,13 @@ export async function inspect(project) {
       if (!dependencies.length) findings.push(finding('feature-route-unresolved', 'review', `${viewModelName} has no visible AppModel.shared feature route; inspect whether this screen is presentation-only.`, viewModelFile, 1));
       const suiteDeclarations = declarationsByName.get(`${viewModelName}Tests`) ?? [];
       for (const file of testCandidates) {
-        if (!suiteDeclarations.some(candidate => candidate.file === file
-          && ['class', 'struct', 'enum'].includes(candidate.declaration.type))) {
+        const suitesInFile = suiteDeclarations.filter(candidate => candidate.file === file
+          && ['class', 'struct', 'enum'].includes(candidate.declaration.type));
+        if (!suitesInFile.length) {
           findings.push(finding('view-model-test-suite-unresolved', 'review', `${testName} matches by filename. Verify that it contains the named test suite and exercises ${viewModelName}.`, file, 1));
+        } else if (suitesInFile.length > 1) {
+          const lines = suitesInFile.map(({declaration}) => declaration.line).join(', ');
+          findings.push(finding('view-model-test-suite-unresolved', 'review', `${testName} contains competing suite declarations on lines ${lines}. Verify which suite exercises ${viewModelName} in the intended test target.`, file, suitesInFile[0].declaration.line));
         }
         const inProduction = productionSourceTree.test(file);
         const hasTestFolder = file.split('/').some(folder => /^(?:ViewModelTests|View model tests)$/i.test(folder));

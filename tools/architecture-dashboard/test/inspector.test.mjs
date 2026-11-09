@@ -1219,6 +1219,10 @@ test('distinguishes a matching ViewModel test filename from a suite declaration'
   const placeholder = await inspect(root);
   assert.match(renderInspection(placeholder), /matching test filename; verify named suite and target membership/);
   assert.doesNotMatch(renderInspection(placeholder), /matching test file found/);
+  await fs.writeFile(path.join(root, file), 'struct Legacy { struct HomeViewModelTests {} }\nstruct Current { struct HomeViewModelTests {} }');
+  const competing = await inspect(root);
+  assert.match(competing.findings.find(item => item.code === 'view-model-test-suite-unresolved')?.message, /competing suite declarations on lines 1, 2/);
+  assert.doesNotMatch(renderInspection(competing), /matching test file found/);
   await fs.writeFile(path.join(root, file), 'struct HomeViewModelTests {}');
   assert.match(renderInspection(await inspect(root)), /matching test file found; verify target membership/);
 });
