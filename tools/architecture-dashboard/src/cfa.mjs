@@ -108,9 +108,9 @@ skill from that toolkit before changing the project.
   draft available for retry if saving fails. Discard it when the user cancels
   editing, and publish confirmed changes only after required persistence succeeds.
 - When a value is genuinely shared across the app, define it once as a static
-  property on a purpose-named enum. A new app can start without a constants
-  enum. Keep Feature-specific values with their
-  Feature. Use authoritative bundle metadata for app identity and localization
+  property on a purpose-named enum. Add the enum when a shared constant
+  needs it. App-wide system constants may live in a purpose-named folder
+  beside AppModel. Keep Feature-specific values with their Feature. Use authoritative bundle metadata for app identity and localization
   resources for translatable text. Keep secrets out of app constants.
 - Features own authoritative application state. Microservices can own internal
   request bookkeeping, caches or database machinery under suitable isolation.
@@ -147,8 +147,9 @@ skill from that toolkit before changing the project.
   events and owns the resulting state. Screen-only observation follows the
   screen's lifetime. Verify that repeated startup signals leave one listener
   and that events still reach the Feature with no relevant screen open.
-  If replacement is supported, verify the old listener stops forwarding and
-  its cleanup leaves the replacement running. Stop isolated listeners after tests.
+  If cancellation is supported, verify that the cancelled listener stops
+  forwarding events. If replacement is supported, also verify that cleanup
+  of the old listener leaves the replacement running. Stop isolated listeners after tests.
 - Features own their background capabilities. During synchronous launch,
   AppModel can ask each Feature to register its permitted BGTaskScheduler
   identifiers once. Schedule work separately and route app-level callbacks
