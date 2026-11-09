@@ -131,6 +131,37 @@ final class DeepLinkingFeature {
     }
 }
 
+// Hold an older restoration result while an incoming request is saved.
+private actor DelayedRestoreRepository: PendingRequestRepository {
+    private let store: PendingRequestStore
+    private var release: CheckedContinuation<Void, Never>?
+
+    init(store: PendingRequestStore) { self.store = store }
+
+    func snapshot() async throws -> PendingSnapshot {
+        let snapshot = try await store.snapshot()
+        await withCheckedContinuation { release = $0 }
+        return snapshot
+    }
+
+    func insert(_ request: DestinationRequest) async throws -> PendingSnapshot {
+        try await store.insert(request)
+    }
+
+    func remove(id: String) async throws -> PendingSnapshot {
+        try await store.remove(id: id)
+    }
+
+    func waitUntilRestoreIsHeld() async {
+        while release == nil { await Task.yield() }
+    }
+
+    func finishRestore() {
+        release?.resume()
+        release = nil
+    }
+}
+
 @main struct Example {
     enum ExampleFailure: Error { case expectedStorageError }
     @MainActor static func main() async throws {
@@ -267,6 +298,19 @@ final class DeepLinkingFeature {
         let restoredAfterIncoming = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
         try await restoredAfterIncoming.restore()
         precondition(restoredAfterIncoming.pending == [retained, incoming])
+
+        let delayedStore = DelayedRestoreRepository(store: PendingRequestStore(fileURL: fileURL))
+        let restoring = DeepLinkingFeature(store: delayedStore)
+        async let restoration: Void = restoring.restore()
+        await delayedStore.waitUntilRestoreIsHeld()
+        let duringRestore = DestinationRequest(id: "notification-during-restore", title: "New launch", launchID: "launch-46")
+        try await restoring.receive(duringRestore)
+        await delayedStore.finishRestore()
+        try await restoration
+        precondition(restoring.pending == [retained, incoming, duringRestore])
+        let restarted = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
+        try await restarted.restore()
+        precondition(restarted.pending == restoring.pending)
 
         // Navigation can succeed while durable removal fails. Retry the write
         // in this process without asking another scene to navigate again.
