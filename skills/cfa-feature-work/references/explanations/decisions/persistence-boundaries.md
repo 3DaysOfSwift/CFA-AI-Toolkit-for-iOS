@@ -12,6 +12,10 @@ CFA uses one app-owned SwiftData storage boundary when a database is warranted. 
 Features own authoritative application state. A persisted record, implementation cache or database context is not a second business authority. Storage services may retain internal machinery, but must not maintain a competing current profile or feed independently of its Feature.
 
 Persist user edits and other durable commands before reporting them as saved. On failure, keep the existing state, retain the editable draft and report the error for retry. Loading and error presentation may update separately.
+In a local-first workflow, publish an edit as locally saved only after
+durably storing the edit and any required pending-sync metadata. Track
+remote confirmation separately and preserve pending changes across retries
+and restarts.
 
 For simple preferences backed by `UserDefaults`, update the defaults before
 publishing the preference. The setter confirms only the in-memory update.
@@ -31,8 +35,9 @@ leaves valid in-memory data available.
 Published snapshot structs for API or persisted data use `let` properties and
 represent immutable values. Replace them with newly constructed confirmed
 snapshots after a successful save or refresh. Never retain a locally modified
-snapshot as saved state. Temporary form fields are unsaved drafts, not another
-authority; the Feature handles validation and persistence.
+snapshot as saved state. The screen ViewModel owns editable form drafts and passes proposed changes
+to the Feature for validation and persistence. A failed save leaves the
+draft available for retry and the last confirmed snapshot in place.
 
 ## Problem
 
