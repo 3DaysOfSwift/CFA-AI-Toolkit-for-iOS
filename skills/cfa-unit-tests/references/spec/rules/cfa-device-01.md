@@ -8,7 +8,7 @@
 
 **Why:** Capabilities can be reused without assuming shared process memory.
 
-**Example:** An iPhone app writes its App Group snapshot before requesting a widget timeline reload. The Watch receives a separate copy through Watch Connectivity.
+**Example:** In the planned Next Rocket Launch showcase, the iPhone writes an App Group snapshot for its widget and then requests a timeline reload. The Watch countdown needs only the next launch, so the phone sends that small snapshot separately through Watch Connectivity. Transfer a larger snapshot file only when the Watch presentation needs it.
 
 **Verify:** Build each target and check membership and API availability. Verify a successful snapshot write precedes the widget reload request and a failed write issues no request. Test transfer and receiving Feature updates on supported devices separately from builds and controlled tests. Exercise missing, unreadable, delayed or stale data.
 
