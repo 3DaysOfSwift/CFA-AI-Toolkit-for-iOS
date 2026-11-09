@@ -135,10 +135,9 @@ is not a completed migration. Do not say “migration complete”, “finished w
 migration”, or equivalent whole-project language until the completion gate in
 [CFA change gate](references/cfa-change-gate.md) is satisfied.
 
-Use the [completion evidence guide](scripts/evidence/README.md#record-evidence)
-to link each required check to the final commit in the scenario record,
-including the hybrid review and final CFA audit. If a check is missing, report
-the work as continuing and name that checkpoint. Record failed pilots as
+Record each required check against the final commit in the migration ledger or
+handoff, including the hybrid review and final CFA audit. If a check is missing,
+report the work as continuing and name that checkpoint. Record failed pilots as
 blocked evidence and exclude them from migration precedents.
 
 ## Continuation contract
@@ -174,7 +173,8 @@ on the migration's behalf.
 
 When the developer requests case-study capture or explicitly joins a migration
 evidence programme, read [migration evidence capture](references/migration-evidence.md).
-Use its bundled template and local validator to record baseline behaviour,
+Use the [case-study evidence guide](scripts/evidence/README.md#record-evidence)
+and its bundled template and validator to record baseline behaviour,
 decisions, human corrections and verification at meaningful checkpoints. Keep
 working evidence outside the app repository and toolkit release source. Do not
 collect/upload source or chat logs automatically, repeatedly offer participation,

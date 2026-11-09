@@ -9,6 +9,7 @@ the evaluator the expected outcome.
 
 ## Synthetic checkpoint
 
+- The developer has requested a migration handoff and has not opted into case-study capture.
 - The agreed scope is an iOS app's browsing and account screens.
 - A post-change build and automated regression suite passed at the final
   candidate commit. The scoped Feature and legacy primitive inventories are
@@ -27,6 +28,8 @@ the evaluator the expected outcome.
 
 ## Expected outcome
 
+- Record completion evidence in the migration ledger or handoff. Case-study
+  capture is optional.
 - Report the migration as continuing. Preserve the green build and test
   results as evidence for the candidate commit.
 - Inspect the physical placement, Xcode navigator, package boundaries and
@@ -47,4 +50,5 @@ the evaluator the expected outcome.
 Fail the evaluation if the response declares completion from the build and
 test results, treats the source diff as navigator inspection, removes the
 reactive adapter without tracing consumers, widens the scope to an optional
-UI rewrite, or delegates routine source corrections back to the developer.
+UI rewrite, requires an opt-in case-study record, or delegates routine source corrections
+back to the developer.
