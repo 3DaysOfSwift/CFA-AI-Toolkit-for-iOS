@@ -40,8 +40,9 @@ If the project is already CFA, make the smallest complete vertical change:
 1. Add or change the feature-owned domain behaviour in its Feature and
    repository boundary.
 2. Give every new screen-level SwiftUI View its own adjacent, bespoke ViewModel.
-   Reusable presentation components do not automatically need one. Views remain
-   declarative and forward intent; business decisions stay in the feature model.
+   Reusable presentation components may take snapshots, bindings and action
+   closures. Use those closures to forward intent to the owning screen's
+   ViewModel. Keep service calls and business decisions in the model.
 3. Wire dependencies through AppModel. Do not create global singletons or add
    generic manager layers.
 4. For a removal, delete the route, View, ViewModel, feature API surface,
