@@ -4,7 +4,7 @@
 
 **Strength:** Default.
 
-**Guidance:** Retain a named handle per independently managed operation; repeated actions may reuse a task when one execution satisfies them all. Do not coalesce commands that must each take effect, even when their inputs match.
+**Guidance:** Retain a named handle for each independently managed unstructured operation the ViewModel creates. Reuse the active handle for equivalent actions when one execution satisfies each caller. Commands that must each take effect keep their own outcomes. Clear the handle after publishing the outcome on success, failure or cancellation. Framework-owned lifecycle tasks and structured children keep their existing owners.
 
 **Why:** Task ownership and shared completion stay visible.
 
