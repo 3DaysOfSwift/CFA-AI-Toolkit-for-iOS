@@ -76,6 +76,12 @@ If the project is already CFA, make the smallest complete vertical change:
    On failure, keep the draft available for retry and leave confirmed state
    unchanged. For a replaceable download, publish current server data and let
    optional caching finish independently.
+   For changed asynchronous operations, apply the
+   [overlapping-call rule](references/spec/rules/cfa-task-01.md). Share one
+   execution when it can satisfy equivalent callers. Queue commands that
+   must each take effect in admission order across suspension points and
+   return each caller's outcome. Use controlled dependencies to verify
+   ordering, cancellation and cleanup after failure.
 2. Give every new screen-level SwiftUI View its own adjacent, bespoke ViewModel.
    Reusable presentation components may take snapshots, bindings and action
    closures. Use those closures to forward intent to the owning screen's
