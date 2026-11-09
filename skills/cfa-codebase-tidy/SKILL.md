@@ -58,6 +58,14 @@ joins without a duplicate request and that cancelling one of several waiters
 leaves the others able to receive the result. Where a screen must exit
 promptly, verify its wait ends before the suspended refresh completes.
 
+When tidying a cache for replaceable downloads, apply the
+[optional snapshot rule](references/spec/rules/cfa-cache-01.md). Hold the
+optional write pending and verify that fresh data is published and the caller
+completes. Force a replacement failure and reopen storage to verify that the
+previous usable snapshot survives. Verify that late restores and writes
+cannot replace fresher data for the same source, while other sources can still
+restore their own snapshots.
+
 When moving durable storage ownership, preserve the existing store location,
 schema compatibility and saved records. Verify against a disposable store written
 by the previous version with representative synthetic records, including
