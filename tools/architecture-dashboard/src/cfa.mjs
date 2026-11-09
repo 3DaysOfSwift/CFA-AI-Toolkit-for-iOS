@@ -77,16 +77,19 @@ skill from that toolkit before changing the project.
   session. Clear account-specific Feature state after successful sign-out and
   guard publication against results from the old session. Apply the product's
   retention policy to locally saved data.
-- AppModel stores shared, concrete Features, one private launch guard and any
-  private task handles needed to own app-wide listeners.
-  AppModel starts those listeners and forwards events to the responsible Feature.
-  Features own their background capabilities. For BGTaskScheduler, register
-  each permitted identifier once before launch finishes and schedule requests
-  separately. Honour expiration, cancellation and system completion.
-  Its explicit initializer assigns injected Features, sets the launch guard to
-  false, and sets listener task handles to nil. One static live() factory
-  constructs production dependencies for AppModel.shared. Never store a service
-  or UI error in AppModel.
+- AppModel exposes concrete Features and keeps a private launch guard and the
+  private task handles needed for app-wide listeners. Its initializer assigns
+  the supplied Features, sets the guard to false and sets the handles to nil.
+  One static live() factory constructs production dependencies for
+  AppModel.shared. Keep services and UI errors out of its stored properties.
+- AppModel starts each needed app-wide listener once and forwards events to
+  the responsible Feature. The Feature interprets events and owns the resulting
+  state. Screen-only observation follows the screen's lifetime.
+- Features own their background capabilities. During synchronous launch,
+  AppModel can ask each Feature to register its permitted BGTaskScheduler
+  identifiers once. Schedule work separately and honour expiration,
+  cancellation and system completion. Work may outlive a screen, but continuing
+  after iOS backgrounds the app requires an appropriate system mechanism.
 - SwiftDataManager owns container and context creation. Keep SwiftData records
   and contexts inside the storage boundary and give Features narrow load and
   save operations.
