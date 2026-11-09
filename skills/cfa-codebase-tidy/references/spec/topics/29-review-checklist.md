@@ -57,7 +57,11 @@ Before accepting a change, answer every question:
 11. Has required concurrency behaviour been preserved rather than simplified
     away?
 12. Are time-dependent business rules deterministic in tests?
-13. Does every ViewModel have its own focused test suite?
+13. Does every ViewModel have its own named test file and focused suite under
+    View model tests, and does each concrete Feature have a named API test
+    file under FeatureTests? Verify that test files belong to the intended
+    test target and are excluded from the production app target. Run the
+    relevant tests to verify the behaviour they cover.
 14. Can a junior developer read the names as plain English without learning the
     entire object graph first?
 15. Was every new abstraction earned by a concrete responsibility?
