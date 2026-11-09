@@ -54,6 +54,8 @@ skill from that toolkit before changing the project.
 - On supported deployment targets, use @Observable for ViewModels and
   Features whose state the UI observes. Preserve a compatible observation
   mechanism when a migration must support an older deployment target.
+  For live data, read observable Feature state through the ViewModel so
+  confirmed changes reach the View without a manually synchronized copy.
 - A detail View may receive selected immutable value data and construct its own
   State-backed ViewModel in its initializer. Do not inject or share ViewModels;
   keep each scene's selection in presentation, not in a shared Feature. The

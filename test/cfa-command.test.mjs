@@ -82,6 +82,7 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /genuinely shared across the app, define it once as a static\s+property on a purpose-named enum/);
   assert.match(content, /snapshot structs use let properties and immutable contents/);
   assert.match(content, /nested values and collection elements for references that can change\s+in place/);
+  assert.match(content, /read observable Feature state through the ViewModel/);
   assert.match(content, /draft available for retry if saving fails/);
   assert.match(content, /same account can sign back in before old work finishes, check the\s+session identity/);
   assert.match(content, /missing, incompatible or unreadable cache\s+supplies no restored data/);
