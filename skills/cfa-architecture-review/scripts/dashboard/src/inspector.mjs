@@ -99,7 +99,7 @@ export async function inspect(project) {
   if (appModelFile) {
     const liveFactories = [...appMembers.matchAll(/\bstatic\s+func\s+live\s*\(/g)];
     if (liveFactories.length !== 1) findings.push(finding('app-model-live-factory', 'review', `Found ${liveFactories.length} static live() declarations directly inside AppModel. Verify the single production factory, including extensions and active compilation conditions.`, appModelFile, 1));
-    for (const match of appMembers.matchAll(/^[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(private[ \t]+)?(?:private\(set\)[ \t]+)?(?:let|var)[ \t]+(\w+)[ \t]*:[ \t]*(?:any[ \t]+)?(\w+)(?:<[^;\n=]*>)?[?!]?([ \t]*=(?!=))?/gm)) {
+    for (const match of appMembers.matchAll(/(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(private[ \t]+)?(?:private\(set\)[ \t]+)?(?:let|var)[ \t]+(\w+)[ \t]*:[ \t]*(?:any[ \t]+)?(\w+)(?:<[^;\n=]*>)?[?!]?([ \t]*=(?!=))?/gm)) {
       const [, privateModifier, name, type, defaultValue] = match;
       const suffix = appModel.slice(match.index + match[0].length);
       // A getter is not stored state. Property observers still belong to storage.
@@ -115,7 +115,9 @@ export async function inspect(project) {
         findings.push(finding('app-model-task-purpose', 'review', `AppModel retains ${name}; verify it owns an app-wide listener and that its lifecycle is managed.`, appModelFile, lineOf(appModel, match.index)));
         continue;
       }
-      if (!featureTypeSuffix.test(type)) findings.push(finding('app-model-non-feature-state', 'warning', `AppModel stores ${name}: ${type}; check that it is a Feature, launch guard or private app-wide listener handle.`, appModelFile, lineOf(appModel, match.index)));
+      const declarations = declarationsByName.get(type) || [];
+      const isLegacyFeature = declarations.length === 1 && /(?:^|\/)Features\/[^/]+\//.test(declarations[0].file);
+      if (!featureTypeSuffix.test(type) && !isLegacyFeature) findings.push(finding('app-model-non-feature-state', 'warning', `AppModel stores ${name}: ${type}; check that it is a Feature, launch guard or private app-wide listener handle.`, appModelFile, lineOf(appModel, match.index)));
     }
   }
   for (const [name, property] of appProperties) {

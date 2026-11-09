@@ -516,3 +516,13 @@ test('requires review of a computed AppModel Feature exposure', async t => {
   const { findings } = await inspect(root);
   assert.equal(findings.find(item => item.code === 'feature-computed-exposure')?.severity, 'review');
 });
+
+test('checks semicolon-separated AppModel storage and excludes method locals', async t => {
+  const root = await fixture(t, {
+    'App/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { let local: String = "local"; return AppModel() }; private var cache: String = ""; private var listener: Task<Void, Never>? }'
+  });
+  const { findings } = await inspect(root);
+  assert.ok(findings.some(item => item.code === 'app-model-non-feature-state' && /cache/.test(item.message)));
+  assert.ok(findings.some(item => item.code === 'app-model-task-purpose' && /listener/.test(item.message)));
+  assert.ok(!findings.some(item => /local/.test(item.message)));
+});
