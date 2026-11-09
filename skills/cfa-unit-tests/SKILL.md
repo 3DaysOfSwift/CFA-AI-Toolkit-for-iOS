@@ -108,7 +108,9 @@ Connectivity handoff separately on supported devices.
 
 For account changes, hold an old account's request open, switch accounts or
 sign out, then complete the old request. Verify that its data is never
-published into the new session. Exercise successful cleanup, sign-out
+published after sign-out or into the new session. Where the same account can
+sign in again before its earlier request completes, test that sequence too.
+Exercise successful cleanup, sign-out
 failure before the session ends, and partial authentication or cleanup
 failure where supported. Assert the actual session and retained or deleted
 data against the product's sign-out contract.

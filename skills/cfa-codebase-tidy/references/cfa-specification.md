@@ -847,7 +847,9 @@ and account-switch entry point, including external session expiry. Define what
 happens when authentication or cleanup fails, and prevent work started under an
 old account from republishing its data after a switch. Cancellation alone does
 not guarantee that work has stopped; validate the current account or a session
-generation before publishing results. Preserve the product's privacy and
+generation before publishing results. If the same account can sign in again
+while earlier work is still finishing, compare the session generation or an
+equivalent session identity. Both sessions have the same account ID. Preserve the product's privacy and
 storage requirements, and test these behaviours before removing observers.
 
 Business requirements also determine how many instances of a domain entity
