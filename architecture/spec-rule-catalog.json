@@ -22,7 +22,7 @@
       "rule": "Group Views and ViewModels separately from AppModel, Features and their services; retain actual Xcode target membership.",
       "why": "Developers can locate capability ownership without following arbitrary layers.",
       "verify": "Inspect folders, target membership, resource paths and build configuration.",
-      "example": "Place NotesView and NotesViewModel together in the View layer, and NotesFeature in the Model layer.",
+      "example": "Place NotesEditorView and NotesEditorViewModel together in the View layer, and NotesFeature in the Model layer.",
       "explanationIds": [
         "project-structure"
       ]
@@ -50,7 +50,7 @@
       "rule": "A screen owns its dedicated `@State private var viewModel` and constructs it inline by default. A detail screen may initialise its own State-backed ViewModel from selected immutable value data in the View initializer. Do not pass or share ViewModels between Views.",
       "why": "Presentation state remains local to the screen.",
       "verify": "Inspect screen declarations, navigation destinations, previews and ViewModel construction.",
-      "example": "NotesView declares its own private State-backed NotesViewModel.",
+      "example": "NotesEditorView declares its own private State-backed NotesEditorViewModel.",
       "explanationIds": [
         "view-model-ownership"
       ]

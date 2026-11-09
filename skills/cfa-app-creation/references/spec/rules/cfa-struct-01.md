@@ -8,7 +8,7 @@
 
 **Why:** Developers can locate capability ownership without following arbitrary layers.
 
-**Example:** Place NotesView and NotesViewModel together in the View layer, and NotesFeature in the Model layer.
+**Example:** Place NotesEditorView and NotesEditorViewModel together in the View layer, and NotesFeature in the Model layer.
 
 **Explanation:** [Why use an ownership-based project structure in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/project-structure).
 

@@ -4,15 +4,16 @@ This complete feature slice follows the path from a screen through its dedicated
 ViewModel, Feature and JSON persistence service. The screen ViewModel owns the
 unsaved text. The Feature queues admitted saves in order, persists each note
 before publication, and continues owned work if the awaiting caller is cancelled.
-The caller still awaits the admitted save’s outcome. A
-failed save leaves the editor open with its text available for retry. Cancel
+The caller still awaits the admitted save’s outcome. A failed save leaves the
+editor open with its text available for retry. Cancel
 closes the editor without saving. During a save, the editor disables text
 entry, Save, Cancel and interactive sheet dismissal.
 
 The code below is also available as [NotesReference.swift](spec/examples/NotesReference.swift).
 The accompanying [executable checks](spec/examples/NotesReferenceTests.swift)
 verify failure recovery, publication after persistence, repeated Save taps,
-ordered independent saves, JSON storage and fresh editor state. Run them on
+ordered independent saves, JSON storage, preservation of unreadable files,
+and fresh editor state. Run them on
 macOS with Xcode and Swift 6:
 
 ```sh

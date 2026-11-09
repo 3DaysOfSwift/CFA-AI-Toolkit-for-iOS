@@ -921,7 +921,7 @@ Tests construct isolated application graphs and never mutate
 `AppModel.shared`. Previews keep the same View → ViewModel → Feature →
 microservice boundaries as the app: a screen constructs and owns its ViewModel,
 and its ViewModel accesses Features. A normal preview can simply use
-`#Preview { NotesView() }`: the View constructs its ViewModel, whose default
+`#Preview { NotesEditorView() }`: the View constructs its ViewModel, whose default
 Feature dependency comes from `AppModel.shared`. Do not inject a ViewModel into
 a screen or place a SwiftData container or context on a View or preview.
 Multiple production scenes use the shared graph so they cannot accidentally

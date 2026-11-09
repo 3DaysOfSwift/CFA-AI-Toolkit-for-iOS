@@ -8,7 +8,7 @@
 
 **Why:** Presentation state remains local to the screen.
 
-**Example:** NotesView declares its own private State-backed NotesViewModel.
+**Example:** NotesEditorView declares its own private State-backed NotesEditorViewModel.
 
 **Explanation:** [Why use screen-owned ViewModels in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/view-model-ownership).
 
