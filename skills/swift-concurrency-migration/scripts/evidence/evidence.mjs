@@ -206,10 +206,10 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
         if (!item || !['test', 'manual'].includes(item.kind) || item.phase !== 'after' ||
             item.outcome !== 'passed' || item.commit !== record.repository.afterCommit) {
           errors.push(`completionGate.dataHandoffEvidenceIds: ${id} requires passed after test or manual evidence at afterCommit`);
+        } else if (item.targets?.length && !item.targets.some(target => gate.affectedTargets.includes(target))) {
+          errors.push(`completionGate.dataHandoffEvidenceIds: ${id} names only unrelated targets.`);
         } else if (!item.environment || (item.targets?.length ?? 0) < 2) {
           warnings.push(`evidence.${id}: identify the producing and receiving targets and the environment used to verify the handoff.`);
-        } else if (!item.targets.some(target => gate.affectedTargets.includes(target))) {
-          warnings.push(`evidence.${id}: the handoff names no affected target. Verify that it covers the changed data path.`);
         }
       }
       for (const [field, kinds] of requiredEvidence) {

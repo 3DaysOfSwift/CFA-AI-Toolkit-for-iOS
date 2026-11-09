@@ -245,8 +245,8 @@ test('completion is not inferred from a build pass or tests at a different commi
   ));
   handoff.targets = ['AnotherApp', 'AnotherWidget'];
   f.write();
-  assert.ok(inspectRecord(f.file).warnings.some(warning =>
-    warning.includes('evidence.after-widget-handoff: the handoff names no affected target')
+  assert.ok(inspectRecord(f.file).errors.includes(
+    'completionGate.dataHandoffEvidenceIds: after-widget-handoff names only unrelated targets.'
   ));
   handoff.targets = ['App', 'Widget'];
   f.write();
