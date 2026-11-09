@@ -8,9 +8,7 @@
 
 **Why:** Previously downloaded data can appear quickly without sacrificing fresher server data.
 
-**Example:** A schedule refresh publishes new server data even if its optional snapshot write is slow or fails.
-
-**Open-source code:** [Next Rocket Launch](https://github.com/3DaysOfSwift/RocketLaunch-iOS-App-Swift-Concurrency/blob/3ecaa30c76428bd8a6f5db8fd5506b6c20b846f7/Swift%20Concurrency%20Project/RocketLaunch/2%20-%20AppModel/Features/Launch%20Schedule/LaunchScheduleFeature.swift). Inspect the specific behaviour; these projects may also contain older conventions.
+**Example:** In the bundled CFA App template, GitReposFeature publishes a fresh response before its optional cache write completes and rejects an older cache restore.
 
 **Explanation:** [Why use record-level persistence boundaries in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/persistence-boundaries).
 

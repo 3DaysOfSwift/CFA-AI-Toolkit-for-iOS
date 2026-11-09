@@ -11,7 +11,7 @@
       "name": "Next Rocket Launch",
       "repository": "https://github.com/3DaysOfSwift/RocketLaunch-iOS-App-Swift-Concurrency",
       "revision": "3ecaa30c76428bd8a6f5db8fd5506b6c20b846f7",
-      "sourcePath": "Swift Concurrency Project/RocketLaunch/2 - AppModel/Features/Launch Schedule/LaunchScheduleFeature.swift",
+      "sourcePath": "Swift Concurrency Project/RocketLaunch/1 - View/Views/Operators/LaunchDetail/LaunchDetailView.swift",
       "additionalSources": [
         {
           "label": "Detail View",
@@ -22,10 +22,8 @@
           "path": "Swift Concurrency Project/RocketLaunch/1 - View/Views/Operators/LaunchDetail/LaunchDetailViewModel.swift"
         }
       ],
-      "description": "Schedule ownership, provider refresh and optional cache",
-      "ruleIds": [
-        "CFA-SPEC-CACHE-01"
-      ]
+      "description": "Selected launch snapshots and detail presentation",
+      "ruleIds": []
     },
     {
       "name": "Cuentiva",
