@@ -19,8 +19,11 @@ and one caller's cancellation leaves the other able to receive the result.
 Saving during initial restoration preserves both the restored and new notes.
 When the JSON file is corrupt, the checks verify that a failed save preserves the file
 and draft. After a valid file is restored, retrying through the same Feature
-reloads the saved notes and keeps the draft. Run the checks on macOS with
-Xcode and Swift 6:
+reloads the saved notes and keeps the draft. A fixed synthetic JSON fixture
+also verifies that an existing note survives opening, appending a note, and
+reopening the store. For a shipped app, use a disposable store written by the
+actual previous implementation to verify an upgrade. Run the checks on macOS
+with Xcode and Swift 6:
 
 ```sh
 xcrun swiftc -swift-version 6 -parse-as-library NotesReference.swift NotesReferenceTests.swift -o /tmp/cfa-notes-tests

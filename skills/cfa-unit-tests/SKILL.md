@@ -161,7 +161,7 @@ Apple-managed sync, verify the actual handoff and conflicting offline edits
 on supported devices separately from the unit tests.
 
 For durable storage compatibility, use a disposable representative store
-written by the previous implementation. Verify that the changed implementation
+written by the previous implementation with synthetic records. Verify that the changed implementation
 opens it at the intended location and can reopen the saved records. Exercise
 a failed open or upgrade and confirm that it preserves the existing data.
 Keep these storage checks separate from tests that start with an empty store.
