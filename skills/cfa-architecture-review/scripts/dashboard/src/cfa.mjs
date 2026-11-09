@@ -201,6 +201,8 @@ skill from that toolkit before changing the project.
   when one leaves, and that a later equivalent caller joins without a duplicate
   request. Where prompt exit is required, verify it while the refresh is suspended.
 - The ViewModel retains named handles for the independent tasks it creates.
+  Name task handles and collections for the work and lifetime they represent.
+  Use a qualifier such as initial only when the task is limited to that phase.
   A synchronous button action can return the existing handle when repeated
   calls are equivalent. Async callers await that same handle's value.
   Keep SwiftUI lifecycle tasks and structured child tasks with their existing
