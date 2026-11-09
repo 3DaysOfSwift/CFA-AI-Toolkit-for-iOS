@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import {realpathSync} from 'node:fs';
+import {existsSync, realpathSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {analyse} from './analyse.mjs';
 import {collectSyntax} from './syntax-evidence.mjs';
@@ -62,7 +62,7 @@ export async function analyseProject(root, options = {}, providers = {}) {
   return (await collectProjectAnalysis(root, options, providers)).analysis;
 }
 
-if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (process.argv[1] && existsSync(process.argv[1]) && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
     const args=process.argv.slice(2), root=args.shift();
     const options={};

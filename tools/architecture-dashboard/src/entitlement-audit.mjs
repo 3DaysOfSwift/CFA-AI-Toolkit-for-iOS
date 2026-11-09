@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
-import {realpathSync} from 'node:fs';
+import {existsSync, realpathSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 
 // Matching written calls gives review leads, never proof of access control.
@@ -38,7 +38,7 @@ export function auditEntitlements(analysis, policy) {
     limitations:['Exact written-call matches are candidates, not resolved targets, proof of an entitlement check, or proof of a missing check.', 'Aliases, dynamic dispatch, properties, closures, external modules and unlisted spellings can be missed.', 'Indexed callers are possible navigation leads; index freshness and target coverage must be verified.', 'Inspect each entry point and test locked and entitled outcomes. No matches do not imply protection.']};
 }
 
-if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (process.argv[1] && existsSync(process.argv[1]) && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
     const args=process.argv.slice(2), options={};
     while (args.length) { const flag=args.shift(), value=args.shift(); if (!['--analysis','--policy','--out'].includes(flag) || !value || options[flag]) throw Error('Usage: node entitlement-audit.mjs --analysis <analysis.json> --policy <paid-capabilities.json> --out <new-report.json>'); options[flag]=value; }

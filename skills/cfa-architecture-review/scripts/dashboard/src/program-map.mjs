@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
-import {realpathSync} from 'node:fs';
+import {existsSync, realpathSync} from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -87,7 +87,7 @@ export async function generate(root, index, moduleName, output) {
   return report;
 }
 
-if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (process.argv[1] && existsSync(process.argv[1]) && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const [root, index, moduleName, output] = process.argv.slice(2);
   if (!root || !index || !moduleName || !output || process.argv.length !== 6) {
     console.error('Usage: node program-map.mjs <project-root> <index-store> <module-name> <new-output-directory>');

@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import {spawnSync} from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import {buildMap, launchTree} from '../src/program-map.mjs';
@@ -39,4 +40,12 @@ test('keeps indexed calls when the compiler records a project path alias', t => 
   fs.writeFileSync(path.join(project, 'A.swift'), '');
   const call = {file: path.join(alias, 'A.swift'), line: 1, column: 1};
   assert.deepEqual(buildMap([call], project), [{...call, file: 'A.swift'}]);
+});
+
+test('analysis modules can be imported from a Node stdin script', () => {
+  const modules = ['program-map', 'project-analysis', 'whole-app-health', 'entitlement-audit'];
+  const input = modules.map(name => `import ${JSON.stringify(new URL(`../src/${name}.mjs`, import.meta.url).href)};`).join('\n');
+  const result = spawnSync(process.execPath, ['--input-type=module', '-'], {input, encoding:'utf8'});
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.stdout, '');
 });

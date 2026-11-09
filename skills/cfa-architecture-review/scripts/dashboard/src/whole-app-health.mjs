@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
-import {realpathSync} from 'node:fs';
+import {existsSync, realpathSync} from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {importReview} from './review-import.mjs';
@@ -345,7 +345,7 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
   await fs.writeFile(output,renderHealthReport(data,iconData),{flag:'wx'});
   return {gaps,files:report.files.length,operations:(review.operations || []).length};
 }
-if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (process.argv[1] && existsSync(process.argv[1]) && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
     const args = process.argv.slice(2);
     const includeTests = args[0] === 'prepare' && args.at(-1) === '--include-tests';
