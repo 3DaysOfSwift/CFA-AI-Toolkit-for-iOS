@@ -343,9 +343,12 @@ skill from that toolkit before changing the project.
   existing sync code, verify that the updated app restores and safely retries
   a pending edit persisted by the previous implementation. Verify Apple-managed
   sync and conflicting offline edits on supported devices when applicable.
-- App.body installs a stable root View and presentation modifiers only. Keep
-  startup conditionals, database loading and feature error UI out of App and
-  out of the root navigation View; feature screens present their own state.
+- App.body declares scenes and app-wide presentation dependencies. Install a
+  stable root View in each WindowGroup. Keep stored AppModel references out
+  of App. Keep startup conditions, database access and Feature loading or
+  error UI out of App and root navigation. Verify that each scene keeps its
+  root available while Features load or fail. Feature screens present their
+  own loading and errors through their ViewModels.
 - Database availability must never gate the interface, including root wrappers
   or blocking overlays. Open storage lazily within a Feature's data request.
   The storage owner prepares the parent directory at the configured store URL

@@ -132,6 +132,8 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /Instant Loading binary snapshots only\s+on request and for a sufficiently stable format with safe decoding/);
   assert.match(content, /Avoid\s+proposing binary snapshots during app creation or migration/);
   assert.match(content, /publish confirmed changes only after required persistence succeeds/);
+  assert.match(content, /stable root View in each WindowGroup/);
+  assert.match(content, /each scene keeps its\s+root available while Features load or fail/);
   assert.match(content, /Call the AppModel launch signal directly\s+and synchronously from the application lifecycle callback/);
   assert.match(content, /AppModel signals the relevant Features and starts its\s+required app-wide listeners before the callback returns/);
   assert.match(content, /SwiftUI Views never store task handles, including in @State/);
