@@ -168,6 +168,9 @@ Report files contain source paths and symbols; review them before sharing.
 - Maps `@main` declarations and source locations of task/scheduling instructions.
 - Locates some app-launch callbacks and button actions as possible event entry
   points; this is not a complete inventory of lifecycle or user actions.
+- Flags recognizable CFA launch calls deferred through a `Task`, a dispatch
+  queue, `OperationQueue.main.addOperation`, or a View lifecycle task. Follow
+  the delegate and any helper calls in source to verify ordering and ownership.
 - Separates unstructured tasks, detached tasks, async-let bindings, group scopes,
   possible child creation sites and framework callbacks.
 - Provides filters, file drill-down, source excerpts and review questions.

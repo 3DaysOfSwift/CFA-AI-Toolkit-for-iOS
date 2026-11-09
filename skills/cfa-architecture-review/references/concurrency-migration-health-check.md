@@ -378,7 +378,10 @@ asynchronous mechanism. For this health check, the toolkit's preferred launch
 policy is to signal initial application loading synchronously from the applicable
 lifecycle callback; the receiving owners may start their own asynchronous work.
 Identify a deferred initial signal as a departure from that policy and highlight
-the exact source path to the team, including its ownership and ordering effects.
+the exact source path to the team, including its ownership and ordering effects. Use
+the inspector's scheduled-launch and View-tied-launch findings as leads. Trace
+indirect calls and other scheduling mechanisms in source even when the
+inspector reports no finding.
 
 For CFA targets, follow the direct AppModel call through Feature startup and
 the start of any required app-wide listeners before the callback returns. Check
