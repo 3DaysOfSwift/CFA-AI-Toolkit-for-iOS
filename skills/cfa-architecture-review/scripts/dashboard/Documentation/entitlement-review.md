@@ -56,7 +56,8 @@ build you intend to review. Index freshness and target coverage require
 separate evidence. Aliases, external code,
 dynamic dispatch and omitted spellings can escape this scan. Read
 `syntaxCoverage`, `syntaxWarnings` and `syntaxReason` before interpreting the
-results. If the parser reports errors, trace the affected files directly and
+results. `syntaxExcludedItems` counts findings outside the source inventory
+that were excluded from the analysis, when that count is available. If the parser reports errors, trace the affected files directly and
 keep any unresolved entry point unverified. If the scanner is unavailable,
 trace the known entry points in source. Zero matches still require that
 review. Enforce protected server actions on the server independently of any
