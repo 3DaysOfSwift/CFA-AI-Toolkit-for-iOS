@@ -332,6 +332,12 @@ from precedent use; do not reframe it as a completed partial migration.
   pending and returns fresh data while the cache write is pending. A failed
   refresh preserves valid displayed data. A late restore or delayed write
   must leave the newer snapshot intact.
+- For changes to the pending deep-link flow, verify that declining navigation
+  leaves the request available after restart. Exercise competing opens from
+  two scenes and verify that only one navigates. Force a removal write to fail
+  after navigation, then verify that the error is reported and retrying the
+  write removes the item without reopening the destination. Use the
+  [review checklist](spec/topics/29-review-checklist.md) for the full scope.
 - Confirm that concrete feature types and their AppModel properties retain the
   `Feature` suffix.
 - Inspect AppModel's stored properties, initializer, and `live()`; then search
