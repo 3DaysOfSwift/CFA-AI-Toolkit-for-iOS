@@ -33,7 +33,8 @@ the corrections made, and the checks repeated after those corrections. Link
 both reviews to evidence at the final commit. In `record.json`, list every
 affected target in `completionGate.affectedTargets` and name the targets
 covered by each build in its `targets` array. Include affected extensions and
-device targets, and link evidence for any changed data handoff. Record each
+device targets, and link each changed data handoff in
+`completionGate.dataHandoffEvidenceIds` (empty only if none are affected). Record each
 affected target’s minimum OS and link evidence that changed paths support it
 through `completionGate.deploymentCompatibilityEvidenceId`. If a test ran on
 a newer OS, record its actual version and provide separate evidence that the

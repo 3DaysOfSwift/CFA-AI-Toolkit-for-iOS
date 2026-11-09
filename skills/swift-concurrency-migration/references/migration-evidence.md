@@ -120,7 +120,8 @@ evidence for every item in the
 Reconcile `completionGate.affectedTargets` with the actual consumers of
 changed code, including extensions and other device targets. Record which
 targets each final-commit build covered in its `targets` array. Link evidence
-for any affected data handoff. Record each target’s minimum OS and link the
+for each affected data handoff in `completionGate.dataHandoffEvidenceIds`.
+Use an empty list only after confirming no handoff is affected. Record each target’s minimum OS and link the
 evidence that changed paths support it. A passing run on a newer
 OS alone does not establish that compatibility.
 

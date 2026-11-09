@@ -188,6 +188,13 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
         ['manualBehaviourRegressionEvidenceId', ['manual']],
         ['manualArchitectureReviewEvidenceId', ['manual']]
       ];
+      for (const id of gate.dataHandoffEvidenceIds) {
+        const item = record.evidence.find(candidate => candidate.id === id);
+        if (!item || !['test', 'manual'].includes(item.kind) || item.phase !== 'after' ||
+            item.outcome !== 'passed' || item.commit !== record.repository.afterCommit) {
+          errors.push(`completionGate.dataHandoffEvidenceIds: ${id} requires passed after test or manual evidence at afterCommit`);
+        }
+      }
       for (const [field, kinds] of requiredEvidence) {
         const item = record.evidence.find(candidate => candidate.id === gate[field]);
         if (!item || !kinds.includes(item.kind) || item.phase !== 'after' || item.outcome !== 'passed' || item.commit !== record.repository.afterCommit) {

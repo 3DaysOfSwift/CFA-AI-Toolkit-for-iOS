@@ -158,10 +158,12 @@ test('completion is not inferred from a build pass or tests at a different commi
     afterEvidence('after-deployment-compatibility', 'manual'),
     afterEvidence('after-cfa-audit', 'source'),
     afterEvidence('after-behaviour-regression', 'manual'),
-    afterEvidence('after-architecture-review', 'manual')
+    afterEvidence('after-architecture-review', 'manual'),
+    afterEvidence('after-widget-handoff', 'manual')
   );
   f.record.completionGate = {
     affectedTargets: ['App', 'Widget'],
+    dataHandoffEvidenceIds: ['after-widget-handoff'],
     navigatorEvidenceId: 'after-navigator',
     featureInventoryEvidenceId: 'after-feature-inventory',
     primitiveInventoryEvidenceId: 'after-primitive-inventory',
@@ -201,6 +203,11 @@ test('completion is not inferred from a build pass or tests at a different commi
   f.write();
   assert.ok(inspectRecord(f.file).errors.some(error => error.includes('missing passed build at afterCommit for Widget')));
   widgetBuild.commit = f.record.repository.afterCommit;
+  const handoff = f.record.evidence.find(item => item.id === 'after-widget-handoff');
+  handoff.commit = f.record.repository.beforeCommit;
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.startsWith('completionGate.dataHandoffEvidenceIds')));
+  handoff.commit = f.record.repository.afterCommit;
   f.seal();
   assert.equal(inspectRecord(f.file).valid, true);
 
