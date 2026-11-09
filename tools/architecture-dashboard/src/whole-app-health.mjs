@@ -16,9 +16,17 @@ const appCheckIDs = [
 ];
 
 const candidateKinds = new Set(['launch-callback', 'button-action', 'view-task', 'refresh']);
-const taskKinds = new Set(['concurrency.task','concurrency.detached','concurrency.taskGroup','concurrency.groupChild','concurrency.asyncLet','entry.viewTask','entry.refreshable']);
+const taskRelations = new Map([
+  ['concurrency.task', 'unstructured-task'],
+  ['concurrency.detached', 'unstructured-task'],
+  ['concurrency.taskGroup', 'same-task'],
+  ['concurrency.groupChild', 'child-task'],
+  ['concurrency.asyncLet', 'child-task'],
+  ['entry.viewTask', 'framework-task'],
+  ['entry.refreshable', 'framework-task']
+]);
 export function taskCandidates(report) {
-  return (report.syntax?.items || []).filter(item=>taskKinds.has(item.kind)).map(item=>({...item,id:`syntax-task:${item.file}:${item.line}:${item.column}:${item.kind}`}));
+  return (report.syntax?.items || []).filter(item=>taskRelations.has(item.kind)).map(item=>({...item,id:`syntax-task:${item.file}:${item.line}:${item.column}:${item.kind}`}));
 }
 function pendingSourceFiles(report, review) {
   const batched = new Set((review.fileBatches || []).flatMap(batch => batch.files || []));
@@ -38,7 +46,7 @@ const hasOpenChecks = operation => !operation.checks?.length ||
   Boolean(operation.steps?.some(step => step.relation === 'unknown'));
 
 function stepCitesTask(step, site) {
-  return step.relation !== 'event' && step.relation !== 'unknown' &&
+  return step.relation === taskRelations.get(site.kind) &&
     step.evidence?.some(ref => ref.file === site.file && ref.line <= site.line && ref.endLine >= site.line);
 }
 
