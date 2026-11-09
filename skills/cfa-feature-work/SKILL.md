@@ -71,6 +71,13 @@ verification checklist. Keep root navigation available during slow or failed
 opening. Verify Feature-scoped retry and reuse of the working store after a
 fetch failure.
 
+When changing how a non-critical preference is restored, apply the
+[preference recovery rule](references/spec/rules/cfa-pref-01.md). Verify the
+product-defined fallback for a missing or obsolete value in a recognised
+format. Preserve the saved value unless an intentional migration or successful
+user choice replaces it. Verify that unreadable storage and failed writes
+remain visible as errors.
+
 When changing offline editing or cross-device synchronization, apply the
 [offline editing and sync rule](references/spec/rules/cfa-sync-01.md). Define
 what counts as locally saved and what counts as server-confirmed. For offline

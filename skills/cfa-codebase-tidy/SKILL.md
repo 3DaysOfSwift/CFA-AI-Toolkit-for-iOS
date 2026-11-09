@@ -81,6 +81,13 @@ reopening after the change. An isolated empty store
 can verify fresh setup. Use the existing-store check to catch upgrade failures,
 and preserve the original data if opening or migration fails.
 
+When changing how a non-critical preference is restored, apply the
+[preference recovery rule](references/spec/rules/cfa-pref-01.md). Verify the
+product-defined fallback for a missing or obsolete value in a recognised
+format. Preserve the saved value unless an intentional migration or successful
+user choice replaces it. Verify that unreadable storage and failed writes
+remain visible as errors.
+
 When tidying existing offline edits or sync, follow the
 [sync rule](references/spec/rules/cfa-sync-01.md). Preserve pending edit
 identities, their persisted metadata and the existing conflict and rejection
