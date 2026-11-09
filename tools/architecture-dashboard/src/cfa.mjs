@@ -22,6 +22,8 @@ const cfaSkillNames = [
 const guidanceMarker = '<!-- CFA Toolkit project guidance -->';
 const outdatedAppModelGuidance = 'AppModel stores only shared, concrete Features, and one private launch guard.';
 const outdatedFeatureGuidance = 'managers use the Manager suffix';
+const outdatedServiceGuidance = 'SwiftData uses SwiftDataManager; URLSession calls use NetworkingManager.';
+const serviceGuidanceUpdate = 'Clarify SwiftDataManager ownership and keep independent network requests able to progress in parallel.';
 const projectGuidance = `${guidanceMarker}
 # CFA project guidance
 
@@ -175,6 +177,9 @@ function doctor(projectArgument) {
       if (content.includes(outdatedFeatureGuidance)) {
         console.log(`WARN outdated feature naming guidance in ${file}; update the CFA guidance block to use concrete *Feature types and matching *Feature properties.`);
       }
+      if (content.includes(outdatedServiceGuidance)) {
+        console.log(`WARN outdated service guidance in ${file}. ${serviceGuidanceUpdate}`);
+      }
       if (content.includes(outdatedAppModelGuidance)) {
         console.log(`WARN outdated AppModel guidance in ${file}; update the CFA guidance block to allow private task handles for app-wide listeners.`);
       }
@@ -221,6 +226,9 @@ function enableProject(values) {
     console.log(`CFA project guidance is already enabled: ${guidanceFile}`);
     if (existingGuidance.includes(outdatedFeatureGuidance)) {
       console.log('The existing guidance still uses the old Manager rule. Edit only the CFA guidance block; the command will not overwrite project instructions.');
+    }
+    if (existingGuidance.includes(outdatedServiceGuidance)) {
+      console.log(`Update the existing CFA service guidance block. ${serviceGuidanceUpdate}`);
     }
     if (existingGuidance.includes(outdatedAppModelGuidance)) {
       console.log('The existing AppModel guidance should allow private task handles for app-wide listeners. Edit only the CFA guidance block.');
