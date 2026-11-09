@@ -589,11 +589,11 @@ export async function inspect(project) {
         }
         const scheduledBody = braceBody(body, scheduled.index + scheduled[0].length - 1);
         const precedingSource = body.slice(0, scheduled.index) + '\n' + scheduledBody;
-        const aliases = [...precedingSource.matchAll(/\b(?:let|var)\s+(\w+)(?:\s*:\s*AppModel)?\s*=\s*AppModel\s*\.\s*shared\b(?!\s*\.)/g)]
+        const aliases = [...precedingSource.matchAll(/\b(?:let|var)\s+(\w+)(?:\s*:\s*(?:\w+\s*\.\s*)*AppModel)?\s*=\s*(?:\w+\s*\.\s*)*AppModel\s*\.\s*shared\b(?!\s*\.)/g)]
           .map(match => match[1]);
         const captures = /^\s*(?:@MainActor\s+)?\[([^\]]*)\]/.exec(scheduledBody);
         if (captures) {
-          for (const capture of captures[1].matchAll(/(?:^|,)\s*(\w+)\s*=\s*AppModel\s*\.\s*shared\s*(?=,|$)/g)) {
+          for (const capture of captures[1].matchAll(/(?:^|,)\s*(\w+)\s*=\s*(?:\w+\s*\.\s*)*AppModel\s*\.\s*shared\s*(?=,|$)/g)) {
             aliases.push(capture[1]);
           }
         }

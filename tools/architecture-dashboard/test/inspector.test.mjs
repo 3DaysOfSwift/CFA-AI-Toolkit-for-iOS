@@ -512,14 +512,14 @@ test('reviews a deferred AppModel launch through a local alias', async t => {
   const root = await fixture(t, {
     'Application/AppDelegate.swift': `class Delegate {
       func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool {
-        let model: AppModel = AppModel.shared
+        let model: Example.AppModel = Example.AppModel.shared
         Task { model.applicationDidFinishLaunching() }
         return true
       }
     }`,
     'Application/CaptureDelegate.swift': `class Delegate {
       func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool {
-        Task { @MainActor [model = AppModel.shared] in model.applicationDidFinishLaunching() }
+        Task { @MainActor [model = Example.AppModel.shared] in model.applicationDidFinishLaunching() }
         return true
       }
     }`,
