@@ -283,8 +283,10 @@ from precedent use; do not reframe it as a completed partial migration.
 - Never introduce a timed splash or storage gate, regardless of visual design.
 - Inspect every newly created or moved Swift file for the imports required by
   its own declarations; imports in another source file do not satisfy this.
-- Confirm that every new screen and feature has the appropriate named
-  test file under View Model Tests and Feature Tests.
+- Confirm that each new screen ViewModel and concrete Feature has its own
+  named test file in its ViewModel test group or under `FeatureTests`,
+  respectively.
+  Verify target membership and the behaviours each test actually exercises.
 - Confirm that launch refresh logic is absent from RootTabView and feature
   screens use `.task` for their own initial work—not as a substitute for
   application launch. Confirm the app delegate starts each shared system
