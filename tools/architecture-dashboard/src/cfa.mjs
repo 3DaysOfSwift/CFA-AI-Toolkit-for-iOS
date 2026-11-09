@@ -98,6 +98,13 @@ skill from that toolkit before changing the project.
   identifiers once. Schedule work separately and honour expiration,
   cancellation and system completion. Work may outlive a screen, but continuing
   after iOS backgrounds the app requires an appropriate system mechanism.
+- For additional device or extension targets, verify that each target includes
+  the shared Model and only its own Views and ViewModels. Each process has its
+  own AppModel and Feature instances. For an App Group widget snapshot, request
+  a timeline reload only after a successful write. Send the Watch a separate
+  snapshot through a suitable transfer, such as Watch Connectivity. Verify that
+  receiving Features refresh from their data sources and handle missing,
+  unreadable, delayed and stale snapshots.
 - SwiftDataManager owns container and context creation. Keep SwiftData records
   and contexts inside the storage boundary and give Features narrow load and
   save operations.
