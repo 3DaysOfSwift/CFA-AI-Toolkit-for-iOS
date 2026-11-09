@@ -790,9 +790,10 @@ test('requests review of an AppModel task without assuming its purpose', async t
   const listener = report.findings.find(item => item.code === 'app-model-task-purpose');
   assert.equal(listener?.severity, 'review');
   assert.match(listener.message, /transactionUpdatesTask/);
-  assert.match(listener.message, /startup creates one app-wide listener/);
+  assert.match(listener.message, /repeated startup leaves one app-wide listener/);
+  assert.match(listener.message, /cleanup leaves the replacement running/);
   assert.match(listener.message, /forwards events to the owning Feature without a screen present/);
-  assert.match(listener.message, /stops or is replaced/);
+  assert.match(listener.message, /old listener stops forwarding/);
 });
 
 test('reviews directly constructed services stored in AppModel with inferred types', async t => {
