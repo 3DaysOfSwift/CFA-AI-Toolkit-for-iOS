@@ -215,7 +215,8 @@ target's source membership and AppModel composition. Check that it reuses
 the shared Model, includes only its own Views and ViewModels, and uses APIs
 available to that target. Trace the writer, the storage or transfer boundary,
 and the receiving Feature's state update. For an App Group widget snapshot,
-verify the write succeeds before the app requests a timeline reload. For a
+verify a successful write precedes the timeline reload request and a failed
+write issues no request. For a
 Watch on another device, verify that a separate copy reaches the receiving
 data source. Report the build and device evidence separately, including
 what happens when the snapshot is missing, unreadable, delayed or stale.
