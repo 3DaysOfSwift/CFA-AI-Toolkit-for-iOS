@@ -63,3 +63,21 @@ test('keeps syntax coverage unverified when a listed file has parser warnings', 
   assert.deepEqual(result.syntax.warnings, ['Parser reported errors in App.swift']);
   assert.equal(result.callCandidates[0].written, 'refresh');
 });
+
+test('keeps syntax and call candidates inside the inventoried source scope', async () => {
+  const result = await analyseProject(os.tmpdir(), {}, {
+    analyse: async () => inventory(),
+    syntax: async () => {
+      const evidence = await syntax();
+      return {
+        ...evidence,
+        files: [...evidence.files, 'Excluded.swift'],
+        items: [...evidence.items, {kind:'call.expression', name:'export', file:'Excluded.swift', line:1}]
+      };
+    }
+  });
+  assert.equal(result.syntax.coverage, 'unverified');
+  assert.equal(result.syntax.excludedItems, 1);
+  assert.deepEqual(result.syntax.items.map(item => item.file), ['App.swift']);
+  assert.deepEqual(result.callCandidates.map(call => call.file), ['App.swift']);
+});

@@ -47,13 +47,16 @@ export async function collectProjectAnalysis(root, options = {}, providers = {})
     if (!indexedByLine.has(key)) indexedByLine.set(key,[]);
     indexedByLine.get(key).push(call);
   }
-  const callCandidates = (syntax.items || []).filter(item => item.kind === 'call.expression').map(item => ({
+  const syntaxItems = syntax.items || [];
+  const scopedSyntaxItems = syntaxItems.filter(item => sourceFiles.has(item.file));
+  const excludedSyntaxItems = syntaxItems.length - scopedSyntaxItems.length;
+  const callCandidates = scopedSyntaxItems.filter(item => item.kind === 'call.expression').map(item => ({
     file:item.file, line:item.line, column:item.column, written:item.name, enclosingFunction:item.enclosingFunction,
     possibleIndexMatches:indexedByLine.get(JSON.stringify([item.file,item.line])) || []
   }));
   const analysis = {schemaVersion:1, generatedAt:new Date().toISOString(), sourceFingerprint:before.sourceFingerprint,
     scope:before.scope, files:before.files.map(({path,hash})=>({path,hash})),
-    buildDefinitions:before.buildDefinitions || [], syntax:{...syntax,coverage:syntaxCoverage}, compilerIndex, callCandidates,
+    buildDefinitions:before.buildDefinitions || [], syntax:{...syntax,items:scopedSyntaxItems,excludedItems:excludedSyntaxItems,coverage:excludedSyntaxItems ? 'unverified' : syntaxCoverage}, compilerIndex, callCandidates,
     limitations:['Syntax calls and lexical task nesting are not resolved relationships or runtime parentage.',
       'Same-line index matches are candidates only; multiple calls and macros can make them ambiguous.',
       'Compiler-index calls reflect an unverified build configuration and are not proof of runtime dispatch.',
