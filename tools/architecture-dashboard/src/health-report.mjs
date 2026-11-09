@@ -39,6 +39,7 @@ export function renderHealthReport(data, iconData = '') {
   }
   const workflows = data.operations || [];
   const architectureUnresolved = !workflows.length || workflows.some(operation =>
+    !operation.steps?.length ||
     ['investigate', 'unassessed'].includes(checkOutcome(operation.checks || [], 'clarity')) ||
     operation.unknowns?.length || operation.steps?.some(step => step.relation === 'unknown')
   );

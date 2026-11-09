@@ -157,6 +157,8 @@ test('an unresolved architecture assessment cannot render a negative conflict ve
   };
   assert.match(renderHealthReport(data), /Frankenstein architecture detected.*Inconclusive/);
   data.operations[0].checks[0].status = 'pass';
+  assert.match(renderHealthReport(data), /Frankenstein architecture detected.*Inconclusive/);
+  data.operations[0].steps = [{id:'event', relation:'event', title:'Save'}];
   assert.match(renderHealthReport(data), /Frankenstein architecture detected.*No architectural conflicts/);
 });
 
