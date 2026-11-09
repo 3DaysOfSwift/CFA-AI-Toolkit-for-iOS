@@ -412,6 +412,12 @@ test('reviews a deferred AppModel launch through a local alias', async t => {
         return true
       }
     }`,
+    'Application/CaptureDelegate.swift': `class Delegate {
+      func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool {
+        Task { @MainActor [model = AppModel.shared] in model.applicationDidFinishLaunching() }
+        return true
+      }
+    }`,
     'Application/DirectDelegate.swift': `class Delegate {
       func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool {
         let model = AppModel.shared
@@ -422,7 +428,7 @@ test('reviews a deferred AppModel launch through a local alias', async t => {
     }`
   });
   const findings = (await inspect(root)).findings.filter(item => item.code === 'scheduled-app-model-launch');
-  assert.deepEqual(findings.map(({file, line}) => [file, line]), [['Application/AppDelegate.swift', 4]]);
+  assert.deepEqual(findings.map(({file, line}) => [file, line]), [['Application/AppDelegate.swift', 4], ['Application/CaptureDelegate.swift', 3]]);
 });
 
 test('identifies priority and explicitly typed Tasks scheduling the launch signal', async t => {

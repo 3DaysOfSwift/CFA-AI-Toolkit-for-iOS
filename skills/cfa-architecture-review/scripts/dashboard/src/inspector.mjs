@@ -463,6 +463,12 @@ export async function inspect(project) {
         const precedingSource = body.slice(0, scheduled.index) + '\n' + scheduledBody;
         const aliases = [...precedingSource.matchAll(/\blet\s+(\w+)(?:\s*:\s*AppModel)?\s*=\s*AppModel\s*\.\s*shared\b(?!\s*\.)/g)]
           .map(match => match[1]);
+        const captures = /^\s*(?:@MainActor\s+)?\[([^\]]*)\]/.exec(scheduledBody);
+        if (captures) {
+          for (const capture of captures[1].matchAll(/(?:^|,)\s*(\w+)\s*=\s*AppModel\s*\.\s*shared\s*(?=,|$)/g)) {
+            aliases.push(capture[1]);
+          }
+        }
         const directSignal = /\bAppModel\s*\.\s*shared\s*\.\s*applicationDidFinishLaunching\s*\(/.test(scheduledBody);
         const aliasedSignal = aliases.some(alias => new RegExp(
           `(?<![.\\w])${alias}\\s*\\.\\s*applicationDidFinishLaunching\\s*\\(`
