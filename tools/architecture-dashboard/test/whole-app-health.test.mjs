@@ -8,7 +8,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 const report = {scope:{skipped:[]}, files:[{path:'App.swift',declarations:[{type:'struct',name:'App',line:1}],sites:[{id:'entry',kind:'launch-callback',file:'App.swift',line:2}]}]};
-const complete = () => ({productionTargets:['App'],targetInventoryVerified:true, fileReviews:[{file:'App.swift',status:'sound'}],typeReviews:[{file:'App.swift',line:1,kind:'struct',name:'App',status:'sound'}],operationInventory:{coverage:'complete'},operations:[{id:'launch',checks:[{status:'pass'}],scenarios:['repeat','leave','late-result','failure'].map(id=>({id,status:'not-applicable'})),unknowns:[],evidence:[{file:'App.swift',line:2,endLine:2}]}],entryPoints:[{siteId:'entry',operationId:'launch'}]});
+const complete = () => ({productionTargets:['App'],targetInventoryVerified:true, fileReviews:[{file:'App.swift',status:'sound'}],typeReviews:[{file:'App.swift',line:1,kind:'struct',name:'App',status:'sound'}],operationInventory:{coverage:'complete'},operations:[{id:'launch',steps:[{id:'trigger',relation:'event'}],checks:[{status:'pass'}],scenarios:['repeat','leave','late-result','failure'].map(id=>({id,status:'not-applicable'})),unknowns:[],evidence:[{file:'App.swift',line:2,endLine:2}]}],entryPoints:[{siteId:'entry',operationId:'launch'}]});
 
 test('next work resumes from recorded evidence and retains the completion gate', () => {
   const pending=complete(); pending.fileReviews=[]; pending.entryPoints=[];
@@ -58,6 +58,14 @@ test('unknown operations and target membership cannot yield a pass score', () =>
   assert.equal(coverageGaps(report,review).length,2);
   const html=renderHealthReport({app:'App',summary:'Summary',verdict:'Clear ownership',scope:'Scope',conclusion:'Conclusion',scoreAvailable:false,criteria:[{title:'Open question',detail:'Investigate',status:'concern'}]});
   assert.match(html,/50%/); assert.match(html,/Needs attention/);
+});
+
+test('a whole-app operation needs a workflow trace', () => {
+  const review = complete();
+  delete review.operations[0].steps;
+  const work = nextWork(report, review);
+  assert.equal(work.nextOperations[0].missingTrace, true);
+  assert.match(work.gaps.join(' '), /need a workflow trace/);
 });
 
 test('an unresolved task relationship keeps an operation pending', () => {
@@ -144,7 +152,7 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
       behaviourScenariosRequired:true,
       fileBatches:[{title:'Application entry',files:['App.swift','Value.swift'],reason:'Reviewed entry and ownership',verification:'Source inspection',evidence}],
       operationInventory:{scope:'App',method:'Source review',coverage:'complete'},
-      operations:[{id:'launch',title:'Start',trigger:'Launch',path:'App',stateOwner:'App',taskOwner:'App',isolation:'Main actor',reason:'Reviewed',verification:'Source inspection',correctness:'sound',clarity:'sound',unknowns:[],triggerSource:{file:'App.swift',line:1},checks,scenarios,evidence}]});
+      operations:[{id:'launch',title:'Start',trigger:'Launch',path:'App',stateOwner:'App',taskOwner:'App',isolation:'Main actor',reason:'Reviewed',verification:'Source inspection',correctness:'sound',clarity:'sound',unknowns:[],triggerSource:{file:'App.swift',line:1},steps:[{id:'trigger',title:'Start',relation:'event',detail:'The app starts here.',evidence}],checks,scenarios,evidence}]});
     await fs.writeFile(reviewPath,JSON.stringify(review));
     assert.deepEqual((await progress(project,reviewPath,syntax)).gaps,[]);
     const badBatch=structuredClone(review); badBatch.fileBatches[0].evidence=[{file:'App.swift',line:1,endLine:1}];

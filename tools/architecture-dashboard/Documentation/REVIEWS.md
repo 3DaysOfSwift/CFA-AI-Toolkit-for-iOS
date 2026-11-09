@@ -274,7 +274,8 @@ The importer checks source hashes and locations, not the truth of the review.
 For multiple problems, a `problem` review can include `issues`: an array of
 objects with `title`, `detail` and source `evidence` for each distinct issue.
 
-An operation may also contain an optional ordered `steps` array. Every step has
+Every whole-app Health Check operation needs an ordered `steps` array. A
+synchronous action can have a single event step if it completes there. Every step has
 `id`, `title`, `relation`, `detail` and source `evidence`. The first step is an
 `event` with no parent; later steps have `parentId` referencing an earlier step
 and relation `same-task`, `child-task`, `unstructured-task`, `framework-task`,

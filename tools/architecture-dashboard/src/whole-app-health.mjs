@@ -39,6 +39,7 @@ export function nextWork(report, review, limit = 8) {
     id: operation.id,
     title: operation.title,
     openChecks: hasOpenChecks(operation),
+    missingTrace: !operation.steps?.length,
     pendingChecks: (operation.checks || [])
       .filter(check => check.status === 'unresolved' || check.status === 'not-checked')
       .map(({id, status, question, resolveBy}) => ({id, status, question, resolveBy})),
@@ -47,7 +48,7 @@ export function nextWork(report, review, limit = 8) {
       .filter(step => step.relation === 'unknown')
       .map(({id, title, detail}) => ({id, title, detail})),
     missingTimingScenarios: missingTimingScenarios(operation)
-  })).filter(operation => operation.openChecks || operation.missingTimingScenarios.length);
+  })).filter(operation => operation.openChecks || operation.missingTrace || operation.missingTimingScenarios.length);
   return {
     pendingFiles: pendingFiles.length,
     pendingEntryPoints: pendingEntries.length,
@@ -101,6 +102,8 @@ export function coverageGaps(report, review) {
   const operations = review.operations || [];
   if (review.operationInventory?.coverage !== 'complete') gaps.push('The operation inventory has not been reconciled with the application entry points.');
   if (!operations.length) gaps.push('No application operations have been reviewed.');
+  const missingTraces = operations.filter(operation => !operation.steps?.length);
+  if (missingTraces.length) gaps.push(`${missingTraces.length} operations need a workflow trace.`);
   const openOperations = operations.filter(hasOpenChecks);
   if (openOperations.length) gaps.push(`${openOperations.length} operations have unresolved checks or boundaries.`);
   const incomplete = operations.filter(op => missingTimingScenarios(op).length);
