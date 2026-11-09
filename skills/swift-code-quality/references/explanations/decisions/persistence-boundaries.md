@@ -13,6 +13,11 @@ Features own authoritative application state. A persisted record, implementation
 
 Persist user edits and other durable commands before reporting them as saved. On failure, keep the existing state, retain the editable draft and report the error for retry. Loading and error presentation may update separately.
 
+For simple preferences backed by `UserDefaults`, update the defaults before
+publishing the preference. The setter confirms only the in-memory update.
+When a workflow requires confirmation that the value was written to disk,
+use a storage API that reports the write outcome.
+
 An optional local cache of a successful remote response can be saved
 independently. Show the current response and complete the refresh for its
 callers while the cache write is pending. Try the cache write with a
