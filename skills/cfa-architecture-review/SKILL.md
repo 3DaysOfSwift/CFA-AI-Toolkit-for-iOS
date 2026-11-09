@@ -125,6 +125,19 @@ trace that path too. For screen-only observation, check the screen or
 ViewModel lifetime instead. Record which behaviour is supported by source
 and which was exercised by tests.
 
+When reviewing deep links or notification actions, apply the
+[deep-link rule](references/spec/rules/cfa-link-01.md). Trace each opening
+callback through DeepLinkingFeature to the receiving scene. Where the app
+uses the pending-request design, check that the request is saved before it is
+shown as pending, and that a refusal or cancellation before navigation
+keeps it available. Verify that either scene can open the request without
+changing another scene's destination, and that competing attempts open it
+only once. Confirm that opening the destination completes navigation even
+while its content loads. If saving removal fails after navigation, follow
+the retry and check that it saves the removal without navigating again.
+For migration reviews, compare the original and current navigation and
+notification-history behaviour.
+
 When sign-out, account switching or session expiry is in scope, apply the
 [account lifecycle rule](references/spec/rules/cfa-account-01.md). Trace when
 the session actually ends, which Feature coordinates cleanup, and what each
