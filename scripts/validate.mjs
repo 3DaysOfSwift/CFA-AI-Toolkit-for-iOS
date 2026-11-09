@@ -75,6 +75,13 @@ export function validate(base=root,{source=true}={}) {
   for(const name of skills) {
     const skill=path.join(base,'skills',name);
     const text=fs.readFileSync(path.join(skill,'SKILL.md'),'utf8');
+    // A colon followed by whitespace is invalid in a plain YAML scalar. This
+    // catches a common metadata mistake; it is not a complete YAML parser.
+    const frontmatter = text.match(/^---\s*\n([\s\S]*?)\n---(?:\s|$)/)?.[1] ?? '';
+    const description = frontmatter.match(/^description:\s+(.+)$/m)?.[1];
+    if (description && !/^["'|>]/.test(description) && /:\s/.test(description)) {
+      throw Error(`Unquoted colon in skill description: ${name}`);
+    }
     if (referenceFeatureSkills.includes(name)) {
       const reference = path.join(skill, 'references/reference-feature.md');
       if (!fs.existsSync(reference) || !text.includes('(references/reference-feature.md)')) throw Error(`Missing reference Feature entry point: ${name}`);

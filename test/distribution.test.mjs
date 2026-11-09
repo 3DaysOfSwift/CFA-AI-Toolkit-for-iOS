@@ -152,6 +152,16 @@ test('release validation rejects a missing workflow policy and an entry point th
  assert.throws(()=>validate(source,{source:false}),/Missing workflow policy entry point/);
 });
 
+test('release validation rejects an unquoted colon in a skill description', t => {
+ const {source}=release(t);
+ const entry=path.join(source,'skills/swift-concurrency-migration/SKILL.md');
+ const original=fs.readFileSync(entry,'utf8');
+ fs.writeFileSync(entry,original.replace(/^description: .*$/m,'description: Legacy migration: migrate an app'));
+ assert.throws(()=>validate(source,{source:false}),/Unquoted colon in skill description: swift-concurrency-migration/);
+ fs.writeFileSync(entry,original);
+ assert.doesNotThrow(()=>validate(source,{source:false}));
+});
+
 test('release validation rejects a stale bundled reference Feature', t => {
  const {source}=release(t);
  const reference=path.join(source,'skills/cfa-app-creation/references/reference-feature.md');
