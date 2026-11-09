@@ -439,7 +439,10 @@ export async function inspect(project) {
     const testName = `${type}Tests.swift`;
     const namedTests = [...paths].filter(file => path.posix.basename(file) === testName);
     for (const file of namedTests) {
-      if (!sources.get(file)?.trim()) {
+      const sourceWithoutImports = sources.get(file)?.replace(
+        /^[ \t]*(?:@testable[ \t]+)?import[ \t]+[\w.]+[ \t]*;?[ \t]*$/gm, ''
+      );
+      if (!sourceWithoutImports?.trim()) {
         findings.push(finding('feature-test-source-empty', 'review', `${testName} contains no executable source. Add tests that exercise the Feature API and verify its test target membership.`, file, 1));
       }
       const inProduction = productionSourceTree.test(file);

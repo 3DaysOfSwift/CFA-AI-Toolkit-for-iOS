@@ -1239,11 +1239,11 @@ test('reviews matching ViewModel tests in production source trees', async t => {
   assert.ok(placement.every(item => item.severity === 'review' && /unit-test target/.test(item.message)));
 });
 
-test('reviews a Feature test file containing only comments', async t => {
+test('reviews a Feature test file containing only imports and comments', async t => {
   const file = 'AppTests/FeatureTests/LaunchFeatureTests.swift';
   const root = await fixture(t, {
     'App/2 - AppModel/Features/Launch/LaunchFeature.swift': 'final class LaunchFeature {}',
-    [file]: '// LaunchFeatureTests are still to be written'
+    [file]: 'import Testing\n@testable import App\n// LaunchFeatureTests are still to be written'
   });
   const {findings} = await inspect(root);
   const empty = findings.find(item => item.code === 'feature-test-source-empty');
