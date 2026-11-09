@@ -206,7 +206,14 @@ export async function inspect(project) {
       const body = braceBody(source, start);
       for (const scheduled of body.matchAll(/\b(?:Task\s*(?:<[^{}\n]*>\s*)?(?:\.\s*(?:init|detached)\s*)?|DispatchQueue\s*\.\s*(?:main|global\s*\([^{}()]*\))\s*\.\s*async(?:After)?\b\s*)(?:\([^{}]*\)\s*|\([^{}]*?\b(?:operation|execute)\s*:\s*)?\{/g)) {
         const scheduledBody = braceBody(body, scheduled.index + scheduled[0].length - 1);
-        if (/\bAppModel\s*\.\s*shared\s*\.\s*applicationDidFinishLaunching\s*\(/.test(scheduledBody)) {
+        const precedingSource = body.slice(0, scheduled.index) + '\n' + scheduledBody;
+        const aliases = [...precedingSource.matchAll(/\blet\s+(\w+)(?:\s*:\s*AppModel)?\s*=\s*AppModel\s*\.\s*shared\b(?!\s*\.)/g)]
+          .map(match => match[1]);
+        const directSignal = /\bAppModel\s*\.\s*shared\s*\.\s*applicationDidFinishLaunching\s*\(/.test(scheduledBody);
+        const aliasedSignal = aliases.some(alias => new RegExp(
+          `(?<![.\\w])${alias}\\s*\\.\\s*applicationDidFinishLaunching\\s*\\(`
+        ).test(scheduledBody));
+        if (directSignal || aliasedSignal) {
           const scheduler = scheduled[0].startsWith('DispatchQueue') ? (/\.\s*asyncAfter\b/.test(scheduled[0]) ? 'DispatchQueue.asyncAfter' : 'DispatchQueue.async') : 'Task';
           findings.push(finding('scheduled-app-model-launch', 'review', `The launch callback appears to defer the AppModel launch signal through ${scheduler}. CFA requires the callback to signal AppModel directly and synchronously. Features may start their own asynchronous work.`, file, lineOf(source, start + 1 + scheduled.index)));
         }

@@ -218,6 +218,28 @@ test('identifies a launch signal deferred by DispatchQueue.asyncAfter', async t 
   assert.match(findings[0].message, /DispatchQueue\.asyncAfter/);
 });
 
+test('reviews a deferred AppModel launch through a local alias', async t => {
+  const root = await fixture(t, {
+    'Application/AppDelegate.swift': `class Delegate {
+      func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool {
+        let model: AppModel = AppModel.shared
+        Task { model.applicationDidFinishLaunching() }
+        return true
+      }
+    }`,
+    'Application/DirectDelegate.swift': `class Delegate {
+      func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool {
+        let model = AppModel.shared
+        model.applicationDidFinishLaunching()
+        Task { await refresh() }
+        return true
+      }
+    }`
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'scheduled-app-model-launch');
+  assert.deepEqual(findings.map(({file, line}) => [file, line]), [['Application/AppDelegate.swift', 4]]);
+});
+
 test('identifies priority and explicitly typed Tasks scheduling the launch signal', async t => {
   const root = await fixture(t, {
     'Application/PriorityDelegate.swift': 'class Delegate { func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { Task(priority: .high) { AppModel.shared.applicationDidFinishLaunching() }; return true } }',
