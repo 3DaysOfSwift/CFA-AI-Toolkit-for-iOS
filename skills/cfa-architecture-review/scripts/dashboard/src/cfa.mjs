@@ -146,17 +146,17 @@ skill from that toolkit before changing the project.
   coordinating Feature for a distinct capability. Trace dependencies for
   cycles and keep one authoritative owner for each value.
 - For sign-out, account switching or external session expiry, let the owning
-  Feature coordinate explicit cleanup calls. Trace each supported entry point
-  and reconcile the outcome with the actual session, including partial
+  Feature coordinate explicit cleanup calls. Each affected Feature clears the
+  data it owns. Trace each supported entry point and reconcile the outcome with the actual session, including partial
   authentication failures. Verify that external expiry reaches its owner
   with the account screen closed. Preserve the session and its data when
   sign-out fails before ending the session. Clear the ended
   session's Feature state and report cleanup failures accurately. A cleanup
   failure after sign-out does not restore the session. During a switch, keep
   the previous session's data out of the new session. Check the account or
-  session generation before publishing in-flight results.
-  If the same account can sign back in before old work finishes, check the
-  session identity even when the earlier task was cancelled. Verify that late
+  session generation before publishing in-flight results, even when the earlier
+  task was cancelled. If the same account can sign back in before old work
+  finishes, check the session identity. Verify that late
   writes cannot recreate cleared data and delayed cleanup cannot delete records
   written by the new session.
   If sign-out promises a fresh-install experience, clear account-specific
