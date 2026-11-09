@@ -515,6 +515,10 @@ export async function inspect(project) {
       const start = view.index + view[0].length;
       const body = braceBody(source, start - 1);
       inspectScreenInputs(view[1], body, source, start, file, findings);
+      for (const match of memberSignatures(body).matchAll(/\b(?:let|var)\s+(\w+)\s*(?::\s*(?:Swift\s*\.\s*)?Task\s*<|(=\s*(?:Swift\s*\.\s*)?Task\b))/g)) {
+        if (match[2] && !/^\s*[<.{(]/.test(body.slice(match.index + match[0].length))) continue;
+        findings.push(finding('screen-task-handle', 'review', `${view[1]} declares ${match[1]} with a possible Task handle. If it stores the handle, move task ownership to the ViewModel.`, file, lineOf(source, start + match.index)));
+      }
       if (isViewFile && rootViewNames.has(view[1])) continue;
       const access = findFeatureAccess(body);
       if (access) {
@@ -587,10 +591,6 @@ export async function inspect(project) {
     const bodyOffset = declaration.index + declaration[0].length;
     const body = braceBody(view, bodyOffset - 1);
     const members = memberSignatures(body);
-    for (const match of members.matchAll(/\b(?:let|var)\s+(\w+)\s*(?::\s*Task\s*<|(=\s*Task\b))/g)) {
-      if (match[2] && !/^\s*[<.{(]/.test(body.slice(match.index + match[0].length))) continue;
-      findings.push(finding('screen-task-handle', 'review', `${name} declares ${match[1]} with a possible Task handle. If it stores the handle, move task ownership to the ViewModel.`, viewFile, lineOf(view, bodyOffset + match.index)));
-    }
     const viewModelName = `${name}Model`;
     const viewModelFile = viewFile.replace(/View\.swift$/, 'ViewModel.swift');
     const viewModel = sources.get(viewModelFile);

@@ -356,6 +356,18 @@ test('allows a stateless graph snapshot initializer inside a compliant screen fi
   assert.deepEqual(findings, []);
 });
 
+test('reviews stored task handles in Views outside conventional screen folders', async t => {
+  const file = 'App/Presentation/RefreshRow.swift';
+  const {report} = await inspectView(t, '', {
+    [file]: `struct RefreshRow: View {
+      @State private var work: Swift.Task<Void, Never>?
+      var body: some View { Text("Refresh").task { await refresh() } }
+    }`
+  });
+  assert.deepEqual(report.findings.filter(item => item.code === 'screen-task-handle')
+    .map(({file, line}) => [file, line]), [[file, 2]]);
+});
+
 test('flags possible screen-owned task handles without flagging lifecycle tasks', async t => {
   const { report } = await inspectView(t, `struct HomeView: View {
     @State private var viewModel = HomeViewModel()
