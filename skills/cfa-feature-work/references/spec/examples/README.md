@@ -2,7 +2,7 @@
 
 ## Notes reference feature
 
-[NotesReference.swift](NotesReference.swift) demonstrates a screen View, its ViewModel, a Feature, JSON persistence and AppModel composition. [NotesReferenceTests.swift](NotesReferenceTests.swift) exercises load and save failure recovery, publication after persistence, repeated Save taps, ordered independent saves, JSON persistence, preservation of unreadable storage and fresh editor state. From this directory on macOS with Xcode and Swift 6, run:
+[NotesReference.swift](NotesReference.swift) demonstrates a screen View, its ViewModel, a Feature, JSON persistence and AppModel composition. [NotesReferenceTests.swift](NotesReferenceTests.swift) exercises load and save failure recovery, publication after persistence, repeated Save taps, ordered independent saves, JSON persistence and fresh editor state. The checks verify that a failed save preserves a corrupt file and that retrying after file recovery restores saved notes and retains the draft. From this directory on macOS with Xcode and Swift 6, run:
 
 `xcrun swiftc -swift-version 6 -parse-as-library NotesReference.swift NotesReferenceTests.swift -o /tmp/cfa-notes-tests && /tmp/cfa-notes-tests`
 

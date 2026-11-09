@@ -12,9 +12,11 @@ entry, Save, Cancel and interactive sheet dismissal.
 The code below is also available as [NotesReference.swift](spec/examples/NotesReference.swift).
 The accompanying [executable checks](spec/examples/NotesReferenceTests.swift)
 verify failure recovery, publication after persistence, repeated Save taps,
-ordered independent saves, JSON storage, preservation of unreadable files,
-and fresh editor state. Run them on
-macOS with Xcode and Swift 6:
+ordered independent saves, JSON storage and fresh editor state. When the
+JSON file is corrupt, the checks verify that a failed save preserves the file
+and draft. After a valid file is restored, retrying through the same Feature
+reloads the saved notes and keeps the draft. Run the checks on macOS with
+Xcode and Swift 6:
 
 ```sh
 xcrun swiftc -swift-version 6 -parse-as-library NotesReference.swift NotesReferenceTests.swift -o /tmp/cfa-notes-tests
