@@ -10,6 +10,6 @@
 
 **Example:** AppModel asks a Feature to register an eligible system background handler during launch.
 
-**Verify:** Verify task identifiers, launch registration, expiration, completion and actual device behaviour.
+**Verify:** Verify permitted task identifiers and once-only launch registration. Check that scheduling is separate and that success, failure and expiration each complete the system callback once. Verify actual background execution on a supported device.
 
 **Full rule, context and examples:** [Use AppModel as the Composition Root and Feature Facade](../topics/17-use-appmodel-as-the-composition-root-and-feature-facade.md). This card is a reading aid; apply the complete canonical section.
