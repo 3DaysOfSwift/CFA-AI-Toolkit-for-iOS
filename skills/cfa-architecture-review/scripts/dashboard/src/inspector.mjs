@@ -141,16 +141,16 @@ export async function inspect(project) {
       findings.push(finding('direct-url-session', 'review', 'URLSession appears outside NetworkingManager. Check whether this is a production network request that should use a NetworkingManager; shared configuration or instances are needed only when appropriate.', file, 1));
     }
   }
-  // A Task inside the lifecycle callback is valid for independent work. Flag
-  // only a lexical launch-signal match inside its closure for human review.
+  // Independent work may be scheduled here. Review only closures that
+  // appear to call the shared launch signal.
   for (const [file, source] of sources) {
     for (const callback of source.matchAll(/\bfunc\s+application\s*\([^{}]*\bdidFinishLaunchingWithOptions\b[^{}]*\)\s*(?:->\s*[^\{]+)?\s*\{/g)) {
       const start = callback.index + callback[0].length - 1;
       const body = braceBody(source, start);
-      for (const task of body.matchAll(/\bTask\s*(?:<[^{}\n]*>\s*)?(?:\.\s*detached\s*)?(?:\([^{}]*\)\s*)?\{/g)) {
-        const taskBody = braceBody(body, task.index + task[0].length - 1);
-        if (/(?<!\bfunc\s+)\bapplicationDidFinishLaunching\s*\(/.test(taskBody)) {
-          findings.push(finding('scheduled-app-model-launch', 'review', 'The launch callback appears to signal AppModel from a Task. Check whether the app-wide startup signal should be called synchronously; Feature-owned asynchronous work can still start its own tasks.', file, lineOf(source, start + 1 + task.index)));
+      for (const scheduled of body.matchAll(/\b(?:Task\s*(?:<[^{}\n]*>\s*)?(?:\.\s*detached\s*)?|DispatchQueue\s*\.\s*(?:main|global\s*\([^{}()]*\))\s*\.\s*async\s*)(?:\([^{}]*\)\s*)?\{/g)) {
+        const scheduledBody = braceBody(body, scheduled.index + scheduled[0].length - 1);
+        if (/(?<!\bfunc\s+)\bapplicationDidFinishLaunching\s*\(/.test(scheduledBody)) {
+          findings.push(finding('scheduled-app-model-launch', 'review', 'The launch callback appears to defer the AppModel launch signal. Check whether the app-wide startup signal should be called synchronously; Feature-owned asynchronous work can still start its own tasks.', file, lineOf(source, start + 1 + scheduled.index)));
         }
       }
     }

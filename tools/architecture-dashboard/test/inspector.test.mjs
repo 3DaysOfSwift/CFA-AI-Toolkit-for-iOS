@@ -148,17 +148,18 @@ test('reviews direct SwiftData preview and query usage without flagging a normal
   assert.ok(matches.some(item => item.file.endsWith('EnvironmentScreen.swift')));
 });
 
-test('identifies a launch signal scheduled inside a delegate Task without flagging independent work', async t => {
+test('identifies a launch signal scheduled inside a delegate Task or dispatch queue without flagging independent work', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
     'Application/AppDelegate.swift': 'class AppDelegate {\n func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool {\n Task { await AppModel.shared.applicationDidFinishLaunching() }\n return true\n }\n}',
-    'Application/OtherDelegate.swift': 'class OtherDelegate { func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { AppModel.shared.applicationDidFinishLaunching(); Task { await refresh() }; return true } }'
+    'Application/OtherDelegate.swift': 'class OtherDelegate { func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { AppModel.shared.applicationDidFinishLaunching(); Task { await refresh() }; return true } }',
+    'Application/DispatchDelegate.swift': 'class AppDelegate {\n func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool {\n DispatchQueue.main.async { AppModel.shared.applicationDidFinishLaunching() }\n return true\n }\n}'
   });
   const findings = (await inspect(root)).findings.filter(item => item.code === 'scheduled-app-model-launch');
-  assert.equal(findings.length, 1);
-  assert.equal(findings[0].severity, 'review');
-  assert.equal(findings[0].file, 'Application/AppDelegate.swift');
-  assert.equal(findings[0].line, 3);
+  assert.deepEqual(findings.map(({file, line, severity}) => [file, line, severity]), [
+    ['Application/AppDelegate.swift', 3, 'review'],
+    ['Application/DispatchDelegate.swift', 3, 'review']
+  ]);
 });
 
 test('identifies priority and explicitly typed Tasks scheduling the launch signal', async t => {
