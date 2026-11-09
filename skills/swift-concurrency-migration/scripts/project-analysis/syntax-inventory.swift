@@ -37,18 +37,28 @@ final class SourceInventory: SyntaxVisitor {
                           enclosingFunction: functions.last, lexicalTaskParent: tasks.last))
     }
 
+    private func recordMain(_ name: String, _ node: some SyntaxProtocol, attributes: AttributeListSyntax) {
+        if attributes.contains(where: { $0.as(AttributeSyntax.self)?.attributeName.trimmedDescription == "main" }) {
+            record("entry.main", name, node)
+        }
+    }
+
     override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
         record("type.struct", node.name.text, node)
-        if node.attributes.trimmedDescription.contains("@main") { record("entry.main", node.name.text, node) }
+        recordMain(node.name.text, node, attributes: node.attributes)
         return .visitChildren
     }
     override func visit(_ node: ClassDeclSyntax) -> SyntaxVisitorContinueKind {
         record("type.class", node.name.text, node)
-        if node.attributes.trimmedDescription.contains("@main") { record("entry.main", node.name.text, node) }
+        recordMain(node.name.text, node, attributes: node.attributes)
         return .visitChildren
     }
     override func visit(_ node: ActorDeclSyntax) -> SyntaxVisitorContinueKind { record("type.actor", node.name.text, node); return .visitChildren }
-    override func visit(_ node: EnumDeclSyntax) -> SyntaxVisitorContinueKind { record("type.enum", node.name.text, node); return .visitChildren }
+    override func visit(_ node: EnumDeclSyntax) -> SyntaxVisitorContinueKind {
+        record("type.enum", node.name.text, node)
+        recordMain(node.name.text, node, attributes: node.attributes)
+        return .visitChildren
+    }
     override func visit(_ node: ProtocolDeclSyntax) -> SyntaxVisitorContinueKind { record("type.protocol", node.name.text, node); return .visitChildren }
     override func visit(_ node: ExtensionDeclSyntax) -> SyntaxVisitorContinueKind { record("type.extension", node.extendedType.trimmedDescription, node); return .visitChildren }
     override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
