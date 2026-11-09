@@ -279,7 +279,9 @@ only when the reason explains why the check does not apply.
 A failed check needs a concrete `consequence` and a `problemKind`. Use
 `local-defect` or `architectural-conflict` for correctness or clarity failures,
 and `cfa-deviation` for failures in the `cfa` dimension. CFA-only failures leave
-concurrency and architectural-clarity verdicts independent.
+concurrency and architectural-clarity verdicts independent. An unresolved or
+unchecked CFA item still keeps the whole-app review open. Once verified, a
+CFA deviation appears in the report without preventing its generation.
 
 The importer derives operation correctness and clarity from these checks. An
 unresolved check preserves all other verified passes; row summaries show their

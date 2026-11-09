@@ -142,10 +142,15 @@ test('a pending review checkpoint retains the open check and its source location
     evidence: [{file: 'App.swift', line: 1, endLine: 1, excerpt: 'App'}]
   };
   review.operations[0].checks = [check];
-  const checkpoint = nextWork(report, review).nextOperations[0];
-  assert.deepEqual(checkpoint.pendingChecks, [{
+  const work = nextWork(report, review);
+  assert.match(work.gaps.join(' '), /operations have unresolved checks/);
+  assert.deepEqual(work.nextOperations[0].pendingChecks, [{
     ...check, evidence: [{file: 'App.swift', line: 1, endLine: 1}]
   }]);
+  check.status = 'not-checked';
+  assert.match(coverageGaps(report, review).join(' '), /operations have unresolved checks/);
+  Object.assign(check, {status: 'fail', problemKind: 'cfa-deviation', consequence: 'The shortcut bypasses the paywall.'});
+  assert.deepEqual(coverageGaps(report, review), []);
 });
 
 test('an unresolved task relationship keeps an operation pending', () => {
