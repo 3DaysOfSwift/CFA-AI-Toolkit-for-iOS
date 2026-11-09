@@ -540,7 +540,7 @@ export async function inspect(project) {
     if (!directRequests.length) {
       const reference = [...source.matchAll(/\bURLSession\s*[.(]/g)].find(outsideManager);
       if (reference) {
-        findings.push(finding('direct-url-session', 'review', 'URLSession is referenced outside NetworkingManager. Trace whether the reference configures a session for injection or leads to a production request that bypasses the manager.', file, lineOf(source, reference.index)));
+        findings.push(finding('url-session-reference', 'review', 'URLSession is referenced outside NetworkingManager. Trace whether the reference configures a session for injection or leads to a production request that bypasses the manager.', file, lineOf(source, reference.index)));
       }
     }
   }

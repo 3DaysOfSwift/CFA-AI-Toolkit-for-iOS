@@ -1076,8 +1076,10 @@ test('recognizes storage and networking declarations independently of filenames'
   });
   const {findings} = await inspect(root);
   assert.ok(!findings.some(item => item.code === 'swiftdata-manager-missing'));
-  assert.deepEqual(findings.filter(item => item.code === 'direct-url-session').map(({file, line}) => [file, line]), [['Client.swift', 1], ['NetworkingManager.swift', 2]]);
-  assert.match(findings.find(item => item.code === 'direct-url-session' && item.file === 'Client.swift')?.message, /configures a session for injection/);
+  assert.ok(!findings.some(item => item.code === 'direct-url-session'));
+  const references = findings.filter(item => item.code === 'url-session-reference');
+  assert.deepEqual(references.map(({file, line}) => [file, line]), [['Client.swift', 1], ['NetworkingManager.swift', 2]]);
+  assert.match(references[0].message, /configures a session for injection/);
 });
 
 test('reviews direct Feature access in reusable Views outside screen folders', async t => {
