@@ -33,6 +33,12 @@ export function specTopics(base) {
   const published = explanations.topics.filter(topic => topic.publication.status === 'published');
   files.set('explanations.md', `# CFA explanations\n\nThese free explanations explore the reasons behind CFA decisions. The current specification is authoritative if an explanation describes an earlier convention.\n\n${published.map(topic => `- [${topic.publication.verificationEvidence.title}](${topic.publication.url})`).join('\n')}\n`);
   files.set('examples/DeepLinkingExample.swift', fs.readFileSync(path.join(base, 'architecture/spec-examples/DeepLinkingExample.swift'), 'utf8'));
+  const notesSource = fs.readFileSync(path.join(base, 'architecture/spec-examples/NotesReference.swift'), 'utf8');
+  const notesGuide = fs.readFileSync(path.join(base, 'architecture/reference-feature.md'), 'utf8');
+  const notesSnippet = notesGuide.match(/^```swift\n([\s\S]*?)^```$/m)?.[1];
+  if (notesSnippet !== notesSource) {
+    throw Error('The Notes reference guide must show the same Swift source as NotesReference.swift.');
+  }
   for (const name of ['NotesReference.swift', 'NotesReferenceTests.swift']) files.set(`examples/${name}`, fs.readFileSync(path.join(base, 'architecture/spec-examples', name), 'utf8'));
   const appCatalogue = JSON.parse(fs.readFileSync(path.join(base, 'architecture/open-source-apps.json'), 'utf8'));
   const sourceURL = app => app.revision && app.sourcePath ? `${app.repository}/blob/${app.revision}/${app.sourcePath.split('/').map(encodeURIComponent).join('/')}` : null;
