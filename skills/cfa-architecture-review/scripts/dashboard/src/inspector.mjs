@@ -349,7 +349,8 @@ export async function inspect(project) {
       findings.push(finding('feature-computed-exposure', 'review', `AppModel exposes ${name} through a computed property. Trace it to the concrete Feature retained by the live graph and check that access does not construct a competing instance.`, appModelFile, property.line));
     }
     if (candidates.length > 1) {
-      findings.push(finding('feature-source-ambiguous', 'review', `${property.type} has multiple declarations. Verify which declaration belongs to the active target before assessing placement or collaborators.`, appModelFile, property.line));
+      const locations = candidates.map(({file, declaration}) => `${file}:${declaration.line}`).sort();
+      findings.push(finding('feature-source-ambiguous', 'review', `${property.type} has multiple declarations. Candidates: ${locations.join(', ')}. Verify which declaration belongs to the active target before assessing placement or collaborators.`, appModelFile, property.line));
     }
     const hasFeatureSuffix = featureTypeSuffix.test(property.type);
     if (!hasFeatureSuffix) {
