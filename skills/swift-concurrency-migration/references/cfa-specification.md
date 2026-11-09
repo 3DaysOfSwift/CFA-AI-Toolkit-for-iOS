@@ -1750,6 +1750,8 @@ Before accepting a change, answer every question:
 4. Can every View be created without receiving a ViewModel, AppModel, Feature,
    or repository, and do screen Views avoid receiving another screen’s actions?
    Reusable presentation components may receive action closures.
+   Do previews construct their Views through the same ownership path, leaving
+   Feature access to the ViewModel and SwiftData access to the storage service?
 5. Is each business decision owned by its Feature? Can supporting Model
    helpers perform calculations or infrastructure work without becoming a
    competing authority for that decision or its state?
