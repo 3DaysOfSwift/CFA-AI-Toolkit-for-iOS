@@ -4,7 +4,7 @@
 
 **Strength:** Default.
 
-**Guidance:** Retain a named handle for each independently managed unstructured operation the ViewModel creates. Reuse the active handle for equivalent actions when one execution satisfies each caller. Commands that must each take effect keep their own outcomes. Clear the handle after publishing the outcome on success, failure or cancellation. Framework-owned lifecycle tasks and structured children keep their existing owners.
+**Guidance:** Retain a named handle for each independently managed unstructured operation the ViewModel creates. Reuse the active handle for equivalent actions when one execution satisfies each caller. Commands that must each take effect keep their own outcomes. Clear the handle after handling the outcome on success, failure or cancellation. If a replacement can start before the old task exits, use task identity to prevent stale results and clear the handle only when that identity still matches. Framework-owned lifecycle tasks and structured children keep their existing owners.
 
 **Why:** Task ownership and shared completion stay visible.
 
