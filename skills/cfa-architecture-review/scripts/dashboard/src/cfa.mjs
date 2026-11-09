@@ -282,7 +282,8 @@ skill from that toolkit before changing the project.
   callers without waiting for the cache write. A failed cache write leaves
   fresh data visible and the refresh successful.
   Keep valid in-memory data if refresh fails, and prevent older restores from
-  replacing fresher data. Bound cache-write retries, preserve the last usable
+  replacing fresher data from the same source. Let other independent sources
+  restore their usable cached data. Bound cache-write retries, preserve the last usable
   cache if replacement fails, and prevent older writes from replacing newer
   snapshots. Report offline availability only for data that was saved. Use JSON
   by default for a simple cache. A missing, incompatible or unreadable cache

@@ -409,7 +409,9 @@ operations enforce authorisation independently.
   are bounded, the fresh data stays visible, the previous usable cache is
   preserved and the app does not claim the fresh data is available offline.
   A failed refresh preserves valid displayed data. A late restore or delayed
-  write must leave the newer snapshot intact.
+  write must leave the newer snapshot intact. For independently refreshed
+  sources, complete one source’s refresh first and verify that restoration
+  still supplies usable cached data for the other sources.
 - For changes to the pending deep-link flow, verify that invalid opening
   requests leave the pending list and its stored snapshot intact. Force the initial save to fail
   and verify that the failure is reported and the request is never presented as
