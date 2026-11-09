@@ -254,9 +254,12 @@ skill from that toolkit before changing the project.
   startup conditionals, database loading and feature error UI out of App and
   out of the root navigation View; feature screens present their own state.
 - Database availability must never gate the interface, including root wrappers
-  or blocking overlays. Open storage lazily within a Feature's data request;
-  opening failures follow that request through Feature, ViewModel and screen,
-  never an app-level launch error. Retry the request without discarding data.
+  or blocking overlays. Open storage lazily within a Feature's data request.
+  The storage owner prepares the parent directory at the configured store URL
+  before opening a file-backed store. Directory and opening failures follow
+  the request through Feature, ViewModel and screen. Retry the same request
+  while preserving the configured store and existing data. A failed fetch
+  cannot justify discarding a working container or substituting an empty store.
   Verify that the root appears and independent navigation works while the
   initial open is pending and after it fails.
 - During migration, preserve business behaviour, user-facing capabilities,
