@@ -114,6 +114,12 @@ repeated startup signals start each listener once and that events reach the
 Feature without a screen. Where cancellation or replacement is supported,
 exercise it and shut down isolated listeners during test cleanup.
 
+For system background work, use a controlled scheduler to verify that launch
+registers each applicable handler once and that scheduling happens separately.
+Drive the handler through success, failure and expiration. Verify that the
+owning Feature handles cancellation and completes the system callback once.
+Confirm actual background execution on a supported device.
+
 Give each production ViewModel a matching
 test file and test what its View can observe: loading/ready/error states,
 actions, drafts, selection and asynchronous results.
