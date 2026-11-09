@@ -1793,8 +1793,9 @@ Before accepting a change, answer every question:
    availability and lifecycle. Separately verify the snapshot handoff on
    supported devices, including the receiving Feature's state update and how
    it handles missing, unreadable, delayed or stale data. For an App Group
-   widget snapshot, verify that the app requests a timeline reload only after
-   the snapshot write succeeds.
+   widget snapshot, verify that a successful write precedes the reload request
+   and a failed write issues no request. If multiple targets can edit the same
+   data, exercise the product’s conflict policy.
 7. Does each ViewModel depend on the smallest coherent set of concrete
    Features needed by its screen?
 8. Does AppModel assemble and expose Features, own app-wide listener tasks,

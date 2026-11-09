@@ -185,7 +185,8 @@ the architecture:
     mechanism. Test missing, unreadable, delayed and stale snapshots against
     the receiving target's policy. Verify actual transfer and receiver updates
     on supported devices, and record that evidence separately from target builds
-    and controlled storage tests.
+    and controlled storage tests. If multiple targets can edit the same data,
+    exercise the product’s conflict policy.
 15. SwiftData access goes through `SwiftDataManager`; every `URLSession` call
     goes through `NetworkingManager`. Features own those lower-level
     collaborators. Keep domain-specific services beside their owning Feature
