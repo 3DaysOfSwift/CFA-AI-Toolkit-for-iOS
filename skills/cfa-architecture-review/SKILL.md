@@ -78,6 +78,13 @@ inspect alternative entry points before recording a finding.
 
 For a quick CFA project map, run `node scripts/dashboard/src/cfa.mjs inspect <project-folder>` from this skill's directory (add `--json` for machine-readable output). From elsewhere, use the full path to this skill's script. This read-only inspector lists screen → ViewModel → AppModel feature routes and named test files, plus lexical gaps to investigate. Check its findings against source before calling anything a defect; it does not type-check, run tests, or establish semantic conformance. Do not use its absence of findings as a review verdict. Check the CFA `viewModel` property name separately from ownership. The inspector can recognise an owned ViewModel under another name.
 
+The screen map relies on conventional filenames and adjacent ViewModels.
+Lifecycle closure findings also cover recognizable SwiftUI Views and their
+extensions outside those folders. In a flat or unfamiliar project, inspect
+unmapped screens, custom modifiers and referenced callbacks directly. Trace
+each task to its actual owner and cancellation policy before recording a
+finding.
+
 When the inspector flags a direct Feature dependency, trace how the caller
 uses it. A genuine business workflow may coordinate Features. Verify that
 the workflow has a clear owner, each shared value retains one authoritative
