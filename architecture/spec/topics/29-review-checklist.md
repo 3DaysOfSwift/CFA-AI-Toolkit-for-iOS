@@ -13,15 +13,22 @@ Before accepting a change, answer every question:
    Reusable presentation components may receive action closures.
    Do previews construct their Views through the same ownership path, leaving
    Feature access to the ViewModel and SwiftData access to the storage service?
+   For a changed detail flow, open different snapshots in two independently
+   identified destinations. Verify that refreshing the source list, including
+   omission of a selected item, leaves both destinations open with their own
+   selections. If detail refresh is available, verify that it updates only
+   that destination.
 5. Is each business decision owned by its Feature? Can supporting Model
    helpers perform calculations or infrastructure work without becoming a
    competing authority for that decision or its state?
 6. Can another target reuse the business decision without copying UI code?
-   If the scope includes additional targets, verify shared Model membership,
-   target-specific presentation, API availability and lifecycle. For snapshot
-   sharing, test missing, unreadable, delayed and stale data on supported
-   devices. When an iPhone app writes an App Group snapshot for a widget,
-   verify that it requests a timeline reload only after a successful write.
+   If the scope includes additional targets, build each affected target and
+   verify shared Model membership, target-specific presentation, API
+   availability and lifecycle. Separately verify the snapshot handoff on
+   supported devices, including the receiving Feature's state update and how
+   it handles missing, unreadable, delayed or stale data. For an App Group
+   widget snapshot, verify that the app requests a timeline reload only after
+   the snapshot write succeeds.
 7. Does each ViewModel depend on the smallest coherent set of concrete
    Features needed by its screen?
 8. Does AppModel assemble and expose Features, own app-wide listener tasks,
@@ -63,7 +70,10 @@ Before accepting a change, answer every question:
 19. Are failures, partial loading, offline persistence, and retry behaviour
     represented honestly?
     - For durable edits, does the Feature publish the saved value only after
-      required persistence succeeds, leaving the draft available on failure?
+      required persistence succeeds? Verify that failure leaves the confirmed
+      value unchanged and the draft available for retry. Check that a successful
+      retry publishes the replacement. Cancel an unsaved edit and verify that
+      it leaves the confirmed and stored values unchanged.
     - For replaceable downloads, can refresh proceed independently of cache
       restoration and complete without waiting for an optional cache write?
       Verify that a late restore or delayed write cannot replace fresher data,
@@ -106,13 +116,6 @@ Before accepting a change, answer every question:
     an existing implementation, verify recovery of a previously saved pending
     edit. Exercise conflict and rejection outcomes where applicable. Verify
     Apple-managed sync on supported devices.
-26. For additional device or extension targets in scope, does each target
-    include the shared Model and only its own Views and ViewModels? Build
-    each target and verify API availability. Separately verify the snapshot
-    handoff on supported devices, including the receiving Feature's state
-    update and how it handles missing, unreadable, delayed or stale data.
-    For an App Group widget snapshot, verify that the app requests a
-    timeline reload only after the snapshot write succeeds.
 
 Every applicable answer must be yes. Marking a question not applicable requires
 a short explanation. Otherwise, the change is not architecturally complete.
