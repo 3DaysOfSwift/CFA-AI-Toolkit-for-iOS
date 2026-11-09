@@ -259,6 +259,10 @@ do not claim that UI gating replaces server-side authorisation.
   and return their own outcomes. Test failure/cancellation cleanup and a later
   retry using controlled dependencies, not sleeps; record exceptions explicitly.
 
+- For changed pull-to-refresh flows, verify that the refresh action awaits
+  completion through an async method or the returned task handle. Hold the
+  request pending and check that the indicator remains active until the
+  screen's wait ends.
 - For a shared refresh that should survive navigation, cancel its only screen
   waiter while the request is suspended. Let the request complete with no
   replacement waiter and verify that the Feature retains the result. In a
