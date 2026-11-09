@@ -109,7 +109,9 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
     }
   }
   await walk(root);
-  const sourceFingerprint = createHash('sha256').update(JSON.stringify(files.map(f=>[f.path,f.hash]))).digest('hex');
+  const fingerprint = createHash('sha256').update(JSON.stringify(files.map(file => [file.path, file.hash])));
+  if (excludedTestDirectories.length) fingerprint.update(JSON.stringify(excludedTestDirectories));
+  const sourceFingerprint = fingerprint.digest('hex');
   return { schemaVersion: 3, sourceFingerprint, dashboard: dashboard(files), project: path.basename(root), generatedAt: new Date().toISOString(),
     method: 'Lexical source inventory — not compiler-resolved or runtime-observed',
     scope: { includeTests, fileCount: files.length, skipped, excludedTestDirectories, targetMembership: 'Not resolved; inactive compilation branches may be included' },
