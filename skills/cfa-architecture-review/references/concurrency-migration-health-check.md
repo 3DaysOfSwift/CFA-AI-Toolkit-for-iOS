@@ -628,6 +628,17 @@ For each relevant operation, inspect:
   after cancellation wins. Verify that the bridge cannot resume twice or leave
   the caller suspended. Where the API supports cancellation, trace whether the
   ownership policy cancels the underlying work or only ends the caller's wait.
+- Paid capability entry points: in CFA, apply the
+  [paid entry point rule](spec/rules/cfa-pay-01.md). Establish which
+  capabilities are paid from product policy and trace each route that presents
+  or invokes one, including routes outside the usual screen. PurchasesFeature
+  owns entitlement state. The screen ViewModel or alternate caller checks
+  current access before use. Verify locked and entitled outcomes for each
+  route. If entitlement can change across an await, revoke access while the
+  route is suspended and verify that it rechecks before presenting or invoking
+  the capability. Record confirmed unguarded paths with source evidence and
+  their effect. Keep unresolved paths unverified. Review authorisation on
+  server-protected operations separately from client-side presentation.
 - Cancellation before side effects: a check before an await does not cover
   cancellation during that await. Trace the interval between preparation or access
   checks and starting a payment, write or other external effect. Check cancellation
