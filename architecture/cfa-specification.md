@@ -1648,7 +1648,7 @@ The test navigator includes these primary groups:
 ```text
 View model tests
 AppModel tests
-Feature tests
+FeatureTests
 ```
 
 Add persistence, integration, concurrency and support groups when the project
