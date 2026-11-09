@@ -1599,6 +1599,12 @@ the observable stored properties read while evaluating it. Ensure the computed
 property reads observable feature state or expose a stored observable result
 when it represents completed asynchronous work.
 
+Use Observation to present current state. During migration, identify consumers
+that must process each event, including repeated events with the same value.
+Preserve their delivery, ordering and cancellation contract through an event
+API suited to those consumers. Verify that contract separately from the UI
+reading the latest observable value.
+
 ## Preserve One Authoritative Owner for Shared State
 
 Every piece of shared mutable application state has one authoritative Feature
