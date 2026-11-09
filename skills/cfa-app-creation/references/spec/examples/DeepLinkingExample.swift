@@ -294,7 +294,8 @@ private actor DelayedRestoreRepository: PendingRequestRepository {
         try await lastRun.restore()
         precondition(lastRun.pending.isEmpty)
         let dismissed = DestinationRequest(id: "notification-dismissed", title: "Another launch", launchID: "launch-43")
-        let retained = DestinationRequest(id: "notification-retained", title: "Later launch", launchID: "launch-44")
+        let retained = DestinationRequest(id: "notification-retained", title: "Another launch", launchID: "launch-43")
+        // Distinct opening events for the same destination remain separate.
         try await lastRun.receive(dismissed)
         try await lastRun.receive(retained)
         precondition(lastRun.pending == [dismissed, retained])
