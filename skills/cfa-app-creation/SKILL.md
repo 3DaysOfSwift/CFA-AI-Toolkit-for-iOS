@@ -19,8 +19,9 @@ do not impose CFA on another architecture or link to an unpublished article.
 Apply the specification's screen-construction invariant within the requested
 scope: a private `viewModel` property with inline `@State` construction by default.
 A detail View may construct its own State-backed ViewModel from selected value data
-in its initializer. Never inject or share ViewModels; keep screen and scene navigation selections
-out of Features. Review-only work
+in its initializer. Never inject or share ViewModels. Keep screen and scene
+selection in presentation and follow the [detail snapshot lifetime rule](references/spec/rules/cfa-ui-03.md)
+when the source data changes. Review-only work
 reports violations; tests inject Features into ViewModels, not ViewModels into Views.
 
 Create the smallest complete working feature, then continue shaping the new
