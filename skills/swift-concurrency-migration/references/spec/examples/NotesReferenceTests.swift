@@ -64,9 +64,24 @@ actor RetryableNotes: NotesRepository {
         let first = Task { try await feature.save("first") }
         await repository.waitForFirst()
         first.cancel() // A departing caller does not cancel the Feature-owned save.
-        let second = Task { try await feature.save("second") }
-        let third = Task { try await feature.save("second") }
-        for _ in 0..<10 { await Task.yield() }
+        // Each MainActor task signals immediately before entering save. The
+        // waiting test can resume on MainActor only once save has suspended.
+        let secondStarted = AsyncStream<Void>.makeStream()
+        let second = Task { @MainActor in
+            secondStarted.continuation.yield(())
+            try await feature.save("second")
+        }
+        var secondSignal = secondStarted.stream.makeAsyncIterator()
+        await secondSignal.next()
+        secondStarted.continuation.finish()
+        let thirdStarted = AsyncStream<Void>.makeStream()
+        let third = Task { @MainActor in
+            thirdStarted.continuation.yield(())
+            try await feature.save("second")
+        }
+        var thirdSignal = thirdStarted.stream.makeAsyncIterator()
+        await thirdSignal.next()
+        thirdStarted.continuation.finish()
         let before = await repository.saved
         precondition(before == ["retry"])
         await repository.release()
