@@ -23,4 +23,9 @@ Open and run `Before.playground` and `After.playground`. Each prints `Passed:` a
 
 ## Boundaries
 
-A local URLProtocol is deterministic; cancellation, timeouts and retries are not demonstrated.
+The local URLProtocol exercises success and error handling with one request at
+a time. For independent requests in a real migration, hold the first response
+open in a controlled transport and verify that the second request reaches the
+transport before the first completes. Preserve deliberate ordering and rate
+limits. See the CFA independent-request rule (`CFA-SPEC-NET-01`). This fixture
+does not exercise cancellation, timeouts or retries.
