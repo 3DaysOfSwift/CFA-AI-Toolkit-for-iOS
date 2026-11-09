@@ -220,6 +220,14 @@ test('completion is not inferred from a build pass or tests at a different commi
   f.write();
   assert.ok(inspectRecord(f.file).errors.some(error => error.startsWith('completionGate.dataHandoffEvidenceIds')));
   handoff.commit = f.record.repository.afterCommit;
+  handoff.outcome = 'not-run';
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.startsWith('completionGate.dataHandoffEvidenceIds')));
+  handoff.outcome = 'passed';
+  f.record.completionGate.dataHandoffEvidenceIds = ['after-widget-build'];
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.startsWith('completionGate.dataHandoffEvidenceIds')));
+  f.record.completionGate.dataHandoffEvidenceIds = [handoff.id];
   f.seal();
   assert.equal(inspectRecord(f.file).valid, true);
 

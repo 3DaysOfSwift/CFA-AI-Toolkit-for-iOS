@@ -531,7 +531,7 @@ This section is for AI coding assistants (Codex, Claude Code, Cursor and others)
 - Tests: one suite per ViewModel, plus named `FeatureTests` for each Feature. Use an isolated AppModel graph rather than `AppModel.shared`; avoid arbitrary sleeps and scheduler assumptions when coordinating tests.
 - Preserve an established product's design. Themes, footers and branding are defaults for new apps only.
 - Migrate the agreed scope to CFA and Swift Concurrency while preserving behavior; do not describe a feature checkpoint as a completed whole-app migration.
-- A change is complete only when the change gate and the specification's Review Checklist pass, with the build and tests run at the final commit.
+- Apply the relevant change-gate and Review Checklist checks. For app changes, build the affected targets and run relevant tests. Report any checks that could not run. A completed migration requires passing builds, tests and manual verification tied to the final commit.
 
 **Further reading**
 
