@@ -38,6 +38,7 @@ actor HeldNotesLoad: NotesRepository {
     private(set) var attempts = 0
     private var started: CheckedContinuation<Void, Never>?
     private var response: CheckedContinuation<[Note], Never>?
+    private(set) var saved: [Note] = []
 
     func load() async throws -> [Note] {
         attempts += 1
@@ -61,7 +62,10 @@ actor HeldNotesLoad: NotesRepository {
         response = nil
     }
 
-    func save(_ note: Note) async throws {}
+    func save(_ note: Note) async throws {
+        precondition(response == nil, "Restore existing notes before saving")
+        saved.append(note)
+    }
 }
 
 @main struct NotesReferenceTests {
@@ -87,6 +91,21 @@ actor HeldNotesLoad: NotesRepository {
         await departing.value
         await staying.value
         precondition(sharedFeature.notes == [loadedNote] && stayingModel.loadError == nil)
+
+        let restoringRepository = HeldNotesLoad()
+        let restoringFeature = NotesFeature(repository: restoringRepository)
+        let restore = Task { try await restoringFeature.loadIfNeeded() }
+        await restoringRepository.waitForLoad()
+        let editor = NotesEditorViewModel(notesFeature: restoringFeature)
+        editor.text = "New note"
+        let saveWhileRestoring = editor.save()
+        let existingNote = Note(id: UUID(), text: "Existing note")
+        await restoringRepository.finish(with: existingNote)
+        try await restore.value
+        let savedDuringRestore = await saveWhileRestoring.value
+        let writes = await restoringRepository.saved
+        precondition(savedDuringRestore && writes.map(\.text) == ["New note"])
+        precondition(restoringFeature.notes == [existingNote] + writes)
 
         let retryRepository = RetryableNotes()
         let retryFeature = NotesFeature(repository: retryRepository)
