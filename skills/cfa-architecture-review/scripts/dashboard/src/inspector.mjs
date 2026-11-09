@@ -580,6 +580,17 @@ export async function inspect(project) {
   const viewDeclarations = /\bstruct\s+(\w+)(?:\s*<[^{}]+>)?\s*:\s*(?:(?:\w+\s*\.\s*)*\w+\s*,\s*)*(?:SwiftUI\s*\.\s*)?View\b(?!\s*\.)[^{}]*\{/g;
   const viewConformances = /\bextension\s+(\w+)\s*:\s*(?:(?:\w+\s*\.\s*)*\w+\s*,\s*)*(?:SwiftUI\s*\.\s*)?View\b(?!\s*\.)[^{}]*\{/g;
   const rootViewNames = new Set(['ContentView', 'RootTabView', 'RootView']);
+  const rootStorageGate = /(?<!#)\b(?:if|guard|switch)\s+[^{};]*\b\w*(?:container|database|storeReady|storageReady|startupError|launchError)\w*\b/i;
+  function inspectRootNavigation(body, file, source, offset) {
+    const featureAccess = findFeatureAccess(body);
+    if (featureAccess) {
+      findings.push(finding('root-feature-access', 'review', 'Root navigation appears to access a Feature directly. Keep refresh and Feature state presentation in the owning screen and its ViewModel.', file, lineOf(source, offset + featureAccess.index)));
+    }
+    const gate = rootStorageGate.exec(body);
+    if (gate) {
+      findings.push(finding('root-storage-gate', 'review', 'Root navigation may gate the interface on storage availability. Open storage within a Feature data request and present its error in the feature screen, never a root wrapper or app-wide blocking overlay.', file, lineOf(source, offset + gate.index)));
+    }
+  }
   const viewNames = new Set();
   const extendedViews = new Set();
   for (const source of sources.values()) {
@@ -706,14 +717,7 @@ export async function inspect(project) {
       if (!rootViewNames.has(rootView[1])) continue;
       const bodyOffset = rootView.index + rootView[0].length;
       const rootBody = braceBody(source, bodyOffset - 1);
-      const featureAccess = findFeatureAccess(rootBody);
-      if (featureAccess) {
-        findings.push(finding('root-feature-access', 'review', 'Root navigation appears to access a Feature directly. Keep refresh and Feature state presentation in the owning screen and its ViewModel.', file, lineOf(source, bodyOffset + featureAccess.index)));
-      }
-      const gate = /(?<!#)\b(?:if|guard|switch)\s+[^{};]*\b\w*(?:container|database|storeReady|storageReady|startupError|launchError)\w*\b/i.exec(rootBody);
-      if (gate) {
-        findings.push(finding('root-storage-gate', 'review', 'Root navigation may gate the interface on storage availability. Open storage within a Feature data request and present its error in the feature screen, never a root wrapper or app-wide blocking overlay.', file, lineOf(source, bodyOffset + gate.index)));
-      }
+      inspectRootNavigation(rootBody, file, source, bodyOffset);
     }
     inspectLifecycleClosures(source, file, findings);
     const modelDeclaration = [...source.matchAll(/\b(?:let|var)\s+\w+\s*:\s*(?:\w+\s*\.\s*)*AppModel\b(?!\s*\.)/g)]
@@ -861,7 +865,10 @@ export async function inspect(project) {
     if (ownedState && ownedState.name !== 'viewModel') {
       findings.push(finding('view-model-property-name', 'warning', `${name} owns its ViewModel as ${ownedState.name}; CFA names the property viewModel.`, viewFile, lineOf(view, bodyOffset + ownedState.index)));
     }
-    const structuralRoot = rootViewNames.has(name) && /\bTabView\s*[(\{]/.test(body) && !/\b(?:AppModel|\w+Feature)\b/.test(body);
+    const rootScopes = [body, ...(extensionsByName.get(name) ?? []).map(extension => extension.body)];
+    const structuralRoot = rootViewNames.has(name)
+      && rootScopes.some(scope => /\bTabView\s*[(\{]/.test(scope))
+      && !rootScopes.some(scope => findFeatureAccess(scope) || rootStorageGate.test(scope) || swiftDataAccess.test(scope));
     if (!viewModel && !structuralRoot) findings.push(finding('view-model-missing', 'review', `${name} has no adjacent ${viewModelName}. Verify whether it is a screen requiring a dedicated ViewModel or a reusable presentation component.`, viewFile, 1));
     else if (viewModel) {
       if (!ownsViewModel) findings.push(finding('view-model-ownership', 'review', `${name} has no recognized private @State ViewModel storage. Verify that the screen constructs and stores its ViewModel. Detail Views may initialize that stored state from a selected immutable snapshot. A computed property does not satisfy CFA screen ownership.`, viewFile, lineOf(view, declaration.index)));
@@ -884,6 +891,10 @@ export async function inspect(project) {
     if (!viewNames.has(name)) continue;
     for (const {file, source, offset, body} of extensions) {
       inspectScreenInputs(name, body, source, offset, file, findings);
+      if (rootViewNames.has(name)) {
+        inspectRootNavigation(body, file, source, offset);
+        continue;
+      }
       const access = findFeatureAccess(body);
       if (access) {
         findings.push(finding('view-feature-access', 'review', 'This View extension appears to access a Feature directly. Trace the call and route it through the owning ViewModel.', file, lineOf(source, offset + access.index)));

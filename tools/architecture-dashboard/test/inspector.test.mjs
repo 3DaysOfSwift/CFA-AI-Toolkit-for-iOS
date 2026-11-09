@@ -1104,6 +1104,27 @@ test('reviews direct Feature access in root tab navigation', async t => {
   assert.ok(!report.findings.some(item => item.code === 'view-feature-access'));
 });
 
+test('checks root navigation implemented in a separate extension', async t => {
+  const extensionFile = 'Application/1 - View/Views/RootTabView+Navigation.swift';
+  const root = await fixture(t, {
+    'Application/1 - View/Views/RootTabView.swift': 'struct RootTabView: View {}',
+    [extensionFile]: `extension RootTabView {
+      var body: some View {
+        if databaseReady {
+          TabView { PracticeView() }.task { await AppModel.shared.practiceFeature.refresh() }
+        }
+      }
+    }`
+  });
+  const report = await inspect(root);
+  assert.equal(report.screens[0].structuralRoot, false);
+  const findings = report.findings.filter(item => item.code === 'root-feature-access' || item.code === 'root-storage-gate');
+  assert.deepEqual(findings.map(item => [item.code, item.file, item.line]), [
+    ['root-feature-access', extensionFile, 4],
+    ['root-storage-gate', extensionFile, 3]
+  ]);
+});
+
 test('reviews direct Feature access in a preview while leaving normal previews clear', async t => {
   const file = 'App/1 - View/Preview.swift';
   const root = await fixture(t, {
