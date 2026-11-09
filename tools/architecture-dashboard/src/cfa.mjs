@@ -118,8 +118,11 @@ skill from that toolkit before changing the project.
 - Publish durable user edits as saved only after required persistence succeeds.
 - Start remote refresh and optional cache restoration independently when both
   are needed. Publish current server data without waiting for the cache write.
-  Keep valid in-memory data if refresh fails, and prevent older cached data
-  from replacing a fresher response. Use JSON by default for a simple cache.
+  Keep valid in-memory data if refresh fails, and prevent older restores from
+  replacing fresher data. Bound cache-write retries, preserve the last usable
+  cache if replacement fails, and prevent older writes from replacing newer
+  snapshots. Report offline availability only for data that was saved. Use JSON
+  by default for a simple cache. Help apply binary snapshots only on request.
 - App.body installs a stable root View and presentation modifiers only. Keep
   startup conditionals, database loading and feature error UI out of App and
   out of the root navigation View; feature screens present their own state.
