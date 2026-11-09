@@ -163,9 +163,11 @@ hold a draft and offer navigation-bar Cancel and Save actions.
 Keep text entry responsive during persistence. Serialize writes or coalesce
 pending edits so the latest value is not discarded or overwritten by an older
 completion. An empty or invalid intermediate draft must not erase saved data.
-Durable edits continue after navigation. On failure, retain the draft, identify
-the unsaved change and offer Retry; do not claim it was saved. Cover rapid edits,
-failed writes/retry and input boundaries in the screen ViewModel tests.
+An admitted durable save normally continues after navigation under its
+Feature's ownership policy. Cancelling a draft before submission discards
+only the unsaved input. On failure, retain the draft, identify the unsaved
+change and offer Retry. Cover rapid edits, failed writes, retry and input
+boundaries in the screen ViewModel tests.
 
 Give custom interactive controls a minimum 48-by-48-point hit region, with
 visible controls and spacing suitable for fingers. Expand the label's frame
