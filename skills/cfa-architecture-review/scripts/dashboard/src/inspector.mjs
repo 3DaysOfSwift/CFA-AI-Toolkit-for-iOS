@@ -6,8 +6,12 @@ import { analyse, maskSwift, scanSource } from './analyse.mjs';
 const screenPath = /(?:^|\/)1 - View\/Views\/.*View\.swift$/;
 const featureTypeSuffix = /Feature(?:API)?$/;
 
+function isKnownNonFeatureType(type) {
+  return type.endsWith('ViewModel') || type === 'NetworkingManager' || type === 'SwiftDataManager';
+}
+
 function isFeatureCandidate(type, file = '') {
-  if (type.endsWith('ViewModel') || type === 'NetworkingManager' || type === 'SwiftDataManager') return false;
+  if (isKnownNonFeatureType(type)) return false;
   return featureTypeSuffix.test(type) || /(?:^|\/)Features\/[^/]+\//.test(file);
 }
 
@@ -239,7 +243,8 @@ export async function inspect(project) {
       if (close < 0 || /^\s*(?:[.\[]|as[?!]?\b)/.test(appModel.slice(close + 1))) continue;
       const type = constructor[1];
       const declarations = declarationsByName.get(type) || [];
-      if (declarations.length !== 1 || isFeatureCandidate(type, declarations[0].file)) continue;
+      if (!isKnownNonFeatureType(type) &&
+          (declarations.length !== 1 || isFeatureCandidate(type, declarations[0].file))) continue;
       findings.push(finding('app-model-non-feature-state', 'review', `AppModel appears to store ${match[1]} from ${type} construction. Verify the inferred type and keep services and presentation state outside AppModel storage.`, appModelFile, line));
     }
     for (const match of appMembers.matchAll(/(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(private[ \t]+)?(?:(?:private\(set\)|fileprivate|internal|public|package)[ \t]+)?(?:let|var)[ \t]+(\w+)[ \t]*:[ \t]*(?:any[ \t]+)?(?:\w+[ \t]*\.[ \t]*)*(\w+)(?:<[^;\n=]*>)?[?!]?([ \t]*=(?!=))?/gm)) {

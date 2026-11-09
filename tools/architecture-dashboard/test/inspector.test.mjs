@@ -479,6 +479,22 @@ test('CFA infrastructure inside a Features folder is still service storage', asy
   assert.ok(!findings.some(item => item.code === 'feature-property-name' && item.file === file));
 });
 
+test('reviews inferred AppModel service storage from another module and allows factory locals', async t => {
+  const file = 'App/2 - AppModel/AppModel.swift';
+  const root = await fixture(t, {
+    [file]: `final class AppModel {
+      let stored = Infrastructure.NetworkingManager()
+      static func live() -> AppModel {
+        let local = Infrastructure.SwiftDataManager()
+        return AppModel()
+      }
+    }`
+  });
+  const { findings } = await inspect(root);
+  assert.deepEqual(findings.filter(item => item.code === 'app-model-non-feature-state')
+    .map(({line, severity}) => [line, severity]), [[2, 'review']]);
+});
+
 test('inspects AppModel properties regardless of indentation', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel {\n  private var twoSpaceTask: Task<Void, Never>?\n\tprivate var tabTask: Task<Void, Never>?\n        private var unexpectedCache: String\n    static func live() -> AppModel { AppModel() }\n}'
