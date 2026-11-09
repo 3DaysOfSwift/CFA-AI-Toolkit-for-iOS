@@ -51,6 +51,13 @@ any other entry point, such as a notification action or shortcut, to its own
 guard and test locked and entitled outcomes. Keep pricing policy outside the
 capability Feature. Protected server operations enforce their own access.
 
+If the product opens destinations from URLs or notification actions, apply
+the [deep-link rules](references/spec/rules/cfa-link-01.md). Route opening
+requests to `DeepLinkingFeature` for validation and durable pending storage.
+Let each scene decide whether to navigate and preserve its active edits or
+payment flow. Verify failed saves, competing scenes and removal after actual
+navigation. Scheduling and delivery alone do not create pending requests.
+
 When persistence is used, apply the specification's mandatory database-availability
 rule: storage never gates the root interface. Exercise initial store-opening
 failure, feature-scoped error/retry, and independent navigation before claiming

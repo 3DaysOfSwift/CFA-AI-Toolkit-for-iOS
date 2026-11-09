@@ -39,6 +39,13 @@ Trace other entry points to their own checks and test both locked and entitled
 behaviour. Keep pricing decisions separate from the capability's implementation.
 Server operations enforce their own access policy.
 
+When changing deep links or notification actions, apply the
+[deep-link rules](references/spec/rules/cfa-link-01.md) and preserve the
+existing product's history and navigation behaviour. Trace each changed
+opening callback through the pending store to the receiving scene. Verify
+that declining leaves the request pending and that retrying a failed removal
+does not navigate twice.
+
 Fit new UI into the existing product design. Do not add themes, footers or
 branding merely because a new Feature is being created. In new-product
 development, App Creation guides product shaping without expanding this task.
