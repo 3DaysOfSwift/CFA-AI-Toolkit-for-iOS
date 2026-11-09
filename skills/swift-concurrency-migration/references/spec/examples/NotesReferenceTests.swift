@@ -292,6 +292,24 @@ actor HeldNotesLoad: NotesRepository {
         precondition(reopenedNotes.first == existingNotes.first)
         precondition(reopenedNotes.map(\.text) == ["Existing note", "Added note"])
 
+        // A file at the parent path prevents the configured store from opening.
+        let blockedParent = folder.appendingPathComponent("blocked-parent")
+        let blocker = Data("Preserve this file".utf8)
+        try blocker.write(to: blockedParent)
+        let blockedStore = blockedParent.appendingPathComponent("notes.json")
+        let blockedFeature = NotesFeature(repository: JSONNotesRepository(file: blockedStore))
+        let blockedEditor = NotesEditorViewModel(notesFeature: blockedFeature)
+        blockedEditor.text = "Retry after fixing the store path"
+        let blockedSave = await blockedEditor.save().value
+        precondition(!blockedSave && blockedEditor.saveError != nil && blockedFeature.notes.isEmpty)
+        precondition(blockedEditor.text == "Retry after fixing the store path")
+        let preservedBlocker = try Data(contentsOf: blockedParent)
+        precondition(preservedBlocker == blocker)
+        try FileManager.default.removeItem(at: blockedParent)
+        let unblockedSave = await blockedEditor.save().value
+        let unblockedNotes = try await JSONNotesRepository(file: blockedStore).load()
+        precondition(unblockedSave && unblockedNotes == blockedFeature.notes && unblockedNotes.count == 1)
+
         print("Notes reference: failed save, retry, ordered overlap and JSON storage passed")
     }
 }
