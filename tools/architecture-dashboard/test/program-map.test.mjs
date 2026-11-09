@@ -13,14 +13,16 @@ test('keeps only project calls and deduplicates index records', () => {
 
 test('joins calls by symbol identity and bounds cycles', () => {
   const calls = [
-    {file: 'App.swift', line: 1, caller: 'application(_:didFinishLaunchingWithOptions:)', callerID: 'delegate', callee: 'start()', calleeID: 'one'},
+    {file: 'App.swift', line: 1, column: 7, caller: 'application(_:didFinishLaunchingWithOptions:)', callerID: 'delegate', callee: 'start()', calleeID: 'one'},
     {file: 'Feature.swift', line: 2, caller: 'start()', callerID: 'one', callee: 'start()', calleeID: 'two'},
     {file: 'Other.swift', line: 3, caller: 'start()', callerID: 'two', callee: 'start()', calleeID: 'one'},
-    {file: 'App.swift', line: 4, caller: 'application(_:didFinishLaunchingWithOptions:)', callerID: 'delegate', callee: 'scheduleRefresh()', calleeID: 'leaf'}
+    {file: 'App.swift', line: 1, column: 22, caller: 'application(_:didFinishLaunchingWithOptions:)', callerID: 'delegate', callee: 'scheduleRefresh()', calleeID: 'leaf'}
   ];
   const tree = launchTree(calls);
   assert.equal(tree.length, 1);
   assert.equal(tree[0].children[0].file, 'App.swift');
+  assert.equal(tree[0].column, 7);
+  assert.deepEqual(tree[0].children.map(child => child.column), [7, 22]);
   assert.equal(tree[0].children[0].children[0].file, 'Feature.swift');
   assert.equal(tree[0].children[0].children[0].children[0].truncated, true);
   const leaf = launchTree(calls, 1)[0].children[1];
