@@ -9,6 +9,12 @@ import {renderHealthReport} from './health-report.mjs';
 import {collectSyntax} from './syntax-evidence.mjs';
 import {collectProjectAnalysis} from './project-analysis.mjs';
 
+const appCheckIDs = [
+  'deliberate-concurrency', 'discoverable-capabilities', 'view-model-boundaries',
+  'additional-targets', 'actor-design', 'state-observation', 'launch-performance',
+  'cancellation', 'mutable-value-copies'
+];
+
 const candidateKinds = new Set(['launch-callback', 'button-action', 'view-task', 'refresh']);
 const taskKinds = new Set(['concurrency.task','concurrency.detached','concurrency.taskGroup','concurrency.groupChild','concurrency.asyncLet','entry.viewTask','entry.refreshable']);
 export function taskCandidates(report) {
@@ -247,6 +253,18 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
     if (!Array.isArray(criterion?.evidence) || !criterion.evidence.length) {
       throw Error('Each whole-app presentation criterion needs source evidence as file and line references.');
     }
+  }
+  const appChecks = new Set();
+  for (const criterion of presentation.criteria) {
+    if (criterion.appChecks === undefined) continue;
+    if (!Array.isArray(criterion.appChecks) || criterion.appChecks.some(id => !appCheckIDs.includes(id))) {
+      throw Error('Use recognised app-level check IDs in criterion.appChecks.');
+    }
+    criterion.appChecks.forEach(id => appChecks.add(id));
+  }
+  const missingAppChecks = appCheckIDs.filter(id => !appChecks.has(id));
+  if (missingAppChecks.length) {
+    throw Error('Record app-level assessments before rendering: ' + missingAppChecks.join(', '));
   }
   for (const finding of review.findings || []) {
     if (!['pass', 'concern', 'problem'].includes(finding.status)) {

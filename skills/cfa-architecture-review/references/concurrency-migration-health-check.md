@@ -162,7 +162,14 @@ must include the associated task site. Add a `presentation` object with app, sum
 criteria for the concise report. Each criterion needs title, detail, status
 (`pass`, `concern`, `problem`) and an `evidence` array of
 `{file, line, endLine}` source ranges. Cite the code that supports the claim,
-and carry confirmed operation problems into the visible findings. Use the app's own PNG icon
+and carry confirmed operation problems into the visible findings. Map the
+app-level assessments to visible criteria using each criterion's `appChecks`
+array. Use the IDs `deliberate-concurrency`, `discoverable-capabilities`,
+`view-model-boundaries`, `additional-targets`, `actor-design`,
+`state-observation`, `launch-performance`, `cancellation`, and
+`mutable-value-copies`. The report derives the structural-conflict verdict
+from the operation checks. For launch performance, explicitly distinguish a
+measured duration from a source assessment when timing is unavailable. Use the app's own PNG icon
 when available. Keep the inventory and working review outside the app source tree. Save the final report in `reports/health-check/` at the app repository root, outside the app target’s source directory.
 
 After review, run:

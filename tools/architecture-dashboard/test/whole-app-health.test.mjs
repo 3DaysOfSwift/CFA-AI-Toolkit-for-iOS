@@ -227,6 +227,13 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
     await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/invalid evidence lines: App.swift:3–3/);
     review.presentation.criteria[0].evidence = [{file:'App.swift',line:1,endLine:2}];
     await fs.writeFile(reviewPath,JSON.stringify(review));
+    await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/Record app-level assessments.*launch-performance/);
+    review.presentation.criteria[0].appChecks = [
+      'deliberate-concurrency', 'discoverable-capabilities', 'view-model-boundaries',
+      'additional-targets', 'actor-design', 'state-observation', 'launch-performance',
+      'cancellation', 'mutable-value-copies'
+    ];
+    await fs.writeFile(reviewPath,JSON.stringify(review));
     const missingClarity = structuredClone(review);
     missingClarity.operations[0].checks.find(check => check.id === 'architectural-clarity').status = 'not-applicable';
     await fs.writeFile(reviewPath,JSON.stringify(missingClarity));
