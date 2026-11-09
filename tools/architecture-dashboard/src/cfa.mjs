@@ -44,10 +44,15 @@ skill from that toolkit before changing the project.
   State-backed ViewModel in its initializer. Do not inject or share ViewModels;
   keep each scene's selection in presentation, not in a shared Feature.
 - In a new app with deep links or notification actions, DeepLinkingFeature
-  validates received opening requests and owns their durable pending list.
-  The receiving scene owns navigation. Keep declined or failed requests pending
-  and remove them after the destination opens or the user dismisses the request.
-  Preserve existing link and notification history behaviour during migration.
+  validates opening requests and owns their durable pending list in Settings.
+  Record incoming URLs and user actions on local or push notifications.
+  Scheduling or delivery alone does not create a pending item. The receiving
+  scene owns navigation and protects unsaved edits and active payments. Any
+  scene can retry a pending request. Coordinate attempts to avoid opening it
+  twice, and remove it on actual navigation or explicit dismissal. Leave
+  declined, cancelled or failed requests pending. The destination owns its
+  content loading. Preserve existing link and notification history behaviour
+  during migration.
 - A normal preview constructs the View and follows the same ownership and
   storage boundaries. Keep SwiftData containers and contexts out of previews.
 - Keep Views declarative. Feature state and business decisions belong outside
