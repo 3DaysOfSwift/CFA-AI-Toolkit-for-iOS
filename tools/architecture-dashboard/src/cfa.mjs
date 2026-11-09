@@ -44,7 +44,9 @@ skill from that toolkit before changing the project.
 - A normal preview constructs the View and follows the same ownership and
   storage boundaries. Keep SwiftData containers and contexts out of previews.
 - Keep Views declarative. Feature state and business decisions belong outside
-  the View layer.
+  the View layer. Reusable presentation components may receive action closures
+  that forward intent to their owning screen and its ViewModel. Keep service
+  closures and other screens' ViewModel actions out of screen inputs.
 - Published domain snapshots use immutable properties and contents, without
   mutable reference state that undermines them; replace them after confirmed
   changes. The screen ViewModel owns temporary unsaved editor values.

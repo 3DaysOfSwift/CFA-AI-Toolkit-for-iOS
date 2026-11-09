@@ -232,6 +232,10 @@ from precedent use; do not reframe it as a completed partial migration.
   detail initialization and reject ViewModel
   injection or shared screen and scene navigation selection in Features.
   Preserve independent destinations.
+- Allow reusable presentation components to receive action closures that
+  forward UI intent to their owning screen. Screen Views use their own
+  ViewModel for work. Keep service closures and other screens’ ViewModel
+  actions out of screen inputs.
 - Compare visuals and interactions with the baseline. Do not introduce
   unrequested design changes or restore defaults the user replaced.
 - For initial app design, verify the applicable new-app design defaults and
