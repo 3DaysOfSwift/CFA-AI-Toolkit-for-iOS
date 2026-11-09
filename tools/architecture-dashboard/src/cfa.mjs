@@ -151,9 +151,10 @@ skill from that toolkit before changing the project.
   Keep synchronous startup work brief. Task creation order gives no guarantee
   about when disk or network work begins. Measure launch and first-frame
   timing separately from completion of Feature work.
-- A Feature-owned shared refresh normally continues when a screen leaves;
-  preserve its result for later callers unless a specific product or resource
-  requirement calls for another cancellation policy.
+- A Feature-owned shared refresh normally continues when a screen leaves, even
+  if it was the only caller. Later equivalent callers can join while the request
+  is in flight, and the Feature retains a successful result. Use another
+  cancellation policy only for a specific product or resource requirement.
   Awaiting the shared task handle does not end the wait on caller cancellation.
   If the screen needs to stop waiting promptly, cancel its wait independently
   while the Feature keeps refreshing.

@@ -89,6 +89,7 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /publish confirmed changes only after required persistence succeeds/);
   assert.match(content, /Call the AppModel launch signal directly\s+and synchronously from the application lifecycle callback/);
   assert.match(content, /AppModel signals the relevant Features and starts its\s+required app-wide listeners before the callback returns/);
+  assert.match(content, /even\s+if it was the only caller\. Later equivalent callers can join/);
   assert.equal((content.match(/CFA Toolkit project guidance/g) ?? []).length, 1);
   assert.match(repeated.stdout, /already enabled/);
   assert.match(doctor.stdout, /INFO CFA project guidance found/);

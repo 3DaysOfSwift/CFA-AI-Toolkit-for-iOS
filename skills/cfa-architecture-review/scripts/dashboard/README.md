@@ -59,8 +59,10 @@ MainActor annotations in UI and feature files.
 The dashboard includes reviewed UI / Model separation and test-quality ratings.
 Ratings require source-backed classifications. In any architecture, trace who
 owns each task, whether callers wait for it, and what should happen on
-cancellation before judging the design. A Feature-owned shared refresh can
-legitimately continue after a screen disappears. For a CFA project, record a
+cancellation before judging the design. In CFA, a Feature-owned shared refresh
+normally continues even after its last screen caller leaves. If a screen needs
+to stop waiting promptly, verify that its wait can end independently while
+the refresh continues. For a CFA project, record a
 departure from a CFA convention separately from a Swift Concurrency defect.
 For example, a ViewModel-created task with no retained handle merits a CFA
 ownership finding. Establish a consequence, such as an obsolete task
