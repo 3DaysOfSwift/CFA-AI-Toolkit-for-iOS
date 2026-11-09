@@ -170,6 +170,9 @@ skill from that toolkit before changing the project.
   processing use an appropriate service isolation boundary off MainActor by
   default. Keep framework-required MainActor calls in a narrow adapter.
   A separate type or async declaration alone does not move work off MainActor.
+- Keep domain values with the Feature that defines their meaning, even if
+  they are Codable or persisted. Keep storage-only records inside persistence
+  and transport-only payloads inside the provider or adapter that maps them.
 - SwiftDataManager owns container and context creation. Keep SwiftData records
   and contexts inside the storage boundary and give Features narrow load and
   save operations that return immutable Sendable domain values. Use a

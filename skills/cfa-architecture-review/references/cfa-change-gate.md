@@ -312,6 +312,9 @@ do not claim that UI gating replaces server-side authorisation.
   requires new-app creation or an explicit request. Report unavailable visual
   checks accurately.
 - Never introduce a timed splash or storage gate, regardless of visual design.
+- Apply the [type placement rule](spec/rules/cfa-struct-07.md) when moving
+  Model files. Keep domain types with their owning Feature, storage records
+  inside persistence, and transport payloads inside their provider or adapter.
 - Inspect every newly created or moved Swift file for the imports required by
   its own declarations; imports in another source file do not satisfy this.
 - Confirm that each new screen ViewModel and concrete Feature has its own
