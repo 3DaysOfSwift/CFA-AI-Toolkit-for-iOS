@@ -131,6 +131,8 @@ Before accepting a change, answer every question:
     requests cannot publish after sign-out, account switching or external
     session expiry, including when the same account signs back in. Verify that
     external session expiry reaches its owner when the account screen is closed.
+    Release delayed writes and cleanup after the session changes and verify
+    that persisted data still reflects the correct session.
     Verify that partial failures are reconciled against the actual session. If the session
     ended and cleanup failed, verify that the app stays signed out, reports
     the failure and keeps old account data out of the signed-out experience.

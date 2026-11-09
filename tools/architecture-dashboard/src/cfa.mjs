@@ -137,7 +137,9 @@ skill from that toolkit before changing the project.
   the previous session's data out of the new session. Check the account or
   session generation before publishing in-flight results.
   If the same account can sign back in before old work finishes, check the
-  session identity even when the earlier task was cancelled.
+  session identity even when the earlier task was cancelled. Verify that late
+  writes cannot recreate cleared data and delayed cleanup cannot delete records
+  written by the new session.
   If sign-out promises a fresh-install experience, clear account-specific
   memory, caches and locally stored files. Preserve independent purchases and
   user-owned documents. Handle unsynchronised work according to the product
