@@ -108,10 +108,12 @@ skill from that toolkit before changing the project.
   draft available for retry if saving fails. Discard it when the user cancels
   editing, and publish confirmed changes only after required persistence succeeds.
 - When a value is genuinely shared across the app, define it once as a static
-  property on a purpose-named enum. Add the enum when a shared constant
-  needs it. App-wide system constants may live in a purpose-named folder
-  beside AppModel. Keep Feature-specific values with their Feature. Use authoritative bundle metadata for app identity and localization
-  resources for translatable text. Keep secrets out of app constants.
+  property on a purpose-named enum. Add it when several callers use the same
+  app-wide concept. Equal literals can still represent separate concepts.
+  App-wide system constants may live in a purpose-named folder beside
+  AppModel. Keep Feature-specific values with their Feature. Use authoritative
+  bundle metadata for app identity and localization resources for translatable
+  text. Keep secrets out of app constants.
 - Features own authoritative application state. Microservices can own internal
   request bookkeeping, caches or database machinery under suitable isolation.
   Check whether any service becomes a second authority for the same business state.

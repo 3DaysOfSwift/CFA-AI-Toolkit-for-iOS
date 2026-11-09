@@ -7,7 +7,7 @@
       "section": "Make the Architecture Visible in the Folder Structure",
       "applies": "A meaningful app-wide value is shared or repeated",
       "strength": "Default",
-      "rule": "Define genuinely shared constants once as static properties on a purpose-named enum when they are needed. Add a constants enum only when a genuinely shared value needs it. App-wide system constants may live in a purpose-named folder beside AppModel. Keep Feature-specific values with their owner. Read app identity from bundle metadata when it is authoritative and use localization resources for translatable text. Keep secrets out of app constants.",
+      "rule": "Start without a constants enum. When several callers use the same app-wide concept, define it once as a static property on a purpose-named enum. Keep independently owned values separate even when their literals happen to match. App-wide system constants may live in a purpose-named folder beside AppModel. Keep Feature-specific values with their owner. Read app identity from bundle metadata when it is authoritative and use localization resources for translatable text. Keep secrets out of app constants.",
       "why": "A single definition avoids inconsistent copies while keeping related code easy to find.",
       "verify": "Check repeated uses, ownership, bundle metadata, localization and that no secrets are embedded.",
       "example": "An AppLinks enum holds the shared company website and support email address.",
