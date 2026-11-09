@@ -901,7 +901,12 @@ export async function inspect(project) {
     else if (viewModel) {
       if (!ownsViewModel) findings.push(finding('view-model-ownership', 'review', `${name} has no recognized private @State ViewModel storage. Verify that the screen constructs and stores its ViewModel. Detail Views may initialize that stored state from a selected immutable snapshot. A computed property does not satisfy CFA screen ownership.`, viewFile, lineOf(view, declaration.index)));
       if (!dependencies.length) findings.push(finding('feature-route-unresolved', 'review', `${viewModelName} has no visible AppModel.shared feature route; inspect whether this screen is presentation-only.`, viewModelFile, 1));
+      const suiteDeclarations = declarationsByName.get(`${viewModelName}Tests`) ?? [];
       for (const file of testCandidates) {
+        if (!suiteDeclarations.some(candidate => candidate.file === file
+          && ['class', 'struct', 'enum'].includes(candidate.declaration.type))) {
+          findings.push(finding('view-model-test-suite-unresolved', 'review', `${testName} matches by filename. Verify that it contains the named test suite and exercises ${viewModelName}.`, file, 1));
+        }
         const inProduction = productionSourceTree.test(file);
         const hasTestFolder = file.split('/').some(folder => /^(?:ViewModelTests|View model tests)$/i.test(folder));
         if (inProduction || !hasTestFolder) {

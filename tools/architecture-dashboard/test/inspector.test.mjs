@@ -1016,6 +1016,19 @@ test('does not assign one test file to competing ViewModel declarations', async 
   assert.match(renderInspection(report), /matching test file needs target verification/);
 });
 
+test('distinguishes a matching ViewModel test filename from a suite declaration', async t => {
+  const file = 'AppTests/View model tests/HomeViewModelTests.swift';
+  const root = await fixture(t, {
+    'App/1 - View/Views/Home/HomeView.swift': 'struct HomeView: View { @State private var viewModel = HomeViewModel() }',
+    'App/1 - View/Views/Home/HomeViewModel.swift': 'final class HomeViewModel {}',
+    [file]: 'struct UnrelatedTests {}'
+  });
+  const report = await inspect(root);
+  assert.equal(report.screens[0].testFile, file);
+  assert.deepEqual(report.findings.filter(item => item.code === 'view-model-test-suite-unresolved')
+    .map(item => item.file), [file]);
+});
+
 test('reviews matching ViewModel tests in production source trees', async t => {
   const file = 'App/1 - View/Views/Home/HomeViewModelTests.swift';
   const root = await fixture(t, {
