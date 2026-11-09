@@ -43,6 +43,14 @@ Read [CFA specification](references/cfa-specification.md), [CFA change gate](ref
 
 Deliver the Xcode project, a short explanation of feature ownership, and executed validation. Apply the specification’s review checklist to the created slice. Do not perform legacy migration as part of this skill.
 
+If the product includes paid capabilities, apply the
+[paid capability rule](references/spec/rules/cfa-pay-01.md). Give
+`PurchasesFeature` ownership of entitlement state. Check access in the
+screen's ViewModel before presenting or invoking the paid capability. Trace
+any other entry point, such as a notification action or shortcut, to its own
+guard and test locked and entitled outcomes. Keep pricing policy outside the
+capability Feature. Protected server operations enforce their own access.
+
 When persistence is used, apply the specification's mandatory database-availability
 rule: storage never gates the root interface. Exercise initial store-opening
 failure, feature-scoped error/retry, and independent navigation before claiming
