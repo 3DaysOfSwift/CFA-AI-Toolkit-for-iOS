@@ -181,7 +181,7 @@ export async function inspect(project) {
       const bodyStart = declaration.index + declaration[0].length;
       const body = braceBody(source, bodyStart - 1);
       const members = memberSignatures(body);
-      for (const property of members.matchAll(/(?:^|(?<=;))[ \t]*(?:(?:private(?:\(set\))?|fileprivate|internal|public)\s+)?(?:let|var)\s+(\w+)\s*:\s*(\w+Feature)\b/gm)) {
+      for (const property of members.matchAll(/(?:^|(?<=;))[ \t]*(?:(?:private(?:\(set\))?|fileprivate|internal|public)\s+)?(?:let|var)\s+(\w+)\s*:\s*(\w+Feature)\b(?!\s*\.)/gm)) {
         if (hasComputedAccessor(body.slice(property.index + property[0].length))) continue;
         const [, name, dependency] = property;
         findings.push(finding('feature-coordination', 'review', `${declaration[1]} stores ${name}: ${dependency}. Trace the workflow and verify that coordination serves a business capability, preserves one owner per state and introduces no dependency cycle.`, file, lineOf(source, bodyStart + property.index)));

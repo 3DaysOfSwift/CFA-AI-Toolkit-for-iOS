@@ -629,6 +629,7 @@ test('surfaces a stored Feature dependency as coordination to review', async t =
     [file]: `final class UserProfileFeature {
       private let orders: OrdersFeature
       private let service: AccountService
+      private let orderID: OrdersFeature.OrderID
       var computed: OrdersFeature { orders }
       func signOut() { let local: OrdersFeature = orders }
     }`
