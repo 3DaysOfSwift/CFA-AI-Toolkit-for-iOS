@@ -616,6 +616,10 @@ export async function inspect(project) {
     for (const callback of source.matchAll(/\bfunc\s+application\s*\(\s*_\s+\w+\s*:\s*(?:UIKit\s*\.\s*)?UIApplication\s*,\s*didFinishLaunchingWithOptions\s*(?:\w+\s*)?:[^{}]*?\)\s*->\s*(?:Swift\s*\.\s*)?Bool\s*\{/g)) {
       const start = callback.index + callback[0].length - 1;
       const body = braceBody(source, start);
+      const synchronousBody = memberSignatures(body);
+      for (const read of synchronousBody.matchAll(/\b(?:Data|String)\s*(?:\.\s*init\s*)?\(\s*contentsOf\s*:/g)) {
+        findings.push(finding('blocking-app-launch-io', 'review', 'The launch callback appears to read data synchronously. Verify the initializer and its input. CFA signals Features during launch and lets their asynchronous work complete independently.', file, lineOf(source, start + 1 + read.index)));
+      }
       for (const scheduled of body.matchAll(/\b(?:Task\s*(?:<[^{}]*>\s*)?(?:\.\s*(?:init|detached)\s*)?|DispatchQueue\s*(?:\.\s*(?:main|global\s*\([^{}()]*\))|\([^{}()]*\))\s*\.\s*async(?:After)?\b\s*|OperationQueue\s*(?:\.\s*main|\(\s*\))\s*\.\s*addOperation\b\s*|(?<![.\w])(?<queue>\w+)\s*\.\s*(?<method>asyncAfter|async|addOperation)\b\s*)(?:\([^{}]*\)\s*|\([^{}]*?\b(?:operation|execute)\s*:\s*)?\{/g)) {
         const {queue, method} = scheduled.groups;
         const queueType = method === 'addOperation' ? 'OperationQueue' : 'DispatchQueue';

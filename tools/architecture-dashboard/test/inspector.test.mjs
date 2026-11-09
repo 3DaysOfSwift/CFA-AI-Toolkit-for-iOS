@@ -544,6 +544,21 @@ test('identifies a launch signal scheduled inside a delegate Task or dispatch qu
   assert.match(findings[1].message, /through DispatchQueue\.async/);
 });
 
+test('reviews synchronous launch reads without attributing Task work to the callback', async t => {
+  const file = 'Application/AppDelegate.swift';
+  const root = await fixture(t, {
+    [file]: `class AppDelegate {
+      func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool {
+        _ = try? Foundation.Data(contentsOf: cacheURL)
+        Task { _ = try? String(contentsOf: otherURL, encoding: .utf8) }
+        return true
+      }
+    }`
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'blocking-app-launch-io');
+  assert.deepEqual(findings.map(item => [item.file, item.line, item.severity]), [[file, 3, 'review']]);
+});
+
 test('reviews a launch signal deferred through mutable local aliases', async t => {
   const file = 'Application/AppDelegate.swift';
   const root = await fixture(t, {
