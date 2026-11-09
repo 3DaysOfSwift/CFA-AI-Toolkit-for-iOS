@@ -71,6 +71,11 @@ If the project is already CFA, make the smallest complete vertical change:
 
 1. Add or change the domain behaviour in its owning Feature. Use the
    Feature's microservices for networking, storage or device APIs as needed.
+   Apply the [immutable snapshot rule](references/spec/rules/cfa-snapshot-01.md)
+   when exposing API or persistence data. Use `let` properties with immutable
+   contents. Check nested values and collection elements for mutable reference
+   state that could change a published snapshot in place. Submit edits through
+   the owning Feature and publish a replacement value after the required save.
    Keep unsaved editor values in the screen ViewModel.
    Publish a durable edit as saved only after required persistence succeeds.
    On failure, keep the draft available for retry and leave confirmed state
