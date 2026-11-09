@@ -46,6 +46,12 @@ test('canonical rule cards with explanation links resolve to a linked catalogue 
   }
 });
 
+test('catalogue validation rejects a canonical ID with no rule card', () => {
+  const catalogue = read();
+  catalogue.topics[0].ruleIds.push('CFA-SPEC-LAUNCH-99');
+  assert.throws(() => validate(catalogue), /Unknown canonical explanation rule ID/);
+});
+
 test('rule lookup returns relevant local rationale without inventing planned URLs', () => {
   const catalogue = read();
   catalogue.topics.find(topic => topic.id === 'unstructured-tasks').publication = {

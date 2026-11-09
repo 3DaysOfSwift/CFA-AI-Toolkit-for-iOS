@@ -61,6 +61,11 @@ export function validateCatalogue(catalogue, directory, { sourceRoot } = {}) {
     new Set(catalogue.auditSources).size === catalogue.auditSources.length &&
     catalogue.auditSources.every(file => sourceFiles.has(file)), 'Invalid audit sources');
   const ids = new Set(), rules = new Set();
+  const ruleDirectory = sourceRoot && path.join(sourceRoot, 'spec/rules');
+  const canonicalRules = ruleDirectory && fs.existsSync(ruleDirectory)
+    ? new Set(fs.readdirSync(ruleDirectory).filter(file => /^cfa-[a-z]+-\d{2}\.md$/.test(file))
+      .map(file => file.replace(/^cfa-/, 'cfa-spec-').slice(0, -3).toUpperCase()))
+    : null;
   const sourceHeadings = new Map();
   const validateSource = source => {
     requireValue(source && sourceFiles.has(source.file) && nonempty(source.heading), 'Invalid canonical source');
@@ -79,6 +84,9 @@ export function validateCatalogue(catalogue, directory, { sourceRoot } = {}) {
     requireValue(Array.isArray(topic.ruleIds) && topic.ruleIds.length > 0, 'Topic needs rule IDs');
     for (const id of topic.ruleIds) {
       requireValue(/^CFA-(?:SPEC-)?[A-Z]+-\d{2}$/.test(id) && !rules.has(id), 'Invalid or duplicate rule ID');
+      if (canonicalRules && id.startsWith('CFA-SPEC-')) {
+        requireValue(canonicalRules.has(id), `Unknown canonical explanation rule ID: ${id}`);
+      }
       rules.add(id);
     }
     requireValue(topic.note === `decisions/${topic.id}.md`, 'Invalid note path');

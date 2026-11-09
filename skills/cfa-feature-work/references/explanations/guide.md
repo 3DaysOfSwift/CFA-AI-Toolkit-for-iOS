@@ -17,9 +17,12 @@ The bundled dependency-free helper is at `scripts/explanations.mjs`, relative
 to the skill directory. With Node.js 20+, run:
 
     node scripts/explanations.mjs lookup unstructured-tasks
-    node scripts/explanations.mjs lookup CFA-TASK-01
+    node scripts/explanations.mjs lookup CFA-SPEC-TASK-01
 
-It returns the note location, classification and verified public links, if any.
+It returns the primary note, classification and verified public links, if any.
+When a rule card offers several explanations, use the article that addresses
+the developer's question and confirm its eligibility in the catalogue.
+Existing explanation keys such as `CFA-TASK-01` still work.
 Read the note itself before explaining it. Unknown keys return an error; do
 not substitute a guessed article. Without Node, read the catalogue and note.
 Neither method needs network access. Neither sends customer code anywhere.
