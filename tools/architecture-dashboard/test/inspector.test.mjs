@@ -22,7 +22,7 @@ test('maps a complete screen to AppModel, feature, collaborator and named tests'
     'Application/1 - View/Views/Chat/ChatViewModel.swift': '@MainActor final class ChatViewModel { private let chatsFeature: ChatsFeature; init(chatsFeature: ChatsFeature = AppModel.shared.chatsFeature) { self.chatsFeature = chatsFeature } }',
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static let shared = live(); static func live() -> AppModel { AppModel() }; let chatsFeature: ChatsFeature }',
     'Application/2 - AppModel/Features/Chats/ChatsFeature.swift': 'final class ChatsFeature { private let repository: any ChatsRepository }',
-    'ApplicationTests/ViewModelTests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}',
+    'ApplicationTests/View model tests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}',
     'ApplicationTests/FeatureTests/Chats/ChatsFeatureTests.swift': 'struct ChatsFeatureTests {}'
   });
   const report = await inspect(root);
@@ -177,7 +177,7 @@ test('reports test search scope when tests are beside the scanned app folder', a
     'Application/1 - View/Views/Chat/ChatViewModel.swift': 'final class ChatViewModel { init(chatsFeature: ChatsFeature = AppModel.shared.chatsFeature) {} }',
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() }; let chatsFeature: ChatsFeature }',
     'Application/2 - AppModel/Features/Chats/ChatsFeature.swift': 'final class ChatsFeature {}',
-    'ApplicationTests/ViewModelTests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}',
+    'ApplicationTests/View model tests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}',
     'ApplicationTests/FeatureTests/ChatsFeatureTests.swift': 'struct ChatsFeatureTests {}'
   });
   const isMissingTest = item => ['feature-tests-missing', 'view-model-tests-missing'].includes(item.code);
@@ -187,7 +187,7 @@ test('reports test search scope when tests are beside the scanned app folder', a
   assert.ok(scoped.every(item => /scanned directory/.test(item.message)));
   assert.equal((await inspect(root)).findings.filter(isMissingTest).length, 0);
   await fs.rename(path.join(root, 'ApplicationTests/FeatureTests'), path.join(root, 'FeatureTests'));
-  await fs.rename(path.join(root, 'ApplicationTests/ViewModelTests/ChatViewModelTests.swift'), path.join(root, 'ChatViewModelTests.swift'));
+  await fs.rename(path.join(root, 'ApplicationTests/View model tests/ChatViewModelTests.swift'), path.join(root, 'ChatViewModelTests.swift'));
   assert.equal((await inspect(root)).findings.filter(isMissingTest).length, 0);
 });
 
@@ -197,7 +197,7 @@ test('does not mistake composition locals for AppModel properties', async t => {
     'Application/1 - View/Views/Chat/ChatViewModel.swift': 'final class ChatViewModel { init(chatFeature: ChatFeature = AppModel.shared.chatFeature) {} }',
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { let chatFeature: ChatFeature = ChatFeature(); return AppModel() } }',
     'Application/2 - AppModel/Features/Chat/ChatFeature.swift': 'final class ChatFeature {}',
-    'ApplicationTests/ViewModelTests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}'
+    'ApplicationTests/View model tests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}'
   });
   const report = await inspect(root);
   assert.ok(report.findings.some(item => item.code === 'unresolved-feature'));
@@ -724,7 +724,7 @@ test('a Feature exposed in an AppModel extension resolves with a computed-exposu
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static let shared = AppModel(); static func live() -> AppModel { AppModel() } }',
     'Application/2 - AppModel/AppModel+Chat.swift': 'extension AppModel { var chatFeature: ChatFeature { ChatFeature() } }',
     'Application/2 - AppModel/Features/Chat/ChatFeature.swift': 'final class ChatFeature {}',
-    'ApplicationTests/ViewModelTests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}'
+    'ApplicationTests/View model tests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}'
   });
   const { findings } = await inspect(root);
   assert.ok(findings.some(item => item.code === 'app-model-shared-factory'));
@@ -848,7 +848,7 @@ test('does not mistake a structural tab root or nested Feature value for a missi
     'Application/1 - View/Views/Practice/PracticeViewModel.swift': 'final class PracticeViewModel { private var retryCommand: PracticeFeature.Command = .refresh; init(practiceFeature: PracticeFeature = AppModel.shared.practiceFeature) {} }',
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() }; let practiceFeature: PracticeFeature }',
     'Application/2 - AppModel/Features/Practice/PracticeFeature.swift': 'final class PracticeFeature {}',
-    'ApplicationTests/ViewModelTests/PracticeViewModelTests.swift': 'struct PracticeViewModelTests {}',
+    'ApplicationTests/View model tests/PracticeViewModelTests.swift': 'struct PracticeViewModelTests {}',
     'ApplicationTests/FeatureTests/PracticeFeatureTests.swift': 'struct PracticeFeatureTests {}'
   });
   const report = await inspect(root);
@@ -1103,7 +1103,7 @@ test('ignores fake dependencies in comments and strings and flags unresolved pro
     'Application/1 - View/Views/Chat/ChatView.swift': 'import SwiftUI\nstruct ChatView: View { @State private var viewModel = ChatViewModel(); var body: some View { Text("AppModel.shared.fakeFeature") } }',
     'Application/1 - View/Views/Chat/ChatViewModel.swift': '// AppModel.shared.fakeFeature\nfinal class ChatViewModel { init(chatsFeature: any ChatsFeatureAPI = AppModel.shared.missingFeature) {} }',
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static let shared = live(); static func live() -> AppModel { AppModel() } }',
-    'ApplicationTests/ViewModelTests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}'
+    'ApplicationTests/View model tests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}'
   });
   const report = await inspect(root);
   assert.deepEqual(report.screens[0].dependencies.map(item => item.property), ['missingFeature']);
@@ -1116,7 +1116,7 @@ test('reports old feature-owner types and mismatched feature references', async 
     'Application/1 - View/Views/Chat/ChatViewModel.swift': 'final class ChatViewModel { private let chats: ChatsManager; init(chats: ChatsManager = AppModel.shared.chatsManager) { self.chats = chats } }',
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static let shared = live(); static func live() -> AppModel { AppModel() }; let chatsManager: ChatsManager }',
     'Application/2 - AppModel/Features/Chats/ChatsManager.swift': 'final class ChatsManager {}',
-    'ApplicationTests/ViewModelTests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}'
+    'ApplicationTests/View model tests/ChatViewModelTests.swift': 'struct ChatViewModelTests {}'
   });
   const report = await inspect(root);
   assert.deepEqual(report.findings.map(item => item.code), ['feature-type-name', 'feature-property-name']);
@@ -1235,11 +1235,12 @@ test('reviews matching ViewModel tests in production source trees', async t => {
     'App/2 - AppModel/HomeViewModelTests.swift': 'struct HomeViewModelTests {}',
     'AppTests/HomeViewModelTests.swift': 'struct HomeViewModelTests {}',
     'OtherTests/View model tests/HomeViewModelTests.swift': 'struct HomeViewModelTests {}',
+    'OtherTests/ViewModelTests/HomeViewModelTests.swift': 'struct HomeViewModelTests {}',
     [file]: 'struct HomeViewModelTests {}'
   });
   const {findings} = await inspect(root);
   const placement = findings.filter(item => item.code === 'view-model-test-placement');
-  assert.deepEqual(placement.map(item => item.file), [file, 'App/2 - AppModel/HomeViewModelTests.swift', 'AppTests/HomeViewModelTests.swift']);
+  assert.deepEqual(placement.map(item => item.file), [file, 'App/2 - AppModel/HomeViewModelTests.swift', 'AppTests/HomeViewModelTests.swift', 'OtherTests/ViewModelTests/HomeViewModelTests.swift']);
   assert.ok(placement.every(item => item.severity === 'review' && /unit-test target/.test(item.message)));
 });
 

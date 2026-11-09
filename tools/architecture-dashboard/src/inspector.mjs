@@ -1000,10 +1000,10 @@ export async function inspect(project) {
           findings.push(finding('view-model-test-suite-unresolved', 'review', `${testName} contains competing suite declarations on lines ${lines}. Verify which suite exercises ${viewModelName} in the intended test target.`, file, suitesInFile[0].declaration.line));
         }
         const inProduction = productionSourceTree.test(file);
-        const hasTestFolder = file.split('/').some(folder => /^(?:ViewModelTests|View model tests)$/i.test(folder));
+        const hasTestFolder = file.split('/').includes('View model tests');
         if (inProduction || !hasTestFolder) {
-          const location = inProduction ? 'in a production source tree' : 'outside a dedicated ViewModel test folder';
-          findings.push(finding('view-model-test-placement', 'review', `${testName} appears ${location}. Verify its Xcode navigator group and unit-test target membership.`, file, 1));
+          const location = inProduction ? 'in a production source tree' : 'outside a View model tests folder on disk';
+          findings.push(finding('view-model-test-placement', 'review', `${testName} appears ${location}. Verify that the Xcode navigator places it under View model tests and that it belongs to the unit-test target.`, file, 1));
         }
       }
       if (testCandidates.length > 1) findings.push(finding('view-model-tests-ambiguous', 'review', `Multiple files match ${testName}: ${testCandidates.join(', ')}. Verify which test target covers this ViewModel.`, viewModelFile, 1));
