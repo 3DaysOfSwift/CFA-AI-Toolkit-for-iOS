@@ -745,6 +745,10 @@ export async function inspect(project) {
       if (composition) {
         findings.push(finding('preview-app-model-composition', 'review', 'This preview appears to construct AppModel. Verify that the preview constructs the View and uses its normal ViewModel and Feature route.', file, lineOf(source, start + composition.index)));
       }
+      const sharedModel = /\bAppModel\s*\.\s*shared\b/.exec(previewBody);
+      if (sharedModel && !access) {
+        findings.push(finding('preview-app-model-access', 'review', 'This preview appears to access AppModel.shared directly. Verify that the preview constructs the View and lets its ViewModel resolve Feature dependencies.', file, lineOf(source, start + sharedModel.index)));
+      }
       for (const line of swiftDataLines(previewBody, start)) {
         findings.push(finding('view-swiftdata-access', 'review', 'This preview appears to access SwiftData directly. Preview construction follows the same CFA storage boundary as the app.', file, line));
       }

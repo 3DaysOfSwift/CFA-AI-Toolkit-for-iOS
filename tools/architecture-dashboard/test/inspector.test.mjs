@@ -1486,6 +1486,18 @@ test('reviews AppModel composition in previews outside the View folder', async t
   ]);
 });
 
+test('reviews a preview passing the shared graph without accessing a Feature', async t => {
+  const file = 'App/PreviewContent/HomePreview.swift';
+  const root = await fixture(t, {
+    [file]: `#Preview { HomeView() }
+    #Preview { HomeView(graph: Example.AppModel.shared) }
+    #Preview { Text("AppModel.shared") }`
+  });
+  const { findings } = await inspect(root);
+  assert.deepEqual(findings.filter(item => item.code === 'preview-app-model-access')
+    .map(({file, line, severity}) => [file, line, severity]), [[file, 2, 'review']]);
+});
+
 test('surfaces a stored Feature dependency as coordination to review', async t => {
   const file = 'Application/2 - AppModel/Features/Profile/UserProfileFeature.swift';
   const root = await fixture(t, {
