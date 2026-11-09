@@ -141,6 +141,18 @@ test('reviews possible model dependencies in a flat View initializer', async t =
   ]);
 });
 
+test('locates possible work started by a SwiftUI initializer', async t => {
+  const { report } = await inspectView(t, `struct HomeView: View {
+    @State private var viewModel = HomeViewModel()
+    init() {
+      Task { await load() }
+    }
+    var body: some View { Text("Home").task { await load() } }
+  }`);
+  const tasks = report.findings.filter(item => item.code === 'screen-initializer-task');
+  assert.deepEqual(tasks.map(item => [item.file, item.line, item.severity]), [[viewPath, 4, 'review']]);
+});
+
 test('maps a conventionally located screen with qualified View conformance', async t => {
   const {report} = await inspectView(t, `struct HomeView: SwiftUI.View {
     @State private var viewModel = HomeViewModel()
