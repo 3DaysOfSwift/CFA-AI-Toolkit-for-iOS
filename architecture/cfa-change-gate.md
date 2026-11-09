@@ -128,8 +128,14 @@ the architecture:
     platform mechanism rather than assuming shared memory.
 15. SwiftData access goes through `SwiftDataManager`; every `URLSession` call
     goes through `NetworkingManager`. Features own those lower-level
-    collaborators. Views/ViewModels never open storage or make transport calls.
-16. The app delegate's launch callback signals `applicationDidFinishLaunching`.
+    collaborators. Keep domain-specific services beside their owning Feature
+    while that location remains descriptive. Put broadly applicable services
+    in a shared location and compose a shared instance in `AppModel.live()`
+    when common configuration or shared state requires it. Views/ViewModels
+    never open storage or make transport calls.
+16. The app delegate calls `AppModel.shared.applicationDidFinishLaunching()`
+    directly and synchronously. Features may start asynchronous work without
+    making the callback await disk or network completion.
     No View `.task` performs app launch, and no App, delegate, or View stores an
     AppModel reference. ViewModels retain only the narrow Features needed by their screen.
 17. The SwiftUI `App.body` declares a stable root View and app-wide presentation
