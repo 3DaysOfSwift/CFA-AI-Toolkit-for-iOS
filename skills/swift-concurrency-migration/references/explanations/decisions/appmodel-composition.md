@@ -19,13 +19,20 @@ Constructing unrelated graphs in different scenes can create conflicting owners 
 
 ## Documented rationale
 
-The specification explicitly chooses shared production composition to keep scenes connected to the same underlying state. It limits AppModel to Features and lifecycle coordination so composition does not become business logic. The app delegate calls AppModel directly and synchronously at startup. Before
-the delegate returns, AppModel invokes the Feature startup methods and starts
-each required app-wide listener once. Screen-only observation follows the
-screen or ViewModel lifetime. Features own the asynchronous refresh and restoration
-work. Disk and network work can finish after the delegate returns, and task
-creation order alone gives no guarantee about when either begins. AppModel
-forwards listener events to the Feature responsible for the business response.
+Scenes in the same process share one production graph so they can use the
+same authoritative state. AppModel assembles the graph and coordinates its
+lifecycle. Features own the business decisions.
+
+The app delegate calls AppModel directly and synchronously so startup is
+signalled during the delegate callback. Before the delegate returns, AppModel
+invokes the relevant Feature startup methods and starts each required app-wide
+listener once. AppModel forwards listener events to the responsible Feature.
+Screen-only observation follows the screen or ViewModel lifetime.
+
+Each Feature owns its asynchronous refresh and restoration work. The delegate
+can return while that work is pending, so the first screen can appear without
+waiting for disk or network completion. Task creation order alone gives no
+guarantee about when either begins.
 
 ## Trade-offs and alternatives
 
@@ -52,6 +59,7 @@ controlled event source. Verify one listener starts, events reach the Feature
 without a screen, and the test can end its listener. Inspect the actual
 application callback to confirm it calls AppModel directly before returning.
 A successful simulator launch alone does not establish that call path.
+Measure first-frame timing separately from disk and network completion.
 
 ## Evidence and provenance
 
