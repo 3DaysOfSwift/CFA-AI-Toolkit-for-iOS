@@ -187,6 +187,11 @@ export async function inspect(project) {
         findings.push(finding('app-model-storage-construction', 'review', `${name} references a ModelContainer initializer. Trace whether it opens storage during graph construction. CFA opens the store within the storage owner’s data request.`, appModelFile, lineOf(appModel, opening + 1 + container.index)));
       }
     }
+    for (const match of appMembers.matchAll(/\bstatic[ \t]+(?:let|var)[ \t]+(\w+)[ \t]*(?::[^;=\n]+)?=(?!=)/g)) {
+      const name = match[1];
+      if (name === 'shared') continue;
+      findings.push(finding('app-model-static-state', 'warning', `AppModel declares static stored property ${name}; CFA reserves static storage in AppModel for the shared production graph.`, appModelFile, lineOf(appModel, match.index)));
+    }
     const sharedInitializer = /\bstatic\s+let\s+shared\s*(?::\s*AppModel\s*)?=/.exec(appMembers);
     if (sharedInitializer) {
       const initializer = appModel.slice(sharedInitializer.index + sharedInitializer[0].length);

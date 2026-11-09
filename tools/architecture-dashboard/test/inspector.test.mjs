@@ -168,6 +168,21 @@ test('reports typed and inferred AppModel property defaults without flagging sha
     .map(({file, line}) => [file, line]), [[file, 3], [file, 4], [file, 5]]);
 });
 
+test('flags extra static AppModel storage while allowing shared and computed properties', async t => {
+  const file = 'Application/2 - AppModel/AppModel.swift';
+  const root = await fixture(t, {
+    [file]: `final class AppModel {
+      static let shared = live()
+      private static var alternateGraph: AppModel = live()
+      static var title: String { "Home" }
+      static func live() -> AppModel { AppModel() }
+    }`
+  });
+  const { findings } = await inspect(root);
+  assert.deepEqual(findings.filter(item => item.code === 'app-model-static-state')
+    .map(({file, line}) => [file, line]), [[file, 3]]);
+});
+
 test('does not identify a launch guard by the order of private Boolean properties', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel {\n    private var unrelatedFlag: Bool = false\n    private var didFinishLaunching: Bool\n    static func live() -> AppModel { AppModel() }\n}'
