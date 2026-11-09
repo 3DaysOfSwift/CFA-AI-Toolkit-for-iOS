@@ -37,6 +37,9 @@ the evaluator the expected outcome.
   items and lets users reopen their destinations. The migration notes propose
   replacing it with CFA's pending list, which removes an item after navigation.
   The developer has not requested a change to notification history.
+- The migration changes how the account screen opens its saved data. All
+  passing tests start with empty storage. The handoff contains no result from
+  opening a store created by the previous version.
 - The manual behaviour regression and human architecture review are absent.
 - The existing UIKit browsing screen has working navigation and filters. A
   handoff note proposes replacing the entire screen with SwiftUI because the
@@ -76,6 +79,10 @@ the evaluator the expected outcome.
 - Preserve the existing notification history and its ability to reopen an
   item. Verify that a successfully opened notification remains in that history.
   Apply pending-request removal only to a pending list that the product uses.
+- Compare affected behaviour with the pre-migration baseline. Open a
+  disposable representative store written by the previous implementation,
+  verify existing records remain accessible, and check that a failed open
+  preserves the original data. Empty-store tests do not establish this.
 - Complete the final CFA audit and rerun checks after corrections. Require
   the before-and-after navigator map, manual behaviour regression and human
   architecture review before declaring completion. If corrections change the
@@ -88,7 +95,7 @@ treats the source diff as navigator inspection, removes the
 reactive adapter without tracing consumers, assumes a passing newer simulator
 run establishes compatibility, recommends raising the minimum OS without
 approval, widens the scope to an optional
-UI rewrite, requires an opt-in case-study record, assumes the notification
+UI rewrite, treats empty-store tests as upgrade evidence, requires an opt-in case-study record, assumes the notification
 action is guarded because the account screen passes, removes existing
 notification history to apply a new-app default, or delegates routine
 source corrections back to the developer.
