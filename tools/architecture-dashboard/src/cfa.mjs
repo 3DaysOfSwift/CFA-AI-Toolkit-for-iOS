@@ -34,7 +34,8 @@ const detailScreenGuidance = 'A detail View may receive selected immutable value
 const screenGuidanceUpdate = 'Apply private @State ViewModel ownership to SwiftUI screens, allow detail Views to construct their own ViewModel from an immutable snapshot, and trace the actual presentation owner for UIKit migrations.';
 const outdatedDeepLinkGuidance = 'remove it on actual navigation or explicit dismissal';
 const outdatedPendingSaveGuidance = 'Persist only the safe data needed to identify and present each request.';
-const deepLinkGuidanceUpdate = 'Confirm pending requests only after persistence succeeds, and retry failed removal without navigating again.';
+const outdatedDismissalGuidance = 'request can reappear after restart until removal is saved. The destination owns its content loading.';
+const deepLinkGuidanceUpdate = 'Confirm pending requests only after persistence succeeds, and retry failed removal without navigating again. Keep a failed dismissal pending for retry.';
 const outdatedSnapshotGuidance = 'Published domain snapshots use immutable properties and contents';
 const snapshotGuidanceUpdate = 'Use let properties and check nested values for mutable references.';
 const outdatedSharedWaitGuidance = 'A departing screen may stop waiting while the Feature keeps refreshing.';
@@ -470,7 +471,8 @@ function doctor(projectArgument) {
       if (content.includes(outdatedScreenGuidance) || (previousInlineScreenGuidance.test(content) && !content.includes(detailScreenGuidance))) {
         console.log(`WARN outdated screen ownership guidance in ${file}. ${screenGuidanceUpdate}`);
       }
-      if (content.includes(outdatedDeepLinkGuidance) || content.includes(outdatedPendingSaveGuidance)) {
+      if (content.includes(outdatedDeepLinkGuidance) || content.includes(outdatedPendingSaveGuidance) ||
+          content.includes(outdatedDismissalGuidance)) {
         console.log(`WARN outdated deep-link guidance in ${file}. ${deepLinkGuidanceUpdate}`);
       }
       if (content.includes(outdatedSnapshotGuidance)) {
@@ -542,7 +544,8 @@ function enableProject(values) {
     if (block.includes(outdatedScreenGuidance) || (previousInlineScreenGuidance.test(block) && !block.includes(detailScreenGuidance))) {
       console.log(`Update the existing CFA screen ownership guidance block. ${screenGuidanceUpdate}`);
     }
-    if (block.includes(outdatedDeepLinkGuidance) || block.includes(outdatedPendingSaveGuidance)) {
+    if (block.includes(outdatedDeepLinkGuidance) || block.includes(outdatedPendingSaveGuidance) ||
+          block.includes(outdatedDismissalGuidance)) {
       console.log(`Update the existing CFA deep-link guidance block. ${deepLinkGuidanceUpdate}`);
     }
     if (block.includes(outdatedSnapshotGuidance)) {

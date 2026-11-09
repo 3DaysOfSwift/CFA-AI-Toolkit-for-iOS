@@ -213,6 +213,23 @@ test('current CFA guidance is not flagged for legacy text in surrounding project
   }
 });
 
+test('both guidance commands identify missing dismissal recovery in the installed block', t => {
+  const {directory, command} = installedCommand(t);
+  const agents = path.join(directory, 'AGENTS.md');
+  assert.equal(spawnSync(command, ['enable-project', directory]).status, 0);
+  const current = fs.readFileSync(agents, 'utf8');
+  const previous = current.replace(/If an explicit\n  dismissal cannot be saved, report the error and keep the request pending for\n  retry\. The destination/, 'The destination');
+  assert.notEqual(previous, current);
+  fs.writeFileSync(agents, previous);
+
+  for (const action of ['doctor', 'enable-project']) {
+    const result = spawnSync(command, [action, directory], {encoding:'utf8'});
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /deep-link guidance.*Keep a failed dismissal pending for retry/);
+  }
+  assert.equal(fs.readFileSync(agents, 'utf8'), previous);
+});
+
 test('installed guidance predating the isolation rule is identified and preserved', t => {
   const { directory, command } = installedCommand(t);
   const agents = path.join(directory, 'AGENTS.md');
