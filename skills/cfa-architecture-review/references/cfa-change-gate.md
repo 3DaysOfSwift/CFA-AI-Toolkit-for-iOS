@@ -97,8 +97,10 @@ the architecture:
     Publish durable user edits as saved only after required persistence succeeds.
     When both restoration and refresh are needed, start them independently.
     A missing, incompatible or unreadable optional cache must leave the download
-    free to proceed. Publish current server data promptly, attempt caching
-    independently, and prevent an older restore from replacing fresh results.
+    free to proceed. Publish current server data without waiting for the cache
+    write. Retry cache writes within a bounded policy, preserve a good cache if
+    replacement fails, and prevent older writes or restores from replacing
+    newer data. Report offline availability only for a saved cache.
     Use JSON by default. Offer Instant Loading binary snapshots only on request
     for a sufficiently stable format with safe rejection of incompatible data.
     When a non-critical preference is missing or obsolete, use its
