@@ -18,6 +18,7 @@ struct PendingSnapshot: Sendable {
 actor PendingRequestStore {
     private let fileURL: URL
     private var requests: [DestinationRequest] = []
+    private var resolvedIDs: Set<String> = []
     private var loaded = false
     private var revision = 0
 
@@ -30,13 +31,18 @@ actor PendingRequestStore {
 
     func insert(_ request: DestinationRequest) throws -> PendingSnapshot {
         try loadIfNeeded()
-        guard !requests.contains(where: { $0.id == request.id }) else { return try snapshot() }
+        guard !resolvedIDs.contains(request.id),
+              !requests.contains(where: { $0.id == request.id }) else { return try snapshot() }
         return try commit(requests + [request])
     }
 
     func remove(id: String) throws -> PendingSnapshot {
         try loadIfNeeded()
-        return try commit(requests.filter { $0.id != id })
+        let remaining = requests.filter { $0.id != id }
+        guard remaining.count != requests.count else { return try snapshot() }
+        let result = try commit(remaining)
+        resolvedIDs.insert(id) // Suppress repeated callbacks for this event in this store's lifetime.
+        return result
     }
 
     private func loadIfNeeded() throws {
@@ -118,47 +124,51 @@ final class DeepLinkingFeature {
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: folder) }
         let fileURL = folder.appendingPathComponent("pending.json")
-        let request = DestinationRequest(id: "notification-1", title: "Next launch", launchID: "launch-42")
+        let initialRequest = DestinationRequest(id: "notification-1", title: "Next launch", launchID: "launch-42")
 
         let firstRun = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
-        try await firstRun.receive(request)
-        try await firstRun.receive(request) // Repeated delivery does not add a duplicate.
-        precondition(firstRun.pending == [request])
-        try await firstRun.open(id: request.id) { _ in false } // User keeps editing.
-        precondition(firstRun.pending == [request])
+        try await firstRun.receive(initialRequest)
+        try await firstRun.receive(initialRequest) // Repeated delivery does not add a duplicate.
+        precondition(firstRun.pending == [initialRequest])
+        try await firstRun.open(id: initialRequest.id) { _ in false } // User keeps editing.
+        precondition(firstRun.pending == [initialRequest])
 
         // Two scenes cannot open the same pending request at the same time.
         var releaseNavigation: CheckedContinuation<Bool, Never>?
         let firstAttempt = Task { @MainActor in
-            try await firstRun.open(id: request.id) { _ in
+            try await firstRun.open(id: initialRequest.id) { _ in
                 await withCheckedContinuation { releaseNavigation = $0 }
             }
         }
         while releaseNavigation == nil { await Task.yield() }
         var secondSceneOpened = false
-        try await firstRun.open(id: request.id) { _ in
+        try await firstRun.open(id: initialRequest.id) { _ in
             secondSceneOpened = true
             return true
         }
-        precondition(!secondSceneOpened && firstRun.pending == [request])
+        precondition(!secondSceneOpened && firstRun.pending == [initialRequest])
         do {
-            try await firstRun.dismiss(id: request.id)
+            try await firstRun.dismiss(id: initialRequest.id)
             preconditionFailure("Dismissal must not race an active navigation")
         } catch PendingRequestError.operationInProgress {
-            precondition(firstRun.pending == [request])
+            precondition(firstRun.pending == [initialRequest])
         }
         releaseNavigation?.resume(returning: false)
         try await firstAttempt.value
-        precondition(firstRun.pending == [request])
+        precondition(firstRun.pending == [initialRequest])
 
         // After one scene declines, another scene can open the same request.
         var secondSceneDestination: DestinationRequest?
-        try await firstRun.open(id: request.id) { destination in
+        try await firstRun.open(id: initialRequest.id) { destination in
             secondSceneDestination = destination
             return true
         }
-        precondition(secondSceneDestination == request && firstRun.pending.isEmpty)
-        try await firstRun.receive(request) // Continue the remaining scenarios with a pending request.
+        precondition(secondSceneDestination == initialRequest && firstRun.pending.isEmpty)
+        try await firstRun.receive(initialRequest)
+        precondition(firstRun.pending.isEmpty) // A repeated callback cannot reopen the completed event.
+
+        let request = DestinationRequest(id: "notification-deferred", title: "Next launch", launchID: "launch-42")
+        try await firstRun.receive(request)
 
         // A cancelled scene attempt cannot consume the pending request.
         var finishCancelledNavigation: CheckedContinuation<Bool, Never>?
