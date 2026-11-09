@@ -155,6 +155,11 @@ calls are build-specific leads whose freshness and completeness are unverified;
 they do not establish task parentage or runtime execution. If the index cannot
 be read, its unavailable status and reason remain in the analysis. Continue the
 source review rather than treating absent indexed calls as proof of absence.
+Use the listed build definitions to locate configuration inputs. For isolation
+findings, record the selected target and configuration and the effective
+Swift settings in the supporting evidence. If configurations differ, qualify
+the finding accordingly. A build-definition hash identifies the scanned
+input; it does not resolve inherited settings or build overrides.
 
 Reconcile the full production target and file list,
 including sources the lexical scan cannot resolve. Check the directories listed

@@ -207,7 +207,7 @@ export async function prepare(root, output, syntaxProvider = collectSyntax, opti
   await fs.writeFile(path.join(output,'project-analysis.json'), JSON.stringify(analysis,null,2)+'\n', {flag:'wx'});
   const checklist = {
     sourceFingerprint: report.sourceFingerprint,
-    note: 'Review each item against its source and record evidence in the review input. Scanner candidates are leads; verify target membership and discover additional entry points manually.',
+    note: 'Review each item against its source and record evidence in the review input. Scanner candidates are leads. Verify target membership, discover additional entry points, and record the target, configuration and effective Swift isolation settings used for isolation findings.',
     productionTargets: {
       status:'pending', targets:[],
       excludedTestDirectories: report.scope.excludedTestDirectories,
