@@ -305,6 +305,12 @@ test('installed Health Check rescans source, surfaces gaps and rejects stale rev
     draftAssessment.presentation.criteria[0].status = 'draft';
     await fs.writeFile(reviewPath,JSON.stringify(draftAssessment));
     assert.match((await next(project,reviewPath,syntax)).gaps.join(' '), /App-level assessments still needed:.*launch-performance/);
+    const blankAssessment = structuredClone(review);
+    blankAssessment.presentation.criteria[0].detail = '  ';
+    await fs.writeFile(reviewPath,JSON.stringify(blankAssessment));
+    await assert.rejects(next(project,reviewPath,syntax), /missing review text/);
+    await assert.rejects(finish(project,reviewPath,output,undefined,syntax), /missing review text/);
+    await assert.rejects(fs.access(output));
     const sourceProblem = structuredClone(review);
     sourceProblem.fileReviews = [{
       file:'Value.swift',status:'problem',reason:'Confirmed issue',verification:'Source inspection',
