@@ -59,8 +59,9 @@ is unavailable. Verify affected targets can still build and exercise the
 handoff separately from source membership checks.
 
 When moving durable storage ownership, preserve the existing store location,
-schema compatibility and saved records. Verify against a representative
-existing store, including reopening after the change. An isolated empty store
+schema compatibility and saved records. Verify against a disposable store written
+by the previous version with representative synthetic records, including
+reopening after the change. An isolated empty store
 can verify fresh setup. Use the existing-store check to catch upgrade failures,
 and preserve the original data if opening or migration fails.
 

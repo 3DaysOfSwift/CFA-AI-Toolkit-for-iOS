@@ -142,7 +142,8 @@ Use deliberate passes:
    persistence for user edits on the save path before reporting success.
    When changing durable storage, preserve the shipped store location and
    schema compatibility. If the migration requires changing either, verify
-   the upgrade with a representative existing store. Check that saved records
+   the upgrade with a disposable store written by the previous version with
+   representative synthetic records. Check that those records
    remain available after reopening and that an open or migration failure
    surfaces without replacing the store with empty data.
    If preference restoration changes, test with values written by the old

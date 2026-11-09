@@ -353,8 +353,9 @@ do not claim that UI gating replaces server-side authorisation.
 - Confirm that storage work does not leak SwiftData `@Model` objects across an
   actor boundary, and that a `@ModelActor` is used where database work is not
   deliberately small and UI-owned.
-- If a change affects durable storage, reopen a representative store created
-  by the prior version. Verify that its location and saved records remain
+- If a change affects durable storage, reopen a disposable store created
+  by the prior version with representative synthetic records. Verify that its
+  location and saved records remain
   usable and that a failed open or upgrade preserves the original data.
 - After replacing a route, check callers, target membership, tests and system
   entry points before removing superseded methods, stored state or files.
