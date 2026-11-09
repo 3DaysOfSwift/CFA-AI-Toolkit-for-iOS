@@ -135,6 +135,14 @@ project files and exclusions to check. The `gaps` list also flags missing
 report criteria and invalid report text. Resolve those gaps before rendering.
 The scanner cannot establish target membership or discover every event by itself.
 
+`next`, `progress` and `report` recheck the current project against the
+fingerprint from `prepare`. Changes to scanned Swift files or local build
+definitions can invalidate the draft. If the fingerprint differs, run
+`prepare` into a new directory with the intended scope. Recheck changed
+source, target membership and task locations, then carry forward only
+judgments whose evidence still supports them. Keep the fresh draft's
+fingerprint and scan scope.
+
 The review's `presentation` requires `app`, `summary`, `verdict`, `conclusion`
 and a nonempty list of `criteria`. Use the verdict to describe the app’s
 concurrency design. Each criterion has a `title`, `detail`, `status` (`pass`,
