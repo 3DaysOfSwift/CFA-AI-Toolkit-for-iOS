@@ -370,11 +370,18 @@ export async function inspect(project) {
   }
 
   const screens = [];
-  if (!declarationsByName.get('SwiftDataManager')?.some(({declaration}) => declaration.type !== 'protocol')) {
+  const storageOwners = (declarationsByName.get('SwiftDataManager') || [])
+    .filter(({declaration}) => declaration.type !== 'protocol');
+  const hasStorageOwnerOutsideTestFolders = storageOwners.some(({file}) =>
+    !path.posix.dirname(file).split('/').some(folder => /(?:^tests?$|Tests?$)/.test(folder)));
+  if (!hasStorageOwnerOutsideTestFolders) {
     for (const [file, source] of sources) {
       const swiftDataImport = /\bimport\s+(?:(?:typealias|struct|class|enum|protocol|let|var|func)\s+)?SwiftData\b/.exec(source);
       if (!swiftDataImport) continue;
-      findings.push(finding('swiftdata-manager-missing', 'review', 'SwiftData is imported, but no concrete SwiftDataManager declaration was found. Check whether the import belongs to an app target and whether an appropriate storage boundary exists; this scan also includes tests and does not resolve target membership.', file, lineOf(source, swiftDataImport.index)));
+      const ownerEvidence = storageOwners.length
+        ? 'Concrete SwiftDataManager declarations were found only in test-named folders.'
+        : 'No concrete SwiftDataManager declaration was found.';
+      findings.push(finding('swiftdata-manager-missing', 'review', `SwiftData is imported. ${ownerEvidence} Check whether the import belongs to an app target and whether an appropriate storage boundary exists; this scan also includes tests and does not resolve target membership.`, file, lineOf(source, swiftDataImport.index)));
     }
   }
   for (const [file, source] of sources) {

@@ -663,6 +663,18 @@ test('keeps app and test SwiftData imports visible when storage ownership is unr
   [['AAATests/StorageTests.swift', 1, 'review'], ['App/Storage.swift', 2, 'review']]);
 });
 
+test('a storage manager in a test-named folder does not settle app storage ownership', async t => {
+  const root = await fixture(t, {
+    'App/Storage.swift': 'import SwiftData',
+    'AppTests/SwiftDataManager.swift': 'actor SwiftDataManager {}'
+  });
+  const {findings} = await inspect(root);
+  const review = findings.find(item => item.code === 'swiftdata-manager-missing');
+  assert.equal(review?.file, 'App/Storage.swift');
+  assert.equal(review.severity, 'review');
+  assert.match(review.message, /only in test-named folders/);
+});
+
 test('flags conditional database startup presentation in App.body', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
