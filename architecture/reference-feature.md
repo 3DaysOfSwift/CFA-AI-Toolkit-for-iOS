@@ -23,8 +23,10 @@ own copy of the collection. The checks reopen the file after overlapping
 inserts and verify that both new notes and the existing note survived.
 This example uses a single repository instance for the file.
 When the JSON file is corrupt, the checks verify that a failed save preserves the file
-and draft. After a valid file is restored, retrying through the same Feature
-reloads the saved notes and keeps the draft. A fixed synthetic JSON fixture
+and draft. After a valid file is restored, retrying the load through the same
+ViewModel and Feature reloads the saved notes without submitting the draft.
+A separate save then succeeds and clears that editor's load error. A fixed
+synthetic JSON fixture
 also verifies that an existing note survives opening, appending a note, and
 reopening the store. For a shipped app, use a disposable store written by the
 actual previous implementation to verify an upgrade. Run the checks on macOS
