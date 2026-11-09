@@ -45,6 +45,13 @@ duplicate-name findings use physical paths. Check the Xcode navigator group,
 test target membership and the behaviour each test exercises. The command
 reads source and prints its findings without modifying the inspected project.
 
+For a root-navigation finding, follow the scene to the View installed in the
+active target. The inspector uses conventional root names and direct View
+construction inside a `WindowGroup`. When multiple declarations match a direct
+call, it asks you to resolve the target. Trace roots returned by helpers in
+source. A storage-related branch needs review to establish whether it blocks
+navigation or displays an error local to the screen.
+
 For a service placement finding, trace who uses the service and which
 capability its work belongs to. Under CFA-SPEC-SVC-01, a launch provider can
 stay beside the schedule Feature even if a second Feature uses it. A generic
