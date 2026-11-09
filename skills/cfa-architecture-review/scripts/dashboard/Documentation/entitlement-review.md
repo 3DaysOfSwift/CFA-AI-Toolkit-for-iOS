@@ -35,8 +35,8 @@ node src/entitlement-audit.mjs --analysis /tmp/project-analysis.json --policy /t
 ```
 
 Inspect every candidate and any indexed caller leads, verify the source revision,
-and trace the actual entry point and entitlement check. Review presentation
-separately: a screen can expose paid data or controls without making a call
+and trace the actual entry point and entitlement check. Use the report’s source scope to see which files or directories were excluded.
+Confirm target membership separately. Review presentation separately: a screen can expose paid data or controls without making a call
 listed in the policy. Trace alternate screens and other callers, including
 deep links, notification actions, and additional targets when they reach the
 capability. For screen routes, check that the ViewModel reads current

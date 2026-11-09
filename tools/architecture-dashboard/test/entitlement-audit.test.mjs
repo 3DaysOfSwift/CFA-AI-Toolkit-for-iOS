@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {auditEntitlements} from '../src/entitlement-audit.mjs';
 
-const analysis={sourceFingerprint:'abc',syntax:{status:'available',coverage:'matching'},compilerIndex:{status:'available',calls:[{calleeID:'caller-1',caller:'openExport',file:'View.swift',line:8,column:5},{calleeID:'caller-1',caller:'openExport',file:'View.swift',line:8,column:25}]},callCandidates:[{written:'exportFeature.export',file:'ExportViewModel.swift',line:20,column:5,enclosingFunction:'export',possibleIndexMatches:[{callerID:'caller-1'},{callerID:'caller-1'}]},{written:'other.export',file:'Other.swift',line:1,column:1}]};
+const analysis={sourceFingerprint:'abc',scope:{includeTests:false,fileCount:3,excludedTestDirectories:['AppTests'],targetMembership:'Not resolved'},syntax:{status:'available',coverage:'matching'},compilerIndex:{status:'available',calls:[{calleeID:'caller-1',caller:'openExport',file:'View.swift',line:8,column:5},{calleeID:'caller-1',caller:'openExport',file:'View.swift',line:8,column:25}]},callCandidates:[{written:'exportFeature.export',file:'ExportViewModel.swift',line:20,column:5,enclosingFunction:'export',possibleIndexMatches:[{callerID:'caller-1'},{callerID:'caller-1'}]},{written:'other.export',file:'Other.swift',line:1,column:1}]};
 test('paid capability matches are review leads, with possible indexed callers',()=>{
   const result=auditEntitlements(analysis,{capabilities:[{name:'Export',writtenCalls:['exportFeature.export']}]});
   assert.equal(result.capabilities[0].status,'review-required');
@@ -12,6 +12,7 @@ test('paid capability matches are review leads, with possible indexed callers',(
     {caller:'openExport',file:'View.swift',line:8,column:25}
   ]);
   assert.equal(result.sourceFingerprint,'abc');
+  assert.deepEqual(result.scope, analysis.scope);
   const compilerIndex = {...analysis.compilerIndex, module:'ExampleApp', reason:'Build coverage is unverified.', indexFreshness:'unverified', excludedCalls:3};
   const indexed = auditEntitlements({...analysis, compilerIndex}, {
     capabilities:[{name:'Export', writtenCalls:['exportFeature.export']}]

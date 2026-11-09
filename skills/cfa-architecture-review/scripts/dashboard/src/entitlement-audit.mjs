@@ -34,7 +34,8 @@ export function auditEntitlements(analysis, policy) {
     }));
     return {name:capability.name, writtenCalls:capability.writtenCalls, status:matches.length ? 'review-required' : 'no-matches-unverified', calls:matches};
   });
-  return {schemaVersion:1, sourceFingerprint:analysis.sourceFingerprint || null, syntaxStatus:analysis.syntax?.status || 'unknown', syntaxCoverage:analysis.syntax?.coverage || 'unverified',
+  return {schemaVersion:1, sourceFingerprint:analysis.sourceFingerprint || null, scope:analysis.scope ?? null,
+    syntaxStatus:analysis.syntax?.status || 'unknown', syntaxCoverage:analysis.syntax?.coverage || 'unverified',
     syntaxWarnings:analysis.syntax?.warnings || [], syntaxReason:analysis.syntax?.reason || null,
     syntaxMissingFiles:analysis.syntax?.missingFiles ?? [],
     syntaxExcludedItems:analysis.syntax?.excludedItems ?? null,
