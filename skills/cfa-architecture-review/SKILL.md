@@ -66,12 +66,23 @@ direction. A stored Feature reference is a lead. Report an architecture
 violation only when the traced dependency conflicts with the rule, such as a
 cycle or duplicated ownership.
 
-For independent network requests, trace each caller to transport initiation.
-Look for synchronous work before the first suspension, waits on another
-request, and deliberate request limits. An actor can accept another call
-while an earlier download awaits its response. Establish an unintended delay
-with source or timing evidence before reporting a bottleneck. Distinguish app
-scheduling from URLSession connection limits and server behaviour.
+For shared microservices, apply the
+[service placement rule](references/spec/rules/cfa-svc-01.md). Trace the
+initializer injection and identify the common configuration or shared state
+that warrants one instance. A second consumer alone does not make a
+domain-specific provider generic. Distinguish service bookkeeping and caches
+from the authoritative application state owned by a Feature.
+
+For independent network requests, apply the
+[networking rule](references/spec/rules/cfa-net-01.md) and trace each caller
+through NetworkingManager to transport initiation. Look for synchronous work
+before the first suspension, waits on another request, and deliberate limits.
+An actor can accept another call while an earlier download awaits its response.
+If a controlled transport check is available, hold one response open and
+verify that a second independent request reaches the transport before releasing
+it. Establish an unintended delay with source or timing evidence before
+reporting a bottleneck. Distinguish app scheduling from URLSession connection
+limits and server behaviour.
 
 Trace published snapshots from their authoritative owner to their consumers.
 Check stored properties and nested references for mutation, and follow writes
