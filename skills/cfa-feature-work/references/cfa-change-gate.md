@@ -204,7 +204,9 @@ the architecture:
     explicitly. If sign-out fails before the session ends, retain account state;
     after success clear affected state and prevent old requests from republishing
     it. Check the current account or session generation before publishing an
-    in-flight result, including when a request has been cancelled. Reconcile
+    in-flight result, including when a request has been cancelled. If the same
+    account can sign back in before earlier work finishes, verify that the
+    earlier session cannot publish into the new one. Reconcile
     partial authentication outcomes and handle cleanup failures honestly.
     If sign-out promises a fresh-install experience, clear account-specific
     in-memory state, caches and local files after successful sign-out. Preserve

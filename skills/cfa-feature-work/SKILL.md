@@ -53,7 +53,9 @@ When changing sign-out, account switching or session expiry, apply the
 Features own account data and coordinate their cleanup through explicit calls.
 If sign-out fails before the session ends, preserve that session and its data.
 After a session change, check the active account or session generation before
-publishing results from in-flight requests. Verify cleanup and retained data
+publishing results from in-flight requests. If the same account can sign in
+again while earlier work is pending, use session identity and verify that the
+old result cannot reach the new session. Verify cleanup and retained data
 against the product's sign-out contract.
 
 When changing offline editing or cross-device synchronization, apply the

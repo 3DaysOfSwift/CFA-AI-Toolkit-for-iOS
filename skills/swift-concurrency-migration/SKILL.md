@@ -90,6 +90,8 @@ Use deliberate passes:
    the existing cleanup and retention contract. Verify that a failed
    sign-out before the session ends preserves account data, and exercise a
    late result from the old session after a successful sign-out or switch.
+   If the same account can sign back in before earlier work finishes, verify
+   that the old session cannot publish into the new one.
 2. Move one complete feature at a time into CFA. Give each screen-level SwiftUI View a
    dedicated ViewModel; reusable presentation components do not automatically need
    one. Move testable feature decisions into its Feature,
