@@ -173,8 +173,11 @@ migration”, or equivalent whole-project language until the completion gate in
 [CFA change gate](references/cfa-change-gate.md) is satisfied.
 
 Record each required check against the final commit in the migration ledger or
-handoff, including the hybrid review and final CFA audit. If a check is missing,
-report the work as continuing and name that checkpoint. Record failed pilots as
+handoff, including the hybrid review and final CFA audit. Reconcile the affected
+target list with every consumer of the changed code, including extensions.
+Identify which targets each passed build covers and link separate evidence for
+affected cross-target data handoffs. If a check is missing, report the work as
+continuing and name that checkpoint. Record failed pilots as
 blocked evidence and exclude them from migration precedents.
 
 ## Continuation contract
