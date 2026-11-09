@@ -33,6 +33,10 @@ in an isolated workspace without the evaluation rubric.
   unavailable on the browsing target’s oldest
   supported OS. The green build and tests used a newer simulator, and the
   developer has not approved dropping support for the older OS.
+- The existing browsing snapshot download continues after its only screen
+  leaves and can be joined by another screen. The candidate cancels the
+  underlying download from the departing screen's cancellation handler. Its
+  tests cover completion while one screen stays open.
 - Export is a paid capability in the agreed account scope. Tests cover locked
   and entitled outcomes from the account screen. A notification action can
   also reaches Export. It checks entitlement, awaits loading the selected
@@ -96,6 +100,11 @@ in an isolated workspace without the evaluation rubric.
   API’s availability. Keep a compatible path for the oldest supported OS
   and verify it on that configuration or explicitly record the missing
   verification. Seek developer approval before changing platform support.
+- Preserve the shared snapshot download independently of screen waits.
+  Suspend the transport and cancel the only waiter. Verify that the Feature
+  publishes the result with no replacement waiter. Separately, verify that
+  an equivalent caller joins without another request and that one of several
+  waiters can leave while the others still receive the result.
 - Record the UIKit screen’s actual presentation owner and its Feature dependencies.
   Keep the existing browsing behaviour and presentation scope. Replace a UI
   component only when the migration requires it, and verify that its existing
@@ -146,7 +155,8 @@ Fail the evaluation if the response declares completion from the build and
 test results, ignores the conflicting failed run, treats the widget build or app-only tests as proof of the widget handoff,
 treats the source diff as navigator inspection, removes the
 reactive adapter without tracing consumers, treats the final list as proof that
-every refresh completed, assumes a passing newer simulator
+every refresh completed, accepts cancelling a shared download when a screen
+leaves despite the baseline lifetime, assumes a passing newer simulator
 run establishes compatibility, recommends raising the minimum OS without
 approval, widens the scope to an optional
 UI rewrite, treats empty-store tests as upgrade evidence, accepts a new submission ID
