@@ -34,7 +34,8 @@ final class FixtureURLProtocol: URLProtocol, @unchecked Sendable {
             return
         }
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-        client?.urlProtocol(self, didLoad: Data(#"{"name":"Artemis"}"#.utf8))
+        let payload = url.path == "/malformed" ? "{" : #"{"name":"Artemis"}"#
+        client?.urlProtocol(self, didLoad: Data(payload.utf8))
         client?.urlProtocolDidFinishLoading(self)
     }
     override func stopLoading() {}
@@ -50,7 +51,8 @@ func runExample() async throws {
     let session = URLSession(configuration: configuration)
     defer { session.invalidateAndCancel() }
     guard let success = URL(string: "https://example.invalid/launch"),
-          let failure = URL(string: "https://example.invalid/failure") else { throw URLError(.badURL) }
+          let failure = URL(string: "https://example.invalid/failure"),
+          let malformed = URL(string: "https://example.invalid/malformed") else { throw URLError(.badURL) }
     let api = LegacyLaunchAPI(session: session)
     let launch = try await withCheckedThrowingContinuation { continuation in
         api.download(from: success) { continuation.resume(with: $0) }
@@ -62,7 +64,13 @@ func runExample() async throws {
         }
         preconditionFailure("HTTP failure must not be reported as success")
     } catch DownloadError.httpStatus(503) {}
-    print("Passed: Artemis downloaded; HTTP 503 reported.")
+    do {
+        let _: Launch = try await withCheckedThrowingContinuation { continuation in
+            api.download(from: malformed) { continuation.resume(with: $0) }
+        }
+        preconditionFailure("Invalid JSON must not be reported as success")
+    } catch DecodingError.dataCorrupted {}
+    print("Passed: Artemis downloaded; HTTP 503 and invalid JSON reported.")
 }
 
 // MARK: - Run before example

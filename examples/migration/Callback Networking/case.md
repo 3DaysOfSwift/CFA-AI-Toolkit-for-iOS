@@ -6,7 +6,7 @@ URLSession returns a decoded launch through a completion handler.
 
 ## Behaviour to preserve
 
-Both implementations return Artemis on success and report HTTP 503 as an error.
+Both implementations return Artemis on success and report HTTP 503 and malformed JSON as distinct errors.
 
 ## Migration
 
