@@ -117,6 +117,10 @@ results in the report, rather than presenting scanner counts as findings.
    stored presentation copies that can go stale, while respecting intentionally
    stable detail snapshots and unsaved drafts. Apply the
    [authoritative observation rule](spec/rules/cfa-obs-01.md).
+   Identify consumers that need every event. Trace their delivery, ordering
+   and cancellation separately from the screen's current value. Where the
+   contract requires it, send two equal-valued events and verify both are
+   processed. A correct final value cannot establish that both arrived.
    For an app-wide listener, trace startup, repeated startup signals, event
    forwarding and cancellation or replacement. Check that required events
    still reach the app with the relevant screen absent. In CFA, AppModel owns
