@@ -27,7 +27,8 @@ const outdatedFeatureGuidance = 'managers use the Manager suffix';
 const outdatedServiceGuidance = 'SwiftData uses SwiftDataManager; URLSession calls use NetworkingManager.';
 const serviceGuidanceUpdate = 'Clarify SwiftDataManager ownership and keep independent network requests able to progress in parallel.';
 const outdatedScreenGuidance = 'Every screen owns a dedicated ViewModel. Declare it as @State private var';
-const screenGuidanceUpdate = 'Apply private @State ViewModel ownership to SwiftUI screens and trace the actual presentation owner for UIKit migrations.';
+const previousInlineScreenGuidance = /@State private var viewModel and construct it inline by default\. Keep View/;
+const screenGuidanceUpdate = 'Apply private @State ViewModel ownership to SwiftUI screens, allow detail Views to construct their own ViewModel from an immutable snapshot, and trace the actual presentation owner for UIKit migrations.';
 const outdatedDeepLinkGuidance = 'remove it on actual navigation or explicit dismissal';
 const outdatedPendingSaveGuidance = 'Persist only the safe data needed to identify and present each request.';
 const deepLinkGuidanceUpdate = 'Confirm pending requests only after persistence succeeds, and retry failed removal without navigating again.';
@@ -393,7 +394,7 @@ function doctor(projectArgument) {
       if (content.includes(outdatedServiceGuidance)) {
         console.log(`WARN outdated service guidance in ${file}. ${serviceGuidanceUpdate}`);
       }
-      if (content.includes(outdatedScreenGuidance)) {
+      if (content.includes(outdatedScreenGuidance) || previousInlineScreenGuidance.test(content)) {
         console.log(`WARN outdated screen ownership guidance in ${file}. ${screenGuidanceUpdate}`);
       }
       if (content.includes(outdatedDeepLinkGuidance) || content.includes(outdatedPendingSaveGuidance)) {
@@ -462,7 +463,7 @@ function enableProject(values) {
     if (block.includes(outdatedServiceGuidance)) {
       console.log(`Update the existing CFA service guidance block. ${serviceGuidanceUpdate}`);
     }
-    if (block.includes(outdatedScreenGuidance)) {
+    if (block.includes(outdatedScreenGuidance) || previousInlineScreenGuidance.test(block)) {
       console.log(`Update the existing CFA screen ownership guidance block. ${screenGuidanceUpdate}`);
     }
     if (block.includes(outdatedDeepLinkGuidance) || block.includes(outdatedPendingSaveGuidance)) {

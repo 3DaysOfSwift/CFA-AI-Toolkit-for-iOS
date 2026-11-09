@@ -146,6 +146,22 @@ test('doctor warns about previously installed CFA guidance without changing it',
   assert.equal(fs.readFileSync(agents, 'utf8'), original);
 });
 
+test('both guidance commands flag the previous inline-only wording', t => {
+  const { directory, command } = installedCommand(t);
+  const project = path.join(directory, 'project');
+  fs.mkdirSync(project);
+  const agents = path.join(project, 'AGENTS.md');
+  const original = '<!-- CFA Toolkit project guidance -->\n- Every screen-level SwiftUI View owns a dedicated ViewModel. Declare it as\n  @State private var viewModel and construct it inline by default. Keep View\n  and ViewModel initializers free of work.\n';
+  fs.writeFileSync(agents, original);
+
+  for (const action of ['doctor', 'enable-project']) {
+    const result = spawnSync(command, [action, project], { encoding: 'utf8' });
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /screen ownership guidance.*immutable snapshot/);
+  }
+  assert.equal(fs.readFileSync(agents, 'utf8'), original);
+});
+
 test('current CFA guidance is not flagged for legacy text in surrounding project notes', t => {
   const {directory, command} = installedCommand(t);
   const agents = path.join(directory, 'AGENTS.md');
