@@ -4,7 +4,7 @@
 
 **Strength:** Required when applicable.
 
-**Guidance:** AppModel starts each app-wide listener once, retains its task handle when asynchronous, and forwards events to the responsible Feature. The Feature interprets events and owns the resulting state. Screen-only observation follows the lifetime of its screen or ViewModel.
+**Guidance:** When the app needs an event regardless of which screen is visible, AppModel starts its listener once, retains its task handle when asynchronous, and forwards events to the responsible Feature. Define cancellation or replacement when the listener needs it. The Feature interprets events and owns the resulting state. Screen-only observation follows the lifetime of its screen or ViewModel.
 
 **Why:** Lifetime follows the scope that requires the event.
 
