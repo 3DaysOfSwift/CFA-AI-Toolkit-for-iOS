@@ -305,6 +305,8 @@ private actor DelayedRestoreRepository: PendingRequestRepository {
         precondition(lastRun.pending == [dismissed, retained])
         try await lastRun.dismiss(id: dismissed.id)
         precondition(lastRun.pending == [retained])
+        try await lastRun.receive(dismissed)
+        precondition(lastRun.pending == [retained], "A replay must not restore a dismissed event")
         let afterDismissal = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
         try await afterDismissal.restore()
         precondition(afterDismissal.pending == [retained])
