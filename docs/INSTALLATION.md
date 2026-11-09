@@ -111,9 +111,11 @@ descriptions remain the mechanism that matches ordinary iOS prompts across the
 computer.
 
 For an existing guidance block, `cfa doctor` and `cfa enable-project` can flag
-older Feature naming, AppModel listener ownership, or service guidance. Use the
-warning to update the marked CFA guidance while preserving your project's own
-instructions. Both commands leave the existing block in place.
+known older wording, including Feature naming, AppModel listener ownership,
+service boundaries, screen ownership, deep links and shared refresh
+cancellation. A block being found only confirms that the project has one.
+Use any warning to update the marked CFA guidance while preserving your
+project's own instructions. Both commands leave the existing block in place.
 
 If `cfa` is not found, add its folder to zsh's path once and open a new Terminal:
 

@@ -234,7 +234,7 @@ function doctor(projectArgument) {
 
   const guidance = guidanceFiles(project);
   if (guidance.length > 0) {
-    console.log(`PASS CFA project guidance: ${guidance.join(', ')}`);
+    console.log(`INFO CFA project guidance found: ${guidance.join(', ')}`);
     for (const file of guidance) {
       const content = fs.readFileSync(file, 'utf8');
       if (content.includes(outdatedFeatureGuidance)) {
