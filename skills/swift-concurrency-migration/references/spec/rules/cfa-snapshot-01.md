@@ -4,7 +4,7 @@
 
 **Strength:** Required.
 
-**Guidance:** Use `let` properties and immutable contents for published snapshot structs. Exclude mutable reference state that could change a snapshot in place. Submit changes through the owning Feature and publish replacement values after confirmation.
+**Guidance:** Use `let` properties and immutable contents for published snapshot structs. Exclude mutable reference state that could change a snapshot in place. Submit edits through the owning Feature and publish replacement values after authoritative persistence succeeds. For a current server response, publish the new snapshot independently of any optional local cache write.
 
 **Why:** A copy should not diverge by being mutated as though it were authoritative.
 
