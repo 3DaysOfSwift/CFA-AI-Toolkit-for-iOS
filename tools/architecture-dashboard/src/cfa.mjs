@@ -96,10 +96,11 @@ skill from that toolkit before changing the project.
   resources for translatable text. Keep secrets out of app constants.
 - Start with independent Features; compose them only for a genuine business
   responsibility, without duplicating authoritative state or creating cycles.
-- For sign-out or account switching, let the owning Feature coordinate explicit
-  cleanup calls. Preserve the session and its data when sign-out fails before
-  ending the session. Reconcile partial authentication changes with the actual
-  session. Clear account-specific Feature state after successful sign-out and
+- For sign-out, account switching or external session expiry, let the owning
+  Feature coordinate explicit cleanup calls. Trace each supported entry point
+  and reconcile the outcome with the actual session. Preserve the session and
+  its data when sign-out fails before ending the session. Clear account-specific
+  Feature state after successful sign-out and
   check the account or session generation before publishing in-flight results.
   If the same account can sign back in before old work finishes, check the
   session identity even when the earlier task was cancelled.

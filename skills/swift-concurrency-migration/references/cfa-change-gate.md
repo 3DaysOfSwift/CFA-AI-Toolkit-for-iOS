@@ -201,7 +201,8 @@ the architecture:
     service-internal request tracking, caches and storage machinery from that
     business authority; do not promote all stateful helpers into AppModel.
     When account changes affect other Features, coordinate the real workflow
-    explicitly. If sign-out fails before the session ends, retain account state;
+    explicitly. Trace sign-out, account switching and external session expiry
+    when supported. If sign-out fails before the session ends, retain account state;
     after success clear affected state and prevent old requests from republishing
     it. Check the current account or session generation before publishing an
     in-flight result, including when a request has been cancelled. If the same
