@@ -14,7 +14,7 @@ The Feature awaits its provider and publishes observable state on MainActor. Req
 
 ## Run and verify
 
-Open and run `Before.playground` and `After.playground`. Each prints `Passed:` after its assertions succeed. Run the shared automated check described in the parent README.
+Open and run `Before.playground` and `After.playground`. Each prints `Passed:` after its assertions succeed. In a toolkit source checkout, also run the automated check described in the parent README.
 
 ## Boundaries
 
