@@ -609,6 +609,7 @@ test('an initializer assignment to another instance does not establish screen ow
     var body: some View { Text("Home") }
   }`);
   assert.equal(report.screens[0].ownsViewModel, false);
+  assert.ok(!report.findings.some(item => item.code === 'view-model-initializer-construction'));
 });
 
 test('reviews a View storing an inferred AppModel alias without confusing locals or Feature access', async t => {
