@@ -574,7 +574,7 @@ export async function inspect(project) {
   // Independent work may be scheduled here. Review only closures that
   // appear to call the shared launch signal.
   for (const [file, source] of sources) {
-    for (const callback of source.matchAll(/\bfunc\s+application\s*\([^{}]*,\s*didFinishLaunchingWithOptions\s*(?:\w+\s*)?:[^{}]*\)\s*(?:->\s*[^\{]+)?\s*\{/g)) {
+    for (const callback of source.matchAll(/\bfunc\s+application\s*\(\s*_\s+\w+\s*:\s*(?:UIKit\s*\.\s*)?UIApplication\s*,\s*didFinishLaunchingWithOptions\s*(?:\w+\s*)?:[^{}]*?\)\s*->\s*(?:Swift\s*\.\s*)?Bool\s*\{/g)) {
       const start = callback.index + callback[0].length - 1;
       const body = braceBody(source, start);
       for (const scheduled of body.matchAll(/\b(?:Task\s*(?:<[^{}]*>\s*)?(?:\.\s*(?:init|detached)\s*)?|DispatchQueue\s*\.\s*(?:main|global\s*\([^{}()]*\))\s*\.\s*async(?:After)?\b\s*|OperationQueue\s*(?:\.\s*main|\(\s*\))\s*\.\s*addOperation\b\s*|(?<![.\w])(?<queue>\w+)\s*\.\s*(?<method>asyncAfter|async|addOperation)\b\s*)(?:\([^{}]*\)\s*|\([^{}]*?\b(?:operation|execute)\s*:\s*)?\{/g)) {
