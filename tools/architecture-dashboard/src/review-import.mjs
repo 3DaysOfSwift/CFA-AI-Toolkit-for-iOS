@@ -19,6 +19,9 @@ export async function importReview(report,input,root) {
     }
   };
   list(review.findings??[],['title','status','description','check']);
+  for (const criterion of Array.isArray(review.presentation?.criteria) ? review.presentation.criteria : []) {
+    if (Array.isArray(criterion?.evidence)) list([criterion], ['title', 'detail']);
+  }
   if (review.fileBatches !== undefined) {
     list(review.fileBatches,['title','reason','verification']);
     const seen = new Set();

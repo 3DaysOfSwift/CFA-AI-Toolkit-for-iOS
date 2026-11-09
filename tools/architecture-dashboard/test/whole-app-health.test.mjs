@@ -134,7 +134,10 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
     await fs.writeFile(reviewPath,JSON.stringify(review));
     await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/criterion needs source evidence/);
     await assert.rejects(fs.access(output));
-    review.presentation.criteria[0].evidence = 'App.swift:1';
+    review.presentation.criteria[0].evidence = [{file:'App.swift',line:99,endLine:99}];
+    await fs.writeFile(reviewPath,JSON.stringify(review));
+    await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/invalid evidence lines/);
+    review.presentation.criteria[0].evidence = [{file:'App.swift',line:1,endLine:1}];
     await fs.writeFile(reviewPath,JSON.stringify(review));
     const result=await finish(project,reviewPath,output,undefined,syntax);
     assert.deepEqual(result.gaps,[]);
