@@ -10,7 +10,15 @@ Both examples publish Artemis on MainActor before reporting completion. The migr
 
 ## Migration
 
-The Feature awaits its provider and publishes observable state on MainActor. This fixture queues every refresh in admission order, including requests with different inputs. Each caller receives its own success or failure after the Feature publishes the outcome.
+The Feature awaits its provider and publishes observable state on MainActor. In this fixture, each call supplies its own simulated provider outcome through
+`available`. The fixture treats each call as a distinct command so every
+outcome is processed in admission order. Each caller receives its own success
+or failure after the Feature publishes it.
+
+For an app refresh where launch and several screens can use the same response,
+share the Feature-owned in-flight request. Apply the
+CFA overlapping-call rule (`CFA-SPEC-TASK-01`) to
+choose the policy from what each caller needs.
 
 ## Run and verify
 
