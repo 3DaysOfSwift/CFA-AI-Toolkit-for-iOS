@@ -4,7 +4,7 @@
 
 **Strength:** Required.
 
-**Guidance:** Expose current observable Feature state through a single owner. Use a separate event API where consumers must process every event. Observation alone does not synchronize independent devices or processes.
+**Guidance:** Expose current observable Feature state through a single owner. On supported deployment targets, use `@Observable` for ViewModels and UI-observed Features. Keep Combine where compatibility or publisher composition requires it. Use `@Bindable` only when a control needs a writable binding. A computed ViewModel property can expose Feature state by reading the observable stored value. Use a separate event API where consumers must process every event. Observation alone does not synchronize independent devices or processes.
 
 **Why:** Views can update without creating competing domain state.
 
