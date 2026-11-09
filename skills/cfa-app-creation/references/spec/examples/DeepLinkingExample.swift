@@ -407,6 +407,14 @@ private actor DelayedRestoreRepository: PendingRequestRepository {
         } catch {
             precondition(removalRetry.pending == [request, retained])
         }
+        do {
+            try await removalRetry.dismiss(id: retained.id)
+            throw ExampleFailure.expectedStorageError
+        } catch is ExampleFailure {
+            throw ExampleFailure.expectedStorageError
+        } catch {
+            precondition(removalRetry.pending == [request, retained])
+        }
         try FileManager.default.removeItem(at: retryFolder)
         try FileManager.default.moveItem(at: movedFolder, to: retryFolder)
         let restoredAfterFailure = DeepLinkingFeature(store: PendingRequestStore(fileURL: retryURL))
@@ -419,6 +427,11 @@ private actor DelayedRestoreRepository: PendingRequestRepository {
         let restoredAfterRetry = DeepLinkingFeature(store: PendingRequestStore(fileURL: retryURL))
         try await restoredAfterRetry.restore()
         precondition(restoredAfterRetry.pending == [retained])
+        try await removalRetry.dismiss(id: retained.id)
+        precondition(removalRetry.pending.isEmpty)
+        let restoredAfterDismissalRetry = DeepLinkingFeature(store: PendingRequestStore(fileURL: retryURL))
+        try await restoredAfterDismissalRetry.restore()
+        precondition(restoredAfterDismissalRetry.pending.isEmpty)
 
         // Decodable data can still violate the pending list's identity rules.
         let invalidURL = folder.appendingPathComponent("invalid-pending.json")
