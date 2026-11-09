@@ -50,7 +50,9 @@ export function renderHealthReport(data, iconData = '') {
     const scenarios = (op.scenarios || []).filter(scenario => scenario.status !== 'not-applicable');
     const labels = {pass:'✓', fail:'×', problem:'×', unresolved:'?', 'not-checked':'?'};
     const rows = items => items.map(item => `<div class="behaviour-row"><strong>${labels[item.status] || '?'} ${escape(item.title)}</strong><p>${escape(item.reason || item.outcome)}</p>${item.consequence ? `<p><strong>Consequence:</strong> ${escape(item.consequence)}</p>` : ''}<p class="evidence">${escape(item.verification)}</p>${sourceLinks(item.evidence)}</div>`).join('');
-    return `${checks.length ? `<h3>Behaviour checks</h3>${rows(checks)}` : ''}${scenarios.length ? `<h3>When timing changes</h3>${rows(scenarios)}` : ''}`;
+    const behaviourChecks = checks.filter(check => check.dimension !== 'cfa');
+    const cfaChecks = checks.filter(check => check.dimension === 'cfa');
+    return `${behaviourChecks.length ? `<h3>Behaviour checks</h3>${rows(behaviourChecks)}` : ''}${cfaChecks.length ? `<h3>CFA alignment</h3>${rows(cfaChecks)}` : ''}${scenarios.length ? `<h3>When timing changes</h3>${rows(scenarios)}` : ''}`;
   };
   const renderOperation = op => `<details class="finding"><summary>${escape(op.title)}</summary><div><p><strong>Path:</strong> ${escape(op.path)}</p><p><strong>State ownership:</strong> ${escape(op.stateOwner || "Not recorded")}</p><p><strong>Task ownership:</strong> ${escape(op.taskOwner)}</p><p><strong>Isolation:</strong> ${escape(op.isolation)}</p><p>${escape(op.reason)}</p>${op.steps?.length ? `<ol>${op.steps.map(step => `<li><strong>${escape(step.title)}</strong> · ${escape(step.relation)}${step.parentId ? ` · parent: ${escape(op.steps.find(parent => parent.id === step.parentId)?.title || step.parentId)}` : ''}<br>${escape(step.detail)}${step.evidence?.length ? `<br><span class="evidence">${escape(evidenceText(step.evidence))}</span>` : ''}</li>`).join('')}</ol>` : ''}${outcomes(op)}${op.unknowns?.length ? `<p><strong>To investigate:</strong> ${op.unknowns.map(escape).join('; ')}</p>` : ''}</div></details>`;
   const groups = new Map();

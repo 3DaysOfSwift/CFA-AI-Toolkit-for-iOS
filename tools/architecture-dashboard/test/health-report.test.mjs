@@ -76,7 +76,10 @@ test('requires a visible finding for confirmed operation problems', () => {
   };
   assert.throws(() => renderHealthReport(data), /Include confirmed operation problems/);
   data.operations[0].checks[0].dimension = 'cfa';
-  assert.doesNotThrow(() => renderHealthReport(data));
+  data.operations[0].checks[0].title = 'Screen task ownership';
+  const cfaReport = renderHealthReport(data);
+  assert.match(cfaReport, /<h3>CFA alignment<\/h3>.*Screen task ownership/);
+  assert.doesNotMatch(cfaReport, /<h3>Behaviour checks<\/h3>/);
   data.operations[0].scenarios = [{status:'problem'}];
   assert.throws(() => renderHealthReport(data), /Include confirmed operation problems/);
   data.criteria.push({title:'Refresh ordering', detail:'A stale result can replace the latest result.', status:'problem'});
