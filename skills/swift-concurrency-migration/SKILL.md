@@ -132,11 +132,11 @@ is not a completed migration. Do not say “migration complete”, “finished w
 migration”, or equivalent whole-project language until the completion gate in
 [CFA change gate](references/cfa-change-gate.md) is satisfied.
 
-Completion evidence must include the final Xcode navigator map, scoped feature
-inventory, remaining-primitive inventory, post-change build/tests, manual
-behaviour regression and human architecture review. If one is missing, report
+Use the [completion evidence guide](scripts/evidence/README.md#record-evidence)
+to link each required check to the final commit in the scenario record,
+including the hybrid review and final CFA audit. If a check is missing, report
 the work as continuing and name that checkpoint. Record failed pilots as
-blocked evidence; they are not reusable migration precedents.
+blocked evidence and exclude them from migration precedents.
 
 ## Continuation contract
 
