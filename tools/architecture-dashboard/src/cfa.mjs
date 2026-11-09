@@ -232,7 +232,8 @@ skill from that toolkit before changing the project.
 - Call the AppModel launch signal directly
   and synchronously from the application lifecycle callback, never a View .task
   or a scheduled Task. AppModel signals the relevant Features and starts its
-  required app-wide listeners before the callback returns. Features can start
+  required app-wide listeners before the callback returns. For an asynchronous
+  listener, AppModel creates and retains its task during startup. Features can start
   their own asynchronous work without delaying the callback for disk or network
   completion. Verify that repeated callbacks leave Feature startup signals
   and app-wide listeners unduplicated.

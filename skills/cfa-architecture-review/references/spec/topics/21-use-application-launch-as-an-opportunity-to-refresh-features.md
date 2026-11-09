@@ -90,9 +90,10 @@ func applicationDidFinishLaunching()
 AppModel keeps one simple Boolean to ensure the method runs once. The app
 delegate calls this synchronous method directly,
 without wrapping the AppModel call in a Task. AppModel synchronously invokes
-the Features' named startup methods and starts any app-wide listeners it owns;
-each Feature owns any asynchronous tasks
-needed for its refresh or local restoration. The delegate returns after those
+the Features' named startup methods and starts any app-wide listeners it owns.
+For an asynchronous listener, startup creates and retains its task. The task
+can begin consuming events after the callback returns. Each Feature owns the
+asynchronous tasks needed for its refresh or local restoration. The delegate returns after those
 startup methods have been invoked, not after their network or disk work has
 finished. Starting tasks in source order does not guarantee the order in which
 their network or disk operations begin. Call from `UIApplicationDelegate.application(_:didFinishLaunchingWithOptions:)`,

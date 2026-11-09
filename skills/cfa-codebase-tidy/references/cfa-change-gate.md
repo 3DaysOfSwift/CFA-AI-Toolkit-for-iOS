@@ -206,8 +206,9 @@ the architecture:
     the transport before releasing the first.
 16. The app delegate calls `AppModel.shared.applicationDidFinishLaunching()`
     directly and synchronously. AppModel signals the relevant Features and
-    starts required app-wide listeners before the callback returns. Verify that
-    repeated launch signals do not start that work again. Features may start
+    starts required app-wide listeners before the callback returns. For an
+    asynchronous listener, verify that AppModel creates and retains its task
+    during startup. Verify that repeated launch signals start no duplicates. Features may start
     asynchronous work without making the callback await disk or network completion.
     Keep synchronous startup work brief. Task creation order does not establish
     disk or network start order. Measure launch and first-frame timing
