@@ -15,7 +15,12 @@ A button that starts new independent work on every tap can duplicate commands an
 
 ## Documented rationale
 
-The specification distinguishes an awaitable operation from a Task lifetime. A retained handle makes ownership, shared completion and cleanup visible. It does not itself implement the Feature's independent overlap policy.
+The specification distinguishes an awaitable operation from a Task lifetime. A retained handle makes ownership, shared completion and cleanup visible.
+Install it before suspension and clear it when the task settles, guarding
+against old cleanup clearing a replacement. Awaiting the handle’s value lets
+a caller observe completion. Cancelling that caller does not automatically
+cancel the unstructured task. Its owner applies the operation’s cancellation
+policy. The Feature separately coordinates requests from all callers.
 
 ## Trade-offs and alternatives
 
@@ -39,7 +44,9 @@ on 2026-10-27. That permission is not individual technical or historical approva
 
 ## Open question
 
-The public worked example should show both the ordinary retained-task path and the legitimate framework-owned .task exception, with an explicit lifetime policy.
+Check how the public worked example presents both lifetimes. The bundled Notes
+reference shows a SwiftUI lifecycle task awaiting a ViewModel load handle that
+also serves the Retry action, with shared loading owned by the Feature.
 
 ## Publication
 
