@@ -9,6 +9,7 @@ import { root } from '../scripts/sync.mjs';
 import { stageRelease } from '../scripts/build.mjs';
 import { validate } from '../scripts/validate.mjs';
 import { install } from '../scripts/install.mjs';
+import { stageSkillsPackage } from './fixtures/skills-package.mjs';
 
 // All records in this test are fabricated fixtures in temporary directories.
 // Tests that set kind=real exercise gates; they never enter a case catalogue.
@@ -248,7 +249,7 @@ test('bundled synthetic example is a valid draft, never publishable', () => {
 
 test('portable installation carries the complete evidence tool and creates cases outside app source', t => {
   const f = fixture(t);
-  const source = stageRelease(path.join(f.directory, 'release'));
+  const source = stageSkillsPackage(path.join(f.directory, 'release'));
   const customer = path.join(f.directory, 'customer');
   install({ source, destination: customer, mode: 'skills', installCommand: false });
   const cli = path.join(customer, '.agents/skills/swift-concurrency-migration/scripts/evidence/evidence.mjs');

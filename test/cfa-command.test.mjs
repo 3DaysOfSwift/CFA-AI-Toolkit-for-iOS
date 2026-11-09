@@ -4,8 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
-import { inventory, isReleasePath, writeJSON } from '../scripts/files.mjs';
+import { stageSkillsPackage } from './fixtures/skills-package.mjs';
 import { install } from '../scripts/install.mjs';
 
 function sandbox(t) {
@@ -16,17 +15,7 @@ function sandbox(t) {
 
 function installedCommand(t) {
   const directory = sandbox(t);
-  const source = path.join(directory, 'ios-app-development-cfa');
-  const root = fileURLToPath(new URL('../', import.meta.url));
-  fs.mkdirSync(source);
-  for (const folder of ['.codex-plugin', 'skills']) {
-    const from = path.join(root, folder);
-    fs.cpSync(from, path.join(source, folder), {
-      recursive: true,
-      filter: file => isReleasePath(path.relative(from, file))
-    });
-  }
-  writeJSON(path.join(source, 'checksums.json'), inventory(source));
+  const source = stageSkillsPackage(path.join(directory, 'ios-app-development-cfa'));
   const result = install({ source, destination: path.join(directory, 'customer'), mode: 'skills' });
   return { directory, command: result.command };
 }
