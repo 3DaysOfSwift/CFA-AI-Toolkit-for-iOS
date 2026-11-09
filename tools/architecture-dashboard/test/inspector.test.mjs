@@ -406,7 +406,7 @@ test('flags conditional database startup presentation in App.body', async t => {
 
 test('flags storage-gated conventional roots as review hints', async t => {
   const root = await fixture(t, {
-    'Application/1 - View/ContentView.swift': 'struct ContentView: View {\n var body: some View {\n if let container = storage.container { RootTabView() } else { ProgressView() } } }',
+    'Application/1 - View/ContentView.swift': 'struct ContentView: View {\n var body: some View {\n if sessionIsReady,\n let container = storage.container { RootTabView() } else { ProgressView() } } }',
     'Application/1 - View/RootTabView.swift': 'struct RootTabView: View { var body: some View { switch databaseState { case .ready: Tabs(); default: ProgressView() } } }',
     'Application/1 - View/RootView.swift': 'struct RootView: View { var body: some View { if isStoreReady { Tabs() } else { ErrorView() } } }'
   });
