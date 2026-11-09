@@ -921,7 +921,10 @@ test('reports ambiguous Feature test filenames across targets', async t => {
 test('distinguishes AppModel computed getters from stored properties with observers', async t => {
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': `final class AppModel {
-      var computedValue: String { "value" }
+      var computedValue: Result<
+        String,
+        Never
+      > { .success("value") }
       var storedValue: String { didSet { reportChange() } }
       static func live() -> AppModel { AppModel() }
     }`

@@ -308,9 +308,16 @@ export async function inspect(project) {
           (declarations.length !== 1 || isFeatureCandidate(type, declarations[0].file))) continue;
       findings.push(finding('app-model-non-feature-state', 'review', `AppModel appears to store ${match[1]} from ${type} construction. Verify the inferred type and keep services and presentation state outside AppModel storage.`, appModelFile, line));
     }
-    for (const match of appMembers.matchAll(/(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(private[ \t]+)?(?:(?:private\(set\)|fileprivate|internal|public|package)[ \t]+)?(?:let|var)[ \t]+(\w+)[ \t]*:[ \t]*(?:any[ \t]+)?(?:\w+[ \t]*\.[ \t]*)*(\w+)(?:<[^;\n=]*>)?[?!]?([ \t]*=(?!=))?/gm)) {
-      const [, privateModifier, name, type, defaultValue] = match;
-      const suffix = appModel.slice(match.index + match[0].length);
+    for (const match of appMembers.matchAll(/(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(private[ \t]+)?(?:(?:private\(set\)|fileprivate|internal|public|package)[ \t]+)?(?:let|var)[ \t]+(\w+)[ \t]*:[ \t]*(?:any[ \t]+)?(?:\w+[ \t]*\.[ \t]*)*(\w+)/gm)) {
+      const [, privateModifier, name, type] = match;
+      let suffix = appModel.slice(match.index + match[0].length);
+      const genericStart = /^\s*</.exec(suffix);
+      if (genericStart) {
+        const close = closingGenericArguments(suffix, genericStart[0].length - 1);
+        if (close >= 0) suffix = suffix.slice(close + 1);
+      }
+      suffix = suffix.replace(/^[?!]/, '');
+      const defaultValue = /^[ \t]*=(?!=)/.test(suffix);
       // A getter is not stored state. Property observers still belong to storage.
       if (!defaultValue && hasComputedAccessor(suffix)) continue;
       if (defaultValue) findings.push(finding('app-model-default-value', 'warning', `AppModel property ${name} has a default value; initialise it in the explicit initializer.`, appModelFile, lineOf(appModel, match.index)));
