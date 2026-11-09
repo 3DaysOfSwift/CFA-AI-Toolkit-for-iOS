@@ -215,7 +215,14 @@ confirmed disk writes, test success and failure through the storage API that
 reports that outcome.
 
 Build AppModel tests from an isolated dependency graph. Do not call production
-`AppModel.shared` from a unit test. When AppModel owns app-wide listeners,
+`AppModel.shared` from a unit test. When startup changes, apply the
+[synchronous launch rule](references/spec/rules/cfa-launch-01.md). Signal
+launch twice with controlled Feature dependencies. Verify the first call
+initiates the required work while disk or network responses remain held, and
+that the second call starts no duplicate work. Trace delegate wiring and
+measure first-frame timing separately from this AppModel test.
+
+When AppModel owns app-wide listeners,
 supply a controlled event source and observe the receiving Feature. Verify
 repeated startup signals start each listener once and that events reach the
 Feature without a screen. Where cancellation or replacement is supported,
