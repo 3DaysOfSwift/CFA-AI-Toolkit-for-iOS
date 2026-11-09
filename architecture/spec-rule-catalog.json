@@ -279,7 +279,7 @@
       "section": "Use Application Launch as an Opportunity to Refresh Features",
       "applies": "Handling app launch",
       "strength": "Required",
-      "rule": "Call AppModel startup directly and synchronously from the application delegate callback. AppModel signals the relevant Features and starts its app-wide listeners before the callback returns. Features own their asynchronous work, and launch does not wait for disk or network completion.",
+      "rule": "Call AppModel startup directly and synchronously from the application delegate callback. AppModel signals the relevant Features and starts its app-wide listeners before the callback returns. Features own their asynchronous work, and launch does not wait for disk or network completion. Keep synchronous startup brief and avoid blocking I/O on the main thread.",
       "why": "App-wide startup signals are issued before the delegate returns.",
       "verify": "Trace the direct call from UIApplicationDelegate through each Feature startup signal and app-wide listener start. Verify repeated callbacks do not repeat startup, and measure first-frame responsiveness separately from network and disk completion. Task creation order alone does not establish I/O start order.",
       "example": "The application delegate calls AppModel startup directly; Features start their own asynchronous refreshes.",
@@ -783,10 +783,10 @@
       "section": "Use Application Launch as an Opportunity to Refresh Features",
       "applies": "Launching when persistence is slow or unavailable",
       "strength": "Required",
-      "rule": "Start required work without blocking navigation or first presentation on a database loading gate.",
+      "rule": "Install stable root navigation independently of store availability. Initializers and AppModel.live() assemble dependencies. The storage owner opens the store lazily on a Feature request. The affected screen presents errors and retries through its ViewModel and Feature.",
       "why": "Users can access unaffected capabilities and see honest loading or failure states.",
       "example": "The root screen appears while a Feature restores local data.",
-      "verify": "Test slow and failed storage, navigation and first-frame responsiveness.",
+      "verify": "Hold store opening pending, then fail it. Verify the root stays visible, an unaffected destination remains accessible, and the affected screen explains the failure and can retry successfully without replacing the root or losing saved data. Verify actual store opening and UI behaviour separately from controlled tests.",
       "explanationIds": [
         "storage-failures"
       ]
@@ -800,7 +800,7 @@
       "rule": "Keep the App structure focused on scene composition and use the application lifecycle for the synchronous AppModel launch signal.",
       "why": "Startup ownership remains independent of any one View.",
       "example": "The app delegate invokes AppModel directly before returning from launch.",
-      "verify": "Inspect the App and delegate and confirm no view task starts the shared launch workflow.",
+      "verify": "Inspect App.body, root navigation and the delegate. Verify a stable root per scene, no storage-dependent root branches, and a direct synchronous launch signal from the delegate. Screen lifecycle tasks may start their own work, while shared startup belongs to AppModel.",
       "explanationIds": []
     }
   ],

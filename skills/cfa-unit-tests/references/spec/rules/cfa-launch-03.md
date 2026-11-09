@@ -10,6 +10,6 @@
 
 **Example:** The app delegate invokes AppModel directly before returning from launch.
 
-**Verify:** Inspect the App and delegate and confirm no view task starts the shared launch workflow.
+**Verify:** Inspect App.body, root navigation and the delegate. Verify a stable root per scene, no storage-dependent root branches, and a direct synchronous launch signal from the delegate. Screen lifecycle tasks may start their own work, while shared startup belongs to AppModel.
 
 **Full rule, context and examples:** [Use Application Launch as an Opportunity to Refresh Features](../topics/21-use-application-launch-as-an-opportunity-to-refresh-features.md). This card is a reading aid; apply the complete canonical section.
