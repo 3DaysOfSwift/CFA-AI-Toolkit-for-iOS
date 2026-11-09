@@ -618,6 +618,7 @@ test('an initializer assignment to another instance does not establish screen ow
       self = Self.preview
       var other = self
       other._viewModel = State(initialValue: HomeViewModel(snapshot: snapshot))
+      other . \`_viewModel\` = State(initialValue: HomeViewModel(snapshot: snapshot))
     }
     var body: some View { Text("Home") }
   }`);

@@ -924,7 +924,7 @@ export async function inspect(project) {
     ))].map(match => ({ name: match[1] ?? match[2], index: match.index }));
     function stateAssignmentTarget(property, backingOnly = false) {
       const name = backingOnly ? `_${property}` : `_?${property}`;
-      return String.raw`(?<![.\p{L}\p{M}\p{N}_\x60])(?:self\s*\.\s*)?(?:\x60${name}\x60|${name})\s*=`;
+      return String.raw`(?<![\p{L}\p{M}\p{N}_\x60])(?<!\.\s*)(?:self\s*\.\s*)?(?:\x60${name}\x60|${name})\s*=`;
     }
     const dependencies = [];
     const initializerLocations = [
