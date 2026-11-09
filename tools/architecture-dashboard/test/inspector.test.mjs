@@ -965,18 +965,19 @@ test('does not choose a test file by basename when multiple targets have matches
   assert.match(renderInspection(report), /multiple matching test files. Verify target/);
 });
 
-test('reviews a matching ViewModel test file under the app View source tree', async t => {
+test('reviews matching ViewModel tests in production source trees', async t => {
   const file = 'App/1 - View/Views/Home/HomeViewModelTests.swift';
   const root = await fixture(t, {
     'App/1 - View/Views/Home/HomeView.swift': 'struct HomeView: View { @State private var viewModel = HomeViewModel() }',
     'App/1 - View/Views/Home/HomeViewModel.swift': 'final class HomeViewModel {}',
+    'App/2 - AppModel/HomeViewModelTests.swift': 'struct HomeViewModelTests {}',
+    'AppTests/HomeViewModelTests.swift': 'struct HomeViewModelTests {}',
     [file]: 'struct HomeViewModelTests {}'
   });
   const {findings} = await inspect(root);
-  const placement = findings.find(item => item.code === 'view-model-test-placement');
-  assert.equal(placement?.file, file);
-  assert.equal(placement?.severity, 'review');
-  assert.match(placement.message, /unit-test target/);
+  const placement = findings.filter(item => item.code === 'view-model-test-placement');
+  assert.deepEqual(placement.map(item => item.file), [file, 'App/2 - AppModel/HomeViewModelTests.swift']);
+  assert.ok(placement.every(item => item.severity === 'review' && /unit-test target/.test(item.message)));
 });
 
 test('reports ambiguous Feature test filenames across targets', async t => {
