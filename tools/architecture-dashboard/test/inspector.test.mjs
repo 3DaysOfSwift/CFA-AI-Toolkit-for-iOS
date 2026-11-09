@@ -221,11 +221,19 @@ test('reviews lifecycle tasks in a SwiftUI View outside the CFA View folder', as
     }
     struct Worker {
       func run() { client.task { Task {} } }
+    }`,
+    'Application/Presentation/Notes+Refresh.swift': `extension NotesView {
+      var refreshView: some View {
+        Text("Refresh").refreshable { Task { await viewModel.refresh() } }
+      }
     }`
   });
   const { findings } = await inspect(root);
   assert.deepEqual(findings.filter(item => item.code === 'task-inside-view-lifecycle')
-    .map(({file, line, severity}) => [file, line, severity]), [[file, 4, 'review']]);
+    .map(({file, line, severity}) => [file, line, severity]).sort(), [
+    ['Application/Presentation/Notes+Refresh.swift', 3, 'review'],
+    [file, 4, 'review']
+  ]);
 });
 
 test('identifies a launch signal scheduled inside a delegate Task or dispatch queue without flagging independent work', async t => {

@@ -323,6 +323,11 @@ export async function inspect(project) {
       }
     }
   }
+  const viewDeclarations = /\bstruct\s+(\w+)(?:\s*<[^{}]+>)?\s*:\s*(?:SwiftUI\s*\.\s*)?View\b[^{}]*\{/g;
+  const viewNames = new Set();
+  for (const source of sources.values()) {
+    for (const view of source.matchAll(viewDeclarations)) viewNames.add(view[1]);
+  }
   const swiftDataAccess = /\b(?:ModelContainer|ModelContext)\b|@Query\b|\.modelContainer\s*\(|@Environment\s*\(\s*\\\s*\.\s*modelContext\b/;
   for (const [file, source] of sources) {
     const isViewFile = /(?:^|\/)1 - View\//.test(file);
@@ -339,7 +344,7 @@ export async function inspect(project) {
       }
     }
     if (!isViewFile) {
-      for (const view of source.matchAll(/\bstruct\s+\w+(?:\s*<[^{}]+>)?\s*:\s*(?:SwiftUI\s*\.\s*)?View\b[^{}]*\{/g)) {
+      for (const view of source.matchAll(viewDeclarations)) {
         const start = view.index + view[0].length;
         const body = braceBody(source, start - 1);
         inspectLifecycleClosures(body, file, findings, lineOf(source, start));
@@ -347,6 +352,11 @@ export async function inspect(project) {
         if (storage) {
           findings.push(finding('view-swiftdata-access', 'review', 'This SwiftUI View appears to access SwiftData directly. Verify that storage is reached through its ViewModel and Feature.', file, lineOf(source, start + storage.index)));
         }
+      }
+      for (const extension of source.matchAll(/\bextension\s+(\w+)\b(?!\s*\.)[^{}]*\{/g)) {
+        if (!viewNames.has(extension[1])) continue;
+        const start = extension.index + extension[0].length;
+        inspectLifecycleClosures(braceBody(source, start - 1), file, findings, lineOf(source, start));
       }
       continue;
     }
