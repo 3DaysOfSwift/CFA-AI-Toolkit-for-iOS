@@ -224,8 +224,10 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
           }
         } else if (field === 'deploymentCompatibilityEvidenceId') {
           const missing = gate.affectedTargets.filter(target => !item.targets?.includes(target));
-          if (missing.length) {
-            warnings.push(`evidence.${item.id}: minimum-OS evidence does not list affected targets: ${missing.join(', ')}. Verify compatibility for each target at its own minimum OS.`);
+          if (!item.targets?.length) {
+            warnings.push(`evidence.${item.id}: list the affected targets covered by the minimum-OS evidence.`);
+          } else if (missing.length) {
+            errors.push(`completionGate.${field}: ${item.id} omits affected targets: ${missing.join(', ')}.`);
           }
         }
       }

@@ -53,7 +53,9 @@ navigator map from manual Xcode inspection, Feature and legacy primitive
 inventories, hybrid review, deployment compatibility, final CFA audit, build, tests, manual behaviour
 regression and human architecture review. Use
 `completionGate.deploymentCompatibilityEvidenceId` to link the minimum OS of
-each affected target and the evidence that changed paths support it. Older
+each affected target and the evidence that changed paths support it. A named
+target list must include every affected target. Evidence without target names
+receives a review warning. Older
 completed records need this link and a fresh review before they validate. Use
 `hybridReviewEvidenceId` and `finalCfaAuditEvidenceId` for the two review links.
 When removing an adapter or dependency, record the consumer scenarios as
