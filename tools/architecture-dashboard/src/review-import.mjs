@@ -168,7 +168,9 @@ export async function importReview(report,input,root) {
       const source=await fs.readFile(real,'utf8');
       const expected=hashes.get(ref.file)??review.evidenceHashes?.[ref.file];
       if(!expected||createHash('sha256').update(source).digest('hex')!==expected) fail('evidence hash mismatch: '+ref.file);
-      cache.set(ref.file,source.split('\n'));
+      const lines = source ? source.split(/\r\n|\n|\r/) : [];
+      if (lines.at(-1) === '') lines.pop();
+      cache.set(ref.file,lines);
     }
     const lines=cache.get(ref.file);
     if(!Number.isInteger(ref.line)||!Number.isInteger(ref.endLine)||ref.line<1||ref.endLine<ref.line||ref.endLine>lines.length) fail(`invalid evidence lines: ${ref.file}:${ref.line}–${ref.endLine}`);

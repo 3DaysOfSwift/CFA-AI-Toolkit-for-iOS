@@ -103,7 +103,7 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
   const base=await fs.mkdtemp(path.join(os.tmpdir(),'whole-health-test-'));
   try {
     const project=path.join(base,'app'); await fs.mkdir(project);
-    await fs.writeFile(path.join(project,'App.swift'),'struct App {}\n');
+    await fs.writeFile(path.join(project,'App.swift'),'struct App {\r\n}\r\n');
     await fs.writeFile(path.join(project,'Value.swift'),'struct Value {}\n');
     const syntax=async()=>({status:'available',files:['App.swift','Value.swift'],items:[],warnings:[]});
     const inventory=await prepare(project,path.join(base,'inventory'),syntax);
@@ -147,9 +147,9 @@ test('report rescans source, surfaces coverage gaps and rejects stale review', a
     review.presentation.criteria[0].evidence = [{file:'Missing.swift',line:1,endLine:1}];
     await fs.writeFile(reviewPath,JSON.stringify(review));
     await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/evidence file not found: Missing.swift/);
-    review.presentation.criteria[0].evidence = [{file:'App.swift',line:99,endLine:99}];
+    review.presentation.criteria[0].evidence = [{file:'App.swift',line:3,endLine:3}];
     await fs.writeFile(reviewPath,JSON.stringify(review));
-    await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/invalid evidence lines: App.swift:99–99/);
+    await assert.rejects(finish(project,reviewPath,output,undefined,syntax),/invalid evidence lines: App.swift:3–3/);
     review.presentation.criteria[0].evidence = [{file:'App.swift',line:1,endLine:2}];
     await fs.writeFile(reviewPath,JSON.stringify(review));
     const sourceProblem = structuredClone(review);
