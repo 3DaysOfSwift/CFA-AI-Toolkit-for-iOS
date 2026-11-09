@@ -204,6 +204,13 @@ function bundledGuidance(content) {
   return content.slice(start, end < 0 ? undefined : end);
 }
 
+function guidanceDiffersFromBundled(block) {
+  const normalize = (value) => value.replace(/\s+/g, ' ').trim();
+  return normalize(block) !== normalize(bundledGuidance(projectGuidance));
+}
+
+const guidanceComparison = 'Compare the CFA block with the installed toolkit and keep project-specific rules.';
+
 function usage() {
   console.log(`CFA AI Toolkit for iOS — cfa command
 
@@ -267,6 +274,9 @@ function doctor(projectArgument) {
     console.log(`INFO CFA project guidance found: ${guidance.join(', ')}`);
     for (const file of guidance) {
       const content = bundledGuidance(fs.readFileSync(file, 'utf8'));
+      if (guidanceDiffersFromBundled(content)) {
+        console.log(`INFO CFA guidance differs from the installed toolkit in ${file}. ${guidanceComparison}`);
+      }
       if (content.includes(outdatedFeatureGuidance)) {
         console.log(`WARN outdated feature naming guidance in ${file}; update the CFA guidance block to use concrete *Feature types and matching *Feature properties.`);
       }
@@ -333,6 +343,9 @@ function enableProject(values) {
   const block = bundledGuidance(existingGuidance);
   if (block) {
     console.log(`CFA project guidance is already enabled: ${guidanceFile}`);
+    if (guidanceDiffersFromBundled(block)) {
+      console.log(`The existing CFA guidance differs from the installed toolkit. ${guidanceComparison}`);
+    }
     if (block.includes(outdatedFeatureGuidance)) {
       console.log('The existing guidance still uses the old Manager rule. Edit only the CFA guidance block; the command will not overwrite project instructions.');
     }

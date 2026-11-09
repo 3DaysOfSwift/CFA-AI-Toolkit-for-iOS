@@ -92,7 +92,7 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.equal((content.match(/CFA Toolkit project guidance/g) ?? []).length, 1);
   assert.match(repeated.stdout, /already enabled/);
   assert.match(doctor.stdout, /INFO CFA project guidance found/);
-  assert.doesNotMatch(doctor.stdout, /outdated startup guidance/);
+  assert.doesNotMatch(doctor.stdout, /outdated startup guidance|differs from the installed toolkit/);
 });
 
 test('enable-project can create Claude guidance when explicitly requested', (t) => {
@@ -150,4 +150,22 @@ test('current CFA guidance is not flagged for legacy text in surrounding project
     assert.equal(result.status, 0, result.stderr);
     assert.doesNotMatch(result.stdout, /snapshot guidance/);
   }
+});
+
+test('installed guidance predating the isolation rule is identified and preserved', t => {
+  const { directory, command } = installedCommand(t);
+  const agents = path.join(directory, 'AGENTS.md');
+  const enabled = spawnSync(command, ['enable-project', directory], { encoding: 'utf8' });
+  assert.equal(enabled.status, 0, enabled.stderr);
+  const current = fs.readFileSync(agents, 'utf8');
+  const previous = current.replace(/- Keep Features explicitly on MainActor\.[\s\S]*?(?=- SwiftDataManager)/, '');
+  assert.notEqual(previous, current);
+  fs.writeFileSync(agents, previous);
+
+  for (const action of ['doctor', 'enable-project']) {
+    const result = spawnSync(command, [action, directory], { encoding: 'utf8' });
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /differs from the installed toolkit/);
+  }
+  assert.equal(fs.readFileSync(agents, 'utf8'), previous);
 });
