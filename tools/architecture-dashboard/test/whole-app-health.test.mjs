@@ -387,3 +387,15 @@ test('rejects scope flags on report instead of silently using a different scope'
     assert.match(result.stderr, /^Usage:/);
   }
 });
+
+test('rejects a malformed review scope before scanning', async t => {
+  const base = await fs.mkdtemp(path.join(os.tmpdir(), 'whole-health-invalid-scope-'));
+  t.after(() => fs.rm(base, {recursive:true,force:true}));
+  const draft = path.join(base,'review.json');
+  const output = path.join(base,'report.html');
+  await fs.writeFile(draft, JSON.stringify({includeTests:'true'}));
+  const syntax = async () => assert.fail('Invalid review scope should be rejected before scanning');
+  await assert.rejects(progress(base,draft,syntax), /includeTests must be true or false/);
+  await assert.rejects(next(base,draft,syntax), /includeTests must be true or false/);
+  await assert.rejects(finish(base,draft,output,undefined,syntax), /includeTests must be true or false/);
+});

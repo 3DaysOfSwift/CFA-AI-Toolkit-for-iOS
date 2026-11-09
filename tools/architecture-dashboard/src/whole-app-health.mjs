@@ -264,23 +264,26 @@ function appCheckGaps(review) {
   return missing.length ? ['App-level assessments still needed: ' + missing.join(', ')] : [];
 }
 
-export async function progress(root, input, syntaxProvider = collectSyntax) {
+async function loadCurrentReview(root, input, syntaxProvider) {
   const raw = JSON.parse(await fs.readFile(input,'utf8'));
-  const {report} = await currentInventory(root, syntaxProvider, {includeTests:raw.includeTests === true});
-  const review = await importReview(report,raw,root);
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw Error('Expected a Health Check review object.');
+  const {includeTests = false} = raw;
+  if (typeof includeTests !== 'boolean') throw Error('Review includeTests must be true or false. Use the scope recorded by prepare.');
+  const {report} = await currentInventory(root, syntaxProvider, {includeTests});
+  return {report, review:await importReview(report,raw,root)};
+}
+
+export async function progress(root, input, syntaxProvider = collectSyntax) {
+  const {report, review} = await loadCurrentReview(root, input, syntaxProvider);
   return {gaps:[...coverageGaps(report,review), ...appCheckGaps(review)],files:report.files.length,operations:(review.operations || []).length};
 }
 export async function next(root, input, syntaxProvider = collectSyntax) {
-  const raw = JSON.parse(await fs.readFile(input,'utf8'));
-  const {report} = await currentInventory(root, syntaxProvider, {includeTests:raw.includeTests === true});
-  const review = await importReview(report,raw,root);
+  const {report, review} = await loadCurrentReview(root, input, syntaxProvider);
   const work = nextWork(report,review);
   return {...work, gaps:[...work.gaps, ...appCheckGaps(review)]};
 }
 export async function finish(root, input, output, icon, syntaxProvider = collectSyntax) {
-  const raw = JSON.parse(await fs.readFile(input,'utf8'));
-  const {report} = await currentInventory(root, syntaxProvider, {includeTests:raw.includeTests === true});
-  const review = await importReview(report,raw,root);
+  const {report, review} = await loadCurrentReview(root, input, syntaxProvider);
   const gaps = coverageGaps(report,review);
   if (gaps.length) throw Error('Health Check is not complete; no report was generated. Complete the review checklist:\n- ' + gaps.join('\n- '));
   const presentation = review.presentation;
