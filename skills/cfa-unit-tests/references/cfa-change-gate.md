@@ -197,6 +197,11 @@ identifies all of the following:
 - a current concurrency inventory showing every scoped GCD, callback,
   OperationQueue, timer, lock, or delegate route as migrated or explicitly
   retained with a reason;
+- the hybrid implementation review, identifying remaining users of legacy
+  mechanisms and dependencies and recording which adapters were removed or
+  intentionally retained to preserve behaviour or platform support;
+- the final CFA audit across the agreed scope, including the resolution of
+  actionable deviations and re-verification after corrections;
 - post-change build and test results at the final commit, plus the relevant
   manual behaviour regression; and
 - a human architecture review confirming that the navigator communicates the
