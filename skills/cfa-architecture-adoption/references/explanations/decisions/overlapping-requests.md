@@ -37,8 +37,8 @@ fails. The bundled Serial Weight Saves migration example exercises this policy.
 For equivalent requests, hold one provider call open while another caller joins.
 Verify that the provider runs once and both callers can receive its outcome.
 Cancel one waiter and verify another can still finish. In a separate run,
-cancel the only screen waiter and verify that the Feature still retains the
-result. If the screen must stop waiting promptly, cancel its wait while the
+cancel the only screen waiter, let the refresh complete without a replacement
+waiter and verify that the Feature retains the result. If the screen must stop waiting promptly, cancel its wait while the
 refresh is suspended and verify that the screen returns before the refresh
 completes.
 

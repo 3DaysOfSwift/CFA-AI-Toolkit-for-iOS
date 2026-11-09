@@ -32,12 +32,13 @@ or end the wait.
 
 Use controlled dependencies to check cancellation before work, during
 suspension and before publication. Verify durable commits, stale-result
-rejection and subsequent retries. Hold a shared refresh open, cancel its only
-screen waiter, and verify that the Feature can still publish the result for a
-later caller. In a separate case, start two equivalent callers, cancel one
-while the refresh is suspended, and verify that the other receives the
-result from the same request. If the design promises a prompt exit for the
-cancelled waiter, verify that its wait ends before releasing the refresh.
+rejection and subsequent retries. Hold a shared refresh open and cancel its
+only screen waiter. Let it finish with no replacement waiter and verify that
+the Feature retains the result. In a separate case, start two equivalent
+callers, cancel one while the refresh is suspended, and verify that the other
+receives the result from the same request. If the design promises a prompt exit
+for the cancelled waiter, verify that its wait ends before releasing the
+refresh.
 
 ## Evidence and provenance
 
