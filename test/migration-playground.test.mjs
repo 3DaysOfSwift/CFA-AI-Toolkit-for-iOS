@@ -9,13 +9,16 @@ import {fileURLToPath} from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const examples = ['Serial Weight Saves', 'Callback Networking', 'MainActor Result', 'Observation Migration'];
 for (const name of examples) for (const [side, version] of [['Before','5'], ['After','6']]) {
-  test(`${name}: ${side} uses Swift ${version} and runs its behaviour check`, {skip:process.platform !== 'darwin', timeout:120000}, () => {
-    const folder = path.join(root, 'examples/migration', name, `${side}.playground`);
+  const folder = path.join(root, 'examples/migration', name, `${side}.playground`);
+  const marker = `// MARK: - Run ${side.toLowerCase()} example`;
+  test(`${name}: ${side} declares Swift ${version} and has a run section`, () => {
     const page = fs.readFileSync(path.join(folder, 'Contents.swift'), 'utf8');
     assert.match(fs.readFileSync(path.join(folder, 'contents.xcplayground'), 'utf8'), new RegExp(`swift-version=["']${version}["']`));
     assert.ok(fs.existsSync(path.join(root, 'examples/migration', name, 'case.md')));
-    const marker = `// MARK: - Run ${side.toLowerCase()} example`;
     assert.equal(page.split(marker).length, 2);
+  });
+  test(`${name}: ${side} runs its Swift ${version} behaviour check`, {skip:process.platform !== 'darwin', timeout:120000}, () => {
+    const page = fs.readFileSync(path.join(folder, 'Contents.swift'), 'utf8');
     const source = page.split(marker)[0].replace('import PlaygroundSupport\n', '').replace('PlaygroundPage.current.needsIndefiniteExecution = true\n', '');
     const harness = `\n@main struct Runner { @MainActor static func main() async throws { ${name === 'Callback Networking' ? 'try await' : name === 'Observation Migration' ? '' : 'await'} runExample() } }\n`;
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfa-migration-'));
