@@ -383,6 +383,12 @@ export async function inspect(project) {
     const outsideManager = match => !managerBodies.some(({start, end}) => match.index >= start && match.index < end);
     const sessionNames = new Set([...source.matchAll(/\b(\w+)\s*:\s*(?:Foundation(?:Networking)?\s*\.\s*)?URLSession\b(?!\s*\.)/g)]
       .map(match => match[1]));
+    for (const alias of source.matchAll(/\b(?:let|var)\s+(\w+)\s*=\s*(?:Foundation(?:Networking)?\s*\.\s*)?URLSession\s*\.\s*shared\b/g)) {
+      const remainder = source.slice(alias.index + alias[0].length);
+      if (/^[ \t]*(?:[;\n}]|$)/.test(remainder) && !/^\s*[.([?]/.test(remainder)) {
+        sessionNames.add(alias[1]);
+      }
+    }
     const directRequest = [...source.matchAll(/\b(?:(URLSession\s*\.\s*shared)|(\w+))\s*\??\.\s*(?:data|bytes|download|upload|dataTask|downloadTask|uploadTask|webSocketTask|streamTask)\s*\(/g)]
       .find(match => (match[1] || sessionNames.has(match[2])) && outsideManager(match));
     const directAccess = directRequest ?? [...source.matchAll(/\bURLSession\s*[.(]/g)].find(outsideManager);
