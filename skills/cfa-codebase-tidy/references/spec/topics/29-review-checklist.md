@@ -74,7 +74,10 @@ Before accepting a change, answer every question:
     trace the observable read from the View through its ViewModel to the
     owning Feature. Verify that a confirmed change updates a screen that
     displays live state. For an intentionally stable detail snapshot, verify
-    its explicit refresh policy instead.
+    its explicit refresh policy instead. When a consumer needs every event,
+    verify that its event API delivers repeated equal values in the required
+    order and handles cancellation. Check event delivery separately from
+    updates to the latest displayed state.
 17. Can every meaningful Task lifetime—durable, replaceable, presentational, or
     long-lived—be explained and managed appropriately? For a shared refresh
     that should survive navigation, verify that it completes and retains its
