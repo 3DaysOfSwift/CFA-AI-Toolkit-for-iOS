@@ -146,8 +146,9 @@ Record actual background execution only when supported by device evidence.
 When reviewing deep links or notification actions, apply the
 [deep-link rule](references/spec/rules/cfa-link-01.md). Trace each opening
 callback through DeepLinkingFeature to the receiving scene. Where the app
-uses the pending-request design, check that the request is saved before it is
-shown as pending, and that a refusal or cancellation before navigation
+uses the pending-request design, check that invalid requests cannot change the
+pending list or saved snapshot. Check that a valid request is saved before it
+is shown as pending, and that a refusal or cancellation before navigation
 keeps it available. Verify that either scene can open the request without
 changing another scene's destination, and that competing attempts open it
 only once. Confirm that opening the destination completes navigation even

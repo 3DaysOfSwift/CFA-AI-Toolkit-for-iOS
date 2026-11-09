@@ -310,7 +310,8 @@ do not claim that UI gating replaces server-side authorisation.
   pending and returns fresh data while the cache write is pending. A failed
   refresh preserves valid displayed data. A late restore or delayed write
   must leave the newer snapshot intact.
-- For changes to the pending deep-link flow, force the initial save to fail
+- For changes to the pending deep-link flow, verify that invalid opening
+  requests leave the pending list and its stored snapshot intact. Force the initial save to fail
   and verify that the failure is reported and the request is never presented as
   saved. Verify that declining navigation leaves a saved request available
   after restart. Exercise competing opens from two scenes and verify that

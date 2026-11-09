@@ -90,7 +90,8 @@ the intended destination. Use a UI or manual test to verify that both scenes
 retain their navigation and that a source refresh does not dismiss either.
 
 For deep links and notification actions, drive scene outcomes through a
-controlled handler. Force the initial save to fail and verify that the caller
+controlled handler. Exercise invalid input before navigation and verify that
+the pending list and its stored snapshot remain intact. Force the initial save to fail and verify that the caller
 receives the error and the pending list does not publish an unsaved request.
 Verify that refusal or cancellation before navigation
 leaves the request pending and that navigation consumes it even if cancellation
