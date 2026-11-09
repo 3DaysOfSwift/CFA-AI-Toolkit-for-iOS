@@ -229,6 +229,11 @@ test('completion is not inferred from a build pass or tests at a different commi
   const unrelatedResult = inspectRecord(f.file);
   assert.ok(unrelatedResult.errors.includes('completionGate.buildEvidenceId: unrelated-build names only unrelated targets.'));
   assert.ok(!unrelatedResult.errors.some(error => error.includes('missing passed build at afterCommit')));
+  delete unrelatedBuild.targets;
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.includes(
+    'completionGate.buildEvidenceId: unrelated-build must list the affected targets it builds.'
+  ));
   f.record.completionGate.buildEvidenceId = 'after-build';
   delete f.record.completionGate.dataHandoffEvidenceIds;
   f.record.status = 'draft';
