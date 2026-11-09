@@ -67,7 +67,8 @@ export async function inspect(project) {
     if (createHash('sha256').update(source).digest('hex') !== file.hash) {
       throw Error(`Source changed during inspection: ${file.path}. Run the inspector again.`);
     }
-    sources.set(file.path, maskSwift(source));
+    // Preserve offsets while making standalone CR line endings visible to line-based patterns.
+    sources.set(file.path, maskSwift(source.replace(/\r(?!\n)/g, '\n')));
   }
   const paths = new Set(sources.keys());
   const appModelFiles = [...paths].filter(file => /(?:^|\/)2 - AppModel\/AppModel\.swift$/.test(file));

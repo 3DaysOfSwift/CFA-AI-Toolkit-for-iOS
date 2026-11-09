@@ -658,3 +658,14 @@ test('surfaces a stored Feature dependency as coordination to review', async t =
   assert.deepEqual(findings.map(({file, line, severity}) => [file, line, severity]), [[file, 2, 'review']]);
   assert.match(findings[0].message, /business capability.*one owner per state.*dependency cycle/);
 });
+
+test('reports AppModel findings at the correct lines in CR-delimited source', async t => {
+  const file = 'Application/2 - AppModel/AppModel.swift';
+  const root = await fixture(t, {
+    [file]: 'final class AppModel {\r    private var cache: String\r    static func live() -> AppModel { AppModel() }\r}'
+  });
+  const {findings} = await inspect(root);
+  const warning = findings.find(item => item.code === 'app-model-non-feature-state');
+  assert.equal(warning?.file, file);
+  assert.equal(warning?.line, 2);
+});
