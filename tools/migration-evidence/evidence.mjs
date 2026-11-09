@@ -169,6 +169,13 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
     if (!gate) {
       errors.push('result: completed requires a completionGate; otherwise use partial');
     } else {
+      const builtTargets = new Set(record.evidence.filter(item =>
+        item.kind === 'build' && item.phase === 'after' && item.outcome === 'passed' &&
+        item.commit === record.repository.afterCommit
+      ).flatMap(item => item.targets ?? []));
+      for (const target of gate.affectedTargets) {
+        if (!builtTargets.has(target)) errors.push(`completionGate.affectedTargets: missing passed build at afterCommit for ${target}`);
+      }
       const requiredEvidence = [
         ['navigatorEvidenceId', ['manual']],
         ['featureInventoryEvidenceId', ['source', 'diff']],

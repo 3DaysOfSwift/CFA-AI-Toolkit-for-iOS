@@ -42,7 +42,10 @@ kind `license` can point to a local license/notice file or an immutable license 
 Use scope.constraints or the case study for selection rationale and applicability.
 
 Before/after build and test entries include their command, environment, commit,
-date, outcome and evidence reference. A check not run still has a planned command
+date, outcome and evidence reference. For completion, list every affected
+target in `completionGate.affectedTargets` and identify the targets covered by
+each build in its `targets` array. Several records may cover the list. Older
+completed records need target names and renewed review. A check not run still has a planned command
 and a note explaining why. Commands are text: the helper never executes them.
 A `completed` record requires a pinned `repository.afterCommit` and passed
 evidence at that revision for every completion gate entry. Link the before/after

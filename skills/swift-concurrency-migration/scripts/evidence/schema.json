@@ -77,6 +77,7 @@
       "properties": {
         "id": {"$ref": "#/$defs/identifier"},
         "kind": {"enum": ["source", "diff", "build", "test", "manual", "correction", "license"]},
+        "targets": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/text"}},
         "phase": {"enum": ["before", "after", "during"]},
         "reference": {"$ref": "#/$defs/text"},
         "summary": {"$ref": "#/$defs/text"},
@@ -89,8 +90,9 @@
     }},
     "completionGate": {
       "type": ["object", "null"], "additionalProperties": false,
-      "required": ["navigatorEvidenceId", "featureInventoryEvidenceId", "primitiveInventoryEvidenceId", "hybridReviewEvidenceId", "deploymentCompatibilityEvidenceId", "finalCfaAuditEvidenceId", "buildEvidenceId", "testEvidenceId", "manualBehaviourRegressionEvidenceId", "manualArchitectureReviewEvidenceId"],
+      "required": ["affectedTargets", "navigatorEvidenceId", "featureInventoryEvidenceId", "primitiveInventoryEvidenceId", "hybridReviewEvidenceId", "deploymentCompatibilityEvidenceId", "finalCfaAuditEvidenceId", "buildEvidenceId", "testEvidenceId", "manualBehaviourRegressionEvidenceId", "manualArchitectureReviewEvidenceId"],
       "properties": {
+        "affectedTargets": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/text"}},
         "navigatorEvidenceId": {"$ref": "#/$defs/identifier"},
         "featureInventoryEvidenceId": {"$ref": "#/$defs/identifier"},
         "primitiveInventoryEvidenceId": {"$ref": "#/$defs/identifier"},

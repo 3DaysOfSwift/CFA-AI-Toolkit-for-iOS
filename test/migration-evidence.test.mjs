@@ -161,6 +161,7 @@ test('completion is not inferred from a build pass or tests at a different commi
     afterEvidence('after-architecture-review', 'manual')
   );
   f.record.completionGate = {
+    affectedTargets: ['App', 'Widget'],
     navigatorEvidenceId: 'after-navigator',
     featureInventoryEvidenceId: 'after-feature-inventory',
     primitiveInventoryEvidenceId: 'after-primitive-inventory',
@@ -194,6 +195,12 @@ test('completion is not inferred from a build pass or tests at a different commi
     assert.ok(inspectRecord(f.file).errors.some(error => error.startsWith(`completionGate.${field}`)));
     item.commit = f.record.repository.afterCommit;
   }
+  f.record.evidence.find(item => item.id === 'after-build').targets = ['App'];
+  const widgetBuild = {...afterEvidence('after-widget-build', 'build'), targets:['Widget'], command:'xcodebuild -target Widget', commit:f.record.repository.beforeCommit};
+  f.record.evidence.push(widgetBuild);
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.includes('missing passed build at afterCommit for Widget')));
+  widgetBuild.commit = f.record.repository.afterCommit;
   f.seal();
   assert.equal(inspectRecord(f.file).valid, true);
 
