@@ -154,7 +154,9 @@ If the project is already CFA, make the smallest complete vertical change:
    For shared refreshes, apply the
    [refresh lifetime rule](references/spec/rules/cfa-task-02.md). By default,
    the Feature keeps refreshing when the last screen leaves and retains the
-   result for later use. Verify separately that a later equivalent caller
+   result for later use. Cancel the only waiter while the request is suspended,
+   let the refresh finish without another caller, and verify that the Feature
+   retains its result. In separate cases, verify that a later equivalent caller
    joins without a second request and that cancelling one of several waiters
    leaves the others able to receive the result. If a departing screen needs
    to return promptly, test that its wait ends while the refresh is suspended.
