@@ -34,7 +34,9 @@ Concurrency is available in Swift 5.5 and later.
 - [Callback networking](Callback%20Networking/case.md) preserves a successful
   decode, an HTTP 503 error and a malformed JSON error when moving to async URLSession.
 - [MainActor result handling](MainActor%20Result/case.md) preserves publication
-  before completion and demonstrates failed refresh, retry and overlapping calls.
+  before completion and demonstrates failed refresh and retry in the playground.
+  The source checkout's automated test covers overlapping calls and cancellation
+  of an admitted refresh caller with a controlled provider.
 - [Observation migration](Observation%20Migration/case.md) preserves the current
   Feature value while showing how notification delivery differs from Combine.
 - [Serial weight saves](Serial%20Weight%20Saves/case.md) preserves distinct save
