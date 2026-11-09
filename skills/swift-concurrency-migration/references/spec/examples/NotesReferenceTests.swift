@@ -78,6 +78,7 @@ actor HeldNotesLoad: NotesRepository {
         let stayingModel = NotesEditorViewModel(notesFeature: sharedFeature)
         let departing = Task { await departingModel.load() }
         await heldLoad.waitForLoad()
+        precondition(departingModel.isLoading && stayingModel.isLoading)
         let stayingStarted = AsyncStream<Void>.makeStream()
         let staying = Task { @MainActor in
             stayingStarted.continuation.yield(())
@@ -92,6 +93,7 @@ actor HeldNotesLoad: NotesRepository {
         await heldLoad.finish(with: loadedNote)
         await departing.value
         await staying.value
+        precondition(!departingModel.isLoading && !stayingModel.isLoading)
         precondition(sharedFeature.notes == [loadedNote] && stayingModel.loadError == nil)
 
         let unattendedLoad = HeldNotesLoad()

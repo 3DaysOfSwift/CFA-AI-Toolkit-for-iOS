@@ -41,7 +41,8 @@ enum NoteError: Error { case emptyText }
 final class NotesFeature {
     private let repository: any NotesRepository
     @ObservationIgnored private var lastSave: (id: UUID, task: Task<Void, Error>)?
-    @ObservationIgnored private var loading: (id: UUID, task: Task<[Note], Error>)?
+    private var loading: (id: UUID, task: Task<[Note], Error>)?
+    var isLoading: Bool { loading != nil }
     private(set) var didLoad = false
     private(set) var notes: [Note] = []
 
@@ -123,6 +124,7 @@ final class NotesEditorViewModel {
     private var loadFailed = false
 
     var isRetryingLoad: Bool { loadTask != nil }
+    var isLoading: Bool { notesFeature.isLoading || isRetryingLoad }
 
     var loadError: String? {
         guard loadFailed, !notesFeature.didLoad else { return nil }
@@ -197,9 +199,9 @@ struct NotesEditorView: View {
             if let error = viewModel.loadError {
                 Text(error)
                 Button("Try again") { viewModel.retryLoad() }
-                    .disabled(viewModel.isRetryingLoad)
+                    .disabled(viewModel.isLoading)
             }
-            if viewModel.isRetryingLoad {
+            if viewModel.isLoading {
                 ProgressView("Loading notes")
             }
             Button("Save") { viewModel.save { dismiss() } }

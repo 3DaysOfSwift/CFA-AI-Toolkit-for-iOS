@@ -95,7 +95,8 @@ enum NoteError: Error { case emptyText }
 final class NotesFeature {
     private let repository: any NotesRepository
     @ObservationIgnored private var lastSave: (id: UUID, task: Task<Void, Error>)?
-    @ObservationIgnored private var loading: (id: UUID, task: Task<[Note], Error>)?
+    private var loading: (id: UUID, task: Task<[Note], Error>)?
+    var isLoading: Bool { loading != nil }
     private(set) var didLoad = false
     private(set) var notes: [Note] = []
 
@@ -177,6 +178,7 @@ final class NotesEditorViewModel {
     private var loadFailed = false
 
     var isRetryingLoad: Bool { loadTask != nil }
+    var isLoading: Bool { notesFeature.isLoading || isRetryingLoad }
 
     var loadError: String? {
         guard loadFailed, !notesFeature.didLoad else { return nil }
@@ -251,9 +253,9 @@ struct NotesEditorView: View {
             if let error = viewModel.loadError {
                 Text(error)
                 Button("Try again") { viewModel.retryLoad() }
-                    .disabled(viewModel.isRetryingLoad)
+                    .disabled(viewModel.isLoading)
             }
-            if viewModel.isRetryingLoad {
+            if viewModel.isLoading {
                 ProgressView("Loading notes")
             }
             Button("Save") { viewModel.save { dismiss() } }
@@ -275,5 +277,5 @@ Feature owns the shared load and can retain its result after the editor closes.
 The screen caller awaits the shared result even if SwiftUI cancels its task.
 On return, the ViewModel checks cancellation before updating the editor’s
 error state. The ViewModel retains a separate task for retries started by the
-button. The editor shows progress during a retry and disables the retry button
-until that attempt ends.
+button. The editor shows progress during the shared load, including retries,
+and disables the retry button while loading.
