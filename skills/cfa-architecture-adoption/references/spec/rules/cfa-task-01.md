@@ -10,7 +10,9 @@
 
 **Example:** Two equivalent reload callers await the same Feature-owned task. See the bundled Habit Tracker Pro HabitsFeature under 2 - AppModel/Features/Habits.
 
-**Explanation:** [Unstructured tasks need an owner—not a ban](https://www.3daysofswiftconcurrency.com/cfa/explanation/unstructured-tasks) · [Two callers. One refresh. No lost edits.](https://www.3daysofswiftconcurrency.com/cfa/explanation/overlapping-requests).
+**Explanation:** [Two callers. One refresh. No lost edits.](https://www.3daysofswiftconcurrency.com/cfa/explanation/overlapping-requests).
+
+**Related reading:** [Unstructured tasks need an owner—not a ban](https://www.3daysofswiftconcurrency.com/cfa/explanation/unstructured-tasks).
 
 **Verify:** Verify equivalent requests share an outcome from one execution. Suspend the first admitted command, then submit further commands, including identical inputs. Verify that each required command executes in admission order, each caller gets its own outcome, and a failure does not strand later commands. Test cancellation, stale results and cleanup.
 

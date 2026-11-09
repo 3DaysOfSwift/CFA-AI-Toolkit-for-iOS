@@ -10,7 +10,9 @@
 
 **Example:** A schedule refresh continues after the user leaves the screen and its result is available on return.
 
-**Explanation:** [Two callers. One refresh. No lost edits.](https://www.3daysofswiftconcurrency.com/cfa/explanation/overlapping-requests) · [Cancellation is a policy, not a button](https://www.3daysofswiftconcurrency.com/cfa/explanation/task-cancellation).
+**Explanation:** [Two callers. One refresh. No lost edits.](https://www.3daysofswiftconcurrency.com/cfa/explanation/overlapping-requests).
+
+**Related reading:** [Cancellation is a policy, not a button](https://www.3daysofswiftconcurrency.com/cfa/explanation/task-cancellation).
 
 **Verify:** Cancel the only screen waiter and verify the refresh completes and retains its result without a replacement waiter. In a separate case, admit a later equivalent caller while the original refresh is suspended and verify it receives the same outcome without starting another request. Verify that when one of several waiters leaves, the others still receive the result. Where the screen requires prompt cancellation, verify its wait ends while the refresh is still in flight.
 

@@ -10,7 +10,9 @@
 
 **Example:** In the bundled Habit Tracker, HabitsFeature owns saved habits while a repository handles persistence.
 
-**Explanation:** [Why use a UI and model boundary in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/presentation-boundaries) · [Why use cohesive features in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/feature-ownership).
+**Explanation:** [Why use cohesive features in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/feature-ownership).
+
+**Related reading:** [Why use a UI and model boundary in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/presentation-boundaries).
 
 **Verify:** Trace reads and writes through all screens and services and check for competing authorities.
 

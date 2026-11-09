@@ -82,11 +82,20 @@ export function specTopics(base) {
       if (!explanation) throw Error(`Unknown explanation ${id} for ${rule.id}`);
       return explanation;
     });
-    if (related.length && !related.some(explanation => explanation.ruleIds.includes(rule.id))) {
+    const direct = related.filter(explanation => explanation.ruleIds.includes(rule.id));
+    if (related.length && !direct.length) {
       throw Error(`No linked explanation resolves canonical rule ${rule.id}`);
     }
-    const published = related.filter(explanation => explanation.publication.status === 'published');
-    const learning = published.length ? `\n\n**Explanation:** ${published.map(item => `[${item.publication.verificationEvidence.title}](${item.publication.url})`).join(' · ')}.` : '';
+    const publishedLinks = items => items
+      .filter(item => item.publication.status === 'published')
+      .map(item => `[${item.publication.verificationEvidence.title}](${item.publication.url})`)
+      .join(' · ');
+    const directLinks = publishedLinks(direct);
+    const relatedLinks = publishedLinks(related.filter(item => !direct.includes(item)));
+    const learning = [
+      directLinks && `**Explanation:** ${directLinks}.`,
+      relatedLinks && `**Related reading:** ${relatedLinks}.`,
+    ].filter(Boolean).map(line => `\n\n${line}`).join('');
     files.set(`rules/${rule.id.toLowerCase().replace('cfa-spec-', 'cfa-')}.md`, `# ${rule.id}: ${rule.title}\n\n**Applies when:** ${rule.applies}.\n\n**Strength:** ${rule.strength}.\n\n**Guidance:** ${rule.rule}\n\n**Why:** ${rule.why}\n\n**Example:** ${rule.example}${runnable}${sources}${learning}\n\n**Verify:** ${rule.verify}\n\n**Full rule, context and examples:** [${section.title}](../topics/${section.name}). This card is a reading aid; apply the complete canonical section.\n`);
   }
   const classified = new Set(catalogue.rules.map(rule => rule.section));

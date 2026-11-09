@@ -10,7 +10,9 @@
 
 **Example:** Repeated refresh taps return the same active ViewModel task handle. An async caller awaits its value when it needs completion. The Feature still coordinates equivalent requests from other screens.
 
-**Explanation:** [Unstructured tasks need an owner—not a ban](https://www.3daysofswiftconcurrency.com/cfa/explanation/unstructured-tasks) · [Two callers. One refresh. No lost edits.](https://www.3daysofswiftconcurrency.com/cfa/explanation/overlapping-requests).
+**Explanation:** [Unstructured tasks need an owner—not a ban](https://www.3daysofswiftconcurrency.com/cfa/explanation/unstructured-tasks).
+
+**Related reading:** [Two callers. One refresh. No lost edits.](https://www.3daysofswiftconcurrency.com/cfa/explanation/overlapping-requests).
 
 **Verify:** Verify equivalent callers share one execution and observe its completion. Test cleanup after success, failure and cancellation, including that an obsolete task cannot clear a replacement handle.
 

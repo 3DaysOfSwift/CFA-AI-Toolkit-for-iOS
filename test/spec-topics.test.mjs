@@ -204,6 +204,9 @@ test('published explanations appear in the index and relevant rule cards', () =>
   }
   assert.match(topics.get('rules/cfa-app-01.md'), /cfa\/explanation\/appmodel-composition/);
   assert.match(topics.get('rules/cfa-conc-03.md'), /cfa\/explanation\/task-cancellation/);
+  const sharedRefresh = topics.get('rules/cfa-task-02.md');
+  assert.match(sharedRefresh, /\*\*Explanation:\*\* [^\n]+\/overlapping-requests\)/);
+  assert.match(sharedRefresh, /\*\*Related reading:\*\* [^\n]+\/task-cancellation\)/);
 });
 
 test('withdrawn explanations keep local routing and missing rule mappings fail generation', () => {
