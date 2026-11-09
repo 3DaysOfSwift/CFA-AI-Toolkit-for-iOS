@@ -126,9 +126,11 @@ actor HeldNotesLoad: NotesRepository {
         await retryModel.load()
         precondition(retryModel.loadError != nil && retryFeature.notes.isEmpty)
         let firstRetry = retryModel.retryLoad()
+        precondition(retryModel.isRetryingLoad)
         let repeatedRetry = retryModel.retryLoad()
         await firstRetry.value
         await repeatedRetry.value
+        precondition(!retryModel.isRetryingLoad)
         let attempts = await retryRepository.attempts
         precondition(attempts == 2)
         precondition(retryModel.loadError == nil && retryFeature.notes.map(\.text) == ["Previously saved"])
