@@ -231,7 +231,8 @@ test('reports typed and inferred AppModel property defaults without flagging sha
     [file]: `final class AppModel {
       static let shared = live()
       private var hasLaunched = false
-      let feedFeature = FeedFeature()
+      let feedFeature
+        = FeedFeature()
       public let ordersFeature: OrdersFeature = OrdersFeature()
       static func live() -> AppModel {
         let feature = FeedFeature()
@@ -241,7 +242,7 @@ test('reports typed and inferred AppModel property defaults without flagging sha
   });
   const { findings } = await inspect(root);
   assert.deepEqual(findings.filter(item => item.code === 'app-model-default-value')
-    .map(({file, line}) => [file, line]), [[file, 3], [file, 4], [file, 5]]);
+    .map(({file, line}) => [file, line]), [[file, 3], [file, 4], [file, 6]]);
 });
 
 test('flags extra static AppModel storage while allowing shared and computed properties', async t => {
@@ -249,7 +250,9 @@ test('flags extra static AppModel storage while allowing shared and computed pro
   const root = await fixture(t, {
     [file]: `final class AppModel {
       static let shared = live()
-      private static var alternateGraph: AppModel = live()
+      private static var alternateGraph:
+        AppModel
+        = live()
       static var title: String { "Home" }
       static func live() -> AppModel { AppModel() }
     }`
@@ -263,7 +266,8 @@ test('flags a mutable shared AppModel graph', async t => {
   const file = 'Application/2 - AppModel/AppModel.swift';
   const root = await fixture(t, {
     [file]: `final class AppModel {
-      private(set) static var shared: AppModel = live()
+      private(set) static var shared: AppModel
+        = live()
       static func live() -> AppModel { AppModel() }
     }`
   });

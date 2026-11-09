@@ -318,7 +318,7 @@ export async function inspect(project) {
         findings.push(finding('app-model-storage-construction', 'review', `${name} references a ModelContainer initializer. Trace whether it opens storage during graph construction. CFA opens the store within the storage owner’s data request.`, file, lineOf(source, opening + 1 + container.index)));
       }
     }
-    for (const match of appMembers.matchAll(/\bstatic[ \t]+(let|var)[ \t]+(\w+)[ \t]*(?::[^;=\n]+)?=(?!=)/g)) {
+    for (const match of appMembers.matchAll(/\bstatic[ \t]+(let|var)[ \t]+(\w+)[ \t]*(?::\s*[^;=\n]+)?\s*=(?!=)/g)) {
       const [, binding, name] = match;
       if (name === 'shared') {
         if (binding === 'var') findings.push(finding('app-model-mutable-shared', 'warning', 'AppModel.shared is mutable. Declare the production graph with static let shared and construct it through live().', appModelFile, lineOf(appModel, match.index)));
@@ -337,7 +337,7 @@ export async function inspect(project) {
         findings.push(finding('app-model-shared-factory', 'review', 'AppModel.shared does not visibly call live(). Trace its initializer and verify the production graph comes from the single live factory.', appModelFile, lineOf(appModel, sharedInitializer.index)));
       }
     }
-    for (const match of appMembers.matchAll(/(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(?:(?:private(?:\(set\))?|fileprivate|internal|public|package)[ \t]+)?(?:let|var)[ \t]+(\w+)[ \t]*=(?!=)/gm)) {
+    for (const match of appMembers.matchAll(/(?:^|(?<=;))[ \t]*(?:@[\w.]+(?:\([^\n)]*\))?[ \t]+)*(?:(?:private(?:\(set\))?|fileprivate|internal|public|package)[ \t]+)?(?:let|var)[ \t]+(\w+)\s*=(?!=)/gm)) {
       const line = lineOf(appModel, match.index);
       findings.push(finding('app-model-default-value', 'warning', `AppModel property ${match[1]} has a default value; initialise it in the explicit initializer.`, appModelFile, line));
       const start = match.index + match[0].length;
