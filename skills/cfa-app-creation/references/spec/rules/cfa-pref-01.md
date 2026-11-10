@@ -12,6 +12,6 @@
 
 **Explanation:** [Why use recoverable storage requests in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/storage-failures).
 
-**Verify:** Test a supported preference, missing and obsolete values, and genuine read and write failures. Verify that fallback preserves the stored value where required.
+**Verify:** Restore a supported value, then exercise missing and obsolete values separately. Verify that each fallback uses the product’s safe default without asking the user to intervene. Check that restoration preserves the stored value when the product requires it. For storage that reports write outcomes, fail a subsequent user change and verify the previous effective preference stays visible and the error is reported. Test corrupt or unreadable storage separately from a readable obsolete value.
 
 **Full rule, context and examples:** [Keep Persistence Behind Repository Contracts](../topics/19-keep-persistence-behind-repository-contracts.md). This card is a reading aid; apply the complete canonical section.

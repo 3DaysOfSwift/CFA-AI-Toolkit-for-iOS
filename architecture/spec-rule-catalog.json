@@ -482,7 +482,7 @@
       "rule": "Use a product-defined safe fallback for a missing or obsolete non-critical preference in a recognised format. Preserve the old value where appropriate and replace it only through an intentional migration or a successful user choice. Report unreadable or corrupt durable storage and failed writes as errors.",
       "why": "An old theme should not force the user to solve an internal compatibility issue.",
       "example": "An unavailable saved colour theme falls back to system appearance.",
-      "verify": "Test a supported preference, missing and obsolete values, and genuine read and write failures. Verify that fallback preserves the stored value where required.",
+      "verify": "Restore a supported value, then exercise missing and obsolete values separately. Verify that each fallback uses the product’s safe default without asking the user to intervene. Check that restoration preserves the stored value when the product requires it. For storage that reports write outcomes, fail a subsequent user change and verify the previous effective preference stays visible and the error is reported. Test corrupt or unreadable storage separately from a readable obsolete value.",
       "explanationIds": [
         "storage-failures"
       ]
