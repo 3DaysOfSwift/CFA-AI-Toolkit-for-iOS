@@ -974,6 +974,12 @@ export async function inspect(project) {
     const viewModel = viewModelDeclaration ? candidateViewModel : undefined;
     const viewModelBodyStart = viewModelDeclaration ? viewModelDeclaration.index + viewModelDeclaration[0].length : 0;
     const viewModelBody = viewModelDeclaration ? braceBody(viewModel, viewModelBodyStart - 1) : '';
+    if (viewModel) {
+      const explicitlyNonisolated = new RegExp(`\\bnonisolated\\s+(?:(?:final|public|internal|private|fileprivate|package|open)\\s+)*class\\s+${viewModelName}\\b`).exec(viewModel);
+      if (explicitlyNonisolated) {
+        findings.push(finding('view-model-isolation', 'review', `${viewModelName} declares nonisolated. Verify its effective isolation; CFA screen ViewModels use MainActor.`, viewModelFile, lineOf(viewModel, explicitlyNonisolated.index)));
+      }
+    }
     const dependencySources = viewModel ? [
       {file: viewModelFile, source: viewModel, offset: viewModelBodyStart, body: viewModelBody},
       ...(extensionsByName.get(viewModelName) ?? [])

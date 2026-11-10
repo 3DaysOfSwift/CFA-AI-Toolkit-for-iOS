@@ -270,6 +270,21 @@ test('locates labelled Task operations in screen and ViewModel initializers', as
     .map(item => [item.file, item.line]), [[viewPath, 4], [modelFile, 3], [modelFile, 6]]);
 });
 
+test('reviews an explicitly nonisolated screen ViewModel', async t => {
+  const modelFile = viewPath.replace('View.swift', 'ViewModel.swift');
+  const { report } = await inspectView(t, `struct HomeView: View {
+    @State private var viewModel = HomeViewModel()
+    var body: some View { Text("Home") }
+  }`, {
+    [modelFile]: `nonisolated final class HomeViewModel {
+      init() {}
+    }`
+  });
+  const finding = report.findings.find(item => item.code === 'view-model-isolation');
+  assert.deepEqual([finding?.file, finding?.line, finding?.severity], [modelFile, 1, 'review']);
+  assert.match(finding.message, /use MainActor/);
+});
+
 test('reviews direct work started by screen and ViewModel initializers', async t => {
   const modelFile = viewPath.replace('View.swift', 'ViewModel.swift');
   const { report } = await inspectView(t, `struct HomeView: View {
