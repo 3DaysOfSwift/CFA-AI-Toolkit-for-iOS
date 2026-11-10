@@ -82,6 +82,8 @@
 				<string>17.0</string>
 				<key>SWIFT_STRICT_CONCURRENCY</key>
 				<string>complete</string>
+				<key>SWIFT_DEFAULT_ACTOR_ISOLATION</key>
+				<string>nonisolated</string>
 				<key>PRODUCT_BUNDLE_IDENTIFIER</key>
 				<string>___VARIABLE_bundleIdentifierPrefix___.___PROJECTNAME:identifier___.___PACKAGENAME:identifier___</string>
 			</dict>

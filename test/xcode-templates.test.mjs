@@ -292,6 +292,22 @@ test('application templates reference every shipped source in the app target', (
   }
 });
 
+test('template targets use explicit Swift 6 isolation and concurrency settings', () => {
+  for (const name of names) {
+    const directory = path.join(root, 'templates/Xcode/Project Templates/iOS/Application');
+    const appInfo = JSON.parse(execFileSync('plutil', ['-convert', 'json', '-o', '-', path.join(directory, `${name}.xctemplate/TemplateInfo.plist`)], { encoding: 'utf8' }));
+    const testInfo = JSON.parse(execFileSync('plutil', ['-convert', 'json', '-o', '-', path.join(directory, `${name} Tests.xctemplate/TemplateInfo.plist`)], { encoding: 'utf8' }));
+    const appSettings = appInfo.Targets.find(target => target.TargetIdentifier === 'com.apple.dt.applicationTarget').SharedSettings;
+    const testSettings = testInfo.Targets.find(target => target.TargetIdentifier === 'com.apple.dt.applicationUnitTestBundleTarget').SharedSettings;
+    for (const settings of [appSettings, testSettings]) {
+      assert.equal(settings.SWIFT_VERSION, '6.0', name);
+      assert.equal(settings.SWIFT_STRICT_CONCURRENCY, 'complete', name);
+      assert.equal(settings.SWIFT_DEFAULT_ACTOR_ISOLATION, 'nonisolated', name);
+    }
+    assert.equal(appSettings.ENABLE_TESTABILITY, 'YES', name);
+  }
+});
+
 test('new-project templates define the app display name from the product name', () => {
   for (const name of names) {
     const file = path.join(root, 'templates/Xcode/Project Templates/iOS/Application', `${name}.xctemplate/TemplateInfo.plist`);
