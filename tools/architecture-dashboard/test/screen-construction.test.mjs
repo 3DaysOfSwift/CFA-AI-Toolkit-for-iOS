@@ -293,6 +293,19 @@ test('selected detail data and owned State are reviewed rather than rejected', a
   assert.ok(findings.every(item => item.severity === 'review'));
 });
 
+test('reports naming separately for an emoji-named detail ViewModel', async t => {
+  const {report} = await inspectView(t, `struct HomeView: View {
+    @State private var 🚀: HomeViewModel
+    init(snapshot: HomeSnapshot) {
+      _🚀 = State(wrappedValue: HomeViewModel(snapshot: snapshot))
+    }
+    var body: some View { Text("Home") }
+  }`);
+  assert.equal(report.screens[0].ownsViewModel, true);
+  assert.equal(report.findings.find(item => item.code === 'view-model-property-name')?.line, 2);
+  assert.ok(!report.findings.some(item => item.code === 'view-model-ownership'));
+});
+
 test('recognises a detail ViewModel initialized through its wrapped property', async t => {
   const {report, findings} = await inspectView(t, `struct HomeView: View {
     @State private var viewModel: HomeViewModel

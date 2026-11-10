@@ -995,18 +995,22 @@ export async function inspect(project) {
     const hasCompetingViewModels = (declarationsByName.get(viewModelName)?.length ?? 0) > 1;
     const testFile = testCandidates.length === 1 && !hasCompetingViewModels ? testCandidates[0] : null;
     const viewModelTypePattern = `(?:(?:\\w+\\s*\\.\\s*)*${viewModelName})`;
+    const stateIdentifierHead = String.raw`\p{L}_\p{Extended_Pictographic}\p{Regional_Indicator}`;
+    const stateIdentifierContinuation = String.raw`${stateIdentifierHead}\p{M}\p{N}\p{Emoji_Modifier}\u200D`;
+    const stateIdentifier = `[${stateIdentifierHead}][${stateIdentifierContinuation}]*`;
+    const statePropertyNamePattern = '(?:`(' + stateIdentifier + ')`|(' + stateIdentifier + '))';
     const stateTypePattern = `(?:SwiftUI\\s*\\.\\s*)?State`;
-    const statePattern = new RegExp(`@${stateTypePattern}\\s+private\\s+var\\s+${propertyNamePattern}(?:\\s*:\\s*${viewModelTypePattern})?\\s*=\\s*${viewModelTypePattern}(?:\\s*\\.\\s*init)?\\s*\\(\\s*\\)(?!\\s*\\.)`, 'u');
-    const typedStatePattern = new RegExp(`@${stateTypePattern}\\s+private\\s+var\\s+${propertyNamePattern}\\s*:\\s*${viewModelTypePattern}\\s*=\\s*\\.init\\s*\\(\\s*\\)(?!\\s*\\.)`, 'u');
+    const statePattern = new RegExp(`@${stateTypePattern}\\s+private\\s+var\\s+${statePropertyNamePattern}(?:\\s*:\\s*${viewModelTypePattern})?\\s*=\\s*${viewModelTypePattern}(?:\\s*\\.\\s*init)?\\s*\\(\\s*\\)(?!\\s*\\.)`, 'u');
+    const typedStatePattern = new RegExp(`@${stateTypePattern}\\s+private\\s+var\\s+${statePropertyNamePattern}\\s*:\\s*${viewModelTypePattern}\\s*=\\s*\\.init\\s*\\(\\s*\\)(?!\\s*\\.)`, 'u');
     const inlineState = statePattern.exec(members) ?? typedStatePattern.exec(members);
     let ownedState = inlineState && { name: inlineState[1] ?? inlineState[2], index: inlineState.index };
     const typedStateProperties = [...members.matchAll(new RegExp(
-      `@${stateTypePattern}\\s+private\\s+var\\s+${propertyNamePattern}\\s*:\\s*${viewModelTypePattern}\\b(?!\\s*\\.)`, 'gu'
+      `@${stateTypePattern}\\s+private\\s+var\\s+${statePropertyNamePattern}\\s*:\\s*${viewModelTypePattern}\\b(?!\\s*\\.)`, 'gu'
     ))].filter(match => !hasComputedAccessor(body.slice(match.index + match[0].length)))
       .map(match => ({ name: match[1] ?? match[2], index: match.index }));
     function stateAssignmentTarget(name, explicitSelf = false) {
       const receiver = explicitSelf ? String.raw`self\s*\.\s*` : String.raw`(?:self\s*\.\s*)?`;
-      return String.raw`(?<![\p{L}\p{M}\p{N}_\x60])(?<!\.\s*)${receiver}(?:\x60${name}\x60|${name})\s*=`;
+      return String.raw`(?<![${stateIdentifierContinuation}\x60])(?<!\.\s*)${receiver}(?:\x60${name}\x60|${name})\s*=`;
     }
     const dependencies = [];
     const initializerLocations = [
