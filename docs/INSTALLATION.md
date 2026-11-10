@@ -159,6 +159,11 @@ compatibility with every host version.
 
 ## Claude Code and other portable skill hosts
 
+Run the installer commands in this section from the extracted plugin release,
+which contains `checksums.json`. A Git source checkout intentionally does not
+contain that generated release inventory; copy its eight `skills` folders
+manually when installing directly from source.
+
 ```sh
 node scripts/install.mjs --mode skills --skills-directory ~/.claude/skills
 ```

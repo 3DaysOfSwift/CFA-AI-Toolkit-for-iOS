@@ -183,12 +183,14 @@ without you having to paste its rules into every prompt.
 
 ### Claude Code and other AI coding tools
 
-The portable CFA AI Toolkit for iOS skills are in the repository’s `skills` folder. Copy
-all eight folders inside it, without renaming them, into the folder where your
-AI coding tool reads skills.
+The portable CFA AI Toolkit for iOS skills are in both the extracted plugin
+release and the repository’s `skills` folder. The checksummed installer below
+must be run from the extracted plugin release. If you are working from a Git
+source checkout, copy all eight skill folders manually; the source checkout
+intentionally has no release checksum inventory.
 
-For Claude Code, that folder is commonly `~/.claude/skills`. This command copies
-the skills there for you:
+For Claude Code, the destination is commonly `~/.claude/skills`. From the
+extracted plugin release, this command copies the skills there for you:
 
 ```sh
 node scripts/install.mjs --mode skills --skills-directory ~/.claude/skills

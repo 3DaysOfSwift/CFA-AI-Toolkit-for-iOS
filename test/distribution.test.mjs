@@ -20,6 +20,16 @@ test('public architecture map uses the canonical CFA folder names', () => {
  assert.doesNotMatch(readme,/│   └── Networking & Data Storage|    ├── ViewModelTests\n/);
 });
 
+test('portable installation guidance distinguishes releases from source checkouts', () => {
+ const readme=fs.readFileSync(path.join(root,'README.md'),'utf8');
+ const installation=fs.readFileSync(path.join(root,'docs/INSTALLATION.md'),'utf8');
+ for(const text of [readme,installation]) {
+  assert.match(text,/extracted plugin release/);
+  assert.match(text,/source checkout[\s\S]{0,200}intentionally (?:has no|does not\s+contain)/);
+  assert.match(text,/copy [^\n]{0,80}eight [^\n]{0,30}folders\s+manually/);
+ }
+});
+
 test('command modules can be imported from Node standard input', () => {
  const modules = [
   'scripts/build.mjs',
