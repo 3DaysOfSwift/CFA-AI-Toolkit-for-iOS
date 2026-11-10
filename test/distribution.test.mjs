@@ -200,6 +200,18 @@ test('release validation rejects a default prompt that does not invoke its skill
  assert.throws(()=>validate(source,{source:false}),/default prompt does not invoke \$cfa-feature-work/);
 });
 
+test('release validation rejects malformed skill interface metadata', t => {
+ const {source}=release(t);
+ const metadata=path.join(source,'skills/cfa-feature-work/agents/openai.yaml');
+ const original=fs.readFileSync(metadata,'utf8');
+ fs.writeFileSync(metadata,original.replace('"CFA Feature Work"','CFA Feature Work'));
+ assert.throws(()=>validate(source,{source:false}),/strings must be quoted and non-empty/);
+ fs.writeFileSync(metadata,original.replace('Add, change or remove a CFA iOS app feature','Too short'));
+ assert.throws(()=>validate(source,{source:false}),/25 to 64 characters/);
+ fs.writeFileSync(metadata,`${original}  display_name: "Duplicate"\n`);
+ assert.throws(()=>validate(source,{source:false}),/metadata structure/);
+});
+
 test('release validation rejects a missing workflow policy and an entry point that bypasses it', t => {
  const {source}=release(t);
  const skill=path.join(source,'skills/cfa-feature-work');

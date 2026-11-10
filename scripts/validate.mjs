@@ -9,6 +9,34 @@ import { verifyXcodeTemplateStructure } from './verify-xcode-template-structure.
 import { verifyTemplateOrientations } from './verify-ios-orientations.mjs';
 import { specTopics } from './spec-topics.mjs';
 const productDescription = 'CFA AI Toolkit for iOS: AI skills and tools to build, modernise, test and maintain SwiftUI apps with Swift Concurrency.';
+function validateSkillInterface(file, name) {
+  const lines = fs.readFileSync(file, 'utf8').trimEnd().split(/\r?\n/);
+  const required = ['display_name', 'short_description', 'default_prompt'];
+  if (lines[0] !== 'interface:' || lines.length !== required.length + 1) {
+    throw Error(`Invalid skill interface metadata structure: ${name}`);
+  }
+  const values = new Map();
+  for (const line of lines.slice(1)) {
+    const match = line.match(/^  ([a-z_]+): (.+)$/);
+    if (!match || !required.includes(match[1]) || values.has(match[1])) {
+      throw Error(`Invalid skill interface metadata structure: ${name}`);
+    }
+    let value;
+    try { value = JSON.parse(match[2]); } catch { /* handled below */ }
+    if (typeof value !== 'string' || !value.trim()) {
+      throw Error(`Skill interface strings must be quoted and non-empty: ${name}`);
+    }
+    values.set(match[1], value);
+  }
+  for (const field of required) if (!values.has(field)) throw Error(`Missing ${field} in skill interface metadata: ${name}`);
+  const description = values.get('short_description');
+  if (description.length < 25 || description.length > 64) {
+    throw Error(`Skill short_description must contain 25 to 64 characters: ${name}`);
+  }
+  if (!new RegExp(`\\$${name}(?![a-z0-9-])`).test(values.get('default_prompt'))) {
+    throw Error(`Skill default prompt does not invoke $${name}: ${name}`);
+  }
+}
 export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
   const skillEntries = fs.readdirSync(path.join(base, 'skills'), { withFileTypes: true });
   const actualSkills = skillEntries.map(entry => entry.name).sort();
@@ -94,15 +122,7 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
     }
     const agentMetadata = path.join(skill, 'agents/openai.yaml');
     if (!fs.existsSync(agentMetadata)) throw Error(`Missing skill interface metadata: ${name}`);
-    const interfaceText = fs.readFileSync(agentMetadata, 'utf8');
-    for (const field of ['display_name', 'short_description', 'default_prompt']) {
-      if (!new RegExp(`^\\s{2}${field}:\\s+\\S`, 'm').test(interfaceText)) {
-        throw Error(`Missing ${field} in skill interface metadata: ${name}`);
-      }
-    }
-    if (!interfaceText.includes(`$${name}`)) {
-      throw Error(`Skill default prompt does not invoke $${name}: ${name}`);
-    }
+    validateSkillInterface(agentMetadata, name);
     // A colon followed by whitespace is invalid in a plain YAML scalar. This
     // catches a common metadata mistake; it is not a complete YAML parser.
     const frontmatter = text.match(/^---\s*\n([\s\S]*?)\n---(?:\s|$)/)?.[1] ?? '';
