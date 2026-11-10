@@ -340,6 +340,11 @@ test('completion is not inferred from a build pass or tests at a different commi
     assert.ok(inspectRecord(f.file).errors.includes(
       `completionGate.${field}: ${review.id} names only unrelated targets.`
     ));
+    review.targets = ['App'];
+    f.write();
+    assert.ok(inspectRecord(f.file).errors.includes(
+      `completionGate.${field}: ${review.id} omits affected targets: Widget.`
+    ));
     review.targets = ['App', 'Widget'];
   }
   const architectureReview = f.record.completionGate.manualArchitectureReviewEvidenceId;

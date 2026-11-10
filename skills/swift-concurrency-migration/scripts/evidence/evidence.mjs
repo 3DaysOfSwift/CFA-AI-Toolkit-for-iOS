@@ -283,9 +283,13 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
           } else if (!item.targets.some(target => gate.affectedTargets.includes(target))) {
             errors.push(`completionGate.${field}: ${item.id} names only unrelated targets.`);
           }
-        } else if (['navigatorEvidenceId', 'manualArchitectureReviewEvidenceId'].includes(field) &&
-                   item.targets?.length && !item.targets.some(target => gate.affectedTargets.includes(target))) {
-          errors.push(`completionGate.${field}: ${item.id} names only unrelated targets.`);
+        } else if (['navigatorEvidenceId', 'manualArchitectureReviewEvidenceId'].includes(field) && item.targets?.length) {
+          const missing = gate.affectedTargets.filter(target => !item.targets.includes(target));
+          if (missing.length === gate.affectedTargets.length) {
+            errors.push(`completionGate.${field}: ${item.id} names only unrelated targets.`);
+          } else if (missing.length) {
+            errors.push(`completionGate.${field}: ${item.id} omits affected targets: ${missing.join(', ')}.`);
+          }
         } else if (field === 'testEvidenceId') {
           if (!item.targets?.length) {
             errors.push(`completionGate.${field}: ${item.id} must name the targets exercised by the test run.`);

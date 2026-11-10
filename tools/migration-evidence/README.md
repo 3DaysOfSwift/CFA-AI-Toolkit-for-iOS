@@ -118,7 +118,8 @@ Verify that the new command exercises the failed check and explain how the
 rerun resolves the failure. Check that minimum-OS evidence lists every
 affected target. Navigator and human architecture reviews can
 cover the whole project without a target list. When they name targets, the
-validator rejects a list containing only unrelated targets. If evidence is
+list must include every affected target. The reviewer verifies coverage when
+the evidence describes the project as a whole. If evidence is
 shared with another checkpoint, record the human architecture review and
 its outcome separately within that evidence. For a completed record, the validator flags checks recorded as not run during
 or after migration. Link equivalent passing final-commit evidence or explain
