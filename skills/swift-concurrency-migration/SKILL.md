@@ -144,9 +144,12 @@ Use deliberate passes:
    For changed listeners, apply the
    [app-wide listener rule](references/spec/rules/cfa-app-02.md). Record the
    original delivery behaviour and verify that repeated startup forwards a
-   controlled event once with no relevant screen mounted. If replacement is
-   supported, verify that the old listener stops forwarding and its cleanup
-   leaves the replacement running.
+   controlled event once with no relevant screen mounted. When both lifetimes
+   are involved, verify that leaving the screen ends screen-only observation
+   while app-wide events still reach the Feature. If cancellation is supported,
+   verify that the stopped listener no longer forwards events. If replacement
+   is supported, verify that delayed cleanup leaves the replacement running.
+   Shut down isolated listeners during test cleanup.
    Features may start asynchronous work without making launch wait for disk or
    network completion. Do not move GCD syntax mechanically during this pass.
    For existing background capabilities, apply the

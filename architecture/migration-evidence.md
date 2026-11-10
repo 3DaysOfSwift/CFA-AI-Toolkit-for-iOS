@@ -139,6 +139,16 @@ open. The presence of a baseline test or observation in the validator establishe
 that a baseline was recorded. The reviewer establishes coverage of each affected
 target and scenario.
 
+For each affected system background capability, use the linked final CFA
+audit to identify the owning Feature and system mechanism. Cite baseline and
+final evidence for permitted identifiers, once-only synchronous registration
+and separate scheduling. Link controlled results showing exactly-once system
+completion for success, failure, expiration and expiration racing normal
+completion. Verify cancellation of the owned work on expiration. Link
+supported-device delivery and its observed outcome separately, or record
+the device verification gap. The reviewer establishes coverage of these
+scenarios from the linked evidence.
+
 In the final CFA audit, compare the resolved bundle identifiers of existing
 app and test targets against the baseline for each affected build
 configuration. Cite the before and after build settings, and record any
