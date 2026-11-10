@@ -113,9 +113,9 @@ the architecture:
 10. A production SwiftData repository with non-trivial reads, writes, imports
     or data sets uses a dedicated `@ModelActor`. Keep its `ModelContext` and
     SwiftData records within the storage boundary and return immutable
-    `Sendable` domain values to the MainActor Feature. Use the MainActor
-    context exception only for deliberately UI-owned work proven short.
-    The storage boundary still applies in that case.
+    `Sendable` domain values to the MainActor Feature. The storage
+    implementation owns the context for small stores too. Views and previews
+    reach storage through their ViewModel and Feature.
 11. Views remain declarative. Bundle/system reads and presentation formatting
     belong to the adjacent ViewModel; business, persistence, and shared state
     belong to the owning Feature.
@@ -480,9 +480,9 @@ operations enforce authorisation independently.
   `ModelContainer` outside the storage boundary, and requests started directly
   through `URLSession` outside `NetworkingManager`. Verify whether other
   `URLSession` references only configure or inject the session.
-- Confirm that storage work does not leak SwiftData `@Model` objects across an
-  actor boundary, and that a `@ModelActor` is used where database work is not
-  deliberately small and UI-owned.
+- Confirm that SwiftData contexts and `@Model` objects stay within the storage
+  implementation. For non-trivial production database work, verify that a
+  dedicated `@ModelActor` owns the context and expensive work runs off MainActor.
 - For changed record-level writes, overlap edits to different records and
   verify that both changes survive reopening the store.
 - If a change affects durable storage, reopen a disposable store created
