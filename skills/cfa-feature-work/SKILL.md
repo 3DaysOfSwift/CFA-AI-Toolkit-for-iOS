@@ -141,9 +141,12 @@ listeners needed regardless of which screen is visible. The responsible
 Feature interprets forwarded events and owns the resulting state. Keep
 screen-only observation scoped to the screen or its ViewModel. For a changed
 app-wide listener, verify that repeated launch signals still leave one listener
-and that events reach the Feature with no relevant screen open. If replacement
-is supported, verify that the old listener stops forwarding and its cleanup
-leaves the replacement running.
+and that events reach the Feature with no relevant screen open. When both
+lifetimes are involved, verify that leaving the screen ends its observation
+while app-wide events still reach the Feature. If cancellation is supported,
+verify that the stopped listener no longer forwards events. If replacement
+is supported, also verify that delayed cleanup leaves the replacement running.
+Shut down isolated listeners during test cleanup.
 
 For system background work in scope, apply the
 [background-work rule](references/spec/rules/cfa-bg-01.md). Keep registration

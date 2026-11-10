@@ -251,9 +251,12 @@ reaches the service. Exercise failure and verify a subsequent retry can start.
 When AppModel owns app-wide listeners,
 supply a controlled event source and observe the receiving Feature. Verify
 repeated startup signals start each listener once and that events reach the
-Feature without a screen. Where cancellation or replacement is supported,
-verify that the old listener stops forwarding and its cleanup leaves the
-replacement running. Shut down isolated listeners during test cleanup.
+Feature without a screen. When both listener lifetimes are in scope, leave
+the screen and verify that screen-only observation ends while app-wide
+events still reach the Feature. If cancellation is supported, verify that
+the stopped listener no longer forwards events. If replacement is supported,
+also verify that delayed cleanup leaves the replacement running. Shut down
+isolated listeners during test cleanup.
 
 For a changed observer-backed stream that supports resubscription, hold the
 old registration's teardown pending and register its replacement. Deliver a

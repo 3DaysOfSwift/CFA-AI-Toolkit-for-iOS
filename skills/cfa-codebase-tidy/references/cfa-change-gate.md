@@ -493,9 +493,10 @@ operations enforce authorisation independently.
   secrets by source location without reproducing their values.
 - For changed app-wide listeners, drive a controlled event source after repeated
   startup signals. Verify a single listener forwards events to the owning
-  Feature with no screen present. Where cancellation or replacement is
-  supported, verify that the old listener stops forwarding events and that its
-  cleanup leaves the replacement running. Shut down isolated listeners during
+  Feature with no screen present. If cancellation is supported, verify that
+  the stopped listener no longer forwards events. If replacement is supported,
+  also verify that delayed cleanup leaves the replacement running. Shut down
+  isolated listeners during
   test cleanup. For screen-only observation, leave the screen and verify
   its observation ends while app-wide event delivery continues.
 - For changed observer-backed streams that support resubscription, verify that

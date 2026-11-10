@@ -285,11 +285,13 @@ the app lifecycle callback to AppModel's listener startup and retained
 task handle, then follow an event to the Feature that interprets it and
 owns the resulting state. After repeated startup signals, use a controlled
 event source to verify that one listener forwards each event with no relevant
-screen mounted. Where cancellation or replacement is supported, verify that
-the old listener stops forwarding and its cleanup leaves the replacement
-running. Check that isolated tests shut down their listeners. For screen-only
-observation, check the screen or ViewModel lifetime instead. Record which
-behaviour is supported by source and which was exercised by tests.
+screen mounted. If cancellation is supported, verify that the stopped listener
+no longer forwards events. If replacement is supported, also verify that
+delayed cleanup leaves the replacement running. Check that isolated tests
+shut down their listeners. For screen-only observation, trace the screen or
+ViewModel lifetime. When both lifetimes are involved, verify that leaving the
+screen ends its observation while app-wide events still reach the Feature.
+Record which behaviour is supported by source and which was exercised by tests.
 
 When reviewing scheduled background work, apply the
 [background-work rule](references/spec/rules/cfa-bg-01.md). Check that each
