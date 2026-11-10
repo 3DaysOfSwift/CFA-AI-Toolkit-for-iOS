@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import { createReadStream } from 'node:fs';
 import path from 'node:path';
 import { dashboard } from './dashboard.mjs';
 import { createHash } from 'node:crypto';
@@ -94,7 +95,7 @@ const excluded = new Set(['.git', '.build', '.swiftpm', 'Pods', 'Carthage', 'nod
 export async function analyse(root, { includeTests = false, excludedOutput } = {}) {
   root = await fs.realpath(root);
   if (!(await fs.stat(root)).isDirectory()) throw new Error('Repository path must be a directory.');
-  const files = [], skipped = [], excludedTestDirectories = [], buildDefinitions = [], symbolicLinks = [], invalidSourceHashes = [];
+  const files = [], skipped = [], excludedTestDirectories = [], buildDefinitions = [], symbolicLinks = [], skippedSourceHashes = [];
   const decoder = new TextDecoder('utf-8', {fatal: true, ignoreBOM: true});
   async function walk(directory, scanSwift = true) {
     for (const entry of (await fs.readdir(directory, { withFileTypes: true })).sort((a,b) => a.name.localeCompare(b.name))) {
@@ -121,7 +122,15 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
         const swiftSource = scanSwift && entry.name.endsWith('.swift');
         if (!buildDefinition && !swiftSource) continue;
         const relative = path.relative(root, absolute).split(path.sep).join('/');
-        if (swiftSource && (await fs.stat(absolute)).size > 2_000_000) { skipped.push({ file: relative, reason: 'Over 2 MB source limit' }); continue; }
+        if (swiftSource && (await fs.stat(absolute)).size > 2_000_000) {
+          skipped.push({ file: relative, reason: 'Over 2 MB source limit' });
+          const hash = createHash('sha256');
+          for await (const chunk of createReadStream(absolute)) hash.update(chunk);
+          const digest = hash.digest('hex');
+          skippedSourceHashes.push([relative, digest]);
+          if (buildDefinition) buildDefinitions.push([relative, digest]);
+          continue;
+        }
         const bytes = await fs.readFile(absolute);
         const hash = createHash('sha256').update(bytes).digest('hex');
         if (buildDefinition) buildDefinitions.push([relative, hash]);
@@ -131,12 +140,12 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
             source = decoder.decode(bytes);
           } catch {
             skipped.push({file:relative, reason:'Source is not valid UTF-8'});
-            invalidSourceHashes.push([relative, hash]);
+            skippedSourceHashes.push([relative, hash]);
             continue;
           }
           if (source.includes('\0')) {
             skipped.push({file:relative, reason:'Source contains a null byte'});
-            invalidSourceHashes.push([relative, hash]);
+            skippedSourceHashes.push([relative, hash]);
             continue;
           }
           files.push({ path: relative, hash, lineCount: source.split(/\r\n|\n|\r/).length, ...scanSource(source, relative) });
@@ -149,7 +158,7 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
   if (excludedTestDirectories.length) fingerprint.update(JSON.stringify(excludedTestDirectories));
   if (buildDefinitions.length) fingerprint.update(JSON.stringify(buildDefinitions));
   if (skipped.length) fingerprint.update(JSON.stringify(skipped));
-  if (invalidSourceHashes.length) fingerprint.update(JSON.stringify(invalidSourceHashes));
+  if (skippedSourceHashes.length) fingerprint.update(JSON.stringify(skippedSourceHashes));
   if (symbolicLinks.length) fingerprint.update(JSON.stringify(symbolicLinks));
   const sourceFingerprint = fingerprint.digest('hex');
   return { schemaVersion: 3, sourceFingerprint, buildDefinitions: buildDefinitions.map(([file, hash]) => ({path: file, hash})), dashboard: dashboard(files), project: path.basename(root), generatedAt: new Date().toISOString(),

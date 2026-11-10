@@ -168,6 +168,22 @@ test('reports invalid Swift source instead of scanning replacement characters', 
   assert.notEqual(changed.sourceFingerprint, report.sourceFingerprint);
 });
 
+test('fingerprints skipped Swift source above the scan limit', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cfa-oversized-source-'));
+  t.after(() => fs.rm(root, {recursive:true, force:true}));
+  const file = path.join(root, 'Oversized.swift');
+  const source = Buffer.alloc(2_000_001, 0x20);
+  await fs.writeFile(file, source);
+  const before = await analyse(root);
+  assert.deepEqual(before.files, []);
+  assert.deepEqual(before.scope.skipped, [{file:'Oversized.swift', reason:'Over 2 MB source limit'}]);
+  source[0] = 0x0a;
+  await fs.writeFile(file, source);
+  const after = await analyse(root);
+  assert.deepEqual(after.scope.skipped, before.scope.skipped);
+  assert.notEqual(after.sourceFingerprint, before.sourceFingerprint);
+});
+
 test('preserves evidence line numbers and comment boundaries for mixed line endings', () => {
   const source = '// Task {}\rstruct Example {}\r\nTask {}\nTask {}';
   const report = scanSource(source, 'Example.swift');
