@@ -5,7 +5,7 @@ skills evolve. They are not application templates and are not copied into a
 developer's Xcode project.
 
 Run `npm run evals` to check required markers in the flat-app, migration
-handoff, product-design and explanation fixtures. This structural check
+handoff, migration-continuation, product-design and explanation fixtures. This structural check
 verifies the fixture files. Run the cases in an installed host to verify
 responses.
 
@@ -34,6 +34,13 @@ host follows the completion gate when builds pass but placement, hybrid paths,
 shared refresh lifetime and background behaviour still need verification.
 Review each claimed outcome against the rubric. A foreground test cannot
 establish system background delivery or completion during expiration.
+
+## Migration continuation
+
+Use the [migration continuation case](migration-continuation.md) to verify that
+an installed host keeps implementing safe, authorised migration slices without
+requiring repeated “continue” prompts. It may stop only at the final completion
+gate or a genuine blocker that prevents every remaining meaningful action.
 
 ## Product-design scope
 
