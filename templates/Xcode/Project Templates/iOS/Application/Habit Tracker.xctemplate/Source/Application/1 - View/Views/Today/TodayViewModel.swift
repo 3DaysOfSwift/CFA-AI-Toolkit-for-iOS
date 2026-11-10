@@ -120,10 +120,21 @@ final class TodayViewModel {
                     let draftStillMatches = amountDrafts[habitID].map { Int($0) == value } ?? true
                     if pendingValues[habitID] == nil && draftStillMatches {
                         failedValues[habitID] = value
-                        errorMessage = error.localizedDescription
+                        errorMessage = message(for: error)
                     }
                 }
             }
+        }
+    }
+
+    private func message(for error: any Error) -> String {
+        guard let habitError = error as? HabitError else {
+            return "Your progress could not be saved. Please try again."
+        }
+        return switch habitError {
+        case .invalidEntry: "A recorded amount cannot be negative."
+        case .habitNotFound: "This habit is no longer available."
+        case .invalidName, .invalidTarget: "Your progress could not be saved. Please try again."
         }
     }
 }

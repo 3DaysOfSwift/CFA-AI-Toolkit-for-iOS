@@ -24,13 +24,22 @@ test('generated template files import the frameworks used by their declarations'
 test('Habit Tracker keeps operation failures in Features and presentation text in ViewModels', () => {
   const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/Habit Tracker.xctemplate/Source/Application');
   const feature = fs.readFileSync(path.join(source, '2 - AppModel/Features/Habits/HabitsFeature.swift'), 'utf8');
+  const domain = fs.readFileSync(path.join(source, '2 - AppModel/Features/Habits/Habit.swift'), 'utf8');
+  const repository = fs.readFileSync(path.join(source, '2 - AppModel/User Data Storage/Local/HabitRepository.swift'), 'utf8');
   assert.match(feature, /private\(set\) var loadError: \(any Error\)\?/);
   assert.doesNotMatch(feature, /loadError\s*=\s*error\.localizedDescription/);
+  assert.doesNotMatch(domain, /LocalizedError|errorDescription/);
+  assert.doesNotMatch(repository, /LocalizedError|errorDescription/);
 
   for (const screen of ['Habits', 'Today', 'DayStreak']) {
     const viewModel = fs.readFileSync(path.join(source, `1 - View/Views/${screen}/${screen}ViewModel.swift`), 'utf8');
     assert.match(viewModel, /var loadError: String\?/);
     assert.match(viewModel, /\.loadError\.map/);
+  }
+  for (const screen of ['AddHabit', 'Today']) {
+    const viewModel = fs.readFileSync(path.join(source, `1 - View/Views/${screen}/${screen}ViewModel.swift`), 'utf8');
+    assert.match(viewModel, /private func message\(for error: any Error\)/);
+    assert.doesNotMatch(viewModel, /error\.localizedDescription/);
   }
 });
 

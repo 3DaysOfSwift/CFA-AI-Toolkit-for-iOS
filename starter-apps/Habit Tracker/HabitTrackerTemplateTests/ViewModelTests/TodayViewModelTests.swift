@@ -134,7 +134,7 @@ struct TodayViewModelTests {
         await viewModel.waitForPendingSaves()
         #expect(feature.habits.first?.value(on: testDate, calendar: .current) == 0)
         #expect(viewModel.amountText(for: habit) == "14")
-        #expect(viewModel.errorMessage != nil)
+        #expect(viewModel.errorMessage == "Your progress could not be saved. Please try again.")
         #expect(viewModel.needsRetry(habit))
 
         await repository.allowWrites()

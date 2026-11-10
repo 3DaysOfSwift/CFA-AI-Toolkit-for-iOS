@@ -50,13 +50,6 @@ actor HabitRepository: HabitsRepository {
     }
 }
 
-enum HabitStorageError: LocalizedError {
+enum HabitStorageError: Error {
     case invalidTrackingValue
-
-    var errorDescription: String? {
-        switch self {
-        case .invalidTrackingValue:
-            "A saved habit has an unsupported tracking type. Its data was left unchanged."
-        }
-    }
 }
