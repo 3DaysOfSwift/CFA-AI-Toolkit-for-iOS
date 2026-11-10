@@ -317,7 +317,7 @@ Application
 │   │   │   └── WeightEntry.swift
 │   │   └── Progress
 │   │       └── ProgressFeature.swift
-│   └── Networking & Data Storage
+│   └── User Data Storage
 │       ├── Protocols
 │       │   └── WeightRepository.swift
 │       └── Local
@@ -328,7 +328,7 @@ Application
 │   └── Date+Day.swift
 ├── Assets.xcassets
 └── ApplicationTests
-    ├── ViewModelTests
+    ├── View model tests
     │   └── GitReposViewModelTests.swift
     └── FeatureTests
         └── WeightLogFeatureTests.swift

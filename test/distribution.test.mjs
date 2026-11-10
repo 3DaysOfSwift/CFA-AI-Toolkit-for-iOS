@@ -13,6 +13,13 @@ import { json, hash, inventory, isReleasePath } from '../scripts/files.mjs';
 function sandbox(t) { const dir=fs.mkdtempSync(path.join(os.tmpdir(),'cfa-test-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));return dir; }
 function release(t) {const dir=sandbox(t);return {dir,source:stageRelease(path.join(dir,'ios-app-development-cfa'))};}
 
+test('public architecture map uses the canonical CFA folder names', () => {
+ const readme=fs.readFileSync(path.join(root,'README.md'),'utf8');
+ assert.match(readme,/User Data Storage/);
+ assert.match(readme,/View model tests/);
+ assert.doesNotMatch(readme,/│   └── Networking & Data Storage|    ├── ViewModelTests\n/);
+});
+
 test('release omits local Xcode state and build outputs, but retains shared project configuration', t => {
  for (const file of ['A.xcodeproj/xcuserdata/person.xcuserdatad/state', 'View.xcuserstate',
   '.DS_Store', 'App/.build/debug/out', 'App/DerivedData/out', 'App/.git/config']) assert.equal(isReleasePath(file),false,file);
