@@ -21,8 +21,9 @@ moved into the app target without checking its consumers and build constraints.
 
 For each move, preserve the relevant target memberships, package product and
 module boundaries, imports, access control, resources, build settings and tests.
-Update Xcode project or package references as appropriate, then build and run the
-affected targets and behaviour tests. Verify both filesystem and navigator; a
+Update Xcode project or package references and any path-dependent scripts.
+Verify resource lookup in each affected target, then build the targets and run
+their behaviour tests. Verify both filesystem and navigator; a
 cosmetic group alone does not move files or prove that they compile in the right
 target. Keep an intentional package placement when it is required or explicitly
 agreed, explain why it differs from the default map, and report an unresolved
