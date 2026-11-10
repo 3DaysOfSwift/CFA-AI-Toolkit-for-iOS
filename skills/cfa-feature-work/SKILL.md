@@ -241,7 +241,14 @@ If the project is already CFA, make the smallest complete vertical change:
    memberships that belong exclusively to the removed scope. Keep shared
    capabilities and the tests that cover their remaining callers. Remove stored
    data only when its retention requirements permit it.
-5. Give each new ViewModel and concrete Feature its own named test file and
+5. After replacing an implementation, apply the
+   [straightforward change rule](references/spec/rules/cfa-maint-01.md).
+   Check whether the change left an obsolete entry point, wrapper or duplicate
+   route. Before removing it, check callers across targets and system callbacks,
+   including references in project configuration. Preserve adapters still needed
+   for compatibility or remaining consumers. Verify the surviving routes after
+   cleanup.
+6. Give each new ViewModel and concrete Feature its own named test file and
    suite. For existing types, extend their suites to cover changed observable
    behaviour at the owning boundary. A new screen using an existing Feature
    needs its own ViewModel tests and can reuse that Feature’s API tests.
