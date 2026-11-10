@@ -172,6 +172,15 @@ test('template AppModel roots remain fixed composition graphs', () => {
   }
 });
 
+test('Day Streak omits a no-op application lifecycle adapter', () => {
+  const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/Day Streak.xctemplate/Source/Application');
+  const app = fs.readFileSync(path.join(source, '1 - View/___PACKAGENAMEASIDENTIFIER___App.swift'), 'utf8');
+  const appModel = fs.readFileSync(path.join(source, '2 - AppModel/AppModel.swift'), 'utf8');
+
+  assert.doesNotMatch(app, /UIApplicationDelegate|UIApplicationDelegateAdaptor|applicationDidFinishLaunching/);
+  assert.doesNotMatch(appModel, /didFinishLaunching|applicationDidFinishLaunching/);
+});
+
 test('template Apps compose presentation managers without another shared graph', () => {
   for (const [name, appFile] of [
     ['CFA App', '___PACKAGENAME:identifier___App.swift'],

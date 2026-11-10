@@ -22,8 +22,6 @@ struct AppModelTests {
 
         #expect(model.practiceFeature === first.practice)
         #expect(model.dayStreakFeature === first.streak)
-        model.applicationDidFinishLaunching()
-        model.applicationDidFinishLaunching()
         try await first.start()
         try await first.finish()
         #expect(model.dayStreakFeature.completedDayCount == 1)
