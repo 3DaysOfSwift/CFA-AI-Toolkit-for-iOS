@@ -88,6 +88,7 @@ test('Habit Tracker separates its Feature repository from its SwiftData model ac
 test('Habit Tracker keeps saved theme ownership in SettingsFeature', () => {
   const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/Habit Tracker.xctemplate/Source/Application');
   const feature = fs.readFileSync(path.join(source, '2 - AppModel/Features/Settings/SettingsFeature.swift'), 'utf8');
+  const palette = fs.readFileSync(path.join(source, '1 - View/Theme/AppColourTheme.swift'), 'utf8');
   const manager = fs.readFileSync(path.join(source, '1 - View/Theme/ThemeManager.swift'), 'utf8');
   const viewModel = fs.readFileSync(path.join(source, '1 - View/Views/Settings/SettingsViewModel.swift'), 'utf8');
   const view = fs.readFileSync(path.join(source, '1 - View/Views/Settings/SettingsView.swift'), 'utf8');
@@ -96,6 +97,7 @@ test('Habit Tracker keeps saved theme ownership in SettingsFeature', () => {
   assert.match(feature, /func selectTheme\(_ theme: ThemeSelection\)/);
   assert.doesNotMatch(feature, /SwiftUI|ColorScheme|Color\(/);
   assert.doesNotMatch(manager, /UserDefaults|defaults\.set/);
+  assert.doesNotMatch(palette, /let name: String/);
   assert.match(manager, /private let settingsFeature: SettingsFeature/);
   assert.match(viewModel, /func selectTheme\(_ theme: ThemeSelection\)/);
   assert.match(view, /set: \{ viewModel\.selectTheme\(\$0\) \}/);
@@ -143,6 +145,7 @@ test('Habit Tracker Pro keeps root and saved appearance state at CFA boundaries'
   const settingsFeature = fs.readFileSync(path.join(source, '2 - AppModel/Features/Settings/SettingsFeature.swift'), 'utf8');
   const settingsViewModel = fs.readFileSync(path.join(source, '1 - View/Views/Settings/SettingsViewModel.swift'), 'utf8');
   const themeManager = fs.readFileSync(path.join(source, '1 - View/Theme/ThemeManager.swift'), 'utf8');
+  const palette = fs.readFileSync(path.join(source, '1 - View/Theme/AppColourTheme.swift'), 'utf8');
 
   assert.match(rootView, /@State private var viewModel = ContentViewModel\(\)/);
   assert.match(rootView, /TabView\(selection: \$viewModel\.selectedTab\)/);
@@ -154,6 +157,7 @@ test('Habit Tracker Pro keeps root and saved appearance state at CFA boundaries'
   assert.match(settingsViewModel, /func selectTheme\(_ theme: ThemeSelection\)/);
   assert.match(themeManager, /private let settingsFeature: SettingsFeature/);
   assert.doesNotMatch(themeManager, /UserDefaults|defaults\.set|func select/);
+  assert.doesNotMatch(palette, /let name: String/);
   assert.equal(fs.existsSync(path.join(source, '1 - View/Views/ContentView.swift')), false);
 });
 
