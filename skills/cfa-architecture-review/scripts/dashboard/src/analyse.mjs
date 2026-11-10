@@ -165,7 +165,7 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
   if (symbolicLinks.length) fingerprint.update(JSON.stringify(symbolicLinks));
   if (nativeSourceHashes.length) fingerprint.update(JSON.stringify({nativeSourceHashes}));
   const sourceFingerprint = fingerprint.digest('hex');
-  return { schemaVersion: 3, sourceFingerprint, buildDefinitions: buildDefinitions.map(([file, hash]) => ({path: file, hash})), dashboard: dashboard(files), project: path.basename(root), generatedAt: new Date().toISOString(),
+  return { schemaVersion: 3, sourceFingerprint, nativeSources: nativeSourceHashes.map(([file, hash]) => ({path: file, hash})), buildDefinitions: buildDefinitions.map(([file, hash]) => ({path: file, hash})), dashboard: dashboard(files), project: path.basename(root), generatedAt: new Date().toISOString(),
     method: 'Lexical source inventory — not compiler-resolved or runtime-observed',
     scope: { includeTests, fileCount: files.length, skipped, excludedTestDirectories, symbolicLinkPaths: symbolicLinks.map(([file]) => file), buildDefinitionPaths: buildDefinitions.map(([file]) => file), nativeSourcePaths: nativeSourceHashes.map(([file]) => file), targetMembership: 'Not resolved; inactive compilation branches may be included' },
     limitations: [

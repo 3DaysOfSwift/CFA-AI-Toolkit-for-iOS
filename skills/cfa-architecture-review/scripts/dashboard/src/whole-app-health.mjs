@@ -31,7 +31,7 @@ export function taskCandidates(report) {
 function pendingSourceFiles(report, review) {
   const batched = new Set((review.fileBatches || []).flatMap(batch => batch.files || []));
   const statuses = new Map((review.fileReviews || []).map(item => [item.file, item.status]));
-  return report.files.filter(({path}) => {
+  return [...report.files, ...(report.nativeSources || [])].filter(({path}) => {
     const status = statuses.get(path);
     return status ? status === 'unassessed' || status === 'investigate' : !batched.has(path);
   }).map(file => file.path);
@@ -228,7 +228,7 @@ export function coverageGaps(report, review) {
     }
   }
   const missingFiles = pendingSourceFiles(report, review);
-  if (missingFiles.length) gaps.push(`${missingFiles.length} Swift files still need review: ${missingFiles.join(', ')}.`);
+  if (missingFiles.length) gaps.push(`${missingFiles.length} source files still need review: ${missingFiles.join(', ')}.`);
   const openTypes = pendingTypeReviews(review);
   if (openTypes.length) {
     const locations = openTypes.map(item => `${item.name} (${item.file}:${item.line})`);
@@ -323,7 +323,7 @@ export async function prepare(root, output, syntaxProvider = collectSyntax, opti
       symbolicLinkPaths: report.scope.symbolicLinkPaths,
       buildDefinitionPaths: report.scope.buildDefinitionPaths
     },
-    files: report.files.map(file=>({file:file.path,status:'pending'})),
+    files: [...report.files, ...(report.nativeSources || [])].map(file=>({file:file.path,status:'pending'})),
     entryPoints: inventoryCandidates(report).map(site=>({siteId:site.id,file:site.file,line:site.line,column:site.column,kind:site.kind,status:'pending'})),
     taskSites: taskCandidates(report).map(site=>({siteId:site.id,file:site.file,line:site.line,column:site.column,kind:site.kind,status:'pending'})),
     operations: {status:'pending', note:'Discover and trace user actions and system events, including operations the scanner cannot detect.'}
@@ -469,7 +469,7 @@ function reportFindingsGaps(review) {
 
 export async function progress(root, input, syntaxProvider = collectSyntax) {
   const {report, review} = await loadCurrentReview(root, input, syntaxProvider);
-  return {gaps:[...coverageGaps(report,review), ...appCheckGaps(review), ...reportFindingsGaps(review), reportPresentationGap(review)].filter(Boolean),files:report.files.length,operations:(review.operations || []).length};
+  return {gaps:[...coverageGaps(report,review), ...appCheckGaps(review), ...reportFindingsGaps(review), reportPresentationGap(review)].filter(Boolean),files:report.files.length + (report.nativeSources?.length ?? 0),operations:(review.operations || []).length};
 }
 export async function next(root, input, syntaxProvider = collectSyntax) {
   const {report, review} = await loadCurrentReview(root, input, syntaxProvider);
@@ -505,7 +505,7 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
   const selectedIcon = icon || await appIcon(root);
   const iconData = selectedIcon ? `data:image/png;base64,${(await fs.readFile(selectedIcon)).toString('base64')}` : '';
   await fs.writeFile(output,renderHealthReport(data,iconData),{flag:'wx'});
-  return {gaps,files:report.files.length,operations:(review.operations || []).length};
+  return {gaps,files:report.files.length + (report.nativeSources?.length ?? 0),operations:(review.operations || []).length};
 }
 if (process.argv[1] && existsSync(process.argv[1]) && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {

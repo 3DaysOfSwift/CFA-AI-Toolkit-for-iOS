@@ -30,13 +30,13 @@ test('coverage requires source files and detected entry points, without individu
   assert.deepEqual(coverageGaps(report,complete()),[]);
   const review=complete(); review.fileReviews=[]; review.typeReviews=[]; review.entryPoints=[];
   const gaps=coverageGaps(report,review).join(' ');
-  assert.match(gaps,/Swift files/); assert.doesNotMatch(gaps,/types/); assert.match(gaps,/entry points/);
+  assert.match(gaps,/source files/); assert.doesNotMatch(gaps,/types/); assert.match(gaps,/entry points/);
   const batched=complete(); batched.fileReviews=[]; batched.typeReviews=[]; batched.fileBatches=[{files:['App.swift']}];
   assert.deepEqual(coverageGaps(report,batched),[]);
   for (const status of ['unassessed','investigate']) {
     batched.fileReviews=[{file:'App.swift',status}];
     assert.deepEqual(nextWork(report,batched).nextFiles,['App.swift']);
-    assert.match(coverageGaps(report,batched).join(' '),/Swift files still need review: App.swift/);
+    assert.match(coverageGaps(report,batched).join(' '),/source files still need review: App.swift/);
   }
 });
 
@@ -422,7 +422,7 @@ test('installed Health Check rescans source, surfaces gaps and rejects stale rev
     assert.match(partialMap, /SwiftSyntax did not inventory: Value\.swift/);
     const draftPath=path.join(base,'inventory','review-draft.json');
     const pending=await progress(project,draftPath,syntax);
-    assert.ok(pending.gaps.some(gap=>gap.includes('Swift files')));
+    assert.ok(pending.gaps.some(gap=>gap.includes('source files')));
     const review={schemaVersion:1,sourceFingerprint:inventory.sourceFingerprint,author:'Reviewer',scope:'App target',presentation:{app:'App',summary:'Summary',verdict:'Clear ownership',conclusion:'Conclusion',criteria:[{title:'A',detail:'Checked',status:'pass'}]}};
     const reviewPath=path.join(base,'review.json'); await fs.writeFile(reviewPath,JSON.stringify(review));
     const checklist=JSON.parse(await fs.readFile(path.join(base,'inventory','checklist.json'),'utf8'));
@@ -684,6 +684,33 @@ test('retains test-named directories in subsequent scans when explicitly include
   const work = await next(project,path.join(output,'review-draft.json'),syntax);
   assert.ok(work.nextFiles.includes(helper));
   assert.ok(!work.gaps.some(gap => gap.includes('different files')));
+});
+
+test('tracks native source reviews with current line evidence', async t => {
+  const base = await fs.mkdtemp(path.join(os.tmpdir(), 'whole-health-native-'));
+  t.after(() => fs.rm(base, {recursive:true, force:true}));
+  const project = path.join(base, 'app');
+  await fs.mkdir(project);
+  await fs.writeFile(path.join(project, 'App.swift'), 'struct App {}');
+  await fs.writeFile(path.join(project, 'Legacy.m'), 'void refresh(void) {}');
+  const syntax = async () => ({status:'available', files:['App.swift'], items:[], warnings:[]});
+  const output = path.join(base, 'inventory');
+  await prepare(project, output, syntax);
+  const checklist = JSON.parse(await fs.readFile(path.join(output, 'checklist.json'), 'utf8'));
+  assert.ok(checklist.files.some(item => item.file === 'Legacy.m'));
+  const draftPath = path.join(output, 'review-draft.json');
+  const draft = JSON.parse(await fs.readFile(draftPath, 'utf8'));
+  const pending = await next(project, draftPath, syntax);
+  assert.ok(pending.nextFiles.includes('Legacy.m'));
+  assert.ok(pending.gaps.some(gap => gap.includes('source files still need review') && gap.includes('Legacy.m')));
+  draft.fileReviews.push({
+    file:'Legacy.m', status:'sound', reason:'Synchronous leaf', verification:'Source inspection',
+    evidence:[{file:'Legacy.m', line:1, endLine:1}]
+  });
+  await fs.writeFile(draftPath, JSON.stringify(draft));
+  const reviewed = await next(project, draftPath, syntax);
+  assert.ok(!reviewed.nextFiles.includes('Legacy.m'));
+  assert.ok(!reviewed.gaps.some(gap => gap.includes('Legacy.m')));
 });
 
 test('rejects scope flags on report instead of silently using a different scope', () => {

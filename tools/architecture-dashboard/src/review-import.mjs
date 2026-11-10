@@ -10,6 +10,7 @@ export async function importReview(report,input,root) {
   if(input?.schemaVersion!==1 || input.sourceFingerprint!==report.sourceFingerprint) fail('schema or source fingerprint mismatch');
   if(!text(input.scope)||!text(input.author)) fail('scope and author required');
   const review=structuredClone(input), refs=[];
+  const sourceFiles = new Map([...report.files, ...(report.nativeSources || [])].map(file => [file.path, file]));
   const list=(items,fields)=>{
     if(!Array.isArray(items)) fail('expected review list');
     for(const item of items) {
@@ -29,7 +30,7 @@ export async function importReview(report,input,root) {
     for (const batch of review.fileBatches) {
       if (!Array.isArray(batch.files) || !batch.files.length) fail('file batch needs source files');
       for (const file of batch.files) {
-        if (!text(file) || !report.files.some(item => item.path === file)) fail('batch file is outside the scan');
+        if (!text(file) || !sourceFiles.has(file)) fail('batch file is outside the scan');
         if (seen.has(file)) fail('duplicate batch file');
         if (!batch.evidence.some(ref => ref.file === file)) fail('batch evidence must include each source file');
         seen.add(file);
@@ -41,7 +42,7 @@ export async function importReview(report,input,root) {
     list(review[key],['file','status','reason','verification']);
     const seen = new Set();
     for (const item of review[key]) {
-      const file = report.files.find(f => f.path === item.file);
+      const file = sourceFiles.get(item.file);
       if (!file) fail('reviewed file is outside the scan');
       if (!['sound','problem','investigate','unassessed'].includes(item.status)) fail('invalid file or type status');
       if (!item.evidence.some(e => e.file === item.file)) fail('review evidence must include its file');
@@ -51,7 +52,7 @@ export async function importReview(report,input,root) {
       }
       let id = item.file;
       if (isType) {
-        if (!text(item.name) || !text(item.kind) || !Number.isInteger(item.line) || !file.declarations.some(d => d.name === item.name && d.type === item.kind && d.line === item.line)) fail('type review must match a scanned declaration');
+        if (!text(item.name) || !text(item.kind) || !Number.isInteger(item.line) || !file.declarations?.some(d => d.name === item.name && d.type === item.kind && d.line === item.line)) fail('type review must match a scanned declaration');
         if (!item.evidence.some(e => e.file === item.file && e.line <= item.line && e.endLine >= item.line)) fail('type evidence must include its declaration');
         id = JSON.stringify([item.file,item.line,item.kind,item.name]);
       }
@@ -157,7 +158,7 @@ export async function importReview(report,input,root) {
     q.concerns??=[];
   }
   const base=await fs.realpath(root),cache=new Map();
-  const hashes=new Map([...report.files, ...(report.buildDefinitions || [])].map(f=>[f.path,f.hash]));
+  const hashes=new Map([...sourceFiles.values(), ...(report.buildDefinitions || [])].map(f=>[f.path,f.hash]));
   const decoder = new TextDecoder('utf-8', {fatal: true, ignoreBOM: true});
   for(const ref of refs) {
     if(!text(ref.file)||path.isAbsolute(ref.file)||ref.file.split(/[\\/]/).includes('..')) fail('evidence must stay inside repository');
