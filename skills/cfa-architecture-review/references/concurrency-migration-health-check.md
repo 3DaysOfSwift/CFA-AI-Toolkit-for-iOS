@@ -171,6 +171,12 @@ Keep Swift Concurrency correctness, general architecture and optional CFA-specif
 conformance distinct. An app can have a deliberate non-CFA design, and a CFA
 layout alone does not prove concurrency correctness or runtime performance.
 
+For existing apps, apply the [design scope rule](spec/rules/cfa-struct-05.md).
+Missing optional themes, a CFA footer or starter branding do not affect
+concurrency or conformance ratings. If a resource or accessibility issue
+affects actual behaviour, describe its evidence separately from styling
+preferences. The Health Check is read-only.
+
 When the requested deliverable also includes a CFA conformance verdict, use
 the [full conformance checklist](spec/rules/cfa-review-01.md) and
 [prohibited patterns](spec/rules/cfa-review-02.md). Record evidence against
