@@ -57,6 +57,19 @@ test('catalogue validation rejects a canonical ID with no rule card', () => {
   assert.throws(() => validate(catalogue), /Unknown canonical explanation rule ID/);
 });
 
+test('catalogue separates canonical rules from legacy lookup aliases', () => {
+  const catalogue = validate(read());
+  assert.ok(catalogue.topics.every(topic => topic.ruleIds.every(id => id.startsWith('CFA-SPEC-'))));
+  assert.ok(catalogue.topics.every(topic => topic.aliases.every(id => !id.startsWith('CFA-SPEC-'))));
+  assert.equal(lookup(catalogue, 'CFA-TASK-01').id, 'unstructured-tasks');
+  const invalidRule = read();
+  invalidRule.topics[0].ruleIds.push('CFA-READ-99');
+  assert.throws(() => validate(invalidRule), /canonical rule ID/);
+  const invalidAlias = read();
+  invalidAlias.topics[0].aliases.push('CFA-SPEC-READ-99');
+  assert.throws(() => validate(invalidAlias), /legacy explanation alias/);
+});
+
 test('rule lookup returns relevant local rationale without inventing planned URLs', () => {
   const catalogue = read();
   catalogue.topics.find(topic => topic.id === 'unstructured-tasks').publication = {
@@ -135,7 +148,10 @@ test('rejects duplicate topic/rule IDs and traversal note paths', () => {
   assert.throws(() => validate(catalogue), /duplicate topic/);
   catalogue = read();
   catalogue.topics[1].ruleIds.push(catalogue.topics[0].ruleIds[0]);
-  assert.throws(() => validate(catalogue), /duplicate rule/);
+  assert.throws(() => validate(catalogue), /duplicate canonical rule/);
+  catalogue = read();
+  catalogue.topics[1].aliases.push(catalogue.topics[0].aliases[0]);
+  assert.throws(() => validate(catalogue), /duplicate legacy explanation alias/);
   catalogue = read();
   catalogue.topics[0].note = '../outside.md';
   assert.throws(() => validate(catalogue), /note path/);

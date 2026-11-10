@@ -1,7 +1,7 @@
 # Names explain the work
 
 Topic: `readability`  
-Rules: `CFA-READ-01`, `CFA-READ-02`, `CFA-SPEC-API-01`, `CFA-SPEC-MAINT-01`, `CFA-SPEC-MAINT-02`\
+Rules: `CFA-SPEC-API-01`, `CFA-SPEC-MAINT-01`, `CFA-SPEC-MAINT-02`\
 Classification: cfa-choice  
 Status: documented basis with editorial analysis; not a founder-approved historical decision record.
 

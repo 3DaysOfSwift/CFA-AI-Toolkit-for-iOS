@@ -24,7 +24,9 @@ A canonical rule lookup can include additional articles named on its rule card.
 Those links use each article's current publication record in the catalogue.
 When a rule card offers several explanations, use the article that addresses
 the developer's question and confirm its eligibility in the catalogue.
-Existing explanation keys such as `CFA-TASK-01` still work.
+Legacy explanation aliases such as `CFA-TASK-01` still work for compatibility,
+but they are not canonical CFA rule identifiers. Use `CFA-SPEC-*` identifiers
+when recording or discussing current CFA rules.
 Read the note itself before explaining it. Unknown keys return an error; do
 not substitute a guessed article. Without Node, read the catalogue and note.
 Neither method needs network access. Neither sends customer code anywhere.

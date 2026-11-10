@@ -1,7 +1,7 @@
 # Why CFA does not mirror every Feature with a protocol
 
 Topic: `concrete-features`  
-Rules: `CFA-API-01`  
+Related canonical rules: `CFA-SPEC-API-01`, `CFA-SPEC-FEATURE-01`\
 Classification: cfa-choice  
 Status: documented basis with editorial analysis; not a founder-approved historical decision record.
 

@@ -1,7 +1,8 @@
 # Business meaning belongs below the screen
 
 Topic: `presentation-boundaries`  
-Rules: `CFA-UI-01`, `CFA-STATE-01`, `CFA-SPEC-FLOW-01`, `CFA-SPEC-FLOW-02`, `CFA-SPEC-UI-01`, `CFA-SPEC-UI-05`, `CFA-SPEC-UI-06`\
+Rules: `CFA-SPEC-FLOW-01`, `CFA-SPEC-FLOW-02`, `CFA-SPEC-UI-01`, `CFA-SPEC-UI-05`, `CFA-SPEC-UI-06`\
+Related canonical rules: `CFA-SPEC-UI-03`, `CFA-SPEC-STATE-01`\
 Classification: cfa-choice  
 Status: documented basis with editorial analysis; not a founder-approved historical decision record.
 

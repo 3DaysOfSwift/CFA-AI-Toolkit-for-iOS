@@ -1,7 +1,8 @@
 # Cancellation is a policy, not a button
 
 Topic: `task-cancellation`  
-Rules: `CFA-CANCEL-01`, `CFA-SPEC-CONC-03`\
+Rules: `CFA-SPEC-CONC-03`\
+Related canonical rules: `CFA-SPEC-TASK-02`\
 Classification: mixed  
 Status: documented basis with editorial analysis; not a founder-approved historical decision record.
 
