@@ -62,7 +62,8 @@ Link the manual navigator inspections through `baselineNavigatorEvidenceId`
 at `beforeCommit` and `navigatorEvidenceId` at `afterCommit`. The baseline
 may be an observation and must cover every affected target.
 Record an executed test or manual observation at `repository.beforeCommit`
-for the behaviour baseline and name the targets exercised. A manual baseline
+for the behaviour baseline. Name the targets exercised and record the build
+configuration, OS and device or simulator. A manual baseline
 must cover at least one affected target. For separately named test targets,
 record which affected app or extension targets they exercise. Compare the same scenarios on each affected target that exposes them. The
 validator checks for baseline evidence. Verify scenario and target coverage

@@ -254,6 +254,11 @@ test('completion is not inferred from a build pass or tests at a different commi
   f.write();
   assert.ok(inspectRecord(f.file).errors.some(error => error.includes('requires recorded before behaviour evidence')));
   baseline.outcome = 'observed';
+  const baselineEnvironment = baseline.environment;
+  baseline.environment = null;
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.includes('before behaviour evidence at beforeCommit with named targets and a recorded environment')));
+  baseline.environment = baselineEnvironment;
 
   const navigator = f.record.evidence.find(item => item.id === 'after-navigator');
   navigator.kind = 'diff';

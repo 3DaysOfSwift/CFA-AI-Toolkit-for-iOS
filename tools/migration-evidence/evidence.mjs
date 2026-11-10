@@ -200,7 +200,7 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
     }
     const affectedTargets = new Set(record.completionGate?.affectedTargets ?? []);
     const hasBehaviourBaseline = record.repository.beforeCommit && record.evidence.some(item => {
-      if (item.phase !== 'before' || item.commit !== record.repository.beforeCommit || !item.targets?.length ||
+      if (item.phase !== 'before' || item.commit !== record.repository.beforeCommit || !item.targets?.length || !item.environment ||
           item.id === record.completionGate?.baselineNavigatorEvidenceId) return false;
       // A test target can have a different name from the app it exercises.
       if (item.kind === 'test') return ['passed', 'failed'].includes(item.outcome);
@@ -208,7 +208,7 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
         (!affectedTargets.size || item.targets.some(target => affectedTargets.has(target)));
     });
     if (!hasBehaviourBaseline) {
-      errors.push('result: completed requires recorded before behaviour evidence at beforeCommit with named targets; otherwise use partial');
+      errors.push('result: completed requires recorded before behaviour evidence at beforeCommit with named targets and a recorded environment; otherwise use partial');
     }
     for (const item of record.evidence) {
       if (item.phase !== 'before' && item.outcome === 'not-run') {
