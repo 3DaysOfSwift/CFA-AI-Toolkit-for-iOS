@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+- Align all eight skill workflows, shared explanations and review tooling with
+  the current CFA rules for Feature ownership, MainActor isolation, service
+  placement, task lifetimes, screen construction and migration completion.
+- Strengthen the architecture inspector's recognition of Feature placement,
+  AppModel composition, services, launch work, SwiftData access and named tests
+  without presenting lexical review leads as proven defects.
+- Make extracted plugin installation self-contained and keep all packaged
+  documentation links and runtime module dependencies valid outside the source
+  checkout.
+- Validate the exact skill inventory, interface metadata, frontmatter,
+  licences, canonical reference generations, release manifests, publisher and
+  repository identity, changelog records and local documentation links.
+- Keep command modules safely importable, preserve portable macOS path handling
+  and add release-package regressions for the corrected failure modes.
+
 ## 0.4.0 — 2026-11-01
 
 - Add a Swift Concurrency Health Check with source inventory, SwiftSyntax task-site evidence and an app-specific report.
