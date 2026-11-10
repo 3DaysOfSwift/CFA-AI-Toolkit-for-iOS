@@ -55,7 +55,9 @@ struct TrendsViewModelTests {
         #expect(viewModel.selectedTrend == nil)
         await purchases.purchaseTrends()
         #expect(viewModel.selectedTrend?.id == first.id)
+        #expect(viewModel.selectedTrend.map(viewModel.activityUnit(for:)) == "Completion")
         viewModel.selectedID = second.id
+        #expect(viewModel.selectedTrend.map(viewModel.activityUnit(for:)) == "km")
         try await habits.recordToday(habitID: second.id, value: 5)
         #expect(viewModel.selectedTrend?.completedDayCount == 1)
         store.entitled = false

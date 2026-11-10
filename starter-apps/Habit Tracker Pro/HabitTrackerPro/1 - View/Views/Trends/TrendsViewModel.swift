@@ -25,6 +25,10 @@ final class TrendsViewModel {
         get { selectedTrend?.id }
         set { selectedHabitID = newValue }
     }
+    func activityUnit(for trend: HabitTrend) -> String {
+        if trend.tracking == .completion { return "Completion" }
+        return trend.unit.isEmpty ? "Recorded amount" : trend.unit
+    }
     @ObservationIgnored private var retryTask: Task<Void, Never>?
     @discardableResult
     func retry() -> Task<Void, Never> {

@@ -17,6 +17,7 @@ struct TrendWeek: Identifiable, Sendable {
 struct HabitTrend: Identifiable, Sendable {
     let id: UUID
     let name: String
+    let tracking: HabitTracking
     let unit: String
     let dailyTarget: Int?
     let days: [TrendDay]
@@ -62,7 +63,7 @@ final class TrendsFeature {
                                  completedDayCount: window.filter(\.isComplete).count)
             }
             return HabitTrend(id: habit.id, name: habit.name,
-                              unit: habit.tracking == .completion ? "Completion" : habit.unit,
+                              tracking: habit.tracking, unit: habit.unit,
                               dailyTarget: habit.dailyTarget, days: days, weeks: weeks,
                               completedDayCount: days.filter(\.isComplete).count)
         }

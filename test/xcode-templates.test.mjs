@@ -267,15 +267,29 @@ test('Habit Tracker Pro keeps StoreKit outcomes in its Feature and the app-wide 
 });
 
 test('Habit Tracker Pro trends reuse the authoritative habit completion rules', () => {
-  const file = path.join(
+  const featureFile = path.join(
     root,
     'starter-apps/Habit Tracker Pro/HabitTrackerPro/2 - AppModel/Features/Trends/TrendsFeature.swift'
   );
-  const source = fs.readFileSync(file, 'utf8');
+  const viewModelFile = path.join(
+    root,
+    'starter-apps/Habit Tracker Pro/HabitTrackerPro/1 - View/Views/Trends/TrendsViewModel.swift'
+  );
+  const viewFile = path.join(
+    root,
+    'starter-apps/Habit Tracker Pro/HabitTrackerPro/1 - View/Views/Trends/TrendsView.swift'
+  );
+  const featureSource = fs.readFileSync(featureFile, 'utf8');
+  const viewModelSource = fs.readFileSync(viewModelFile, 'utf8');
+  const viewSource = fs.readFileSync(viewFile, 'utf8');
 
-  assert.match(source, /value: habit\.value\(on: day, calendar: calendar\)/);
-  assert.match(source, /isComplete: habit\.isComplete\(on: day, calendar: calendar\)/);
-  assert.doesNotMatch(source, /value >= \(habit\.dailyTarget|var amounts:/);
+  assert.match(featureSource, /value: habit\.value\(on: day, calendar: calendar\)/);
+  assert.match(featureSource, /isComplete: habit\.isComplete\(on: day, calendar: calendar\)/);
+  assert.match(featureSource, /let tracking: HabitTracking/);
+  assert.doesNotMatch(featureSource, /value >= \(habit\.dailyTarget|var amounts:|"Completion"/);
+  assert.match(viewModelSource, /func activityUnit\(for trend: HabitTrend\) -> String/);
+  assert.match(viewSource, /activityUnit: viewModel\.activityUnit\(for: trend\)/);
+  assert.doesNotMatch(viewSource, /trend\.unit\.isEmpty\s*\?/);
 });
 
 test('Day Streak keeps saved theme ownership in SettingsFeature', () => {
