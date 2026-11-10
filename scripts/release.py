@@ -19,11 +19,11 @@ def is_release_path(relative):
             and not any(relative.name.endswith(suffix) for suffix in EXCLUSIONS['fileSuffixes']))
 
 def untracked_release_files(root, allowed=SOURCE_PARTS):
-    """Return untracked, non-ignored files that a checkout release would package."""
+    """Return every untracked file that a checkout release would package."""
     if not (root / '.git').exists():
         return []
     result = subprocess.run(
-        ['git', 'ls-files', '--others', '--exclude-standard', '-z'],
+        ['git', 'ls-files', '--others', '-z'],
         cwd=root, check=True, stdout=subprocess.PIPE)
     allowed_roots = set(allowed)
     paths = (Path(value.decode()) for value in result.stdout.split(b'\0') if value)

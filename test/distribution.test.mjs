@@ -86,6 +86,7 @@ test('checkout releases detect untracked files that would enter the payload', t 
  assert.equal(spawnSync('git',['init','--quiet'],{cwd:directory,encoding:'utf8'}).status,0);
  fs.mkdirSync(path.join(directory,'skills'),{recursive:true});
  fs.mkdirSync(path.join(directory,'docs/__pycache__'),{recursive:true});
+ fs.writeFileSync(path.join(directory,'.gitignore'),'skills/private-notes.txt\n');
  fs.writeFileSync(path.join(directory,'skills/private-notes.txt'),'not for release\n');
  fs.writeFileSync(path.join(directory,'docs/__pycache__/cache.pyc'),'cache\n');
  fs.writeFileSync(path.join(directory,'outside.txt'),'outside the release roots\n');
