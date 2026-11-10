@@ -26,9 +26,10 @@ You can instead run it from Terminal:
 ./Install\ Xcode\ Template.command
 ```
 
-Wait for the installer to say **“CFA App is installed in Xcode”** and show
-the installed folder. If it does not, the template has not been installed;
-read the Terminal message before closing that window.
+Wait for the final **“Quit and reopen Xcode”** instruction before closing the
+Terminal window. An earlier success message for CFA App alone does not confirm
+that all three template components were installed. If an error appears, read it
+before closing the window.
 
 Then quit and reopen Xcode. Choose **File → New → Project → iOS → CFA App**
 or **Habit Tracker** or **Day Streak**. Habit Tracker includes habit tracking,

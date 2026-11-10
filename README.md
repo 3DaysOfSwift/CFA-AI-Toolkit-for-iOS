@@ -7,8 +7,8 @@
 # CFA AI Toolkit for iOS
 
 **Build, modernise, test and maintain iOS apps with AI, SwiftUI and Swift
-Concurrency.** This repository contains the CFA AI Toolkit for iOS: eight AI skills, a
-native Xcode project template, an architecture inspector and practical
+Concurrency.** This repository contains the CFA AI Toolkit for iOS: eight AI skills,
+three native Xcode project templates, an architecture inspector and practical
 guidance for working on new and existing apps. It is published by
 [3 Days of Swift Concurrency](https://www.3daysofswiftconcurrency.com/).
 
