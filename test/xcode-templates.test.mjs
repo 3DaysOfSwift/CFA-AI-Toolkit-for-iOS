@@ -165,6 +165,26 @@ test('native templates provide the accent color expected by generated Xcode proj
   }
 });
 
+test('templates using UserDefaults declare its required-reason API', () => {
+  for (const name of names) {
+    const template = path.join(root, 'templates/Xcode/Project Templates/iOS/Application', `${name}.xctemplate`);
+    const sourceRoot = path.join(template, 'Source/Application');
+    const swiftSources = fs.readdirSync(sourceRoot, { recursive: true, encoding: 'utf8' })
+      .filter(file => file.endsWith('.swift'))
+      .map(file => fs.readFileSync(path.join(sourceRoot, file), 'utf8'))
+      .join('\n');
+    if (!/\bUserDefaults\b/.test(swiftSources)) continue;
+
+    const manifestFile = path.join(sourceRoot, '3 - App Resources/PrivacyInfo.xcprivacy');
+    const manifest = JSON.parse(execFileSync('plutil', ['-convert', 'json', '-o', '-', manifestFile], { encoding: 'utf8' }));
+    const declaration = manifest.NSPrivacyAccessedAPITypes?.find(
+      entry => entry.NSPrivacyAccessedAPIType === 'NSPrivacyAccessedAPICategoryUserDefaults'
+    );
+    assert.ok(declaration, `${name} must declare UserDefaults access`);
+    assert.ok(declaration.NSPrivacyAccessedAPITypeReasons?.includes('CA92.1'), `${name} must declare reason CA92.1`);
+  }
+});
+
 for (const [name, application, assets, configuration, light, dark] of [
   ['Habit Tracker', 'Habit Tracker/HabitTrackerTemplate', 'Habit Tracker/HabitTrackerTemplate/Assets.xcassets', 'Habit Tracker/HabitTrackerTemplate.xcodeproj/project.pbxproj', [0.96, 0.96, 0.94], [0.08, 0.09, 0.09]],
   ['Habit Tracker Pro', 'Habit Tracker Pro/HabitTrackerPro', 'Habit Tracker Pro/HabitTrackerPro/Assets.xcassets', 'Habit Tracker Pro/HabitTrackerPro.xcodeproj/project.pbxproj', [0.96, 0.96, 0.94], [0.08, 0.09, 0.09]],
