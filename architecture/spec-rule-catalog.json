@@ -105,9 +105,9 @@
       "section": "Define Features by Business Capability, Not by Screen or Tab",
       "applies": "A business workflow genuinely spans Features",
       "strength": "Default",
-      "rule": "Start with independent Features and inject lower-level services through their initializers. An existing Feature or a distinct coordinating Feature may coordinate other Features when a reusable business responsibility requires it. Keep the dependency direction explicit and acyclic. A screen that only combines existing outputs can do that in its ViewModel.",
+      "rule": "Start with independent Features and inject lower-level services through their initializers. An existing Feature or a distinct coordinating Feature may coordinate other Features when a reusable business responsibility requires it. Keep the dependency direction explicit and acyclic. A coordinating Feature belongs in AppModel and the standard Feature folder structure. It owns its workflow decisions and uses the existing authoritative state owners. A screen that only combines existing outputs does so in its ViewModel. During migration, avoid creating a coordinating Feature for each screen and preserve existing behaviour.",
       "why": "Avoid both feature spaghetti and needless coordinators.",
-      "verify": "Trace the workflow, verify one owner per state and check dependencies for cycles.",
+      "verify": "Name the business decision that justifies coordination. Trace which Feature owns each decision and state update. Verify one authoritative owner per state value, check for cycles and verify existing behaviour when migrating.",
       "example": "A Today capability can coordinate existing Features when its reusable selection decisions belong in the Model. A cohesive CheckoutFeature can own its cart and use a private payment service.",
       "explanationIds": [
         "feature-ownership"
