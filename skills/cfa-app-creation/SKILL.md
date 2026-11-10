@@ -214,9 +214,12 @@ accepts an `.xcarchive` or built `Info.plist`. It requires concrete, non-empty
 bundle identifier, display name, marketing version, and build number values;
 unresolved build settings and template placeholders fail the check. Run it
 against every newly created app target before handoff and against the archive
-when archiving is in scope. Inspect identifiers across build configurations
-and verify test-target identifiers separately. Report an unavailable build or archive check
-accurately.
+when archiving is in scope. Each invocation verifies one built app. Inspect
+the resolved `PRODUCT_BUNDLE_IDENTIFIER` for the app and test targets in
+each build configuration separately. Compare those settings with the
+requested identifiers, including configurations that were not used for the
+built-app check. Record missing configurations or unavailable build or archive
+checks as unverified.
 
 ## Initial app icon
 

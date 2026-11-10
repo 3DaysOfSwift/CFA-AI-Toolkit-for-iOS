@@ -256,7 +256,9 @@ Verify language mode, concurrency checking, default isolation and relevant SDK a
 Apply the [project identity rule](references/spec/rules/cfa-id-01.md) when
 changing project structure or build settings. Compare the resolved app and
 test target bundle identifiers before and after the change across affected
-build configurations. Preserve existing identifiers unless the developer
+build configurations. Record each target and configuration with its
+baseline and final resolved values. Keep the identity check open if either
+value is missing for an affected configuration. Preserve existing identifiers unless the developer
 explicitly requests a change.
 
 Completion requires an updated primitive inventory, relevant build/tests and
