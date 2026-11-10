@@ -350,9 +350,14 @@ skill from that toolkit before changing the project.
   write outcomes when the product requires confirmed persistence.
 - Use the product-defined fallback when a non-critical preference is missing
   or its recognised stored format contains an obsolete value. For example,
-  use system appearance for a retired theme. Replace an old
-  saved value only through an intentional migration or a successful user choice.
-  Report unreadable or corrupt durable storage and failed durable writes as errors.
+  use system appearance for a retired theme without asking the user to
+  intervene. Preserve the old saved value where appropriate and replace it only
+  through an intentional migration or a successful user choice. Report
+  unreadable or corrupt durable storage and failed durable writes as errors.
+  Test supported, missing and obsolete values separately from unreadable or
+  corrupt storage. When storage reports a failed write after a user change,
+  verify that the previous effective preference stays visible and the error
+  is reported.
 - Start remote refresh and optional cache restoration independently when both
   are needed. Publish current server data and complete the refresh for its
   callers without waiting for the cache write. A failed cache write leaves
