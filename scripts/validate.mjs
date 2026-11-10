@@ -81,6 +81,10 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
   for(const name of skills) {
     const skill=path.join(base,'skills',name);
     const text=fs.readFileSync(path.join(skill,'SKILL.md'),'utf8');
+    const skillLicense=path.join(skill,'LICENSE');
+    if(!fs.existsSync(skillLicense) || hash(skillLicense)!==hash(path.join(base,'LICENSE'))) {
+      throw Error(`Missing or stale skill licence: ${name}. Run npm run sync.`);
+    }
     const agentMetadata = path.join(skill, 'agents/openai.yaml');
     if (!fs.existsSync(agentMetadata)) throw Error(`Missing skill interface metadata: ${name}`);
     const interfaceText = fs.readFileSync(agentMetadata, 'utf8');
@@ -180,6 +184,10 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
     for (const file of ['README.md', 'package.json']) {
       if (hash(path.join(base, 'tools/architecture-dashboard', file)) !== hash(path.join(base, 'skills/cfa-architecture-review/scripts/dashboard', file))) throw Error(`Stale bundled dashboard ${file}. Run npm run sync.`);
     }
+  }
+  const dashboardLicense=path.join(base,'skills/cfa-architecture-review/scripts/dashboard/LICENSE');
+  if(!fs.existsSync(dashboardLicense) || hash(dashboardLicense)!==hash(path.join(base,'LICENSE'))) {
+    throw Error('Missing or stale bundled dashboard licence. Run npm run sync.');
   }
   if (source && checkXcodeProjects) {
     if (process.platform === 'darwin') {

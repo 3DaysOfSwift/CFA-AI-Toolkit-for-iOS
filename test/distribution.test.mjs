@@ -29,6 +29,17 @@ test('release validation keeps the public toolkit description aligned', t => {
  assert.throws(()=>validate(source,{source:false}),/Unexpected plugin description/);
 });
 
+test('release validation rejects stale skill and bundled-tool licences', t => {
+ const {source}=release(t);
+ const skillLicense=path.join(source,'skills/cfa-feature-work/LICENSE');
+ fs.appendFileSync(skillLicense,'\nStale copy.\n');
+ assert.throws(()=>validate(source,{source:false}),/stale skill licence: cfa-feature-work/);
+ fs.copyFileSync(path.join(source,'LICENSE'),skillLicense);
+ const dashboardLicense=path.join(source,'skills/cfa-architecture-review/scripts/dashboard/LICENSE');
+ fs.appendFileSync(dashboardLicense,'\nStale copy.\n');
+ assert.throws(()=>validate(source,{source:false}),/stale bundled dashboard licence/);
+});
+
 test('release omits local Xcode state and build outputs, but retains shared project configuration', t => {
  for (const file of ['A.xcodeproj/xcuserdata/person.xcuserdatad/state', 'View.xcuserstate',
   '.DS_Store', 'App/.build/debug/out', 'App/DerivedData/out', 'App/.git/config']) assert.equal(isReleasePath(file),false,file);
