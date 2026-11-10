@@ -275,13 +275,17 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
   ];
   for (const relative of markdownFiles) {
     const markdown = fs.readFileSync(path.join(base, relative), 'utf8');
-    for (const match of markdown.matchAll(/\]\(([^)]+)\)/g)) {
-      let link = match[1].split('#')[0].trim().replace(/^<|>$/g, '');
+    const localReferences = [
+      ...[...markdown.matchAll(/\]\(([^)]+)\)/g)].map(match => match[1]),
+      ...[...markdown.matchAll(/\b(?:src|href)=["']([^"']+)["']/gi)].map(match => match[1])
+    ];
+    for (const reference of localReferences) {
+      let link = reference.split('#')[0].trim().replace(/^<|>$/g, '');
       if (!link || /^[a-z]+:/i.test(link)) continue;
       try { link = decodeURIComponent(link); } catch { throw Error(`Invalid encoded Markdown link: ${relative} → ${link}`); }
       const resolved = path.resolve(path.dirname(path.join(base, relative)), link);
       if ((!resolved.startsWith(path.resolve(base) + path.sep) && resolved !== path.resolve(base)) || !fs.existsSync(resolved)) {
-        throw Error(`Broken local Markdown link: ${relative} → ${link}`);
+        throw Error(`Broken local documentation reference: ${relative} → ${link}`);
       }
     }
   }

@@ -251,7 +251,13 @@ test('release validation rejects a missing packaged module dependency', t => {
 test('release validation rejects broken packaged documentation links', t => {
  const {source}=release(t);
  fs.unlinkSync(path.join(source,'CONTRIBUTING.md'));
- assert.throws(()=>validate(source,{source:false}),/Broken local Markdown link: README\.md → CONTRIBUTING\.md/);
+ assert.throws(()=>validate(source,{source:false}),/Broken local documentation reference: README\.md → CONTRIBUTING\.md/);
+});
+
+test('release validation rejects missing local HTML documentation assets', t => {
+ const {source}=release(t);
+ fs.unlinkSync(path.join(source,'readme-images/3DaysOfSwiftConcurrency-h512.png'));
+ assert.throws(()=>validate(source,{source:false}),/Broken local documentation reference: README\.md → readme-images\/3DaysOfSwiftConcurrency-h512\.png/);
 });
 
 test('every portable skill carries the shared workflow and separate design defaults', t => {
