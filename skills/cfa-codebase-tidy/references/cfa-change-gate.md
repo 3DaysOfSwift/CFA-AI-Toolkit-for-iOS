@@ -414,10 +414,12 @@ operations enforce authorisation independently.
   on the same instance and verify its next decision. Direct time reads in a
   View are suitable for transient visuals.
 - For preference restoration, exercise a supported saved value, a missing
-  value, and an obsolete value in the recognised format. Check that fallback
-  leaves the old value intact where the product requires it. Test unreadable
-  or corrupt durable storage and failed writes separately and verify that the
-  app exposes the failure.
+  value, and an obsolete value in the recognised format. Verify that a safe
+  fallback takes effect without asking the user to intervene and preserves
+  the stored value where the product requires it. Test unreadable or corrupt
+  durable storage separately. Where the storage API reports write outcomes,
+  fail a subsequent user change and verify that the previous effective
+  preference stays visible while the app reports the failure.
 - For changed failure paths, trace the Feature outcome through the ViewModel.
   Verify that the ViewModel owns screen-specific error text and that the
   screen presents the outcome of the requested operation.
