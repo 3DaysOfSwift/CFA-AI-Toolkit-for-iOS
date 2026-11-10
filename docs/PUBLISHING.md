@@ -1,5 +1,9 @@
 # Publishing CFA AI Toolkit for iOS
 
+This is a source-checkout maintainer procedure. Download the source archive or
+use the Git repository before running its `npm`, sync, test or release commands;
+the installable plugin archive intentionally carries only customer runtime scripts.
+
 ## Identity
 
 - Public product name: **CFA AI Toolkit for iOS**

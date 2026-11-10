@@ -181,6 +181,12 @@ test('release validation rejects a missing packaged module dependency', t => {
  assert.throws(()=>validate(source,{source:false}),/Missing packaged module dependency: scripts\/install\.mjs/);
 });
 
+test('release validation rejects broken packaged documentation links', t => {
+ const {source}=release(t);
+ fs.unlinkSync(path.join(source,'CONTRIBUTING.md'));
+ assert.throws(()=>validate(source,{source:false}),/Broken local Markdown link: README\.md → CONTRIBUTING\.md/);
+});
+
 test('every portable skill carries the shared workflow and separate design defaults', t => {
  const {dir,source}=release(t);
  const destination=path.join(dir,'customer');

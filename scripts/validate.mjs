@@ -135,7 +135,7 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
     for (const file of migrationEvidenceFiles) {
       if (hash(path.join(evidenceFolder, file)) !== hash(path.join(base, 'tools/migration-evidence', file))) throw Error(`Stale migration evidence dependency: ${file}`);
     }
-    const guide = fs.readFileSync(path.join(base, 'architecture/migration-evidence.md'), 'utf8').replace('../tools/migration-evidence/README.md', '../scripts/evidence/README.md');
+    const guide = fs.readFileSync(path.join(base, 'architecture/migration-evidence.md'), 'utf8').replace('../skills/swift-concurrency-migration/scripts/evidence/README.md', '../scripts/evidence/README.md');
     if (guide !== fs.readFileSync(captureReference, 'utf8')) throw Error('Stale migration capture guide. Run npm run sync.');
   }
   execFileSync(process.execPath, [path.join(evidenceFolder, 'evidence.mjs'), 'validate', path.join(evidenceFolder, 'examples/synthetic-serial-writes/record.json')], { stdio: 'pipe' });
@@ -244,6 +244,25 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
   const dashboardLicense=path.join(base,'skills/cfa-architecture-review/scripts/dashboard/LICENSE');
   if(!fs.existsSync(dashboardLicense) || hash(dashboardLicense)!==hash(path.join(base,'LICENSE'))) {
     throw Error('Missing or stale bundled dashboard licence. Run npm run sync.');
+  }
+  const markdownFiles = [
+    ...['README.md', 'AGENTS.md', 'CONTRIBUTING.md'].filter(file => fs.existsSync(path.join(base, file))),
+    ...['architecture', 'docs', 'skills', 'tools', 'evals', 'examples'].flatMap(folder => {
+      const directory = path.join(base, folder);
+      return fs.existsSync(directory) ? files(directory).filter(file => file.endsWith('.md')).map(file => path.posix.join(folder, file)) : [];
+    })
+  ];
+  for (const relative of markdownFiles) {
+    const markdown = fs.readFileSync(path.join(base, relative), 'utf8');
+    for (const match of markdown.matchAll(/\]\(([^)]+)\)/g)) {
+      let link = match[1].split('#')[0].trim().replace(/^<|>$/g, '');
+      if (!link || /^[a-z]+:/i.test(link)) continue;
+      try { link = decodeURIComponent(link); } catch { throw Error(`Invalid encoded Markdown link: ${relative} → ${link}`); }
+      const resolved = path.resolve(path.dirname(path.join(base, relative)), link);
+      if ((!resolved.startsWith(path.resolve(base) + path.sep) && resolved !== path.resolve(base)) || !fs.existsSync(resolved)) {
+        throw Error(`Broken local Markdown link: ${relative} → ${link}`);
+      }
+    }
   }
   if (source && checkXcodeProjects) {
     if (process.platform === 'darwin') {

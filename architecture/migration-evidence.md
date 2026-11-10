@@ -50,7 +50,7 @@ project constraints independently before proposing a change.
 
 The migration skill bundles the local `scripts/evidence/evidence.mjs` helper,
 schema, empty template and one explicitly synthetic example. Node.js 20+ is the
-only runtime prerequisite. See its [usage guide](../tools/migration-evidence/README.md)
+only runtime prerequisite. See its [usage guide](../skills/swift-concurrency-migration/scripts/evidence/README.md)
 in the source repository; the installed skill includes the equivalent local guide.
 
 The helper creates a new folder only, refuses destinations inside the supplied

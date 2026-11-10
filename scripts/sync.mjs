@@ -83,7 +83,7 @@ export function sync(base = root, { skipXcodeProjects = false } = {}) {
     copy(`examples/migration/${file}`, `skills/swift-concurrency-migration/assets/migration-examples/${file}`);
   }
   const captureGuide = fs.readFileSync(path.join(base, 'architecture/migration-evidence.md'), 'utf8')
-    .replace('../tools/migration-evidence/README.md', '../scripts/evidence/README.md');
+    .replace('../skills/swift-concurrency-migration/scripts/evidence/README.md', '../scripts/evidence/README.md');
   fs.writeFileSync(path.join(base, 'skills/swift-concurrency-migration/references/migration-evidence.md'), captureGuide);
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(fs.realpathSync(process.argv[1])).href) {
