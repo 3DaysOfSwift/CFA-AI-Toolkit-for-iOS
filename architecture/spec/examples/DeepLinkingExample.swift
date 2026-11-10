@@ -148,16 +148,22 @@ final class DeepLinkingFeature {
     }
 }
 
-// Hold an older restoration result while an incoming request is saved.
-private actor DelayedRestoreRepository: PendingRequestRepository {
+// Suspend a repository operation so the example can exercise an overlapping caller.
+private actor GatedPendingRequestRepository: PendingRequestRepository {
+    enum Gate { case snapshot, removal }
+
     private let store: PendingRequestStore
+    private let gate: Gate
     private var release: CheckedContinuation<Void, Never>?
 
-    init(store: PendingRequestStore) { self.store = store }
+    init(store: PendingRequestStore, gate: Gate) {
+        self.store = store
+        self.gate = gate
+    }
 
     func snapshot() async throws -> PendingSnapshot {
         let snapshot = try await store.snapshot()
-        await withCheckedContinuation { release = $0 }
+        if gate == .snapshot { await withCheckedContinuation { release = $0 } }
         return snapshot
     }
 
@@ -166,14 +172,15 @@ private actor DelayedRestoreRepository: PendingRequestRepository {
     }
 
     func remove(id: String) async throws -> PendingSnapshot {
-        try await store.remove(id: id)
+        if gate == .removal { await withCheckedContinuation { release = $0 } }
+        return try await store.remove(id: id)
     }
 
-    func waitUntilRestoreIsHeld() async {
+    func waitUntilHeld() async {
         while release == nil { await Task.yield() }
     }
 
-    func finishRestore() {
+    func resumeOperation() {
         release?.resume()
         release = nil
     }
@@ -341,7 +348,8 @@ private actor DelayedRestoreRepository: PendingRequestRepository {
         try await nextRun.open(id: request.id, inScene: navigate)
         precondition(openedDestination == request)
         precondition(nextRun.pending.isEmpty)
-        let lastRun = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
+        let dismissalStore = GatedPendingRequestRepository(store: PendingRequestStore(fileURL: fileURL), gate: .removal)
+        let lastRun = DeepLinkingFeature(store: dismissalStore)
         try await lastRun.restore()
         precondition(lastRun.pending.isEmpty)
         let dismissed = DestinationRequest(id: "notification-dismissed", title: "Another launch", launchID: "launch-43")
@@ -360,7 +368,14 @@ private actor DelayedRestoreRepository: PendingRequestRepository {
         } catch is CancellationError {
             precondition(lastRun.pending == [dismissed, retained])
         }
-        try await lastRun.dismiss(id: dismissed.id)
+        let admittedDismissal = Task { @MainActor in
+            try await lastRun.dismiss(id: dismissed.id)
+        }
+        await dismissalStore.waitUntilHeld()
+        admittedDismissal.cancel()
+        precondition(lastRun.pending == [dismissed, retained])
+        await dismissalStore.resumeOperation()
+        try await admittedDismissal.value
         precondition(lastRun.pending == [retained])
         try await lastRun.receive(dismissed)
         precondition(lastRun.pending == [retained], "A replay must not restore a dismissed event")
@@ -377,13 +392,13 @@ private actor DelayedRestoreRepository: PendingRequestRepository {
         try await restoredAfterIncoming.restore()
         precondition(restoredAfterIncoming.pending == [retained, incoming])
 
-        let delayedStore = DelayedRestoreRepository(store: PendingRequestStore(fileURL: fileURL))
+        let delayedStore = GatedPendingRequestRepository(store: PendingRequestStore(fileURL: fileURL), gate: .snapshot)
         let restoring = DeepLinkingFeature(store: delayedStore)
         async let restoration: Void = restoring.restore()
-        await delayedStore.waitUntilRestoreIsHeld()
+        await delayedStore.waitUntilHeld()
         let duringRestore = DestinationRequest(id: "notification-during-restore", title: "New launch", launchID: "launch-46")
         try await restoring.receive(duringRestore)
-        await delayedStore.finishRestore()
+        await delayedStore.resumeOperation()
         try await restoration
         precondition(restoring.pending == [retained, incoming, duringRestore])
         let restarted = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
@@ -392,10 +407,10 @@ private actor DelayedRestoreRepository: PendingRequestRepository {
 
         // A delayed restoration cannot put an opened request back on screen.
         async let restorationBeforeOpen: Void = restoring.restore()
-        await delayedStore.waitUntilRestoreIsHeld()
+        await delayedStore.waitUntilHeld()
         try await restoring.open(id: duringRestore.id) { _ in true }
         precondition(restoring.pending == [retained, incoming])
-        await delayedStore.finishRestore()
+        await delayedStore.resumeOperation()
         try await restorationBeforeOpen
         precondition(restoring.pending == [retained, incoming])
         let restartedAfterOpen = DeepLinkingFeature(store: PendingRequestStore(fileURL: fileURL))
