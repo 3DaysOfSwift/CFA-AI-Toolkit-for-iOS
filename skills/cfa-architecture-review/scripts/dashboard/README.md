@@ -141,7 +141,8 @@ access and the locked and entitled outcomes separately.
 For a whole-app Health Check, first run
 `node src/whole-app-health.mjs prepare <project-root> <new-inventory-directory>`.
 On macOS with Xcode, this also compiles a local SwiftSyntax inventory and writes
-`task-map.json` with source-located tasks and lexical nesting. It does not infer
+`task-map.json` with task locations and nesting in the written source. A nested
+site may be in a call argument or a closure. The map does not infer
 task ownership or runtime parentage. Parser failure and scope mismatches remain
 visible for investigation.
 Reconcile the current inventory against the production targets, source files,

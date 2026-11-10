@@ -170,7 +170,7 @@ export function renderTaskMap(taskMap) {
     taskMap.excludedItems ? `Parser findings outside the source inventory: ${taskMap.excludedItems}.` : null
   ].filter(Boolean);
   const diagnostics = parserNotes.map(note => `<p>${esc(note)}</p>`).join('');
-  const rows=taskMap.sites.map(site=>`<li><strong>${esc(labels[site.kind] || site.kind)}</strong> · ${esc(site.file)}:${site.line}:${site.column}<br><span>${site.enclosingFunction ? `Function: ${esc(site.enclosingFunction)}` : 'Enclosing function not identified'}${site.lexicalTaskParent ? ` · Written inside task at ${esc(site.lexicalTaskParent)}` : ''}</span></li>`).join('');
+  const rows=taskMap.sites.map(site=>`<li><strong>${esc(labels[site.kind] || site.kind)}</strong> · ${esc(site.file)}:${site.line}:${site.column}<br><span>${site.enclosingFunction ? `Function: ${esc(site.enclosingFunction)}` : 'Enclosing function not identified'}${site.lexicalTaskParent ? ` · Nested in source within Task call at ${esc(site.lexicalTaskParent)}` : ''}</span></li>`).join('');
   return `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Task sites</title><style>body{font:16px/1.6 system-ui;background:#111214;color:#f2f3f4;max-width:900px;margin:50px auto;padding:0 24px}h1{font-size:2.4rem}p,span{color:#bac4c8}li{padding:14px 0;border-bottom:1px solid #373b3f;overflow-wrap:anywhere}</style><h1>Task sites</h1><p>${esc(taskMap.note)}</p><p>${taskMap.sites.length} sites · SwiftSyntax ${esc(taskMap.status)} · file coverage ${esc(taskMap.coverage ?? 'unverified')}</p>${diagnostics}<ul>${rows}</ul></html>`;
 }
 export function inventoryCandidates(report) {
