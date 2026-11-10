@@ -191,7 +191,8 @@ test('reconciled task sites must be cited in a workflow step', () => {
   const work = nextWork(inventory, review);
   assert.equal(work.pendingOperations, 1);
   assert.deepEqual(work.nextOperations[0].invalidTaskLinks, [{
-    id:'stale-link', taskSiteId:'stale', relation:'unstructured-task', evidence
+    id:'stale-link', taskSiteId:'stale', relation:'unstructured-task',
+    reason:'Task site is absent from the current inventory.', evidence
   }]);
 });
 
@@ -211,10 +212,10 @@ test('shared task sites can appear in more than one evidenced workflow', () => {
   review.taskSites = [{siteId:site.id, operationId:'launch'}];
   assert.deepEqual(coverageGaps(inventory, review), []);
   refresh.evidence = [launch.evidence[0]];
-  assert.match(coverageGaps(inventory, review).join(' '), /refresh\/load must cite its reconciled task site/);
+  assert.match(coverageGaps(inventory, review).join(' '), /refresh\/load must cite its reconciled task site\. Operation evidence must include App\.swift:3:5/);
   refresh.evidence.push(...evidence);
   review.taskSites = [{siteId:site.id, excludedReason:'Resolves to a different API'}];
-  assert.match(coverageGaps(inventory, review).join(' '), /refresh\/load must cite its reconciled task site/);
+  assert.match(coverageGaps(inventory, review).join(' '), /refresh\/load must cite its reconciled task site\. Task site was excluded/);
 });
 
 test('rejects blank or non-text Health Check headings', () => {

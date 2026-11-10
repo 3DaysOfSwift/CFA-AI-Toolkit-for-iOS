@@ -62,12 +62,23 @@ function hasTaskTrace(operation, site, sites) {
 }
 
 function invalidTaskLinks(operation, sites, taskEntries) {
-  return (operation.steps || []).filter(step => {
-    if (step.taskSiteId === undefined) return false;
+  const invalid = [];
+  for (const step of operation.steps || []) {
+    if (step.taskSiteId === undefined) continue;
     const site = sites.find(item => item.id === step.taskSiteId);
-    if (!site || !taskEntries.get(site.id)?.operationId || !stepCitesTask(step, site)) return true;
-    return !stepCitesTask({relation: step.relation, evidence: operation.evidence}, site);
-  });
+    const entry = taskEntries.get(step.taskSiteId);
+    let reason;
+    if (!site) reason = 'Task site is absent from the current inventory.';
+    else if (entry?.excludedReason) reason = 'Task site was excluded from the review.';
+    else if (!entry?.operationId) reason = 'Task site needs an operation assignment.';
+    else if (step.relation !== taskRelations.get(site.kind)) reason = `Expected relation ${taskRelations.get(site.kind)}.`;
+    else if (!stepCitesTask(step, site)) reason = `Step evidence must include ${site.file}:${site.line}:${site.column}.`;
+    else if (!stepCitesTask({relation: step.relation, evidence: operation.evidence}, site)) {
+      reason = `Operation evidence must include ${site.file}:${site.line}:${site.column}.`;
+    }
+    if (reason) invalid.push({...step, reason});
+  }
+  return invalid;
 }
 
 const pendingTypeReviews = review => (review.typeReviews || [])
@@ -118,7 +129,7 @@ export function nextWork(report, review, limit = 8) {
       .filter(scenario => scenario.status === 'unresolved')
       .map(({id, title, outcome, verification, evidence}) => ({id, title, outcome, verification, evidence: evidenceLocations(evidence)})),
     invalidTaskLinks: invalidTaskLinks(operation, sites, tasks)
-      .map(({id, taskSiteId, relation, evidence}) => ({id, taskSiteId, relation, evidence: evidenceLocations(evidence)})),
+      .map(({id, taskSiteId, relation, reason, evidence}) => ({id, taskSiteId, relation, reason, evidence: evidenceLocations(evidence)})),
     missingTimingScenarios: missingTimingScenarios(operation)
   })).filter(operation => operation.openChecks || operation.missingTrace || operation.missingTimingScenarios.length || operation.invalidTaskLinks.length);
   return {
@@ -272,7 +283,7 @@ export function coverageGaps(report, review) {
   }
   for (const operation of operations) {
     for (const step of invalidTaskLinks(operation, tasks, taskEntries)) {
-      gaps.push(`Workflow step ${operation.id}/${step.id} must cite its reconciled task site.`);
+      gaps.push(`Workflow step ${operation.id}/${step.id} must cite its reconciled task site. ${step.reason}`);
     }
   }
   if (untracedTasks.length) gaps.push(`Reconciled task sites need workflow steps: ${untracedTasks.join(', ')}.`);
