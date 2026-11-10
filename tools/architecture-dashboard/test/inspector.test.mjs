@@ -726,6 +726,8 @@ test('reviews a deferred AppModel launch through a local alias', async t => {
 
 test('identifies priority and explicitly typed Tasks scheduling the launch signal', async t => {
   const root = await fixture(t, {
+    'Application/QualifiedDelegate.swift': 'class Delegate { func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { _Concurrency.Task { AppModel.shared.applicationDidFinishLaunching() }; return true } }',
+    'Application/CustomDelegate.swift': 'class Delegate { func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { runner . Task { AppModel.shared.applicationDidFinishLaunching() }; return true } }',
     'Application/PriorityDelegate.swift': 'class Delegate { func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { Task(priority: .high) { AppModel.shared.applicationDidFinishLaunching() }; return true } }',
     'Application/DetachedDelegate.swift': 'class Delegate { func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { Task.detached(priority: .background) { await AppModel.shared.applicationDidFinishLaunching() }; return true } }',
     'Application/TypedDelegate.swift': 'class Delegate { func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { Task<\n  Void,\n  Never\n> { AppModel.shared.applicationDidFinishLaunching() }; return true } }',
@@ -734,7 +736,7 @@ test('identifies priority and explicitly typed Tasks scheduling the launch signa
     'Application/DirectDelegate.swift': 'class Delegate { func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { AppModel.shared.applicationDidFinishLaunching(); Task(priority: .high) { await refresh() }; return true } }'
   });
   const files = (await inspect(root)).findings.filter(item => item.code === 'scheduled-app-model-launch').map(item => item.file).sort();
-  assert.deepEqual(files, ['Application/DetachedDelegate.swift', 'Application/ExplicitInitializerDelegate.swift', 'Application/OperationArgumentDelegate.swift', 'Application/PriorityDelegate.swift', 'Application/TypedDelegate.swift']);
+  assert.deepEqual(files, ['Application/DetachedDelegate.swift', 'Application/ExplicitInitializerDelegate.swift', 'Application/OperationArgumentDelegate.swift', 'Application/PriorityDelegate.swift', 'Application/QualifiedDelegate.swift', 'Application/TypedDelegate.swift']);
 });
 
 test('reviews deferred startup when the delegate omits unused parameter names', async t => {

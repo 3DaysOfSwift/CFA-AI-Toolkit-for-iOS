@@ -639,7 +639,7 @@ export async function inspect(project) {
       const start = callback.index + callback[0].length - 1;
       const body = braceBody(source, start);
       inspectSynchronousLaunchIO('The launch callback', file, source, start, findings);
-      for (const scheduled of body.matchAll(/\b(?:Task\s*(?:<[^{}]*>\s*)?(?:\.\s*(?:init|detached)\s*)?|DispatchQueue\s*(?:\.\s*(?:main|global\s*\([^{}()]*\))|\([^{}()]*\))\s*\.\s*async(?:After)?\b\s*|OperationQueue\s*(?:\.\s*main|\(\s*\))\s*\.\s*addOperation\b\s*|(?<![.\w])(?<queue>\w+)\s*\.\s*(?<method>asyncAfter|async|addOperation)\b\s*)(?:\([^{}]*\)\s*|\([^{}]*?\b(?:operation|execute)\s*:\s*)?\{/g)) {
+      for (const scheduled of body.matchAll(/\b(?:(?<!\.\s*)(?:(?:Swift|_Concurrency)\s*\.\s*)?Task\s*(?:<[^{}]*>\s*)?(?:\.\s*(?:init|detached)\s*)?|DispatchQueue\s*(?:\.\s*(?:main|global\s*\([^{}()]*\))|\([^{}()]*\))\s*\.\s*async(?:After)?\b\s*|OperationQueue\s*(?:\.\s*main|\(\s*\))\s*\.\s*addOperation\b\s*|(?<![.\w])(?<queue>\w+)\s*\.\s*(?<method>asyncAfter|async|addOperation)\b\s*)(?:\([^{}]*\)\s*|\([^{}]*?\b(?:operation|execute)\s*:\s*)?\{/g)) {
         const {queue, method} = scheduled.groups;
         const queueType = method === 'addOperation' ? 'OperationQueue' : 'DispatchQueue';
         if (queue) {
