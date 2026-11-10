@@ -721,6 +721,13 @@ test('tracks native source reviews with current line evidence', async t => {
   const reviewed = await next(project, draftPath, syntax);
   assert.ok(!reviewed.nextFiles.includes('Legacy.m'));
   assert.ok(!reviewed.gaps.some(gap => gap.includes('Legacy.m')));
+  await fs.writeFile(path.join(project, 'Legacy.m'), 'void refresh(void) { restart(); }');
+  const mustNotParse = async () => assert.fail('A stale native source review must fail before SwiftSyntax runs');
+  await assert.rejects(next(project, draftPath, mustNotParse), /source fingerprint mismatch/);
+  await assert.rejects(progress(project, draftPath, mustNotParse), /source fingerprint mismatch/);
+  await assert.rejects(finish(project, draftPath, path.join(base, 'health-check.html'), undefined, mustNotParse),
+    /source fingerprint mismatch/);
+  await assert.rejects(fs.access(path.join(base, 'health-check.html')), {code:'ENOENT'});
 });
 
 test('rejects scope flags on report instead of silently using a different scope', () => {
