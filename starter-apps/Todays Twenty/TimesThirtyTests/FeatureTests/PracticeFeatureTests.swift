@@ -4,6 +4,42 @@ import Testing
 
 @MainActor
 struct PracticeFeatureTests {
+    @Test func admittedStartSurvivesCallerCancellation() async throws {
+        let env = TestEnvironment()
+        await env.repository.pauseNextSave()
+        let caller = Task { try await env.start() }
+        for _ in 0..<10_000 {
+            if await env.repository.isWaiting() { break }
+            await Task.yield()
+        }
+        #expect(await env.repository.isWaiting())
+
+        caller.cancel()
+        await env.repository.resumeSave()
+        try await caller.value
+
+        #expect(env.practice.currentSession != nil)
+        #expect(await env.repository.saveCount == 1)
+    }
+
+    @Test func admittedRefreshSurvivesCallerCancellation() async throws {
+        let env = TestEnvironment()
+        await env.repository.pauseNextFetch()
+        let caller = Task { try await env.practice.refresh() }
+        for _ in 0..<10_000 {
+            if await env.repository.isFetchWaiting() { break }
+            await Task.yield()
+        }
+        #expect(await env.repository.isFetchWaiting())
+
+        caller.cancel()
+        await env.repository.resumeFetch()
+        try await caller.value
+
+        #expect(env.practice.hasLoaded)
+        #expect(await env.repository.fetchCount == 1)
+    }
+
     @Test func equivalentRefreshesShareOneFeatureOperation() async {
         let env = TestEnvironment()
         await env.repository.pauseNextFetch()

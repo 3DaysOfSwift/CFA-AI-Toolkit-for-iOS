@@ -75,6 +75,23 @@ struct HabitsFeatureTests {
         #expect(feature.habits.first?.entries.first?.value == 3)
     }
 
+    @Test("An admitted record survives caller cancellation", .timeLimit(.minutes(1)))
+    func admittedRecordSurvivesCancellation() async throws {
+        let habit = Habit(id: UUID(), name: "Read", tracking: .count, unit: "pages", dailyTarget: nil, entries: [])
+        let repository = PausedRecordRepository(habit: habit)
+        let feature = HabitsFeature(repository: repository)
+        await feature.reload()
+        let caller = Task { try await feature.recordToday(habitID: habit.id, value: 4) }
+        await repository.waitForRecord()
+
+        caller.cancel()
+        await repository.releaseRecord()
+        try await caller.value
+
+        #expect(await repository.recordCount == 1)
+        #expect(feature.habits.first?.entries.first?.value == 4)
+    }
+
     @Test("Loading failure stays in the feature for the screen to present")
     func reportsLoadingFailure() async {
         let feature = HabitsFeature(repository: FailingHabitsRepository())
