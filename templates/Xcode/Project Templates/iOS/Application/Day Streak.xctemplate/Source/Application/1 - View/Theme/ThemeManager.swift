@@ -1,4 +1,6 @@
+import Observation
 import SwiftUI
+import UIKit
 
 enum ThemeChoice: String, CaseIterable, Identifiable {
     case automatic, daylight, midnight, quiet, ocean, plum, ember, indigo

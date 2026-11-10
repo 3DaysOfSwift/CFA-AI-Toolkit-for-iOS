@@ -8,6 +8,19 @@ import { execFileSync, spawnSync } from 'node:child_process';
 const root = path.resolve(import.meta.dirname, '..');
 const names = ['CFA App', 'Habit Tracker', 'Day Streak'];
 
+test('generated template files import the frameworks used by their declarations', () => {
+  const application = 'templates/Xcode/Project Templates/iOS/Application';
+  const expectations = new Map([
+    ['Habit Tracker.xctemplate/Source/Application/1 - View/___PACKAGENAMEASIDENTIFIER___App.swift', ['SwiftUI', 'UIKit']],
+    ['Day Streak.xctemplate/Source/Application/1 - View/___PACKAGENAMEASIDENTIFIER___App.swift', ['SwiftUI', 'UIKit']],
+    ['Day Streak.xctemplate/Source/Application/1 - View/Theme/ThemeManager.swift', ['Observation', 'SwiftUI', 'UIKit']]
+  ]);
+  for (const [relative, modules] of expectations) {
+    const source = fs.readFileSync(path.join(root, application, relative), 'utf8');
+    for (const module of modules) assert.match(source, new RegExp(`^import ${module}$`, 'm'), `${relative} requires ${module}`);
+  }
+});
+
 test('native templates provide the accent color expected by generated Xcode projects', () => {
   for (const name of names) {
     const file = path.join(root, 'templates/Xcode/Project Templates/iOS/Application', `${name}.xctemplate/Source/Assets.xcassets/AccentColor.colorset/Contents.json`);
