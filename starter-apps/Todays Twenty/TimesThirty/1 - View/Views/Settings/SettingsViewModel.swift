@@ -9,6 +9,8 @@ final class SettingsViewModel {
     }
 
     var preferredDifficulty: Difficulty { settingsFeature.preferredDifficulty }
+    var selectedTheme: ThemeChoice { settingsFeature.selectedTheme }
     var version: String { settingsFeature.version }
     func selectDifficulty(_ difficulty: Difficulty) { settingsFeature.selectDifficulty(difficulty) }
+    func selectTheme(_ theme: ThemeChoice) { settingsFeature.selectTheme(theme) }
 }

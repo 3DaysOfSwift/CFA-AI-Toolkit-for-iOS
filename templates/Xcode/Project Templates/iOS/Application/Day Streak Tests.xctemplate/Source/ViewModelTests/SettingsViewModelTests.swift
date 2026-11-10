@@ -11,7 +11,10 @@ struct SettingsViewModelTests {
         let feature = SettingsFeature(defaults: defaults)
         let model = SettingsViewModel(settingsFeature: feature)
         model.selectDifficulty(.gentle)
+        model.selectTheme(.ember)
         #expect(model.preferredDifficulty == .gentle)
+        #expect(model.selectedTheme == .ember)
         #expect(feature.preferredDifficulty == .gentle)
+        #expect(feature.selectedTheme == .ember)
     }
 }

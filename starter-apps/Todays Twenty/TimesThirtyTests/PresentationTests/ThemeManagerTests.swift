@@ -4,13 +4,15 @@ import Testing
 
 @MainActor
 struct ThemeManagerTests {
-    @Test func unknownSavedThemeFallsBackToAutomatic() throws {
+    @Test func reflectsTheSettingsFeatureTheme() throws {
         let name = "TimesThirtyTests.\(UUID())"
         let defaults = try #require(UserDefaults(suiteName: name))
         defer { defaults.removePersistentDomain(forName: name) }
-        defaults.set("obsolete-theme", forKey: "selectedTheme")
-
-        let manager = ThemeManager(defaults: defaults)
+        let feature = SettingsFeature(defaults: defaults)
+        let manager = ThemeManager(settingsFeature: feature)
         #expect(manager.selectedTheme == .automatic)
+        feature.selectTheme(.plum)
+        #expect(manager.selectedTheme == .plum)
+        #expect(manager.current.colorScheme == .dark)
     }
 }

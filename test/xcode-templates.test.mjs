@@ -34,6 +34,24 @@ test('Habit Tracker keeps operation failures in Features and presentation text i
   }
 });
 
+test('Day Streak keeps saved theme ownership in SettingsFeature', () => {
+  const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/Day Streak.xctemplate/Source/Application');
+  const feature = fs.readFileSync(path.join(source, '2 - AppModel/Features/Settings/SettingsFeature.swift'), 'utf8');
+  const manager = fs.readFileSync(path.join(source, '1 - View/Theme/ThemeManager.swift'), 'utf8');
+  const viewModel = fs.readFileSync(path.join(source, '1 - View/Views/Settings/SettingsViewModel.swift'), 'utf8');
+  const view = fs.readFileSync(path.join(source, '1 - View/Views/Settings/SettingsView.swift'), 'utf8');
+
+  assert.match(feature, /private\(set\) var selectedTheme: ThemeChoice/);
+  assert.match(feature, /enum ThemeChoice: String, CaseIterable, Identifiable/);
+  assert.match(feature, /func selectTheme\(_ theme: ThemeChoice\)/);
+  assert.doesNotMatch(feature, /SwiftUI|ColorScheme|Color\(/);
+  assert.doesNotMatch(manager, /UserDefaults|defaults\.set/);
+  assert.match(manager, /private let settingsFeature: SettingsFeature/);
+  assert.match(viewModel, /func selectTheme\(_ theme: ThemeChoice\)/);
+  assert.match(view, /set: \{ viewModel\.selectTheme\(\$0\) \}/);
+  assert.doesNotMatch(view, /themeManager\.select/);
+});
+
 test('native templates provide the accent color expected by generated Xcode projects', () => {
   for (const name of names) {
     const file = path.join(root, 'templates/Xcode/Project Templates/iOS/Application', `${name}.xctemplate/Source/Assets.xcassets/AccentColor.colorset/Contents.json`);
