@@ -14,7 +14,7 @@ struct PracticeViewModelTests {
             practiceFeature: env.practice,
             dayStreakFeature: env.streak,
             settingsFeature: settings,
-            appInformation: ["CFBundleDisplayName": "My Practice"]
+            appInformation: AppInformation(appName: "My Practice")
         )
 
         #expect(viewModel.appName == "My Practice")

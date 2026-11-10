@@ -12,12 +12,12 @@ struct SettingsViewModelTests {
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
         let feature = SettingsFeature(defaults: defaults)
-        let viewModel = SettingsViewModel(settingsFeature: feature, appInformation: [
-            "CFBundleDisplayName": "My Habits",
-            "CFBundleName": "InternalName",
-            "CFBundleShortVersionString": "2.3",
-            "CFBundleVersion": "42"
-        ])
+        let appInformation = AppInformation(
+            appName: "My Habits",
+            marketingVersion: "2.3",
+            buildNumber: "42"
+        )
+        let viewModel = SettingsViewModel(settingsFeature: feature, appInformation: appInformation)
 
         #expect(viewModel.appName == "My Habits")
         #expect(viewModel.versionDescription == "Version 2.3 (42)")
@@ -29,16 +29,14 @@ struct SettingsViewModelTests {
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
         let feature = SettingsFeature(defaults: defaults)
-        let viewModel = SettingsViewModel(settingsFeature: feature, appInformation: [
-            "CFBundleDisplayName": " ",
-            "CFBundleName": "Habit Tracker",
-            "CFBundleShortVersionString": "",
-            "CFBundleVersion": 42
-        ])
+        let viewModel = SettingsViewModel(
+            settingsFeature: feature,
+            appInformation: AppInformation(appName: " ", marketingVersion: "", buildNumber: nil)
+        )
 
-        #expect(viewModel.appName == "Habit Tracker")
+        #expect(viewModel.appName == "App")
         #expect(viewModel.versionDescription == "Version — (—)")
-        #expect(SettingsViewModel(settingsFeature: feature, appInformation: [:]).appName == "App")
+        #expect(SettingsViewModel(settingsFeature: feature, appInformation: AppInformation()).appName == "App")
     }
 
     @Test("Changing week start updates the preference feature")

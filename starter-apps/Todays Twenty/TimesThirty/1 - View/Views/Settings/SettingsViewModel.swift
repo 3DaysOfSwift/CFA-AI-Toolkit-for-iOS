@@ -4,31 +4,18 @@ import Observation
 @MainActor @Observable
 final class SettingsViewModel {
     private let settingsFeature: SettingsFeature
-    private let appInformation: [String: Any]
+    private let appInformation: AppInformation
 
     init(settingsFeature: SettingsFeature = AppModel.shared.settingsFeature,
-         appInformation: [String: Any] = Bundle.main.infoDictionary ?? [:]) {
+         appInformation: AppInformation = .current) {
         self.settingsFeature = settingsFeature
         self.appInformation = appInformation
     }
 
     var preferredDifficulty: Difficulty { settingsFeature.preferredDifficulty }
     var selectedTheme: ThemeChoice { settingsFeature.selectedTheme }
-    var appName: String {
-        information(for: "CFBundleDisplayName") ?? information(for: "CFBundleName") ?? "App"
-    }
-    var versionDescription: String {
-        "Version \(information(for: "CFBundleShortVersionString") ?? "—") " +
-        "(\(information(for: "CFBundleVersion") ?? "—"))"
-    }
-
-    private func information(for key: String) -> String? {
-        guard let value = appInformation[key] as? String,
-              !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            return nil
-        }
-        return value
-    }
+    var appName: String { appInformation.appName }
+    var versionDescription: String { appInformation.versionDescription }
     func selectDifficulty(_ difficulty: Difficulty) { settingsFeature.selectDifficulty(difficulty) }
     func selectTheme(_ theme: ThemeChoice) { settingsFeature.selectTheme(theme) }
     func difficultyTitle(_ difficulty: Difficulty) -> String { difficulty.rawValue.capitalized }

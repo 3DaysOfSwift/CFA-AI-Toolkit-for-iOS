@@ -5,11 +5,11 @@ import Observation
 @Observable
 final class SettingsViewModel {
     private let settingsFeature: SettingsFeature
-    private let appInformation: [String: Any]
+    private let appInformation: AppInformation
     private let developerWebsiteAddress = "https://3daysofswiftconcurrency.com"
 
     init(settingsFeature: SettingsFeature = AppModel.shared.settingsFeature,
-         appInformation: [String: Any] = Bundle.main.infoDictionary ?? [:]) {
+         appInformation: AppInformation = .current) {
         self.settingsFeature = settingsFeature
         self.appInformation = appInformation
     }
@@ -31,24 +31,11 @@ final class SettingsViewModel {
         }
     }
 
-    var appName: String {
-        information(for: "CFBundleDisplayName") ?? information(for: "CFBundleName") ?? "App"
-    }
+    var appName: String { appInformation.appName }
 
     var developerWebsiteURL: URL? {
         URL(string: developerWebsiteAddress)
     }
 
-    var versionDescription: String {
-        "Version \(information(for: "CFBundleShortVersionString") ?? "—") " +
-        "(\(information(for: "CFBundleVersion") ?? "—"))"
-    }
-
-    private func information(for key: String) -> String? {
-        guard let value = appInformation[key] as? String,
-              !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            return nil
-        }
-        return value
-    }
+    var versionDescription: String { appInformation.versionDescription }
 }

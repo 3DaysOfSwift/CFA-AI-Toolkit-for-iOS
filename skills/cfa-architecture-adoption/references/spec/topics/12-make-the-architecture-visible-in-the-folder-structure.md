@@ -6,6 +6,7 @@ Use this top-level reading order:
 Application
 ├── 1 - View
 │   ├── App.swift
+│   ├── AppInformation.swift
 │   ├── Theme
 │   │   ├── AppColourTheme.swift
 │   │   └── ThemeManager.swift

@@ -18,21 +18,25 @@ struct SettingsViewModelTests {
         #expect(feature.selectedTheme == .ember)
         #expect(viewModel.difficultyTitle(.challenge) == "Challenge")
         #expect(viewModel.themeTitle(.midnight) == "Midnight")
-        let versionModel = SettingsViewModel(
+        let versionViewModel = SettingsViewModel(
             settingsFeature: feature,
-            appInformation: [
-                "CFBundleDisplayName": "My Practice",
-                "CFBundleShortVersionString": "2.3",
-                "CFBundleVersion": "4"
-            ]
+            appInformation: AppInformation(
+                appName: "My Practice",
+                marketingVersion: "2.3",
+                buildNumber: "4"
+            )
         )
-        #expect(versionModel.appName == "My Practice")
-        #expect(versionModel.versionDescription == "Version 2.3 (4)")
-        #expect(SettingsViewModel(settingsFeature: feature, appInformation: [:]).versionDescription == "Version — (—)")
-        let blankVersionModel = SettingsViewModel(
+        #expect(versionViewModel.appName == "My Practice")
+        #expect(versionViewModel.versionDescription == "Version 2.3 (4)")
+        let missingMetadataViewModel = SettingsViewModel(
             settingsFeature: feature,
-            appInformation: ["CFBundleShortVersionString": " ", "CFBundleVersion": 4]
+            appInformation: AppInformation()
         )
-        #expect(blankVersionModel.versionDescription == "Version — (—)")
+        #expect(missingMetadataViewModel.versionDescription == "Version — (—)")
+        let blankVersionViewModel = SettingsViewModel(
+            settingsFeature: feature,
+            appInformation: AppInformation(marketingVersion: " ", buildNumber: nil)
+        )
+        #expect(blankVersionViewModel.versionDescription == "Version — (—)")
     }
 }

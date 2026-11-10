@@ -8,20 +8,27 @@ struct SettingsViewModelTests {
         let name = "CFASettingsScreenTests.\(UUID())"
         let defaults = try #require(UserDefaults(suiteName: name))
         defer { defaults.removePersistentDomain(forName: name) }
-        let feature = SettingsFeature(defaults: defaults)
-        let model = SettingsViewModel(settingsFeature: feature, appInformation: [
-            "CFBundleDisplayName": "CFA Example",
-            "CFBundleShortVersionString": "2.3",
-            "CFBundleVersion": "4"
-        ])
-        model.selectTheme(.forest)
-        #expect(feature.selectedTheme == .forest)
-        #expect(model.themeName(.systemGrey) == "System Grey")
-        #expect(model.appName == "CFA Example")
-        #expect(model.versionDescription == "Version 2.3 (4)")
-        #expect(model.developerWebsiteURL?.host() == "3daysofswiftconcurrency.com")
-        let missing = SettingsViewModel(settingsFeature: feature, appInformation: [:])
-        #expect(missing.appName == "App")
-        #expect(missing.versionDescription == "Version — (—)")
+        let settingsFeature = SettingsFeature(defaults: defaults)
+        let appInformation = AppInformation(
+            appName: "CFA Example",
+            marketingVersion: "2.3",
+            buildNumber: "4"
+        )
+        let viewModel = SettingsViewModel(
+            settingsFeature: settingsFeature,
+            appInformation: appInformation
+        )
+        viewModel.selectTheme(.forest)
+        #expect(settingsFeature.selectedTheme == .forest)
+        #expect(viewModel.themeName(.systemGrey) == "System Grey")
+        #expect(viewModel.appName == "CFA Example")
+        #expect(viewModel.versionDescription == "Version 2.3 (4)")
+        #expect(viewModel.developerWebsiteURL?.host() == "3daysofswiftconcurrency.com")
+        let missingMetadataViewModel = SettingsViewModel(
+            settingsFeature: settingsFeature,
+            appInformation: AppInformation()
+        )
+        #expect(missingMetadataViewModel.appName == "App")
+        #expect(missingMetadataViewModel.versionDescription == "Version — (—)")
     }
 }

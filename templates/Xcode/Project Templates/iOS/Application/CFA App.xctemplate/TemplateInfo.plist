@@ -56,6 +56,15 @@
 				<string>com.apple.dt.applicationTarget</string>
 			</array>
 		</dict>
+		<key>1 - View/AppInformation.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/AppInformation.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
 		<key>1 - View/Theme/ThemeManager.swift</key>
 		<dict>
 			<key>Path</key>
@@ -226,6 +235,7 @@
 	<key>Nodes</key>
 	<array>
 		<string>1 - View/___PACKAGENAME:identifier___App.swift</string>
+		<string>1 - View/AppInformation.swift</string>
 		<string>1 - View/Theme/AppColourTheme+Palette.swift</string>
 		<string>1 - View/Theme/ThemeManager.swift</string>
 		<string>1 - View/Views/Root/RootTabView.swift</string>

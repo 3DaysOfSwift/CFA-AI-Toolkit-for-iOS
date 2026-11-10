@@ -87,9 +87,13 @@ shared feature state to the owning Feature. Bindings, simple conditional
 rendering, and short layout-local values that directly describe the rendered
 interface remain declarative View code.
 
-A ViewModel may accept a selected immutable snapshot for its detail screen and defaults
-its narrow Feature dependencies from AppModel.shared. Tests may provide
-isolated Features. Screen selection remains presentation state.
+A ViewModel may accept a selected immutable domain snapshot for its detail screen and
+defaults its narrow Feature dependencies from AppModel.shared. Tests may provide
+isolated Features. It may also accept a typed immutable presentation value when system
+presentation data, such as app identity, must be deterministic in tests. Keep that value
+free of behaviour and mutable state. Do not pass `Bundle`, a raw metadata dictionary,
+a service, or an unrelated convenience value through a ViewModel initializer. Screen
+selection remains presentation state.
 
 ```swift
 // Dedicated editor: describe the Save control and forward intent.

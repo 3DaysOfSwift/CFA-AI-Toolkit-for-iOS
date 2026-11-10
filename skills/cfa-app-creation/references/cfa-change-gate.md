@@ -120,8 +120,11 @@ the architecture:
     belong to the adjacent ViewModel; business, persistence, and shared state
     belong to the owning Feature.
 12. A ViewModel initializer defaults its narrow Feature dependencies from
-    `AppModel.shared`. A detail ViewModel may also receive a selected immutable snapshot;
-    avoid unrelated convenience parameters.
+    `AppModel.shared`. A detail ViewModel may also receive a selected immutable domain
+    snapshot. A typed immutable presentation value may be injected when a system value
+    such as app identity must be deterministic in tests. Such a value contains no
+    behaviour or mutable state; do not inject `Bundle`, raw metadata dictionaries,
+    services, or unrelated convenience parameters.
 13. Each local data responsibility uses the simplest single persistence route.
     A replaceable remote snapshot normally uses one JSON cache; SwiftData is reserved
     for genuinely structured, queryable, growing, or relational local data.

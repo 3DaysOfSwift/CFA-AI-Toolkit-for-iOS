@@ -221,6 +221,7 @@ Use this top-level reading order:
 Application
 ├── 1 - View
 │   ├── App.swift
+│   ├── AppInformation.swift
 │   ├── Theme
 │   │   ├── AppColourTheme.swift
 │   │   └── ThemeManager.swift
@@ -637,7 +638,7 @@ through every SwiftUI initializer.
 This is mandatory for CFA application screens. Before delivery, verify all three:
 
 1. Every screen owns a private dedicated ViewModel, constructed inline by default. A detail View may initialise its own State-backed ViewModel from a selected immutable snapshot in its initializer.
-2. Each ViewModel initializer defaults its narrow live feature dependencies from `AppModel.shared` while allowing tests to supply isolated replacements.
+2. Each ViewModel initializer defaults its narrow live feature dependencies from `AppModel.shared` while allowing tests to supply isolated replacements. It may receive a selected immutable domain snapshot for a detail screen or a typed immutable presentation value when system presentation data must be deterministic in tests. It does not accept `Bundle`, raw metadata dictionaries, services or unrelated convenience parameters.
 3. Never pass a ViewModel into a View. Selected value data is permitted for detail destinations; preserve independent destination identity.
 
 Do not remove a screen ViewModel, or pass feature dependencies through a screen initializer, merely because a generic architecture guideline would use fewer types. CFA makes the ViewModel boundary explicit so every screen has one clear, testable route into the shared application graph.

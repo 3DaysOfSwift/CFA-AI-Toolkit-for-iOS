@@ -33,6 +33,15 @@
 			<key>Group</key>
 			<string>1 - View</string>
 		</dict>
+		<key>1 - View/AppInformation.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/AppInformation.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
 		<key>1 - View/Theme/AppColourTheme.swift</key>
 		<dict>
 			<key>Path</key>
@@ -284,6 +293,7 @@
 	<key>Nodes</key>
 	<array>
 		<string>1 - View/___PACKAGENAMEASIDENTIFIER___App.swift</string>
+		<string>1 - View/AppInformation.swift</string>
 		<string>1 - View/Theme/AppColourTheme.swift</string>
 		<string>1 - View/Theme/ThemeManager.swift</string>
 		<string>1 - View/Views/AddHabit/AddHabitView.swift</string>

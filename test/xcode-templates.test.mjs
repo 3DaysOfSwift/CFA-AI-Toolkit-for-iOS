@@ -8,6 +8,24 @@ import { execFileSync, spawnSync } from 'node:child_process';
 const root = path.resolve(import.meta.dirname, '..');
 const names = ['CFA App', 'Habit Tracker', 'Day Streak'];
 
+test('template ViewModels receive typed app information instead of raw bundle metadata', () => {
+  const application = path.join(root, 'templates/Xcode/Project Templates/iOS/Application');
+  for (const name of names) {
+    const source = path.join(application, `${name}.xctemplate/Source/Application/1 - View`);
+    const appInformation = fs.readFileSync(path.join(source, 'AppInformation.swift'), 'utf8');
+    assert.match(appInformation, /struct AppInformation: Equatable, Sendable/);
+    assert.match(appInformation, /Bundle\.main\.infoDictionary/);
+
+    const viewModels = fs.readdirSync(source, {recursive: true, encoding: 'utf8'})
+      .filter(file => file.endsWith('ViewModel.swift'));
+    for (const relative of viewModels) {
+      const viewModel = fs.readFileSync(path.join(source, relative), 'utf8');
+      assert.doesNotMatch(viewModel, /\[String:\s*Any\]/, `${name}: ${relative}`);
+      assert.doesNotMatch(viewModel, /Bundle\.main/, `${name}: ${relative}`);
+    }
+  }
+});
+
 test('starter tests use responsibility-named system-under-test locals', () => {
   const starterApps = path.join(root, 'starter-apps');
   const testSources = fs.readdirSync(starterApps, { recursive: true, encoding: 'utf8' })
@@ -165,7 +183,8 @@ test('Habit Tracker Pro keeps root and saved appearance state at CFA boundaries'
   assert.match(settingsFeature, /private\(set\) var selectedTheme: ThemeSelection/);
   assert.match(settingsFeature, /func selectTheme\(_ theme: ThemeSelection\)/);
   assert.doesNotMatch(settingsFeature, /Bundle\.main|appInformation|appVersion|buildNumber|SwiftUI/);
-  assert.match(settingsViewModel, /Bundle\.main\.infoDictionary/);
+  assert.match(settingsViewModel, /appInformation: AppInformation = \.current/);
+  assert.doesNotMatch(settingsViewModel, /Bundle\.main|\[String:\s*Any\]/);
   assert.match(settingsViewModel, /func selectTheme\(_ theme: ThemeSelection\)/);
   assert.match(themeManager, /private let settingsFeature: SettingsFeature/);
   assert.doesNotMatch(themeManager, /UserDefaults|defaults\.set|func select/);
@@ -245,7 +264,8 @@ test('Day Streak maps domain outcomes to presentation inside ViewModels', () => 
   assert.doesNotMatch(practiceViewModel, /wrongAnswers\.isEmpty|wrongAnswers\.contains/);
   assert.doesNotMatch(streakViewModel, /error\.localizedDescription/);
   assert.doesNotMatch(settingsFeature, /Bundle\.main|appInformation|appVersion|buildNumber|"Version/);
-  assert.match(settingsViewModel, /Bundle\.main\.infoDictionary/);
+  assert.match(settingsViewModel, /appInformation: AppInformation = \.current/);
+  assert.doesNotMatch(settingsViewModel, /Bundle\.main|\[String:\s*Any\]/);
   assert.match(settingsViewModel, /var versionDescription: String/);
 });
 
@@ -447,9 +467,12 @@ test('starter Settings screens use an About section and a version footer outside
     assert.doesNotMatch(view, /LabeledContent\("Version"/);
     assert.doesNotMatch(view, /On.device AI|LabeledContent\("AI"/);
     if (application.startsWith('Project Templates/')) {
-      assert.match(viewModel, /Bundle\.main\.infoDictionary/);
-      assert.match(viewModel, /CFBundleShortVersionString/);
-      assert.match(viewModel, /CFBundleVersion/);
+      const presentationRoot = path.dirname(path.dirname(settings));
+      const appInformation = fs.readFileSync(path.join(presentationRoot, 'AppInformation.swift'), 'utf8');
+      assert.match(viewModel, /appInformation: AppInformation = \.current/);
+      assert.match(appInformation, /Bundle\.main\.infoDictionary/);
+      assert.match(appInformation, /CFBundleShortVersionString/);
+      assert.match(appInformation, /CFBundleVersion/);
     }
   }
 });
