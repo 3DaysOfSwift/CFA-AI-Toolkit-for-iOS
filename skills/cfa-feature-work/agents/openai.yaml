@@ -1,4 +1,4 @@
 interface:
   display_name: "CFA Feature Work"
   short_description: "Add, change or remove a CFA iOS app feature"
-  default_prompt: "Add a feature to this CFA iOS app."
+  default_prompt: "Use $cfa-feature-work to add, change, or remove the requested feature in this CFA iOS app."

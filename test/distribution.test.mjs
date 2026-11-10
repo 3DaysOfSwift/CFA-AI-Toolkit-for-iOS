@@ -152,9 +152,17 @@ test('every skill ships complete interface metadata', t => {
   for (const field of ['display_name','short_description','default_prompt']) {
    assert.match(contents,new RegExp(`^\\s{2}${field}:\\s+\\S`,'m'),`${name}: ${field}`);
   }
+  assert.ok(contents.includes(`$${name}`), `${name}: default prompt invocation`);
  }
  fs.unlinkSync(path.join(source,'skills/swift-code-quality/agents/openai.yaml'));
  assert.throws(()=>validate(source,{source:false}),/Missing skill interface metadata: swift-code-quality/);
+});
+
+test('release validation rejects a default prompt that does not invoke its skill', t => {
+ const {source}=release(t);
+ const metadata=path.join(source,'skills/cfa-feature-work/agents/openai.yaml');
+ fs.writeFileSync(metadata,fs.readFileSync(metadata,'utf8').replace('$cfa-feature-work','cfa-feature-work'));
+ assert.throws(()=>validate(source,{source:false}),/default prompt does not invoke \$cfa-feature-work/);
 });
 
 test('release validation rejects a missing workflow policy and an entry point that bypasses it', t => {

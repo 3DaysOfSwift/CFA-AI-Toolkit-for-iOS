@@ -1,4 +1,4 @@
 interface:
   display_name: "CFA Unit Tests"
   short_description: "Write and audit meaningful CFA iOS tests"
-  default_prompt: "Write meaningful unit tests for this CFA iOS app."
+  default_prompt: "Use $cfa-unit-tests to write or audit meaningful unit tests for this CFA iOS app."

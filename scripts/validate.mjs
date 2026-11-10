@@ -82,6 +82,9 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
         throw Error(`Missing ${field} in skill interface metadata: ${name}`);
       }
     }
+    if (!interfaceText.includes(`$${name}`)) {
+      throw Error(`Skill default prompt does not invoke $${name}: ${name}`);
+    }
     // A colon followed by whitespace is invalid in a plain YAML scalar. This
     // catches a common metadata mistake; it is not a complete YAML parser.
     const frontmatter = text.match(/^---\s*\n([\s\S]*?)\n---(?:\s|$)/)?.[1] ?? '';
