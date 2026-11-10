@@ -145,7 +145,10 @@ rejection policy. Verify that edits already pending before adoption survive
 a failed sync and restart after the change. Confirm that retry still produces
 one logical server change, including when the server applied the edit before
 losing its reply. Verify that local save and server confirmation remain
-distinct. Verify affected Apple-managed sync on supported devices.
+distinct. For custom-server edits, fail the local write and verify that
+the app reports no local success and makes no edit eligible for upload.
+Exercise the product's conflict and rejection outcomes. Verify affected
+Apple-managed sync, including conflicting offline edits, on supported devices.
 
 Use this workflow for an architecture-only adoption when the application is
 already modern or the developer has explicitly limited the scope to structure.

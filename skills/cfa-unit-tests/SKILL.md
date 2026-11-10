@@ -208,7 +208,10 @@ storage, and verify that the edit and its pending metadata survive together.
 Retry with the same edit identity and verify that it produces one logical
 server change. Separately, let the server fixture apply the edit and drop its
 reply. Reconstruct the Feature and verify that retry confirms the same edit
-without applying it again. Exercise the product's conflict and rejection outcomes and
+without applying it again. When replacing sync or its storage, start with a
+pending edit written by the previous implementation. Verify that the new
+implementation restores its original identity and metadata and can retry it
+safely. Exercise the product's conflict and rejection outcomes and
 verify that server confirmation is shown only after acceptance. For
 Apple-managed sync, verify the actual handoff and conflicting offline edits
 on supported devices separately from the unit tests.

@@ -113,8 +113,11 @@ remain visible as errors.
 When tidying existing offline edits or sync, follow the
 [sync rule](references/spec/rules/cfa-sync-01.md). Preserve pending edit
 identities, their persisted metadata and the existing conflict and rejection
-policy. Verify that moving storage or task ownership leaves pending edits
-recoverable after failure and restart and safe to retry. If the server can
+policy. When replacing sync or its storage, start with an edit saved by the
+previous implementation. Verify that moving storage or task ownership leaves
+pending edits recoverable after failure and restart and safe to retry.
+For custom-server edits, fail the local write and verify that it reports no
+local success and makes no edit eligible for upload. If the server can
 apply an edit before losing its reply, verify that retry with the saved identity
 does not apply it again. Keep locally saved
 and server-confirmed outcomes distinct.
