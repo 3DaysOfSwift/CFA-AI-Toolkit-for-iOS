@@ -254,6 +254,12 @@ skill from that toolkit before changing the project.
   dedicated @ModelActor for non-trivial production database work. Verify
   where the context is created and that expensive work executes off MainActor.
   Views and previews reach storage through their ViewModel and Feature.
+- Keep domain-specific microservices beside the Feature whose work they
+  support, including when another Feature uses them. Move a broadly applicable
+  service to a shared location when no Feature naturally owns it. When common
+  configuration or shared state warrants one instance, compose it locally in
+  AppModel.live() and inject it through each consumer's initializer. Otherwise
+  use the simplest value or instances that meet the requirements.
 - Route URLSession requests through NetworkingManager. Composition code may
   configure and inject the session. Keep response validation and decoding
   with each Feature-specific API adapter. In new apps, start with a stateless

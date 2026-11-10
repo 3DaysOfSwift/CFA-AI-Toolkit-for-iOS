@@ -205,8 +205,10 @@ the architecture:
     collaborators. Keep domain-specific services beside their owning Feature
     while that location remains descriptive. Put broadly applicable services
     in a shared location and compose a shared instance in `AppModel.live()`
-    when common configuration or shared state requires it. Views/ViewModels
-    never open storage or make transport calls. Independent requests must
+    when common configuration or shared state warrants it. Inject that
+    dependency through each consumer's initializer. A second consumer alone
+    does not change a domain-specific service's placement. Views and ViewModels
+    reach storage and transport through their Features. Independent requests must
     reach the transport without waiting for another response unless a
     documented policy limits them. Where networking changes, hold one
     response open and verify that a second independent request reaches
