@@ -40,6 +40,14 @@ test('release validation rejects stale skill and bundled-tool licences', t => {
  assert.throws(()=>validate(source,{source:false}),/stale bundled dashboard licence/);
 });
 
+test('release validation rejects unreviewed skill packages', t => {
+ const {source}=release(t);
+ const unexpected=path.join(source,'skills/unreviewed-skill');
+ fs.mkdirSync(unexpected);
+ fs.writeFileSync(path.join(unexpected,'SKILL.md'),'---\nname: unreviewed-skill\ndescription: Not reviewed.\n---\n');
+ assert.throws(()=>validate(source,{source:false}),/Unexpected or missing skill package/);
+});
+
 test('release omits local Xcode state and build outputs, but retains shared project configuration', t => {
  for (const file of ['A.xcodeproj/xcuserdata/person.xcuserdatad/state', 'View.xcuserstate',
   '.DS_Store', 'App/.build/debug/out', 'App/DerivedData/out', 'App/.git/config']) assert.equal(isReleasePath(file),false,file);

@@ -10,6 +10,13 @@ import { verifyTemplateOrientations } from './verify-ios-orientations.mjs';
 import { specTopics } from './spec-topics.mjs';
 const productDescription = 'CFA AI Toolkit for iOS: AI skills and tools to build, modernise, test and maintain SwiftUI apps with Swift Concurrency.';
 export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
+  const skillEntries = fs.readdirSync(path.join(base, 'skills'), { withFileTypes: true });
+  const actualSkills = skillEntries.map(entry => entry.name).sort();
+  const expectedSkills = [...skills].sort();
+  if (skillEntries.some(entry => !entry.isDirectory()) ||
+      JSON.stringify(actualSkills) !== JSON.stringify(expectedSkills)) {
+    throw Error(`Unexpected or missing skill package: expected exactly ${expectedSkills.join(', ')}.`);
+  }
   const expectedTopics = specTopics(base);
   for (const folder of ['architecture/spec', ...cfaSkills.map(name => `skills/${name}/references/spec`)]) {
     const directory = path.join(base, folder);
