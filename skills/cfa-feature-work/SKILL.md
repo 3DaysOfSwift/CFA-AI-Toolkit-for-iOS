@@ -45,6 +45,15 @@ Move broadly applicable services to a shared location. Compose a shared
 instance locally in `AppModel.live()` when common configuration or shared
 state warrants it, then inject it through the consumers' initializers.
 
+When changing network services, apply the
+[networking rule](references/spec/rules/cfa-net-01.md). Route URLSession
+requests through NetworkingManager and keep provider-specific validation and
+decoding in their adapters. Preserve documented request limits. For
+independent requests, hold the first response open in a controlled transport
+and verify the next request reaches it before the first finishes. If an
+actor protects shared state, check for actual serialization of requests
+across suspension before attributing a bottleneck to it.
+
 If the change introduces or touches a paid capability, apply the
 [paid capability rule](references/spec/rules/cfa-pay-01.md) and establish its
 access policy from the product requirements. The screen ViewModel reads current

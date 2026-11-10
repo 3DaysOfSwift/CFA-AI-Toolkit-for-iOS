@@ -51,6 +51,14 @@ Read [CFA specification](references/cfa-specification.md), [CFA change gate](ref
    their Feature while that location describes their purpose. Compose shared
    dependencies locally in `AppModel.live()` and inject them through
    consumer initializers when common configuration or state warrants sharing.
+   When changing network services, apply the
+   [networking rule](references/spec/rules/cfa-net-01.md). Route URLSession
+   requests through NetworkingManager and keep provider-specific validation and
+   decoding in their adapters. Preserve documented request limits. For
+   independent requests, hold the first response open in a controlled transport
+   and verify the next request reaches it before the first finishes. If an
+   actor protects shared state, check for actual serialization of requests
+   across suspension before attributing a bottleneck to it.
 4. Migrate one end-to-end feature at a time, checking callers and live wiring. Keep data formats, navigation, errors, ordering and operation lifetimes stable. Remove superseded wiring only once all callers have moved.
 5. Preserve the existing design, palettes, theme selector, Settings content and branding. Do not apply new-app design defaults or report their absence as adoption gaps. An explicitly requested visual change stays limited to that request; record it in the behaviour contract and verify saved preferences and affected interactions.
 6. Build and run relevant regression checks at each meaningful boundary.
