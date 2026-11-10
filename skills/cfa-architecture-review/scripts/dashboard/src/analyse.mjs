@@ -117,7 +117,7 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
         await walk(absolute, scanSwift);
       } else if (entry.isFile()) {
         const packageManifest = /^Package(?:@swift-\d+(?:\.\d+)*)?\.swift$/.test(entry.name);
-        const buildDefinition = packageManifest || /(?:\.(?:pbxproj|xcconfig|xcscheme|entitlements)$|Info\.plist$|^(?:contents\.xcworkspacedata|Package\.resolved)$)/.test(entry.name);
+        const buildDefinition = packageManifest || /(?:\.(?:pbxproj|xcconfig|xcscheme|entitlements|plist)$|^(?:contents\.xcworkspacedata|Package\.resolved)$)/.test(entry.name);
         const swiftSource = scanSwift && entry.name.endsWith('.swift');
         if (!buildDefinition && !swiftSource) continue;
         const relative = path.relative(root, absolute).split(path.sep).join('/');
