@@ -30,8 +30,10 @@ behaviour preservation. Keep remaining risks and work visible.
 For the final migration record, use one row per in-scope behaviour and
 affected target that exposes it. Include user journeys and access to existing
 saved data. Link the original and final-commit evidence for the same scenario
-by ID. Evidence can be reused across rows when it actually covers them. If a
-test target has a different name, identify the product target it exercises.
+by ID. For both revisions, record the exercised targets, build configuration,
+OS and device or simulator on the linked evidence. Evidence can be reused
+across rows when it actually covers them. If a test target has a different
+name, identify the product target it exercises.
 If a baseline result cannot be recovered for a required comparison, record
 it as unknown and keep the migration open.
 

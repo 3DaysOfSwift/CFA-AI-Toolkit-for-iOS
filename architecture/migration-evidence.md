@@ -131,8 +131,9 @@ OS alone does not establish that compatibility.
 
 For behaviour regression, compare each in-scope requirement on every affected
 target that exposes it. Link evidence for the same scenario at the baseline
-and final revisions. Name all affected targets on the linked final manual
-regression record. If checks ran separately, cite each run and its environment
+and final revisions. For each baseline and final run, record the exercised
+targets, build configuration, OS and device or simulator. Name all affected
+targets on the linked final manual regression record. If checks ran separately, cite each run and its environment
 from that record. An unknown required baseline comparison keeps the migration
 open. The presence of a baseline test or observation in the validator establishes
 that a baseline was recorded. The reviewer establishes coverage of each affected
