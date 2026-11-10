@@ -26,7 +26,9 @@ Open and run `Before.playground` and `After.playground`. Each prints `Passed:` a
 ## Boundaries
 
 In-memory fixture; no actual disk failure or process restart. The shared automated
-check also holds the first save open and verifies that admitted saves run in order
+check also holds the first save open and verifies that no weight is published
+until storage confirms it. Admitted saves run in order
 across a failing middle command. It also verifies that two identical admitted
 saves both take effect, and that the queue releases its last admission after
-completion. A fresh save then succeeds after the queue has drained.
+completion. A fresh save from an already cancelled caller then succeeds after
+the queue has drained, as required by this legacy admission policy.

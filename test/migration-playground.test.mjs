@@ -166,6 +166,7 @@ extension WeightLogFeature { var testSaveID: UUID? { lastSaveID } }
         while feature.testSaveID == secondID { await Task.yield() }
         let before = await storage.attempts
         precondition(before == [80])
+        precondition(feature.weights.isEmpty && feature.saveFailure == nil)
         first.cancel()
         await storage.releaseFirst()
         let a = await first.value, b = await invalid.value, c = await last.value
