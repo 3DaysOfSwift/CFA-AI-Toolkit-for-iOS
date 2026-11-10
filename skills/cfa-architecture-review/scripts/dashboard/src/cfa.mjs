@@ -411,6 +411,11 @@ This project guidance supplements the developer's request; it does not replace
 the installed CFA skills or authorise unrelated changes.
 `;
 
+function hasDuplicateGuidance(content) {
+  const first = content.indexOf(guidanceMarker);
+  return first >= 0 && content.includes(guidanceMarker, first + guidanceMarker.length);
+}
+
 function bundledGuidance(content) {
   const start = content.indexOf(guidanceMarker);
   if (start < 0) return '';
@@ -497,7 +502,11 @@ function doctor(projectArgument) {
   if (guidance.length > 0) {
     console.log(`INFO CFA project guidance found: ${guidance.join(', ')}`);
     for (const file of guidance) {
-      const content = bundledGuidance(fs.readFileSync(file, 'utf8'));
+      const fileContent = fs.readFileSync(file, 'utf8');
+      if (hasDuplicateGuidance(fileContent)) {
+        console.log(`WARN multiple CFA guidance blocks in ${file}. Reconcile them into one current block and preserve project-specific rules.`);
+      }
+      const content = bundledGuidance(fileContent);
       if (guidanceDiffersFromBundled(content)) {
         console.log(`INFO CFA guidance differs from the installed toolkit in ${file}. ${guidanceComparison}`);
       }
@@ -571,6 +580,9 @@ function enableProject(values) {
   const block = bundledGuidance(existingGuidance);
   if (block) {
     console.log(`CFA project guidance is already enabled: ${guidanceFile}`);
+    if (hasDuplicateGuidance(existingGuidance)) {
+      console.log(`WARN multiple CFA guidance blocks in ${guidanceFile}. Reconcile them into one current block and preserve project-specific rules.`);
+    }
     if (guidanceDiffersFromBundled(block)) {
       console.log(`The existing CFA guidance differs from the installed toolkit. ${guidanceComparison}`);
     }

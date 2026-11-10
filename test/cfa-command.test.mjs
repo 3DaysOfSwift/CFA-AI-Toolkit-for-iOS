@@ -220,6 +220,21 @@ test('both guidance commands flag the previous inline-only wording', t => {
   assert.equal(fs.readFileSync(agents, 'utf8'), original);
 });
 
+test('both guidance commands warn about a second CFA block after a current one', t => {
+  const {directory, command} = installedCommand(t);
+  const agents = path.join(directory, 'AGENTS.md');
+  assert.equal(spawnSync(command, ['enable-project', directory]).status, 0);
+  fs.appendFileSync(agents, '\n<!-- CFA Toolkit project guidance -->\nObsolete project guidance.\n');
+  const original = fs.readFileSync(agents, 'utf8');
+
+  for (const action of ['doctor', 'enable-project']) {
+    const result = spawnSync(command, [action, directory], {encoding: 'utf8'});
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /multiple CFA guidance blocks/);
+    assert.equal(fs.readFileSync(agents, 'utf8'), original);
+  }
+});
+
 test('current CFA guidance is not flagged for legacy text in surrounding project notes', t => {
   const {directory, command} = installedCommand(t);
   const agents = path.join(directory, 'AGENTS.md');
