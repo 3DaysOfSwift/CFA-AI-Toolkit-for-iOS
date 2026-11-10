@@ -74,6 +74,14 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
   for(const name of skills) {
     const skill=path.join(base,'skills',name);
     const text=fs.readFileSync(path.join(skill,'SKILL.md'),'utf8');
+    const agentMetadata = path.join(skill, 'agents/openai.yaml');
+    if (!fs.existsSync(agentMetadata)) throw Error(`Missing skill interface metadata: ${name}`);
+    const interfaceText = fs.readFileSync(agentMetadata, 'utf8');
+    for (const field of ['display_name', 'short_description', 'default_prompt']) {
+      if (!new RegExp(`^\\s{2}${field}:\\s+\\S`, 'm').test(interfaceText)) {
+        throw Error(`Missing ${field} in skill interface metadata: ${name}`);
+      }
+    }
     // A colon followed by whitespace is invalid in a plain YAML scalar. This
     // catches a common metadata mistake; it is not a complete YAML parser.
     const frontmatter = text.match(/^---\s*\n([\s\S]*?)\n---(?:\s|$)/)?.[1] ?? '';

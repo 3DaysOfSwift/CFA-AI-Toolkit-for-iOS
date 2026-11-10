@@ -143,6 +143,20 @@ test('every portable skill carries the shared workflow and separate design defau
  }
 });
 
+test('every skill ships complete interface metadata', t => {
+ const {source}=release(t);
+ for (const name of skills) {
+  const metadata=path.join(source,'skills',name,'agents/openai.yaml');
+  assert.ok(fs.existsSync(metadata),name);
+  const contents=fs.readFileSync(metadata,'utf8');
+  for (const field of ['display_name','short_description','default_prompt']) {
+   assert.match(contents,new RegExp(`^\\s{2}${field}:\\s+\\S`,'m'),`${name}: ${field}`);
+  }
+ }
+ fs.unlinkSync(path.join(source,'skills/swift-code-quality/agents/openai.yaml'));
+ assert.throws(()=>validate(source,{source:false}),/Missing skill interface metadata: swift-code-quality/);
+});
+
 test('release validation rejects a missing workflow policy and an entry point that bypasses it', t => {
  const {source}=release(t);
  const skill=path.join(source,'skills/cfa-feature-work');
