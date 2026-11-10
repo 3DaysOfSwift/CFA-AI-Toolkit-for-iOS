@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { validatePublication } from '../skills/cfa-architecture-review/scripts/explanations.mjs';
+import { validatePublication } from '../tools/explanations/explanations.mjs';
 
 // Topic files are a lossless reading edition of the canonical specification.
 export function specTopics(base) {

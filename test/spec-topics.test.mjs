@@ -8,6 +8,12 @@ import { specTopics } from '../scripts/spec-topics.mjs';
 import { root, cfaSkills } from '../scripts/sync.mjs';
 import { lookup } from '../tools/explanations/explanations.mjs';
 
+test('specification generation validates explanations from the canonical tool', () => {
+  const generator = fs.readFileSync(path.join(root, 'scripts/spec-topics.mjs'), 'utf8');
+  assert.match(generator, /from '\.\.\/tools\/explanations\/explanations\.mjs'/);
+  assert.doesNotMatch(generator, /from '\.\.\/skills\//);
+});
+
 test('topic reading edition retains every canonical section and is bundled consistently', () => {
   const expected = specTopics(root);
   const canonical = fs.readFileSync(path.join(root, 'architecture/cfa-specification.md'), 'utf8');
