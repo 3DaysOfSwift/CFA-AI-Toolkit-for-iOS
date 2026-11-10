@@ -430,6 +430,11 @@ skill from that toolkit before changing the project.
   actionable discrepancies, repeat the audit, and rerun affected builds
   and tests after corrections.
   Apply the installed CFA change gate before claiming migration completion.
+  For migrated background work, compare permitted identifiers, launch
+  registration and scheduling with the baseline. Record controlled completion
+  and expiration results separately from supported-device delivery. For
+  changed cross-target handoffs, verify the receiving target's behaviour
+  separately from compilation and link the handoff evidence.
   Compare each affected target's behaviour with the baseline. Record each
   target's minimum OS and verify changed paths at that minimum. Check API
   availability separately from Swift language mode. Preserve deployment
