@@ -424,8 +424,11 @@ skill from that toolkit before changing the project.
   current UI state, including repeated values, order, cancellation and any
   required buffering. Reconcile temporary file locations, Xcode navigator
   groups and target membership.
-  Audit the agreed migration scope against CFA, correct in-scope discrepancies
-  and rerun affected builds and tests after corrections.
+  Audit the agreed migration scope against CFA. Cite final-commit evidence
+  for each applicable requirement, explain which requirements do not apply,
+  and record agreed exceptions and their effect on the verdict. Correct
+  actionable discrepancies, repeat the audit, and rerun affected builds
+  and tests after corrections.
   Apply the installed CFA change gate before claiming migration completion.
   Compare each affected target's behaviour with the baseline. Record each
   target's minimum OS and verify changed paths at that minimum. Check API
