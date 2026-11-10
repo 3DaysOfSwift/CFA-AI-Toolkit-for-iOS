@@ -86,6 +86,27 @@ test('maintained tests and examples use responsibility-named locals', () => {
   }
 });
 
+test('maintained Settings Features name their persisted preference keys once', () => {
+  const settingsFeatures = [
+    ['starter-apps/Habit Tracker/HabitTrackerTemplate/2 - AppModel/Features/Settings/SettingsFeature.swift', ['firstWeekday', 'selectedTheme']],
+    ['starter-apps/Habit Tracker Pro/HabitTrackerPro/2 - AppModel/Features/Settings/SettingsFeature.swift', ['firstWeekday', 'selectedTheme']],
+    ['templates/Xcode/Project Templates/iOS/Application/Habit Tracker.xctemplate/Source/Application/2 - AppModel/Features/Settings/SettingsFeature.swift', ['firstWeekday', 'selectedTheme']],
+    ['starter-apps/Todays Twenty/TimesThirty/2 - AppModel/Features/Settings/SettingsFeature.swift', ['preferredDifficulty', 'selectedTheme']],
+    ['templates/Xcode/Project Templates/iOS/Application/Day Streak.xctemplate/Source/Application/2 - AppModel/Features/Settings/SettingsFeature.swift', ['preferredDifficulty', 'selectedTheme']]
+  ];
+
+  for (const [relative, preferenceKeys] of settingsFeatures) {
+    const source = fs.readFileSync(path.join(root, relative), 'utf8');
+    for (const preferenceKey of preferenceKeys) {
+      const storageKeyName = `${preferenceKey}StorageKey`;
+      const escapedValue = preferenceKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      assert.match(source, new RegExp(`private static let ${storageKeyName} = "${escapedValue}"`), relative);
+      assert.equal(source.match(new RegExp(`"${escapedValue}"`, 'g'))?.length, 1, relative);
+      assert.ok((source.match(new RegExp(`Self\\.${storageKeyName}`, 'g'))?.length ?? 0) >= 2, relative);
+    }
+  }
+});
+
 test('generated template files import the frameworks used by their declarations', () => {
   const application = 'templates/Xcode/Project Templates/iOS/Application';
   const expectations = new Map([
