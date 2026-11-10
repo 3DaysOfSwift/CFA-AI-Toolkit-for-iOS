@@ -96,8 +96,12 @@ For detail screens that keep a selected snapshot, construct two independent
 ViewModels with different snapshots and a shared Feature. Change the source
 list, including omitting a selected item, and verify each ViewModel retains
 its own display. If detail refresh is supported, check that it updates only
-the intended destination. Use a UI or manual test to verify that both scenes
-retain their navigation and that a source refresh does not dismiss either.
+the intended destination. In a SwiftUI host, change the input passed to a
+detail View while preserving its identity and verify that it still displays
+its original selection. Two standalone ViewModel instances only verify
+presentation behaviour at the ViewModel boundary. Use a UI or manual test
+to verify that both destinations retain their navigation after a source
+refresh.
 
 For deep links and notification actions, apply the
 [deep-link rule](references/spec/rules/cfa-link-01.md). Verify that URL opens

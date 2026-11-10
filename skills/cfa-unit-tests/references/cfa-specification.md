@@ -1822,7 +1822,9 @@ Before accepting a change, answer every question:
    Do previews construct their Views through the same ownership path, leaving
    Feature access to the ViewModel and SwiftData access to the storage service?
    For a changed detail flow, open different snapshots in two independently
-   identified destinations. Verify that refreshing the source list, including
+   identified destinations. Rebuild a detail View with changed input and the
+   same SwiftUI identity. Verify that its existing ViewModel retains its
+   selection. Verify that refreshing the source list, including
    omission of a selected item, leaves both destinations open with their own
    selections. If detail refresh is available, verify that it updates only
    that destination.
