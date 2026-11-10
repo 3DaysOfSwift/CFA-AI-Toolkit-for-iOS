@@ -49,6 +49,7 @@ final class NotesFeature {
     init(repository: any NotesRepository) { self.repository = repository }
 
     func loadIfNeeded() async throws {
+        try Task.checkCancellation()
         guard !didLoad else { return }
         if let loading {
             try await loading.value

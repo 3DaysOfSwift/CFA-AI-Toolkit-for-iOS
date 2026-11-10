@@ -128,6 +128,16 @@ actor HeldNotesLoad: NotesRepository {
         let cancelledLoad = Task { @MainActor in await retryModel.load() }
         cancelledLoad.cancel()
         await cancelledLoad.value
+        let cancelledFeatureLoad = Task { @MainActor in
+            try await retryFeature.loadIfNeeded()
+        }
+        cancelledFeatureLoad.cancel()
+        do {
+            try await cancelledFeatureLoad.value
+            preconditionFailure("A cancelled caller must not start a new load.")
+        } catch is CancellationError {
+            // The Feature rejects this caller before admitting any work.
+        }
         let attemptsAfterCancellation = await retryRepository.attempts
         precondition(attemptsAfterCancellation == 0 && retryModel.loadError == nil)
         await retryModel.load()
