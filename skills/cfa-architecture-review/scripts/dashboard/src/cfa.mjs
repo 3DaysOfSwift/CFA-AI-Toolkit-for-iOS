@@ -378,7 +378,11 @@ skill from that toolkit before changing the project.
   failed. Surface a failed initial fetch as an error and keep previously loaded
   data visible if a refresh fails. Verify that the root appears and independent
   navigation works while the initial open is pending and after it fails.
-  Separately verify that retry after a fetch failure reuses the opened store.
+  After a successful open, fail the first fetch and verify that the screen
+  presents an error. Retry the same Feature request using the opened store.
+  Separately fail a refresh with existing data and verify that the data stays
+  visible and usable. Check actual store opening and navigation separately
+  from controlled tests.
 - During migration, preserve business behaviour, user-facing capabilities,
   stored data and meaningful interactions. Limit implementation changes to
   the agreed CFA and Swift Concurrency migration and supported platforms.
