@@ -24,6 +24,11 @@
 - Distinguish source-checkout installation from checksummed release installation,
   and validate Codex-facing interface metadata plus the portable Agent Plugin
   schema so host presentation cannot drift silently.
+- Preserve executable modes for release entry points and require the declared
+  dashboard command to remain executable.
+- Exclude Python caches, ignored reports and generated build output from release
+  archives, and refuse every untracked file that would otherwise enter a
+  checkout-built payload.
 
 ## 0.4.0 — 2026-11-01
 
