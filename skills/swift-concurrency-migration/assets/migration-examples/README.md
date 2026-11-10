@@ -43,8 +43,13 @@ Concurrency is available in Swift 5.5 and later.
   before completion and demonstrates failed refresh and retry in the playground.
   The source checkout's automated test covers overlapping calls and cancellation
   of an admitted refresh caller with a controlled provider.
-- [Observation migration](Observation%20Migration/case.md) preserves the current
-  Feature value while showing how notification delivery differs from Combine.
+- [Observation migration](Observation%20Migration/case.md) preserves the
+  current count while moving from Combine to Observation. The same two
+  mutations produce two Combine notifications and one notification from a
+  single Observation registration. Apply this migration to current-state
+  consumers. Keep an event API for callers that need each occurrence and
+  verify repeated values, ordering, cancellation and any required buffering
+  separately from the displayed state.
 - [Serial weight saves](Serial%20Weight%20Saves/case.md) preserves distinct save
   outcomes. The automated test verifies admission order across a failing
   command and confirms that identical admitted saves each take effect.
