@@ -305,9 +305,12 @@ Application
 │   │   ├── AppColourTheme.swift
 │   │   └── ThemeManager.swift
 │   └── Views
-│       └── Git Repos
-│           ├── GitReposView.swift
-│           └── GitReposViewModel.swift
+│       ├── Git Repos
+│       │   ├── GitReposView.swift
+│       │   └── GitReposViewModel.swift
+│       └── Settings
+│           ├── SettingsView.swift
+│           └── SettingsViewModel.swift
 ├── 2 - AppModel
 │   ├── AppModel.swift
 │   ├── Features
@@ -317,8 +320,10 @@ Application
 │   │   ├── WeightLog
 │   │   │   ├── WeightLogFeature.swift
 │   │   │   └── WeightEntry.swift
-│   │   └── Progress
-│   │       └── ProgressFeature.swift
+│   │   ├── Progress
+│   │   │   └── ProgressFeature.swift
+│   │   └── Settings
+│   │       └── SettingsFeature.swift
 │   └── User Data Storage
 │       ├── Protocols
 │       │   └── WeightRepository.swift

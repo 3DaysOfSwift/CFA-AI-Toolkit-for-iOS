@@ -37,6 +37,16 @@ test('AppInformation is an optional typed presentation boundary', () => {
   assert.match(codingGuide, /normalize it in\s+an adjacent typed presentation value such as `AppInformation`/);
 });
 
+test('public architecture map includes the mandatory Settings boundary', () => {
+  const readme = fs.readFileSync(path.join(root, 'README.md'), 'utf8');
+  const folderMap = /Here is an illustrative CFA folder map[\s\S]*?```text\n([\s\S]*?)```/.exec(readme)?.[1];
+
+  assert.ok(folderMap, 'README CFA folder map');
+  assert.match(folderMap, /SettingsView\.swift/);
+  assert.match(folderMap, /SettingsViewModel\.swift/);
+  assert.match(folderMap, /SettingsFeature\.swift/);
+});
+
 test('headings inside fenced examples remain part of their section', () => {
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'cfa-spec-topics-'));
   try {
