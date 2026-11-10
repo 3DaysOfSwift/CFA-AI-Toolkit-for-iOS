@@ -136,6 +136,27 @@ test('Habit Tracker Pro keeps shared habit behavior aligned with its CFA templat
   );
 });
 
+test('Habit Tracker Pro keeps root and saved appearance state at CFA boundaries', () => {
+  const source = path.join(root, 'starter-apps/Habit Tracker Pro/HabitTrackerPro');
+  const rootView = fs.readFileSync(path.join(source, '1 - View/Views/Root/ContentView.swift'), 'utf8');
+  const rootViewModel = fs.readFileSync(path.join(source, '1 - View/Views/Root/ContentViewModel.swift'), 'utf8');
+  const settingsFeature = fs.readFileSync(path.join(source, '2 - AppModel/Features/Settings/SettingsFeature.swift'), 'utf8');
+  const settingsViewModel = fs.readFileSync(path.join(source, '1 - View/Views/Settings/SettingsViewModel.swift'), 'utf8');
+  const themeManager = fs.readFileSync(path.join(source, '1 - View/Theme/ThemeManager.swift'), 'utf8');
+
+  assert.match(rootView, /@State private var viewModel = ContentViewModel\(\)/);
+  assert.match(rootView, /TabView\(selection: \$viewModel\.selectedTab\)/);
+  assert.match(rootViewModel, /@Observable\s+final class ContentViewModel/);
+  assert.match(settingsFeature, /private\(set\) var selectedTheme: ThemeSelection/);
+  assert.match(settingsFeature, /func selectTheme\(_ theme: ThemeSelection\)/);
+  assert.doesNotMatch(settingsFeature, /Bundle\.main|appInformation|appVersion|buildNumber|SwiftUI/);
+  assert.match(settingsViewModel, /Bundle\.main\.infoDictionary/);
+  assert.match(settingsViewModel, /func selectTheme\(_ theme: ThemeSelection\)/);
+  assert.match(themeManager, /private let settingsFeature: SettingsFeature/);
+  assert.doesNotMatch(themeManager, /UserDefaults|defaults\.set|func select/);
+  assert.equal(fs.existsSync(path.join(source, '1 - View/Views/ContentView.swift')), false);
+});
+
 test('Day Streak keeps saved theme ownership in SettingsFeature', () => {
   const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/Day Streak.xctemplate/Source/Application');
   const feature = fs.readFileSync(path.join(source, '2 - AppModel/Features/Settings/SettingsFeature.swift'), 'utf8');

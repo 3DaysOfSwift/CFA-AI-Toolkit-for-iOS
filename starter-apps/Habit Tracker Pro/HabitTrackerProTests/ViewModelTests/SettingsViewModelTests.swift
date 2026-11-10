@@ -11,13 +11,13 @@ struct SettingsViewModelTests {
         let suite = "SettingsAboutTests.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
-        let feature = SettingsFeature(defaults: defaults, appInformation: [
+        let feature = SettingsFeature(defaults: defaults)
+        let viewModel = SettingsViewModel(settingsFeature: feature, appInformation: [
             "CFBundleDisplayName": "My Habits",
             "CFBundleName": "InternalName",
             "CFBundleShortVersionString": "2.3",
             "CFBundleVersion": "42"
         ])
-        let viewModel = SettingsViewModel(settingsFeature: feature)
 
         #expect(viewModel.appName == "My Habits")
         #expect(viewModel.versionDescription == "Version 2.3 (42)")
@@ -28,8 +28,8 @@ struct SettingsViewModelTests {
         let suite = "SettingsAboutTests.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
-        let feature = SettingsFeature(defaults: defaults, appInformation: [:])
-        let viewModel = SettingsViewModel(settingsFeature: feature)
+        let feature = SettingsFeature(defaults: defaults)
+        let viewModel = SettingsViewModel(settingsFeature: feature, appInformation: [:])
 
         #expect(viewModel.appName == "App")
         #expect(viewModel.versionDescription == "Version — (—)")
@@ -49,5 +49,22 @@ struct SettingsViewModelTests {
         viewModel.selectFirstWeekday(1)
 
         #expect(viewModel.firstWeekday == 1)
+    }
+
+    @Test("Changing theme updates the preference feature")
+    func selectsTheme() {
+        let suite = "SettingsViewModelTests.\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suite) else {
+            Issue.record("Could not create isolated UserDefaults suite")
+            return
+        }
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let feature = SettingsFeature(defaults: defaults)
+        let viewModel = SettingsViewModel(settingsFeature: feature)
+
+        viewModel.selectTheme(.ocean)
+
+        #expect(viewModel.selectedTheme == .ocean)
+        #expect(viewModel.themeTitle(.ocean) == "Ocean")
     }
 }
