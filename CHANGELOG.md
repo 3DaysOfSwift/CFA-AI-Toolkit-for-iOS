@@ -21,6 +21,9 @@
 - Keep the bundled dashboard package on the toolkit release version and validate
   local Markdown links, HTML assets and heading anchors in source and plugin
   documentation.
+- Distinguish source-checkout installation from checksummed release installation,
+  and validate Codex-facing interface metadata plus the portable Agent Plugin
+  schema so host presentation cannot drift silently.
 
 ## 0.4.0 — 2026-11-01
 
