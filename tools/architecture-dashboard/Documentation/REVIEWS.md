@@ -379,7 +379,10 @@ or `unknown`. These are reviewer-authored relationships, not an inferred call
 graph. Cite each task site assigned to an operation in that operation’s workflow
 steps as well as its overall evidence. When the cited lines could identify
 more than one task, give each task its own step with the corresponding
-`taskSiteId`. After confirming the scanner candidate,
+`taskSiteId`. Reconcile a shared site once in `taskSites`. Other workflows
+that reach it can use the same ID if both their operation and step cite
+its source. Verify each caller's relationship separately. Excluded task
+candidates cannot be linked this way. After confirming the scanner candidate,
 use `unstructured-task` for Task and Task.detached, `child-task` for async let
 and task group children, `same-task` for the task group scope itself, and
 `framework-task` for SwiftUI task and refreshable callbacks.

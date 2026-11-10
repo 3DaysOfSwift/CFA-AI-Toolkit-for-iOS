@@ -195,6 +195,28 @@ test('reconciled task sites must be cited in a workflow step', () => {
   }]);
 });
 
+test('shared task sites can appear in more than one evidenced workflow', () => {
+  const inventory = structuredClone(report);
+  inventory.syntax = {status:'available', files:['App.swift'], warnings:[], items:[
+    {kind:'concurrency.task', file:'App.swift', line:3, column:5}
+  ]};
+  const [site] = taskCandidates(inventory);
+  const review = complete();
+  const launch = review.operations[0];
+  const evidence = [{file:'App.swift', line:3, endLine:3}];
+  launch.evidence.push(...evidence);
+  launch.steps.push({id:'load', parentId:'trigger', relation:'unstructured-task', taskSiteId:site.id, evidence});
+  const refresh = {...structuredClone(launch), id:'refresh'};
+  review.operations.push(refresh);
+  review.taskSites = [{siteId:site.id, operationId:'launch'}];
+  assert.deepEqual(coverageGaps(inventory, review), []);
+  refresh.evidence = [launch.evidence[0]];
+  assert.match(coverageGaps(inventory, review).join(' '), /refresh\/load must cite its reconciled task site/);
+  refresh.evidence.push(...evidence);
+  review.taskSites = [{siteId:site.id, excludedReason:'Resolves to a different API'}];
+  assert.match(coverageGaps(inventory, review).join(' '), /refresh\/load must cite its reconciled task site/);
+});
+
 test('rejects blank or non-text Health Check headings', () => {
   const report = {app:'App',summary:'Summary',verdict:'Clear ownership',scope:'Scope',
     conclusion:'Conclusion',criteria:[{title:'Ownership',detail:'Checked',status:'pass'}]};

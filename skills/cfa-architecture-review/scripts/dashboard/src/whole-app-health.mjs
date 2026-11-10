@@ -65,7 +65,8 @@ function invalidTaskLinks(operation, sites, taskEntries) {
   return (operation.steps || []).filter(step => {
     if (step.taskSiteId === undefined) return false;
     const site = sites.find(item => item.id === step.taskSiteId);
-    return !site || taskEntries.get(site.id)?.operationId !== operation.id || !stepCitesTask(step, site);
+    if (!site || !taskEntries.get(site.id)?.operationId || !stepCitesTask(step, site)) return true;
+    return !stepCitesTask({relation: step.relation, evidence: operation.evidence}, site);
   });
 }
 
