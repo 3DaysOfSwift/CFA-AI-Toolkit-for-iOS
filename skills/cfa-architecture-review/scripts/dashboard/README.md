@@ -182,7 +182,9 @@ concurrency design. Each criterion has a `title`, `detail`, `status` (`pass`,
 importer checks ranges against the scanned source. Map app-level assessments to criteria with
 `appChecks` as described in [Whole-app report criteria](Documentation/REVIEWS.md#whole-app-report-criteria). Convert free-text citations
 in older reviews to file and line ranges before rendering. Include confirmed
-operation, file and type problems among the report criteria. The renderer weights criteria
+operation, file and type problems among the report criteria. The report also
+shows individual source problems and concerns so findings that cite the same
+lines remain visible. The renderer weights criteria
 equally (1, ½ or 0 respectively) to choose the assessment label. The score
 reaches 100% only when every reviewed criterion passes. A confirmed problem
 keeps the Result marked as needing attention even if the score is high. Set `qualitativeOnly`

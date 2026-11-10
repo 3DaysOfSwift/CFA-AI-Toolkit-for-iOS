@@ -423,6 +423,12 @@ function reportPresentationGap(review) {
   return null;
 }
 
+function confirmedSourceProblems(review) {
+  return [
+    ...(review.findings || []), ...(review.fileReviews || []), ...(review.typeReviews || [])
+  ].filter(item => item.status === 'problem').flatMap(item => item.issues?.length ? item.issues : [item]);
+}
+
 function reportFindingsGaps(review) {
   const gaps = [];
   const criteria = Array.isArray(review.presentation?.criteria)
@@ -433,9 +439,7 @@ function reportFindingsGaps(review) {
       gaps.push('Whole-app finding status must be pass, concern or problem: ' + finding.title);
     }
   }
-  const sourceProblems = [
-    ...(review.findings || []), ...(review.fileReviews || []), ...(review.typeReviews || [])
-  ].filter(item => item.status === 'problem').flatMap(item => item.issues?.length ? item.issues : [item]);
+  const sourceProblems = confirmedSourceProblems(review);
   const operationProblems = (review.operations || []).flatMap(operation => [
     ...(operation.checks || []).filter(check => check.status === 'fail' && check.dimension !== 'cfa'),
     ...(operation.scenarios || []).filter(scenario => scenario.status === 'problem')
@@ -501,6 +505,14 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
       return {...step, taskLocation: `${site.file}:${site.line}:${site.column}`};
     });
   }
+  data.sourceFindings = [
+    ...confirmedSourceProblems(review).map(item => ({...item, status:'problem'})),
+    ...(review.findings || []).filter(item => item.status === 'concern')
+  ].map(item => ({
+    status:item.status, title:item.title || item.name || item.file,
+    detail:item.detail || item.description || item.reason,
+    check:item.check, verification:item.verification, evidence:item.evidence
+  }));
   data.architecturalConflict = review.operations.some(op => op.problemKind === 'architectural-conflict');
   const selectedIcon = icon || await appIcon(root);
   const iconData = selectedIcon ? `data:image/png;base64,${(await fs.readFile(selectedIcon)).toString('base64')}` : '';

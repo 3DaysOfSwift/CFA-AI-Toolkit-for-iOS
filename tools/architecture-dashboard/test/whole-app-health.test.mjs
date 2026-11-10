@@ -582,11 +582,17 @@ test('installed Health Check rescans source, surfaces gaps and rejects stale rev
       title:'Duplicate work on repeated action',detail:'Repeated actions start competing work.',status:'problem',
       evidence:[{file:'App.swift',line:2,endLine:2}]
     });
+    timingProblem.findings.push({
+      title:'Independent issue at the same line',status:'problem',
+      description:'<A different failure mode>',check:'Trace the error path.',
+      evidence:[{file:'Value.swift',line:1,endLine:1}]
+    });
     await fs.writeFile(reviewPath,JSON.stringify(timingProblem));
     const problemsOutput = path.join(base,'problems.html');
     await finish(project,reviewPath,problemsOutput,undefined,syntax);
     const problemHtml = await fs.readFile(problemsOutput,'utf8');
     assert.match(problemHtml,/Problems to address.*Confirmed issue.*Duplicate work on repeated action/s);
+    assert.match(problemHtml,/Source findings.*Confirmed issue.*Independent issue at the same line.*&lt;A different failure mode&gt;.*Trace the error path/s);
     assert.match(problemHtml,/Frankenstein architecture detected.*No architectural conflicts/);
     assert.match(problemHtml, /Start <small>· Timing defect<\/small><\/summary>/);
     assert.match(problemHtml, /When timing changes.*Timing defect.*Repeating the action starts duplicate work/s);
