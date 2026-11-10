@@ -51,12 +51,12 @@ struct SettingsView: View {
                                 Image(systemName: "multiply")
                             }
                             .font(.system(.caption2, design: .rounded, weight: .bold))
-                            Text("Todays Twenty")
+                            Text(viewModel.appName)
                                 .font(.system(.title3, design: .rounded, weight: .bold))
                         }
                         .foregroundStyle(themeManager.current.tint)
                         .accessibilityElement(children: .ignore)
-                        .accessibilityLabel("Todays Twenty")
+                        .accessibilityLabel(viewModel.appName)
                     }
                     LabeledContent("Storage", value: "SwiftData · on device")
                     LabeledContent("Architecture", value: "CFA iOS Architecture")

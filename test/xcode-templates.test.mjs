@@ -145,6 +145,22 @@ test('Day Streak gives reusable presentation components purpose-named files', ()
   assert.equal(fs.existsSync(path.join(directory, 'PracticeComponents.swift')), false);
 });
 
+test('Day Streak presents the generated app identity instead of its source-project name', () => {
+  const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/Day Streak.xctemplate/Source/Application');
+  const practiceView = fs.readFileSync(path.join(source, '1 - View/Views/Practice/PracticeView.swift'), 'utf8');
+  const practiceViewModel = fs.readFileSync(path.join(source, '1 - View/Views/Practice/PracticeViewModel.swift'), 'utf8');
+  const settingsView = fs.readFileSync(path.join(source, '1 - View/Views/Settings/SettingsView.swift'), 'utf8');
+  const settingsViewModel = fs.readFileSync(path.join(source, '1 - View/Views/Settings/SettingsViewModel.swift'), 'utf8');
+
+  for (const file of [practiceView, practiceViewModel, settingsView, settingsViewModel]) {
+    assert.doesNotMatch(file, /Todays Twenty|TimesThirty/);
+  }
+  assert.match(practiceView, /navigationTitle\(viewModel\.appName\)/);
+  assert.match(settingsView, /Text\(viewModel\.appName\)/);
+  assert.match(practiceViewModel, /var appName: String/);
+  assert.match(settingsViewModel, /var appName: String/);
+});
+
 test('CFA App keeps theme presentation outside its AppModel layer', () => {
   const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/CFA App.xctemplate/Source/Application');
   const model = fs.readFileSync(path.join(source, '2 - AppModel/Features/Settings/AppColourTheme.swift'), 'utf8');

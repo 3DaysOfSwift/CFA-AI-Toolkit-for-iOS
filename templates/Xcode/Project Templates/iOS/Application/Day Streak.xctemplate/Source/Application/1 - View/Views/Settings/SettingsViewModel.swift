@@ -13,6 +13,9 @@ final class SettingsViewModel {
 
     var preferredDifficulty: Difficulty { settingsFeature.preferredDifficulty }
     var selectedTheme: ThemeChoice { settingsFeature.selectedTheme }
+    var appName: String {
+        information(for: "CFBundleDisplayName") ?? information(for: "CFBundleName") ?? "App"
+    }
     var versionDescription: String {
         "Version \(information(for: "CFBundleShortVersionString") ?? "—") " +
         "(\(information(for: "CFBundleVersion") ?? "—"))"

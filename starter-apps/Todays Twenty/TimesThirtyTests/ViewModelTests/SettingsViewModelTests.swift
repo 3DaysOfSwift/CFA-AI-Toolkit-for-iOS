@@ -20,8 +20,13 @@ struct SettingsViewModelTests {
         #expect(model.themeTitle(.midnight) == "Midnight")
         let versionModel = SettingsViewModel(
             settingsFeature: feature,
-            appInformation: ["CFBundleShortVersionString": "2.3", "CFBundleVersion": "4"]
+            appInformation: [
+                "CFBundleDisplayName": "My Practice",
+                "CFBundleShortVersionString": "2.3",
+                "CFBundleVersion": "4"
+            ]
         )
+        #expect(versionModel.appName == "My Practice")
         #expect(versionModel.versionDescription == "Version 2.3 (4)")
         #expect(SettingsViewModel(settingsFeature: feature, appInformation: [:]).versionDescription == "Version — (—)")
         let blankVersionModel = SettingsViewModel(

@@ -31,7 +31,7 @@ struct PracticeView: View {
                 }
             }
             .background(themeManager.current.background)
-            .navigationTitle("Todays Twenty")
+            .navigationTitle(viewModel.appName)
             .navigationBarTitleDisplayMode(.inline)
             .task { await viewModel.refresh().value }
             .task(id: scenePhase == .active ? viewModel.questionAwaitingAdvanceID : nil) {

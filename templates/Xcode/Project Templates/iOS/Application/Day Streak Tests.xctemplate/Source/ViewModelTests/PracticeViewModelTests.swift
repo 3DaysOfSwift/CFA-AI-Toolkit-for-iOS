@@ -4,6 +4,22 @@ import Testing
 
 @MainActor
 struct PracticeViewModelTests {
+    @Test func readsTheGeneratedAppIdentityForItsNavigationTitle() throws {
+        let name = "___PROJECTNAME:identifier___Tests.\(UUID())"
+        let defaults = try #require(UserDefaults(suiteName: name))
+        defer { defaults.removePersistentDomain(forName: name) }
+        let env = TestEnvironment()
+        let settings = SettingsFeature(defaults: defaults)
+        let model = PracticeViewModel(
+            practiceFeature: env.practice,
+            dayStreakFeature: env.streak,
+            settingsFeature: settings,
+            appInformation: ["CFBundleDisplayName": "My Practice"]
+        )
+
+        #expect(model.appName == "My Practice")
+    }
+
     @Test func answerFeedbackReflectsQuestionState() throws {
         let env = TestEnvironment()
         let name = "___PROJECTNAME:identifier___Tests.\(UUID())"

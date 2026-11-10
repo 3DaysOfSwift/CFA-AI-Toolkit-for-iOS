@@ -6,6 +6,7 @@ final class PracticeViewModel {
     private let practiceFeature: PracticeFeature
     private let dayStreakFeature: DayStreakFeature
     private let settingsFeature: SettingsFeature
+    private let appInformation: [String: Any]
     private(set) var errorMessage: String?
     @ObservationIgnored private var queuedCommandTask: Task<Void, Never>?
     @ObservationIgnored private var lastQueuedCommand: PracticeFeature.Command?
@@ -18,10 +19,12 @@ final class PracticeViewModel {
 
     init(practiceFeature: PracticeFeature = AppModel.shared.practiceFeature,
          dayStreakFeature: DayStreakFeature = AppModel.shared.dayStreakFeature,
-         settingsFeature: SettingsFeature = AppModel.shared.settingsFeature) {
+         settingsFeature: SettingsFeature = AppModel.shared.settingsFeature,
+         appInformation: [String: Any] = Bundle.main.infoDictionary ?? [:]) {
         self.practiceFeature = practiceFeature
         self.dayStreakFeature = dayStreakFeature
         self.settingsFeature = settingsFeature
+        self.appInformation = appInformation
     }
 
     var session: PracticeSession? { practiceFeature.currentSession }
@@ -36,6 +39,18 @@ final class PracticeViewModel {
     var streak: Int { dayStreakFeature.currentStreak }
     var week: [StreakDay] { dayStreakFeature.week }
     var preferredDifficulty: Difficulty { settingsFeature.preferredDifficulty }
+    var appName: String {
+        information(for: "CFBundleDisplayName") ?? information(for: "CFBundleName") ?? "App"
+    }
+
+    private func information(for key: String) -> String? {
+        guard let value = appInformation[key] as? String,
+              !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return nil
+        }
+        return value
+    }
+
     func difficultyDescription(_ difficulty: Difficulty) -> String {
         switch difficulty {
         case .gentle: "2–5 times tables"
