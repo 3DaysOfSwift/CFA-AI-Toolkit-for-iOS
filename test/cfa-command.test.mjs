@@ -44,6 +44,18 @@ test('doctor reports an installed skill missing its specification', (t) => {
   assert.doesNotMatch(result.stdout, /PASS CFA skills are installed/);
 });
 
+test('doctor reports a mandatory shared reference missing from any installed skill', (t) => {
+  const { directory, command } = installedCommand(t);
+  const reference = 'swift-code-quality/references/project-workflow.md';
+  fs.unlinkSync(path.join(directory, 'customer/.agents/skills', reference));
+
+  const result = spawnSync(command, ['doctor', directory], { encoding: 'utf8' });
+
+  assert.equal(result.status, 1, result.stderr);
+  assert.ok(result.stdout.includes(`WARN missing CFA reference: ${reference}`));
+  assert.doesNotMatch(result.stdout, /PASS CFA skills are installed/);
+});
+
 test('doctor identifies a missing review skill entry and a directory masquerading as one', (t) => {
   const { directory, command } = installedCommand(t);
   const skills = path.join(directory, 'customer/.agents/skills');

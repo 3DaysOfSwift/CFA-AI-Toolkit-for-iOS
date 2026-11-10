@@ -559,7 +559,12 @@ function doctor(projectArgument) {
   const missingReferences = skillsRoot ? cfaSkillNames
     .filter(name => !missingSkills.includes(name))
     .flatMap(name => {
-      const references = ['swift-coding-guide.md'];
+      const references = [
+        'swift-coding-guide.md',
+        'project-workflow.md',
+        'new-app-design-defaults.md',
+        'explanations/guide.md'
+      ];
       if (name !== 'swift-code-quality') references.push('cfa-specification.md', 'cfa-change-gate.md', 'spec/README.md');
       return references.map(file => path.join(name, 'references', file))
         .filter(file => !fs.statSync(path.join(skillsRoot, file), { throwIfNoEntry: false })?.isFile());
