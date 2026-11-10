@@ -9,6 +9,10 @@ import { verifyXcodeTemplateStructure } from './verify-xcode-template-structure.
 import { verifyTemplateOrientations } from './verify-ios-orientations.mjs';
 import { specTopics } from './spec-topics.mjs';
 const productDescription = 'CFA AI Toolkit for iOS: AI skills and tools to build, modernise, test and maintain SwiftUI apps with Swift Concurrency.';
+const productIdentifier = 'ios-app-development-cfa';
+const publisherName = '3 Days of Swift Concurrency';
+const publisherURL = 'https://www.3daysofswiftconcurrency.com/';
+const repositoryURL = 'https://github.com/3DaysOfSwiftConcurrency/CFA-AI-Toolkit-for-iOS';
 function validateSkillInterface(file, name) {
   const lines = fs.readFileSync(file, 'utf8').trimEnd().split(/\r?\n/);
   const required = ['display_name', 'short_description', 'default_prompt'];
@@ -95,9 +99,10 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
     throw Error('Unmapped canonical sections: run npm run explanations:audit and update the rationale catalogue.');
   }
   const manifest=json(path.join(base,'.codex-plugin/plugin.json'));
-  if(manifest.name!=='ios-app-development-cfa') throw Error('Unexpected plugin identifier.');
+  if(manifest.name!==productIdentifier) throw Error('Unexpected plugin identifier.');
   if(manifest.interface?.displayName!=='CFA AI Toolkit for iOS') throw Error('Unexpected plugin display name.');
   if(manifest.description!==productDescription) throw Error('Unexpected plugin description.');
+  if(manifest.author?.name!==publisherName) throw Error('Unexpected plugin publisher.');
   if(!/^\d+\.\d+\.\d+(?:-[a-z0-9.-]+)?$/.test(manifest.version)) throw Error('Invalid release version.');
   if(manifest.license!=='MIT' || manifest.skills!=='./skills/') throw Error('Missing licence or skills path.');
   for (const field of ['logo', 'composerIcon']) {
@@ -111,11 +116,15 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
   const portable=json(path.join(base,'plugin.json'));
   const packageFile=path.join(base,'package.json');
   const packageManifest=fs.existsSync(packageFile) ? json(packageFile) : undefined;
-  if(portable.name!==manifest.name || portable.version!==manifest.version || portable.license!==manifest.license) {
+  if(portable.name!==manifest.name || portable.version!==manifest.version || portable.license!==manifest.license ||
+      portable.author?.name!==publisherName || portable.author?.url!==publisherURL ||
+      portable.homepage!==repositoryURL || portable.repository!==repositoryURL) {
     throw Error('Portable plugin manifest does not match Codex manifest.');
   }
-  if(portable.description!==productDescription || (packageManifest && packageManifest.description!==productDescription)) {
-    throw Error('Plugin and package descriptions must use the current CFA AI Toolkit for iOS subtitle.');
+  if(portable.description!==productDescription ||
+      (packageManifest && (packageManifest.name!==productIdentifier || packageManifest.version!==manifest.version ||
+        packageManifest.license!==manifest.license || packageManifest.description!==productDescription))) {
+    throw Error('Plugin and package identity must use the current CFA AI Toolkit for iOS metadata.');
   }
   if(source) {
     const sourceExamples = files(path.join(base,'examples/migration')).filter(isReleasePath).sort();
@@ -236,7 +245,6 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
     }
   }
   if(source) {
-    if(packageManifest?.version!==manifest.version) throw Error('Version mismatch.');
     for(const name of cfaSkills) if(hash(path.join(base,'architecture/cfa-specification.md'))!==hash(path.join(base,`skills/${name}/references/cfa-specification.md`))) throw Error('Stale architecture copy. Run npm run sync.');
     for(const dir of ['src','Documentation']) {
       const sourceFiles = files(path.join(base,'tools/architecture-dashboard',dir)).sort();
