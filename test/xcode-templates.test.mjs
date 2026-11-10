@@ -181,6 +181,18 @@ test('Habit Tracker Pro keeps StoreKit outcomes in its Feature and the app-wide 
   assert.match(paywallViewModel, /case \.pendingApproval:/);
 });
 
+test('Habit Tracker Pro trends reuse the authoritative habit completion rules', () => {
+  const file = path.join(
+    root,
+    'starter-apps/Habit Tracker Pro/HabitTrackerPro/2 - AppModel/Features/Trends/TrendsFeature.swift'
+  );
+  const source = fs.readFileSync(file, 'utf8');
+
+  assert.match(source, /value: habit\.value\(on: day, calendar: calendar\)/);
+  assert.match(source, /isComplete: habit\.isComplete\(on: day, calendar: calendar\)/);
+  assert.doesNotMatch(source, /value >= \(habit\.dailyTarget|var amounts:/);
+});
+
 test('Day Streak keeps saved theme ownership in SettingsFeature', () => {
   const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/Day Streak.xctemplate/Source/Application');
   const feature = fs.readFileSync(path.join(source, '2 - AppModel/Features/Settings/SettingsFeature.swift'), 'utf8');
