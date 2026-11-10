@@ -65,7 +65,7 @@ test('deep-link example persists a deferred request and completes after navigati
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'cfa-spec-example-'));
   try {
     const executable = path.join(directory, 'example');
-    const build = spawnSync('xcrun', ['swiftc', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(directory, 'cache'), path.join(root, 'architecture/spec-examples/DeepLinkingExample.swift'), '-o', executable], { encoding: 'utf8', timeout: 90000 });
+    const build = spawnSync('xcrun', ['swiftc', '-disable-sandbox', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(directory, 'cache'), path.join(root, 'architecture/spec-examples/DeepLinkingExample.swift'), '-o', executable], { encoding: 'utf8', timeout: 90000 });
     assert.equal(build.status, 0, build.stderr || build.error?.message);
     const run = spawnSync(executable, [], { encoding: 'utf8', timeout: 15000 });
     assert.equal(run.status, 0, run.stderr || run.error?.message);
@@ -86,7 +86,7 @@ test('Notes reference preserves failed drafts and serialises independent saves',
     const source = path.join(root, 'architecture/spec-examples/NotesReference.swift');
     const tests = path.join(root, 'architecture/spec-examples/NotesReferenceTests.swift');
     const executable = path.join(directory, 'notes');
-    const build = spawnSync('xcrun', ['swiftc', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(directory, 'cache'), source, tests, '-o', executable], { encoding: 'utf8', timeout: 90000 });
+    const build = spawnSync('xcrun', ['swiftc', '-disable-sandbox', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(directory, 'cache'), source, tests, '-o', executable], { encoding: 'utf8', timeout: 90000 });
     assert.equal(build.status, 0, build.stderr || build.error?.message);
     const run = spawnSync(executable, [], { encoding: 'utf8', timeout: 15000 });
     assert.equal(run.status, 0, run.stderr || run.error?.message);
@@ -164,7 +164,7 @@ extension NotesFeature { var auditSaveID: UUID? { lastSave?.id } }
     const input = path.join(directory, 'NotesQueue.swift');
     fs.writeFileSync(input, reference + harness);
     const executable = path.join(directory, 'notes-queue');
-    const build = spawnSync('xcrun', ['swiftc', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(directory, 'cache'), input, '-o', executable], { encoding: 'utf8', timeout: 90000 });
+    const build = spawnSync('xcrun', ['swiftc', '-disable-sandbox', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(directory, 'cache'), input, '-o', executable], { encoding: 'utf8', timeout: 90000 });
     assert.equal(build.status, 0, build.stderr || build.error?.message);
     const run = spawnSync(executable, [], { encoding: 'utf8', timeout: 15000 });
     assert.equal(run.status, 0, run.stderr || run.error?.message);

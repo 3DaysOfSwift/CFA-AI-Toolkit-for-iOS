@@ -614,7 +614,7 @@ test('CFA App template publishes fresh data without waiting for its optional cac
       path.join(source, 'Networking & Data Storage/Protocols/GitReposProvider.swift'),
       path.join(root, 'test/fixtures/CFAAppTemplateBehavior.swift')
     ];
-    const build = spawnSync('xcrun', ['swiftc', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(directory, 'cache'), ...files, '-o', executable], {encoding: 'utf8', timeout: 90000});
+    const build = spawnSync('xcrun', ['swiftc', '-disable-sandbox', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(directory, 'cache'), ...files, '-o', executable], {encoding: 'utf8', timeout: 90000});
     assert.equal(build.status, 0, build.stderr || build.error?.message);
     const run = spawnSync(executable, [], {encoding: 'utf8', timeout: 15000});
     assert.equal(run.status, 0, run.stderr || run.error?.message);
