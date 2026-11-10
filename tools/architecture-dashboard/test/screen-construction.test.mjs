@@ -248,6 +248,28 @@ test('locates possible work started by the screen ViewModel initializer', async 
   assert.deepEqual(tasks.map(item => [item.file, item.line]), [[modelFile, 3]]);
 });
 
+test('locates labelled Task operations in screen and ViewModel initializers', async t => {
+  const modelFile = viewPath.replace('View.swift', 'ViewModel.swift');
+  const { report } = await inspectView(t, `struct HomeView: View {
+    @State private var viewModel = HomeViewModel()
+    init() {
+      Task(operation: { await worker.perform() })
+    }
+    var body: some View { Text("Home") }
+  }`, {
+    [modelFile]: `final class HomeViewModel {
+      init() {
+        Task(priority: nil, operation: { await worker.perform() })
+      }
+      init(worker: Worker) {
+        Swift.Task.init(operation: { await worker.perform() })
+      }
+    }`
+  });
+  assert.deepEqual(report.findings.filter(item => item.code === 'screen-initializer-task')
+    .map(item => [item.file, item.line]), [[viewPath, 4], [modelFile, 3], [modelFile, 6]]);
+});
+
 test('reviews direct work started by screen and ViewModel initializers', async t => {
   const modelFile = viewPath.replace('View.swift', 'ViewModel.swift');
   const { report } = await inspectView(t, `struct HomeView: View {
@@ -773,12 +795,12 @@ test('reviews a lower-level service injected directly into a screen ViewModel', 
   const file = viewPath.replace('View.swift', 'ViewModel.swift');
   const extensionFile = 'App/Presentation/HomeViewModel+Init.swift';
   const {report} = await inspectView(t, 'struct HomeView: View { @State private var viewModel = HomeViewModel() }', {
-    [file]: 'final class HomeViewModel {\n init(repository: any NotesRepository, network: NetworkingManager) {}\n init(notesFeature: NotesFeature) {}\n}',
+    [file]: 'final class HomeViewModel {\n init(repository: any NotesRepository, provider: NotesProvider, client: APIClient, store: NotesStore, service: SyncService, responder: any NotesResponding, network: NetworkingManager) {}\n init(notesFeature: NotesFeature) {}\n}',
     [extensionFile]: 'extension HomeViewModel {\n convenience init(network: NetworkingManager) { self.init(notesFeature: AppModel.shared.notesFeature) }\n}'
   });
   const findings = report.findings.filter(item => item.code === 'view-model-non-feature-dependency');
   assert.deepEqual(findings.map(({file, line}) => [file, line]), [[file, 2], [extensionFile, 2]]);
-  assert.match(findings[0].message, /NotesRepository, NetworkingManager/);
+  assert.match(findings[0].message, /NotesRepository, NotesProvider, APIClient, NotesStore, SyncService, NotesResponding, NetworkingManager/);
 });
 
 test('reviews stored ViewModel services without an explicit initializer', async t => {
@@ -786,13 +808,15 @@ test('reviews stored ViewModel services without an explicit initializer', async 
   const {report} = await inspectView(t, 'struct HomeView: View { @State private var viewModel = HomeViewModel() }', {
     [file]: `final class HomeViewModel {
       private let dépôt: (any App.NotesRepository)? = nil
+      private let client: APIClient? = nil
+      private let service: SyncService? = nil
       private var computed: NotesRepository? { nil }
       private var snapshot: NotesRepository.Snapshot?
       func example() { let local: NetworkingManager = .init() }
     }`
   });
   assert.deepEqual(report.findings.filter(item => item.code === 'view-model-non-feature-dependency')
-    .map(({file, line}) => [file, line]), [[file, 2]]);
+    .map(({file, line}) => [file, line]), [[file, 2], [file, 3], [file, 4]]);
 });
 
 test('reviews memberwise ViewModel input with a Unicode property name', async t => {

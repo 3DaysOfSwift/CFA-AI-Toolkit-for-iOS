@@ -6,7 +6,7 @@ import { analyse, maskSwift, scanSource } from './analyse.mjs';
 const screenPath = /(?:^|\/)1 - View\/Views\/.*View\.swift$/;
 const productionSourceTree = /(?:^|\/)(?:1 - View|2 - AppModel|3 - App Resources|4 - Swift Extensions)\//;
 const featureTypeSuffix = /Feature(?:API)?$/;
-const serviceTypeSuffix = /(?:Repository|NetworkingManager|SwiftDataManager)$/;
+const serviceTypeSuffix = /(?:Repository|Provider|Responding|Client|Store|Service|NetworkingManager|SwiftDataManager)$/;
 
 function isKnownNonFeatureType(type) {
   return type.endsWith('ViewModel') || type === 'NetworkingManager' || type === 'SwiftDataManager';
@@ -154,7 +154,7 @@ function* typeInitializers(body) {
 }
 
 function inspectInitializerWork(name, initializer, source, start, file, findings) {
-  const task = initializer.initializerBody && /\bTask\s*(?:<[^{};]*>\s*)?(?:\.\s*(?:detached|init)\s*)?(?:\([^{}]*\)\s*)?\{/.exec(initializer.initializerBody);
+  const task = initializer.initializerBody && /\b(?:(?:Swift|_Concurrency)\s*\.\s*)?Task\s*(?:<[^{};]*>\s*)?(?:\.\s*(?:detached|init)\s*)?(?:\((?:[^{}()]|\([^{}()]*\))*\)\s*|\((?:[^{}()]|\([^{}()]*\))*?\boperation\s*:\s*)?\{/.exec(initializer.initializerBody);
   if (task) {
     findings.push(finding('screen-initializer-task', 'review', `${name}'s initializer contains a Task. Trace whether construction starts work or only defines a closure for later use.`, file, lineOf(source, start + initializer.bodyStart + task.index)));
   }
