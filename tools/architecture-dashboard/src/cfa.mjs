@@ -287,10 +287,12 @@ skill from that toolkit before changing the project.
   cancellation policy only for a specific product or resource requirement.
   Awaiting the shared task handle does not end the wait on caller cancellation.
   If the screen needs to stop waiting promptly, cancel its wait independently
-  while the Feature keeps refreshing. Verify separately that the last waiter
-  can leave without a replacement, that other waiters still receive the result
-  when one leaves, and that a later equivalent caller joins without a duplicate
-  request. Where prompt exit is required, verify it while the refresh is suspended.
+  while the Feature keeps refreshing. Cancel the sole waiter and verify the
+  Feature completes the refresh and retains its result with no replacement
+  waiter. Separately, verify that other waiters receive the result when one
+  leaves, and that a later equivalent caller joins the in-flight refresh and
+  receives its outcome without a duplicate request. Where prompt exit is
+  required, verify that the screen's wait ends while the refresh is suspended.
 - SwiftUI Views never store task handles, including in @State. The ViewModel
   owns explicitly created screen tasks and retains their named handles.
   Name task handles and collections for the work and lifetime they represent.
