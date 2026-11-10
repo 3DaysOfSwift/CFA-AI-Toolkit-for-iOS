@@ -369,9 +369,16 @@ operations enforce authorisation independently.
   requires new-app creation or an explicit request. Report unavailable visual
   checks accurately.
 - Never introduce a timed splash or storage gate, regardless of visual design.
-- Apply the [type placement rule](spec/rules/cfa-struct-07.md) when moving
-  Model files. Keep domain types with their owning Feature, storage records
-  inside persistence, and transport payloads inside their provider or adapter.
+- Apply the [type placement rule](spec/rules/cfa-struct-07.md) when adding or
+  moving domain types and extensions. Inspect declarations and callers to
+  establish ownership. Keep domain types with the Feature that defines their
+  meaning, storage records inside persistence, and transport payloads inside
+  their provider or adapter. Keep purpose-specific extensions with their
+  owners, UI framework extensions in the View layer, and broadly reusable
+  standard library and Foundation extensions in `4 - Swift Extensions`.
+- After moving files, check the physical paths and Xcode navigator groups,
+  verify target membership and resource lookup, update scripts that use the
+  old paths, and build and test the affected targets.
 - Inspect every newly created or moved Swift file for the imports required by
   its own declarations; imports in another source file do not satisfy this.
 - Confirm that each new screen ViewModel and concrete Feature has its own
