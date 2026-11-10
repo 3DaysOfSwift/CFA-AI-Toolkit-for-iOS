@@ -72,7 +72,10 @@ results in the report, rather than presenting scanner counts as findings.
    of every affected target and trace how each consumer obtains fresh data.
    For an App Group widget snapshot, verify that the write completes before
    the app requests a timeline reload and that a failed write issues no reload
-   request. WidgetKit controls reload timing. For a Watch companion, trace the
+   request. On a supported device, verify that the widget reads the new
+   snapshot and presents its value when WidgetKit next runs the timeline.
+   A reload request alone establishes only that the app asked for an update.
+   For a Watch companion, trace the
    separate snapshot transfer to the receiving Feature and verify that it updates
    its observable state. Check missing, unreadable, delayed and stale snapshots.
    Where multiple targets can edit the same data, exercise the product's
