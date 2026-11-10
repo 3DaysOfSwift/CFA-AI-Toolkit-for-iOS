@@ -9,7 +9,7 @@ const featureTypeSuffix = /Feature(?:API)?$/;
 const serviceTypeSuffix = /(?:Repository|Provider|Responding|Client|Store|Service|NetworkingManager|SwiftDataManager)$/;
 
 function isKnownNonFeatureType(type) {
-  return type.endsWith('ViewModel') || type === 'NetworkingManager' || type === 'SwiftDataManager';
+  return type.endsWith('ViewModel') || serviceTypeSuffix.test(type);
 }
 
 function isFeatureCandidate(type, file = '') {

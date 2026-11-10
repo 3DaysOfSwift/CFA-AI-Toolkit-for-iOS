@@ -920,13 +920,19 @@ test('CFA infrastructure inside a Features folder is still service storage', asy
     [file]: `final class AppModel {
       let networking: NetworkingManager
       let storage = SwiftDataManager()
+      let client: APIClient
+      let repository = NotesRepository()
     }`,
     'App/2 - AppModel/Features/Notes/NetworkingManager.swift': 'struct NetworkingManager {}',
-    'App/2 - AppModel/Features/Notes/SwiftDataManager.swift': 'struct SwiftDataManager {}'
+    'App/2 - AppModel/Features/Notes/SwiftDataManager.swift': 'struct SwiftDataManager {}',
+    'App/2 - AppModel/Features/Notes/APIClient.swift': 'struct APIClient {}',
+    'App/2 - AppModel/Features/Notes/NotesRepository.swift': 'struct NotesRepository {}'
   });
   const { findings } = await inspect(root);
   assert.deepEqual(findings.filter(item => item.code === 'app-model-non-feature-state')
-    .map(({line, severity}) => [line, severity]).sort(), [[2, 'warning'], [3, 'review']]);
+    .map(({line, severity}) => [line, severity]).sort(), [
+      [2, 'warning'], [3, 'review'], [4, 'warning'], [5, 'review']
+    ]);
   assert.ok(!findings.some(item => item.code === 'feature-property-name' && item.file === file));
 });
 
