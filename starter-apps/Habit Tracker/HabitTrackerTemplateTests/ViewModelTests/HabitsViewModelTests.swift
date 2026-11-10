@@ -33,4 +33,19 @@ struct HabitsViewModelTests {
         #expect(viewModel.description(for: completion) == "Daily completion")
     }
 
+    @Test("Presents a loading failure without exposing infrastructure text")
+    func loadingFailureMessage() async {
+        let feature = HabitsFeature(repository: HabitsScreenFailingRepository())
+        let viewModel = HabitsViewModel(habitsFeature: feature)
+
+        await feature.reload()
+
+        #expect(viewModel.loadError == "Your saved habits could not be loaded. Please try again.")
+    }
+}
+
+private actor HabitsScreenFailingRepository: HabitsRepository {
+    func fetchHabits() async throws -> [Habit] { throw CocoaError(.fileReadNoPermission) }
+    func insertHabit(_ habit: Habit) async throws {}
+    func record(habitID: UUID, entryID: UUID, date: Date, value: Int) async throws {}
 }

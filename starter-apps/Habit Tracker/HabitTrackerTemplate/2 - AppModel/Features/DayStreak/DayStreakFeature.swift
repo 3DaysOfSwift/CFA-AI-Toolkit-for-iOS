@@ -32,7 +32,7 @@ final class DayStreakFeature {
     }
 
     var isLoading: Bool { habitsFeature.isLoading }
-    var loadError: String? { habitsFeature.loadError }
+    var loadError: (any Error)? { habitsFeature.loadError }
     func reload() async { await habitsFeature.reload() }
 
     var summaries: [HabitStreakSummary] {

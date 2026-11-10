@@ -54,7 +54,7 @@ struct HabitsFeatureTests {
     func reportsLoadingFailure() async {
         let feature = HabitsFeature(repository: FailingHabitsRepository())
         await feature.reload()
-        #expect(feature.loadError == "Database unavailable")
+        #expect(feature.loadError is FailingHabitsRepository.Failure)
         #expect(feature.habits.isEmpty)
         #expect(!feature.isLoading)
     }

@@ -30,7 +30,7 @@ struct DayStreakViewModelTests {
         let habitsFeature = HabitsFeature(repository: repository)
         let viewModel = DayStreakViewModel(dayStreakFeature: DayStreakFeature(habitsFeature: habitsFeature))
         await viewModel.retryLoading().value
-        #expect(viewModel.loadError != nil)
+        #expect(viewModel.loadError == "Your saved activity could not be loaded. Please try again.")
         #expect(!viewModel.isLoading)
         await repository.allowLoading()
         await viewModel.retryLoading().value

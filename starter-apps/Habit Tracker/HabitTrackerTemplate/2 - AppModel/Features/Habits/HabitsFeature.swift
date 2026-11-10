@@ -12,7 +12,7 @@ final class HabitsFeature {
     private let currentDate: () -> Date
     private(set) var habits: [Habit] = []
     private(set) var isLoading = false
-    private(set) var loadError: String?
+    private(set) var loadError: (any Error)?
 
     init(repository: any HabitsRepository, calendar: Calendar = .autoupdatingCurrent,
          currentDate: @escaping () -> Date = { .now }) {
@@ -51,11 +51,11 @@ final class HabitsFeature {
                         self.habits = try await self.repository.fetchHabits()
                         self.loadError = nil
                     } catch {
-                        self.loadError = error.localizedDescription
+                        self.loadError = error
                     }
                 }
             } catch {
-                loadError = error.localizedDescription
+                loadError = error
             }
         }
         reloadTask = task

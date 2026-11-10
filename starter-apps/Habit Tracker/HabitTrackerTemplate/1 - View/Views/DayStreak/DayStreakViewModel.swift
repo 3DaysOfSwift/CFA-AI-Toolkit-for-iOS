@@ -12,7 +12,9 @@ final class DayStreakViewModel {
 
     var summaries: [HabitStreakSummary] { dayStreakFeature.summaries }
     var isLoading: Bool { dayStreakFeature.isLoading }
-    var loadError: String? { dayStreakFeature.loadError }
+    var loadError: String? {
+        dayStreakFeature.loadError.map { _ in "Your saved activity could not be loaded. Please try again." }
+    }
     @ObservationIgnored private var retryTask: Task<Void, Never>?
     @discardableResult
     func retryLoading() -> Task<Void, Never> {

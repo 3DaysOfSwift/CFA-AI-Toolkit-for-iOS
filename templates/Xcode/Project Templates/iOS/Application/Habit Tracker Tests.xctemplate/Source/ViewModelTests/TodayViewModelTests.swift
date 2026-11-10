@@ -22,6 +22,16 @@ struct TodayViewModelTests {
         #expect(viewModel.completedHabitCount == 1)
     }
 
+    @Test("Presents a loading failure without exposing infrastructure text")
+    func loadingFailureMessage() async {
+        let feature = HabitsFeature(repository: TodayScreenFailingRepository())
+        let viewModel = TodayViewModel(todayFeature: TodayFeature(habitsFeature: feature))
+
+        await feature.reload()
+
+        #expect(viewModel.loadError == "Your saved habits could not be loaded. Please try again.")
+    }
+
     @Test("Completing a habit records today's value through the feature")
     func completionRoutesToFeature() async {
         let habit = Habit(id: UUID(), name: "Run", tracking: .completion, unit: "", dailyTarget: nil, entries: [])
@@ -229,6 +239,12 @@ struct TodayViewModelTests {
     private func countHabit() -> Habit {
         Habit(id: UUID(), name: "Pull ups", tracking: .count, unit: "reps", dailyTarget: 20, entries: [])
     }
+}
+
+private actor TodayScreenFailingRepository: HabitsRepository {
+    func fetchHabits() async throws -> [Habit] { throw CocoaError(.fileReadNoPermission) }
+    func insertHabit(_ habit: Habit) async throws {}
+    func record(habitID: UUID, entryID: UUID, date: Date, value: Int) async throws {}
 }
 
 private actor CountEditingRepository: HabitsRepository {

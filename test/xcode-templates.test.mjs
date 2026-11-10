@@ -21,6 +21,19 @@ test('generated template files import the frameworks used by their declarations'
   }
 });
 
+test('Habit Tracker keeps operation failures in Features and presentation text in ViewModels', () => {
+  const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/Habit Tracker.xctemplate/Source/Application');
+  const feature = fs.readFileSync(path.join(source, '2 - AppModel/Features/Habits/HabitsFeature.swift'), 'utf8');
+  assert.match(feature, /private\(set\) var loadError: \(any Error\)\?/);
+  assert.doesNotMatch(feature, /loadError\s*=\s*error\.localizedDescription/);
+
+  for (const screen of ['Habits', 'Today', 'DayStreak']) {
+    const viewModel = fs.readFileSync(path.join(source, `1 - View/Views/${screen}/${screen}ViewModel.swift`), 'utf8');
+    assert.match(viewModel, /var loadError: String\?/);
+    assert.match(viewModel, /\.loadError\.map/);
+  }
+});
+
 test('native templates provide the accent color expected by generated Xcode projects', () => {
   for (const name of names) {
     const file = path.join(root, 'templates/Xcode/Project Templates/iOS/Application', `${name}.xctemplate/Source/Assets.xcassets/AccentColor.colorset/Contents.json`);
