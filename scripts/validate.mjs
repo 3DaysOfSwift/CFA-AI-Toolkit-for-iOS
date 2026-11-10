@@ -37,6 +37,29 @@ function validateSkillInterface(file, name) {
     throw Error(`Skill default prompt does not invoke $${name}: ${name}`);
   }
 }
+function validateSkillFrontmatter(text, name) {
+  const match = text.match(/^---\s*\n([\s\S]*?)\n---(?:\s|$)/);
+  if (!match) throw Error(`Invalid skill frontmatter: ${name}`);
+  const lines = match[1].split(/\r?\n/);
+  const values = new Map();
+  for (const line of lines) {
+    const field = line.match(/^(name|description):\s+(.+)$/);
+    if (!field || values.has(field[1])) throw Error(`Invalid skill frontmatter structure: ${name}`);
+    values.set(field[1], field[2]);
+  }
+  if (lines.length !== 2 || values.get('name') !== name || !/^[a-z0-9-]{1,63}$/.test(name)) {
+    throw Error(`Skill frontmatter name must match its package: ${name}`);
+  }
+  const rawDescription = values.get('description');
+  let description;
+  if (rawDescription.startsWith('"')) {
+    try { description = JSON.parse(rawDescription); } catch { /* handled below */ }
+  } else {
+    description = rawDescription.replace(/\s+#.*$/, '');
+    if (/:\s/.test(description)) throw Error(`Unquoted colon in skill description: ${name}`);
+  }
+  if (typeof description !== 'string' || !description.trim()) throw Error(`Invalid skill description: ${name}`);
+}
 export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
   const skillEntries = fs.readdirSync(path.join(base, 'skills'), { withFileTypes: true });
   const actualSkills = skillEntries.map(entry => entry.name).sort();
@@ -123,14 +146,7 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
     const agentMetadata = path.join(skill, 'agents/openai.yaml');
     if (!fs.existsSync(agentMetadata)) throw Error(`Missing skill interface metadata: ${name}`);
     validateSkillInterface(agentMetadata, name);
-    // A colon followed by whitespace is invalid in a plain YAML scalar. This
-    // catches a common metadata mistake; it is not a complete YAML parser.
-    const frontmatter = text.match(/^---\s*\n([\s\S]*?)\n---(?:\s|$)/)?.[1] ?? '';
-    const description = frontmatter.match(/^description:\s+(.+)$/m)?.[1];
-    const plainDescription = description?.replace(/\s+#.*$/, '');
-    if (description && !/^["'|>]/.test(description) && /:\s/.test(plainDescription)) {
-      throw Error(`Unquoted colon in skill description: ${name}`);
-    }
+    validateSkillFrontmatter(text, name);
     if (referenceFeatureSkills.includes(name)) {
       const reference = path.join(skill, 'references/reference-feature.md');
       if (!fs.existsSync(reference) || !text.includes('(references/reference-feature.md)')) throw Error(`Missing reference Feature entry point: ${name}`);
@@ -151,7 +167,6 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
     const explanationHelper = path.join(skill, 'scripts/explanations.mjs');
     if (!fs.existsSync(explanationHelper)) throw Error(`Missing explanation helper: ${name}`);
     if (source && hash(explanationHelper) !== hash(path.join(base, 'tools/explanations/explanations.mjs'))) throw Error(`Stale explanation helper: ${name}`);
-    if(!text.startsWith('---\n') || !text.includes(`name: ${name}\n`) || !/^description: .+/m.test(text)) throw Error(`Invalid skill: ${name}`);
     if(text.includes('[TODO:')) throw Error(`Unfinished skill: ${name}`);
     if (iconSkills.includes(name)) {
       const iconSet = path.join(skill, 'assets/AppIcon.appiconset');

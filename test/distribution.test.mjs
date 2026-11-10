@@ -237,6 +237,18 @@ test('release validation rejects an unquoted colon in a skill description', t =>
  assert.doesNotThrow(()=>validate(source,{source:false}));
 });
 
+test('release validation rejects ambiguous skill frontmatter', t => {
+ const {source}=release(t);
+ const entry=path.join(source,'skills/cfa-feature-work/SKILL.md');
+ const original=fs.readFileSync(entry,'utf8');
+ fs.writeFileSync(entry,original.replace('name: cfa-feature-work','name: another-skill'));
+ assert.throws(()=>validate(source,{source:false}),/name must match its package/);
+ fs.writeFileSync(entry,original.replace('description: Add','name: cfa-feature-work\ndescription: Add'));
+ assert.throws(()=>validate(source,{source:false}),/frontmatter structure/);
+ fs.writeFileSync(entry,original.replace('\n---\n\n# CFA feature work','\nmetadata: extra\n---\n\n# CFA feature work'));
+ assert.throws(()=>validate(source,{source:false}),/frontmatter structure/);
+});
+
 test('release validation rejects a stale bundled reference Feature', t => {
  const {source}=release(t);
  const reference=path.join(source,'skills/cfa-app-creation/references/reference-feature.md');
