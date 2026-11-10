@@ -111,6 +111,9 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
   const portable=json(path.join(base,'plugin.json'));
   const packageFile=path.join(base,'package.json');
   const packageManifest=fs.existsSync(packageFile) ? json(packageFile) : undefined;
+  if(portable.name!==manifest.name || portable.version!==manifest.version || portable.license!==manifest.license) {
+    throw Error('Portable plugin manifest does not match Codex manifest.');
+  }
   if(portable.description!==productDescription || (packageManifest && packageManifest.description!==productDescription)) {
     throw Error('Plugin and package descriptions must use the current CFA AI Toolkit for iOS subtitle.');
   }
@@ -121,7 +124,11 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
     for (const file of sourceExamples) if (hash(path.join(base,'examples/migration',file)) !== hash(path.join(base,'skills/swift-concurrency-migration/assets/migration-examples',file))) throw Error(`Stale migration example: ${file}`);
     if (JSON.stringify(files(path.join(base,'skills/swift-concurrency-migration/scripts/project-analysis')).sort()) !== JSON.stringify([...projectAnalysisFiles].sort())) throw Error('Unexpected or missing migration project analysis files.');
     for (const file of projectAnalysisFiles) if (hash(path.join(base,'tools/architecture-dashboard/src',file)) !== hash(path.join(base,'skills/swift-concurrency-migration/scripts/project-analysis',file))) throw Error(`Stale migration project analysis: ${file}`);
-    if(portable.name!==manifest.name || portable.version!==manifest.version) throw Error('Portable plugin manifest does not match Codex manifest.');
+    const releaseNote = path.join(base, `docs/RELEASE-v${manifest.version}.md`);
+    const changelog = fs.readFileSync(path.join(base, 'CHANGELOG.md'), 'utf8');
+    if (!fs.existsSync(releaseNote) || !new RegExp(`^## ${manifest.version.replaceAll('.', '\\.')}(?:\\s|$)`, 'm').test(changelog)) {
+      throw Error(`Missing release note or changelog entry for ${manifest.version}.`);
+    }
   }
   const evidenceFolder = path.join(base, 'skills/swift-concurrency-migration/scripts/evidence');
   if (JSON.stringify(files(evidenceFolder).sort()) !== JSON.stringify([...migrationEvidenceFiles].sort())) {

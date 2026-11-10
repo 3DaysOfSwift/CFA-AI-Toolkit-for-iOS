@@ -29,6 +29,15 @@ test('release validation keeps the public toolkit description aligned', t => {
  assert.throws(()=>validate(source,{source:false}),/Unexpected plugin description/);
 });
 
+test('release validation keeps portable and Codex manifest identity aligned', t => {
+ const {source}=release(t);
+ const manifest=path.join(source,'plugin.json');
+ const value=json(manifest);
+ value.version='9.9.9';
+ fs.writeFileSync(manifest,JSON.stringify(value));
+ assert.throws(()=>validate(source,{source:false}),/Portable plugin manifest does not match Codex manifest/);
+});
+
 test('release validation rejects stale skill and bundled-tool licences', t => {
  const {source}=release(t);
  const skillLicense=path.join(source,'skills/cfa-feature-work/LICENSE');
