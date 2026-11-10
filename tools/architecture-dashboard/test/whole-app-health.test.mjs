@@ -407,6 +407,11 @@ test('installed Health Check rescans source, surfaces gaps and rejects stale rev
     const draftBefore = await fs.readFile(draft, 'utf8');
     await assert.rejects(prepare(project,path.join(base,'inventory'),syntax), /Resume with next and the existing review-draft.json/);
     assert.equal(await fs.readFile(draft, 'utf8'), draftBefore);
+    const interrupted = path.join(base, 'interrupted-inventory');
+    await fs.mkdir(interrupted);
+    await fs.writeFile(path.join(interrupted, 'inventory.json'), 'saved inventory');
+    await assert.rejects(prepare(project,interrupted,syntax), /No review-draft.json was found/);
+    assert.equal(await fs.readFile(path.join(interrupted, 'inventory.json'), 'utf8'), 'saved inventory');
     const taskMap = await fs.readFile(path.join(base,'inventory','task-map.html'),'utf8');
     assert.match(taskMap,/Task sites/);
     assert.match(taskMap,/SwiftSyntax available · file coverage matching/);

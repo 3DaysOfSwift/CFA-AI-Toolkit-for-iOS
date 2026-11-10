@@ -303,7 +303,14 @@ export async function prepare(root, output, syntaxProvider = collectSyntax, opti
     await fs.mkdir(output, {recursive:false});
   } catch (error) {
     if (error.code !== 'EEXIST') throw error;
-    throw Error(`Health Check output already exists: ${output}. Resume with next and the existing review-draft.json, or choose a new output directory for a fresh scan.`, {cause:error});
+    const draft = await fs.stat(path.join(output, 'review-draft.json')).catch(statError => {
+      if (!['ENOENT', 'ENOTDIR'].includes(statError.code)) throw statError;
+      return null;
+    });
+    const recovery = draft?.isFile()
+      ? 'Resume with next and the existing review-draft.json, or choose a new output directory for a fresh scan.'
+      : 'No review-draft.json was found. Choose a new output directory for a fresh scan.';
+    throw Error(`Health Check output already exists: ${output}. ${recovery}`, {cause:error});
   }
   await fs.writeFile(path.join(output,'inventory.json'), JSON.stringify(report,null,2)+'\n', {flag:'wx'});
   await fs.writeFile(path.join(output,'project-analysis.json'), JSON.stringify(analysis,null,2)+'\n', {flag:'wx'});
