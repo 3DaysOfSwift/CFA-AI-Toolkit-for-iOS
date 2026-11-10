@@ -64,12 +64,12 @@ function memberSignatures(body) {
   }).join('');
 }
 
-// Keep explicit error-handling blocks on the synchronous path. Leave local
+// Keep error handling and defer on the synchronous path. Leave local
 // functions and closures masked because their execution needs a call trace.
 function synchronousLaunchStatements(body) {
   const topLevel = memberSignatures(body);
   let result = topLevel;
-  for (const block of body.matchAll(/(?:^|[;{}\n])\s*(?<keyword>do|catch)\s*\{/g)) {
+  for (const block of body.matchAll(/(?:^|[;{}\n])\s*(?<keyword>do|catch|defer)\s*\{/g)) {
     const opening = block.index + block[0].length - 1;
     const keywordStart = block.index + block[0].indexOf(block.groups.keyword);
     if (topLevel.slice(keywordStart, keywordStart + block.groups.keyword.length) !== block.groups.keyword) continue;

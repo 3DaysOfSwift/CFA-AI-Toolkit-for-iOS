@@ -607,23 +607,25 @@ test('reviews direct filesystem setup during startup, including qualified FileMa
   assert.deepEqual(findings.map(({file, line}) => [file, line]), [[file, 3], [file, 4]]);
 });
 
-test('reviews synchronous launch I/O in do and catch but skips scheduled closures', async t => {
+test('reviews synchronous launch I/O in error handling and defer but skips scheduled closures', async t => {
   const file = 'Application/AppDelegate.swift';
   const root = await fixture(t, {
     [file]: `class AppDelegate {
       func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         do {
           _ = try Data(contentsOf: cacheURL)
-          Task { do { _ = try? Data(contentsOf: otherURL) } }
+          Task { defer { _ = try? Data(contentsOf: otherURL) } }
         } catch {
           try? FileManager.default.removeItem(at: cacheURL)
         }
+        defer { _ = FileManager.default.fileExists(atPath: cachePath) }
+        _ = try? Data(contentsOf: nextURL)
         return true
       }
     }`
   });
   const findings = (await inspect(root)).findings.filter(item => item.code === 'blocking-app-launch-io');
-  assert.deepEqual(findings.map(({file, line}) => [file, line]), [[file, 4], [file, 7]]);
+  assert.deepEqual(findings.map(({file, line}) => [file, line]), [[file, 4], [file, 7], [file, 9], [file, 10]]);
 });
 
 test('reviews synchronous file opens before the launch callback returns', async t => {
