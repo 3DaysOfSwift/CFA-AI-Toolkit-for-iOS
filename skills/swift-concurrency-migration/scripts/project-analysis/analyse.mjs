@@ -96,6 +96,7 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
   root = await fs.realpath(root);
   if (!(await fs.stat(root)).isDirectory()) throw new Error('Repository path must be a directory.');
   const files = [], skipped = [], excludedTestDirectories = [], buildDefinitions = [], symbolicLinks = [], skippedSourceHashes = [];
+  const nativeSourceHashes = [];
   const decoder = new TextDecoder('utf-8', {fatal: true, ignoreBOM: true});
   async function walk(directory, scanSwift = true) {
     for (const entry of (await fs.readdir(directory, { withFileTypes: true })).sort((a,b) => a.name.localeCompare(b.name))) {
@@ -120,7 +121,8 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
         const packageManifest = /^Package(?:@swift-\d+(?:\.\d+)*)?\.swift$/.test(entry.name);
         const buildDefinition = packageManifest || /(?:\.(?:pbxproj|xcconfig|xcscheme|entitlements|plist)$|^(?:contents\.xcworkspacedata|Package\.resolved)$)/.test(entry.name);
         const swiftSource = scanSwift && entry.name.endsWith('.swift');
-        if (!buildDefinition && !swiftSource) continue;
+        const nativeSource = scanSwift && /\.(?:m|mm|c|cc|cpp|cxx|h|hh|hpp|hxx|modulemap)$/i.test(entry.name);
+        if (!buildDefinition && !swiftSource && !nativeSource) continue;
         const relative = path.relative(root, absolute).split(path.sep).join('/');
         if (swiftSource && (await fs.stat(absolute)).size > 2_000_000) {
           skipped.push({ file: relative, reason: 'Over 2 MB source limit' });
@@ -134,6 +136,7 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
         const bytes = await fs.readFile(absolute);
         const hash = createHash('sha256').update(bytes).digest('hex');
         if (buildDefinition) buildDefinitions.push([relative, hash]);
+        if (nativeSource) nativeSourceHashes.push([relative, hash]);
         if (swiftSource) {
           let source;
           try {
@@ -160,10 +163,11 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
   if (skipped.length) fingerprint.update(JSON.stringify(skipped));
   if (skippedSourceHashes.length) fingerprint.update(JSON.stringify(skippedSourceHashes));
   if (symbolicLinks.length) fingerprint.update(JSON.stringify(symbolicLinks));
+  if (nativeSourceHashes.length) fingerprint.update(JSON.stringify({nativeSourceHashes}));
   const sourceFingerprint = fingerprint.digest('hex');
   return { schemaVersion: 3, sourceFingerprint, buildDefinitions: buildDefinitions.map(([file, hash]) => ({path: file, hash})), dashboard: dashboard(files), project: path.basename(root), generatedAt: new Date().toISOString(),
     method: 'Lexical source inventory — not compiler-resolved or runtime-observed',
-    scope: { includeTests, fileCount: files.length, skipped, excludedTestDirectories, symbolicLinkPaths: symbolicLinks.map(([file]) => file), buildDefinitionPaths: buildDefinitions.map(([file]) => file), targetMembership: 'Not resolved; inactive compilation branches may be included' },
+    scope: { includeTests, fileCount: files.length, skipped, excludedTestDirectories, symbolicLinkPaths: symbolicLinks.map(([file]) => file), buildDefinitionPaths: buildDefinitions.map(([file]) => file), nativeSourcePaths: nativeSourceHashes.map(([file]) => file), targetMembership: 'Not resolved; inactive compilation branches may be included' },
     limitations: [
       'Matches are source matches: similarly named custom APIs may match; wrappers and unusual syntax may be missed.',
       'String interpolation bodies and Swift regex literals are not fully parsed. Source offsets use UTF-16 code units.',

@@ -166,8 +166,9 @@ report criteria and invalid report text. Resolve those gaps before rendering.
 The scanner cannot establish target membership or discover every event by itself.
 
 `next`, `progress` and `report` recheck the current project against the
-fingerprint from `prepare`. Changes to scanned Swift files or local build
-definitions can invalidate the draft. If the fingerprint differs, run
+fingerprint from `prepare`. Changes to scanned Swift files, Objective-C or C-family sources and headers,
+module maps, or local build definitions can invalidate the draft. Native files
+appear in the inventory scope for manual review. Automated source findings cover Swift. If the fingerprint differs, run
 `prepare` into a new directory with the intended scope. Recheck changed
 source, target membership and task locations, then carry forward only
 judgments whose evidence still supports them. Keep the fresh draft's
@@ -226,7 +227,7 @@ Report files contain source paths and symbols; review them before sharing.
 - Flags explicit Task creation in recognizable View initializers and mapped
   screen ViewModel initializers. Trace helper calls and deferred closures to
   establish whether construction actually starts work.
-- Records scan scope and fingerprints scanned Swift files and local build definitions.
+- Records scan scope and fingerprints scanned Swift files, Objective-C and C-family sources and headers, module maps, and local build definitions.
 - Runs offline, without analytics, external fonts, scripts or CDN assets.
 - Lists scanned files and detected types as unassessed until a source-backed
   reviewer supplies a result; records explicit developer acceptance of a problem

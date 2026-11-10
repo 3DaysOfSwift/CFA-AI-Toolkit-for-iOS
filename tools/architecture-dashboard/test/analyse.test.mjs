@@ -92,6 +92,22 @@ test('changing Xcode target definitions invalidates source review evidence', asy
   assert.notEqual(after.sourceFingerprint, before.sourceFingerprint);
 });
 
+test('native source and bridging header edits invalidate Swift review evidence', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cfa-native-source-'));
+  t.after(() => fs.rm(root, {recursive:true, force:true}));
+  await fs.writeFile(path.join(root, 'App.swift'), 'struct App {}');
+  for (const file of ['Legacy.m', 'App-Bridging-Header.h', 'module.modulemap']) {
+    const source = path.join(root, file);
+    await fs.writeFile(source, 'Original native source');
+    const before = await analyse(root);
+    await fs.writeFile(source, 'Changed native source');
+    const after = await analyse(root);
+    assert.deepEqual(after.files, before.files);
+    assert.notEqual(after.sourceFingerprint, before.sourceFingerprint, file);
+    assert.ok(after.scope.nativeSourcePaths.includes(file));
+  }
+});
+
 test('changing app capability or lifecycle configuration invalidates source review evidence', async t => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cfa-app-configuration-'));
   t.after(() => fs.rm(root, {recursive:true, force:true}));
