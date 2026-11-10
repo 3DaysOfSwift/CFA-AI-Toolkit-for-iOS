@@ -420,8 +420,10 @@ skill from that toolkit before changing the project.
   Feature instance when it must operate across a date change. A View may
   read time directly for transient visuals.
 - Give each ViewModel its own named test file and suite under View model tests.
-  Give each concrete Feature a named API test file under FeatureTests. When
-  adding or moving tests, verify membership in the intended test target and
+  Give each concrete Feature a named API test file under FeatureTests. Inject
+  isolated Features into ViewModel tests. For AppModel tests, construct an
+  isolated graph and leave AppModel.shared untouched. When adding or moving
+  tests, verify membership in the intended test target and
   keep test sources out of the production app target. Run the affected tests.
 - Do not call an app CFA merely because it has numbered folders. Trace real
   ownership, AppModel composition, and the focused tests for the changed work.
