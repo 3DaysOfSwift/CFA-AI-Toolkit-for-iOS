@@ -601,18 +601,21 @@ For each relevant operation, inspect:
   preferences, check the update before publication and treat it as an
   in-memory update. When confirmed persistence is required, look for a
   storage API that reports the write outcome.
-- Record-level persistence: trace creates, updates and deletes to the
-  repository's write boundary. If a caller submits an entire collection,
-  check whether that collection could be stale. Exercise two edits to
-  different records from the same starting snapshot and verify that both
-  changes persist. Include a delete racing an unrelated update. Use the
-  storage result to verify the final records after reopening.
-- Durable storage upgrades: when reviewing a storage change, check the
-  previous store location and format against the new open or migration path.
-  Use a disposable store written by the previous implementation with
-  representative synthetic records. Verify the new implementation reopens
-  those records and a failed open or upgrade preserves the original data.
-  Record this evidence separately from tests that start with an empty store.
+- Record-level persistence: in CFA, apply the
+  [durable save rule](spec/rules/cfa-store-01.md). Trace individual creates,
+  updates and deletes to writes by stable record identity. If a caller submits
+  an entire collection, check whether its snapshot can overwrite unrelated
+  changes. Exercise overlapping edits to different records and a delete racing
+  an unrelated update. Reopen storage to verify the final records. For an
+  explicit whole-dataset import or restore, trace its separate integrity rules
+  and verify its failure and recovery behaviour against the product contract.
+- Durable storage upgrades: compare the previous store location and format
+  with the new open or migration path. Use a disposable store written by the
+  previous implementation with representative synthetic records. Verify that
+  existing records remain accessible after reopening. When open or upgrade
+  fails, verify that the failure reaches the affected operation and the
+  original store is preserved without presenting a replacement empty store
+  as a successful load. Record this evidence separately from fresh-store tests.
 - Preference restoration: apply the [safe fallback rule](spec/rules/cfa-pref-01.md)
   in CFA. Check that a supported value is restored and that a missing or
   obsolete non-critical value in a recognised format uses the product's safe
