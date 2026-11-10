@@ -489,11 +489,10 @@ boundary. This is our architecture convention, not a limitation of SwiftData.
   Features without a current screen. They await the model actor and publish
   immutable Sendable domain values. SwiftData `@Model` instances stay inside
   the storage boundary.
-- A small UI-owned context may remain on `@MainActor` only when its work is
-  demonstrably short and it deliberately serves UI-managed models. Do not use
-  that convenience as the default for a commercial feature with a growing data
-  set. Do not replace `@ModelActor` with a plain actor that happens to contain
-  a `ModelContext`.
+- Keep SwiftData contexts and managed records in the storage implementation
+  for small stores too. Views and previews reach persistence through their
+  ViewModel and Feature. A plain actor containing a `ModelContext` does not
+  substitute for `@ModelActor` in non-trivial production database work.
 - Open lazily off MainActor and coalesce overlapping requests. Serialize
   container creation across independent graphs where required to avoid the
   observed Core Data initialization race. Do not serialize the entire test

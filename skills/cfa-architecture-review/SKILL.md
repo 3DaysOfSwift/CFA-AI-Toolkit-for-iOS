@@ -169,9 +169,9 @@ For SwiftData, trace the context and managed records through the storage
 owner, including the repository's returned values and nested contents.
 Verify that Features receive immutable Sendable domain values. For non-trivial
 production work, identify the dedicated `@ModelActor` and trace context
-creation and expensive operations. A deliberately UI-owned context still
-keeps its records inside the storage boundary and requires evidence that its
-work stays short.
+creation and expensive operations. Check that the storage implementation
+owns every context and that Views and previews use the same ViewModel and
+Feature path to reach storage.
 
 For published API and persistence snapshots, apply the
 [immutable snapshot rule](references/spec/rules/cfa-snapshot-01.md). Identify

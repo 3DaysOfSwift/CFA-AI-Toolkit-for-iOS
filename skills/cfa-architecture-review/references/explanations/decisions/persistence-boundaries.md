@@ -72,8 +72,8 @@ One store is a CFA choice, not a SwiftData limit. Keep each context and managed 
 For non-trivial SwiftData work, verify that a dedicated `@ModelActor` owns
 the context and that expensive work executes off MainActor. Trace where
 the actor and context are created. Confirm that only immutable Sendable
-domain values leave the storage boundary. A deliberately UI-owned context
-is an exception for work proven short.
+domain values leave the storage boundary. Check that the storage
+implementation owns every context, including in paths exercised by previews.
 
 Exercise fresh directory preparation, concurrent first requests, isolated test stores, failed saves, reopening and retry. Verify record updates preserve unrelated records. Hold a previously published snapshot while saving a change and verify that it stays unchanged when the Feature publishes the replacement. Record runtime/toolchain and preserve shipped paths and schema.
 

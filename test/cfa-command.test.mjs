@@ -194,7 +194,7 @@ test('doctor warns about previously installed CFA guidance without changing it',
   assert.equal(doctor.status, 0, doctor.stderr);
   assert.match(doctor.stdout, /outdated feature naming guidance/);
   assert.match(doctor.stdout, /outdated AppModel guidance.*app-wide listeners/);
-  assert.match(doctor.stdout, /outdated service guidance.*SwiftDataManager ownership/);
+  assert.match(doctor.stdout, /outdated service guidance.*Keep SwiftData contexts inside storage/);
   assert.match(doctor.stdout, /outdated screen ownership guidance.*UIKit migrations/);
   assert.match(repeated.stdout, /existing CFA screen ownership guidance.*UIKit migrations/);
   assert.match(repeated.stdout, /existing CFA service guidance.*independent network requests/);

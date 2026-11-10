@@ -105,8 +105,8 @@ results in the report, rather than presenting scanner counts as findings.
    work uses a dedicated `@ModelActor`, keeps its context and live records
    within the storage boundary, and returns immutable Sendable values to
    the Feature. Trace where the context is created and where the expensive
-   work executes. A deliberately UI-owned context needs evidence that its work
-   stays short and follows the same storage boundary.
+   work executes. Verify storage owns the context even for small stores and
+   that previews follow the same ViewModel and Feature path as the app.
    For networking, trace independent requests from their callers through the
    networking service to URLSession. Look for sequential awaits, explicit queues,
    shared task chains, blocking calls or expensive synchronous actor-isolated

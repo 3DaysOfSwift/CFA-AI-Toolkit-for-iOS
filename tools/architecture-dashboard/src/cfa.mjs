@@ -26,8 +26,8 @@ const outdatedAppModelGuidance = 'AppModel stores only shared, concrete Features
 const outdatedFeatureGuidance = 'managers use the Manager suffix';
 const outdatedDependencyFlow = 'Preserve the CFA call path: View → ViewModel → Feature → Microservices';
 const dependencyFlowUpdate = 'A Feature calls internal microservices only when its work needs them.';
-const outdatedServiceGuidance = 'SwiftData uses SwiftDataManager; URLSession calls use NetworkingManager.';
-const serviceGuidanceUpdate = 'Clarify SwiftDataManager ownership and keep independent network requests able to progress in parallel.';
+const outdatedServiceGuidance = /SwiftData uses SwiftDataManager; URLSession calls use NetworkingManager\.|deliberately UI-owned context/;
+const serviceGuidanceUpdate = 'Keep SwiftData contexts inside storage, including when used by previews, and keep independent network requests able to progress in parallel.';
 const outdatedScreenGuidance = 'Every screen owns a dedicated ViewModel. Declare it as @State private var';
 const previousInlineScreenGuidance = /@State private var viewModel and construct it inline by default\. Keep View/;
 const detailScreenGuidance = 'A detail View may receive selected immutable value data';
@@ -251,7 +251,7 @@ skill from that toolkit before changing the project.
   save operations that return immutable Sendable domain values. Use a
   dedicated @ModelActor for non-trivial production database work. Verify
   where the context is created and that expensive work executes off MainActor.
-  Keep any deliberately UI-owned context limited to work proven short.
+  Views and previews reach storage through their ViewModel and Feature.
 - Route URLSession requests through NetworkingManager. Composition code may
   configure and inject the session. Keep response validation and decoding
   with each Feature-specific API adapter. In new apps, start with a stateless
@@ -574,7 +574,7 @@ function doctor(projectArgument) {
       if (content.includes(outdatedDependencyFlow)) {
         console.log(`WARN outdated CFA dependency guidance in ${file}. ${dependencyFlowUpdate}`);
       }
-      if (content.includes(outdatedServiceGuidance)) {
+      if (outdatedServiceGuidance.test(content)) {
         console.log(`WARN outdated service guidance in ${file}. ${serviceGuidanceUpdate}`);
       }
       if (content.includes(outdatedScreenGuidance) || (previousInlineScreenGuidance.test(content) && !content.includes(detailScreenGuidance))) {
@@ -650,7 +650,7 @@ function enableProject(values) {
     if (block.includes(outdatedDependencyFlow)) {
       console.log(`Update the existing CFA dependency guidance block. ${dependencyFlowUpdate}`);
     }
-    if (block.includes(outdatedServiceGuidance)) {
+    if (outdatedServiceGuidance.test(block)) {
       console.log(`Update the existing CFA service guidance block. ${serviceGuidanceUpdate}`);
     }
     if (block.includes(outdatedScreenGuidance) || (previousInlineScreenGuidance.test(block) && !block.includes(detailScreenGuidance))) {

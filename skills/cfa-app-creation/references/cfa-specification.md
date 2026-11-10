@@ -1162,9 +1162,9 @@ For production SwiftData repositories with non-trivial reads, writes, imports,
 or data sets, use a dedicated `@ModelActor`. It owns its `ModelContext`; Features
 remain `@MainActor` and publish only immutable `Sendable` domain
 values after awaiting the repository. SwiftData `@Model` records never cross
-from the model actor into a feature, ViewModel, or View. A small,
-deliberately UI-owned context may be main-actor isolated when its work is proven
-short, but that is an exception—not the default commercial persistence design.
+from the storage implementation into a Feature, ViewModel, or View. The
+storage implementation owns its context, including for small stores. Views
+and previews use the same ViewModel and Feature path to reach storage.
 
 For an individual create, update or delete, write the change by stable record
 identity. Replacing the collection from a caller's snapshot can overwrite
