@@ -49,6 +49,11 @@ the ViewModel obtains its Feature through the normal dependency path. A detail
 preview may supply the same immutable selection as its production caller.
 Keep SwiftData access in the storage service and out of the preview.
 
+Start with independent Features and inject their lower-level services.
+Apply the [Feature coordination rule](references/spec/rules/cfa-feature-02.md)
+when a reusable business workflow needs more than one Feature. Keep screen-only
+composition in the ViewModel and keep Model dependencies acyclic.
+
 For a Feature-owned shared refresh, apply the
 [refresh lifetime rule](references/spec/rules/cfa-task-02.md). By default,
 let the refresh finish and retain its result even if its only screen leaves.

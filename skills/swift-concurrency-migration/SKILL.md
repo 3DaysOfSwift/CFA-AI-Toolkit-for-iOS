@@ -73,6 +73,10 @@ Use deliberate passes:
    Feature. Identify missing business owners rather than inventing one per tab.
    Preserve one authoritative owner for shared business state; do not duplicate
    stores or collections.
+   Apply the [Feature coordination rule](references/spec/rules/cfa-feature-02.md)
+   when a migrated workflow spans capabilities. Leave screen-only composition
+   with its presentation owner. Keep reusable business coordination in the
+   Model, with explicit acyclic dependencies and no duplicated state ownership.
    Preserve the business outcomes, available capabilities and intended user
    journeys. Fix confirmed defects within scope and verify the correction.
    Migration to CFA and Swift Concurrency is the goal, not a search for unrelated

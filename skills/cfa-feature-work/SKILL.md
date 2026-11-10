@@ -32,6 +32,11 @@ First identify the live target, AppModel composition, existing feature owner,
 affected Views/ViewModels, storage and tests. Record the intended user journey,
 success/failure states and existing behaviour that must remain intact.
 
+Apply the [Feature coordination rule](references/spec/rules/cfa-feature-02.md)
+when a change touches several Features. Keep screen-only composition in the
+ViewModel. Give reusable business coordination an explicit Model owner when
+needed, with directional dependencies and one owner for each authoritative value.
+
 If the change introduces or touches a paid capability, apply the
 [paid capability rule](references/spec/rules/cfa-pay-01.md) and establish its
 access policy from the product requirements. The screen ViewModel reads current
