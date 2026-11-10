@@ -53,9 +53,13 @@ After the scoped feature migration and placement and hybrid reviews, audit the
 actual first-party source, tests, targets, packages, filesystem and Xcode navigator
 against the CFA specification and change gate. Cover the agreed migration scope using the [CFA review checklist](spec/topics/29-review-checklist.md).
 Record evidence for each applicable requirement and a reason for each
-inapplicable one. For paid capabilities, include alternate entry points and
-locked and entitled outcomes. Record unresolved paths as unverified. Document
-any intentional exception against the product constraints and explain its
+inapplicable one. For paid capabilities, identify the product entitlement
+policy and trace paid presentation and execution through the usual screen
+and alternate entry points. Test locked and entitled outcomes on each route.
+Where access can change across a suspension, revoke entitlement while the
+route waits and verify that it rechecks before presenting or invoking the
+capability. Cite the source and consequence of any confirmed unguarded
+path. Record unresolved paths as unverified. Document any intentional exception against the product constraints and explain its
 effect on the scoped conformance verdict.
 
 For affected account transitions, reconcile the original sign-out, account

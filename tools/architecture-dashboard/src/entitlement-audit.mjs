@@ -72,7 +72,8 @@ export function auditEntitlements(analysis, policy) {
       'Trace paid presentation and execution on the usual screen and alternate entry points, including routes absent from these results.',
       'Verify PurchasesFeature owns entitlement state and that the screen ViewModel or alternate route caller checks current entitlement before presentation or execution. Test locked and entitled outcomes. On a screen, verify that denied access shows the intended locked or purchase experience.',
       'Keep entitlement and pricing checks outside the paid capability Feature. Verify server-protected operations enforce their own authorisation.',
-      'If entitlement can change while the route is suspended, revoke it during the wait and verify that the resumed route checks again and blocks access.'
+      'If entitlement can change while the route is suspended, revoke it during the wait and verify that the resumed route checks again and blocks access.',
+      'Cite the source and consequence of confirmed unguarded paths. Record unresolved paths as unverified.'
     ],
     limitations:['Exact written-call matches are candidates, not resolved targets, proof of an entitlement check, or proof of a missing check.', 'Aliases, dynamic dispatch, properties, closures, external modules and unlisted spellings can be missed.', 'Direct and upstream indexed callers are possible navigation leads; index freshness and target coverage must be verified.', 'Inspect each entry point and test locked and entitled outcomes. No matches do not imply protection.']};
 }
