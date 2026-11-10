@@ -480,6 +480,13 @@ initializer from a selected immutable snapshot. Flag externally supplied
 ViewModels. In other architectures, describe the actual lifetime or ownership
 consequences of injection.
 
+For CFA, apply the [dependency flow rule](spec/rules/cfa-flow-01.md) and
+[Feature command rule](spec/rules/cfa-api-01.md) at actual call sites. Trace
+the screen through its ViewModel to the Feature that owns the business
+action. Check whether callers reach through the Feature into a repository
+or mutate nested implementation state. Trace any reverse dependency and
+identify what ownership boundary it crosses.
+
 For every reviewed journey, connect the trigger to calls, state commits and
 completion. Identify existing-task execution, new unstructured roots, structured
 children and actor transitions separately. Explain why the chosen lifetime and
@@ -505,11 +512,15 @@ For each relevant operation, inspect:
   policy and leaves later calls and task cleanup consistent. Record the product
   reason for policies such as latest-request-wins.
 - Button-driven tasks in CFA: trace the action from the View to its ViewModel.
-  Check that independently managed work has a named handle stored before
-  suspension. Hold the work pending, repeat an equivalent action and verify
-  it shares execution and completion. Check cleanup after success or failure
-  and that a later retry starts new work. Assess distinct commands against
-  their own admission policy.
+  Apply the [ViewModel task rule](spec/rules/cfa-task-03.md) when the ViewModel
+  creates an independently managed task. Check its named handle and keep
+  framework-owned lifecycle work and structured children with their existing
+  owners. Hold the task pending, repeat an equivalent action and verify the
+  callers share execution and observe completion. Check cleanup after success,
+  failure and cancellation, and verify a later retry starts new work. If an
+  older task can finish after a replacement starts, verify that its result
+  and cleanup leave the current state and replacement handle intact. Assess
+  distinct commands against their own admission policy and individual outcomes.
 - Pull-to-refresh: trace the `.refreshable` closure through the ViewModel
   and check which completion it awaits. For CFA, if the method returns a
   task handle, check that the closure awaits its value. Hold the work pending
