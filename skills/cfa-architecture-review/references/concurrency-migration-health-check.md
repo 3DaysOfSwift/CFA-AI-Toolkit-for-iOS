@@ -171,6 +171,15 @@ Keep Swift Concurrency correctness, general architecture and optional CFA-specif
 conformance distinct. An app can have a deliberate non-CFA design, and a CFA
 layout alone does not prove concurrency correctness or runtime performance.
 
+When the requested deliverable also includes a CFA conformance verdict, use
+the [full conformance checklist](spec/rules/cfa-review-01.md) and
+[prohibited patterns](spec/rules/cfa-review-02.md). Record evidence against
+each applicable requirement and a reason for each exclusion. Resolve scanner
+leads against actual usage and target membership. A whole-app concurrency
+assessment can establish a health result while a separate CFA requirement
+remains unverified. Keep that requirement open in the conformance assessment
+and state what evidence would resolve it.
+
 ## Produce the Health Check report
 
 Run the packaged scanner on the current checkout before each Health Check.
