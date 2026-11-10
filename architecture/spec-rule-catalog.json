@@ -209,7 +209,7 @@
       "strength": "Required",
       "rule": "Publish confirmed saved state only after required authoritative persistence succeeds. Preserve input on failure. Persist individual record changes by stable identity and reserve whole-dataset replacement for explicit operations with their own integrity rules. For simple preferences, update `UserDefaults` before publishing the value. The setter does not confirm a disk write. Use a storage API that reports the write outcome when the product requires confirmed persistence.",
       "why": "The UI must not claim that an unsaved change was saved.",
-      "verify": "Inject failed and successful writes, then check state and retry behaviour. Reopen storage and verify that overlapping writes to different records preserve both changes.",
+      "verify": "Hold the write pending and verify that the Feature still exposes the last confirmed value. Fail the write and verify the error is visible, the draft is retained and confirmed state stays unchanged. Retry successfully and verify that publication follows persistence. Start overlapping edits to different records from the same original snapshot, then reopen storage and verify that both changes survived.",
       "example": "In the bundled Habit Tracker, a failed count save leaves confirmed progress unchanged and TodayViewModel retains the entered value for retry.",
       "explanationIds": [
         "persistence-boundaries"

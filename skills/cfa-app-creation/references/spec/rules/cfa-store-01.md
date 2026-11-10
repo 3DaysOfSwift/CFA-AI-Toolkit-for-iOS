@@ -12,6 +12,6 @@
 
 **Explanation:** [Why use record-level persistence boundaries in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/persistence-boundaries).
 
-**Verify:** Inject failed and successful writes, then check state and retry behaviour. Reopen storage and verify that overlapping writes to different records preserve both changes.
+**Verify:** Hold the write pending and verify that the Feature still exposes the last confirmed value. Fail the write and verify the error is visible, the draft is retained and confirmed state stays unchanged. Retry successfully and verify that publication follows persistence. Start overlapping edits to different records from the same original snapshot, then reopen storage and verify that both changes survived.
 
 **Full rule, context and examples:** [Keep Persistence Behind Repository Contracts](../topics/19-keep-persistence-behind-repository-contracts.md). This card is a reading aid; apply the complete canonical section.
