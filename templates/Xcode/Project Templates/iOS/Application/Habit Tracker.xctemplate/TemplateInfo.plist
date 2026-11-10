@@ -389,6 +389,10 @@
 				<string>complete</string>
 				<key>SWIFT_DEFAULT_ACTOR_ISOLATION</key>
 				<string>nonisolated</string>
+				<key>MARKETING_VERSION</key>
+				<string>1.0</string>
+				<key>CURRENT_PROJECT_VERSION</key>
+				<string>1</string>
 				<key>INFOPLIST_KEY_UISupportedInterfaceOrientations</key>
 				<string>UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight</string>
 				<key>INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad</key>

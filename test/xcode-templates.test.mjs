@@ -337,12 +337,14 @@ test('template targets use explicit Swift 6 isolation and concurrency settings',
   }
 });
 
-test('new-project templates define the app display name from the product name', () => {
+test('new-project templates define app display name and initial version identity', () => {
   for (const name of names) {
     const file = path.join(root, 'templates/Xcode/Project Templates/iOS/Application', `${name}.xctemplate/TemplateInfo.plist`);
     const info = JSON.parse(execFileSync('python3', ['-c', 'import json, plistlib, sys; print(json.dumps(plistlib.load(open(sys.argv[1], "rb"))))', file], { encoding: 'utf8' }));
     const settings = info.Targets.find(target => target.TargetIdentifier === 'com.apple.dt.applicationTarget' || !target.TargetIdentifier)?.SharedSettings;
     assert.equal(settings?.INFOPLIST_KEY_CFBundleDisplayName, '$(PRODUCT_NAME)', `${name} must supply a resolved display name`);
+    assert.equal(settings?.MARKETING_VERSION, '1.0', `${name} must supply a marketing version`);
+    assert.equal(settings?.CURRENT_PROJECT_VERSION, '1', `${name} must supply a build number`);
   }
 });
 
