@@ -609,8 +609,11 @@ export async function inspect(project) {
     }
   }
   for (const [file, source] of sources) {
-    const managerBodies = [...source.matchAll(/\b(?:struct|class|actor|enum|extension)\s+NetworkingManager\b[^{}]*\{/g)]
+    const managerBodies = [...source.matchAll(/\b(struct|class|actor|enum|extension)\s+NetworkingManager\b[^{}]*\{/g)]
       .map(match => {
+        if (match[1] === 'actor') {
+          findings.push(finding('networking-manager-actor', 'review', 'NetworkingManager is an actor. Identify the shared state it protects and trace whether an independent request reaches transport while the first response is pending. Inspect synchronous actor work and any deliberate request limits.', file, lineOf(source, match.index)));
+        }
         const start = match.index + match[0].length;
         return {start, end: start + braceBody(source, start - 1).length};
       });

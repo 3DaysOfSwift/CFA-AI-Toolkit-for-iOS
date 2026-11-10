@@ -1019,6 +1019,17 @@ test('reviews requests through an injected URLSession outside NetworkingManager'
     .map(({file, line, severity}) => [file, line, severity]), [['OptionalProvider.swift', 2, 'review'], ['Provider.swift', 2, 'review'], ['ReactiveProvider.swift', 3, 'review']]);
 });
 
+test('asks for transport overlap evidence when NetworkingManager is an actor', async t => {
+  const root = await fixture(t, {
+    'Transport.swift': 'actor NetworkingManager {}\nextension NetworkingManager {}',
+    'Other.swift': 'actor Provider {}'
+  });
+  const {findings} = await inspect(root);
+  const review = findings.filter(item => item.code === 'networking-manager-actor');
+  assert.deepEqual(review.map(({file, line, severity}) => [file, line, severity]), [['Transport.swift', 1, 'review']]);
+  assert.match(review[0].message, /independent request reaches transport while the first response is pending/);
+});
+
 test('points to the URLSession request when the same file also configures a session', async t => {
   const root = await fixture(t, {
     'Provider.swift': `struct Provider {
