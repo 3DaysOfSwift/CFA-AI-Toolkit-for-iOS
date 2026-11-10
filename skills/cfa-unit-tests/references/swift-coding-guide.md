@@ -79,11 +79,14 @@ button was tapped or a screen appeared. The ViewModel owns the screen workflow,
 so its API describes the meaningful intent that workflow performs.
 
 Each SwiftUI View describes the interface; it does not perform imperative work.
-Move view-related work—formatting externally supplied values, reading bundle or
-system metadata, constructing presentation strings, coordinating actions, and
-handling UI outcomes—to that View's ViewModel so it can be tested without
-rendering the View. Move business decisions, persistence, network work, and
-shared feature state to the owning Feature. Bindings, simple conditional
+Move view-related work—formatting externally supplied values, reading
+screen-specific system metadata, constructing presentation strings,
+coordinating actions, and handling UI outcomes—to that View's ViewModel so it
+can be tested without rendering the View. When several screens present the same
+immutable system metadata, or tests need deterministic values, normalize it in
+an adjacent typed presentation value such as `AppInformation` and inject that
+value into the ViewModels. Move business decisions, persistence, network work,
+and shared feature state to the owning Feature. Bindings, simple conditional
 rendering, and short layout-local values that directly describe the rendered
 interface remain declarative View code.
 

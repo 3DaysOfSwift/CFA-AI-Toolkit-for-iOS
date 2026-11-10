@@ -116,9 +116,11 @@ the architecture:
     `Sendable` domain values to the MainActor Feature. The storage
     implementation owns the context for small stores too. Views and previews
     reach storage through their ViewModel and Feature.
-11. Views remain declarative. Bundle/system reads and presentation formatting
-    belong to the adjacent ViewModel; business, persistence, and shared state
-    belong to the owning Feature.
+11. Views remain declarative. Presentation formatting and screen-specific
+    system reads belong to the adjacent ViewModel. When multiple screens need the
+    same immutable system presentation data, or tests need deterministic values,
+    normalize it in an adjacent typed presentation value such as `AppInformation`.
+    Business, persistence, and shared mutable state belong to the owning Feature.
 12. A ViewModel initializer defaults its narrow Feature dependencies from
     `AppModel.shared`. A detail ViewModel may also receive a selected immutable domain
     snapshot. A typed immutable presentation value may be injected when a system value

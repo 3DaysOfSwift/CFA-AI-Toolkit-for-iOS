@@ -24,6 +24,19 @@ test('topic reading edition retains every canonical section and is bundled consi
   }
 });
 
+test('AppInformation is an optional typed presentation boundary', () => {
+  const specification = fs.readFileSync(path.join(root, 'architecture/cfa-specification.md'), 'utf8');
+  const changeGate = fs.readFileSync(path.join(root, 'architecture/cfa-change-gate.md'), 'utf8');
+  const codingGuide = fs.readFileSync(path.join(root, 'architecture/swift-coding-guide.md'), 'utf8');
+
+  assert.match(specification, /AppInformation\.swift \(when app identity is presented\)/);
+  assert.match(specification, /`AppInformation\.swift` is optional/);
+  assert.match(specification, /Apps that do not present this metadata do not add the\s+type/);
+  assert.match(changeGate, /adjacent typed presentation value such as `AppInformation`/);
+  assert.doesNotMatch(changeGate, /Bundle\/system reads and presentation formatting\s+belong to the adjacent ViewModel/);
+  assert.match(codingGuide, /normalize it in\s+an adjacent typed presentation value such as `AppInformation`/);
+});
+
 test('headings inside fenced examples remain part of their section', () => {
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'cfa-spec-topics-'));
   try {

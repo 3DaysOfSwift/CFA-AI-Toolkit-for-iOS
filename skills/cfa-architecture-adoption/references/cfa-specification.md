@@ -221,7 +221,7 @@ Use this top-level reading order:
 Application
 ├── 1 - View
 │   ├── App.swift
-│   ├── AppInformation.swift
+│   ├── AppInformation.swift (when app identity is presented)
 │   ├── Theme
 │   │   ├── AppColourTheme.swift
 │   │   └── ThemeManager.swift
@@ -256,6 +256,15 @@ Application
         └── Feature Name
             └── FeatureNameFeatureTests.swift
 ```
+
+`AppInformation.swift` is optional. Include it when one or more screens present
+the app name, marketing version, build number, or similar system metadata. It is
+an immutable `Sendable` presentation value that converts the authoritative
+bundle metadata into typed display values. ViewModels may default this value to
+its live bundle-backed instance and tests inject explicit values. Do not place
+`Bundle`, `[String: Any]`, business behaviour, or mutable application state in a
+ViewModel initializer. Apps that do not present this metadata do not add the
+type merely to complete the folder diagram.
 
 The Xcode navigator must communicate the design without requiring a developer
 to inspect source files.
