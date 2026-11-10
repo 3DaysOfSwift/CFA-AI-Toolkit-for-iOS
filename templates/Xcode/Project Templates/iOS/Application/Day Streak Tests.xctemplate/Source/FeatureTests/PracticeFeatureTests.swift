@@ -4,6 +4,29 @@ import Testing
 
 @MainActor
 struct PracticeFeatureTests {
+    @Test func equivalentRefreshesShareOneFeatureOperation() async {
+        let env = TestEnvironment()
+        await env.repository.pauseNextFetch()
+        await env.repository.fail(true)
+        let first = Task { try await env.practice.refresh() }
+        for _ in 0..<10_000 {
+            if await env.repository.isFetchWaiting() { break }
+            await Task.yield()
+        }
+        #expect(await env.repository.isFetchWaiting())
+        let second = Task { try await env.practice.refresh() }
+        for _ in 0..<100 { await Task.yield() }
+
+        await env.repository.resumeFetch()
+        let firstResult = await first.result
+        let secondResult = await second.result
+
+        #expect(await env.repository.fetchCount == 1)
+        #expect(!env.practice.hasLoaded)
+        #expect(throws: TestFailure.self) { try firstResult.get() }
+        #expect(throws: TestFailure.self) { try secondResult.get() }
+    }
+
     @Test func correctAnswerIsScoredOnlyOnce() async throws {
         let env = TestEnvironment()
         try await env.start()

@@ -9,23 +9,32 @@ actor MemorySessions: SessionRepository {
     private(set) var saveCount = 0
     private(set) var fetchCount = 0
     private var saveGate: CheckedContinuation<Void, Never>?
-    private var shouldPause = false
+    private var fetchGate: CheckedContinuation<Void, Never>?
+    private var shouldPauseSave = false
+    private var shouldPauseFetch = false
 
     init(_ sessions: [PracticeSession] = []) { self.sessions = sessions }
     func fail(_ value: Bool) { shouldFail = value }
-    func pauseNextSave() { shouldPause = true }
+    func pauseNextSave() { shouldPauseSave = true }
+    func pauseNextFetch() { shouldPauseFetch = true }
     func isWaiting() -> Bool { saveGate != nil }
+    func isFetchWaiting() -> Bool { fetchGate != nil }
     func resumeSave() { saveGate?.resume(); saveGate = nil }
+    func resumeFetch() { fetchGate?.resume(); fetchGate = nil }
 
-    func fetchSessions() throws -> [PracticeSession] {
+    func fetchSessions() async throws -> [PracticeSession] {
         fetchCount += 1
+        if shouldPauseFetch {
+            shouldPauseFetch = false
+            await withCheckedContinuation { fetchGate = $0 }
+        }
         if shouldFail { throw TestFailure.storage }
         return sessions
     }
 
     func save(_ session: PracticeSession) async throws {
-        if shouldPause {
-            shouldPause = false
+        if shouldPauseSave {
+            shouldPauseSave = false
             await withCheckedContinuation { saveGate = $0 }
         }
         if shouldFail { throw TestFailure.storage }

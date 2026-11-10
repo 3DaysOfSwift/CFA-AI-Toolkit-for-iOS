@@ -57,5 +57,5 @@ final class DayStreakFeature {
         return count
     }
 
-    func refresh() async throws { try await practiceFeature.perform(.refresh) }
+    func refresh() async throws { try await practiceFeature.refresh() }
 }

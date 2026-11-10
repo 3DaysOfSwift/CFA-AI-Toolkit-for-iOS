@@ -21,6 +21,8 @@ final class PracticeFeature {
     private let makeQuestion: (Difficulty) -> MultiplicationQuestion
     @ObservationIgnored private var operationTask: Task<Void, Error>?
     @ObservationIgnored private var operationID: UUID?
+    @ObservationIgnored private var refreshTask: Task<Void, Error>?
+    @ObservationIgnored private var refreshID: UUID?
 
     init(repository: any SessionRepository, calendar: Calendar = .autoupdatingCurrent,
          now: @escaping () -> Date = Date.init,
@@ -51,6 +53,32 @@ final class PracticeFeature {
     }
 
     func perform(_ command: Command) async throws {
+        if command == .refresh {
+            try await refresh()
+            return
+        }
+        let (identifier, task) = admit(command)
+        try await finish(identifier: identifier, task: task)
+    }
+
+    func refresh() async throws {
+        if let refreshTask {
+            try await refreshTask.value
+            return
+        }
+        let (identifier, task) = admit(.refresh)
+        refreshTask = task
+        refreshID = identifier
+        defer {
+            if refreshID == identifier {
+                refreshTask = nil
+                refreshID = nil
+            }
+        }
+        try await finish(identifier: identifier, task: task)
+    }
+
+    private func admit(_ command: Command) -> (UUID, Task<Void, Error>) {
         let predecessor = operationTask
         let identifier = UUID()
         let task = Task { @MainActor in
@@ -61,6 +89,10 @@ final class PracticeFeature {
         }
         operationTask = task
         operationID = identifier
+        return (identifier, task)
+    }
+
+    private func finish(identifier: UUID, task: Task<Void, Error>) async throws {
         defer {
             if operationID == identifier {
                 operationTask = nil

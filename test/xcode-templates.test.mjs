@@ -91,6 +91,17 @@ test('Day Streak maps domain outcomes to presentation inside ViewModels', () => 
   assert.doesNotMatch(streakViewModel, /error\.localizedDescription/);
 });
 
+test('Day Streak shares equivalent refreshes at the Feature boundary', () => {
+  const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/Day Streak.xctemplate/Source/Application');
+  const feature = fs.readFileSync(path.join(source, '2 - AppModel/Features/Practice/PracticeFeature.swift'), 'utf8');
+  const viewModel = fs.readFileSync(path.join(source, '1 - View/Views/Practice/PracticeViewModel.swift'), 'utf8');
+
+  assert.match(feature, /private var refreshTask: Task<Void, Error>\?/);
+  assert.match(feature, /func refresh\(\) async throws/);
+  assert.match(feature, /if let refreshTask\s*\{\s*try await refreshTask\.value/);
+  assert.match(viewModel, /try await practiceFeature\.refresh\(\)/);
+});
+
 test('CFA App keeps theme presentation outside its AppModel layer', () => {
   const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/CFA App.xctemplate/Source/Application');
   const model = fs.readFileSync(path.join(source, '2 - AppModel/Features/Settings/AppColourTheme.swift'), 'utf8');

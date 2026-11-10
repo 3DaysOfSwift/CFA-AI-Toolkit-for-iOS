@@ -67,7 +67,7 @@ final class PracticeViewModel {
         let task = Task { @MainActor in
             defer { refreshTask = nil }
             do {
-                try await practiceFeature.perform(.refresh)
+                try await practiceFeature.refresh()
                 errorMessage = nil
             } catch {
                 retryCommand = .refresh
