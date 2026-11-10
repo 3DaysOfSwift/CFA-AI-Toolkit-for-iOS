@@ -125,7 +125,16 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
   }
   const manifest=json(path.join(base,'.codex-plugin/plugin.json'));
   if(manifest.name!==productIdentifier) throw Error('Unexpected plugin identifier.');
-  if(manifest.interface?.displayName!=='CFA AI Toolkit for iOS') throw Error('Unexpected plugin display name.');
+  const pluginInterface=manifest.interface;
+  if(pluginInterface?.displayName!=='CFA AI Toolkit for iOS' || pluginInterface.developerName!==publisherName ||
+      pluginInterface.category!=='Productivity' || typeof pluginInterface.shortDescription!=='string' ||
+      !pluginInterface.shortDescription.trim() || typeof pluginInterface.longDescription!=='string' ||
+      !pluginInterface.longDescription.includes('Eight skills') ||
+      JSON.stringify(pluginInterface.capabilities)!==JSON.stringify(['Read','Write']) ||
+      !Array.isArray(pluginInterface.defaultPrompt) || pluginInterface.defaultPrompt.length<5 ||
+      pluginInterface.defaultPrompt.some(prompt=>typeof prompt!=='string' || !prompt.trim())) {
+    throw Error('Invalid Codex plugin interface metadata.');
+  }
   if(manifest.description!==productDescription) throw Error('Unexpected plugin description.');
   if(manifest.author?.name!==publisherName) throw Error('Unexpected plugin publisher.');
   if(!/^\d+\.\d+\.\d+(?:-[a-z0-9.-]+)?$/.test(manifest.version)) throw Error('Invalid release version.');
@@ -142,9 +151,12 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
   const packageFile=path.join(base,'package.json');
   const packageManifest=fs.existsSync(packageFile) ? json(packageFile) : undefined;
   const dashboardManifest=json(path.join(base,'skills/cfa-architecture-review/scripts/dashboard/package.json'));
-  if(portable.name!==manifest.name || portable.version!==manifest.version || portable.license!==manifest.license ||
+  const requiredPortableKeywords=['swift','swiftui','ios','swift-concurrency','architecture','cfa'];
+  if(portable.$schema!=='https://agent-plugins.org/schemas/1.0.0/plugin.schema.json' ||
+      portable.name!==manifest.name || portable.version!==manifest.version || portable.license!==manifest.license ||
       portable.author?.name!==publisherName || portable.author?.url!==publisherURL ||
-      portable.homepage!==repositoryURL || portable.repository!==repositoryURL) {
+      portable.homepage!==repositoryURL || portable.repository!==repositoryURL ||
+      !Array.isArray(portable.keywords) || requiredPortableKeywords.some(keyword=>!portable.keywords.includes(keyword))) {
     throw Error('Portable plugin manifest does not match Codex manifest.');
   }
   if(portable.description!==productDescription ||

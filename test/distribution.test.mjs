@@ -97,6 +97,24 @@ test('release validation keeps the public publisher and repository identity alig
  assert.throws(()=>validate(source,{source:false}),/Portable plugin manifest does not match Codex manifest/);
 });
 
+test('release validation rejects malformed host interface metadata', t => {
+ const {source}=release(t);
+ const manifest=path.join(source,'.codex-plugin/plugin.json');
+ const value=json(manifest);
+ value.interface.capabilities=['Read'];
+ fs.writeFileSync(manifest,JSON.stringify(value));
+ assert.throws(()=>validate(source,{source:false}),/Invalid Codex plugin interface metadata/);
+});
+
+test('release validation keeps the portable Agent Plugin contract', t => {
+ const {source}=release(t);
+ const manifest=path.join(source,'plugin.json');
+ const value=json(manifest);
+ delete value.$schema;
+ fs.writeFileSync(manifest,JSON.stringify(value));
+ assert.throws(()=>validate(source,{source:false}),/Portable plugin manifest does not match Codex manifest/);
+});
+
 test('release validation keeps the dashboard package on the toolkit version', t => {
  const {source}=release(t);
  const manifest=path.join(source,'skills/cfa-architecture-review/scripts/dashboard/package.json');
