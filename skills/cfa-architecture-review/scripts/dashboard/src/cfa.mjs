@@ -40,6 +40,8 @@ const outdatedSnapshotGuidance = 'Published domain snapshots use immutable prope
 const snapshotGuidanceUpdate = 'Use let properties and check nested values for mutable references.';
 const outdatedSharedWaitGuidance = 'A departing screen may stop waiting while the Feature keeps refreshing.';
 const sharedWaitGuidanceUpdate = 'For a prompt exit, cancel the screen’s wait independently of the Feature’s shared refresh.';
+const outdatedIsolationGuidance = 'Keep Features explicitly on MainActor.';
+const isolationGuidanceUpdate = 'Keep ViewModels and Features explicitly on MainActor.';
 const projectGuidance = `${guidanceMarker}
 # CFA project guidance
 
@@ -234,7 +236,7 @@ skill from that toolkit before changing the project.
   devices, including how receiving Features refresh their state and handle
   missing, unreadable, delayed and stale snapshots. If multiple targets can
   edit the same data, verify the product's conflict policy.
-- Keep Features explicitly on MainActor. Networking, persistence and expensive
+- Keep ViewModels and Features explicitly on MainActor. Networking, persistence and expensive
   processing use an appropriate service isolation boundary off MainActor by
   default. Keep framework-required MainActor calls in a narrow adapter.
   A separate type or async declaration alone does not move work off MainActor.
@@ -612,6 +614,9 @@ function doctor(projectArgument) {
       if (content.includes(outdatedAppModelGuidance)) {
         console.log(`WARN outdated AppModel guidance in ${file}; update the CFA guidance block to allow private task handles for app-wide listeners.`);
       }
+      if (content.includes(outdatedIsolationGuidance)) {
+        console.log(`WARN outdated isolation guidance in ${file}. ${isolationGuidanceUpdate}`);
+      }
     }
   } else {
     console.log(`INFO no optional CFA project guidance in ${project}`);
@@ -687,6 +692,9 @@ function enableProject(values) {
     }
     if (block.includes(outdatedAppModelGuidance)) {
       console.log('The existing AppModel guidance should allow private task handles for app-wide listeners. Edit only the CFA guidance block.');
+    }
+    if (block.includes(outdatedIsolationGuidance)) {
+      console.log(`Update the existing CFA isolation guidance block. ${isolationGuidanceUpdate}`);
     }
     return;
   }
