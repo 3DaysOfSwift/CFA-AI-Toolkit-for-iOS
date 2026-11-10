@@ -640,6 +640,18 @@ test('a computed property cannot establish ViewModel ownership through an initia
   assert.ok(!report.findings.some(item => item.code === 'view-model-property-name'));
 });
 
+test('a nested type of the ViewModel does not establish screen ownership', async t => {
+  const {report} = await inspectView(t, `struct HomeView: View {
+    @State private var viewModel: HomeViewModel.Preview
+    init(snapshot: HomeSnapshot) {
+      self.viewModel = .init(snapshot: snapshot)
+    }
+    var body: some View { Text("Home") }
+  }`);
+  assert.equal(report.screens[0].ownsViewModel, false);
+  assert.ok(report.findings.some(item => item.code === 'view-model-ownership'));
+});
+
 test('an initializer assignment to another instance does not establish screen ownership', async t => {
   const {report} = await inspectView(t, `struct HomeView: View {
     @State private var viewModel: HomeViewModel
