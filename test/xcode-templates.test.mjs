@@ -100,9 +100,8 @@ test('Day Streak maps domain outcomes to presentation inside ViewModels', () => 
   assert.match(practiceViewModel, /private func message\(for error: any Error/);
   assert.doesNotMatch(practiceViewModel, /error\.localizedDescription/);
   assert.doesNotMatch(streakViewModel, /error\.localizedDescription/);
-  assert.doesNotMatch(settingsFeature, /"Version \\\(/);
-  assert.match(settingsFeature, /var appVersion: String/);
-  assert.match(settingsFeature, /var buildNumber: String/);
+  assert.doesNotMatch(settingsFeature, /Bundle\.main|appInformation|appVersion|buildNumber|"Version/);
+  assert.match(settingsViewModel, /Bundle\.main\.infoDictionary/);
   assert.match(settingsViewModel, /var versionDescription: String/);
 });
 
@@ -287,8 +286,11 @@ test('starter Settings screens use an About section and a version footer outside
     assert.match(view, /footer: \{[\s\S]*Text\(viewModel.versionDescription\)/);
     assert.doesNotMatch(view, /LabeledContent\("Version"/);
     assert.doesNotMatch(view, /On.device AI|LabeledContent\("AI"/);
-    assert.match(viewModel, /settingsFeature.appVersion/);
-    assert.match(viewModel, /settingsFeature.buildNumber/);
+    if (application.startsWith('Project Templates/')) {
+      assert.match(viewModel, /Bundle\.main\.infoDictionary/);
+      assert.match(viewModel, /CFBundleShortVersionString/);
+      assert.match(viewModel, /CFBundleVersion/);
+    }
   }
 });
 

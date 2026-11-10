@@ -18,10 +18,16 @@ struct SettingsViewModelTests {
         #expect(feature.selectedTheme == .ember)
         #expect(model.difficultyTitle(.challenge) == "Challenge")
         #expect(model.themeTitle(.midnight) == "Midnight")
-        let versionFeature = SettingsFeature(
-            defaults: defaults,
+        let versionModel = SettingsViewModel(
+            settingsFeature: feature,
             appInformation: ["CFBundleShortVersionString": "2.3", "CFBundleVersion": "4"]
         )
-        #expect(SettingsViewModel(settingsFeature: versionFeature).versionDescription == "Version 2.3 (4)")
+        #expect(versionModel.versionDescription == "Version 2.3 (4)")
+        #expect(SettingsViewModel(settingsFeature: feature, appInformation: [:]).versionDescription == "Version — (—)")
+        let blankVersionModel = SettingsViewModel(
+            settingsFeature: feature,
+            appInformation: ["CFBundleShortVersionString": " ", "CFBundleVersion": 4]
+        )
+        #expect(blankVersionModel.versionDescription == "Version — (—)")
     }
 }

@@ -10,31 +10,14 @@ enum ThemeSelection: String, CaseIterable, Identifiable {
 @Observable
 final class SettingsFeature {
     private let defaults: UserDefaults
-    private let appInformation: [String: Any]
     private(set) var firstWeekday: Int
     private(set) var selectedTheme: ThemeSelection
 
-    init(defaults: UserDefaults, appInformation: [String: Any] = Bundle.main.infoDictionary ?? [:]) {
+    init(defaults: UserDefaults) {
         self.defaults = defaults
-        self.appInformation = appInformation
         let savedValue = defaults.integer(forKey: "firstWeekday")
         firstWeekday = [1, 2].contains(savedValue) ? savedValue : 2
         selectedTheme = ThemeSelection(rawValue: defaults.string(forKey: "selectedTheme") ?? "") ?? .automatic
-    }
-
-    var appName: String {
-        information(for: "CFBundleDisplayName") ?? information(for: "CFBundleName") ?? "App"
-    }
-
-    var appVersion: String { information(for: "CFBundleShortVersionString") ?? "—" }
-    var buildNumber: String { information(for: "CFBundleVersion") ?? "—" }
-
-    private func information(for key: String) -> String? {
-        guard let value = appInformation[key] as? String,
-              !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            return nil
-        }
-        return value
     }
 
     func selectFirstWeekday(_ weekday: Int) {

@@ -9,7 +9,7 @@ struct AppModelTests {
         let defaults = try #require(UserDefaults(suiteName: name))
         defer { defaults.removePersistentDomain(forName: name) }
         let repos = GitReposFeature(provider: TestGitReposProvider(), cache: TestRepoCache())
-        let settings = SettingsFeature(defaults: defaults, appInformation: [:])
+        let settings = SettingsFeature(defaults: defaults)
         let model = AppModel(gitReposFeature: repos, settingsFeature: settings)
         #expect(model.gitReposFeature === repos)
         #expect(model.settingsFeature === settings)
@@ -22,7 +22,7 @@ struct AppModelTests {
         let provider = LaunchProvider()
         let repos = GitReposFeature(provider: provider, cache: TestRepoCache())
         let model = AppModel(gitReposFeature: repos,
-                             settingsFeature: SettingsFeature(defaults: defaults, appInformation: [:]))
+                             settingsFeature: SettingsFeature(defaults: defaults))
         model.applicationDidFinishLaunching()
         await provider.waitUntilStarted()
         model.applicationDidFinishLaunching()

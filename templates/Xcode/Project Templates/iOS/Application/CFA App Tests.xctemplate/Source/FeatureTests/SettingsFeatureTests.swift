@@ -9,7 +9,7 @@ struct SettingsFeatureTests {
         let defaults = try #require(UserDefaults(suiteName: name))
         defer { defaults.removePersistentDomain(forName: name) }
         defaults.set("obsolete", forKey: "selectedColourTheme")
-        let feature = SettingsFeature(defaults: defaults, appInformation: [:])
+        let feature = SettingsFeature(defaults: defaults)
         #expect(feature.selectedTheme == .automatic)
         feature.selectTheme(.ocean)
         #expect(defaults.string(forKey: "selectedColourTheme") == AppColourTheme.ocean.rawValue)
