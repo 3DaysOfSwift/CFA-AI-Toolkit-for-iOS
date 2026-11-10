@@ -75,8 +75,11 @@ export function scanSource(source, file) {
       if (kind==='task' && /(?:(?:->|:)\s*(?:sending\s+)?|\b(?:struct|class|enum|actor|protocol|extension)\s+)(?:Swift\s*\.\s*)?$/.test(masked.slice(0,match.index))) continue;
       // SwiftSyntax locates these modifiers at their member name, after the dot.
       const offset = kind === 'view-task' || kind === 'refresh' ? match[0].search(/\w/) : 0;
-      // Keep existing button IDs anchored at Button, even when the source location includes SwiftUI.
-      const idIndex = match.index + (kind === 'button-action' ? (match[1]?.length ?? 0) : 0);
+      // Keep IDs anchored at the original API name when a source location
+      // includes its module qualifier. Saved reviews refer to those IDs.
+      let idIndex = match.index;
+      if (kind === 'button-action') idIndex += match[1]?.length ?? 0;
+      if (kind === 'task' || kind === 'detached') idIndex += match[0].indexOf('Task');
       sites.push({ id: `${file}:${idIndex}:${kind}`, kind, label, ...evidence(match.index + offset) });
     }
   }

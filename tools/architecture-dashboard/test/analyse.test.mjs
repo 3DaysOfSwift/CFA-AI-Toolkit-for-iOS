@@ -22,7 +22,11 @@ test('ordinary await creates no task; nested unstructured tasks stay distinct',(
 });
 test('finds task closures written as explicit operation arguments', () => {
   const source = '_Concurrency.Task(operation: { refresh() })\n_Concurrency.Task<Void, Never>.detached(priority: .background, operation: { refresh() })\nrunner . Task { refresh() }\nFixtures.Task.detached { refresh() }';
-  assert.deepEqual(scanSource(source,'A.swift').sites.map(site => site.kind), ['task','detached']);
+  const {sites} = scanSource(source, 'A.swift');
+  assert.deepEqual(sites.map(site => site.kind), ['task', 'detached']);
+  assert.deepEqual(sites.map(site => site.column), [1, 1]);
+  assert.equal(sites[0].id, `A.swift:${source.indexOf('Task')}:task`);
+  assert.equal(sites[1].id, `A.swift:${source.indexOf('Task<Void')}:detached`);
 });
 
 test('framework modifiers, detached work and group scopes have distinct kinds',()=>{
