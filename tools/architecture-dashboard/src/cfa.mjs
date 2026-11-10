@@ -454,8 +454,10 @@ skill from that toolkit before changing the project.
   architecture review of the final Xcode navigator and ownership structure.
   Keep the migration open while required evidence is missing.
 - Inject a clock or date function when a business rule depends on current
-  time. Read it in the Feature at the point of decision. Test date and time-zone
-  boundaries with controlled inputs, and advance the clock on the same
+  time. Read it in the Feature at the point of decision. Give date-relative
+  operations Feature APIs such as recordCoffeeToday so ViewModels do not
+  reconstruct the business calendar. Test date and time-zone boundaries
+  with controlled inputs, and advance the clock on the same
   Feature instance when it must operate across a date change. A View may
   read time directly for transient visuals.
 - Give each ViewModel its own named test file and suite under View model tests.

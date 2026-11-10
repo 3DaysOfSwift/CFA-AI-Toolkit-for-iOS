@@ -407,7 +407,9 @@ operations enforce authorisation independently.
   removes existing data nor substitutes another store. Report any storage or
   UI checks that did not run.
 - For time-dependent business decisions, verify the Feature reads an injected
-  clock when making the decision. Test relevant date and time-zone boundaries.
+  clock when making the decision. Keep date-relative business intent in the
+  Feature API, for example `recordCoffeeToday`, so the ViewModel does not
+  reconstruct the business calendar. Test relevant date and time-zone boundaries.
   Where a Feature must work across a date change, advance the controlled clock
   on the same instance and verify its next decision. Direct time reads in a
   View are suitable for transient visuals.
