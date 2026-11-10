@@ -135,6 +135,13 @@ test('release validation keeps the dashboard package on the toolkit version', t 
  assert.throws(()=>validate(source,{source:false}),/dashboard package identity does not match/);
 });
 
+test('release validation requires its declared dashboard command to be executable', t => {
+ const {source}=release(t);
+ const cli=path.join(source,'skills/cfa-architecture-review/scripts/dashboard/src/cli.mjs');
+ fs.chmodSync(cli,0o644);
+ assert.throws(()=>validate(source,{source:false}),/dashboard command must be an executable file/);
+});
+
 test('release validation rejects stale skill and bundled-tool licences', t => {
  const {source}=release(t);
  const skillLicense=path.join(source,'skills/cfa-feature-work/LICENSE');

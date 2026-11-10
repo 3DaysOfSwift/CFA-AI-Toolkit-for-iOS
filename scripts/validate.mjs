@@ -169,6 +169,11 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
       dashboardManifest.bin?.['swift-architecture']!=='./src/cli.mjs') {
     throw Error('Bundled dashboard package identity does not match the toolkit release.');
   }
+  const dashboardCLI=path.join(base,'skills/cfa-architecture-review/scripts/dashboard',dashboardManifest.bin['swift-architecture']);
+  const dashboardCLIStat=fs.statSync(dashboardCLI,{throwIfNoEntry:false});
+  if(!dashboardCLIStat?.isFile() || (process.platform!=='win32' && !(dashboardCLIStat.mode & 0o111))) {
+    throw Error('Bundled dashboard command must be an executable file.');
+  }
   if(source) {
     const sourceExamples = files(path.join(base,'examples/migration')).filter(isReleasePath).sort();
     const bundledExamples = files(path.join(base,'skills/swift-concurrency-migration/assets/migration-examples')).filter(isReleasePath).sort();
