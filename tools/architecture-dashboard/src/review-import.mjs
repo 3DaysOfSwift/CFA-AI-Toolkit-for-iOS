@@ -167,9 +167,11 @@ export async function importReview(report,input,root) {
         throw error;
       });
       if(!real.startsWith(base+path.sep)) fail('evidence symlink escapes repository');
-      const bytes=await fs.readFile(real);
       const expected=hashes.get(ref.file)??review.evidenceHashes?.[ref.file];
-      if(!expected||createHash('sha256').update(bytes).digest('hex')!==expected) fail('evidence hash mismatch: '+ref.file);
+      if(typeof expected !== 'string' || !/^[a-f0-9]{64}$/.test(expected)) fail('evidence hash mismatch: '+ref.file);
+      if(!(await fs.stat(real)).isFile()) fail('evidence must name a regular file: '+ref.file);
+      const bytes=await fs.readFile(real);
+      if(createHash('sha256').update(bytes).digest('hex')!==expected) fail('evidence hash mismatch: '+ref.file);
       if (bytes.includes(0) || bytes.subarray(0, 8).toString('ascii') === 'bplist00') {
         fail('line evidence requires UTF-8 text: '+ref.file);
       }
