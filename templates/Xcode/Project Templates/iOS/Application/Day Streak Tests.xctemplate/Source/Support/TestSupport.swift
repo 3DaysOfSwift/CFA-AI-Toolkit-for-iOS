@@ -58,11 +58,12 @@ struct TestEnvironment {
     let practice: PracticeFeature
     let streak: DayStreakFeature
 
-    init(repository: MemorySessions = MemorySessions(), clock: TestClock = TestClock()) {
+    init(repository: MemorySessions = MemorySessions(), clock: TestClock = TestClock(),
+         calendar suppliedCalendar: Calendar? = nil) {
         self.repository = repository
         self.clock = clock
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = .gmt
+        var calendar = suppliedCalendar ?? Calendar(identifier: .gregorian)
+        if suppliedCalendar == nil { calendar.timeZone = .gmt }
         self.calendar = calendar
         let practice = PracticeFeature(repository: repository, calendar: calendar, now: { clock.date }, makeQuestion: { _ in
             MultiplicationQuestion(id: UUID(), left: 9, right: 9, choices: [72, 81, 90, 63, 54, 80, 82, 99, 100])

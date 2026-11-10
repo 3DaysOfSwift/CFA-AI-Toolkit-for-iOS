@@ -42,7 +42,7 @@ final class DayStreakFeature {
         }
     }
 
-    static func streak(endingNear today: Date, days: Set<Date>, calendar: Calendar) -> Int {
+    private static func streak(endingNear today: Date, days: Set<Date>, calendar: Calendar) -> Int {
         var date = calendar.startOfDay(for: today)
         // An unfinished today does not break yesterday's streak before midnight.
         if !days.contains(date), let yesterday = calendar.date(byAdding: .day, value: -1, to: date) {
