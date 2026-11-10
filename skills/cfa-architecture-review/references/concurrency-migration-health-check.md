@@ -220,8 +220,16 @@ input; it does not resolve inherited settings or build overrides.
 Reconcile the full production target and file list,
 including sources the lexical scan cannot resolve. When `next` returns
 `targetReview`, reconcile its build definition paths, excluded test
-directories and symbolic links with actual target membership. Check the directories listed
-under `productionTargets.excludedTestDirectories` in the checklist against
+directories and symbolic links with actual target membership. The scanner
+lists symlink paths without following them. For a link used by a
+production target, confirm its destination is independently scanned and
+cite the canonical file. If a required destination is outside the scanned
+inventory, establish a scan scope that covers it before completing the review.
+Keep target membership unverified while any required linked source or build
+definition is missing. Changing a link target invalidates prior evidence.
+Editing the destination invalidates it only when that destination is scanned.
+
+Check the directories listed under `productionTargets.excludedTestDirectories` in the checklist against
 actual target membership before confirming that they contain only test sources. If any such directory contains production Swift, run `prepare` again with `--include-tests` as the last argument. The new draft preserves that inventory scope for subsequent commands. Record verified test-only files in a separate file batch with source and membership evidence. Give their candidate entry points and task sites an explicit exclusion reason. Record evidence-backed file batches, detected candidate entry points and each meaningful user or system operation using `scripts/dashboard/Documentation/REVIEWS.md`. A shared helper can be reviewed once and linked from multiple operations after checking each caller. Individual type verdicts are optional. Include
 `productionTargets` (an array of reviewed target and local-package names),
 `targetInventoryVerified` (true only after verifying membership), and
