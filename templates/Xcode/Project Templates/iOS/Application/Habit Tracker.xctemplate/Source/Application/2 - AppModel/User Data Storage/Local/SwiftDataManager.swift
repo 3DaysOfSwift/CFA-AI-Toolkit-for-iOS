@@ -3,14 +3,14 @@ import SwiftData
 
 actor SwiftDataManager: HabitsRepository {
     private let configuration: ModelConfiguration
-    private var habitRepository: HabitRepository?
+    private var habitStore: HabitStore?
 
     init(configuration: ModelConfiguration = ModelConfiguration(for: StoredHabit.self, StoredHabitEntry.self)) {
         self.configuration = configuration
     }
 
-    private func repository() throws -> HabitRepository {
-        if let habitRepository { return habitRepository }
+    private func store() throws -> HabitStore {
+        if let habitStore { return habitStore }
 
         // Prepare the actual configured location, without moving existing stores.
         // Directory failures must reach the requesting feature before SwiftData opens.
@@ -25,20 +25,20 @@ actor SwiftDataManager: HabitsRepository {
             for: StoredHabit.self, StoredHabitEntry.self,
             configurations: configuration
         )
-        let repository = HabitRepository(modelContainer: container)
-        habitRepository = repository
-        return repository
+        let store = HabitStore(modelContainer: container)
+        habitStore = store
+        return store
     }
 
     func fetchHabits() async throws -> [Habit] {
-        try await repository().fetchHabits()
+        try await store().fetchHabits()
     }
 
     func insertHabit(_ habit: Habit) async throws {
-        try await repository().insertHabit(habit)
+        try await store().insertHabit(habit)
     }
 
     func record(habitID: UUID, entryID: UUID, date: Date, value: Int) async throws {
-        try await repository().record(habitID: habitID, entryID: entryID, date: date, value: value)
+        try await store().record(habitID: habitID, entryID: entryID, date: date, value: value)
     }
 }

@@ -2,7 +2,7 @@ import Foundation
 import SwiftData
 
 @ModelActor
-actor HabitRepository: HabitsRepository {
+actor HabitStore {
     func fetchHabits() async throws -> [Habit] {
         let storedHabits = try modelContext.fetch(FetchDescriptor<StoredHabit>())
         let storedEntries = try modelContext.fetch(FetchDescriptor<StoredHabitEntry>())

@@ -204,10 +204,10 @@
 				<string>com.apple.dt.applicationTarget</string>
 			</array>
 		</dict>
-		<key>2 - AppModel/User Data Storage/Local/HabitRepository.swift</key>
+		<key>2 - AppModel/User Data Storage/Local/HabitStore.swift</key>
 		<dict>
 			<key>Path</key>
-			<string>Source/Application/2 - AppModel/User Data Storage/Local/HabitRepository.swift</string>
+			<string>Source/Application/2 - AppModel/User Data Storage/Local/HabitStore.swift</string>
 			<key>TargetIdentifiers</key>
 			<array>
 				<string>com.apple.dt.applicationTarget</string>
@@ -294,7 +294,7 @@
 		<string>2 - AppModel/Features/Habits/HabitsFeature.swift</string>
 		<string>2 - AppModel/Features/Settings/SettingsFeature.swift</string>
 		<string>2 - AppModel/Features/Today/TodayFeature.swift</string>
-		<string>2 - AppModel/User Data Storage/Local/HabitRepository.swift</string>
+		<string>2 - AppModel/User Data Storage/Local/HabitStore.swift</string>
 		<string>2 - AppModel/User Data Storage/Local/StoredHabit.swift</string>
 		<string>2 - AppModel/User Data Storage/Local/SwiftDataManager.swift</string>
 		<string>2 - AppModel/User Data Storage/Protocols/HabitsRepository.swift</string>
