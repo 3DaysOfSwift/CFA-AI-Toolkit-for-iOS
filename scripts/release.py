@@ -57,12 +57,14 @@ def main():
     out = args.out.resolve()
     if out.exists():
         parser.error('Output already exists; choose a new --out directory.')
+    run = lambda *command: subprocess.run(command, cwd=ROOT, check=True)
+    run(args.node, 'scripts/sync.mjs')
+    # Synchronisation can create a new generated file, so inspect the payload
+    # only after it has reached the state that will actually be packaged.
     untracked = untracked_release_files(ROOT)
     if untracked:
         parser.error('Release-eligible untracked files must be reviewed, added or ignored first: '
                      + ', '.join(untracked))
-    run = lambda *command: subprocess.run(command, cwd=ROOT, check=True)
-    run(args.node, 'scripts/sync.mjs')
     run(args.node, 'scripts/validate.mjs')
     tests = (sorted(ROOT.glob('test/*.test.mjs'))
              + sorted(ROOT.glob('tools/architecture-dashboard/test/*.test.mjs'))
