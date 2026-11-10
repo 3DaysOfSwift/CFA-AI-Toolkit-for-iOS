@@ -111,6 +111,7 @@ final class DeepLinkingFeature {
 
     // Explicit dismissal removes the saved request as well as its visible entry.
     func dismiss(id: String) async throws {
+        try Task.checkCancellation()
         guard activeRequests.insert(id).inserted else { throw PendingRequestError.operationInProgress }
         defer { activeRequests.remove(id) }
         try await removePending(id: id)
@@ -127,15 +128,17 @@ final class DeepLinkingFeature {
             // This marker lasts only for the current process.
             openedAwaitingRemoval.insert(id)
         }
-        // Navigation is already committed. Keep cleanup alive if the scene
-        // task is cancelled, and keep this request reserved until cleanup ends.
-        let cleanup = Task { try await removePending(id: id) }
-        try await cleanup.value
+        try await removePending(id: id)
     }
 
     private func removePending(id: String) async throws {
-        publish(try await store.remove(id: id))
-        openedAwaitingRemoval.remove(id)
+        // An admitted dismissal or completed navigation owns its durable
+        // removal independently of the scene. The caller holds the reservation.
+        let removal = Task {
+            publish(try await store.remove(id: id))
+            openedAwaitingRemoval.remove(id)
+        }
+        try await removal.value
     }
 
     private func publish(_ snapshot: PendingSnapshot) {
@@ -347,6 +350,16 @@ private actor DelayedRestoreRepository: PendingRequestRepository {
         try await lastRun.receive(dismissed)
         try await lastRun.receive(retained)
         precondition(lastRun.pending == [dismissed, retained])
+        let cancelledDismissal = Task { @MainActor in
+            try await lastRun.dismiss(id: dismissed.id)
+        }
+        cancelledDismissal.cancel()
+        do {
+            try await cancelledDismissal.value
+            preconditionFailure("A cancelled caller must not admit a dismissal")
+        } catch is CancellationError {
+            precondition(lastRun.pending == [dismissed, retained])
+        }
         try await lastRun.dismiss(id: dismissed.id)
         precondition(lastRun.pending == [retained])
         try await lastRun.receive(dismissed)
