@@ -649,7 +649,10 @@ For each relevant operation, inspect:
 - Optional download caches: in CFA, apply the
   [optional snapshot rule](spec/rules/cfa-cache-01.md). Verify that a slow
   restore does not delay the remote request and that a missing, incompatible
-  or unreadable cache does not prevent it. For independent sources, finish
+  or unreadable cache does not prevent it. If startup already owns the
+  download, fail the optional restore while that request is in flight and
+  verify that restoration does not start a duplicate request. Check that
+  the UI still reflects the remote request's outcome. For independent sources, finish
   one source's refresh before releasing restoration. Verify that restoration
   preserves the fresh result for that source and still restores usable cached
   data for a source that has not refreshed. Hold the optional write pending
