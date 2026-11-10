@@ -149,6 +149,13 @@ supported-device delivery and its observed outcome separately, or record
 the device verification gap. The reviewer establishes coverage of these
 scenarios from the linked evidence.
 
+For affected account transitions, link the baseline and final outcomes for
+sign-out, switching and external expiry where supported. Record the actual
+session after authentication or cleanup failures. Include the observed state
+and persisted records after releasing old requests, writes and cleanup. Where
+the same account can sign back in before old work completes, include that
+sequence in the comparison.
+
 In the final CFA audit, compare the resolved bundle identifiers of existing
 app and test targets against the baseline for each affected build
 configuration. Cite the before and after build settings, and record any

@@ -65,7 +65,11 @@ and cleanup can fail separately, verify the actual session and which data
 remains accessible. If the session ended, a cleanup error must leave the
 app signed out. Complete an old request after the transition, including
 after signing back in to the same account where supported, and verify that
-its result cannot publish into the new session.
+its result cannot publish into the new session, even if the old request
+was cancelled. Release a delayed write and delayed cleanup after the
+transition. Inspect persisted records to verify the write cannot recreate
+cleared data and the cleanup cannot delete new-session data. Compare retained
+data with the existing product contract.
 
 For every misplaced file, compare its actual disk path and navigator group with
 the appropriate CFA location, including files temporarily placed in an existing
