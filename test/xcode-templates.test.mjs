@@ -111,6 +111,31 @@ test('Habit Tracker shares equivalent record commands at the Feature boundary', 
   assert.match(feature, /try await lastRecordTask\.value/);
 });
 
+test('Habit Tracker Pro keeps shared habit behavior aligned with its CFA template', () => {
+  const source = path.join(root, 'starter-apps/Habit Tracker Pro/HabitTrackerPro');
+  const feature = fs.readFileSync(path.join(source, '2 - AppModel/Features/Habits/HabitsFeature.swift'), 'utf8');
+  const domain = fs.readFileSync(path.join(source, '2 - AppModel/Features/Habits/Habit.swift'), 'utf8');
+  const manager = fs.readFileSync(path.join(source, '2 - AppModel/User Data Storage/Local/SwiftDataManager.swift'), 'utf8');
+  const store = fs.readFileSync(path.join(source, '2 - AppModel/User Data Storage/Local/HabitStore.swift'), 'utf8');
+  const todayViewModel = fs.readFileSync(path.join(source, '1 - View/Views/Today/TodayViewModel.swift'), 'utf8');
+
+  assert.match(feature, /private\(set\) var loadError: \(any Error\)\?/);
+  assert.match(feature, /func isValidEntryValue\(_ value: Int\) -> Bool/);
+  assert.match(feature, /private var lastRecord: \(habitID: UUID, value: Int\)\?/);
+  assert.doesNotMatch(feature, /loadError\s*=\s*error\.localizedDescription/);
+  assert.doesNotMatch(domain, /LocalizedError|errorDescription/);
+  assert.match(todayViewModel, /todayFeature\.isValidEntryValue/);
+  assert.doesNotMatch(todayViewModel, /value >= 0|error\.localizedDescription/);
+  assert.match(manager, /actor SwiftDataManager: HabitsRepository/);
+  assert.match(manager, /private var habitStore: HabitStore\?/);
+  assert.match(store, /@ModelActor\s+actor HabitStore\s*\{/);
+  assert.doesNotMatch(store, /actor HabitStore: HabitsRepository/);
+  assert.equal(
+    fs.existsSync(path.join(source, '2 - AppModel/User Data Storage/Local/HabitRepository.swift')),
+    false
+  );
+});
+
 test('Day Streak keeps saved theme ownership in SettingsFeature', () => {
   const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/Day Streak.xctemplate/Source/Application');
   const feature = fs.readFileSync(path.join(source, '2 - AppModel/Features/Settings/SettingsFeature.swift'), 'utf8');

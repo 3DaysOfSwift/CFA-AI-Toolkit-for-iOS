@@ -2,7 +2,7 @@ import Foundation
 import SwiftData
 
 @ModelActor
-actor HabitRepository: HabitsRepository {
+actor HabitStore {
     func fetchHabits() async throws -> [Habit] {
         let storedHabits = try modelContext.fetch(FetchDescriptor<StoredHabit>())
         let storedEntries = try modelContext.fetch(FetchDescriptor<StoredHabitEntry>())
@@ -50,13 +50,6 @@ actor HabitRepository: HabitsRepository {
     }
 }
 
-enum HabitStorageError: LocalizedError {
+enum HabitStorageError: Error {
     case invalidTrackingValue
-
-    var errorDescription: String? {
-        switch self {
-        case .invalidTrackingValue:
-            "A saved habit has an unsupported tracking type. Its data was left unchanged."
-        }
-    }
 }
