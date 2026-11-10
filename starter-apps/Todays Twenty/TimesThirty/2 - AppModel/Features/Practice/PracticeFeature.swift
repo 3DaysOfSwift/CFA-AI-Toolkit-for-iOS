@@ -23,6 +23,9 @@ final class PracticeFeature {
     @ObservationIgnored private var operationID: UUID?
     @ObservationIgnored private var refreshTask: Task<Void, Error>?
     @ObservationIgnored private var refreshID: UUID?
+    @ObservationIgnored private var lastCommand: Command?
+    @ObservationIgnored private var lastCommandTask: Task<Void, Error>?
+    @ObservationIgnored private var lastCommandID: UUID?
 
     init(repository: any SessionRepository, calendar: Calendar = .autoupdatingCurrent,
          now: @escaping () -> Date = Date.init,
@@ -57,7 +60,21 @@ final class PracticeFeature {
             try await refresh()
             return
         }
+        if lastCommand == command, let lastCommandTask {
+            try await lastCommandTask.value
+            return
+        }
         let (identifier, task) = admit(command)
+        lastCommand = command
+        lastCommandTask = task
+        lastCommandID = identifier
+        defer {
+            if lastCommandID == identifier {
+                lastCommand = nil
+                lastCommandTask = nil
+                lastCommandID = nil
+            }
+        }
         try await finish(identifier: identifier, task: task)
     }
 

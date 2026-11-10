@@ -204,10 +204,18 @@ struct PracticeFeatureTests {
 
     @Test func concurrentStartsDoNotCreateDuplicateSessions() async throws {
         let env = TestEnvironment()
+        await env.repository.pauseNextSave()
         let first = Task { try await env.start() }
+        for _ in 0..<10_000 {
+            if await env.repository.isWaiting() { break }
+            await Task.yield()
+        }
+        #expect(await env.repository.isWaiting())
         let second = Task { try await env.start() }
-        _ = await first.result
-        _ = await second.result
+        for _ in 0..<100 { await Task.yield() }
+        await env.repository.resumeSave()
+        try await first.value
+        try await second.value
         #expect(env.practice.sessions.count == 1)
         #expect(await env.repository.saveCount == 1)
     }

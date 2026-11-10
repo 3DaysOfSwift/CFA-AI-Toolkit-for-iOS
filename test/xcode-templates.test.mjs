@@ -102,6 +102,15 @@ test('Day Streak shares equivalent refreshes at the Feature boundary', () => {
   assert.match(viewModel, /try await practiceFeature\.refresh\(\)/);
 });
 
+test('Day Streak shares consecutive equivalent commands at the Feature boundary', () => {
+  const file = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/Day Streak.xctemplate/Source/Application/2 - AppModel/Features/Practice/PracticeFeature.swift');
+  const feature = fs.readFileSync(file, 'utf8');
+
+  assert.match(feature, /private var lastCommand: Command\?/);
+  assert.match(feature, /if lastCommand == command, let lastCommandTask/);
+  assert.match(feature, /try await lastCommandTask\.value/);
+});
+
 test('CFA App keeps theme presentation outside its AppModel layer', () => {
   const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/CFA App.xctemplate/Source/Application');
   const model = fs.readFileSync(path.join(source, '2 - AppModel/Features/Settings/AppColourTheme.swift'), 'utf8');
