@@ -70,7 +70,7 @@ export function auditEntitlements(analysis, policy) {
     indexExcludedCalls:analysis.compilerIndex?.excludedCalls ?? null, capabilities,
     verification:[
       'Trace paid presentation and execution on the usual screen and alternate entry points, including routes absent from these results.',
-      'Verify PurchasesFeature owns entitlement state and that the screen ViewModel or alternate route caller checks current entitlement before presentation or execution. Test locked and entitled outcomes.',
+      'Verify PurchasesFeature owns entitlement state and that the screen ViewModel or alternate route caller checks current entitlement before presentation or execution. Test locked and entitled outcomes. On a screen, verify that denied access shows the intended locked or purchase experience.',
       'Keep entitlement and pricing checks outside the paid capability Feature. Verify server-protected operations enforce their own authorisation.',
       'If entitlement can change while the route is suspended, revoke it during the wait and verify that the resumed route checks again and blocks access.'
     ],

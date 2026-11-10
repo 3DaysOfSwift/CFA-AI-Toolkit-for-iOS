@@ -295,7 +295,8 @@ the architecture:
 Review the changed source as one feature slice, not as isolated files.
 When the scope includes a paid capability, establish its entitlement policy.
 Check that PurchasesFeature owns entitlement state and that the screen
-ViewModel checks it before paid presentation or execution. Trace each
+ViewModel checks it before paid presentation or execution and presents the
+product’s locked or purchase experience when access is denied. Trace each
 alternate entry point that bypasses the screen to its caller's own check.
 Keep pricing and entitlement checks outside the capability Feature. Flag
 established unguarded paths and report unresolved paths as unverified. Test locked and entitled paths. If entitlement

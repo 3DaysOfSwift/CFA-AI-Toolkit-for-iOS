@@ -324,7 +324,8 @@ skill from that toolkit before changing the project.
   order and individual outcomes, and verify a failure leaves later work able
   to finish.
 - PurchasesFeature owns entitlement state. Screen ViewModels check current
-  entitlement before presenting or calling a paid capability. Identify paid
+  entitlement before presenting or calling a paid capability and present the
+  product’s locked or purchase experience when access is denied. Identify paid
   capabilities from the product requirements and entitlement policy. Trace
   alternative screens, deep links, notification actions and additional targets
   that reach the capability. A route that bypasses the screen checks current
