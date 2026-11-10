@@ -222,15 +222,6 @@
 			<key>Group</key>
 			<string>3 - App Resources</string>
 		</dict>
-		<key>4 - Swift Extensions/Date+Display.swift</key>
-		<dict>
-			<key>Path</key>
-			<string>Source/Application/4 - Swift Extensions/Date+Display.swift</string>
-			<key>TargetIdentifiers</key>
-			<array>
-				<string>com.apple.dt.applicationTarget</string>
-			</array>
-		</dict>
 	</dict>
 	<key>Nodes</key>
 	<array>
@@ -254,7 +245,6 @@
 		<string>2 - AppModel/Networking &amp; Data Storage/Protocols/GitReposProvider.swift</string>
 		<string>3 - App Resources/LaunchScreen.storyboard</string>
 		<string>3 - App Resources/PrivacyInfo.xcprivacy</string>
-		<string>4 - Swift Extensions/Date+Display.swift</string>
 	</array>
 	<key>Options</key>
 	<array>

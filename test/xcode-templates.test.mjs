@@ -134,6 +134,15 @@ test('CFA App keeps theme presentation outside its AppModel layer', () => {
   assert.match(view, /Text\(viewModel\.themeName\(theme\)\)/);
 });
 
+test('CFA App omits unused example-only extensions', () => {
+  const file = path.join(
+    root,
+    'templates/Xcode/Project Templates/iOS/Application/CFA App.xctemplate/Source/Application/4 - Swift Extensions/Date+Display.swift'
+  );
+
+  assert.equal(fs.existsSync(file), false);
+});
+
 test('template AppModel roots remain fixed composition graphs', () => {
   for (const name of names) {
     const file = path.join(root, 'templates/Xcode/Project Templates/iOS/Application', `${name}.xctemplate/Source/Application/2 - AppModel/AppModel.swift`);
