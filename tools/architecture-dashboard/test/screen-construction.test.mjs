@@ -624,6 +624,22 @@ test('recognizes escaped detail ViewModel backing storage and reports naming sep
   assert.equal(report.findings.find(item => item.code === 'view-model-initializer-construction')?.line, 3);
 });
 
+test('a computed property cannot establish ViewModel ownership through an initializer assignment', async t => {
+  const {report} = await inspectView(t, `struct HomeView: View {
+    @State private var model: HomeViewModel {
+      get { HomeViewModel() }
+      set { }
+    }
+    init(snapshot: HomeSnapshot) {
+      self.model = HomeViewModel(snapshot: snapshot)
+    }
+    var body: some View { Text("Home") }
+  }`);
+  assert.equal(report.screens[0].ownsViewModel, false);
+  assert.ok(report.findings.some(item => item.code === 'view-model-ownership'));
+  assert.ok(!report.findings.some(item => item.code === 'view-model-property-name'));
+});
+
 test('an initializer assignment to another instance does not establish screen ownership', async t => {
   const {report} = await inspectView(t, `struct HomeView: View {
     @State private var viewModel: HomeViewModel

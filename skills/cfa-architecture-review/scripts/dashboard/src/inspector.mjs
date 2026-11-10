@@ -983,7 +983,8 @@ export async function inspect(project) {
     let ownedState = inlineState && { name: inlineState[1] ?? inlineState[2], index: inlineState.index };
     const typedStateProperties = [...members.matchAll(new RegExp(
       `@${stateTypePattern}\\s+private\\s+var\\s+${propertyNamePattern}\\s*:\\s*${viewModelTypePattern}\\b`, 'gu'
-    ))].map(match => ({ name: match[1] ?? match[2], index: match.index }));
+    ))].filter(match => !hasComputedAccessor(body.slice(match.index + match[0].length)))
+      .map(match => ({ name: match[1] ?? match[2], index: match.index }));
     function stateAssignmentTarget(name, explicitSelf = false) {
       const receiver = explicitSelf ? String.raw`self\s*\.\s*` : String.raw`(?:self\s*\.\s*)?`;
       return String.raw`(?<![\p{L}\p{M}\p{N}_\x60])(?<!\.\s*)${receiver}(?:\x60${name}\x60|${name})\s*=`;
