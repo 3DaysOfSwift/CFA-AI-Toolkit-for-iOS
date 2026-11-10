@@ -157,6 +157,27 @@ test('Habit Tracker Pro keeps root and saved appearance state at CFA boundaries'
   assert.equal(fs.existsSync(path.join(source, '1 - View/Views/ContentView.swift')), false);
 });
 
+test('Habit Tracker Pro keeps StoreKit work and domain outcomes inside its purchase Feature', () => {
+  const source = path.join(root, 'starter-apps/Habit Tracker Pro/HabitTrackerPro');
+  const app = fs.readFileSync(path.join(source, '1 - View/App.swift'), 'utf8');
+  const appModel = fs.readFileSync(path.join(source, '2 - AppModel/AppModel.swift'), 'utf8');
+  const purchaseStore = fs.readFileSync(path.join(source, '2 - AppModel/Features/Purchases/PurchaseStore.swift'), 'utf8');
+  const purchasesFeature = fs.readFileSync(path.join(source, '2 - AppModel/Features/Purchases/PurchasesFeature.swift'), 'utf8');
+  const paywallViewModel = fs.readFileSync(path.join(source, '1 - View/Views/TrendsPaywall/TrendsPaywallViewModel.swift'), 'utf8');
+
+  assert.doesNotMatch(app, /applicationDidBecomeActive[\s\S]*Task\s*\{/);
+  assert.doesNotMatch(appModel, /@Observable|transactionUpdatesTask|transactionUpdates\(\)/);
+  assert.match(appModel, /purchasesFeature\.requestEntitlementRefresh\(\)/);
+  assert.match(purchasesFeature, /private var transactionUpdatesTask: Task<Void, Never>\?/);
+  assert.match(purchasesFeature, /private func startObservingTransactions\(\)/);
+  assert.match(purchasesFeature, /func requestEntitlementRefresh\(\)/);
+  assert.match(purchasesFeature, /var error: \(any Error\)\?/);
+  assert.doesNotMatch(purchasesFeature, /localizedDescription|errorMessage|"Your purchase|"No Trends/);
+  assert.doesNotMatch(purchaseStore, /LocalizedError|errorDescription/);
+  assert.match(paywallViewModel, /purchasesFeature\.error\.map\(message\(for:\)\)/);
+  assert.match(paywallViewModel, /case \.pendingApproval:/);
+});
+
 test('Day Streak keeps saved theme ownership in SettingsFeature', () => {
   const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/Day Streak.xctemplate/Source/Application');
   const feature = fs.readFileSync(path.join(source, '2 - AppModel/Features/Settings/SettingsFeature.swift'), 'utf8');

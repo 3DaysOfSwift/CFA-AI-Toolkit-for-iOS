@@ -1,10 +1,8 @@
 import Foundation
-import Observation
 
 @MainActor
-@Observable
 final class AppModel {
-    static let shared = live()
+    static let shared = AppModel.live()
 
     let todayFeature: TodayFeature
     let habitsFeature: HabitsFeature
@@ -13,7 +11,6 @@ final class AppModel {
     let purchasesFeature: PurchasesFeature
     let trendsFeature: TrendsFeature
     private var didFinishLaunching: Bool
-    @ObservationIgnored private var transactionUpdatesTask: Task<Void, Never>?
 
     init(todayFeature: TodayFeature, habitsFeature: HabitsFeature, dayStreakFeature: DayStreakFeature,
          settingsFeature: SettingsFeature, purchasesFeature: PurchasesFeature, trendsFeature: TrendsFeature) {
@@ -24,7 +21,6 @@ final class AppModel {
         self.purchasesFeature = purchasesFeature
         self.trendsFeature = trendsFeature
         didFinishLaunching = false
-        transactionUpdatesTask = nil
     }
 
     static func live() -> AppModel {
@@ -41,23 +37,14 @@ final class AppModel {
         )
     }
 
-    deinit { transactionUpdatesTask?.cancel() }
-
     func applicationDidFinishLaunching() {
         guard !didFinishLaunching else { return }
         didFinishLaunching = true
-        let updates = purchasesFeature.transactionUpdates()
-        transactionUpdatesTask = Task { [purchasesFeature] in
-            for await _ in updates {
-                guard !Task.isCancelled else { break }
-                await purchasesFeature.refreshEntitlement()
-            }
-        }
         habitsFeature.startLoading()
         purchasesFeature.startLoading()
     }
 
-    func applicationDidBecomeActive() async {
-        await purchasesFeature.refreshEntitlement()
+    func applicationDidBecomeActive() {
+        purchasesFeature.requestEntitlementRefresh()
     }
 }

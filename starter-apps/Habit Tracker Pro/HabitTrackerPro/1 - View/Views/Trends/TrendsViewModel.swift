@@ -16,7 +16,7 @@ final class TrendsViewModel {
 
     var hasAccess: Bool { purchasesFeature.hasTrendsAccess }
     var isLoading: Bool { hasAccess && trendsFeature.isLoading }
-    var loadError: String? { hasAccess ? trendsFeature.loadError : nil }
+    var loadError: String? { hasAccess ? trendsFeature.loadError.map(message(for:)) : nil }
     var trends: [HabitTrend] { hasAccess ? trendsFeature.trends : [] }
     var selectedTrend: HabitTrend? {
         trends.first(where: { $0.id == selectedHabitID }) ?? trends.first
@@ -36,5 +36,9 @@ final class TrendsViewModel {
         }
         retryTask = task
         return task
+    }
+
+    private func message(for error: any Error) -> String {
+        "We couldn’t load your habit trends. Please try again."
     }
 }

@@ -39,7 +39,7 @@ final class TrendsFeature {
     }
 
     var isLoading: Bool { habitsFeature.isLoading }
-    var loadError: String? { habitsFeature.loadError }
+    var loadError: (any Error)? { habitsFeature.loadError }
     func reload() async { await habitsFeature.reload() }
 
     /// Calculate trends from the habits already owned by HabitsFeature.

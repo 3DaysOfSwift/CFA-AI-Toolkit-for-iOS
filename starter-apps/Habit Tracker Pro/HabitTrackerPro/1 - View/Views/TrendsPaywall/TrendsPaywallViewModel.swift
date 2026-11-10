@@ -20,8 +20,17 @@ final class TrendsPaywallViewModel {
     }
     var isPurchasingOrRestoring: Bool { purchasesFeature.isPurchasingOrRestoring }
     var isLoadingOffer: Bool { purchasesFeature.isLoadingOffer }
-    var errorMessage: String? { purchasesFeature.errorMessage }
-    var notice: String? { purchasesFeature.notice }
+    var errorMessage: String? { purchasesFeature.error.map(message(for:)) }
+    var notice: String? {
+        switch purchasesFeature.notice {
+        case .pendingApproval:
+            "Your purchase is awaiting approval. Trends will unlock after it is approved."
+        case .noPurchaseFound:
+            "No Trends purchase was found for this Apple Account."
+        case nil:
+            nil
+        }
+    }
     @ObservationIgnored private var purchaseTask: Task<Void, Never>?
     @discardableResult
     func purchase() -> Task<Void, Never> {
@@ -54,5 +63,16 @@ final class TrendsPaywallViewModel {
         }
         retryTask = task
         return task
+    }
+
+    private func message(for error: any Error) -> String {
+        switch error {
+        case PurchaseError.unavailable:
+            "The Trends purchase is unavailable. Please try again later."
+        case PurchaseError.unverified:
+            "We couldn’t verify your purchase. Please try Restore Purchases."
+        default:
+            "Something went wrong with the Trends purchase. Please try again."
+        }
     }
 }

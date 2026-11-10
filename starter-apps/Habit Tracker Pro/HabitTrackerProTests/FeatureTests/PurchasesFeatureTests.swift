@@ -146,7 +146,7 @@ struct PurchasesFeatureTests {
         store.outcome = .cancelled
         await feature.purchaseTrends()
         #expect(!feature.hasTrendsAccess)
-        #expect(feature.errorMessage == nil)
+        #expect(feature.error == nil)
         store.outcome = .pending
         await feature.purchaseTrends()
         #expect(!feature.hasTrendsAccess)
@@ -178,19 +178,19 @@ struct PurchasesFeatureTests {
         store.failsOffer = true
         await feature.loadOffer()
         #expect(feature.offer == nil)
-        #expect(feature.errorMessage != nil)
+        #expect(feature.error != nil)
         store.failsOffer = false
         await feature.loadOffer()
         #expect(feature.offer != nil)
         store.failsPurchase = true
         await feature.purchaseTrends()
         #expect(!feature.hasTrendsAccess)
-        #expect(feature.errorMessage != nil)
+        #expect(feature.error != nil)
         store.failsPurchase = false
         store.failsVerification = true
         await feature.purchaseTrends()
         #expect(!feature.hasTrendsAccess)
-        #expect(feature.errorMessage != nil)
+        #expect(feature.error != nil)
         store.failsVerification = false
         await feature.refreshEntitlement()
         #expect(feature.hasTrendsAccess)
@@ -202,12 +202,12 @@ struct PurchasesFeatureTests {
         store.failsVerification = true
         await feature.prepare()
         #expect(feature.offer != nil)
-        #expect(feature.errorMessage != nil)
+        #expect(feature.error != nil)
         #expect(!feature.hasTrendsAccess)
 
         store.failsVerification = false
         await feature.refreshEntitlement()
-        #expect(feature.errorMessage == nil)
+        #expect(feature.error == nil)
     }
 
     @Test func staleEntitlementCannotUndoRevocation() async {

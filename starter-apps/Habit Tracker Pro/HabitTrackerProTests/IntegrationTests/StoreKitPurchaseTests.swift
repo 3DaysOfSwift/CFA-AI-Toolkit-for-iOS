@@ -26,7 +26,7 @@ struct StoreKitPurchaseTests {
         let feature = PurchasesFeature(store: store)
         await feature.purchaseTrends()
         #expect(feature.hasTrendsAccess)
-        #expect(feature.errorMessage == nil)
+        #expect(feature.error == nil)
 
         let trackingStore = TrackingPurchaseStore()
         let relaunched = PurchasesFeature(store: trackingStore)
