@@ -16,7 +16,7 @@ final class CFAAppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct ___PACKAGENAME:identifier___App: App {
     @UIApplicationDelegateAdaptor(CFAAppDelegate.self) private var appDelegate
-    @State private var themeManager = ThemeManager.shared
+    @State private var themeManager = ThemeManager(settingsFeature: AppModel.shared.settingsFeature)
 
     var body: some Scene {
         WindowGroup {

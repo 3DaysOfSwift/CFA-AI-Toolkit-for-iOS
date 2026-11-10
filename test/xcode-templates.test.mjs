@@ -139,7 +139,21 @@ test('template AppModel roots remain fixed composition graphs', () => {
     const file = path.join(root, 'templates/Xcode/Project Templates/iOS/Application', `${name}.xctemplate/Source/Application/2 - AppModel/AppModel.swift`);
     const source = fs.readFileSync(file, 'utf8');
     assert.doesNotMatch(source, /@Observable|import Observation/);
-    assert.match(source, /static let shared\s*=\s*(?:AppModel\.)?live\(\)/);
+    assert.match(source, /static let shared\s*=\s*AppModel\.live\(\)/);
+  }
+});
+
+test('template Apps compose presentation managers without another shared graph', () => {
+  for (const [name, appFile] of [
+    ['CFA App', '___PACKAGENAME:identifier___App.swift'],
+    ['Habit Tracker', '___PACKAGENAMEASIDENTIFIER___App.swift'],
+    ['Day Streak', '___PACKAGENAMEASIDENTIFIER___App.swift']
+  ]) {
+    const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application', `${name}.xctemplate/Source/Application`);
+    const manager = fs.readFileSync(path.join(source, '1 - View/Theme/ThemeManager.swift'), 'utf8');
+    const app = fs.readFileSync(path.join(source, '1 - View', appFile), 'utf8');
+    assert.doesNotMatch(manager, /static let shared/);
+    assert.match(app, /@State private var themeManager = ThemeManager\(settingsFeature: AppModel\.shared\.settingsFeature\)/);
   }
 });
 

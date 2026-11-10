@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 final class AppModel {
-    static let shared = live()
+    static let shared = AppModel.live()
     let practiceFeature: PracticeFeature
     let dayStreakFeature: DayStreakFeature
     let settingsFeature: SettingsFeature
