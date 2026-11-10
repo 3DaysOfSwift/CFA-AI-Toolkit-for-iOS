@@ -299,7 +299,12 @@ async function currentInventory(root, syntaxProvider = collectSyntax, options = 
 }
 export async function prepare(root, output, syntaxProvider = collectSyntax, options = {}) {
   const {report,analysis} = await currentInventory(root, syntaxProvider, options);
-  await fs.mkdir(output, {recursive:false});
+  try {
+    await fs.mkdir(output, {recursive:false});
+  } catch (error) {
+    if (error.code !== 'EEXIST') throw error;
+    throw Error(`Health Check output already exists: ${output}. Resume with next and the existing review-draft.json, or choose a new output directory for a fresh scan.`, {cause:error});
+  }
   await fs.writeFile(path.join(output,'inventory.json'), JSON.stringify(report,null,2)+'\n', {flag:'wx'});
   await fs.writeFile(path.join(output,'project-analysis.json'), JSON.stringify(analysis,null,2)+'\n', {flag:'wx'});
   const checklist = {

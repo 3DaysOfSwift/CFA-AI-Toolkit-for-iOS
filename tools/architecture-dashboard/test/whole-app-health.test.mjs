@@ -403,6 +403,10 @@ test('installed Health Check rescans source, surfaces gaps and rejects stale rev
     await fs.writeFile(buildSettings, initialSettings);
     const syntax=async()=>({status:'available',files:['App.swift','Value.swift'],items:[],warnings:[]});
     const inventory=await prepare(project,path.join(base,'inventory'),syntax);
+    const draft = path.join(base, 'inventory', 'review-draft.json');
+    const draftBefore = await fs.readFile(draft, 'utf8');
+    await assert.rejects(prepare(project,path.join(base,'inventory'),syntax), /Resume with next and the existing review-draft.json/);
+    assert.equal(await fs.readFile(draft, 'utf8'), draftBefore);
     const taskMap = await fs.readFile(path.join(base,'inventory','task-map.html'),'utf8');
     assert.match(taskMap,/Task sites/);
     assert.match(taskMap,/SwiftSyntax available · file coverage matching/);
