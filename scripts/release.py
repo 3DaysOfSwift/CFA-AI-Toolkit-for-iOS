@@ -24,7 +24,11 @@ def archive(output, pairs, prefix):
             entry = zipfile.ZipInfo(prefix + '/' + relative, (1980, 1, 1, 0, 0, 0))
             entry.compress_type = zipfile.ZIP_DEFLATED
             entry.create_system = 3
-            mode = 0o755 if relative.endswith(('.command', '.sh')) else 0o644
+            # Preserve intentional executable entry points regardless of their
+            # extension. In particular, the dashboard's package.json exposes
+            # src/cli.mjs as a bin, so reducing every .mjs file to 0644 breaks
+            # the declared command after extraction.
+            mode = 0o755 if source.stat().st_mode & 0o111 else 0o644
             entry.external_attr = (0o100000 | mode) << 16
             z.writestr(entry, source.read_bytes())
 
