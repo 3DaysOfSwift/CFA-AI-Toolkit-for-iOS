@@ -91,6 +91,20 @@ test('Day Streak maps domain outcomes to presentation inside ViewModels', () => 
   assert.doesNotMatch(streakViewModel, /error\.localizedDescription/);
 });
 
+test('CFA App keeps theme presentation outside its AppModel layer', () => {
+  const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/CFA App.xctemplate/Source/Application');
+  const model = fs.readFileSync(path.join(source, '2 - AppModel/Features/Settings/AppColourTheme.swift'), 'utf8');
+  const palette = fs.readFileSync(path.join(source, '1 - View/Theme/AppColourTheme+Palette.swift'), 'utf8');
+  const viewModel = fs.readFileSync(path.join(source, '1 - View/Views/Settings/SettingsViewModel.swift'), 'utf8');
+  const view = fs.readFileSync(path.join(source, '1 - View/Views/Settings/SettingsView.swift'), 'utf8');
+
+  assert.doesNotMatch(model, /var name:|defaultLight|defaultDark|SwiftUI|ColorScheme|Color\(/);
+  assert.match(palette, /static let defaultLight/);
+  assert.match(palette, /static let defaultDark/);
+  assert.match(viewModel, /func themeName\(_ theme: AppColourTheme\)/);
+  assert.match(view, /Text\(viewModel\.themeName\(theme\)\)/);
+});
+
 test('native templates provide the accent color expected by generated Xcode projects', () => {
   for (const name of names) {
     const file = path.join(root, 'templates/Xcode/Project Templates/iOS/Application', `${name}.xctemplate/Source/Assets.xcassets/AccentColor.colorset/Contents.json`);

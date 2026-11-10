@@ -19,7 +19,7 @@ struct SettingsView: View {
                         )
                     ) {
                         ForEach(AppColourTheme.allCases) { theme in
-                            Text(theme.name).tag(theme)
+                            Text(viewModel.themeName(theme)).tag(theme)
                         }
                     }
                     .pickerStyle(.menu)

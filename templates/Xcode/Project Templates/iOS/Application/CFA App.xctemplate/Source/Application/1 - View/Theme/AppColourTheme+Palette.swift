@@ -1,6 +1,9 @@
 import SwiftUI
 
 extension AppColourTheme {
+    static let defaultLight: AppColourTheme = .systemGrey
+    static let defaultDark: AppColourTheme = .ocean
+
     var colorScheme: ColorScheme? {
         switch self {
         case .automatic: nil

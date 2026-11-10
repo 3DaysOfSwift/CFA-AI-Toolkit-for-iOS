@@ -14,6 +14,19 @@ final class SettingsViewModel {
         settingsFeature.selectTheme(theme)
     }
 
+    func themeName(_ theme: AppColourTheme) -> String {
+        switch theme {
+        case .automatic: "Automatic"
+        case .ocean: "Ocean"
+        case .graphite: "Graphite"
+        case .midnight: "Midnight"
+        case .systemGrey: "System Grey"
+        case .forest: "Forest"
+        case .terracotta: "Terracotta"
+        case .lavender: "Lavender"
+        }
+    }
+
     var appName: String { settingsFeature.appName }
 
     var developerWebsiteURL: URL? {

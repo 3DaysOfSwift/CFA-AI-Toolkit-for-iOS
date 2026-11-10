@@ -12,5 +12,6 @@ struct SettingsViewModelTests {
         let model = SettingsViewModel(settingsFeature: feature)
         model.selectTheme(.forest)
         #expect(feature.selectedTheme == .forest)
+        #expect(model.themeName(.systemGrey) == "System Grey")
     }
 }
