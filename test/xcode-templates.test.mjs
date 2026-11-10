@@ -105,6 +105,15 @@ test('CFA App keeps theme presentation outside its AppModel layer', () => {
   assert.match(view, /Text\(viewModel\.themeName\(theme\)\)/);
 });
 
+test('template AppModel roots remain fixed composition graphs', () => {
+  for (const name of names) {
+    const file = path.join(root, 'templates/Xcode/Project Templates/iOS/Application', `${name}.xctemplate/Source/Application/2 - AppModel/AppModel.swift`);
+    const source = fs.readFileSync(file, 'utf8');
+    assert.doesNotMatch(source, /@Observable|import Observation/);
+    assert.match(source, /static let shared\s*=\s*(?:AppModel\.)?live\(\)/);
+  }
+});
+
 test('native templates provide the accent color expected by generated Xcode projects', () => {
   for (const name of names) {
     const file = path.join(root, 'templates/Xcode/Project Templates/iOS/Application', `${name}.xctemplate/Source/Assets.xcassets/AccentColor.colorset/Contents.json`);
