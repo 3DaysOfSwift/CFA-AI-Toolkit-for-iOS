@@ -215,11 +215,15 @@ separately. The inventory lists symbolic links it encountered under
 a link refers to shipping source or configuration before confirming target
 coverage. While membership is unverified, `next` returns these links, build
 definitions and excluded test directories under `targetReview`. Use them to
-locate evidence for the actual target membership. Retargeting a listed link
-invalidates the review. Changes inside
-its destination are tracked only if the destination is independently scanned.
-An exported HTML file is a dated
-snapshot.
+locate evidence for the actual target membership. Retargeting a listed link invalidates
+the review. A link's destination contents are fingerprinted only when that
+destination is independently scanned. If a production target uses linked code,
+review the destination and cite its canonical repository-relative path when
+available. For a repository-local source outside the inventory, provide its
+content hash in `evidenceHashes` so resuming the review rechecks the citation.
+If required source is outside the repository, keep target coverage open until
+the source can be reviewed and cited within the reviewed project root.
+An exported HTML file is a dated snapshot.
 
 Use one operation for each meaningful action with a distinct behavioural path;
 shared code can be cited by several operations after each caller is checked. Set
