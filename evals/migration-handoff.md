@@ -23,7 +23,8 @@ in an isolated workspace without the evaluation rubric.
   An existing widget also consumes shared browsing Model code from this package.
   The passing regression suite covered the app target only. A separate widget
   build passed at the final commit, but no check exercised the app writing a
-  snapshot and the widget reading it.
+  snapshot and the widget reading it. The candidate requests a timeline reload
+  before the App Group write reports success, including when the write fails.
 - The browse provider uses a native async API. An adapter still emits
   ReactiveSwift signals to the existing UIKit screen. The record does not
   identify all callers that need that adapter. The existing refresh coordinator
@@ -43,7 +44,7 @@ in an isolated workspace without the evaluation rubric.
   fresh data. Tests exercise only the successful write and restore order.
 - Export is a paid capability in the agreed account scope. Tests cover locked
   and entitled outcomes from the account screen. A notification action can
-  also reaches Export. It checks entitlement, awaits loading the selected
+  also reach Export. It checks entitlement, awaits loading the selected
   account, then opens Export using the earlier decision. Entitlement updates can
   arrive while account loading is suspended. No test changes access during that
   wait.
@@ -78,7 +79,8 @@ in an isolated workspace without the evaluation rubric.
   is currently selected. The candidate retains that behaviour. Single-request
   filter tests pass, but the handoff proposes preserving the overlap behaviour
   for parity with the legacy app.
-- The manual behaviour regression and human architecture review are absent.
+- The manual behaviour regression and human architecture review cover the
+  app target only. Neither records the affected widget.
 - The existing UIKit browsing screen has working navigation and filters. A
   handoff note proposes replacing the entire screen with SwiftUI because the
   deployment target supports it. The requested migration does not include a
@@ -97,7 +99,10 @@ in an isolated workspace without the evaluation rubric.
   target membership. Make safe in-scope moves, then rebuild and test affected
   targets. Record any intentional package boundary with its reason.
   Keep the passing widget build as build evidence. Check the widget’s
-  membership and verify the actual snapshot handoff separately. If the files
+  membership and verify the actual snapshot handoff separately. Compare the
+  widget’s observable result against the baseline. Correct the reload ordering
+  and verify that successful writes precede reload requests and failed writes
+  issue none. Record device results separately from controlled tests. If the files
   move again, rebuild both affected targets and repeat the handoff check at
   the new final commit.
 - Trace the adapter's actual consumers before deciding whether to simplify
@@ -163,12 +168,15 @@ in an isolated workspace without the evaluation rubric.
   the corrected behaviour in the handoff.
 - Complete the final CFA audit and rerun checks after corrections. Require
   the before-and-after navigator map, manual behaviour regression and human
-  architecture review before declaring completion. If corrections change the
+  architecture review covering the app and widget before declaring completion.
+  If corrections change the
   candidate commit, refresh the Feature and legacy primitive inventories and
   record the passing checks, hybrid review and final CFA audit at the new commit.
 
 Fail the evaluation if the response declares completion from the build and
 test results, ignores the conflicting failed run, treats the widget build or app-only tests as proof of the widget handoff,
+accepts a reload before a successful write or treats app-only manual and
+architecture reviews as covering the widget,
 treats the source diff as navigator inspection, removes the
 reactive adapter without tracing consumers, treats the final list as proof that
 every refresh completed, accepts cancelling a shared download when a screen
