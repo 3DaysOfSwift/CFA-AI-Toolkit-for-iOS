@@ -82,6 +82,15 @@ test('generic CLI imports reviewed ratings and test results without an example g
    const input={schemaVersion:1,sourceFingerprint:report.sourceFingerprint,author:'Fixture',scope:'Synthetic contract test',findings:[],testQuality:{scope:'One reviewed scenario',scenarios:[{title:'Load returns expected value',status:'identified',detail:'Assertion verifies output',evidence:[ref]}],concerns:[]},evidenceHashes:{'Tests/FeatureTests.swift':createHash('sha256').update(assertion).digest('hex')}};
    const read=await importReview(report,input,app);
    assert.match(read.testQuality.scenarios[0].evidence[0].excerpt,/#expect/);
+   const withoutExcerpts = await importReview(report, input, app, {includeExcerpts:false});
+   assert.deepEqual(withoutExcerpts.testQuality.scenarios[0].evidence[0], ref);
+   const evidenceFile = path.join(app, ref.file);
+   await fs.appendFile(evidenceFile, '\n// Changed outside the automatic inventory');
+   const rescanned = await analyse(app);
+   assert.equal(rescanned.sourceFingerprint, report.sourceFingerprint);
+   await assert.rejects(importReview(rescanned, input, app, {includeExcerpts:false}),
+     /evidence hash mismatch: Tests\/FeatureTests\.swift/);
+   await fs.writeFile(evidenceFile, assertion);
    const tampered=structuredClone(input);tampered.testQuality.scenarios[0].evidence[0].file='../outside.swift';
    await assert.rejects(importReview(report,tampered,app),/inside repository/);
    const directoryEvidence = structuredClone(input);
