@@ -13,6 +13,7 @@ struct DayStreakViewModelTests {
         #expect(viewModel.currentStreak == 1)
         #expect(viewModel.completedDayCount == 1)
         #expect(viewModel.correctAnswerCount == 20)
+        #expect(viewModel.recentCompletedDays == [env.clock.date])
     }
 
     @Test func presentsLoadingFailureWithoutInfrastructureText() async {

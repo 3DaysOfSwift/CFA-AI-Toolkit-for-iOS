@@ -16,7 +16,7 @@ final class DayStreakViewModel {
     var completedDayCount: Int { dayStreakFeature.completedDayCount }
     var correctAnswerCount: Int { dayStreakFeature.correctAnswerCount }
     var week: [StreakDay] { dayStreakFeature.week }
-    var completedDates: [Date] { dayStreakFeature.completedDays.sorted(by: >) }
+    var recentCompletedDays: [Date] { dayStreakFeature.recentCompletedDays }
 
     @discardableResult
     func refresh() -> Task<Void, Never> {
