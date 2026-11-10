@@ -27,6 +27,10 @@
 		<dict>
 			<key>Path</key>
 			<string>Source/Application/1 - View/___PACKAGENAME:identifier___App.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
 			<key>Group</key>
 			<string>1 - View</string>
 			<key>SortOrder</key>
@@ -36,6 +40,10 @@
 		<dict>
 			<key>Path</key>
 			<string>Source/Assets.xcassets</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
 			<key>SortOrder</key>
 			<integer>100</integer>
 		</dict>
@@ -43,91 +51,163 @@
 		<dict>
 			<key>Path</key>
 			<string>Source/Application/1 - View/Theme/AppColourTheme+Palette.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
 		</dict>
 		<key>1 - View/Theme/ThemeManager.swift</key>
 		<dict>
 			<key>Path</key>
 			<string>Source/Application/1 - View/Theme/ThemeManager.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
 		</dict>
 		<key>1 - View/Views/Root/RootTabView.swift</key>
 		<dict>
 			<key>Path</key>
 			<string>Source/Application/1 - View/Views/Root/RootTabView.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
 		</dict>
 		<key>1 - View/Views/Root/RootTabViewModel.swift</key>
 		<dict>
 			<key>Path</key>
 			<string>Source/Application/1 - View/Views/Root/RootTabViewModel.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
 		</dict>
 		<key>1 - View/Views/Git Repos/GitReposView.swift</key>
 		<dict>
 			<key>Path</key>
 			<string>Source/Application/1 - View/Views/Git Repos/GitReposView.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
 		</dict>
 		<key>1 - View/Views/Git Repos/GitReposViewModel.swift</key>
 		<dict>
 			<key>Path</key>
 			<string>Source/Application/1 - View/Views/Git Repos/GitReposViewModel.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
 		</dict>
 		<key>1 - View/Views/Settings/SettingsView.swift</key>
 		<dict>
 			<key>Path</key>
 			<string>Source/Application/1 - View/Views/Settings/SettingsView.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
 		</dict>
 		<key>1 - View/Views/Settings/SettingsViewModel.swift</key>
 		<dict>
 			<key>Path</key>
 			<string>Source/Application/1 - View/Views/Settings/SettingsViewModel.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
 		</dict>
 		<key>2 - AppModel/AppModel.swift</key>
 		<dict>
 			<key>Path</key>
 			<string>Source/Application/2 - AppModel/AppModel.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
 		</dict>
 		<key>2 - AppModel/Features/Git Repos/Repo.swift</key>
 		<dict>
 			<key>Path</key>
 			<string>Source/Application/2 - AppModel/Features/Git Repos/Repo.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
 		</dict>
 		<key>2 - AppModel/Features/Git Repos/GitReposFeature.swift</key>
 		<dict>
 			<key>Path</key>
 			<string>Source/Application/2 - AppModel/Features/Git Repos/GitReposFeature.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
 		</dict>
 		<key>2 - AppModel/Features/Settings/AppColourTheme.swift</key>
 		<dict>
 			<key>Path</key>
 			<string>Source/Application/2 - AppModel/Features/Settings/AppColourTheme.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
 		</dict>
 		<key>2 - AppModel/Features/Settings/SettingsFeature.swift</key>
 		<dict>
 			<key>Path</key>
 			<string>Source/Application/2 - AppModel/Features/Settings/SettingsFeature.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
 		</dict>
 		<key>2 - AppModel/Networking &amp; Data Storage/File Cache/RepoFileCache.swift</key>
 		<dict>
 			<key>Path</key>
 			<string>Source/Application/2 - AppModel/Networking &amp; Data Storage/File Cache/RepoFileCache.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
 		</dict>
 		<key>2 - AppModel/Networking &amp; Data Storage/Networking/GitHubAPI.swift</key>
 		<dict>
 			<key>Path</key>
 			<string>Source/Application/2 - AppModel/Networking &amp; Data Storage/Networking/GitHubAPI.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
 		</dict>
 		<key>2 - AppModel/Networking &amp; Data Storage/Networking/NetworkingManager.swift</key>
 		<dict>
 			<key>Path</key>
 			<string>Source/Application/2 - AppModel/Networking &amp; Data Storage/Networking/NetworkingManager.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
 		</dict>
 		<key>2 - AppModel/Networking &amp; Data Storage/Protocols/GitReposProvider.swift</key>
 		<dict>
 			<key>Path</key>
 			<string>Source/Application/2 - AppModel/Networking &amp; Data Storage/Protocols/GitReposProvider.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
 		</dict>
 		<key>3 - App Resources/LaunchScreen.storyboard</key>
 		<dict>
 			<key>Path</key>
 			<string>Source/Application/3 - App Resources/LaunchScreen.storyboard</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
 			<key>Group</key>
 			<string>3 - App Resources</string>
 		</dict>
@@ -135,6 +215,10 @@
 		<dict>
 			<key>Path</key>
 			<string>Source/Application/3 - App Resources/PrivacyInfo.xcprivacy</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
 			<key>Group</key>
 			<string>3 - App Resources</string>
 		</dict>
@@ -142,6 +226,10 @@
 		<dict>
 			<key>Path</key>
 			<string>Source/Application/4 - Swift Extensions/Date+Display.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
 		</dict>
 	</dict>
 	<key>Nodes</key>
@@ -235,6 +323,8 @@
 	<key>Targets</key>
 	<array>
 		<dict>
+			<key>TargetIdentifier</key>
+			<string>com.apple.dt.applicationTarget</string>
 			<key>SharedSettings</key>
 			<dict>
 				<key>ENABLE_PREVIEWS</key>

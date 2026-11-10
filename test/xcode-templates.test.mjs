@@ -271,6 +271,27 @@ test('new-project templates contain no UI-test targets or empty UI-test folders'
   }
 });
 
+test('application templates reference every shipped source in the app target', () => {
+  for (const name of names) {
+    const template = path.join(root, 'templates/Xcode/Project Templates/iOS/Application', `${name}.xctemplate`);
+    const info = JSON.parse(execFileSync('plutil', ['-convert', 'json', '-o', '-', path.join(template, 'TemplateInfo.plist')], { encoding: 'utf8' }));
+    assert.ok(info.Targets.some(target => target.TargetIdentifier === 'com.apple.dt.applicationTarget'), `${name} requires an explicit app target`);
+    for (const node of info.Nodes) assert.ok(info.Definitions[node], `${name} node ${node} requires a definition`);
+
+    const definitions = Object.values(info.Definitions);
+    const paths = definitions.map(definition => definition.Path).filter(Boolean);
+    const sourceFiles = fs.readdirSync(path.join(template, 'Source'), { recursive: true, encoding: 'utf8' })
+      .filter(file => fs.statSync(path.join(template, 'Source', file)).isFile())
+      .map(file => `Source/${file}`);
+    for (const file of sourceFiles) {
+      assert.ok(paths.some(defined => file === defined || file.startsWith(`${defined}/`)), `${name} does not reference ${file}`);
+    }
+    for (const definition of definitions) {
+      assert.ok(definition.TargetIdentifiers?.includes('com.apple.dt.applicationTarget'), `${name} must assign ${definition.Path} to the app target`);
+    }
+  }
+});
+
 test('new-project templates define the app display name from the product name', () => {
   for (const name of names) {
     const file = path.join(root, 'templates/Xcode/Project Templates/iOS/Application', `${name}.xctemplate/TemplateInfo.plist`);
