@@ -3,11 +3,11 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { files, isReleasePath } from './files.mjs';
 import { specTopics } from './spec-topics.mjs';
+import { cfaSkills, skills } from './skill-names.mjs';
+export { cfaSkills, skills } from './skill-names.mjs';
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-export const cfaSkills = ['cfa-app-creation', 'cfa-feature-work', 'cfa-architecture-adoption', 'swift-concurrency-migration', 'cfa-architecture-review', 'cfa-codebase-tidy', 'cfa-unit-tests'];
 export const referenceFeatureSkills = ['cfa-app-creation', 'cfa-feature-work', 'cfa-architecture-adoption', 'swift-concurrency-migration'];
 export const behaviourContractSkills = ['cfa-feature-work', 'cfa-architecture-adoption', 'swift-concurrency-migration', 'cfa-codebase-tidy', 'cfa-unit-tests'];
-export const skills = [...cfaSkills, 'swift-code-quality'];
 export const explanationFiles = ['guide.md', 'catalogue.json',
   ...JSON.parse(fs.readFileSync(path.join(root, 'architecture/explanations/catalogue.json'), 'utf8')).topics.map(topic => topic.note)];
 export const iconSkills = ['cfa-app-creation', 'cfa-architecture-adoption', 'swift-concurrency-migration', 'cfa-codebase-tidy'];
@@ -86,7 +86,7 @@ export function sync(base = root, { skipXcodeProjects = false } = {}) {
     .replace('../tools/migration-evidence/README.md', '../scripts/evidence/README.md');
   fs.writeFileSync(path.join(base, 'skills/swift-concurrency-migration/references/migration-evidence.md'), captureGuide);
 }
-if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL(fs.realpathSync(process.argv[1])).href) {
   const args = process.argv.slice(2);
   if (args.length > 1 || args.some(arg => arg !== '--skip-xcode-projects')) {
     console.error('Usage: node scripts/sync.mjs [--skip-xcode-projects]');

@@ -163,6 +163,24 @@ test('portable installation accepts an explicit host skill directory',t=>{
  assert.equal(fs.existsSync(path.join(destination,'.agents','skills')),false);
 });
 
+test('staged release installer runs without maintainer-only source dependencies', t => {
+ const {dir,source}=release(t);
+ const installer=path.join(source,'scripts/install.mjs');
+ const help=spawnSync(process.execPath,[installer,'--help'],{encoding:'utf8'});
+ assert.equal(help.status,0,help.stderr);
+ assert.match(help.stdout,/CFA installer/);
+ const destination=path.join(dir,'extracted-release-customer');
+ const installed=spawnSync(process.execPath,[installer,'--mode','skills','--destination',destination,'--no-command'],{encoding:'utf8'});
+ assert.equal(installed.status,0,installed.stderr);
+ for(const name of skills) assert.ok(fs.existsSync(path.join(destination,'.agents/skills',name,'SKILL.md')),name);
+});
+
+test('release validation rejects a missing packaged module dependency', t => {
+ const {source}=release(t);
+ fs.unlinkSync(path.join(source,'scripts/skill-names.mjs'));
+ assert.throws(()=>validate(source,{source:false}),/Missing packaged module dependency: scripts\/install\.mjs/);
+});
+
 test('every portable skill carries the shared workflow and separate design defaults', t => {
  const {dir,source}=release(t);
  const destination=path.join(dir,'customer');

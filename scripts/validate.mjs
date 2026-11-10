@@ -61,6 +61,20 @@ function validateSkillFrontmatter(text, name) {
   if (typeof description !== 'string' || !description.trim()) throw Error(`Invalid skill description: ${name}`);
 }
 export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
+  const moduleFiles = ['scripts', 'skills', ...(source ? ['tools'] : [])].flatMap(folder => {
+    const directory = path.join(base, folder);
+    return fs.existsSync(directory) ? files(directory).map(file => path.posix.join(folder, file)) : [];
+  }).filter(file => file.endsWith('.mjs'));
+  for (const relative of moduleFiles) {
+    const moduleFile = path.join(base, relative);
+    const moduleText = fs.readFileSync(moduleFile, 'utf8');
+    for (const match of moduleText.matchAll(/(?:from\s+|import\s*)['"](\.[^'"]+)['"]/g)) {
+      const dependency = path.resolve(path.dirname(moduleFile), match[1]);
+      if (!fs.statSync(dependency, { throwIfNoEntry: false })?.isFile()) {
+        throw Error(`Missing packaged module dependency: ${relative} → ${match[1]}`);
+      }
+    }
+  }
   const skillEntries = fs.readdirSync(path.join(base, 'skills'), { withFileTypes: true });
   const actualSkills = skillEntries.map(entry => entry.name).sort();
   const expectedSkills = [...skills].sort();
@@ -241,7 +255,7 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
   }
   return manifest;
 }
-if(process.argv[1] && import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href) {
+if(process.argv[1] && import.meta.url===pathToFileURL(fs.realpathSync(process.argv[1])).href) {
   try {
     const args = process.argv.slice(2);
     if (args.length && (args.length !== 1 || args[0] !== '--skip-xcode-projects')) {
