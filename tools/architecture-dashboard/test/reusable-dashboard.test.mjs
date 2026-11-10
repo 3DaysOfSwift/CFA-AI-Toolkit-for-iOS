@@ -93,6 +93,12 @@ test('generic CLI imports reviewed ratings and test results without an example g
    await fs.writeFile(evidenceFile, assertion);
    const tampered=structuredClone(input);tampered.testQuality.scenarios[0].evidence[0].file='../outside.swift';
    await assert.rejects(importReview(report,tampered,app),/inside repository/);
+   for (const file of ['C:/absolute.swift', 'Tests/invalid\0.swift']) {
+     tampered.testQuality.scenarios[0].evidence[0].file = file;
+     await assert.rejects(importReview(report, tampered, app), /inside repository/);
+   }
+   await assert.rejects(importReview(report, {...input, evidenceHashes:[]}, app),
+     /evidenceHashes must map repository-relative files to SHA-256 hashes/);
    const directoryEvidence = structuredClone(input);
    directoryEvidence.testQuality.scenarios[0].evidence[0].file = 'Tests';
    directoryEvidence.evidenceHashes.Tests = input.evidenceHashes[ref.file];

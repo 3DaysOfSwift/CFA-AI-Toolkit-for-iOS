@@ -10,6 +10,10 @@ export async function importReview(report,input,root,{includeExcerpts = true} = 
   if(input?.schemaVersion!==1 || input.sourceFingerprint!==report.sourceFingerprint) fail('schema or source fingerprint mismatch');
   if(!text(input.scope)||!text(input.author)) fail('scope and author required');
   const review=structuredClone(input), refs=[];
+  if (review.evidenceHashes !== undefined &&
+      (!review.evidenceHashes || typeof review.evidenceHashes !== 'object' || Array.isArray(review.evidenceHashes))) {
+    fail('evidenceHashes must map repository-relative files to SHA-256 hashes');
+  }
   const sourceFiles = new Map([...report.files, ...(report.nativeSources || [])].map(file => [file.path, file]));
   const list=(items,fields)=>{
     if(!Array.isArray(items)) fail('expected review list');
@@ -161,7 +165,7 @@ export async function importReview(report,input,root,{includeExcerpts = true} = 
   const hashes=new Map([...sourceFiles.values(), ...(report.buildDefinitions || [])].map(f=>[f.path,f.hash]));
   const decoder = new TextDecoder('utf-8', {fatal: true, ignoreBOM: true});
   for(const ref of refs) {
-    if(!text(ref.file)||path.isAbsolute(ref.file)||ref.file.split(/[\\/]/).includes('..')) fail('evidence must stay inside repository');
+    if(!text(ref.file)||ref.file.includes('\0')||path.isAbsolute(ref.file)||path.win32.isAbsolute(ref.file)||ref.file.split(/[\\/]/).includes('..')) fail('evidence must stay inside repository');
     if(!cache.has(ref.file)) {
       const real=await fs.realpath(path.join(base,ref.file)).catch(error => {
         if (error.code === 'ENOENT' || error.code === 'ENOTDIR') fail('evidence file not found: '+ref.file);
