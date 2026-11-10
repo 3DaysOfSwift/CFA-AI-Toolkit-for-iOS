@@ -49,6 +49,14 @@ the ViewModel obtains its Feature through the normal dependency path. A detail
 preview may supply the same immutable selection as its production caller.
 Keep SwiftData access in the storage service and out of the preview.
 
+Apply the [type placement rule](references/spec/rules/cfa-struct-07.md) when placing
+domain values and extensions. Keep a domain type with the Feature that defines
+its meaning even if the type is Codable or persisted. Place storage-only
+records in the persistence implementation and transport-only payloads in the
+provider or adapter. Keep purpose-specific extensions with their owners,
+UI framework extensions in the View layer, and broadly reusable standard
+library and Foundation extensions in `4 - Swift Extensions`.
+
 Start with independent Features and inject their lower-level services.
 Apply the [Feature coordination rule](references/spec/rules/cfa-feature-02.md)
 when a reusable business workflow needs more than one Feature. Keep screen-only
