@@ -216,3 +216,7 @@ struct NotesEditorView: View {
         .task { await viewModel.load() }
     }
 }
+
+#Preview {
+    NotesEditorView()
+}

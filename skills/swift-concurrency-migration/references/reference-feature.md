@@ -274,6 +274,10 @@ struct NotesEditorView: View {
         .task { await viewModel.load() }
     }
 }
+
+#Preview {
+    NotesEditorView()
+}
 ```
 
 The editor’s lifecycle task awaits the ViewModel’s async load directly. The
@@ -283,3 +287,6 @@ On return, the ViewModel checks cancellation before updating the editor’s
 error state. The ViewModel retains a separate task for retries started by the
 button. The editor shows progress during the shared load, including retries,
 and disables the retry button while loading.
+
+The preview constructs the screen directly. The screen creates its own ViewModel,
+and the ViewModel resolves its Feature through the normal composition path.
