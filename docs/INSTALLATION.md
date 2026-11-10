@@ -92,8 +92,9 @@ for machine-readable output. The inspector does not edit the app, run tests,
 or certify architectural correctness.
 
 Use `cfa doctor` to check that the skill entry files and core references are
-present and see whether the project has optional CFA guidance. Confirm skill
-discovery and execution separately in the AI host.
+present, that the installed skills carry matching generations of the bundled
+CFA references, and whether the project has optional CFA guidance. Confirm
+skill discovery and execution separately in the AI host.
 
 ```sh
 cfa doctor

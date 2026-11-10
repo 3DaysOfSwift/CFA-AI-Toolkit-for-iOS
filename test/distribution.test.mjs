@@ -20,6 +20,15 @@ test('public architecture map uses the canonical CFA folder names', () => {
  assert.doesNotMatch(readme,/│   └── Networking & Data Storage|    ├── ViewModelTests\n/);
 });
 
+test('release validation keeps the public toolkit description aligned', t => {
+ const {source}=release(t);
+ const manifest=path.join(source,'.codex-plugin/plugin.json');
+ const value=json(manifest);
+ value.description='Older CFA subtitle';
+ fs.writeFileSync(manifest,JSON.stringify(value));
+ assert.throws(()=>validate(source,{source:false}),/Unexpected plugin description/);
+});
+
 test('release omits local Xcode state and build outputs, but retains shared project configuration', t => {
  for (const file of ['A.xcodeproj/xcuserdata/person.xcuserdatad/state', 'View.xcuserstate',
   '.DS_Store', 'App/.build/debug/out', 'App/DerivedData/out', 'App/.git/config']) assert.equal(isReleasePath(file),false,file);

@@ -8,8 +8,8 @@ private source, absolute workstation paths or credentials into releases.
 The public display brand is CFA AI Toolkit for iOS. Keep the existing repository
 URL and plugin identifier stable for compatibility.
 Cooperative Feature Architecture (CFA) remains the architecture name. Use the
-subtitle “AI skills and tools to build, modernise and maintain SwiftUI apps with
-Swift Concurrency.” AppModel is the composition-root type, not the public product
+subtitle “AI skills and tools to build, modernise, test and maintain SwiftUI apps
+with Swift Concurrency.” AppModel is the composition-root type, not the public product
 name. Respect a customer's bundle prefix.
 
 Name each concrete feature owner with a `Feature` suffix, such as

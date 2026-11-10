@@ -8,6 +8,7 @@ import { files, hash, isReleasePath, json } from './files.mjs';
 import { verifyXcodeTemplateStructure } from './verify-xcode-template-structure.mjs';
 import { verifyTemplateOrientations } from './verify-ios-orientations.mjs';
 import { specTopics } from './spec-topics.mjs';
+const productDescription = 'CFA AI Toolkit for iOS: AI skills and tools to build, modernise, test and maintain SwiftUI apps with Swift Concurrency.';
 export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
   const expectedTopics = specTopics(base);
   for (const folder of ['architecture/spec', ...cfaSkills.map(name => `skills/${name}/references/spec`)]) {
@@ -24,6 +25,7 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
   const manifest=json(path.join(base,'.codex-plugin/plugin.json'));
   if(manifest.name!=='ios-app-development-cfa') throw Error('Unexpected plugin identifier.');
   if(manifest.interface?.displayName!=='CFA AI Toolkit for iOS') throw Error('Unexpected plugin display name.');
+  if(manifest.description!==productDescription) throw Error('Unexpected plugin description.');
   if(!/^\d+\.\d+\.\d+(?:-[a-z0-9.-]+)?$/.test(manifest.version)) throw Error('Invalid release version.');
   if(manifest.license!=='MIT' || manifest.skills!=='./skills/') throw Error('Missing licence or skills path.');
   for (const field of ['logo', 'composerIcon']) {
@@ -34,6 +36,12 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
     const width = image.readUInt32BE(16), height = image.readUInt32BE(20);
     if (width !== height || width < 48 || width > 4096) throw Error(`CFA ${field} must be a square image between 48 and 4096 pixels.`);
   }
+  const portable=json(path.join(base,'plugin.json'));
+  const packageFile=path.join(base,'package.json');
+  const packageManifest=fs.existsSync(packageFile) ? json(packageFile) : undefined;
+  if(portable.description!==productDescription || (packageManifest && packageManifest.description!==productDescription)) {
+    throw Error('Plugin and package descriptions must use the current CFA AI Toolkit for iOS subtitle.');
+  }
   if(source) {
     const sourceExamples = files(path.join(base,'examples/migration')).filter(isReleasePath).sort();
     const bundledExamples = files(path.join(base,'skills/swift-concurrency-migration/assets/migration-examples')).filter(isReleasePath).sort();
@@ -41,7 +49,6 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
     for (const file of sourceExamples) if (hash(path.join(base,'examples/migration',file)) !== hash(path.join(base,'skills/swift-concurrency-migration/assets/migration-examples',file))) throw Error(`Stale migration example: ${file}`);
     if (JSON.stringify(files(path.join(base,'skills/swift-concurrency-migration/scripts/project-analysis')).sort()) !== JSON.stringify([...projectAnalysisFiles].sort())) throw Error('Unexpected or missing migration project analysis files.');
     for (const file of projectAnalysisFiles) if (hash(path.join(base,'tools/architecture-dashboard/src',file)) !== hash(path.join(base,'skills/swift-concurrency-migration/scripts/project-analysis',file))) throw Error(`Stale migration project analysis: ${file}`);
-    const portable=json(path.join(base,'plugin.json'));
     if(portable.name!==manifest.name || portable.version!==manifest.version) throw Error('Portable plugin manifest does not match Codex manifest.');
   }
   const evidenceFolder = path.join(base, 'skills/swift-concurrency-migration/scripts/evidence');
@@ -162,7 +169,7 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
     }
   }
   if(source) {
-    if(json(path.join(base,'package.json')).version!==manifest.version) throw Error('Version mismatch.');
+    if(packageManifest?.version!==manifest.version) throw Error('Version mismatch.');
     for(const name of cfaSkills) if(hash(path.join(base,'architecture/cfa-specification.md'))!==hash(path.join(base,`skills/${name}/references/cfa-specification.md`))) throw Error('Stale architecture copy. Run npm run sync.');
     for(const dir of ['src','Documentation']) {
       const sourceFiles = files(path.join(base,'tools/architecture-dashboard',dir)).sort();

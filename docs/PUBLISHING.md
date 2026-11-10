@@ -7,7 +7,7 @@
 - Plugin identifier: `ios-app-development-cfa`
 - Plugin display name: **CFA AI Toolkit for iOS**
 - Repository slug: `CFA-AI-Toolkit-for-iOS`
-- Subtitle: **AI skills and tools to build, modernise and maintain SwiftUI apps with Swift Concurrency.**
+- Subtitle: **AI skills and tools to build, modernise, test and maintain SwiftUI apps with Swift Concurrency.**
 - Suggested repository topics: `swift`, `swiftui`, `ios`, `swift-concurrency`, `architecture`, `ai-assisted-development`, `mvvm`, `gcd`, `migration`, `agent-skills`.
 
 Use the exact product name in public-facing toolkit/plugin titles, descriptions,

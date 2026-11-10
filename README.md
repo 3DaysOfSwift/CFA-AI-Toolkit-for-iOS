@@ -445,8 +445,9 @@ cfa enable-project --host claude
 ```
 
 This is optional. It reinforces CFA in that repository; it does not install
-skills or alter source code. Check the current installation and project guidance
-at any time with:
+skills or alter source code. Check that all eight installed skills are present,
+their bundled CFA references agree, and inspect project guidance at any time
+with:
 
 ```sh
 cfa doctor
