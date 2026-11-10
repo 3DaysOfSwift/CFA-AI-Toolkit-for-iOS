@@ -170,7 +170,9 @@ purpose-named folder. Do not create a constants container speculatively when
 starting an app. When an app-wide value is genuinely shared or repeated, such as
 a company website or support address, define it once in a purpose-named enum
 using static properties, and reuse it to prevent inconsistent copies or typos.
-Keep Feature-specific constants with their owning Feature rather than placing
+Consolidate values when their callers share the same meaning and should change
+together. Keep independently owned values separate even when their literals
+currently match. Keep Feature-specific constants with their owning Feature rather than placing
 everything in one generic container. Read an app name or version from the
 appropriate bundle metadata when that is the source of truth, and keep
 localizable display text in localization resources. Do not hard-code secrets.

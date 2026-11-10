@@ -10,6 +10,6 @@
 
 **Example:** An AppLinks enum holds the shared company website and support email address.
 
-**Verify:** Check repeated uses, ownership, bundle metadata, localization and that no secrets are embedded.
+**Verify:** Trace repeated uses to their owning policies. Consolidate a value only when the callers should change together. Check bundle and localization authority, and report embedded secrets by source location without reproducing their values.
 
 **Full rule, context and examples:** [Make the Architecture Visible in the Folder Structure](../topics/12-make-the-architecture-visible-in-the-folder-structure.md). This card is a reading aid; apply the complete canonical section.
