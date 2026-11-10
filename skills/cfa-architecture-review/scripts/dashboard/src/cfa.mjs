@@ -225,8 +225,11 @@ skill from that toolkit before changing the project.
 - Keep Views and their adjacent ViewModels under 1 - View and keep AppModel,
   Features and their microservices under 2 - AppModel. Name folders for the
   responsibilities they contain. Put independently reusable Views in their own
-  files and keep private implementation details beside their owner. When
-  moving files, verify target membership, resource lookup and affected builds.
+  files and keep private implementation details beside their owner. Before
+  moving files, inspect their declarations and callers. Preserve behaviour,
+  target membership and resource lookup. Check both the filesystem and the
+  Xcode navigator, update scripts that refer to moved paths, and build and
+  test the affected targets.
 - Reserve 4 - Swift Extensions for broadly reusable Swift standard library and
   Foundation extensions. Keep SwiftUI and UIKit extensions in the View layer.
   Keep purpose-specific extensions and protocols with their owners.
