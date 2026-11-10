@@ -10,6 +10,6 @@
 
 **Example:** A new target derives its bundle identifier from the product name and requested prefix.
 
-**Verify:** Inspect bundle identifiers across build configurations. For each newly created app target, build for a generic iOS device and verify the built Info.plist contains a resolved bundle identifier, display name, marketing version and build number. Check test target identifiers separately.
+**Verify:** When adapting an existing project, compare the resolved bundle identifiers before and after project structure or build settings changes for each affected existing app and test target and build configuration. Record both values and the developer’s authorisation for any change. For each newly created app target, build for a generic iOS device and verify the built Info.plist contains a resolved bundle identifier, display name, marketing version and build number. Check test target identifiers separately.
 
 **Full rule, context and examples:** [Project Identity](../topics/06-project-identity.md). This card is a reading aid; apply the complete canonical section.

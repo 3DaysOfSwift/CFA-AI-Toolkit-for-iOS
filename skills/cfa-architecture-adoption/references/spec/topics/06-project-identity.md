@@ -3,7 +3,11 @@
 For a new application, use the developer’s organisation prefix and a bundle-safe
 app name. Ask for the prefix if it is not supplied; for disposable examples use
 `com.example.<AppName>`. Test targets append their target name. Never change an
-existing bundle identifier without an explicit request.
+existing bundle identifier without an explicit request. When adapting an
+existing project, compare the resolved bundle identifiers of the affected
+existing app and test targets before and after project structure or build
+settings changes. Record both values for each affected build configuration
+and record the developer’s authorisation for any change.
 
 The original 3 Days of Swift Concurrency projects use
 `com.3DaysOfSwiftConcurrency.<AppName>` as their organisation convention. It is

@@ -358,7 +358,7 @@
       "rule": "Follow the project identity rules and user-specified bundle identifier; never change existing identifiers merely to match an example.",
       "why": "Identifiers control signing, capabilities and published app continuity.",
       "example": "A new target derives its bundle identifier from the product name and requested prefix.",
-      "verify": "Inspect bundle identifiers across build configurations. For each newly created app target, build for a generic iOS device and verify the built Info.plist contains a resolved bundle identifier, display name, marketing version and build number. Check test target identifiers separately.",
+      "verify": "When adapting an existing project, compare the resolved bundle identifiers before and after project structure or build settings changes for each affected existing app and test target and build configuration. Record both values and the developer’s authorisation for any change. For each newly created app target, build for a generic iOS device and verify the built Info.plist contains a resolved bundle identifier, display name, marketing version and build number. Check test target identifiers separately.",
       "explanationIds": []
     },
     {
