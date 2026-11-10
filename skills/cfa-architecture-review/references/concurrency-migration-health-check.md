@@ -464,13 +464,18 @@ check the isolation of internal service state. Identify View, screen
 coordination and model boundaries. For each important
 business rule, locate its implementation and explain whether it can operate
 without constructing UI. Check whether ViewModels arrange existing capabilities
-or implement business policies that deserve a model owner.
+or implement business policies that deserve a model owner. In CFA, apply the
+[domain and display rule](spec/rules/cfa-ui-06.md). Trace which filters change
+only one screen's presentation and which determine the domain result used by
+other consumers. Verify that a screen filter leaves shared Feature data intact.
 
 Inspect SwiftUI View bodies, actions and initializers. Distinguish ordinary
 presentation logic and delegated button actions from embedded business rules,
 persistence and multi-step operation coordination. For CFA projects, check that
 each screen constructs its own private State-backed ViewModel. Construction is
-normally inline. A detail View may construct its own ViewModel in its
+normally inline. Apply the [screen ownership rule](spec/rules/cfa-ui-02.md)
+and record the `viewModel` naming convention separately from actual
+ownership. A detail View may construct its own ViewModel in its
 initializer from a selected immutable snapshot. Flag externally supplied
 ViewModels. In other architectures, describe the actual lifetime or ownership
 consequences of injection.
@@ -546,9 +551,12 @@ For each relevant operation, inspect:
   data belonging to the newer session.
 - State authority: which object accepts results and controls mutations? Look for
   independent writers or conflicting cached state, not harmless value snapshots.
-- Detail navigation in CFA: trace the selected immutable snapshot from the list
+- Detail navigation in CFA: apply the
+  [detail snapshot rule](spec/rules/cfa-ui-03.md). Trace the selected immutable snapshot from the list
   to the destination's own ViewModel. Check two independently identified
-  destinations sharing the same Feature. Refresh the source and omit one
+  destinations sharing the same Feature. Rebuild one destination with changed
+  input but the same SwiftUI identity and verify its existing ViewModel retains
+  its selection. Refresh the source and omit one
   selected item. Both destinations should keep their selection and stay open.
   Where the detail offers explicit refresh, check that it updates only its own
   display. Assess intentional live updates against the product requirements.
