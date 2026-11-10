@@ -485,6 +485,23 @@ test('template targets use explicit Swift 6 isolation and concurrency settings',
   }
 });
 
+test('starter app projects use explicit Swift 6 isolation and concurrency settings', () => {
+  for (const project of [
+    'Habit Tracker/HabitTrackerTemplate.xcodeproj/project.pbxproj',
+    'Habit Tracker Pro/HabitTrackerPro.xcodeproj/project.pbxproj',
+    'Todays Twenty/TimesThirty.xcodeproj/project.pbxproj'
+  ]) {
+    const source = fs.readFileSync(path.join(root, 'starter-apps', project), 'utf8');
+    const swiftVersions = source.match(/SWIFT_VERSION = 6\.0;/g) ?? [];
+    const strictConcurrency = source.match(/SWIFT_STRICT_CONCURRENCY = complete;/g) ?? [];
+    const defaultIsolation = source.match(/SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;/g) ?? [];
+
+    assert.ok(swiftVersions.length >= 4, `${project} must configure its app and test targets`);
+    assert.equal(strictConcurrency.length, swiftVersions.length, project);
+    assert.equal(defaultIsolation.length, swiftVersions.length, project);
+  }
+});
+
 test('new-project templates define app display name and initial version identity', () => {
   for (const name of names) {
     const file = path.join(root, 'templates/Xcode/Project Templates/iOS/Application', `${name}.xctemplate/TemplateInfo.plist`);
