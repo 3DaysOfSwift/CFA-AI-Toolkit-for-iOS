@@ -1,5 +1,5 @@
 {
-  "directoryNames": [".git", ".build", ".venv", "DerivedData", "__pycache__", "node_modules", "venv", "xcuserdata", "playground.xcworkspace"],
+  "directoryNames": [".git", ".build", ".venv", "DerivedData", "__pycache__", "dist", "node_modules", "reports", "venv", "xcuserdata", "playground.xcworkspace"],
   "fileNames": [".DS_Store"],
-  "fileSuffixes": [".pyc", ".pyo", ".xcuserstate"]
+  "fileSuffixes": [".pyc", ".pyd", ".pyo", ".xcuserstate"]
 }

@@ -187,8 +187,9 @@ test('release validation rejects unreviewed skill packages', t => {
 test('release omits local Xcode state and build outputs, but retains shared project configuration', t => {
  for (const file of ['A.xcodeproj/xcuserdata/person.xcuserdatad/state', 'View.xcuserstate',
   '.DS_Store', 'App/.build/debug/out', 'App/DerivedData/out', 'App/.git/config',
-  'scripts/__pycache__/release.cpython-312.pyc', 'scripts/release.pyc',
-  'scripts/.venv/bin/python', 'scripts/venv/bin/python']) assert.equal(isReleasePath(file),false,file);
+  'scripts/__pycache__/release.cpython-312.pyc', 'scripts/release.pyc', 'scripts/helper.pyd',
+  'scripts/.venv/bin/python', 'scripts/venv/bin/python', 'tools/reports/private.html',
+  'tools/dist/generated.js']) assert.equal(isReleasePath(file),false,file);
  for (const file of ['A.xcodeproj/xcshareddata/xcschemes/App.xcscheme',
   'Package.swift', '.swiftpm/configuration/registries.json', 'Package.resolved']) assert.equal(isReleasePath(file),true,file);
  const {source}=release(t);
