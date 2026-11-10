@@ -61,6 +61,10 @@ skill from that toolkit before changing the project.
   the screen's lifetime. The first frame may appear before that work completes.
   In .refreshable, await the refresh method or its returned task handle's
   value so the indicator stays active while the screen waits.
+  When reviewing SwiftUI code, check ownership separately from naming.
+  A differently named private State-backed property can still establish
+  ownership. Report the departure from the viewModel naming convention
+  separately. Computed, shared and injected ViewModels fail ownership.
   For existing UIKit screens in a migration, map the actual presentation owner
   to its Features and tests.
 - A concrete feature owner uses the
