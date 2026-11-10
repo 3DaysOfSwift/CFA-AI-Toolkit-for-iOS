@@ -396,7 +396,7 @@ work runs. Include synchronous events and preserve unknown boundaries.
 
 ## Whole-app Health Check file batches
 
-Record related files once in `fileBatches`: each batch has `title`, `files` (an array of repository-relative Swift paths), `reason` (what was inspected), `verification` and `evidence` (source references including at least one reference in each listed file). The reviewer must actually inspect each file and trace relevant behaviour; evidence validation only checks provenance. A file may appear in only one batch. Existing `fileReviews` are still accepted. Individual `typeReviews` are optional. Reuse shared-service evidence across the operations that call it, after checking each caller's behaviour. Reconcile all detected entry points and task sites and manually discover additional operations before claiming a whole-app review.
+Record related files once in `fileBatches`: each batch has `title`, `files` (an array of repository-relative source paths, including Objective-C and C-family files listed in the checklist), `reason` (what was inspected), `verification` and `evidence` (source references including at least one reference in each listed file). The reviewer must actually inspect each file and trace relevant behaviour; evidence validation only checks provenance. A file may appear in only one batch. Existing `fileReviews` are still accepted. Individual `typeReviews` are optional. Reuse shared-service evidence across the operations that call it, after checking each caller's behaviour. Reconcile all detected entry points and task sites and manually discover additional operations before claiming a whole-app review.
 
 ## Whole-app report criteria
 

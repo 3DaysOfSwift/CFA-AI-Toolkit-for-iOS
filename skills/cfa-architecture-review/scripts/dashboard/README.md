@@ -157,6 +157,10 @@ Prepare requires a new directory. If the existing directory has no draft,
 choose a new one. If the draft is malformed, correct it or restore a valid
 copy before resuming.
 Use `nextFiles`, `nextEntryPoints` and `nextTaskSites` to pick up the inventory.
+For a task already assigned to a workflow, `nextTaskSites` gives its
+`operationId`, `expectedRelation` and `candidateStepIds`. Inspect the source
+before assigning the task's `id` to a step's `taskSiteId`. If none of the
+existing steps describes the task, add a step with its own evidence.
 `nextFileReviews` and `nextTypes` include the recorded reasons and source
 locations for work already started. `nextOperations` identifies missing traces,
 open checks, timing scenarios and invalid task links. Use the operation ID
