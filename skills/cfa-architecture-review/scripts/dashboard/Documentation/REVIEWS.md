@@ -398,6 +398,12 @@ work runs. Include synchronous events and preserve unknown boundaries.
 
 Record related files once in `fileBatches`: each batch has `title`, `files` (an array of repository-relative source paths, including Objective-C and C-family files listed in the checklist), `reason` (what was inspected), `verification` and `evidence` (source references including at least one reference in each listed file). The reviewer must actually inspect each file and trace relevant behaviour; evidence validation only checks provenance. A file may appear in only one batch. Existing `fileReviews` are still accepted. Individual `typeReviews` are optional. Reuse shared-service evidence across the operations that call it, after checking each caller's behaviour. Reconcile all detected entry points and task sites and manually discover additional operations before claiming a whole-app review.
 
+In a mixed-language target, trace native entry points and callbacks through any
+bridging code into Swift. For example, a native `main.m` can enter UIKit before
+a Swift delegate signals AppModel. Record the native launch step and cite the
+source on each side of the boundary. Prefix headers and module maps belong in
+the source review when they affect that route.
+
 ## Whole-app report criteria
 
 In `presentation.criteria`, give each visible criterion a `title`, `detail`,

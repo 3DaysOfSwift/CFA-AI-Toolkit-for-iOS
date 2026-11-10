@@ -104,7 +104,7 @@ test('native source and bridging header edits invalidate Swift review evidence',
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cfa-native-source-'));
   t.after(() => fs.rm(root, {recursive:true, force:true}));
   await fs.writeFile(path.join(root, 'App.swift'), 'struct App {}');
-  for (const file of ['Legacy.m', 'App-Bridging-Header.h', 'module.modulemap']) {
+  for (const file of ['Legacy.m', 'App-Bridging-Header.h', 'App-Prefix.pch', 'module.modulemap']) {
     const source = path.join(root, file);
     await fs.writeFile(source, 'Original native source');
     const before = await analyse(root);

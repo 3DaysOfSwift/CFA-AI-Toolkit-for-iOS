@@ -125,7 +125,7 @@ export async function analyse(root, { includeTests = false, excludedOutput } = {
         const packageManifest = /^Package(?:@swift-\d+(?:\.\d+)*)?\.swift$/.test(entry.name);
         const buildDefinition = packageManifest || /(?:\.(?:pbxproj|xcconfig|xcscheme|entitlements|plist)$|^(?:contents\.xcworkspacedata|Package\.resolved)$)/.test(entry.name);
         const swiftSource = scanSwift && entry.name.endsWith('.swift');
-        const nativeSource = scanSwift && /\.(?:m|mm|c|cc|cpp|cxx|h|hh|hpp|hxx|modulemap)$/i.test(entry.name);
+        const nativeSource = scanSwift && /\.(?:m|mm|c|cc|cpp|cxx|h|hh|hpp|hxx|pch|modulemap)$/i.test(entry.name);
         if (!buildDefinition && !swiftSource && !nativeSource) continue;
         const relative = path.relative(root, absolute).split(path.sep).join('/');
         if (swiftSource && (await fs.stat(absolute)).size > 2_000_000) {
