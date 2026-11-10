@@ -658,7 +658,11 @@ export async function inspect(project) {
       const start = callback.index + callback[0].length - 1;
       const body = braceBody(source, start);
       inspectSynchronousLaunchIO('The launch callback', file, source, start, findings);
-      for (const scheduled of body.matchAll(/\b(?:(?<!\.\s*)(?:(?:Swift|_Concurrency)\s*\.\s*)?Task\s*(?:<[^{}]*>\s*)?(?:\.\s*(?:init|detached)\s*)?|DispatchQueue\s*(?:\.\s*(?:main|global\s*\([^{}()]*\))|\([^{}()]*\))\s*\.\s*async(?:After)?\b\s*|OperationQueue\s*(?:\.\s*main|\(\s*\))\s*\.\s*addOperation\b\s*|(?<![.\w])(?<queue>\w+)\s*\.\s*(?<method>asyncAfter|async|addOperation)\b\s*)(?:\([^{}]*\)\s*|\([^{}]*?\b(?:operation|execute)\s*:\s*)?\{/g)) {
+      for (const reference of body.matchAll(/\b(?:(?<dispatch>DispatchQueue\s*\.\s*main\s*\.\s*(?:asyncAfter|async))\s*\((?:(?:[^{}()]|\([^{}()]*\))*?,\s*)?execute\s*:\s*|(?<operation>OperationQueue\s*\.\s*main\s*\.\s*addOperation)\s*\(\s*)(?:\w+\s*\.\s*)*AppModel\s*\.\s*shared\s*\.\s*applicationDidFinishLaunching\s*(?=[,)])/g)) {
+        const scheduler = (reference.groups.dispatch ?? reference.groups.operation).replace(/\s+/g, '').replace('.main.', '.');
+        findings.push(finding('scheduled-app-model-launch', 'review', `The launch callback appears to pass the AppModel launch signal to ${scheduler} for later execution. CFA requires the callback to signal AppModel directly and synchronously.`, file, lineOf(source, start + 1 + reference.index)));
+      }
+      for (const scheduled of body.matchAll(/\b(?:(?<!\.\s*)(?:(?:Swift|_Concurrency)\s*\.\s*)?Task\s*(?:<[^{}]*>\s*)?(?:\.\s*(?:init|detached)\s*)?|DispatchQueue\s*(?:\.\s*(?:main|global\s*\([^{}()]*\))|\([^{}()]*\))\s*\.\s*async(?:After)?\b\s*|OperationQueue\s*(?:\.\s*main|\(\s*\))\s*\.\s*addOperation\b\s*|(?<![.\w])(?<queue>\w+)\s*\.\s*(?<method>asyncAfter|async|addOperation)\b\s*)(?:\((?:[^{}()]|\([^{}()]*\))*\)\s*|\((?:[^{}()]|\([^{}()]*\))*?\b(?:operation|execute)\s*:\s*)?\{/g)) {
         const {queue, method} = scheduled.groups;
         const queueType = method === 'addOperation' ? 'OperationQueue' : 'DispatchQueue';
         if (queue) {

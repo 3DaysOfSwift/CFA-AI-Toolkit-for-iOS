@@ -575,6 +575,24 @@ test('identifies a launch signal scheduled inside a delegate Task or dispatch qu
   assert.match(findings[1].message, /through DispatchQueue\.async/);
 });
 
+test('reviews a launch signal passed as a scheduler argument', async t => {
+  const file = 'Application/AppDelegate.swift';
+  const root = await fixture(t, {
+    [file]: `class AppDelegate {
+      func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool {
+        DispatchQueue.main.async(execute: AppModel.shared.applicationDidFinishLaunching)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { AppModel.shared.applicationDidFinishLaunching() }
+        OperationQueue.main.addOperation(AppModel.shared.applicationDidFinishLaunching)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: AppModel.shared.applicationDidFinishLaunching)
+        DispatchQueue.main.async(execute: analytics.applicationDidFinishLaunching)
+        return true
+      }
+    }`
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'scheduled-app-model-launch');
+  assert.deepEqual(findings.map(item => item.line).sort(), [3, 4, 5, 6]);
+});
+
 test('reviews synchronous launch reads without attributing Task work to the callback', async t => {
   const file = 'Application/AppDelegate.swift';
   const root = await fixture(t, {
