@@ -734,8 +734,13 @@ For each relevant operation, inspect:
   route. If entitlement can change across an await, revoke access while the
   route is suspended and verify that it rechecks before presenting or invoking
   the capability. Record confirmed unguarded paths with source evidence and
-  their effect. Keep unresolved paths unverified. Review authorisation on
+  their effect. Keep unresolved paths unverified. Classify a missing
+  entitlement guard as a CFA and product-policy finding. If a suspension
+  lets revoked access reach the paid operation, describe that timing defect
+  and cite the check, suspension and use. Review authorisation on
   server-protected operations separately from client-side presentation.
+  Use the [entitlement review workflow](../scripts/dashboard/Documentation/entitlement-review.md)
+  for candidate routes, then verify each route against source and product policy.
 - Cancellation before side effects: a check before an await does not cover
   cancellation during that await. Trace the interval between preparation or access
   checks and starting a payment, write or other external effect. Check cancellation
