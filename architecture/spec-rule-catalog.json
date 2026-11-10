@@ -743,7 +743,7 @@
       "rule": "Follow the specification’s placement rules for extensions. Keep domain types with the Feature that defines their meaning, even when they are Codable or persisted. Keep storage-only records inside the persistence implementation and transport-only payloads inside their provider or adapter.",
       "why": "Related types remain understandable independently of storage representation.",
       "example": "A launch snapshot belongs with the launch capability rather than being defined by its database schema.",
-      "verify": "Review extension and type ownership against the full source section.",
+      "verify": "Read declarations and trace callers to identify who defines the type’s meaning. Follow both conversion boundaries: providers translate wire payloads and repositories translate storage records into domain values. Check that these representations stay inside their owners. When moving files, verify the physical path, Xcode navigator, target membership and resource lookup. Update path-dependent scripts and build and test the affected targets.",
       "explanationIds": [
         "project-structure"
       ]

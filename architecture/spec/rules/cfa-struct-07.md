@@ -12,6 +12,6 @@
 
 **Explanation:** [Why use an ownership-based project structure in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/project-structure).
 
-**Verify:** Review extension and type ownership against the full source section.
+**Verify:** Read declarations and trace callers to identify who defines the type’s meaning. Follow both conversion boundaries: providers translate wire payloads and repositories translate storage records into domain values. Check that these representations stay inside their owners. When moving files, verify the physical path, Xcode navigator, target membership and resource lookup. Update path-dependent scripts and build and test the affected targets.
 
 **Full rule, context and examples:** [Make the Architecture Visible in the Folder Structure](../topics/12-make-the-architecture-visible-in-the-folder-structure.md). This card is a reading aid; apply the complete canonical section.
