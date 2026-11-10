@@ -46,6 +46,11 @@ Read [CFA specification](references/cfa-specification.md), [CFA change gate](ref
    its presentation owner. For reusable business coordination, preserve each
    participating Feature's authoritative state and keep dependencies acyclic.
 3. Separate screen presentation from feature rules. Introduce or align AppModel.shared as the composition root with Feature properties, its launch guard, and private task handles for app-wide listeners; its explicit initializer receives Features, and its single `static live()` builds production dependencies. AppModel owns app-wide listeners and forwards events to the relevant Feature. Move each authoritative value and its mutations to a named Feature. Route SwiftData through `SwiftDataManager` and networking through `NetworkingManager`. Call the AppModel launch signal directly and synchronously from the app lifecycle callback, without wrapping the call in a Task; Features may start asynchronous work without making launch wait for disk or network completion. Use SwiftUI's `.task` for screen-owned initial work, without assuming it completes before the screen appears.
+   Apply the [service placement rule](references/spec/rules/cfa-svc-01.md)
+   when moving or sharing a service. Keep domain-specific providers beside
+   their Feature while that location describes their purpose. Compose shared
+   dependencies locally in `AppModel.live()` and inject them through
+   consumer initializers when common configuration or state warrants sharing.
 4. Migrate one end-to-end feature at a time, checking callers and live wiring. Keep data formats, navigation, errors, ordering and operation lifetimes stable. Remove superseded wiring only once all callers have moved.
 5. Preserve the existing design, palettes, theme selector, Settings content and branding. Do not apply new-app design defaults or report their absence as adoption gaps. An explicitly requested visual change stays limited to that request; record it in the behaviour contract and verify saved preferences and affected interactions.
 6. Build and run relevant regression checks at each meaningful boundary.

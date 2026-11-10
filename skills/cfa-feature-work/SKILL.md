@@ -37,6 +37,14 @@ when a change touches several Features. Keep screen-only composition in the
 ViewModel. Give reusable business coordination an explicit Model owner when
 needed, with directional dependencies and one owner for each authoritative value.
 
+When adding or sharing a service, apply the
+[service placement rule](references/spec/rules/cfa-svc-01.md). Keep a
+domain-specific provider beside its Feature while that placement still
+describes its work. A second consumer can receive it without moving it.
+Move broadly applicable services to a shared location. Compose a shared
+instance locally in `AppModel.live()` when common configuration or shared
+state warrants it, then inject it through the consumers' initializers.
+
 If the change introduces or touches a paid capability, apply the
 [paid capability rule](references/spec/rules/cfa-pay-01.md) and establish its
 access policy from the product requirements. The screen ViewModel reads current

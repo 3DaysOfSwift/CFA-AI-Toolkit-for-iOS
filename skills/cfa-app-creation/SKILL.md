@@ -54,6 +54,12 @@ Apply the [Feature coordination rule](references/spec/rules/cfa-feature-02.md)
 when a reusable business workflow needs more than one Feature. Keep screen-only
 composition in the ViewModel and keep Model dependencies acyclic.
 
+Apply the [service placement rule](references/spec/rules/cfa-svc-01.md)
+when choosing a service location and lifetime. Keep domain-specific services
+beside their Feature and use a shared location for broadly applicable services.
+Compose one instance locally in `AppModel.live()` when common configuration
+or shared state warrants it. Supply it through the consumers' initializers.
+
 For a Feature-owned shared refresh, apply the
 [refresh lifetime rule](references/spec/rules/cfa-task-02.md). By default,
 let the refresh finish and retain its result even if its only screen leaves.
