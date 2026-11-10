@@ -56,6 +56,19 @@ test('doctor reports a mandatory shared reference missing from any installed ski
   assert.doesNotMatch(result.stdout, /PASS CFA skills are installed/);
 });
 
+test('doctor rejects mixed generations of bundled CFA references', (t) => {
+  const { directory, command } = installedCommand(t);
+  const reference = 'references/spec/rules/cfa-flow-01.md';
+  const stale = path.join(directory, 'customer/.agents/skills/cfa-feature-work', reference);
+  fs.appendFileSync(stale, '\nStale local rule copy.\n');
+
+  const result = spawnSync(command, ['doctor', directory], { encoding: 'utf8' });
+
+  assert.equal(result.status, 1, result.stderr);
+  assert.ok(result.stdout.includes(`WARN inconsistent CFA reference copies: ${reference}`));
+  assert.doesNotMatch(result.stdout, /PASS CFA skills are installed/);
+});
+
 test('doctor identifies a missing review skill entry and a directory masquerading as one', (t) => {
   const { directory, command } = installedCommand(t);
   const skills = path.join(directory, 'customer/.agents/skills');

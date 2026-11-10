@@ -18,6 +18,7 @@ const cfaSkillNames = [
   'cfa-unit-tests',
   'swift-code-quality'
 ];
+const architectureSkillNames = cfaSkillNames.filter(name => name !== 'swift-code-quality');
 // Keep this legacy ownership marker stable so upgrades recognise existing guidance.
 const guidanceMarker = '<!-- CFA Toolkit project guidance -->';
 const outdatedStartupGuidance = 'or a scheduled Task. Features can start their own asynchronous work without';
@@ -550,6 +551,49 @@ function guidanceFiles(project) {
     .filter((file) => fs.existsSync(file) && fs.readFileSync(file, 'utf8').includes(guidanceMarker));
 }
 
+function regularFiles(folder, prefix = '') {
+  if (!fs.statSync(folder, { throwIfNoEntry: false })?.isDirectory()) return [];
+  return fs.readdirSync(folder, { withFileTypes: true }).flatMap(entry => {
+    const relative = path.join(prefix, entry.name);
+    const absolute = path.join(folder, entry.name);
+    if (entry.isDirectory()) return regularFiles(absolute, relative);
+    return entry.isFile() ? [relative] : [];
+  });
+}
+
+function inconsistentReferences(skillsRoot) {
+  const inconsistencies = new Set();
+  const compare = (skillNames, references) => {
+    for (const reference of references) {
+      const copies = skillNames.map(name => {
+        const file = path.join(skillsRoot, name, 'references', reference);
+        return fs.statSync(file, { throwIfNoEntry: false })?.isFile()
+          ? fs.readFileSync(file)
+          : undefined;
+      });
+      const baseline = copies.find(Boolean);
+      if (!baseline || copies.some(copy => !copy || !copy.equals(baseline))) {
+        inconsistencies.add(path.join('references', reference));
+      }
+    }
+  };
+  compare(cfaSkillNames, [
+    'swift-coding-guide.md',
+    'project-workflow.md',
+    'new-app-design-defaults.md',
+    'explanations/guide.md'
+  ]);
+  const specFiles = new Set(architectureSkillNames.flatMap(name => regularFiles(
+    path.join(skillsRoot, name, 'references', 'spec'), 'spec'
+  )));
+  compare(architectureSkillNames, [
+    'cfa-specification.md',
+    'cfa-change-gate.md',
+    ...specFiles
+  ]);
+  return [...inconsistencies].sort();
+}
+
 function doctor(projectArgument) {
   const project = projectDirectory(projectArgument);
   const skillsRoot = installedSkillsRoot();
@@ -570,11 +614,16 @@ function doctor(projectArgument) {
         .filter(file => !fs.statSync(path.join(skillsRoot, file), { throwIfNoEntry: false })?.isFile());
     }) : [];
 
-  if (missingSkills.length === 0 && missingReferences.length === 0) {
+  const referenceDrift = skillsRoot && missingSkills.length === 0
+    ? inconsistentReferences(skillsRoot)
+    : [];
+
+  if (missingSkills.length === 0 && missingReferences.length === 0 && referenceDrift.length === 0) {
     console.log(`PASS CFA skills are installed: ${skillsRoot}`);
   } else if (skillsRoot) {
     if (missingSkills.length) console.log(`WARN missing CFA skills: ${missingSkills.join(', ')}`);
     for (const file of missingReferences) console.log(`WARN missing CFA reference: ${file}`);
+    for (const file of referenceDrift) console.log(`WARN inconsistent CFA reference copies: ${file}`);
   } else {
     console.log('WARN this CFA command is not running from an installed CFA skill.');
   }
@@ -628,7 +677,7 @@ function doctor(projectArgument) {
     console.log(`Run: cfa enable-project ${JSON.stringify(project)}`);
   }
 
-  if (missingSkills.length || missingReferences.length) process.exitCode = 1;
+  if (missingSkills.length || missingReferences.length || referenceDrift.length) process.exitCode = 1;
 }
 
 function parseEnableProjectArguments(values) {
