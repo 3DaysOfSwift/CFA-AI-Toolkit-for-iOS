@@ -422,8 +422,10 @@ skill from that toolkit before changing the project.
   adapter or dependency, compare the same consumer scenarios on each affected
   target before and after migration. Keep event delivery checks separate from
   current UI state, including repeated values, order, cancellation and any
-  required buffering. Reconcile temporary file locations, Xcode navigator
-  groups and target membership.
+  required buffering. Record the Xcode navigator and Feature ownership map
+  for affected targets at the baseline and final commits. Reconcile temporary
+  file locations and target membership. Move files to their intended CFA
+  locations when safe and record intentional package boundaries or blockers.
   Audit the agreed migration scope against CFA. Cite final-commit evidence
   for each applicable requirement, explain which requirements do not apply,
   and record agreed exceptions and their effect on the verdict. Correct
