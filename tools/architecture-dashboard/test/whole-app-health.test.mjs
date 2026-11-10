@@ -143,9 +143,9 @@ test('one broad workflow step cannot stand in for two distinct tasks', () => {
   review.operations[0].evidence.push(...evidence);
   const step = {id:'load',parentId:'trigger',relation:'unstructured-task',evidence};
   review.operations[0].steps.push(step);
-  assert.deepEqual(nextWork(inventory, review).nextTaskSites, sites);
+  assert.deepEqual(nextWork(inventory, review).nextTaskSites.map(site => site.candidateStepIds), [['load'], ['load']]);
   step.taskSiteId = sites[0].id;
-  assert.deepEqual(nextWork(inventory, review).nextTaskSites, [sites[1]]);
+  assert.deepEqual(nextWork(inventory, review).nextTaskSites.map(site => site.id), [sites[1].id]);
 });
 
 test('reconciled task sites must be cited in a workflow step', () => {
@@ -155,6 +155,9 @@ test('reconciled task sites must be cited in a workflow step', () => {
   ]};
   const review = complete();
   const [site] = taskCandidates(inventory);
+  const pending = (item, candidateStepIds = []) => ({
+    ...item, operationId:'launch', expectedRelation:'unstructured-task', candidateStepIds
+  });
   review.taskSites = [{siteId:site.id,operationId:'launch'}];
   assert.throws(() => nextWork(inventory, review), /reconciled task site: launch → App\.swift:3:5/);
   review.taskSites[0].operationId = 'unknown';
@@ -163,12 +166,12 @@ test('reconciled task sites must be cited in a workflow step', () => {
   const evidence = [{file:'App.swift',line:3,endLine:3}];
   review.operations[0].evidence.push(...evidence);
   assert.match(coverageGaps(inventory,review).join(' '), /need workflow steps: App.swift:3:5/);
-  assert.deepEqual(nextWork(inventory, review).nextTaskSites, [site]);
+  assert.deepEqual(nextWork(inventory, review).nextTaskSites, [pending(site)]);
   review.operations[0].steps[0].evidence = evidence;
   assert.match(coverageGaps(inventory,review).join(' '), /need workflow steps: App.swift:3:5/);
   const step = {id:'load',parentId:'trigger',relation:'child-task',evidence};
   review.operations[0].steps.push(step);
-  assert.deepEqual(nextWork(inventory, review).nextTaskSites, [site]);
+  assert.deepEqual(nextWork(inventory, review).nextTaskSites, [pending(site)]);
   assert.match(coverageGaps(inventory, review).join(' '), /App.swift:3:5 \(launch, expected unstructured-task\)/);
   step.relation = 'unstructured-task';
   assert.deepEqual(coverageGaps(inventory,review), []);
@@ -177,9 +180,9 @@ test('reconciled task sites must be cited in a workflow step', () => {
   inventory.syntax.items.push({kind:'concurrency.task',file:'App.swift',line:3,column:25});
   const [, second] = taskCandidates(inventory);
   review.taskSites.push({siteId:second.id,operationId:'launch'});
-  assert.deepEqual(nextWork(inventory, review).nextTaskSites, [site, second]);
+  assert.deepEqual(nextWork(inventory, review).nextTaskSites, [pending(site, ['load']), pending(second, ['load'])]);
   review.operations[0].steps[1].taskSiteId = site.id;
-  assert.deepEqual(nextWork(inventory, review).nextTaskSites, [second]);
+  assert.deepEqual(nextWork(inventory, review).nextTaskSites, [pending(second)]);
   review.operations[0].steps.push({
     id:'second-load',parentId:'trigger',relation:'unstructured-task',taskSiteId:second.id,evidence
   });

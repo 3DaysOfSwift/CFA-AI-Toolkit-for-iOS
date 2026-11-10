@@ -151,7 +151,16 @@ export function nextWork(report, review, limit = 8) {
       name, kind, file, line, status, reason, verification, evidence: evidenceLocations(evidence)
     })),
     nextEntryPoints: pendingEntries.slice(0, limit),
-    nextTaskSites: pendingTasks.slice(0, limit),
+    nextTaskSites: pendingTasks.slice(0, limit).map(site => {
+      const operationId = tasks.get(site.id)?.operationId;
+      if (!operationId) return site;
+      const steps = operations.get(operationId)?.steps || [];
+      return {
+        ...site, operationId, expectedRelation: taskRelations.get(site.kind),
+        candidateStepIds: steps.filter(step => step.taskSiteId === undefined && stepCitesTask(step, site))
+          .map(step => step.id)
+      };
+    }),
     nextOperations: pendingOperations.slice(0, limit),
     ...(review.targetInventoryVerified === true && hasProductionTargets(review) ? {} : {
       targetReview: {
