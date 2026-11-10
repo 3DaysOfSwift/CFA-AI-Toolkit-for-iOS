@@ -9,10 +9,10 @@ struct ThemeManagerTests {
         let defaults = try #require(UserDefaults(suiteName: name))
         defer { defaults.removePersistentDomain(forName: name) }
         let feature = SettingsFeature(defaults: defaults)
-        let manager = ThemeManager(settingsFeature: feature)
-        #expect(manager.selectedTheme == .automatic)
+        let themeManager = ThemeManager(settingsFeature: feature)
+        #expect(themeManager.selectedTheme == .automatic)
         feature.selectTheme(.plum)
-        #expect(manager.selectedTheme == .plum)
-        #expect(manager.current.colorScheme == .dark)
+        #expect(themeManager.selectedTheme == .plum)
+        #expect(themeManager.current.colorScheme == .dark)
     }
 }

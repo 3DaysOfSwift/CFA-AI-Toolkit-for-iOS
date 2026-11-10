@@ -8,6 +8,17 @@ import { execFileSync, spawnSync } from 'node:child_process';
 const root = path.resolve(import.meta.dirname, '..');
 const names = ['CFA App', 'Habit Tracker', 'Day Streak'];
 
+test('starter tests use responsibility-named system-under-test locals', () => {
+  const starterApps = path.join(root, 'starter-apps');
+  const testSources = fs.readdirSync(starterApps, { recursive: true, encoding: 'utf8' })
+    .filter(file => file.endsWith('Tests.swift'));
+
+  for (const relative of testSources) {
+    const source = fs.readFileSync(path.join(starterApps, relative), 'utf8');
+    assert.doesNotMatch(source, /\b(?:let|var) (?:model|manager|results)\b/, relative);
+  }
+});
+
 test('generated template files import the frameworks used by their declarations', () => {
   const application = 'templates/Xcode/Project Templates/iOS/Application';
   const expectations = new Map([
@@ -182,6 +193,7 @@ test('Habit Tracker Pro keeps StoreKit outcomes in its Feature and the app-wide 
   assert.match(purchasesFeature, /var error: \(any Error\)\?/);
   assert.doesNotMatch(purchasesFeature, /localizedDescription|errorMessage|"Your purchase|"No Trends/);
   assert.doesNotMatch(purchaseStore, /LocalizedError|errorDescription/);
+  assert.doesNotMatch(purchaseStore, /let title: String/);
   assert.match(paywallViewModel, /purchasesFeature\.error\.map\(message\(for:\)\)/);
   assert.match(paywallViewModel, /case \.pendingApproval:/);
 });

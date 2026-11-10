@@ -20,14 +20,14 @@ struct ThemeManagerTests {
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
         let feature = SettingsFeature(defaults: defaults)
-        let manager = ThemeManager(settingsFeature: feature)
-        #expect(manager.selectedTheme.id == "automatic")
+        let themeManager = ThemeManager(settingsFeature: feature)
+        #expect(themeManager.selectedTheme.id == "automatic")
         for selection in ThemeSelection.allCases {
             feature.selectTheme(selection)
-            #expect(manager.selectedTheme.id == selection.rawValue)
+            #expect(themeManager.selectedTheme.id == selection.rawValue)
         }
         feature.selectTheme(.automatic)
-        #expect(manager.selectedTheme.colorScheme == nil)
+        #expect(themeManager.selectedTheme.colorScheme == nil)
     }
 
     @Test func automaticResolvesEverySemanticColourForCurrentTraits() {

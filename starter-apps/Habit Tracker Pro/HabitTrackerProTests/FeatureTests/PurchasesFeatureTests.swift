@@ -106,14 +106,14 @@ struct PurchasesFeatureTests {
         let suiteName = "HabitTrackerPro.PurchaseUpdates.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suiteName))
         defer { defaults.removePersistentDomain(forName: suiteName) }
-        let model = AppModel(todayFeature: TodayFeature(habitsFeature: habits),
+        let appModel = AppModel(todayFeature: TodayFeature(habitsFeature: habits),
                              habitsFeature: habits,
                              dayStreakFeature: DayStreakFeature(habitsFeature: habits),
                              settingsFeature: SettingsFeature(defaults: defaults),
                              purchasesFeature: feature,
                              trendsFeature: TrendsFeature(habitsFeature: habits))
-        model.applicationDidFinishLaunching()
-        model.applicationDidFinishLaunching()
+        appModel.applicationDidFinishLaunching()
+        appModel.applicationDidFinishLaunching()
         #expect(store.updateSubscriptionCount == 1)
         await store.waitForFinishes(1)
         store.entitled = true

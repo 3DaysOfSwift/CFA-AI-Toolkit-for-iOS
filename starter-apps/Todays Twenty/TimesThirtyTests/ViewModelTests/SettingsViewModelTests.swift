@@ -9,15 +9,15 @@ struct SettingsViewModelTests {
         let defaults = try #require(UserDefaults(suiteName: name))
         defer { defaults.removePersistentDomain(forName: name) }
         let feature = SettingsFeature(defaults: defaults)
-        let model = SettingsViewModel(settingsFeature: feature)
-        model.selectDifficulty(.gentle)
-        model.selectTheme(.ember)
-        #expect(model.preferredDifficulty == .gentle)
-        #expect(model.selectedTheme == .ember)
+        let viewModel = SettingsViewModel(settingsFeature: feature)
+        viewModel.selectDifficulty(.gentle)
+        viewModel.selectTheme(.ember)
+        #expect(viewModel.preferredDifficulty == .gentle)
+        #expect(viewModel.selectedTheme == .ember)
         #expect(feature.preferredDifficulty == .gentle)
         #expect(feature.selectedTheme == .ember)
-        #expect(model.difficultyTitle(.challenge) == "Challenge")
-        #expect(model.themeTitle(.midnight) == "Midnight")
+        #expect(viewModel.difficultyTitle(.challenge) == "Challenge")
+        #expect(viewModel.themeTitle(.midnight) == "Midnight")
         let versionModel = SettingsViewModel(
             settingsFeature: feature,
             appInformation: [

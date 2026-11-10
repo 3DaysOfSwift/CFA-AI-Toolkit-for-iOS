@@ -11,7 +11,7 @@ final class StoreKitManager: PurchaseStore {
             throw PurchaseError.unavailable
         }
         self.product = product
-        return PurchaseOffer(title: product.displayName, displayPrice: product.displayPrice)
+        return PurchaseOffer(displayPrice: product.displayPrice)
     }
 
     func purchase() async throws -> PurchaseOutcome {

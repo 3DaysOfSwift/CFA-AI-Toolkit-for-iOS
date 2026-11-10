@@ -12,11 +12,11 @@ struct SwiftDataManagerTests {
     func rejectsEntryForMissingHabit() async throws {
         let fixture = try StoreFixture()
         defer { fixture.remove() }
-        let manager = SwiftDataManager(configuration: fixture.configuration)
+        let swiftDataManager = SwiftDataManager(configuration: fixture.configuration)
         await #expect(throws: HabitError.habitNotFound) {
-            try await manager.record(habitID: UUID(), entryID: UUID(), date: .now, value: 1)
+            try await swiftDataManager.record(habitID: UUID(), entryID: UUID(), date: .now, value: 1)
         }
-        #expect(try await manager.fetchHabits().isEmpty)
+        #expect(try await swiftDataManager.fetchHabits().isEmpty)
     }
 
     @Test("The explicit default configuration keeps the existing store location")
@@ -30,19 +30,19 @@ struct SwiftDataManagerTests {
     func preparesAndReopensStore() async throws {
         let fixture = try StoreFixture()
         defer { fixture.remove() }
-        let manager = SwiftDataManager(configuration: fixture.configuration)
+        let swiftDataManager = SwiftDataManager(configuration: fixture.configuration)
         #expect(!FileManager.default.fileExists(atPath: fixture.storeDirectory.path))
 
-        let initialHabits = try await manager.fetchHabits()
+        let initialHabits = try await swiftDataManager.fetchHabits()
         #expect(initialHabits.isEmpty)
         #expect(FileManager.default.fileExists(atPath: fixture.storeURL.path))
 
         let habit = Habit(id: UUID(), name: "Pull ups", tracking: .count,
                           unit: "reps", dailyTarget: 10, entries: [])
-        try await manager.insertHabit(habit)
+        try await swiftDataManager.insertHabit(habit)
         let date = Date(timeIntervalSince1970: 1_700_000_000)
         let entryID = UUID()
-        try await manager.record(habitID: habit.id, entryID: entryID, date: date, value: 14)
+        try await swiftDataManager.record(habitID: habit.id, entryID: entryID, date: date, value: 14)
 
         let reopenedManager = SwiftDataManager(configuration: fixture.configuration)
         let savedHabits = try await reopenedManager.fetchHabits()
@@ -60,27 +60,27 @@ struct SwiftDataManagerTests {
     func updatesExistingNonMidnightEntry() async throws {
         let fixture = try StoreFixture()
         defer { fixture.remove() }
-        let manager = SwiftDataManager(configuration: fixture.configuration)
+        let swiftDataManager = SwiftDataManager(configuration: fixture.configuration)
         let habit = Habit(id: UUID(), name: "Walk", tracking: .count,
                           unit: "steps", dailyTarget: 10, entries: [])
-        try await manager.insertHabit(habit)
+        try await swiftDataManager.insertHabit(habit)
         let calendar = Calendar.current
         let day = calendar.startOfDay(for: Date(timeIntervalSince1970: 1_700_000_000))
         let recordedAt = try #require(calendar.date(byAdding: .hour, value: 12, to: day))
         let entryID = UUID()
-        try await manager.record(habitID: habit.id, entryID: entryID, date: recordedAt, value: 3)
+        try await swiftDataManager.record(habitID: habit.id, entryID: entryID, date: recordedAt, value: 3)
 
-        let feature = HabitsFeature(repository: manager, calendar: calendar, currentDate: { recordedAt })
+        let feature = HabitsFeature(repository: swiftDataManager, calendar: calendar, currentDate: { recordedAt })
         await feature.reload()
         try await feature.recordToday(habitID: habit.id, value: 7)
         let updated = try #require(feature.habits.first?.entries.first)
         #expect(updated.id == entryID && updated.date == recordedAt && updated.value == 7)
-        let stored = try await manager.fetchHabits()
+        let stored = try await swiftDataManager.fetchHabits()
         #expect(stored.first?.entries == [updated])
 
         try await feature.recordToday(habitID: habit.id, value: 0)
         #expect(feature.habits.first?.entries.isEmpty == true)
-        let afterDelete = try await manager.fetchHabits()
+        let afterDelete = try await swiftDataManager.fetchHabits()
         #expect(afterDelete.first?.entries.isEmpty == true)
     }
 
@@ -90,10 +90,10 @@ struct SwiftDataManagerTests {
         defer { fixture.remove() }
         let marker = Data("Keep this existing file".utf8)
         try marker.write(to: fixture.blockingURL)
-        let manager = SwiftDataManager(configuration: fixture.configuration)
+        let swiftDataManager = SwiftDataManager(configuration: fixture.configuration)
 
         do {
-            _ = try await manager.fetchHabits()
+            _ = try await swiftDataManager.fetchHabits()
             Issue.record("A blocked directory must throw, not return an empty collection")
         } catch {
             #expect(error is CocoaError)
@@ -103,7 +103,7 @@ struct SwiftDataManagerTests {
 
         // Only the fixture owner removes its synthetic blocker; production never does.
         try FileManager.default.removeItem(at: fixture.blockingURL)
-        let habits = try await manager.fetchHabits()
+        let habits = try await swiftDataManager.fetchHabits()
         #expect(habits.isEmpty)
         #expect(FileManager.default.fileExists(atPath: fixture.storeURL.path))
     }
@@ -112,17 +112,17 @@ struct SwiftDataManagerTests {
     func overlappingFirstReads() async throws {
         let fixture = try StoreFixture()
         defer { fixture.remove() }
-        let manager = SwiftDataManager(configuration: fixture.configuration)
-        async let first = manager.fetchHabits()
-        async let second = manager.fetchHabits()
-        let results = try await (first, second)
-        #expect(results.0.isEmpty)
-        #expect(results.1.isEmpty)
+        let swiftDataManager = SwiftDataManager(configuration: fixture.configuration)
+        async let first = swiftDataManager.fetchHabits()
+        async let second = swiftDataManager.fetchHabits()
+        let fetchResults = try await (first, second)
+        #expect(fetchResults.0.isEmpty)
+        #expect(fetchResults.1.isEmpty)
 
         let habit = Habit(id: UUID(), name: "Walk", tracking: .completion,
                           unit: "", dailyTarget: nil, entries: [])
-        try await manager.insertHabit(habit)
-        let savedHabits = try await manager.fetchHabits()
+        try await swiftDataManager.insertHabit(habit)
+        let savedHabits = try await swiftDataManager.fetchHabits()
         #expect(savedHabits.map(\.id) == [habit.id])
     }
 

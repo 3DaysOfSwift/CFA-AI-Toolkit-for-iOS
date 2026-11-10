@@ -1,7 +1,6 @@
 import Foundation
 
 struct PurchaseOffer: Equatable, Sendable {
-    let title: String
     let displayPrice: String
 }
 

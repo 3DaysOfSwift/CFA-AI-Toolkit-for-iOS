@@ -15,12 +15,12 @@ struct AppModelTests {
         let repository = WaitingHabitRepository()
         let habits = HabitsFeature(repository: repository)
         let settings = SettingsFeature(defaults: defaults)
-        let model = AppModel(todayFeature: TodayFeature(habitsFeature: habits), habitsFeature: habits,
+        let appModel = AppModel(todayFeature: TodayFeature(habitsFeature: habits), habitsFeature: habits,
                              dayStreakFeature: DayStreakFeature(habitsFeature: habits), settingsFeature: settings)
 
-        model.applicationDidFinishLaunching()
+        appModel.applicationDidFinishLaunching()
         await repository.waitForFetch()
-        #expect(model.settingsFeature === settings)
+        #expect(appModel.settingsFeature === settings)
         #expect(habits.isLoading)
         let changes = AsyncStream<Void>.makeStream()
         withObservationTracking { _ = habits.loadError } onChange: { changes.continuation.yield(()) }

@@ -20,16 +20,16 @@ struct ThemeManagerTests {
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
         let feature = SettingsFeature(defaults: defaults)
-        let manager = ThemeManager(settingsFeature: feature)
-        #expect(manager.selectedTheme.id == "automatic")
+        let themeManager = ThemeManager(settingsFeature: feature)
+        #expect(themeManager.selectedTheme.id == "automatic")
         for palette in AppColourTheme.availableThemes {
             let selection = try #require(ThemeSelection(rawValue: palette.id))
             feature.selectTheme(selection)
-            #expect(manager.selectedTheme.id == palette.id)
+            #expect(themeManager.selectedTheme.id == palette.id)
             #expect(SettingsFeature(defaults: defaults).selectedTheme == selection)
         }
         feature.selectTheme(.automatic)
-        #expect(manager.selectedTheme.colorScheme == nil)
+        #expect(themeManager.selectedTheme.colorScheme == nil)
         defaults.set("obsolete-theme", forKey: "selectedTheme")
         #expect(SettingsFeature(defaults: defaults).selectedTheme == .automatic)
         // Existing installations keep their recognised choices.

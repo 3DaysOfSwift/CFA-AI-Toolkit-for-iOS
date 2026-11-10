@@ -15,16 +15,16 @@ struct AppModelTests {
         let first = TestEnvironment()
         let second = TestEnvironment()
         let settings = SettingsFeature(defaults: defaults)
-        let model = AppModel(practiceFeature: first.practice, dayStreakFeature: first.streak,
+        let appModel = AppModel(practiceFeature: first.practice, dayStreakFeature: first.streak,
                              settingsFeature: settings)
         let other = AppModel(practiceFeature: second.practice, dayStreakFeature: second.streak,
                              settingsFeature: SettingsFeature(defaults: otherDefaults))
 
-        #expect(model.practiceFeature === first.practice)
-        #expect(model.dayStreakFeature === first.streak)
+        #expect(appModel.practiceFeature === first.practice)
+        #expect(appModel.dayStreakFeature === first.streak)
         try await first.start()
         try await first.finish()
-        #expect(model.dayStreakFeature.completedDayCount == 1)
+        #expect(appModel.dayStreakFeature.completedDayCount == 1)
         #expect(other.practiceFeature.sessions.isEmpty)
         #expect(other.dayStreakFeature.completedDayCount == 0)
     }

@@ -31,7 +31,7 @@ final class TestPurchaseStore: PurchaseStore {
         offerCount += 1
         if holdsOffer { await withCheckedContinuation { offerGate = $0 } }
         if failsOffer { throw PurchaseError.unavailable }
-        return PurchaseOffer(title: "Unlock Trends", displayPrice: "$4.99")
+        return PurchaseOffer(displayPrice: "$4.99")
     }
     func purchase() async throws -> PurchaseOutcome {
         purchaseCount += 1

@@ -10,14 +10,14 @@ struct PracticeViewModelTests {
         defer { defaults.removePersistentDomain(forName: name) }
         let env = TestEnvironment()
         let settings = SettingsFeature(defaults: defaults)
-        let model = PracticeViewModel(
+        let viewModel = PracticeViewModel(
             practiceFeature: env.practice,
             dayStreakFeature: env.streak,
             settingsFeature: settings,
             appInformation: ["CFBundleDisplayName": "My Practice"]
         )
 
-        #expect(model.appName == "My Practice")
+        #expect(viewModel.appName == "My Practice")
     }
 
     @Test func answerFeedbackReflectsQuestionState() throws {
@@ -25,19 +25,19 @@ struct PracticeViewModelTests {
         let name = "___PROJECTNAME:identifier___Tests.\(UUID())"
         let defaults = try #require(UserDefaults(suiteName: name))
         defer { defaults.removePersistentDomain(forName: name) }
-        let model = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
+        let viewModel = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
                                       settingsFeature: SettingsFeature(defaults: defaults))
         let question = MultiplicationQuestion(id: UUID(), left: 3, right: 4, choices: [12, 13])
-        #expect(!model.isCorrectAnswer(12, in: question))
+        #expect(!viewModel.isCorrectAnswer(12, in: question))
         let attempted = question.updating(wrongAnswers: [13])
-        #expect(model.isIncorrectAnswer(13, in: attempted))
-        #expect(!model.isIncorrectAnswer(12, in: attempted))
+        #expect(viewModel.isIncorrectAnswer(13, in: attempted))
+        #expect(!viewModel.isIncorrectAnswer(12, in: attempted))
         let revealed = attempted.updating(isRevealed: true)
-        #expect(model.isCorrectAnswer(12, in: revealed))
-        #expect(!model.isCorrectAnswer(13, in: revealed))
-        #expect(model.difficultyDescription(.gentle) == "2–5 times tables")
-        #expect(model.difficultyDescription(.everyday) == "2–12 times tables")
-        #expect(model.difficultyDescription(.challenge) == "6–19 times tables")
+        #expect(viewModel.isCorrectAnswer(12, in: revealed))
+        #expect(!viewModel.isCorrectAnswer(13, in: revealed))
+        #expect(viewModel.difficultyDescription(.gentle) == "2–5 times tables")
+        #expect(viewModel.difficultyDescription(.everyday) == "2–12 times tables")
+        #expect(viewModel.difficultyDescription(.challenge) == "6–19 times tables")
     }
 
     @Test(arguments: [false, true])
@@ -46,22 +46,22 @@ struct PracticeViewModelTests {
         let name = "___PROJECTNAME:identifier___Tests.\(UUID())"
         let defaults = try #require(UserDefaults(suiteName: name))
         defer { defaults.removePersistentDomain(forName: name) }
-        let model = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
+        let viewModel = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
                                       settingsFeature: SettingsFeature(defaults: defaults))
         try await env.start()
-        let question = try #require(model.session?.question)
+        let question = try #require(viewModel.session?.question)
         let command: PracticeFeature.Command = reveal ? .reveal(questionID: question.id) : .answer(questionID: question.id, value: 81)
-        await model.perform(command).value
-        #expect(model.questionAwaitingAdvanceID == question.id)
+        await viewModel.perform(command).value
+        #expect(viewModel.questionAwaitingAdvanceID == question.id)
         let start = ContinuousClock.now
-        async let first: Void = model.advanceAfterFeedback()
-        async let repeated: Void = model.advanceAfterFeedback()
+        async let first: Void = viewModel.advanceAfterFeedback()
+        async let repeated: Void = viewModel.advanceAfterFeedback()
         await first
         await repeated
         #expect(start.duration(to: .now) >= .seconds(2))
-        #expect(model.session?.questionNumber == 2)
-        #expect(model.session?.correctCount == (reveal ? 0 : 1))
-        #expect(model.questionAwaitingAdvanceID == nil)
+        #expect(viewModel.session?.questionNumber == 2)
+        #expect(viewModel.session?.correctCount == (reveal ? 0 : 1))
+        #expect(viewModel.questionAwaitingAdvanceID == nil)
     }
 
     @Test func wrongAnswersDoNotAdvanceAndCancelledFeedbackPreservesQuestion() async throws {
@@ -69,23 +69,23 @@ struct PracticeViewModelTests {
         let name = "___PROJECTNAME:identifier___Tests.\(UUID())"
         let defaults = try #require(UserDefaults(suiteName: name))
         defer { defaults.removePersistentDomain(forName: name) }
-        let model = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
+        let viewModel = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
                                       settingsFeature: SettingsFeature(defaults: defaults))
         try await env.start()
-        let question = try #require(model.session?.question)
-        await model.perform(.answer(questionID: question.id, value: 72)).value
-        #expect(model.questionAwaitingAdvanceID == nil)
-        await model.advanceAfterFeedback()
-        #expect(model.session?.question.id == question.id)
-        await model.perform(.reveal(questionID: question.id)).value
-        let delay = Task { await model.advanceAfterFeedback() }
+        let question = try #require(viewModel.session?.question)
+        await viewModel.perform(.answer(questionID: question.id, value: 72)).value
+        #expect(viewModel.questionAwaitingAdvanceID == nil)
+        await viewModel.advanceAfterFeedback()
+        #expect(viewModel.session?.question.id == question.id)
+        await viewModel.perform(.reveal(questionID: question.id)).value
+        let delay = Task { await viewModel.advanceAfterFeedback() }
         delay.cancel()
         await delay.value
-        #expect(model.session?.question.id == question.id)
-        #expect(model.questionAwaitingAdvanceID == question.id)
-        await model.advanceAfterFeedback()
-        #expect(model.session?.questionNumber == 2)
-        #expect(model.session?.correctCount == 0)
+        #expect(viewModel.session?.question.id == question.id)
+        #expect(viewModel.questionAwaitingAdvanceID == question.id)
+        await viewModel.advanceAfterFeedback()
+        #expect(viewModel.session?.questionNumber == 2)
+        #expect(viewModel.session?.correctCount == 0)
     }
 
     @Test func sessionPresentationTracksDailyExtraAndMidnight() async throws {
@@ -93,28 +93,28 @@ struct PracticeViewModelTests {
         let name = "___PROJECTNAME:identifier___Tests.\(UUID())"
         let defaults = try #require(UserDefaults(suiteName: name))
         defer { defaults.removePersistentDomain(forName: name) }
-        let model = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
+        let viewModel = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
                                       settingsFeature: SettingsFeature(defaults: defaults))
 
-        #expect(!model.isSessionInProgress)
+        #expect(!viewModel.isSessionInProgress)
         try await env.start()
-        #expect(model.isSessionInProgress)
-        let resumedModel = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
-                                             settingsFeature: SettingsFeature(defaults: defaults))
-        #expect(resumedModel.isSessionInProgress)
+        #expect(viewModel.isSessionInProgress)
+        let resumedViewModel = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
+                                                 settingsFeature: SettingsFeature(defaults: defaults))
+        #expect(resumedViewModel.isSessionInProgress)
         try await env.finish()
-        #expect(!model.isSessionInProgress)
+        #expect(!viewModel.isSessionInProgress)
         try await env.practice.perform(.start(extra: true, difficulty: .everyday))
-        #expect(model.isSessionInProgress)
+        #expect(viewModel.isSessionInProgress)
         try await env.finish()
-        #expect(!model.isSessionInProgress)
+        #expect(!viewModel.isSessionInProgress)
 
         env.clock.date = try #require(env.calendar.date(byAdding: .day, value: 1, to: env.clock.date))
         try await env.start()
-        #expect(model.isSessionInProgress)
+        #expect(viewModel.isSessionInProgress)
         env.clock.date = try #require(env.calendar.date(byAdding: .day, value: 1, to: env.clock.date))
-        await model.refresh().value
-        #expect(!model.isSessionInProgress)
+        await viewModel.refresh().value
+        #expect(!viewModel.isSessionInProgress)
     }
 
     @Test func distinctTapsQueueInsteadOfDroppingTheSecondAnswer() async throws {
@@ -122,17 +122,17 @@ struct PracticeViewModelTests {
         let name = "___PROJECTNAME:identifier___Tests.\(UUID())"
         let defaults = try #require(UserDefaults(suiteName: name))
         defer { defaults.removePersistentDomain(forName: name) }
-        let model = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
+        let viewModel = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
                                       settingsFeature: SettingsFeature(defaults: defaults))
         try await env.start()
-        let question = try #require(model.session?.question)
-        let wrong = model.perform(.answer(questionID: question.id, value: 72))
-        let correct = model.perform(.answer(questionID: question.id, value: 81))
+        let question = try #require(viewModel.session?.question)
+        let wrong = viewModel.perform(.answer(questionID: question.id, value: 72))
+        let correct = viewModel.perform(.answer(questionID: question.id, value: 81))
         await wrong.value
         await correct.value
-        #expect(model.session?.question.isAnswered == true)
-        #expect(model.session?.question.wrongAnswers == [72])
-        #expect(model.session?.correctCount == 0)
+        #expect(viewModel.session?.question.isAnswered == true)
+        #expect(viewModel.session?.question.wrongAnswers == [72])
+        #expect(viewModel.session?.correctCount == 0)
     }
 
     @Test func commandsCoalesceWhileSaveIsInFlight() async throws {
@@ -140,26 +140,26 @@ struct PracticeViewModelTests {
         let name = "___PROJECTNAME:identifier___Tests.\(UUID())"
         let defaults = try #require(UserDefaults(suiteName: name))
         defer { defaults.removePersistentDomain(forName: name) }
-        let model = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
+        let viewModel = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
                                       settingsFeature: SettingsFeature(defaults: defaults))
         try await env.start()
         await env.repository.pauseNextSave()
-        let question = try #require(model.session?.question)
-        let first = model.perform(.answer(questionID: question.id, value: 81))
+        let question = try #require(viewModel.session?.question)
+        let first = viewModel.perform(.answer(questionID: question.id, value: 81))
         // Bounded yielding waits for the deterministic persistence gate, not a guessed delay.
         for _ in 0..<10_000 {
             if await env.repository.isWaiting() { break }
             await Task.yield()
         }
         #expect(await env.repository.isWaiting())
-        let second = model.perform(.answer(questionID: question.id, value: 81))
-        #expect(model.session?.correctCount == 0)
+        let second = viewModel.perform(.answer(questionID: question.id, value: 81))
+        #expect(viewModel.session?.correctCount == 0)
         await env.repository.resumeSave()
         await first.value
         await second.value
-        #expect(model.session?.correctCount == 1)
+        #expect(viewModel.session?.correctCount == 1)
         #expect(await env.repository.saveCount == 2) // start + one answer
-        #expect(model.feedback.contains("One point"))
+        #expect(viewModel.feedback.contains("One point"))
     }
 
     @Test func returningToAnEarlierDifficultyKeepsTheLastSelection() async throws {
@@ -167,23 +167,23 @@ struct PracticeViewModelTests {
         let name = "___PROJECTNAME:identifier___Tests.\(UUID())"
         let defaults = try #require(UserDefaults(suiteName: name))
         defer { defaults.removePersistentDomain(forName: name) }
-        let model = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
+        let viewModel = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
                                       settingsFeature: SettingsFeature(defaults: defaults))
         try await env.start()
         await env.repository.pauseNextSave()
-        let first = model.perform(.difficulty(.gentle))
+        let first = viewModel.perform(.difficulty(.gentle))
         for _ in 0..<10_000 {
             if await env.repository.isWaiting() { break }
             await Task.yield()
         }
         #expect(await env.repository.isWaiting())
-        let second = model.perform(.difficulty(.challenge))
-        let third = model.perform(.difficulty(.gentle))
+        let second = viewModel.perform(.difficulty(.challenge))
+        let third = viewModel.perform(.difficulty(.gentle))
         await env.repository.resumeSave()
         await first.value
         await second.value
         await third.value
-        #expect(model.session?.difficulty == .gentle)
+        #expect(viewModel.session?.difficulty == .gentle)
         #expect(await env.repository.saveCount == 4) // start + three selections
     }
 
@@ -192,15 +192,15 @@ struct PracticeViewModelTests {
         let name = "___PROJECTNAME:identifier___Tests.\(UUID())"
         let defaults = try #require(UserDefaults(suiteName: name))
         defer { defaults.removePersistentDomain(forName: name) }
-        let model = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
+        let viewModel = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
                                       settingsFeature: SettingsFeature(defaults: defaults))
         await env.repository.fail(true)
-        await model.refresh().value
-        #expect(model.errorMessage == "Your saved practice could not be loaded. Please try again.")
+        await viewModel.refresh().value
+        #expect(viewModel.errorMessage == "Your saved practice could not be loaded. Please try again.")
         await env.repository.fail(false)
-        await model.refresh().value
-        #expect(model.hasLoaded)
-        #expect(model.errorMessage == nil)
+        await viewModel.refresh().value
+        #expect(viewModel.hasLoaded)
+        #expect(viewModel.errorMessage == nil)
     }
 
     @Test func errorAndRetryAreScreenScoped() async throws {
@@ -208,14 +208,14 @@ struct PracticeViewModelTests {
         let name = "___PROJECTNAME:identifier___Tests.\(UUID())"
         let defaults = try #require(UserDefaults(suiteName: name))
         defer { defaults.removePersistentDomain(forName: name) }
-        let model = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
+        let viewModel = PracticeViewModel(practiceFeature: env.practice, dayStreakFeature: env.streak,
                                       settingsFeature: SettingsFeature(defaults: defaults))
         await env.repository.fail(true)
-        await model.perform(.refresh).value
-        #expect(model.errorMessage == "Your saved practice could not be loaded. Please try again.")
+        await viewModel.perform(.refresh).value
+        #expect(viewModel.errorMessage == "Your saved practice could not be loaded. Please try again.")
         await env.repository.fail(false)
-        await model.retry().value
-        #expect(model.errorMessage == nil)
-        #expect(model.hasLoaded)
+        await viewModel.retry().value
+        #expect(viewModel.errorMessage == nil)
+        #expect(viewModel.hasLoaded)
     }
 }

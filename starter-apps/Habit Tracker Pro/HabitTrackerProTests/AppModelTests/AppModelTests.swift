@@ -18,16 +18,16 @@ struct AppModelTests {
             termination.continuation.finish()
         }
         let habits = HabitsFeature(repository: InMemoryHabitsRepository())
-        var model: AppModel? = AppModel(
+        var appModel: AppModel? = AppModel(
             todayFeature: TodayFeature(habitsFeature: habits), habitsFeature: habits,
             dayStreakFeature: DayStreakFeature(habitsFeature: habits),
             settingsFeature: SettingsFeature(defaults: defaults),
             purchasesFeature: PurchasesFeature(store: store),
             trendsFeature: TrendsFeature(habitsFeature: habits)
         )
-        model?.applicationDidFinishLaunching()
+        appModel?.applicationDidFinishLaunching()
         #expect(store.updateSubscriptionCount == 1)
-        model = nil
+        appModel = nil
         var iterator = termination.stream.makeAsyncIterator()
         #expect(await iterator.next() == true)
     }
