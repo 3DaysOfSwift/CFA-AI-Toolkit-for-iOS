@@ -292,7 +292,13 @@ the architecture:
 
 ## Before delivery
 
-Review the changed source as one feature slice, not as isolated files.
+Review the changed source as one feature slice. Check the old entry points,
+helpers, state and tests for anything the change made redundant. Before
+removing code, check target membership, framework callbacks, dynamic entry
+points and external consumers. Remove confirmed unused code within scope
+and update affected tests during implementation. In a read-only review,
+report what the evidence establishes.
+
 When the scope includes a paid capability, establish its entitlement policy.
 Check that PurchasesFeature owns entitlement state and that the screen
 ViewModel checks it before paid presentation or execution and presents the
