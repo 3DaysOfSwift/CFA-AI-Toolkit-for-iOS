@@ -418,8 +418,12 @@ skill from that toolkit before changing the project.
   calling the migration complete. Before handoff,
   trace remaining legacy and Swift Concurrency paths together. Identify
   remaining callers of legacy dependencies and record which adapters were
-  removed or retained to preserve behaviour or platform support. Reconcile
-  temporary file locations, Xcode navigator groups and target membership.
+  removed or retained to preserve behaviour or platform support. For a removed
+  adapter or dependency, compare the same consumer scenarios on each affected
+  target before and after migration. Keep event delivery checks separate from
+  current UI state, including repeated values, order, cancellation and any
+  required buffering. Reconcile temporary file locations, Xcode navigator
+  groups and target membership.
   Audit the agreed migration scope against CFA, correct in-scope discrepancies
   and rerun affected builds and tests after corrections.
   Apply the installed CFA change gate before claiming migration completion.
