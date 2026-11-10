@@ -515,6 +515,18 @@ test('review fingerprint catches edited record, case study and local evidence', 
   assert.equal(inspectRecord(f.file).valid, false);
 });
 
+test('review fingerprints cover exact evidence bytes and prototype-like filenames', t => {
+  const f = reviewedFixture(t);
+  const evidence = f.record.evidence.find(item => item.id === 'after-test');
+  evidence.reference = '__proto__';
+  const file = path.join(f.destination, evidence.reference);
+  fs.writeFileSync(file, Buffer.from([0xff]));
+  f.seal();
+  assert.equal(inspectRecord(f.file).valid, true);
+  fs.writeFileSync(file, Buffer.from([0xfe]));
+  assert.ok(inspectRecord(f.file).errors.some(error => error.startsWith('review.digest')));
+});
+
 test('publication gate excludes drafts, synthetic cases, holdouts, superseded cases and missing clearances', t => {
   const f = reviewedFixture(t);
   assert.equal(inspectRecord(f.file, { publish: true }).valid, true);

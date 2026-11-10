@@ -8,8 +8,9 @@ const directory = path.dirname(fileURLToPath(import.meta.url));
 const schema = JSON.parse(fs.readFileSync(path.join(directory, 'schema.json'), 'utf8'));
 const hash = value => crypto.createHash('sha256').update(value).digest('hex');
 const read = file => {
-  if (!fs.statSync(file).isFile() || fs.statSync(file).size > 8_000_000) throw Error('Evidence must be a regular file smaller than 8 MB.');
-  return fs.readFileSync(file, 'utf8');
+  const stat = fs.statSync(file);
+  if (!stat.isFile() || stat.size > 8_000_000) throw Error('Evidence must be a regular file smaller than 8 MB.');
+  return fs.readFileSync(file);
 };
 const canonical = value => JSON.stringify(value, (_, item) => {
   if (item && typeof item === 'object' && !Array.isArray(item)) {
@@ -88,11 +89,11 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
   try {
     if (fs.lstatSync(recordFile).isSymbolicLink()) throw Error('Record must not be a symbolic link.');
     folder = fs.realpathSync(path.dirname(recordFile));
-    record = JSON.parse(read(recordFile));
+    record = JSON.parse(read(recordFile).toString('utf8'));
   } catch { return { valid: false, errors: ['Cannot read a regular JSON record file.'], warnings }; }
   validateStructure(record, schema, '$', errors);
   if (errors.length) return { valid: false, errors, warnings };
-  const localHashes = {};
+  const localHashes = Object.create(null);
   const inspectReference = (reference, label, localOnly = false) => {
     try {
       if (reference.startsWith('https:') && !localOnly) {
@@ -348,7 +349,7 @@ export function createRecord({ destination, project, id, migrationId, date, synt
   const target = path.join(fs.realpathSync(path.dirname(path.resolve(destination))), path.basename(destination));
   if (inside(projectRoot, target) || inside(target, projectRoot)) throw Error('Evidence must be separate from the application project.');
   if (fs.existsSync(target)) throw Error('Destination already exists; nothing was overwritten.');
-  const record = JSON.parse(read(path.join(directory, 'template/record.json')));
+  const record = JSON.parse(read(path.join(directory, 'template/record.json')).toString('utf8'));
   Object.assign(record, { id, migrationId, createdAt: date, kind: synthetic ? 'synthetic' : 'real', title: synthetic ? `SYNTHETIC: ${id}` : id });
   const errors = validateStructure(record);
   if (errors.length) throw Error(errors.join('\n'));
