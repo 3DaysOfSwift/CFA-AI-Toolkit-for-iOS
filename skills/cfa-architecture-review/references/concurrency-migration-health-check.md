@@ -695,6 +695,15 @@ For each relevant operation, inspect:
 For every suspected defect, construct a concrete event sequence and check the
 full path for an existing guard, serialized policy or framework guarantee that
 invalidates it. Separate a source-supported possibility from a reproduced failure.
+When assessing CFA test coverage, apply the
+[behavioural test rule](spec/rules/cfa-test-01.md). Confirm that the named
+ViewModel suites and Feature API tests belong to the intended unit-test
+target. Trace assertions to observable outcomes and check that dependencies
+are isolated from the production shared AppModel. For concurrency-sensitive
+checks, verify that tests control the relevant suspension or clock and assert
+the caller's outcome as well as shared state. Keep source-inspected test
+coverage separate from the results of executed tests.
+
 Read applicable tests and run focused existing tests when feasible; do not edit
 the app or trigger production operations to demonstrate a problem. Propose missing
 tests without claiming they passed. Report build/test failures separately.
