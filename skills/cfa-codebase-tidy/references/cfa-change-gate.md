@@ -186,8 +186,8 @@ the architecture:
     can keep work running after its screen closes. Continuing after the app
     itself enters the background requires an appropriate system mechanism.
     For additional device or extension targets, include the appropriate shared
-    Model source and target-specific presentation. Verify target membership,
-    API availability and lifecycle requirements. Each process has its own
+    Model source and target-specific presentation. Build each affected target
+    and verify target membership, API availability and lifecycle requirements. Each process has its own
     AppModel and Feature instances. Transfer immutable snapshots through an
     appropriate platform mechanism and refresh observable state at the receiving
     Feature. If the iPhone app shares an App Group snapshot with a widget,

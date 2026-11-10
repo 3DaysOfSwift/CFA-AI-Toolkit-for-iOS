@@ -52,10 +52,16 @@ when the snapshot reaches its data source.
 
 ## Verification
 
-Trace live wiring, ensure dependencies are required by the explicit initializer, and run tests against independent graphs. Check that scenes in the same process share the graph. For an App Group widget
-snapshot, verify that a successful write precedes the timeline reload request.
-For a Watch handoff, verify on supported devices that the receiving Feature
-updates when the transferred snapshot arrives.
+Trace live wiring, ensure dependencies are required by the explicit initializer, and run tests against independent graphs. Check that scenes in the same process share the graph.
+
+Build each affected device or extension target. Check shared Model membership,
+target-specific presentation, API availability and lifecycle. For an App Group
+widget snapshot, verify that a successful write precedes the timeline reload
+request and that a failed write issues no request. Verify supported-device
+handoffs separately from builds and controlled tests. Check that the receiving
+Feature updates when a snapshot arrives and handles missing, unreadable,
+delayed and stale snapshots according to the product policy. Exercise that
+policy’s conflict handling when multiple targets can edit the same data.
 
 For app-wide listeners, call startup twice with an isolated graph and a
 controlled event source. Verify that one listener starts and that events
