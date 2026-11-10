@@ -67,7 +67,7 @@ struct SettingsView: View {
                 Section {
                     VStack(spacing: 18) {
                         Text("Little questions. Lasting confidence.\nYour practice history stays on this device.")
-                        Text(viewModel.version)
+                        Text(viewModel.versionDescription)
                     }
                     .font(.footnote).foregroundStyle(.secondary)
                     .multilineTextAlignment(.center).frame(maxWidth: .infinity)

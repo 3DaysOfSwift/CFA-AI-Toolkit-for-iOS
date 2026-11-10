@@ -11,20 +11,24 @@ final class SettingsFeature {
     private(set) var selectedTheme: ThemeChoice
     private(set) var preferredDifficulty: Difficulty
     private let defaults: UserDefaults
-    let version: String
+    private let appInformation: [String: Any]
 
     init(defaults: UserDefaults, appInformation: [String: Any] = Bundle.main.infoDictionary ?? [:]) {
         self.defaults = defaults
+        self.appInformation = appInformation
         selectedTheme = ThemeChoice(rawValue: defaults.string(forKey: "selectedTheme") ?? "") ?? .automatic
         preferredDifficulty = Difficulty(rawValue: defaults.string(forKey: "preferredDifficulty") ?? "") ?? .everyday
-        func information(_ key: String) -> String {
-            guard let value = appInformation[key] as? String,
-                  !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return "—" }
-            return value
+    }
+
+    var appVersion: String { information(for: "CFBundleShortVersionString") ?? "—" }
+    var buildNumber: String { information(for: "CFBundleVersion") ?? "—" }
+
+    private func information(for key: String) -> String? {
+        guard let value = appInformation[key] as? String,
+              !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return nil
         }
-        let number = information("CFBundleShortVersionString")
-        let build = information("CFBundleVersion")
-        version = "Version \(number) (\(build))"
+        return value
     }
 
     func selectDifficulty(_ difficulty: Difficulty) {

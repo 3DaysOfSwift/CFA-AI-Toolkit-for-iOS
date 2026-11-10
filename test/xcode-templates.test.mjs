@@ -90,14 +90,20 @@ test('Day Streak keeps saved theme ownership in SettingsFeature', () => {
 test('Day Streak maps domain outcomes to presentation inside ViewModels', () => {
   const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/Day Streak.xctemplate/Source/Application');
   const model = fs.readFileSync(path.join(source, '2 - AppModel/Features/Practice/PracticeSession.swift'), 'utf8');
+  const settingsFeature = fs.readFileSync(path.join(source, '2 - AppModel/Features/Settings/SettingsFeature.swift'), 'utf8');
   const practiceViewModel = fs.readFileSync(path.join(source, '1 - View/Views/Practice/PracticeViewModel.swift'), 'utf8');
   const streakViewModel = fs.readFileSync(path.join(source, '1 - View/Views/DayStreak/DayStreakViewModel.swift'), 'utf8');
+  const settingsViewModel = fs.readFileSync(path.join(source, '1 - View/Views/Settings/SettingsViewModel.swift'), 'utf8');
 
   assert.doesNotMatch(model, /LocalizedError|errorDescription|var title:|var detail:/);
   assert.match(practiceViewModel, /func difficultyDescription\(_ difficulty: Difficulty\)/);
   assert.match(practiceViewModel, /private func message\(for error: any Error/);
   assert.doesNotMatch(practiceViewModel, /error\.localizedDescription/);
   assert.doesNotMatch(streakViewModel, /error\.localizedDescription/);
+  assert.doesNotMatch(settingsFeature, /"Version \\\(/);
+  assert.match(settingsFeature, /var appVersion: String/);
+  assert.match(settingsFeature, /var buildNumber: String/);
+  assert.match(settingsViewModel, /var versionDescription: String/);
 });
 
 test('Day Streak shares equivalent refreshes at the Feature boundary', () => {

@@ -18,5 +18,10 @@ struct SettingsViewModelTests {
         #expect(feature.selectedTheme == .ember)
         #expect(model.difficultyTitle(.challenge) == "Challenge")
         #expect(model.themeTitle(.midnight) == "Midnight")
+        let versionFeature = SettingsFeature(
+            defaults: defaults,
+            appInformation: ["CFBundleShortVersionString": "2.3", "CFBundleVersion": "4"]
+        )
+        #expect(SettingsViewModel(settingsFeature: versionFeature).versionDescription == "Version 2.3 (4)")
     }
 }
