@@ -69,6 +69,13 @@ implements it. The entity-specific subscription guidance is a future option.
 
 Trace one user intention to its domain decision and persistence. Confirm a second consumer sees the same authoritative result. Fail a refresh and verify that previously loaded data remains available.
 
+Open two independently identified detail destinations with different snapshots.
+Refresh the list with a changed value for one item and omit the other. Verify
+that both details remain open and keep their selected snapshots. If the product
+offers explicit refresh within a detail screen, verify that refreshing one
+changes only its display. For Next Rocket Launch, return to the list, refresh,
+and select the updated launch again to see the new snapshot.
+
 ## Evidence and provenance
 
 Canonical source sections are listed in this topic's entry in [the catalogue](../catalogue.json).
