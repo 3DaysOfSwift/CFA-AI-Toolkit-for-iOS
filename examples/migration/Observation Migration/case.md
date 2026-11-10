@@ -21,8 +21,9 @@ defaults to the Feature supplied by `AppModel.shared`, which uses a single
 `live()` factory. The example focuses on observation and composition without
 an app launch callback. The runnable check supplies a Feature from an isolated
 AppModel and reads the count through the ViewModel’s computed property. It
-verifies that a new tracking registration receives a later change and that a
-ViewModel from a separate graph keeps its own count. SwiftUI normally
+verifies that a new tracking registration receives a later change. Two
+ViewModels sharing one Feature read the same current count, and a ViewModel
+from a separate graph keeps its own count. SwiftUI normally
 establishes observation as it evaluates the properties a View reads; manual
 re-registration is shown here to make one-shot tracking visible.
 

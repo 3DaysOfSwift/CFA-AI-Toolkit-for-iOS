@@ -64,6 +64,7 @@ func runExample() {
     let otherModel = AppModel(habitFeature: HabitFeature())
     let feature = model.habitFeature
     let viewModel = HabitViewModel(habitFeature: feature)
+    let sharedFeatureViewModel = HabitViewModel(habitFeature: feature)
     let otherViewModel = HabitViewModel(habitFeature: otherModel.habitFeature)
     let count = NotificationCount()
     withObservationTracking { _ = viewModel.completedDays } onChange: { count.record() }
@@ -77,6 +78,7 @@ func runExample() {
     precondition(latestCount == 2)
     feature.recordCompletedDay()
     precondition(viewModel.completedDays == 3 && count.read() == 2)
+    precondition(sharedFeatureViewModel.completedDays == 3)
     precondition(otherViewModel.completedDays == 0)
     print("Passed: Observation tracking is one-shot and can be registered again.")
 }
