@@ -47,6 +47,8 @@ test('compiled SwiftSyntax scanner inventories startup candidates', {
     '    _Concurrency.Task<Void, Never>.init { }',
     '    _Concurrency.Task.detached { }',
     '    Fixtures.Task { }',
+    '    _Concurrency.withTaskGroup(of: Void.self) { _ in }',
+    '    Fixtures.withTaskGroup(of: Void.self) { _ in }',
     '  }',
     '}'
   ].join('\n'));
@@ -58,6 +60,8 @@ test('compiled SwiftSyntax scanner inventories startup candidates', {
     ['concurrency.task', 8, 5],
     ['concurrency.detached', 9, 5]
   ]);
+  assert.deepEqual(inventory.items.filter(item => item.kind === 'concurrency.taskGroup')
+    .map(({line, column}) => [line, column]), [[11, 5]]);
   assert.deepEqual(inventory.items.filter(item => item.kind.startsWith('entry.'))
     .map(({kind, name, file, line, column}) => [kind, name, file, line, column]), [
     ['entry.main', 'App', 'App.swift', 2, 1],

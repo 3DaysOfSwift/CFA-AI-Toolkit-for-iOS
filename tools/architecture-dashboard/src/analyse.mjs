@@ -47,7 +47,7 @@ const rules = [
   ['task', 'Unstructured task', /\b(?<!\.\s*)(?:(?:Swift|_Concurrency)\s*\.\s*)?Task\s*(?:<[^;{}]+?>)?\s*(?:\.\s*init\s*)?(?:\([^;{}]*?\)\s*|\([^;{}]*?\boperation\s*:\s*)?\{/g],
   ['detached', 'Detached task', /\b(?<!\.\s*)(?:(?:Swift|_Concurrency)\s*\.\s*)?Task\s*(?:<[^;{}]+?>)?\s*\.\s*detached\s*(?:\([^;{}]*?\)\s*|\([^;{}]*?\boperation\s*:\s*)?\{/g],
   ['async-let', 'Structured child binding', /\basync\s+let\s+\w+/g],
-  ['group', 'Task-group scope', /\bwith(?:Throwing|Discarding|ThrowingDiscarding)?TaskGroup\s*\(/g],
+  ['group', 'Task-group scope', /\b(?<!\.\s*)(?:(?:Swift|_Concurrency)\s*\.\s*)?with(?:Throwing|Discarding|ThrowingDiscarding)?TaskGroup\s*\(/g],
   ['group-child', 'Possible group child site', /\.\s*addTask(?:UnlessCancelled)?\s*(?:\([^;{}]*?\))?\s*\{/g],
   ['view-task', 'SwiftUI .task', /\.\s*task\s*(?:\([^;{}]*?\))?\s*\{/g],
   ['refresh', 'SwiftUI .refreshable', /\.\s*refreshable\s*\{/g],

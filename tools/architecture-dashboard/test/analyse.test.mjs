@@ -30,7 +30,7 @@ test('finds task closures written as explicit operation arguments', () => {
 });
 
 test('framework modifiers, detached work and group scopes have distinct kinds',()=>{
-  const source='Task.detached { }\n.task(id: item) { }\n.refreshable { }\nwithThrowingTaskGroup(of: Int.self) { group in group.addTask { 1 } }';
+  const source='Task.detached { }\n.task(id: item) { }\n.refreshable { }\n_Concurrency.withThrowingTaskGroup(of: Int.self) { group in group.addTask { 1 } }\nFixtures.withTaskGroup(of: Int.self) {}';
   assert.deepEqual(scanSource(source,'A.swift').sites.map(s=>s.kind),['detached','view-task','refresh','group','group-child']);
 });
 test('discovers possible synchronous entry points without declaring them complete',()=>{
