@@ -43,11 +43,21 @@ test('compiled SwiftSyntax scanner inventories startup candidates', {
     '  @MainActor',
     '  public func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool { true }',
     '  func application(_ app: UIApplication, options didFinishLaunchingWithOptions: Bool) -> Bool { true }',
+    '  func run() {',
+    '    _Concurrency.Task<Void, Never>.init { }',
+    '    _Concurrency.Task.detached { }',
+    '    Fixtures.Task { }',
+    '  }',
     '}'
   ].join('\n'));
 
   const inventory = await collectSyntax(root);
   assert.equal(inventory.status, 'available', inventory.reason);
+  assert.deepEqual(inventory.items.filter(item => ['concurrency.task', 'concurrency.detached'].includes(item.kind))
+    .map(({kind, line, column}) => [kind, line, column]), [
+    ['concurrency.task', 8, 5],
+    ['concurrency.detached', 9, 5]
+  ]);
   assert.deepEqual(inventory.items.filter(item => item.kind.startsWith('entry.'))
     .map(({kind, name, file, line, column}) => [kind, name, file, line, column]), [
     ['entry.main', 'App', 'App.swift', 2, 1],

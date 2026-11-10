@@ -161,10 +161,15 @@ final class SourceInventory: SyntaxVisitor {
         if let specialization = expression.as(GenericSpecializationExprSyntax.self) {
             return taskSpelling(specialization.expression)
         }
-        if let member = expression.as(MemberAccessExprSyntax.self),
-           let base = member.base,
-           taskSpelling(base) == "Task" {
-            return "Task." + member.declName.baseName.text
+        if let member = expression.as(MemberAccessExprSyntax.self), let base = member.base {
+            let name = member.declName.baseName.text
+            if name == "Task", let module = base.as(DeclReferenceExprSyntax.self),
+               ["Swift", "_Concurrency"].contains(module.baseName.text) {
+                return "Task"
+            }
+            if taskSpelling(base) == "Task" {
+                return "Task." + name
+            }
         }
         return expression.trimmedDescription
     }

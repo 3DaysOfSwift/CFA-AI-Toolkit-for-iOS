@@ -21,7 +21,7 @@ test('ordinary await creates no task; nested unstructured tasks stay distinct',(
   assert.ok(sites.every(s=>!('parentTask' in s)));
 });
 test('finds task closures written as explicit operation arguments', () => {
-  const source = 'Task(operation: { refresh() })\nTask.detached(priority: .background, operation: { refresh() })';
+  const source = '_Concurrency.Task(operation: { refresh() })\n_Concurrency.Task<Void, Never>.detached(priority: .background, operation: { refresh() })\nrunner . Task { refresh() }\nFixtures.Task.detached { refresh() }';
   assert.deepEqual(scanSource(source,'A.swift').sites.map(site => site.kind), ['task','detached']);
 });
 
