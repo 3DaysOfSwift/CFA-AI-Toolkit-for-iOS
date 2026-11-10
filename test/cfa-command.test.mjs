@@ -155,6 +155,8 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /Link baseline\s+and final-commit evidence for each in-scope behaviour/);
   assert.match(content, /manual regression results with the tested build and environment/);
   assert.match(content, /remaining callers of legacy dependencies and record which adapters were\s+removed or retained to preserve behaviour or platform support/);
+  assert.match(content, /Compare each affected target's behaviour with the baseline/);
+  assert.match(content, /human\s+architecture review of the final Xcode navigator/);
   assert.equal((content.match(/CFA Toolkit project guidance/g) ?? []).length, 1);
   assert.match(repeated.stdout, /already enabled/);
   assert.match(doctor.stdout, /INFO CFA project guidance found/);

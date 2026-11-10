@@ -395,6 +395,11 @@ skill from that toolkit before changing the project.
   temporary file locations, Xcode navigator groups and target membership.
   Audit the agreed migration scope against CFA, correct in-scope discrepancies
   and rerun affected builds and tests after corrections.
+  Apply the installed CFA change gate before claiming migration completion.
+  Compare each affected target's behaviour with the baseline. Pin the builds,
+  tests and manual regression evidence to the final commit. Record the human
+  architecture review of the final Xcode navigator and ownership structure.
+  Keep the migration open while required evidence is missing.
 - Inject a clock or date function when a business rule depends on current
   time. Read it in the Feature at the point of decision. Test date and time-zone
   boundaries with controlled inputs, and advance the clock on the same
