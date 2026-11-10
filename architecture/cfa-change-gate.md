@@ -201,8 +201,8 @@ the architecture:
     exercise the product’s conflict policy.
 15. SwiftData access goes through `SwiftDataManager`; every `URLSession` request
     goes through `NetworkingManager`. Composition code may configure and inject
-    a session. Features own those lower-level
-    collaborators. Keep domain-specific services beside their owning Feature
+    a session. Feature-specific API adapters validate and decode their own
+    responses. Features own those lower-level collaborators. Keep domain-specific services beside their owning Feature
     while that location remains descriptive. Put broadly applicable services
     in a shared location and compose a shared instance in `AppModel.live()`
     when common configuration or shared state warrants it. Inject that
