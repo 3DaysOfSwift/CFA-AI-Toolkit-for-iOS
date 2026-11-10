@@ -47,7 +47,9 @@ target in `completionGate.affectedTargets` and identify the targets covered by
 each build in its `targets` array. Several records may cover the list. The build
 linked by `buildEvidenceId` must name at least one affected target. Older
 completed records need target names and renewed review. A check not run still has a planned command
-and a note explaining why. Commands are text: the helper never executes them.
+and a note explaining why. A record marked completed must explain failed or
+unexecuted checks in its limitations even while it is a draft. Commands are
+text: the helper never executes them.
 A `completed` record requires a pinned `repository.afterCommit` distinct from
 `repository.beforeCommit`, with passed evidence at the final revision for every
 completion gate entry. Link the before/after

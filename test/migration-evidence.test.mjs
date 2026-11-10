@@ -490,6 +490,11 @@ test('completion is not inferred from a build pass or tests at a different commi
   assert.match(digest.stderr, /evidence.earlier-regression: failed during migration/);
 
   f.record.status = 'draft';
+  const limitations = f.record.limitations;
+  f.record.limitations = [];
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.includes('limitations: explain incomplete work, failed or unexecuted checks'));
+  f.record.limitations = limitations;
   f.record.repository.afterCommit = null;
   for (const item of f.record.evidence) {
     if (item.phase === 'after') item.commit = null;

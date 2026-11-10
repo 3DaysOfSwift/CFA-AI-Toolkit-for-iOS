@@ -188,9 +188,11 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
         errors.push(`evidence.${item.id}.recordedAt: evidence added after review requires renewed review.`);
       }
     }
-    if (record.result !== 'completed' || record.evidence.some(item => ['failed', 'not-run'].includes(item.outcome))) {
-      if (!record.limitations.length) errors.push('limitations: explain incomplete work, failed or unexecuted checks');
-    }
+  }
+  const hasIncompleteChecks = record.evidence.some(item => ['failed', 'not-run'].includes(item.outcome));
+  if (!record.limitations.length && ((reviewed && record.result !== 'completed') ||
+      ((reviewed || record.result === 'completed') && hasIncompleteChecks))) {
+    errors.push('limitations: explain incomplete work, failed or unexecuted checks');
   }
   if (record.result === 'completed') {
     if (record.repository.beforeCommit && record.repository.beforeCommit === record.repository.afterCommit) {
