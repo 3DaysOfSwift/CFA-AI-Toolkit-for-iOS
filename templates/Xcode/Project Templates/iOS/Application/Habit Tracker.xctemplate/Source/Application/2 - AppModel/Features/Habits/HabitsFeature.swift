@@ -7,6 +7,9 @@ final class HabitsFeature {
     @ObservationIgnored private var reloadTask: Task<Void, Never>?
     @ObservationIgnored private var operationTask: Task<Void, Error>?
     @ObservationIgnored private var operationID: UUID?
+    @ObservationIgnored private var lastRecord: (habitID: UUID, value: Int)?
+    @ObservationIgnored private var lastRecordTask: Task<Void, Error>?
+    @ObservationIgnored private var lastRecordID: UUID?
     private let repository: any HabitsRepository
     private let calendar: Calendar
     private let currentDate: () -> Date
@@ -78,7 +81,11 @@ final class HabitsFeature {
 
     func recordToday(habitID: UUID, value: Int) async throws {
         guard value >= 0 else { throw HabitError.invalidEntry }
-        try await enqueue {
+        if lastRecord?.habitID == habitID, lastRecord?.value == value, let lastRecordTask {
+            try await lastRecordTask.value
+            return
+        }
+        let (identifier, task) = admit {
             guard let index = self.habits.firstIndex(where: { $0.id == habitID }) else { throw HabitError.habitNotFound }
             let day = self.calendar.startOfDay(for: self.currentDate())
             var entries = self.habits[index].entries
@@ -93,10 +100,26 @@ final class HabitsFeature {
             }
             self.habits[index] = self.habits[index].replacingEntries(entries)
         }
+        lastRecord = (habitID, value)
+        lastRecordTask = task
+        lastRecordID = identifier
+        defer {
+            if lastRecordID == identifier {
+                lastRecord = nil
+                lastRecordTask = nil
+                lastRecordID = nil
+            }
+        }
+        try await finish(identifier: identifier, task: task)
     }
 
     // Every admitted change completes before the next one reads or publishes state.
     private func enqueue(_ work: @escaping @MainActor () async throws -> Void) async throws {
+        let (identifier, task) = admit(work)
+        try await finish(identifier: identifier, task: task)
+    }
+
+    private func admit(_ work: @escaping @MainActor () async throws -> Void) -> (UUID, Task<Void, Error>) {
         let previous = operationTask
         let id = UUID()
         let task = Task { @MainActor in
@@ -105,8 +128,12 @@ final class HabitsFeature {
         }
         operationTask = task
         operationID = id
+        return (id, task)
+    }
+
+    private func finish(identifier: UUID, task: Task<Void, Error>) async throws {
         defer {
-            if operationID == id { operationTask = nil; operationID = nil }
+            if operationID == identifier { operationTask = nil; operationID = nil }
         }
         try await task.value
     }

@@ -60,6 +60,15 @@ test('Habit Tracker keeps saved theme ownership in SettingsFeature', () => {
   assert.doesNotMatch(view, /themeManager\.select\(/);
 });
 
+test('Habit Tracker shares equivalent record commands at the Feature boundary', () => {
+  const file = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/Habit Tracker.xctemplate/Source/Application/2 - AppModel/Features/Habits/HabitsFeature.swift');
+  const feature = fs.readFileSync(file, 'utf8');
+
+  assert.match(feature, /private var lastRecord: \(habitID: UUID, value: Int\)\?/);
+  assert.match(feature, /lastRecord\?\.habitID == habitID/);
+  assert.match(feature, /try await lastRecordTask\.value/);
+});
+
 test('Day Streak keeps saved theme ownership in SettingsFeature', () => {
   const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/Day Streak.xctemplate/Source/Application');
   const feature = fs.readFileSync(path.join(source, '2 - AppModel/Features/Settings/SettingsFeature.swift'), 'utf8');
