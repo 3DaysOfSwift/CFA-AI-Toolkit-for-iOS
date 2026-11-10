@@ -643,6 +643,7 @@ test('installed Health Check rescans source, surfaces gaps and rejects stale rev
       detail:'Start the shared load.', evidence, taskSiteId:sharedCandidate.id
     });
     sharedReview.operations.push({...structuredClone(sharedReview.operations[0]), id:'refresh', title:'Refresh'});
+    delete sharedReview.operations[0].steps.at(-1).taskSiteId;
     sharedReview.taskSites = [{siteId:sharedCandidate.id, operationId:'launch'}];
     const sharedSyntax = async () => ({...await syntax(), items:[sharedSite]});
     await fs.writeFile(reviewPath, JSON.stringify(sharedReview));

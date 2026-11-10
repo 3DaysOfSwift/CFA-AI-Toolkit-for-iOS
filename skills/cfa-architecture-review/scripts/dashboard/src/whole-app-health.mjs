@@ -50,15 +50,18 @@ function stepCitesTask(step, site) {
     step.evidence?.some(ref => ref.file === site.file && ref.line <= site.line && ref.endLine >= site.line);
 }
 
+function implicitTaskSite(step, sites) {
+  const matches = sites.filter(site => stepCitesTask(step, site));
+  if (matches.length !== 1) return undefined;
+  const [site] = matches;
+  if (sites.some(other => other.id !== site.id && other.file === site.file && other.line === site.line)) return undefined;
+  return site;
+}
+
 function hasTaskTrace(operation, site, sites) {
-  const sharesLine = sites.some(other =>
-    other.id !== site.id && other.file === site.file && other.line === site.line
-  );
-  return operation?.steps?.some(step => {
-    if (!stepCitesTask(step, site)) return false;
-    if (step.taskSiteId !== undefined) return step.taskSiteId === site.id;
-    return !sharesLine && !sites.some(other => other.id !== site.id && stepCitesTask(step, other));
-  });
+  return operation?.steps?.some(step => step.taskSiteId === undefined
+    ? implicitTaskSite(step, sites)?.id === site.id
+    : step.taskSiteId === site.id && stepCitesTask(step, site));
 }
 
 function invalidTaskLinks(operation, sites, taskEntries) {
@@ -494,12 +497,16 @@ export async function finish(root, input, output, icon, syntaxProvider = collect
   const findingsGaps = reportFindingsGaps(review);
   if (findingsGaps.length) throw Error(findingsGaps.join('\n'));
   const data = {...presentation, scope:review.scope};
-  data.operations = (review.operations || []).map(op=>({group:op.group,title:op.title,trigger:op.trigger,verification:op.verification,evidence:op.evidence,path:op.path,stateOwner:op.stateOwner,taskOwner:op.taskOwner,isolation:op.isolation,reason:op.reason,unknowns:op.unknowns,steps:op.steps,checks:op.checks,scenarios:op.scenarios,problemKind:op.problemKind,recommendation:op.recommendation}));
-  const taskSites = new Map(taskCandidates(report).map(site => [site.id, site]));
+  data.operations = (review.operations || []).map(op=>({id:op.id,group:op.group,title:op.title,trigger:op.trigger,verification:op.verification,evidence:op.evidence,path:op.path,stateOwner:op.stateOwner,taskOwner:op.taskOwner,isolation:op.isolation,reason:op.reason,unknowns:op.unknowns,steps:op.steps,checks:op.checks,scenarios:op.scenarios,problemKind:op.problemKind,recommendation:op.recommendation}));
+  const candidates = taskCandidates(report);
+  const taskSites = new Map(candidates.map(site => [site.id, site]));
+  const taskOwners = new Map((review.taskSites || []).map(entry => [entry.siteId, entry.operationId]));
   for (const operation of data.operations) {
     operation.steps = operation.steps.map(step => {
-      const site = taskSites.get(step.taskSiteId);
-      if (!site) {
+      const site = step.taskSiteId === undefined
+        ? implicitTaskSite(step, candidates)
+        : taskSites.get(step.taskSiteId);
+      if (!site || (step.taskSiteId === undefined && taskOwners.get(site.id) !== operation.id)) {
         return {...step, taskLocation: undefined};
       }
       return {...step, taskLocation: `${site.file}:${site.line}:${site.column}`};
