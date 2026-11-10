@@ -462,9 +462,11 @@ operations enforce authorisation independently.
   `Feature` suffix.
 - When a change introduces or duplicates app-wide values, apply the
   [shared constants rule](spec/rules/cfa-const-01.md). Define repeated shared
-  values once in a purpose-named enum. Keep Feature-specific values with
-  their owner and use bundle metadata and localization resources where
-  they are authoritative. Keep secrets out of app constants.
+  values once in a purpose-named enum when the callers should change together.
+  Keep independent policies separate even when their literals match. Keep
+  Feature-specific values with their owner and use bundle metadata and
+  localization resources where they are authoritative. Report embedded
+  secrets by source location without reproducing their values.
 - For changed app-wide listeners, drive a controlled event source after repeated
   startup signals. Verify a single listener forwards events to the owning
   Feature with no screen present. Where cancellation or replacement is

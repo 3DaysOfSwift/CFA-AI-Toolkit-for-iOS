@@ -199,8 +199,9 @@ Prefer explicit names and sequential steps over clever chains, nested ternaries 
 
 Do not add a constants enum to a new app before it has a use. When a meaningful
 value such as a company website or support address is shared or repeated, define
-it once as a static property on a purpose-named enum; keep Feature-specific
-values with their Feature. Use bundle metadata for app identity when it is the
+it once as a static property on a purpose-named enum. Consolidate it only
+when the callers should change together. Identical literals may represent
+independent policies. Keep Feature-specific values with their Feature. Use bundle metadata for app identity when it is the
 source of truth, localization resources for localizable text, and never embed
 secrets in app constants.
 
