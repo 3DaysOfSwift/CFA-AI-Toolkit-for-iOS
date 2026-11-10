@@ -92,6 +92,15 @@ and record authorisation for any change.
 | Target and build configuration | Baseline bundle identifier and evidence ID | Final bundle identifier and evidence ID | Authorisation for a change |
 | --- | --- | --- | --- |
 
+For each affected data handoff, compare the same producer and receiver
+scenario at the baseline and final revisions. Record what the receiving
+Feature publishes. For an App Group widget snapshot, verify that a successful
+write precedes the reload request and that a failed write issues no request.
+Record supported-device evidence separately from controlled tests.
+
+| Producer and receiver | Handoff scenario | Baseline evidence ID | Final evidence ID and observed result |
+| --- | --- | --- | --- |
+
 Keep failed runs and link each passing final-commit rerun with `rerunOf`.
 For failed builds, tests and manual checks, name the targets exercised and
 use the same environment description on both runs. Explain how the rerun

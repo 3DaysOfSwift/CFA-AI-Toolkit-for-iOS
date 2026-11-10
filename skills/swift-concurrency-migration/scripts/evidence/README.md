@@ -93,7 +93,12 @@ evidence IDs in `completionGate.dataHandoffEvidenceIds`. Use an empty list
 only when the reviewer confirms no data handoff is affected. List the
 producing and receiving targets and the environment used to exercise the
 handoff. Use the exact Xcode target names, with no surrounding whitespace. Completion requires both target names and the environment. The
-validator also rejects handoff evidence that names only unrelated targets. A passing build establishes compilation only. The linked final test run must name the targets it exercises. For test targets
+validator also rejects handoff evidence that names only unrelated targets.
+Use the case study's handoff table to compare each affected route at the
+baseline and final revisions. Check the receiving Feature's observable
+result and any applicable write-before-reload and failed-write behaviour.
+Record supported-device results separately from controlled tests. A passing
+build establishes compilation only. The linked final test run must name the targets it exercises. For test targets
 with separate names, record which affected app or extension targets they exercise.
 The validator cannot infer that relationship from test target names.
 
