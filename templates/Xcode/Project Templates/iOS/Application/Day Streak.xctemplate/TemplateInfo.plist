@@ -42,10 +42,55 @@
 				<string>com.apple.dt.applicationTarget</string>
 			</array>
 		</dict>
-		<key>1 - View/Views/Components/PracticeComponents.swift</key>
+		<key>1 - View/Views/Components/DayBoundaryObserver.swift</key>
 		<dict>
 			<key>Path</key>
-			<string>Source/Application/1 - View/Views/Components/PracticeComponents.swift</string>
+			<string>Source/Application/1 - View/Views/Components/DayBoundaryObserver.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/Components/HeroCard.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/Components/HeroCard.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/Components/OperationErrorView.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/Components/OperationErrorView.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/Components/PracticeButtonStyle.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/Components/PracticeButtonStyle.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/Components/PrimaryAction.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/Components/PrimaryAction.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
+		<key>1 - View/Views/Components/StreakStrip.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/Components/StreakStrip.swift</string>
 			<key>TargetIdentifiers</key>
 			<array>
 				<string>com.apple.dt.applicationTarget</string>
@@ -213,7 +258,12 @@
 	<array>
 		<string>1 - View/___PACKAGENAMEASIDENTIFIER___App.swift</string>
 		<string>1 - View/Theme/ThemeManager.swift</string>
-		<string>1 - View/Views/Components/PracticeComponents.swift</string>
+		<string>1 - View/Views/Components/DayBoundaryObserver.swift</string>
+		<string>1 - View/Views/Components/HeroCard.swift</string>
+		<string>1 - View/Views/Components/OperationErrorView.swift</string>
+		<string>1 - View/Views/Components/PracticeButtonStyle.swift</string>
+		<string>1 - View/Views/Components/PrimaryAction.swift</string>
+		<string>1 - View/Views/Components/StreakStrip.swift</string>
 		<string>1 - View/Views/ContentView.swift</string>
 		<string>1 - View/Views/DayStreak/DayStreakView.swift</string>
 		<string>1 - View/Views/DayStreak/DayStreakViewModel.swift</string>

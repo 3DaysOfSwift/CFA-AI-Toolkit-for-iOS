@@ -120,6 +120,26 @@ test('Day Streak shares consecutive equivalent commands at the Feature boundary'
   assert.match(feature, /try await lastCommandTask\.value/);
 });
 
+test('Day Streak gives reusable presentation components purpose-named files', () => {
+  const directory = path.join(
+    root,
+    'templates/Xcode/Project Templates/iOS/Application/Day Streak.xctemplate/Source/Application/1 - View/Views/Components'
+  );
+  const components = [
+    'DayBoundaryObserver',
+    'HeroCard',
+    'OperationErrorView',
+    'PracticeButtonStyle',
+    'PrimaryAction',
+    'StreakStrip'
+  ];
+
+  for (const component of components) {
+    assert.ok(fs.existsSync(path.join(directory, `${component}.swift`)), component);
+  }
+  assert.equal(fs.existsSync(path.join(directory, 'PracticeComponents.swift')), false);
+});
+
 test('CFA App keeps theme presentation outside its AppModel layer', () => {
   const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/CFA App.xctemplate/Source/Application');
   const model = fs.readFileSync(path.join(source, '2 - AppModel/Features/Settings/AppColourTheme.swift'), 'utf8');
