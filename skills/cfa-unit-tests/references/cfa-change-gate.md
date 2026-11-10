@@ -123,7 +123,7 @@ the architecture:
     `AppModel.shared`. A detail ViewModel may also receive a selected immutable domain
     snapshot. A typed immutable presentation value may be injected when a system value
     such as app identity must be deterministic in tests. Such a value contains no
-    behaviour or mutable state; do not inject `Bundle`, raw metadata dictionaries,
+    business behaviour or mutable state; do not inject `Bundle`, raw metadata dictionaries,
     services, or unrelated convenience parameters.
 13. Each local data responsibility uses the simplest single persistence route.
     A replaceable remote snapshot normally uses one JSON cache; SwiftData is reserved

@@ -91,7 +91,7 @@ A ViewModel may accept a selected immutable domain snapshot for its detail scree
 defaults its narrow Feature dependencies from AppModel.shared. Tests may provide
 isolated Features. It may also accept a typed immutable presentation value when system
 presentation data, such as app identity, must be deterministic in tests. Keep that value
-free of behaviour and mutable state. Do not pass `Bundle`, a raw metadata dictionary,
+free of business behaviour and mutable state. Do not pass `Bundle`, a raw metadata dictionary,
 a service, or an unrelated convenience value through a ViewModel initializer. Screen
 selection remains presentation state.
 
