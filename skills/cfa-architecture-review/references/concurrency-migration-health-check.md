@@ -702,9 +702,11 @@ For each relevant operation, inspect:
   local commit. Fail that commit and verify that the app reports neither local
   success nor a pending edit eligible for upload. After a successful local save,
   fail sync, restart and retry with the same edit identity. In a separate case,
-  lose the reply after the server applies the edit and verify retry confirms
-  the original edit without applying it again. Check that local success and
-  server confirmation are reported separately. When reviewing a change to sync,
+  lose the reply after the server applies the edit. Restart before retrying
+  and verify that the app recovers the same edit identity, confirms the
+  original edit without applying it again, and reports it as synced only
+  after confirmation. Check that local success and server confirmation are
+  reported separately. When reviewing a change to sync,
   verify that an edit persisted by the previous version retains its identity
   and retry metadata after upgrade. For both custom and Apple-managed sync,
   exercise the product's conflict policy with edits to the same item on two
