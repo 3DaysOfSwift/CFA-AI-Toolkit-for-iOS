@@ -452,9 +452,10 @@ at any time with:
 cfa doctor
 ```
 
-If it reports a difference, compare the marked CFA block with the installed
-toolkit and keep your project-specific instructions. Running
-`cfa enable-project` again preserves the existing block. See the [installation guide](docs/INSTALLATION.md) for details.
+If it reports a difference, run `cfa project-guidance` to print the installed
+CFA block for comparison. Keep your project-specific instructions when
+reconciling the two versions. Running `cfa enable-project` again preserves
+the existing block. See the [installation guide](docs/INSTALLATION.md) for details.
 
 The installer places `cfa` in `~/.local/bin`. If Terminal says `command not
 found: cfa`, add that folder to your zsh path once, then open a new Terminal:
@@ -534,7 +535,7 @@ This section is for AI coding assistants (Codex, Claude Code, Cursor and others)
 Use the [CFA specification](architecture/spec/README.md) for the full rules,
 examples and verification criteria.
 
-- Path: View → dedicated ViewModel → Feature → Microservices. These supporting services can include repositories, networking and device API adapters. Views never receive ViewModels, Features, AppModel or repositories. Reusable components can receive action closures that forward intent to the owning screen and its ViewModel.
+- The dependency path is View → dedicated ViewModel → Feature. A Feature calls internal microservices when it needs storage, networking or device APIs. Views never receive ViewModels, Features, AppModel or repositories. Reusable components can receive action closures that forward intent to the owning screen and its ViewModel.
 - Each screen-level SwiftUI View owns its ViewModel in a private `@State` property named `viewModel`, created inline by default. A detail View may initialise its own State-backed ViewModel from a selected immutable snapshot. The ViewModel defaults its narrow Feature dependencies from `AppModel.shared`.
 - Features are concrete `@MainActor` classes named `…Feature`, with no matching protocol. Use `@Observable` on ViewModels and Features that expose UI-observed state when the deployment target supports Observation. During migration, retain a compatible observation mechanism when the existing target requires it.
 - Features keep domain data, operation state and failure outcomes as separate values. Keep these values separate when modelling loading state. Screen ViewModels own the error text and unsaved editor drafts. Publish durable changes as saved after required persistence succeeds. Publish current server data and release refresh callers without waiting for an optional cache write.
