@@ -125,7 +125,10 @@ results in the report, rather than presenting scanner counts as findings.
    Identify consumers that need every event. Trace their delivery, ordering
    and cancellation separately from the screen's current value. Where the
    contract requires it, send two equal-valued events and verify both are
-   processed. A correct final value cannot establish that both arrived.
+   processed. A correct final value cannot establish that both arrived. If
+   the contract defines buffering, hold the consumer back, send a burst, and
+   verify which events it receives and in what order when it resumes. Record
+   an untested buffering policy separately from the verified UI state.
    For a CFA app-wide listener, apply the
    [app-wide listener rule](spec/rules/cfa-app-02.md). Trace startup and the
    retained task handle for asynchronous listeners. Drive a controlled event
