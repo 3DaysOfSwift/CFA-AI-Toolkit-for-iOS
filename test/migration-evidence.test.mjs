@@ -214,6 +214,8 @@ test('completion is not inferred from a build pass or tests at a different commi
     manualBehaviourRegressionEvidenceId: 'after-behaviour-regression',
     manualArchitectureReviewEvidenceId: 'after-architecture-review'
   };
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.includes('beforeCommit with named targets')));
   baseline.targets = ['Unrelated'];
   f.write();
   assert.ok(inspectRecord(f.file).errors.some(error => error.includes('requires recorded before behaviour evidence')));

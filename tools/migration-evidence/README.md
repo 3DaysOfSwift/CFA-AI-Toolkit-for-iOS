@@ -57,8 +57,9 @@ regression and human architecture review. List every affected target in the
 navigator inspection, Feature and primitive inventories, hybrid review, final
 CFA audit and human architecture review evidence.
 Record an executed test or manual observation at `repository.beforeCommit`
-for the behaviour baseline. If a manual baseline names targets, it must cover
-at least one affected target. Compare the same scenarios on each affected target that exposes them. The
+for the behaviour baseline and name the targets exercised. A manual baseline
+must cover at least one affected target. For separately named test targets,
+record which affected app or extension targets they exercise. Compare the same scenarios on each affected target that exposes them. The
 validator checks for baseline evidence. Verify scenario and target coverage
 using the case study’s behaviour table. Use
 `completionGate.deploymentCompatibilityEvidenceId` to link the minimum OS of
