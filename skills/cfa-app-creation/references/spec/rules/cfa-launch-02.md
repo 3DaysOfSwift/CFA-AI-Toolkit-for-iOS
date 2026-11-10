@@ -12,6 +12,6 @@
 
 **Explanation:** [Why use recoverable storage requests in our code?](https://www.3daysofswiftconcurrency.com/cfa/explanation/storage-failures).
 
-**Verify:** Hold store opening pending, then fail it. Verify the root stays visible, an unaffected destination remains accessible, and the affected screen explains the failure and can retry successfully without replacing the root or losing saved data. In a separate case, fail a fetch after opening and verify retry reuses the working store and preserves any prior results. Verify actual store opening and UI behaviour separately from controlled tests.
+**Verify:** Hold store opening pending, then fail it. Verify the root stays visible, an unaffected destination remains accessible, and the affected screen explains the failure and can retry successfully without replacing the root or losing saved data. After a successful store open, fail the first fetch and verify the screen shows failure instead of an empty success. Retry using the already open store. In a separate case, fail a refresh with data already loaded and verify that the data stays visible and usable. Verify actual store opening and UI behaviour separately from controlled tests.
 
 **Full rule, context and examples:** [Use Application Launch as an Opportunity to Refresh Features](../topics/21-use-application-launch-as-an-opportunity-to-refresh-features.md). This card is a reading aid; apply the complete canonical section.
