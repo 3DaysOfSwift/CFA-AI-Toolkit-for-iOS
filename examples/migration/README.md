@@ -41,8 +41,11 @@ Concurrency is available in Swift 5.5 and later.
   that independent requests overlap and cancellation reaches the transport.
 - [MainActor result handling](MainActor%20Result/case.md) preserves publication
   before completion and demonstrates failed refresh and retry in the playground.
-  The source checkout's automated test covers overlapping calls and cancellation
-  of an admitted refresh caller with a controlled provider.
+  Each call supplies a distinct simulated outcome, so this fixture queues
+  calls in admission order and returns each caller's result. Its controlled
+  test verifies that an admitted call still completes when its caller cancels.
+  In an app where equivalent refresh callers need the same result, share one
+  in-flight Feature request instead of queueing duplicate downloads.
 - [Observation migration](Observation%20Migration/case.md) preserves the
   current count while moving from Combine to Observation. The same two
   mutations produce two Combine notifications and one notification from a
