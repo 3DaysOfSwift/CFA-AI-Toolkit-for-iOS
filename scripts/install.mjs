@@ -126,7 +126,7 @@ export function install({source=path.resolve(path.dirname(fileURLToPath(import.m
   if(commandTarget) writeCommand(commandTarget,dashboardCommand);
   return {status:mode==='plugin'&&stageOnly?'staged':'installed',mode,version:manifest.version,paths:destinations.map(([,to])=>to),command:commandTarget,marketplace:market?.name,backups:changes.flatMap(c=>c.backup?[c.backup]:[])};
 }
-if(process.argv[1]&&import.meta.url===pathToFileURL(fs.realpathSync(process.argv[1])).href) {
+if(process.argv[1]&&fs.existsSync(process.argv[1])&&import.meta.url===pathToFileURL(fs.realpathSync(process.argv[1])).href) {
   try {
     const options={};const args=process.argv.slice(2);
     if(args.includes('--help')) {

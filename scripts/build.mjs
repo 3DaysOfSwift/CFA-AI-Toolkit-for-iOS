@@ -20,7 +20,7 @@ export function stageRelease(output,base=root) {
   validate(output,{source:false});
   return output;
 }
-if(process.argv[1]&&import.meta.url===pathToFileURL(fs.realpathSync(process.argv[1])).href) {
+if(process.argv[1]&&fs.existsSync(process.argv[1])&&import.meta.url===pathToFileURL(fs.realpathSync(process.argv[1])).href) {
   try {
     if(process.argv.length!==3)throw Error('Usage: node scripts/build.mjs <new-output-folder>');
     console.log(stageRelease(process.argv[2]));

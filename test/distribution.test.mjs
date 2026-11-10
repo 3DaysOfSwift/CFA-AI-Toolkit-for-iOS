@@ -20,6 +20,23 @@ test('public architecture map uses the canonical CFA folder names', () => {
  assert.doesNotMatch(readme,/│   └── Networking & Data Storage|    ├── ViewModelTests\n/);
 });
 
+test('command modules can be imported from Node standard input', () => {
+ const modules = [
+  'scripts/build.mjs',
+  'scripts/install.mjs',
+  'scripts/sync.mjs',
+  'scripts/validate.mjs',
+  'scripts/verify-ios-app-identity.mjs',
+  'scripts/verify-ios-orientations.mjs',
+  'tools/explanations/explanations.mjs',
+  'tools/architecture-dashboard/src/health-report.mjs'
+ ];
+ const input=modules.map(file=>`import ${JSON.stringify(new URL(`../${file}`,import.meta.url).href)};`).join('\n');
+ const result=spawnSync(process.execPath,['--input-type=module','-'],{input,encoding:'utf8'});
+ assert.equal(result.status,0,result.stderr);
+ assert.equal(result.stdout,'');
+});
+
 test('release validation keeps the public toolkit description aligned', t => {
  const {source}=release(t);
  const manifest=path.join(source,'.codex-plugin/plugin.json');

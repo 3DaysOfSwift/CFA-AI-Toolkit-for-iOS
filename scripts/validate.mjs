@@ -281,7 +281,7 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
   }
   return manifest;
 }
-if(process.argv[1] && import.meta.url===pathToFileURL(fs.realpathSync(process.argv[1])).href) {
+if(process.argv[1] && fs.existsSync(process.argv[1]) && import.meta.url===pathToFileURL(fs.realpathSync(process.argv[1])).href) {
   try {
     const args = process.argv.slice(2);
     if (args.length && (args.length !== 1 || args[0] !== '--skip-xcode-projects')) {

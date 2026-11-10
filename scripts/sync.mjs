@@ -86,7 +86,7 @@ export function sync(base = root, { skipXcodeProjects = false } = {}) {
     .replace('../skills/swift-concurrency-migration/scripts/evidence/README.md', '../scripts/evidence/README.md');
   fs.writeFileSync(path.join(base, 'skills/swift-concurrency-migration/references/migration-evidence.md'), captureGuide);
 }
-if (process.argv[1] && import.meta.url === pathToFileURL(fs.realpathSync(process.argv[1])).href) {
+if (process.argv[1] && fs.existsSync(process.argv[1]) && import.meta.url === pathToFileURL(fs.realpathSync(process.argv[1])).href) {
   const args = process.argv.slice(2);
   if (args.length > 1 || args.some(arg => arg !== '--skip-xcode-projects')) {
     console.error('Usage: node scripts/sync.mjs [--skip-xcode-projects]');

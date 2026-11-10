@@ -228,7 +228,7 @@ export function main(args) {
   return { valid: true, topics: catalogue.topics.length };
 }
 
-if (process.argv[1] && fs.realpathSync(fileURLToPath(import.meta.url)) === fs.realpathSync(path.resolve(process.argv[1]))) {
+if (process.argv[1] && fs.existsSync(process.argv[1]) && fs.realpathSync(fileURLToPath(import.meta.url)) === fs.realpathSync(path.resolve(process.argv[1]))) {
   try { console.log(JSON.stringify(main(process.argv.slice(2)), null, 2)); }
   catch (error) { console.error(error.message); process.exitCode = 1; }
 }

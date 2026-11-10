@@ -59,7 +59,7 @@ export function verifyTemplateOrientations(root) {
   }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(fs.realpathSync(process.argv[1])).href) {
+if (process.argv[1] && fs.existsSync(process.argv[1]) && import.meta.url === pathToFileURL(fs.realpathSync(process.argv[1])).href) {
   try {
     let file = process.argv[2];
     if (!file) throw Error('Usage: node verify-ios-orientations.mjs <built Info.plist | app.app | app.xcarchive>');
