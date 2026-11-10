@@ -335,6 +335,11 @@ test('completion is not inferred from a build pass or tests at a different commi
 
   for (const field of ['navigatorEvidenceId', 'manualArchitectureReviewEvidenceId']) {
     const review = f.record.evidence.find(item => item.id === f.record.completionGate[field]);
+    delete review.targets;
+    f.write();
+    assert.ok(inspectRecord(f.file).errors.includes(
+      `completionGate.${field}: ${review.id} must list the affected targets it reviews.`
+    ));
     review.targets = ['Unrelated'];
     f.write();
     assert.ok(inspectRecord(f.file).errors.includes(

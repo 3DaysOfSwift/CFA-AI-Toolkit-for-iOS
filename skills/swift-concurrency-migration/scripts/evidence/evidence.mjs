@@ -283,9 +283,11 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
           } else if (!item.targets.some(target => gate.affectedTargets.includes(target))) {
             errors.push(`completionGate.${field}: ${item.id} names only unrelated targets.`);
           }
-        } else if (['navigatorEvidenceId', 'manualArchitectureReviewEvidenceId'].includes(field) && item.targets?.length) {
-          const missing = gate.affectedTargets.filter(target => !item.targets.includes(target));
-          if (missing.length === gate.affectedTargets.length) {
+        } else if (['navigatorEvidenceId', 'manualArchitectureReviewEvidenceId'].includes(field)) {
+          const missing = gate.affectedTargets.filter(target => !item.targets?.includes(target));
+          if (!item.targets?.length) {
+            errors.push(`completionGate.${field}: ${item.id} must list the affected targets it reviews.`);
+          } else if (missing.length === gate.affectedTargets.length) {
             errors.push(`completionGate.${field}: ${item.id} names only unrelated targets.`);
           } else if (missing.length) {
             errors.push(`completionGate.${field}: ${item.id} omits affected targets: ${missing.join(', ')}.`);
