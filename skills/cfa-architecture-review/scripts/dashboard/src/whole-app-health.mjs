@@ -382,8 +382,16 @@ function appCheckGaps(review) {
 }
 
 async function loadCurrentReview(root, input, syntaxProvider) {
-  const raw = JSON.parse(await fs.readFile(input,'utf8'));
-  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw Error('Expected a Health Check review object.');
+  const contents = await fs.readFile(input, 'utf8');
+  let raw;
+  try {
+    raw = JSON.parse(contents);
+  } catch (error) {
+    throw Error(`Saved Health Check review is not valid JSON at "${input}". Correct the file or restore a valid copy before resuming.`, {cause:error});
+  }
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    throw Error(`Expected a Health Check review object at "${input}". Correct the file or restore a valid copy before resuming.`);
+  }
   const {includeTests = false} = raw;
   if (typeof includeTests !== 'boolean') throw Error('Review includeTests must be true or false. Use the scope recorded by prepare.');
   if (raw.schemaVersion !== 1 || typeof raw.sourceFingerprint !== 'string' || !raw.sourceFingerprint.trim()) {

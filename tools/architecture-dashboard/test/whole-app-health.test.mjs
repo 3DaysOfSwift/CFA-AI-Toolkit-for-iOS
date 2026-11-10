@@ -681,6 +681,27 @@ test('rejects scope flags on report instead of silently using a different scope'
   }
 });
 
+test('identifies a malformed saved review before scanning', async t => {
+  const base = await fs.mkdtemp(path.join(os.tmpdir(), 'whole-health-invalid-draft-'));
+  t.after(() => fs.rm(base, {recursive:true, force:true}));
+  const draft = path.join(base, 'review.json');
+  const syntax = async () => assert.fail('Malformed draft should be rejected before scanning');
+  for (const [contents, diagnosis] of [
+    ['{"schemaVersion":', 'not valid JSON'],
+    ['null', 'Expected a Health Check review object'],
+    ['[]', 'Expected a Health Check review object']
+  ]) {
+    await fs.writeFile(draft, contents);
+    await assert.rejects(next(base, draft, syntax), error => {
+      assert.ok(error.message.includes(diagnosis));
+      assert.ok(error.message.includes(draft));
+      assert.match(error.message, /restore a valid copy before resuming/);
+      return true;
+    });
+    assert.equal(await fs.readFile(draft, 'utf8'), contents);
+  }
+});
+
 test('rejects a malformed review scope before scanning', async t => {
   const base = await fs.mkdtemp(path.join(os.tmpdir(), 'whole-health-invalid-scope-'));
   t.after(() => fs.rm(base, {recursive:true,force:true}));
