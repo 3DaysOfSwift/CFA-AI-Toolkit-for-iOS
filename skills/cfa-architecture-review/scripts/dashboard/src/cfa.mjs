@@ -485,7 +485,7 @@ function guidanceDiffersFromBundled(block) {
   return normalize(block) !== normalize(bundledGuidance(projectGuidance));
 }
 
-const guidanceComparison = 'Compare the CFA block with the installed toolkit and keep project-specific rules.';
+const guidanceComparison = 'Run cfa project-guidance to print the installed block for comparison. Keep project-specific rules.';
 
 function usage() {
   console.log(`CFA AI Toolkit for iOS — cfa command
@@ -494,6 +494,7 @@ Usage:
   cfa dashboard [project-folder] [dashboard options]
   cfa inspect [project-folder] [--json]
   cfa doctor [project-folder]
+  cfa project-guidance
   cfa enable-project [project-folder] [--host auto|codex|claude]
 
 Examples:
@@ -720,6 +721,10 @@ try {
     else if (command === 'inspect') await inspectProject(args);
     else if (command === 'doctor') doctor(args.shift());
     else if (command === 'enable-project') enableProject(args);
+    else if (command === 'project-guidance') {
+      if (args.length) throw Error('Usage: cfa project-guidance');
+      process.stdout.write(projectGuidance);
+    }
     else throw Error('Unknown CFA command. Run: cfa --help');
   }
 } catch (error) {

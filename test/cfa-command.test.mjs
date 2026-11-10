@@ -100,6 +100,11 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.equal(repeated.status, 0, repeated.stderr);
   assert.equal(doctor.status, 0, doctor.stderr);
   assert.match(content, /Keep this text\./);
+  const printed = spawnSync(command, ['project-guidance'], { encoding: 'utf8', cwd: project });
+  assert.equal(printed.status, 0, printed.stderr);
+  assert.ok(content.endsWith(printed.stdout));
+  assert.match(printed.stdout, /^<!-- CFA Toolkit project guidance -->/);
+  assert.equal(fs.readFileSync(agents, 'utf8'), content);
   assert.match(content, /Preserve the existing product design\s+during migration and maintenance/);
   assert.match(content, /Missing optional themes, branding or a CFA footer\s+do not count as architecture findings/);
   assert.match(content, /from View to ViewModel to Feature\. The Feature\s+calls internal microservices when it needs networking, storage or device APIs/);

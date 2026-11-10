@@ -114,8 +114,9 @@ computer.
 For an existing guidance block, `cfa doctor` and `cfa enable-project` report
 when its wording differs from the copy shipped with the installed toolkit.
 A difference may come from an older toolkit or from project-specific edits.
-Known older rules also get focused update hints. Compare the marked CFA block
-with the installed guidance and keep your project's own instructions. Both
+Known older rules also get focused update hints. Run `cfa project-guidance`
+to print the installed block for comparison. Keep your project’s own
+instructions when reconciling the marked CFA block. Both
 commands preserve the existing block.
 
 If `cfa` is not found, add its folder to zsh's path once and open a new Terminal:
