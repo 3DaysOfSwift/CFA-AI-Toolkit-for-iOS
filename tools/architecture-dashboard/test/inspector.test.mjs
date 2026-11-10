@@ -47,6 +47,26 @@ test('maps a complete screen to AppModel, feature, collaborator and named tests'
 
 });
 
+test('reviews raw Bundle metadata in a ViewModel and accepts typed AppInformation', async t => {
+  const view = 'Application/1 - View/Views/Settings/SettingsView.swift';
+  const viewModel = 'Application/1 - View/Views/Settings/SettingsViewModel.swift';
+  const root = await fixture(t, {
+    [view]: 'import SwiftUI\nstruct SettingsView: View { @State private var viewModel = SettingsViewModel(); var body: some View { Text(viewModel.version) } }',
+    [viewModel]: 'import Foundation\n@MainActor final class SettingsViewModel { private let bundle: Bundle = .main\nvar version: String { Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unavailable" } }',
+    'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static let shared = live(); static func live() -> AppModel { AppModel() } }',
+    'ApplicationTests/View model tests/SettingsViewModelTests.swift': 'struct SettingsViewModelTests {}'
+  });
+
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'view-model-bundle-access');
+
+  assert.deepEqual(findings.map(item => [item.file, item.line]), [[viewModel, 3], [viewModel, 2]]);
+  await fs.writeFile(
+    path.join(root, viewModel),
+    'struct AppInformation { static let current = AppInformation() }\n@MainActor final class SettingsViewModel { private let appInformation: AppInformation\ninit(appInformation: AppInformation = .current) { self.appInformation = appInformation }\nvar version: String { "Version" } }'
+  );
+  assert.ok(!(await inspect(root)).findings.some(item => item.code === 'view-model-bundle-access'));
+});
+
 test('leaves AppModel routes unresolved when multiple app roots are scanned', async t => {
   const root = await fixture(t, {
     'First/2 - AppModel/AppModel.swift': 'final class AppModel { let feedFeature: FeedFeature }',

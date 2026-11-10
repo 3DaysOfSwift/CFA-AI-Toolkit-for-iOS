@@ -985,6 +985,15 @@ export async function inspect(project) {
       ...(extensionsByName.get(viewModelName) ?? [])
     ] : [];
     for (const location of dependencySources) {
+      for (const access of location.body.matchAll(/\bBundle\s*\.\s*main\b/g)) {
+        findings.push(finding(
+          'view-model-bundle-access',
+          'review',
+          `${viewModelName} reads Bundle.main directly. When a screen presents app identity or other immutable system metadata, normalize it in an adjacent typed presentation value such as AppInformation and inject that value for tests.`,
+          location.file,
+          lineOf(location.source, location.offset + access.index)
+        ));
+      }
       for (const initializer of typeInitializers(location.body)) {
         inspectInitializerWork(viewModelName, initializer, location.source, location.offset, location.file, findings);
         const services = [...new Set(initializer.types.filter(type => serviceTypeSuffix.test(type)))];
@@ -999,6 +1008,9 @@ export async function inspect(project) {
     const retainedAppModels = [];
     for (const member of storedTypedMembers(viewModelMembers, viewModel ?? '')) {
       if (member.type === 'AppModel') retainedAppModels.push(member);
+      if (member.type === 'Bundle') {
+        findings.push(finding('view-model-bundle-access', 'review', `${viewModelName} appears to store Bundle directly. Prefer an adjacent typed presentation value such as AppInformation so tests inject explicit immutable metadata.`, viewModelFile, lineOf(viewModel, member.index)));
+      }
       if (!serviceTypeSuffix.test(member.type)) continue;
       findings.push(finding('view-model-non-feature-dependency', 'review', `${viewModelName} appears to store ${member.type} directly. Verify that the ViewModel calls a Feature and that the Feature owns the service dependency.`, viewModelFile, lineOf(viewModel, member.index)));
     }
