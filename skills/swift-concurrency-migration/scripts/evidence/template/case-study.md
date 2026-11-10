@@ -80,8 +80,8 @@ architecture review outcome explicitly, including when it shares a document
 with the navigator inspection, final CFA audit or manual regression. In `record.json`, list every
 affected target in `completionGate.affectedTargets` and name the targets
 covered by each build and the linked final test run in their `targets` arrays.
-List every affected target in the navigator inspection, final CFA audit and
-human architecture review evidence.
+List every affected target in the navigator inspection, Feature and primitive inventories,
+hybrid review, final CFA audit and human architecture review evidence.
 If test targets have separate names, explain which app or extension targets
 they exercise. Include affected extensions and
 device targets, and link each changed data handoff in
