@@ -230,9 +230,11 @@ Report files contain source paths and symbols; review them before sharing.
 - Provides filters, file drill-down, source excerpts and review questions.
 - Finds limited GCD, blocking-work and UI-responsibility warnings.
 - Flags explicit ViewModel and AppModel initializer inputs in recognizable
-  SwiftUI Views. Type names ending in Feature or Repository are leads for
-  source review. Confirm the declaration and its role, and trace screen callers
-  to distinguish selected immutable detail data from injected dependencies.
+  SwiftUI Views. Type names ending in Feature or a recognized lower-level
+  service suffix—Repository, Provider, Responding, Client, Store, Service,
+  NetworkingManager or SwiftDataManager—are leads for source review. Confirm
+  the declaration and its role, and trace screen callers to distinguish selected
+  immutable detail data from injected dependencies.
   Reusable components can receive action closures that forward UI intent to
   their screen. Review synthesized initializers and type aliases in source.
 - Flags explicit Task creation, obvious blocking I/O and work-named calls in
