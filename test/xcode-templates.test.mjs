@@ -28,6 +28,24 @@ test('starter projects and test templates use the canonical CFA test groups', ()
   }
 });
 
+test('CFA App uses the canonical User Data Storage navigator branch', () => {
+  const template = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/CFA App.xctemplate');
+  const application = path.join(template, 'Source/Application/2 - AppModel');
+  const metadata = fs.readFileSync(path.join(template, 'TemplateInfo.plist'), 'utf8');
+
+  assert.equal(fs.existsSync(path.join(application, 'Networking & Data Storage')), false);
+  for (const relative of [
+    'User Data Storage/Local/RepoFileCache.swift',
+    'User Data Storage/Networking/GitHubAPI.swift',
+    'User Data Storage/Networking/NetworkingManager.swift',
+    'User Data Storage/Protocols/GitReposProvider.swift'
+  ]) {
+    assert.equal(fs.existsSync(path.join(application, relative)), true, relative);
+    assert.match(metadata, new RegExp(relative.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  }
+  assert.doesNotMatch(metadata, /Networking &amp; Data Storage|File Cache/);
+});
+
 test('template ViewModels receive typed app information instead of raw bundle metadata', () => {
   const application = path.join(root, 'templates/Xcode/Project Templates/iOS/Application');
   for (const name of names) {
@@ -677,7 +695,7 @@ test('CFA App template publishes fresh data without waiting for its optional cac
     const files = [
       path.join(source, 'Features/Git Repos/Repo.swift'),
       path.join(source, 'Features/Git Repos/GitReposFeature.swift'),
-      path.join(source, 'Networking & Data Storage/Protocols/GitReposProvider.swift'),
+      path.join(source, 'User Data Storage/Protocols/GitReposProvider.swift'),
       path.join(root, 'test/fixtures/CFAAppTemplateBehavior.swift')
     ];
     const build = spawnSync('xcrun', ['swiftc', '-disable-sandbox', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(directory, 'cache'), ...files, '-o', executable], {encoding: 'utf8', timeout: 90000});

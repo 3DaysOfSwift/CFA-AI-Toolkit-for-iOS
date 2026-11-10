@@ -173,37 +173,37 @@
 				<string>com.apple.dt.applicationTarget</string>
 			</array>
 		</dict>
-		<key>2 - AppModel/Networking &amp; Data Storage/File Cache/RepoFileCache.swift</key>
+		<key>2 - AppModel/User Data Storage/Local/RepoFileCache.swift</key>
 		<dict>
 			<key>Path</key>
-			<string>Source/Application/2 - AppModel/Networking &amp; Data Storage/File Cache/RepoFileCache.swift</string>
+			<string>Source/Application/2 - AppModel/User Data Storage/Local/RepoFileCache.swift</string>
 			<key>TargetIdentifiers</key>
 			<array>
 				<string>com.apple.dt.applicationTarget</string>
 			</array>
 		</dict>
-		<key>2 - AppModel/Networking &amp; Data Storage/Networking/GitHubAPI.swift</key>
+		<key>2 - AppModel/User Data Storage/Networking/GitHubAPI.swift</key>
 		<dict>
 			<key>Path</key>
-			<string>Source/Application/2 - AppModel/Networking &amp; Data Storage/Networking/GitHubAPI.swift</string>
+			<string>Source/Application/2 - AppModel/User Data Storage/Networking/GitHubAPI.swift</string>
 			<key>TargetIdentifiers</key>
 			<array>
 				<string>com.apple.dt.applicationTarget</string>
 			</array>
 		</dict>
-		<key>2 - AppModel/Networking &amp; Data Storage/Networking/NetworkingManager.swift</key>
+		<key>2 - AppModel/User Data Storage/Networking/NetworkingManager.swift</key>
 		<dict>
 			<key>Path</key>
-			<string>Source/Application/2 - AppModel/Networking &amp; Data Storage/Networking/NetworkingManager.swift</string>
+			<string>Source/Application/2 - AppModel/User Data Storage/Networking/NetworkingManager.swift</string>
 			<key>TargetIdentifiers</key>
 			<array>
 				<string>com.apple.dt.applicationTarget</string>
 			</array>
 		</dict>
-		<key>2 - AppModel/Networking &amp; Data Storage/Protocols/GitReposProvider.swift</key>
+		<key>2 - AppModel/User Data Storage/Protocols/GitReposProvider.swift</key>
 		<dict>
 			<key>Path</key>
-			<string>Source/Application/2 - AppModel/Networking &amp; Data Storage/Protocols/GitReposProvider.swift</string>
+			<string>Source/Application/2 - AppModel/User Data Storage/Protocols/GitReposProvider.swift</string>
 			<key>TargetIdentifiers</key>
 			<array>
 				<string>com.apple.dt.applicationTarget</string>
@@ -249,10 +249,10 @@
 		<string>2 - AppModel/Features/Git Repos/GitReposFeature.swift</string>
 		<string>2 - AppModel/Features/Settings/AppColourTheme.swift</string>
 		<string>2 - AppModel/Features/Settings/SettingsFeature.swift</string>
-		<string>2 - AppModel/Networking &amp; Data Storage/File Cache/RepoFileCache.swift</string>
-		<string>2 - AppModel/Networking &amp; Data Storage/Networking/GitHubAPI.swift</string>
-		<string>2 - AppModel/Networking &amp; Data Storage/Networking/NetworkingManager.swift</string>
-		<string>2 - AppModel/Networking &amp; Data Storage/Protocols/GitReposProvider.swift</string>
+		<string>2 - AppModel/User Data Storage/Local/RepoFileCache.swift</string>
+		<string>2 - AppModel/User Data Storage/Networking/GitHubAPI.swift</string>
+		<string>2 - AppModel/User Data Storage/Networking/NetworkingManager.swift</string>
+		<string>2 - AppModel/User Data Storage/Protocols/GitReposProvider.swift</string>
 		<string>3 - App Resources/LaunchScreen.storyboard</string>
 		<string>3 - App Resources/PrivacyInfo.xcprivacy</string>
 	</array>

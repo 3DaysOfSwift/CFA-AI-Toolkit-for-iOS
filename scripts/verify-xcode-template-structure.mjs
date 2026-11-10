@@ -92,7 +92,7 @@ export function verifyXcodeTemplateStructure(templateDirectory = defaultTemplate
       /\b(?:if|switch|ModelContainer|ProgressView|ContentUnavailableView)\b/.test(sceneBody)) {
     fail('App.body must present one stable structural root without startup branching or database presentation.');
   }
-  const apiSource = fs.readFileSync(path.join(templateDirectory, 'Source/Application/2 - AppModel/Networking & Data Storage/Networking/GitHubAPI.swift'), 'utf8');
+  const apiSource = fs.readFileSync(path.join(templateDirectory, 'Source/Application/2 - AppModel/User Data Storage/Networking/GitHubAPI.swift'), 'utf8');
   if (/\bURLSession\b/.test(apiSource) || !/networkingManager\.data\(/.test(apiSource)) {
     fail('The template API must use NetworkingManager rather than URLSession directly.');
   }
@@ -128,29 +128,29 @@ export function verifyXcodeTemplateStructure(templateDirectory = defaultTemplate
       group: undefined
     },
     {
-      id: '2 - AppModel/Networking & Data Storage/File Cache/RepoFileCache.swift',
-      sourcePath: 'Source/Application/2 - AppModel/Networking & Data Storage/File Cache/RepoFileCache.swift',
+      id: '2 - AppModel/User Data Storage/Local/RepoFileCache.swift',
+      sourcePath: 'Source/Application/2 - AppModel/User Data Storage/Local/RepoFileCache.swift',
       group: undefined
     },
     {
-      id: '2 - AppModel/Networking & Data Storage/Networking/GitHubAPI.swift',
-      sourcePath: 'Source/Application/2 - AppModel/Networking & Data Storage/Networking/GitHubAPI.swift',
+      id: '2 - AppModel/User Data Storage/Networking/GitHubAPI.swift',
+      sourcePath: 'Source/Application/2 - AppModel/User Data Storage/Networking/GitHubAPI.swift',
       group: undefined
     },
     {
-      id: '2 - AppModel/Networking & Data Storage/Networking/NetworkingManager.swift',
-      sourcePath: 'Source/Application/2 - AppModel/Networking & Data Storage/Networking/NetworkingManager.swift',
+      id: '2 - AppModel/User Data Storage/Networking/NetworkingManager.swift',
+      sourcePath: 'Source/Application/2 - AppModel/User Data Storage/Networking/NetworkingManager.swift',
       group: undefined
     },
     {
-      id: '2 - AppModel/Networking & Data Storage/Protocols/GitReposProvider.swift',
-      sourcePath: 'Source/Application/2 - AppModel/Networking & Data Storage/Protocols/GitReposProvider.swift',
+      id: '2 - AppModel/User Data Storage/Protocols/GitReposProvider.swift',
+      sourcePath: 'Source/Application/2 - AppModel/User Data Storage/Protocols/GitReposProvider.swift',
       group: undefined
     }
   ]) {
     checkEntry(info, templateDirectory, entry);
   }
-  if (Object.keys(info.Definitions ?? {}).some((name) => /Favourite|Saved Repos|FavouriteReposAPI|SwiftData|User Data Storage/.test(name))) {
+  if (Object.keys(info.Definitions ?? {}).some((name) => /Favourite|Saved Repos|FavouriteReposAPI|SwiftData|Networking & Data Storage/.test(name))) {
     fail('contains retired storage or repository template files.');
   }
   if (info.Definitions?.['___PACKAGENAME:identifier___App.swift']) {
@@ -161,7 +161,7 @@ export function verifyXcodeTemplateStructure(templateDirectory = defaultTemplate
     fail('Assets.xcassets must be the root Xcode asset catalog and include the CFA AppIcon artwork.');
   }
   const sourceDirectory = path.join(templateDirectory, 'Source', 'Application');
-  for (const retiredPath of ['Assets.xcassets', '2 - AppModel/User Data Storage']) {
+  for (const retiredPath of ['Assets.xcassets', '2 - AppModel/Networking & Data Storage']) {
     if (fs.existsSync(path.join(sourceDirectory, retiredPath))) {
       fail(`contains retired source path ${retiredPath}.`);
     }
