@@ -597,7 +597,10 @@ For each relevant operation, inspect:
   if cancellation was requested. Include signing back in as the same account
   to exercise session identity. Release delayed writes and cleanup after the
   transition and verify that they cannot recreate cleared data or remove
-  data belonging to the newer session.
+  data belonging to the newer session. Inspect the persisted records after
+  the delayed work finishes, in addition to checking the Feature's visible
+  state. For a durable store, reopen it and verify that the same-account
+  sign-in retains the new session's writes without restoring cleared records.
 - State authority: which object accepts results and controls mutations? Look for
   independent writers or conflicting cached state, not harmless value snapshots.
 - Detail navigation in CFA: apply the
