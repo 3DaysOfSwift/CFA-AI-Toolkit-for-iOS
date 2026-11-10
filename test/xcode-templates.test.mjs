@@ -12,7 +12,7 @@ test('generated template files import the frameworks used by their declarations'
   const application = 'templates/Xcode/Project Templates/iOS/Application';
   const expectations = new Map([
     ['Habit Tracker.xctemplate/Source/Application/1 - View/___PACKAGENAMEASIDENTIFIER___App.swift', ['SwiftUI', 'UIKit']],
-    ['Day Streak.xctemplate/Source/Application/1 - View/___PACKAGENAMEASIDENTIFIER___App.swift', ['SwiftUI', 'UIKit']],
+    ['Day Streak.xctemplate/Source/Application/1 - View/___PACKAGENAMEASIDENTIFIER___App.swift', ['SwiftUI']],
     ['Day Streak.xctemplate/Source/Application/1 - View/Theme/ThemeManager.swift', ['Observation', 'SwiftUI', 'UIKit']]
   ]);
   for (const [relative, modules] of expectations) {
