@@ -98,6 +98,14 @@ export function validateCatalogue(catalogue, directory, { sourceRoot } = {}) {
     requireValue(!fs.lstatSync(path.join(directory, 'decisions')).isSymbolicLink() &&
       !fs.lstatSync(notePath).isSymbolicLink(), 'Linked notes are not distributable');
     const note = fs.readFileSync(notePath, 'utf8');
+    requireValue(note.match(/^Topic: `([^`]+)`/m)?.[1] === topic.id,
+      `Decision note topic does not match catalogue: ${topic.id}`);
+    requireValue(!/^.*CFA-(?!SPEC-)[A-Z]+-\d{2}.*$/m.test(note),
+      `Decision note contains a legacy explanation alias: ${topic.id}`);
+    const noteRules = note.match(/^Rules: (.+?)(?:\\)?$/m)?.[1]
+      .match(/CFA-SPEC-[A-Z]+-\d{2}/g) ?? [];
+    requireValue(JSON.stringify(noteRules) === JSON.stringify(topic.ruleIds),
+      `Decision note rules do not match catalogue: ${topic.id}`);
     for (const section of ['Rule', 'Problem', 'Documented rationale', 'Trade-offs and alternatives',
       'Scope and exceptions', 'Verification', 'Evidence and provenance', 'Publication']) {
       requireValue(headings(note).includes(section), `Incomplete decision note: ${topic.id}/${section}`);
