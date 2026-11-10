@@ -193,6 +193,8 @@ skill from that toolkit before changing the project.
   events and owns the resulting state. Screen-only observation follows the
   screen's lifetime. Verify that repeated startup signals leave one listener
   and that events still reach the Feature with no relevant screen open.
+  Where both lifetimes are involved, leave the screen and verify its observation
+  ends while app-wide events still reach the Feature.
   If cancellation is supported, verify that the cancelled listener stops
   forwarding events. If replacement is supported, also verify that cleanup
   of the old listener leaves the replacement running. For observer-backed
