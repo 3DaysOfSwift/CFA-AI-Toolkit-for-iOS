@@ -51,7 +51,7 @@ final class TodayViewModel {
 
     func editAmount(_ text: String, for habit: Habit) {
         amountDrafts[habit.id] = text
-        guard let value = Int(text), value >= 0 else {
+        guard let value = Int(text), todayFeature.isValidEntryValue(value) else {
             pendingValues[habit.id] = nil
             failedValues[habit.id] = nil
             if failedValues.isEmpty { errorMessage = nil }
@@ -61,13 +61,14 @@ final class TodayViewModel {
     }
 
     func increment(_ habit: Habit) {
-        guard let value = Int(amountText(for: habit)), value >= 0, value < Int.max else { return }
+        guard let value = Int(amountText(for: habit)),
+              todayFeature.isValidEntryValue(value), value < Int.max else { return }
         editAmount(String(value + 1), for: habit)
     }
 
     func canIncrement(_ habit: Habit) -> Bool {
         guard let value = Int(amountText(for: habit)) else { return false }
-        return value >= 0 && value < Int.max
+        return todayFeature.isValidEntryValue(value) && value < Int.max
     }
 
     func isSaving(_ habit: Habit) -> Bool {
@@ -75,7 +76,8 @@ final class TodayViewModel {
     }
 
     func statusText(for habit: Habit) -> String? {
-        if let draft = amountDrafts[habit.id], Int(draft).map({ $0 >= 0 }) != true {
+        if let draft = amountDrafts[habit.id],
+           Int(draft).map({ todayFeature.isValidEntryValue($0) }) != true {
             return "Enter a whole number of zero or more."
         }
         if failedValues[habit.id] != nil { return "Not saved. Tap Retry to try again." }

@@ -34,6 +34,10 @@ final class HabitsFeature {
         habit.isComplete(on: today, calendar: calendar)
     }
 
+    func isValidEntryValue(_ value: Int) -> Bool {
+        value >= 0
+    }
+
     func startLoading() {
         _ = startReloadIfNeeded()
     }
@@ -80,7 +84,7 @@ final class HabitsFeature {
     }
 
     func recordToday(habitID: UUID, value: Int) async throws {
-        guard value >= 0 else { throw HabitError.invalidEntry }
+        guard isValidEntryValue(value) else { throw HabitError.invalidEntry }
         if lastRecord?.habitID == habitID, lastRecord?.value == value, let lastRecordTask {
             try await lastRecordTask.value
             return

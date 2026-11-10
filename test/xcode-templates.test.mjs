@@ -57,6 +57,19 @@ test('Habit Tracker keeps operation failures in Features and presentation text i
   }
 });
 
+test('Habit Tracker keeps entry validity in its Feature boundary', () => {
+  const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/Habit Tracker.xctemplate/Source/Application');
+  const feature = fs.readFileSync(path.join(source, '2 - AppModel/Features/Habits/HabitsFeature.swift'), 'utf8');
+  const todayFeature = fs.readFileSync(path.join(source, '2 - AppModel/Features/Today/TodayFeature.swift'), 'utf8');
+  const viewModel = fs.readFileSync(path.join(source, '1 - View/Views/Today/TodayViewModel.swift'), 'utf8');
+
+  assert.match(feature, /func isValidEntryValue\(_ value: Int\) -> Bool/);
+  assert.match(feature, /guard isValidEntryValue\(value\) else/);
+  assert.match(todayFeature, /func isValidEntryValue\(_ value: Int\) -> Bool/);
+  assert.match(viewModel, /todayFeature\.isValidEntryValue/);
+  assert.doesNotMatch(viewModel, /value >= 0/);
+});
+
 test('Habit Tracker separates its Feature repository from its SwiftData model actor', () => {
   const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/Habit Tracker.xctemplate/Source/Application');
   const manager = fs.readFileSync(path.join(source, '2 - AppModel/User Data Storage/Local/SwiftDataManager.swift'), 'utf8');

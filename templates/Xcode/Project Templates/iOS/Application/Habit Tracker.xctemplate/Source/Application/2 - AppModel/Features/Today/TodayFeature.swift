@@ -18,6 +18,7 @@ final class TodayFeature {
 
     func valueToday(for habit: Habit) -> Int { habitsFeature.valueToday(for: habit) }
     func isCompleteToday(_ habit: Habit) -> Bool { habitsFeature.isCompleteToday(habit) }
+    func isValidEntryValue(_ value: Int) -> Bool { habitsFeature.isValidEntryValue(value) }
     var isLoading: Bool { habitsFeature.isLoading }
     var loadError: (any Error)? { habitsFeature.loadError }
 
