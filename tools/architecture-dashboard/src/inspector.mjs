@@ -630,11 +630,12 @@ export async function inspect(project) {
         sessionNames.add(alias[1]);
       }
     }
+    const sessionType = String.raw`(?<!\.\s*)(?:Foundation(?:Networking)?\s*\.\s*)?URLSession`;
     const requestCall = /\s*[?!]?\.\s*(?:data|bytes|download|upload|dataTask|dataTaskPublisher|downloadTask|uploadTask|webSocketTask|streamTask)\s*\(/;
-    const requestOnReceiver = new RegExp(String.raw`\b(?:((?<!\.\s*)(?:Foundation(?:Networking)?\s*\.\s*)?URLSession\s*\.\s*shared)|(\w+))${requestCall.source}`, 'g');
+    const requestOnReceiver = new RegExp(String.raw`\b(?:(${sessionType}\s*\.\s*shared)|(\w+))${requestCall.source}`, 'g');
     const directRequests = [...source.matchAll(requestOnReceiver)]
       .filter(match => (match[1] || sessionNames.has(match[2])) && outsideManager(match));
-    for (const constructor of source.matchAll(/\b(?<!\.\s*)(?:Foundation(?:Networking)?\s*\.\s*)?URLSession\s*(?:\.\s*init\s*)?\(/g)) {
+    for (const constructor of source.matchAll(new RegExp(String.raw`\b${sessionType}\s*(?:\.\s*init\s*)?\(`, 'g'))) {
       if (!outsideManager(constructor)) continue;
       const closing = closingParenthesis(source, constructor.index + constructor[0].length - 1);
       if (closing >= 0 && source.slice(closing + 1).search(requestCall) === 0) directRequests.push(constructor);
@@ -644,7 +645,7 @@ export async function inspect(project) {
       findings.push(finding('direct-url-session', 'review', 'Possible URLSession request outside NetworkingManager. Verify the receiver type and production target membership before reporting a bypass.', file, lineOf(source, request.index)));
     }
     if (!directRequests.length) {
-      const reference = [...source.matchAll(/\bURLSession\s*[.(]/g)].find(outsideManager);
+      const reference = [...source.matchAll(new RegExp(String.raw`\b${sessionType}\s*[.(]`, 'g'))].find(outsideManager);
       if (reference) {
         findings.push(finding('url-session-reference', 'review', 'URLSession is referenced outside NetworkingManager. Trace whether the reference configures a session for injection or leads to a production request that bypasses the manager.', file, lineOf(source, reference.index)));
       }

@@ -1061,6 +1061,7 @@ test('points to the URLSession request when the same file also configures a sess
     }`
   });
   const {findings} = await inspect(root);
+  assert.ok(!findings.some(item => item.file === 'CustomProvider.swift' && item.code === 'url-session-reference'));
   assert.deepEqual(findings.filter(item => item.code === 'direct-url-session')
     .map(({file, line}) => [file, line]), [['ChainedProvider.swift', 4], ['ConfiguredProvider.swift', 3], ['InferredProvider.swift', 3], ['Provider.swift', 3], ['SharedProvider.swift', 3], ['SharedProvider.swift', 4]]);
 });
@@ -1607,7 +1608,7 @@ test('recognizes storage and networking declarations independently of filenames'
     'Storage.swift': 'import SwiftData\nstruct SwiftDataManager {}',
     'Transport.swift': 'struct NetworkingManager { let session = URLSession.shared }',
     'NetworkingManager.swift': 'extension NetworkingManager { static let fallback = URLSession.shared }\nstruct Bypass { let session = URLSession.shared }',
-    'Client.swift': 'struct Client { let session = URLSession.shared }'
+    'Client.swift': 'struct Client { let session = Foundation.URLSession.shared }'
   });
   const {findings} = await inspect(root);
   assert.ok(!findings.some(item => item.code === 'swiftdata-manager-missing'));
