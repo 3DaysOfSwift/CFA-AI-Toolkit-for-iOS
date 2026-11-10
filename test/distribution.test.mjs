@@ -81,6 +81,29 @@ with zipfile.ZipFile(sys.argv[2]) as value:
  assert.deepEqual(result.stdout.trim().split('\n'),['0o755','0o755','0o644']);
 });
 
+test('checkout releases detect untracked files that would enter the payload', t => {
+ const directory=sandbox(t);
+ assert.equal(spawnSync('git',['init','--quiet'],{cwd:directory,encoding:'utf8'}).status,0);
+ fs.mkdirSync(path.join(directory,'skills'),{recursive:true});
+ fs.mkdirSync(path.join(directory,'docs/__pycache__'),{recursive:true});
+ fs.writeFileSync(path.join(directory,'skills/private-notes.txt'),'not for release\n');
+ fs.writeFileSync(path.join(directory,'docs/__pycache__/cache.pyc'),'cache\n');
+ fs.writeFileSync(path.join(directory,'outside.txt'),'outside the release roots\n');
+ const python=`
+import importlib.util
+import json
+import pathlib
+import sys
+spec = importlib.util.spec_from_file_location("cfa_release", sys.argv[1])
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+print(json.dumps(module.untracked_release_files(pathlib.Path(sys.argv[2]), ["skills", "docs"])))
+`;
+ const result=spawnSync('python3',['-c',python,path.join(root,'scripts/release.py'),directory],{encoding:'utf8'});
+ assert.equal(result.status,0,result.stderr);
+ assert.deepEqual(JSON.parse(result.stdout),['skills/private-notes.txt']);
+});
+
 test('release validation keeps the public toolkit description aligned', t => {
  const {source}=release(t);
  const manifest=path.join(source,'.codex-plugin/plugin.json');

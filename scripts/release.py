@@ -10,11 +10,26 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parent.parent
 EXCLUSIONS = json.loads((ROOT / 'scripts/release-exclusions.json').read_text())
+SOURCE_PARTS = ['.codex-plugin', '.github', 'readme-images', 'architecture', 'skills', 'tools', 'scripts', 'test', 'evals', 'examples', 'templates', 'starter-apps', 'docs',
+                'README.md', 'LICENSE', 'CHANGELOG.md', 'CONTRIBUTING.md', 'AGENTS.md', '.gitignore', 'Install.command', 'Install Xcode Template.command', 'package.json', 'plugin.json']
 
 def is_release_path(relative):
     return (not any(part in EXCLUSIONS['directoryNames'] for part in relative.parts)
             and relative.name not in EXCLUSIONS['fileNames']
             and not any(relative.name.endswith(suffix) for suffix in EXCLUSIONS['fileSuffixes']))
+
+def untracked_release_files(root, allowed=SOURCE_PARTS):
+    """Return untracked, non-ignored files that a checkout release would package."""
+    if not (root / '.git').exists():
+        return []
+    result = subprocess.run(
+        ['git', 'ls-files', '--others', '--exclude-standard', '-z'],
+        cwd=root, check=True, stdout=subprocess.PIPE)
+    allowed_roots = set(allowed)
+    paths = (Path(value.decode()) for value in result.stdout.split(b'\0') if value)
+    return sorted(relative.as_posix() for relative in paths
+                  if relative.parts and relative.parts[0] in allowed_roots
+                  and is_release_path(relative))
 
 def archive(output, pairs, prefix):
     with zipfile.ZipFile(output, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as z:
@@ -42,6 +57,10 @@ def main():
     out = args.out.resolve()
     if out.exists():
         parser.error('Output already exists; choose a new --out directory.')
+    untracked = untracked_release_files(ROOT)
+    if untracked:
+        parser.error('Release-eligible untracked files must be reviewed, added or ignored first: '
+                     + ', '.join(untracked))
     run = lambda *command: subprocess.run(command, cwd=ROOT, check=True)
     run(args.node, 'scripts/sync.mjs')
     run(args.node, 'scripts/validate.mjs')
@@ -55,10 +74,8 @@ def main():
     run(args.node, 'scripts/build.mjs', str(package))
     plugin_zip = out / f'{name}-{version}-plugin.zip'
     archive(plugin_zip, [(p.relative_to(package).as_posix(), p) for p in package.rglob('*') if p.is_file()], name)
-    allowed = ['.codex-plugin', '.github', 'readme-images', 'architecture', 'skills', 'tools', 'scripts', 'test', 'evals', 'examples', 'templates', 'starter-apps', 'docs',
-               'README.md', 'LICENSE', 'CHANGELOG.md', 'CONTRIBUTING.md', 'AGENTS.md', '.gitignore', 'Install.command', 'Install Xcode Template.command', 'package.json', 'plugin.json']
     sources = []
-    for part in allowed:
+    for part in SOURCE_PARTS:
         path = ROOT / part
         if not path.exists():
             continue
