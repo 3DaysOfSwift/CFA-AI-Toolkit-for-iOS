@@ -423,8 +423,12 @@ skill from that toolkit before changing the project.
   target before and after migration. Keep event delivery checks separate from
   current UI state, including repeated values, order, cancellation and any
   required buffering. Record the Xcode navigator and Feature ownership map
-  for affected targets at the baseline and final commits. Reconcile temporary
-  file locations and target membership. Move files to their intended CFA
+  for affected targets at the baseline and final commits. For each scoped
+  screen or tab, identify its presentation owner, concrete Feature
+  dependencies, composition owner, named tests and any retained legacy
+  boundary. Record whether each scoped legacy concurrency route was migrated
+  or retained, and explain each retention. Reconcile temporary file locations
+  and target membership. Move files to their intended CFA
   locations when safe and record intentional package boundaries or blockers.
   Audit the agreed migration scope against CFA. Cite final-commit evidence
   for each applicable requirement, explain which requirements do not apply,
