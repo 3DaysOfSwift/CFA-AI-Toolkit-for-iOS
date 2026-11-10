@@ -21,6 +21,20 @@ test('generated template files import the frameworks used by their declarations'
   }
 });
 
+test('screen-level template roots own dedicated ViewModels', () => {
+  const application = path.join(root, 'templates/Xcode/Project Templates/iOS/Application');
+  for (const name of ['Habit Tracker', 'Day Streak']) {
+    const source = path.join(application, `${name}.xctemplate/Source/Application/1 - View/Views`);
+    const view = fs.readFileSync(path.join(source, 'ContentView.swift'), 'utf8');
+    const viewModel = fs.readFileSync(path.join(source, 'ContentViewModel.swift'), 'utf8');
+
+    assert.match(view, /@State private var viewModel = ContentViewModel\(\)/);
+    assert.match(view, /TabView\(selection: \$viewModel\.selectedTab\)/);
+    assert.match(viewModel, /@MainActor\s+@Observable\s+final class ContentViewModel/);
+    assert.match(viewModel, /var selectedTab: Tab = \./);
+  }
+});
+
 test('Habit Tracker keeps operation failures in Features and presentation text in ViewModels', () => {
   const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/Habit Tracker.xctemplate/Source/Application');
   const feature = fs.readFileSync(path.join(source, '2 - AppModel/Features/Habits/HabitsFeature.swift'), 'utf8');

@@ -22,6 +22,7 @@
 		<string>PresentationTests/ThemeManagerTests.swift</string>
 		<string>StorageTests/SwiftDataManagerTests.swift</string>
 		<string>Support/TestSupport.swift</string>
+		<string>ViewModelTests/ContentViewModelTests.swift</string>
 		<string>ViewModelTests/DayStreakViewModelTests.swift</string>
 		<string>ViewModelTests/PracticeViewModelTests.swift</string>
 		<string>ViewModelTests/SettingsViewModelTests.swift</string>
@@ -62,6 +63,11 @@
 		<dict>
 			<key>Path</key>
 			<string>Source/Support/TestSupport.swift</string>
+		</dict>
+		<key>ViewModelTests/ContentViewModelTests.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/ViewModelTests/ContentViewModelTests.swift</string>
 		</dict>
 		<key>ViewModelTests/DayStreakViewModelTests.swift</key>
 		<dict>

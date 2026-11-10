@@ -24,6 +24,7 @@
 		<string>PresentationTests/ThemeManagerTests.swift</string>
 		<string>Support/InMemoryHabitsRepository.swift</string>
 		<string>ViewModelTests/AddHabitViewModelTests.swift</string>
+		<string>ViewModelTests/ContentViewModelTests.swift</string>
 		<string>ViewModelTests/DayStreakViewModelTests.swift</string>
 		<string>ViewModelTests/HabitsViewModelTests.swift</string>
 		<string>ViewModelTests/SettingsViewModelTests.swift</string>
@@ -75,6 +76,11 @@
 		<dict>
 			<key>Path</key>
 			<string>Source/ViewModelTests/AddHabitViewModelTests.swift</string>
+		</dict>
+		<key>ViewModelTests/ContentViewModelTests.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/ViewModelTests/ContentViewModelTests.swift</string>
 		</dict>
 		<key>ViewModelTests/DayStreakViewModelTests.swift</key>
 		<dict>

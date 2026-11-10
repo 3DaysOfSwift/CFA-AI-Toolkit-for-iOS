@@ -78,6 +78,15 @@
 				<string>com.apple.dt.applicationTarget</string>
 			</array>
 		</dict>
+		<key>1 - View/Views/ContentViewModel.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/Application/1 - View/Views/ContentViewModel.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.apple.dt.applicationTarget</string>
+			</array>
+		</dict>
 		<key>1 - View/Views/DayStreak/DayStreakView.swift</key>
 		<dict>
 			<key>Path</key>
@@ -280,6 +289,7 @@
 		<string>1 - View/Views/AddHabit/AddHabitView.swift</string>
 		<string>1 - View/Views/AddHabit/AddHabitViewModel.swift</string>
 		<string>1 - View/Views/ContentView.swift</string>
+		<string>1 - View/Views/ContentViewModel.swift</string>
 		<string>1 - View/Views/DayStreak/DayStreakView.swift</string>
 		<string>1 - View/Views/DayStreak/DayStreakViewModel.swift</string>
 		<string>1 - View/Views/Habits/HabitsView.swift</string>
