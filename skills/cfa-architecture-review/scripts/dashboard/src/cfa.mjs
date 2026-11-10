@@ -302,10 +302,13 @@ skill from that toolkit before changing the project.
   Install the handle before suspension and clear it after handling success,
   failure or cancellation. If replacement can start before the old task exits,
   use task identity to reject stale results and clear the handle only when
-  that identity still matches. In a controlled test, finish the old task
-  after installing its replacement. Verify that the old result and cleanup
-  leave the current state and replacement handle intact. Keep
-  SwiftUI lifecycle tasks and structured child tasks with their existing owners. Await directly when the current task owns the work.
+  that identity still matches. In controlled tests, complete the old task
+  with success or failure after its replacement publishes. Verify that old
+  data and errors cannot replace current state, even if the cancelled task
+  still returns. Separately, finish the old task while its replacement is
+  pending and verify cleanup leaves the new handle and loading state intact.
+  Keep SwiftUI lifecycle tasks and structured child tasks with their existing
+  owners. Await directly when the current task owns the work.
 - Cancel superseded presentation work such as search. Cancel screen-only work
   on disappearance when continuing would have no value. Check cancellation
   before expensive work and before publishing, and protect current state
