@@ -51,7 +51,11 @@ the architecture:
    Handle expired or unavailable destinations clearly. Scheduling and delivery alone do
    not add an item. Settings shows the shared pending list, which either scene
    can act on using its own navigation state. Protect unsaved edits and active
-   payment flows. Concurrent attempts must not open the same request twice.
+   payment flows. Deduplicate repeated callbacks by opening-event identity,
+   including callbacks that arrive after the request was removed. Keep a
+   distinct opening event for the same destination available. Concurrent
+   attempts must not open the same request twice, and a scene waiting on one
+   request must leave other requests available to other scenes.
    Remove a request after successful navigation or explicit dismissal. Declining,
    cancelling before navigation, or failing to navigate leaves it pending.
    Navigation succeeds when the destination opens, even if cancellation follows
