@@ -502,6 +502,16 @@ test('starter app projects use explicit Swift 6 isolation and concurrency settin
   }
 });
 
+test('starter apps contain no generated Swift package workspace metadata', () => {
+  for (const application of ['Habit Tracker', 'Habit Tracker Pro', 'Todays Twenty']) {
+    const tracked = execFileSync('git', ['ls-files', `starter-apps/${application}/.swiftpm`], {
+      cwd: root,
+      encoding: 'utf8'
+    }).trim();
+    assert.equal(tracked, '', application);
+  }
+});
+
 test('new-project templates define app display name and initial version identity', () => {
   for (const name of names) {
     const file = path.join(root, 'templates/Xcode/Project Templates/iOS/Application', `${name}.xctemplate/TemplateInfo.plist`);
