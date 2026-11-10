@@ -60,6 +60,13 @@ beside their Feature and use a shared location for broadly applicable services.
 Compose one instance locally in `AppModel.live()` when common configuration
 or shared state warrants it. Supply it through the consumers' initializers.
 
+When exposing refresh state, follow the [launch and refresh guidance](references/spec/topics/21-use-application-launch-as-an-opportunity-to-refresh-features.md).
+Keep confirmed domain data, refresh status and refresh errors separate so
+usable data remains visible during a refresh and after failure. The Feature
+owns domain data and operation outcomes. Its screen ViewModel turns them into
+presentation-ready loading and error information. Verify the pending, failure
+and successful retry paths with previously loaded data.
+
 For a Feature-owned shared refresh, apply the
 [refresh lifetime rule](references/spec/rules/cfa-task-02.md). By default,
 let the refresh finish and retain its result even if its only screen leaves.

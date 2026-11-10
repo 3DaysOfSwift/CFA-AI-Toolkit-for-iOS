@@ -37,6 +37,13 @@ when a change touches several Features. Keep screen-only composition in the
 ViewModel. Give reusable business coordination an explicit Model owner when
 needed, with directional dependencies and one owner for each authoritative value.
 
+When exposing refresh state, follow the [launch and refresh guidance](references/spec/topics/21-use-application-launch-as-an-opportunity-to-refresh-features.md).
+Keep confirmed domain data, refresh status and refresh errors separate so
+usable data remains visible during a refresh and after failure. The Feature
+owns domain data and operation outcomes. Its screen ViewModel turns them into
+presentation-ready loading and error information. Verify the pending, failure
+and successful retry paths with previously loaded data.
+
 When adding or sharing a service, apply the
 [service placement rule](references/spec/rules/cfa-svc-01.md). Keep a
 domain-specific provider beside its Feature while that placement still
