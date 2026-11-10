@@ -629,6 +629,22 @@ test('installed Health Check rescans source, surfaces gaps and rejects stale rev
     assert.match(html,/The owner handles this case/);
     assert.match(html,/App\.swift:1–2/);
     assert.doesNotMatch(html,/What still needs checking/);
+    const sharedReview = structuredClone(review);
+    const sharedSite = {kind:'concurrency.task', file:'Value.swift', line:1, column:1};
+    const [sharedCandidate] = taskCandidates({syntax:{items:[sharedSite]}});
+    sharedReview.operations[0].steps.push({
+      id:'load', parentId:'trigger', title:'Load', relation:'unstructured-task',
+      detail:'Start the shared load.', evidence, taskSiteId:sharedCandidate.id
+    });
+    sharedReview.operations.push({...structuredClone(sharedReview.operations[0]), id:'refresh', title:'Refresh'});
+    sharedReview.taskSites = [{siteId:sharedCandidate.id, operationId:'launch'}];
+    const sharedSyntax = async () => ({...await syntax(), items:[sharedSite]});
+    await fs.writeFile(reviewPath, JSON.stringify(sharedReview));
+    const sharedOutput = path.join(base, 'shared-task.html');
+    await finish(project, reviewPath, sharedOutput, undefined, sharedSyntax);
+    const sharedHtml = await fs.readFile(sharedOutput, 'utf8');
+    assert.equal([...sharedHtml.matchAll(/Task site: Value\.swift:1:1/g)].length, 2);
+    await fs.writeFile(reviewPath, JSON.stringify(review));
     const mustNotParse = async () => assert.fail('Stale evidence should be rejected before running SwiftSyntax');
     await fs.appendFile(buildSettings, 'SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor\n');
     await assert.rejects(next(project, reviewPath, mustNotParse), /fingerprint mismatch/);
