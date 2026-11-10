@@ -157,8 +157,11 @@ skill from that toolkit before changing the project.
 - Start with independent Features. A ViewModel can arrange existing capabilities
   for its screen. When a reusable business workflow genuinely spans Features,
   put its decisions in the Feature that owns the workflow, or introduce a
-  coordinating Feature for a distinct capability. Trace dependencies for
-  cycles and keep one authoritative owner for each value.
+  coordinating Feature for a distinct capability. Compose that Feature in
+  AppModel and place it alongside the other Features. Identify the business
+  decision it owns before adding it. During migration, keep presentation-only
+  composition in each screen's ViewModel. Trace dependencies for cycles and
+  keep one authoritative owner for each value.
 - For sign-out, account switching or external session expiry, let the owning
   Feature coordinate explicit cleanup calls. Each affected Feature clears the
   data it owns. Trace each supported entry point and reconcile the outcome with the actual session, including partial
