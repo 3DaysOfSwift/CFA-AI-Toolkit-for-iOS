@@ -217,8 +217,11 @@ the architecture:
     directly and synchronously. AppModel signals the relevant Features and
     starts required app-wide listeners before the callback returns. For an
     asynchronous listener, verify that AppModel creates and retains its task
-    during startup. Verify that repeated launch signals start no duplicates. Features may start
-    asynchronous work without making the callback await disk or network completion.
+    during startup. The task may begin consuming events after the callback
+    returns. Verify task creation and retention separately from event
+    consumption, and check that repeated launch signals start no duplicates.
+    Features may start asynchronous work without making the callback await
+    disk or network completion.
     Keep synchronous startup work brief. Task creation order does not establish
     disk or network start order. Measure launch and first-frame timing
     separately from Feature readiness.

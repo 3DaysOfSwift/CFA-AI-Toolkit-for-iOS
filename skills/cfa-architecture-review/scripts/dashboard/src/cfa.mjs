@@ -278,8 +278,10 @@ skill from that toolkit before changing the project.
   and synchronously from the application lifecycle callback, never a View .task
   or a scheduled Task. AppModel signals the relevant Features and starts its
   required app-wide listeners before the callback returns. For an asynchronous
-  listener, AppModel creates and retains its task during startup. Features can start
-  their own asynchronous work without delaying the callback for disk or network
+  listener, AppModel creates and retains its task during startup. The task
+  may begin consuming events after the callback returns. Verify task creation
+  and retention separately from event consumption. Features can start their
+  own asynchronous work without delaying the callback for disk or network
   completion. Verify that repeated callbacks leave Feature startup signals
   and app-wide listeners unduplicated.
   If a screen requests the same refresh while launch work is in flight,
