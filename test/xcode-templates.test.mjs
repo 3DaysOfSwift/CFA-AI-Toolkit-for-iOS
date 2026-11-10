@@ -96,9 +96,12 @@ test('Day Streak maps domain outcomes to presentation inside ViewModels', () => 
   const settingsViewModel = fs.readFileSync(path.join(source, '1 - View/Views/Settings/SettingsViewModel.swift'), 'utf8');
 
   assert.doesNotMatch(model, /LocalizedError|errorDescription|var title:|var detail:/);
+  assert.match(model, /var earnsPoint: Bool/);
+  assert.match(model, /func isCorrectChoice\(_ choice: Int\)/);
   assert.match(practiceViewModel, /func difficultyDescription\(_ difficulty: Difficulty\)/);
   assert.match(practiceViewModel, /private func message\(for error: any Error/);
   assert.doesNotMatch(practiceViewModel, /error\.localizedDescription/);
+  assert.doesNotMatch(practiceViewModel, /wrongAnswers\.isEmpty|wrongAnswers\.contains/);
   assert.doesNotMatch(streakViewModel, /error\.localizedDescription/);
   assert.doesNotMatch(settingsFeature, /Bundle\.main|appInformation|appVersion|buildNumber|"Version/);
   assert.match(settingsViewModel, /Bundle\.main\.infoDictionary/);

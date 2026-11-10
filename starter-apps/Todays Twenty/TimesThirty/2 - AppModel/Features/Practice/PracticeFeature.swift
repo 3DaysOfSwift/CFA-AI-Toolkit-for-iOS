@@ -154,8 +154,9 @@ final class PracticeFeature {
                 guard session.question.id == questionID else { throw PracticeError.staleQuestion }
                 guard !session.question.isResolved, session.question.choices.contains(value) else { return }
                 if value == session.question.answer {
-                    let correctCount = session.correctCount + (session.question.wrongAnswers.isEmpty ? 1 : 0)
-                    session = session.updating(question: session.question.updating(isAnswered: true),
+                    let answeredQuestion = session.question.updating(isAnswered: true)
+                    let correctCount = session.correctCount + (answeredQuestion.earnsPoint ? 1 : 0)
+                    session = session.updating(question: answeredQuestion,
                                                correctCount: correctCount,
                                                completedAt: correctCount >= PracticeSession.target ? now() : nil)
                 } else {

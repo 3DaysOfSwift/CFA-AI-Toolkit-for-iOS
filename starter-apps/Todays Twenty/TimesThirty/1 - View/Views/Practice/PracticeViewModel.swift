@@ -59,20 +59,20 @@ final class PracticeViewModel {
         }
     }
     func isCorrectAnswer(_ answer: Int, in question: MultiplicationQuestion) -> Bool {
-        question.isResolved && answer == question.answer
+        question.isCorrectChoice(answer)
     }
 
     func isIncorrectAnswer(_ answer: Int, in question: MultiplicationQuestion) -> Bool {
-        question.wrongAnswers.contains(answer)
+        question.isIncorrectChoice(answer)
     }
 
     var feedback: String {
         guard let question = session?.question else { return "" }
         if question.isRevealed { return "Answer revealed. This question earns no point." }
         if question.isAnswered {
-            return question.wrongAnswers.isEmpty ? "That's right. One point earned!" : "You've found it! No point this time—keep going."
+            return question.earnsPoint ? "That's right. One point earned!" : "You've found it! No point this time—keep going."
         }
-        if !question.wrongAnswers.isEmpty { return "Not quite. Try another answer. This question won't earn a point." }
+        if question.hasIncorrectAttempts { return "Not quite. Try another answer. This question won't earn a point." }
         return "Tap the question to reveal the answer."
     }
 

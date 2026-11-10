@@ -23,6 +23,16 @@ struct MultiplicationQuestion: Codable, Equatable, Sendable, Identifiable {
     let isAnswered: Bool
     var answer: Int { left * right }
     var isResolved: Bool { isRevealed || isAnswered }
+    var earnsPoint: Bool { isAnswered && wrongAnswers.isEmpty }
+    var hasIncorrectAttempts: Bool { !wrongAnswers.isEmpty }
+
+    func isCorrectChoice(_ choice: Int) -> Bool {
+        isResolved && choice == answer
+    }
+
+    func isIncorrectChoice(_ choice: Int) -> Bool {
+        wrongAnswers.contains(choice)
+    }
 
     init(id: UUID, left: Int, right: Int, choices: [Int], wrongAnswers: Set<Int> = [],
          isRevealed: Bool = false, isAnswered: Bool = false) {
