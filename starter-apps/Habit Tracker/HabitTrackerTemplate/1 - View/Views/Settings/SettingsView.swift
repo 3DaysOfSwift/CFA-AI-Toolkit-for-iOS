@@ -10,15 +10,11 @@ struct SettingsView: View {
             Form {
                 Section("Appearance") {
                     Picker("Colour theme", selection: Binding(
-                        get: { themeManager.selectedTheme.id },
-                        set: { id in
-                            if let selected = AppColourTheme.availableThemes.first(where: { $0.id == id }) {
-                                themeManager.select(selected)
-                            }
-                        }
+                        get: { viewModel.selectedTheme },
+                        set: { viewModel.selectTheme($0) }
                     )) {
-                        ForEach(AppColourTheme.availableThemes, id: \.id) { option in
-                            Text(option.name).tag(option.id)
+                        ForEach(ThemeSelection.allCases) { option in
+                            Text(viewModel.themeTitle(option)).tag(option)
                         }
                     }
                     .pickerStyle(.menu)

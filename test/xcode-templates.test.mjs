@@ -43,6 +43,23 @@ test('Habit Tracker keeps operation failures in Features and presentation text i
   }
 });
 
+test('Habit Tracker keeps saved theme ownership in SettingsFeature', () => {
+  const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/Habit Tracker.xctemplate/Source/Application');
+  const feature = fs.readFileSync(path.join(source, '2 - AppModel/Features/Settings/SettingsFeature.swift'), 'utf8');
+  const manager = fs.readFileSync(path.join(source, '1 - View/Theme/ThemeManager.swift'), 'utf8');
+  const viewModel = fs.readFileSync(path.join(source, '1 - View/Views/Settings/SettingsViewModel.swift'), 'utf8');
+  const view = fs.readFileSync(path.join(source, '1 - View/Views/Settings/SettingsView.swift'), 'utf8');
+
+  assert.match(feature, /private\(set\) var selectedTheme: ThemeSelection/);
+  assert.match(feature, /func selectTheme\(_ theme: ThemeSelection\)/);
+  assert.doesNotMatch(feature, /SwiftUI|ColorScheme|Color\(/);
+  assert.doesNotMatch(manager, /UserDefaults|defaults\.set/);
+  assert.match(manager, /private let settingsFeature: SettingsFeature/);
+  assert.match(viewModel, /func selectTheme\(_ theme: ThemeSelection\)/);
+  assert.match(view, /set: \{ viewModel\.selectTheme\(\$0\) \}/);
+  assert.doesNotMatch(view, /themeManager\.select\(/);
+});
+
 test('Day Streak keeps saved theme ownership in SettingsFeature', () => {
   const source = path.join(root, 'templates/Xcode/Project Templates/iOS/Application/Day Streak.xctemplate/Source/Application');
   const feature = fs.readFileSync(path.join(source, '2 - AppModel/Features/Settings/SettingsFeature.swift'), 'utf8');

@@ -50,4 +50,22 @@ struct SettingsViewModelTests {
 
         #expect(viewModel.firstWeekday == 1)
     }
+
+    @Test("Changing theme routes through the preference feature")
+    func selectsTheme() {
+        let suite = "SettingsViewModelTests.\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suite) else {
+            Issue.record("Could not create isolated UserDefaults suite")
+            return
+        }
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let feature = SettingsFeature(defaults: defaults)
+        let viewModel = SettingsViewModel(settingsFeature: feature)
+
+        viewModel.selectTheme(.terracotta)
+
+        #expect(viewModel.selectedTheme == .terracotta)
+        #expect(feature.selectedTheme == .terracotta)
+        #expect(viewModel.themeTitle(.terracotta) == "Terracotta")
+    }
 }

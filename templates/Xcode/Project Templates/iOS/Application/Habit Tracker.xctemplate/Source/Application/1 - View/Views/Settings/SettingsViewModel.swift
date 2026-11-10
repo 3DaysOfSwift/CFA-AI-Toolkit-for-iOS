@@ -11,6 +11,7 @@ final class SettingsViewModel {
     }
 
     var firstWeekday: Int { settingsFeature.firstWeekday }
+    var selectedTheme: ThemeSelection { settingsFeature.selectedTheme }
     var appName: String { settingsFeature.appName }
 
     var versionDescription: String {
@@ -19,5 +20,22 @@ final class SettingsViewModel {
 
     func selectFirstWeekday(_ weekday: Int) {
         settingsFeature.selectFirstWeekday(weekday)
+    }
+
+    func selectTheme(_ theme: ThemeSelection) {
+        settingsFeature.selectTheme(theme)
+    }
+
+    func themeTitle(_ theme: ThemeSelection) -> String {
+        switch theme {
+        case .automatic: "Automatic"
+        case .light: "Light"
+        case .dark: "Dark"
+        case .ocean: "Ocean"
+        case .plum: "Plum"
+        case .forest: "Forest"
+        case .terracotta: "Terracotta"
+        case .indigo: "Indigo"
+        }
     }
 }

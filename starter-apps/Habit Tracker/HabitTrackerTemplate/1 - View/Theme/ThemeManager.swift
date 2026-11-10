@@ -4,17 +4,12 @@ import SwiftUI
 @MainActor
 @Observable
 final class ThemeManager {
-    private let defaults: UserDefaults
-    private(set) var selectedTheme: AppColourTheme
-
-    init(defaults: UserDefaults = .standard) {
-        self.defaults = defaults
-        let savedID = defaults.string(forKey: "selectedTheme")
-        selectedTheme = AppColourTheme.availableThemes.first(where: { $0.id == savedID }) ?? .automatic
+    private let settingsFeature: SettingsFeature
+    var selectedTheme: AppColourTheme {
+        AppColourTheme.availableThemes.first(where: { $0.id == settingsFeature.selectedTheme.rawValue }) ?? .automatic
     }
 
-    func select(_ theme: AppColourTheme) {
-        defaults.set(theme.id, forKey: "selectedTheme")
-        selectedTheme = theme
+    init(settingsFeature: SettingsFeature) {
+        self.settingsFeature = settingsFeature
     }
 }
