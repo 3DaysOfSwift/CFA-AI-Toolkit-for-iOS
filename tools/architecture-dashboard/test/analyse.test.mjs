@@ -31,7 +31,11 @@ test('finds task closures written as explicit operation arguments', () => {
 
 test('framework modifiers, detached work and group scopes have distinct kinds',()=>{
   const source='Task.detached { }\n.task(id: item) { }\n.refreshable { }\n_Concurrency.withThrowingTaskGroup(of: Int.self) { group in group.addTask { 1 } }\nFixtures.withTaskGroup(of: Int.self) {}';
-  assert.deepEqual(scanSource(source,'A.swift').sites.map(s=>s.kind),['detached','view-task','refresh','group','group-child']);
+  const {sites} = scanSource(source, 'A.swift');
+  assert.deepEqual(sites.map(site => site.kind), ['detached','view-task','refresh','group','group-child']);
+  const group = sites.find(site => site.kind === 'group');
+  assert.equal(group.column, 1);
+  assert.equal(group.id, `A.swift:${source.indexOf('withThrowingTaskGroup')}:group`);
 });
 test('discovers possible synchronous entry points without declaring them complete',()=>{
   const source='func application(_ app: UIApplication, didFinishLaunchingWithOptions opts: Options?) -> Bool { true }\nButton("Refresh") { refresh() }';

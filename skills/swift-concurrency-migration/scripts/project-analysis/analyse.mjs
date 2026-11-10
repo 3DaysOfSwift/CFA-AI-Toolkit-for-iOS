@@ -80,6 +80,7 @@ export function scanSource(source, file) {
       let idIndex = match.index;
       if (kind === 'button-action') idIndex += match[1]?.length ?? 0;
       if (kind === 'task' || kind === 'detached') idIndex += match[0].indexOf('Task');
+      if (kind === 'group') idIndex += match[0].indexOf('with');
       sites.push({ id: `${file}:${idIndex}:${kind}`, kind, label, ...evidence(match.index + offset) });
     }
   }
