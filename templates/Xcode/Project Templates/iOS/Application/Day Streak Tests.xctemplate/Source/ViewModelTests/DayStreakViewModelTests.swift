@@ -14,4 +14,14 @@ struct DayStreakViewModelTests {
         #expect(model.completedDayCount == 1)
         #expect(model.correctAnswerCount == 20)
     }
+
+    @Test func presentsLoadingFailureWithoutInfrastructureText() async {
+        let env = TestEnvironment()
+        let model = DayStreakViewModel(dayStreakFeature: env.streak)
+        await env.repository.fail(true)
+
+        await model.refresh().value
+
+        #expect(model.errorMessage == "Your saved activity could not be loaded. Please try again.")
+    }
 }

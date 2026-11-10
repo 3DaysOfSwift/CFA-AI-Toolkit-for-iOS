@@ -19,6 +19,9 @@ struct PracticeViewModelTests {
         let revealed = attempted.updating(isRevealed: true)
         #expect(model.isCorrectAnswer(12, in: revealed))
         #expect(!model.isCorrectAnswer(13, in: revealed))
+        #expect(model.difficultyDescription(.gentle) == "2–5 times tables")
+        #expect(model.difficultyDescription(.everyday) == "2–12 times tables")
+        #expect(model.difficultyDescription(.challenge) == "6–19 times tables")
     }
 
     @Test(arguments: [false, true])
@@ -177,7 +180,7 @@ struct PracticeViewModelTests {
                                       settingsFeature: SettingsFeature(defaults: defaults))
         await env.repository.fail(true)
         await model.refresh().value
-        #expect(model.errorMessage != nil)
+        #expect(model.errorMessage == "Your saved practice could not be loaded. Please try again.")
         await env.repository.fail(false)
         await model.refresh().value
         #expect(model.hasLoaded)
@@ -193,7 +196,7 @@ struct PracticeViewModelTests {
                                       settingsFeature: SettingsFeature(defaults: defaults))
         await env.repository.fail(true)
         await model.perform(.refresh).value
-        #expect(model.errorMessage != nil)
+        #expect(model.errorMessage == "Your saved practice could not be loaded. Please try again.")
         await env.repository.fail(false)
         await model.retry().value
         #expect(model.errorMessage == nil)

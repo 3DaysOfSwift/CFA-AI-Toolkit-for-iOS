@@ -16,5 +16,7 @@ struct SettingsViewModelTests {
         #expect(model.selectedTheme == .ember)
         #expect(feature.preferredDifficulty == .gentle)
         #expect(feature.selectedTheme == .ember)
+        #expect(model.difficultyTitle(.challenge) == "Challenge")
+        #expect(model.themeTitle(.midnight) == "Midnight")
     }
 }

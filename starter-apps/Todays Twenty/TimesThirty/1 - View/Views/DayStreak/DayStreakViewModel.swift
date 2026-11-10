@@ -25,7 +25,7 @@ final class DayStreakViewModel {
             defer { refreshTask = nil }
             errorMessage = nil
             do { try await dayStreakFeature.refresh() }
-            catch { errorMessage = error.localizedDescription }
+            catch { errorMessage = "Your saved activity could not be loaded. Please try again." }
         }
         refreshTask = task
         return task

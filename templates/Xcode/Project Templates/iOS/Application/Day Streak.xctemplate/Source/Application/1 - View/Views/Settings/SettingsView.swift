@@ -13,7 +13,7 @@ struct SettingsView: View {
                         get: { viewModel.selectedTheme },
                         set: { viewModel.selectTheme($0) }
                     )) {
-                        ForEach(ThemeChoice.allCases) { Text($0.title).tag($0) }
+                        ForEach(ThemeChoice.allCases) { Text(viewModel.themeTitle($0)).tag($0) }
                     }.pickerStyle(.menu).frame(minHeight: 48)
                 } header: {
                     Text("Make it yours")
@@ -26,7 +26,7 @@ struct SettingsView: View {
                         get: { viewModel.preferredDifficulty },
                         set: { viewModel.selectDifficulty($0) }
                     )) {
-                        ForEach(Difficulty.allCases) { Text($0.title).tag($0) }
+                        ForEach(Difficulty.allCases) { Text(viewModel.difficultyTitle($0)).tag($0) }
                     }.pickerStyle(.menu).frame(minHeight: 48)
                 } header: {
                     Text("Your practice")

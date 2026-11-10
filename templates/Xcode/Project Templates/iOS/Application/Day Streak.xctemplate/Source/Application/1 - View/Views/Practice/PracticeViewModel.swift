@@ -36,6 +36,13 @@ final class PracticeViewModel {
     var streak: Int { dayStreakFeature.currentStreak }
     var week: [StreakDay] { dayStreakFeature.week }
     var preferredDifficulty: Difficulty { settingsFeature.preferredDifficulty }
+    func difficultyDescription(_ difficulty: Difficulty) -> String {
+        switch difficulty {
+        case .gentle: "2–5 times tables"
+        case .everyday: "2–12 times tables"
+        case .challenge: "6–19 times tables"
+        }
+    }
     func isCorrectAnswer(_ answer: Int, in question: MultiplicationQuestion) -> Bool {
         question.isResolved && answer == question.answer
     }
@@ -64,7 +71,7 @@ final class PracticeViewModel {
                 errorMessage = nil
             } catch {
                 retryCommand = .refresh
-                errorMessage = error.localizedDescription
+                errorMessage = "Your saved practice could not be loaded. Please try again."
             }
         }
         refreshTask = task
@@ -88,7 +95,7 @@ final class PracticeViewModel {
             errorMessage = nil
             retryCommand = command
             do { try await practiceFeature.perform(command) }
-            catch { errorMessage = error.localizedDescription }
+            catch { errorMessage = message(for: error, command: command) }
         }
         queuedCommandTask = task
         lastQueuedCommand = command
@@ -139,4 +146,19 @@ final class PracticeViewModel {
 
     @discardableResult
     func retry() -> Task<Void, Never> { perform(retryCommand) }
+
+    private func message(for error: any Error, command: PracticeFeature.Command) -> String {
+        if command == .refresh {
+            return "Your saved practice could not be loaded. Please try again."
+        }
+        guard let practiceError = error as? PracticeError else {
+            return "Your practice could not be saved. Please try again."
+        }
+        return switch practiceError {
+        case .unavailableSession: "This session is no longer available. Refresh to see today's practice."
+        case .staleQuestion: "The question has changed. Please answer the question now on screen."
+        case .difficultyLocked: "Difficulty is fixed after the first question."
+        case .unresolvedQuestion: "Find or reveal the correct answer before continuing."
+        }
+    }
 }

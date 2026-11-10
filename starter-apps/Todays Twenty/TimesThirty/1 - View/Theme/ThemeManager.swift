@@ -3,7 +3,6 @@ import SwiftUI
 import UIKit
 
 extension ThemeChoice {
-    var title: String { rawValue.capitalized }
     var colorScheme: ColorScheme? {
         switch self {
         case .automatic: nil
