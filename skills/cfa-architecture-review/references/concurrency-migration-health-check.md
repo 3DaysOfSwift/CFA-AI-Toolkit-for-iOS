@@ -511,6 +511,13 @@ For each relevant operation, inspect:
   and verify that the indicator remains active while the screen waits.
   Assess cancellation of that wait separately from ownership of a shared
   Feature refresh.
+- Time-dependent business decisions: in CFA, apply the
+  [injectable clock rule](spec/rules/cfa-time-01.md). Trace when the Feature
+  reads its clock and which calendar or time zone governs the decision.
+  Advance the controlled clock across the relevant boundary while keeping
+  the same Feature instance, then verify that its next decision uses the
+  new time. Review a visual countdown separately from business eligibility,
+  expiry or retry decisions.
 - Lifetime: navigation away, observation ending, sign-out and account changes.
   Work may intentionally outlive a screen; establish its owner and purpose.
 - Background work: trace registration, scheduling, system delivery and the

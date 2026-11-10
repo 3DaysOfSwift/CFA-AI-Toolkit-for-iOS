@@ -44,6 +44,13 @@ owns domain data and operation outcomes. Its screen ViewModel turns them into
 presentation-ready loading and error information. Verify the pending, failure
 and successful retry paths with previously loaded data.
 
+When a business decision depends on current time, apply the
+[injectable clock rule](references/spec/rules/cfa-time-01.md). Inject the
+clock or date function and read it when the Feature makes the decision.
+Keep business date comparisons in the Feature. Test relevant time zones
+and date boundaries, including a clock advance on the same Feature instance
+where it can remain active across the boundary.
+
 When adding or sharing a service, apply the
 [service placement rule](references/spec/rules/cfa-svc-01.md). Keep a
 domain-specific provider beside its Feature while that placement still
