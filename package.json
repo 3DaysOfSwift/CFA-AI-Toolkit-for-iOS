@@ -9,7 +9,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "node --test test/*.test.mjs tools/architecture-dashboard/test/*.test.mjs",
+    "test": "node --test test/*.test.mjs tools/architecture-dashboard/test/*.test.mjs tools/swift-syntax-prototype/test.mjs",
     "sync": "node scripts/sync.mjs",
     "validate": "node scripts/validate.mjs",
     "evals": "node scripts/run-evaluations.mjs",

@@ -37,6 +37,29 @@ test('command modules can be imported from Node standard input', () => {
  assert.equal(result.stdout,'');
 });
 
+test('source archives preserve documented shell-script execution', t => {
+ const directory=sandbox(t);
+ const script=path.join(directory,'run.sh');
+ const archive=path.join(directory,'source.zip');
+ fs.writeFileSync(script,'#!/bin/sh\n');
+ fs.chmodSync(script,0o755);
+ const python=`
+import importlib.util
+import pathlib
+import sys
+import zipfile
+spec = importlib.util.spec_from_file_location("cfa_release", sys.argv[1])
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+module.archive(pathlib.Path(sys.argv[2]), [("tools/run.sh", pathlib.Path(sys.argv[3]))], "pkg")
+with zipfile.ZipFile(sys.argv[2]) as value:
+    print(oct((value.getinfo("pkg/tools/run.sh").external_attr >> 16) & 0o777))
+`;
+ const result=spawnSync('python3',['-c',python,path.join(root,'scripts/release.py'),archive,script],{encoding:'utf8'});
+ assert.equal(result.status,0,result.stderr);
+ assert.equal(result.stdout.trim(),'0o755');
+});
+
 test('release validation keeps the public toolkit description aligned', t => {
  const {source}=release(t);
  const manifest=path.join(source,'.codex-plugin/plugin.json');

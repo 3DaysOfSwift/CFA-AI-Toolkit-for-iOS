@@ -24,7 +24,7 @@ def archive(output, pairs, prefix):
             entry = zipfile.ZipInfo(prefix + '/' + relative, (1980, 1, 1, 0, 0, 0))
             entry.compress_type = zipfile.ZIP_DEFLATED
             entry.create_system = 3
-            mode = 0o755 if relative.endswith('.command') else 0o644
+            mode = 0o755 if relative.endswith(('.command', '.sh')) else 0o644
             entry.external_attr = (0o100000 | mode) << 16
             z.writestr(entry, source.read_bytes())
 
@@ -41,7 +41,9 @@ def main():
     run = lambda *command: subprocess.run(command, cwd=ROOT, check=True)
     run(args.node, 'scripts/sync.mjs')
     run(args.node, 'scripts/validate.mjs')
-    tests = sorted(ROOT.glob('test/*.test.mjs')) + sorted(ROOT.glob('tools/architecture-dashboard/test/*.test.mjs'))
+    tests = (sorted(ROOT.glob('test/*.test.mjs'))
+             + sorted(ROOT.glob('tools/architecture-dashboard/test/*.test.mjs'))
+             + [ROOT / 'tools/swift-syntax-prototype/test.mjs'])
     run(args.node, '--test', *(str(test) for test in tests))
     manifest = json.loads((ROOT / '.codex-plugin/plugin.json').read_text())
     name, version = manifest['name'], manifest['version']
