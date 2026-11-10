@@ -791,6 +791,11 @@ export async function inspect(project) {
       const start = preview.index + preview[0].length;
       const previewBody = braceBody(source, start - 1);
       inspectEnvironmentProviders('This preview', previewBody, file, source, start);
+      const viewModelConstruction = [...previewBody.matchAll(/(?<![\w.])(?:\w+\s*\.\s*)*(\w+ViewModel)(?:\s*\.\s*init)?\s*\(/g)]
+        .find(match => !/\.\s*(?:environment|environmentObject)\s*\(\s*$/.test(previewBody.slice(0, match.index)));
+      if (viewModelConstruction) {
+        findings.push(finding('preview-view-model-construction', 'review', `This preview appears to construct ${viewModelConstruction[1]}. Verify that it constructs the screen directly and that the screen creates its own ViewModel.`, file, lineOf(source, start + viewModelConstruction.index)));
+      }
       const access = findFeatureAccess(previewBody);
       const composition = /\bAppModel\s*(?:\.\s*(?:live|init)\s*)?\(/.exec(previewBody);
       if (composition) {

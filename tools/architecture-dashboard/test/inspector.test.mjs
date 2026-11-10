@@ -1732,11 +1732,19 @@ test('reviews ViewModel injection in previews', async t => {
     #Preview { HomeView().environment(HomeViewModel()) }
     struct HomePreview: PreviewProvider {
       static var previews: some View { HomeView().environmentObject(HomeViewModel()) }
-    }`
+    }
+    #Preview { HomeView(viewModel: Example.HomeViewModel.init()) }
+    #Preview {
+      let model = HomeViewModel()
+      HomeView(viewModel: model)
+    }
+    #Preview { Text("HomeViewModel()") }`
   });
   const { findings } = await inspect(root);
   assert.deepEqual(findings.filter(item => item.code === 'view-model-environment-provider')
     .map(item => [item.file, item.line]), [[file, 2], [file, 4]]);
+  assert.deepEqual(findings.filter(item => item.code === 'preview-view-model-construction')
+    .map(item => [item.file, item.line]), [[file, 6], [file, 8]]);
 });
 
 test('reviews a preview passing the shared graph without accessing a Feature', async t => {
