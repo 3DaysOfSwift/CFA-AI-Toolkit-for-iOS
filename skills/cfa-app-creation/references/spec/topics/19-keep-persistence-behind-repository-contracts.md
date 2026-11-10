@@ -9,8 +9,14 @@ Repository implementations:
 - isolate external systems;
 - convert storage representations to and from domain values;
 - protect mutable state using actors or another explicit isolation mechanism;
-- define offline, retry, and synchronization behaviour;
+- implement storage-level retry and synchronization mechanics;
 - throw meaningful errors rather than silently inventing success.
+
+The Feature owns the application policy for offline use, retries and
+synchronization. For example, the repository reports whether a write
+succeeded. The Feature reports a failed write so the user can retry. If the
+product supports offline editing and the local write succeeds, the Feature
+can publish the edit as saved locally and pending server sync.
 
 For production SwiftData repositories with non-trivial reads, writes, imports,
 or data sets, use a dedicated `@ModelActor`. It owns its `ModelContext`; Features
