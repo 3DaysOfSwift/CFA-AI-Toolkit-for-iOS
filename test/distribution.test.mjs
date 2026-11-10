@@ -260,6 +260,13 @@ test('release validation rejects missing local HTML documentation assets', t => 
  assert.throws(()=>validate(source,{source:false}),/Broken local documentation reference: README\.md → readme-images\/3DaysOfSwiftConcurrency-h512\.png/);
 });
 
+test('release validation rejects broken local documentation anchors', t => {
+ const {source}=release(t);
+ const publishing=path.join(source,'docs/PUBLISHING.md');
+ fs.writeFileSync(publishing,fs.readFileSync(publishing,'utf8').replace('## Maintainer release procedure','## Release steps'));
+ assert.throws(()=>validate(source,{source:false}),/Broken local documentation anchor: docs\/VALIDATION\.md → PUBLISHING\.md#maintainer-release-procedure/);
+});
+
 test('every portable skill carries the shared workflow and separate design defaults', t => {
  const {dir,source}=release(t);
  const destination=path.join(dir,'customer');

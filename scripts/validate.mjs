@@ -13,6 +13,31 @@ const productIdentifier = 'ios-app-development-cfa';
 const publisherName = '3 Days of Swift Concurrency';
 const publisherURL = 'https://www.3daysofswiftconcurrency.com/';
 const repositoryURL = 'https://github.com/3DaysOfSwiftConcurrency/CFA-AI-Toolkit-for-iOS';
+function markdownAnchors(file) {
+  const anchors = new Set(), counts = new Map();
+  let fence;
+  for (const line of fs.readFileSync(file, 'utf8').split(/\r?\n/)) {
+    const delimiter = line.match(/^\s*(`{3,}|~{3,})/);
+    if (delimiter) {
+      if (!fence) fence = delimiter[1][0];
+      else if (delimiter[1][0] === fence) fence = undefined;
+      continue;
+    }
+    if (fence) continue;
+    const heading = line.match(/^ {0,3}#{1,6}\s+(.+?)\s*#*$/)?.[1];
+    if (!heading) continue;
+    const base = heading.toLowerCase().trim()
+      .replace(/<[^>]+>/g, '')
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      .replace(/[`*_~]/g, '')
+      .replace(/[^\p{L}\p{N}\s-]/gu, '')
+      .replace(/\s+/g, '-');
+    const duplicate = counts.get(base) ?? 0;
+    counts.set(base, duplicate + 1);
+    anchors.add(duplicate ? `${base}-${duplicate}` : base);
+  }
+  return anchors;
+}
 function validateSkillInterface(file, name) {
   const lines = fs.readFileSync(file, 'utf8').trimEnd().split(/\r?\n/);
   const required = ['display_name', 'short_description', 'default_prompt'];
@@ -273,6 +298,7 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
       return fs.existsSync(directory) ? files(directory).filter(file => file.endsWith('.md')).map(file => path.posix.join(folder, file)) : [];
     })
   ];
+  const anchorCache = new Map();
   for (const relative of markdownFiles) {
     const markdown = fs.readFileSync(path.join(base, relative), 'utf8');
     const localReferences = [
@@ -280,12 +306,24 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
       ...[...markdown.matchAll(/\b(?:src|href)=["']([^"']+)["']/gi)].map(match => match[1])
     ];
     for (const reference of localReferences) {
-      let link = reference.split('#')[0].trim().replace(/^<|>$/g, '');
-      if (!link || /^[a-z]+:/i.test(link)) continue;
-      try { link = decodeURIComponent(link); } catch { throw Error(`Invalid encoded Markdown link: ${relative} → ${link}`); }
-      const resolved = path.resolve(path.dirname(path.join(base, relative)), link);
+      const cleaned = reference.trim().replace(/^<|>$/g, '');
+      if (/^[a-z]+:/i.test(cleaned)) continue;
+      const [rawLink, rawFragment] = cleaned.split('#');
+      let link, fragment;
+      try {
+        link = decodeURIComponent(rawLink);
+        fragment = rawFragment === undefined ? undefined : decodeURIComponent(rawFragment);
+      } catch { throw Error(`Invalid encoded documentation reference: ${relative} → ${cleaned}`); }
+      const current = path.join(base, relative);
+      const resolved = link ? path.resolve(path.dirname(current), link) : current;
       if ((!resolved.startsWith(path.resolve(base) + path.sep) && resolved !== path.resolve(base)) || !fs.existsSync(resolved)) {
         throw Error(`Broken local documentation reference: ${relative} → ${link}`);
+      }
+      if (fragment && resolved.endsWith('.md')) {
+        if (!anchorCache.has(resolved)) anchorCache.set(resolved, markdownAnchors(resolved));
+        if (!anchorCache.get(resolved).has(fragment)) {
+          throw Error(`Broken local documentation anchor: ${relative} → ${cleaned}`);
+        }
       }
     }
   }
