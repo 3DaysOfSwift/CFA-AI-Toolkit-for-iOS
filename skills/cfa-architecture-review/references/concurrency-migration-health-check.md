@@ -90,8 +90,12 @@ results in the report, rather than presenting scanner counts as findings.
    Account for the Swift language mode, default isolation and SDK annotations,
    including inferred isolation and protocol requirements. For a CFA project,
    check that every Feature is MainActor-isolated, including Features without
-   a screen. Trace synchronous service work before and after suspension to
-   determine where expensive work executes. Treat missing configuration or
+   a screen. Trace synchronous work in Features, ViewModels and their
+   services before and after suspension. For example, a Feature can await a
+   download and then decode the response on MainActor. Identify the isolation
+   of the decoding call and the input it handles. Apply the
+   [isolation rule](spec/rules/cfa-conc-01.md) to expensive processing. Report a
+   source-supported risk separately from a measured UI delay. Treat missing configuration or
    unresolved dispatch as an evidence gap and keep CFA conformance separate
    from concurrency correctness. Trace values and closure captures across
    isolation boundaries. For a mutable reference declared `@unchecked Sendable`,
