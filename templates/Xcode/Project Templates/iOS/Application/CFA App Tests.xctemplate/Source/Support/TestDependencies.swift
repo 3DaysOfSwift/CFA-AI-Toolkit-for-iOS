@@ -2,9 +2,11 @@ import Foundation
 @testable import ___PROJECTNAME:identifier___
 
 actor TestGitReposProvider: GitReposProvider {
-    let result: [GitHubRepoResponse]
-    init(result: [GitHubRepoResponse] = []) { self.result = result }
-    func fetchRepos() -> [GitHubRepoResponse] { result }
+    let gitHubResponses: [GitHubRepoResponse]
+    init(gitHubResponses: [GitHubRepoResponse] = []) {
+        self.gitHubResponses = gitHubResponses
+    }
+    func fetchRepos() -> [GitHubRepoResponse] { gitHubResponses }
 }
 
 private enum TestNetworkError: Error { case unavailable }

@@ -46,14 +46,25 @@ test('template ViewModels receive typed app information instead of raw bundle me
   }
 });
 
-test('starter tests use responsibility-named system-under-test locals', () => {
-  const starterApps = path.join(root, 'starter-apps');
-  const testSources = fs.readdirSync(starterApps, { recursive: true, encoding: 'utf8' })
-    .filter(file => file.endsWith('Tests.swift'));
+test('maintained tests and examples use responsibility-named locals', () => {
+  const sourceRoots = [
+    ['starter-apps', file => file.endsWith('Tests.swift')],
+    ['templates/Xcode/Project Templates/iOS/Application/CFA App Tests.xctemplate/Source', file => file.endsWith('.swift')],
+    ['architecture/spec-examples', file => file.endsWith('.swift')],
+    ['examples/migration', file => file.endsWith('.swift')]
+  ];
 
-  for (const relative of testSources) {
-    const source = fs.readFileSync(path.join(starterApps, relative), 'utf8');
-    assert.doesNotMatch(source, /\b(?:let|var) (?:model|manager|results)\b/, relative);
+  for (const [relativeRoot, includes] of sourceRoots) {
+    const sourceRoot = path.join(root, relativeRoot);
+    const swiftSources = fs.readdirSync(sourceRoot, { recursive: true, encoding: 'utf8' }).filter(includes);
+    for (const relative of swiftSources) {
+      const source = fs.readFileSync(path.join(sourceRoot, relative), 'utf8');
+      assert.doesNotMatch(
+        source,
+        /\b(?:let|var) (?:model|manager|result|results|item)\b/,
+        `${relativeRoot}/${relative}`
+      );
+    }
   }
 });
 

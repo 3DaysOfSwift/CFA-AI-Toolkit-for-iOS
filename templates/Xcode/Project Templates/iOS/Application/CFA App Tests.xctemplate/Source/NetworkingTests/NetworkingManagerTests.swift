@@ -50,11 +50,11 @@ struct NetworkingManagerTests {
         configuration.protocolClasses = [OverlapURLProtocol.self]
         let session = URLSession(configuration: configuration)
         defer { session.invalidateAndCancel() }
-        let provider = await GitHubAPI(networkingManager: NetworkingManager(session: session))
+        let gitHubAPI = await GitHubAPI(networkingManager: NetworkingManager(session: session))
 
         // The fixture releases neither response until both calls reach it.
-        async let first = provider.fetchRepos()
-        async let second = provider.fetchRepos()
+        async let first = gitHubAPI.fetchRepos()
+        async let second = gitHubAPI.fetchRepos()
         let (firstRepos, secondRepos) = try await (first, second)
         #expect(firstRepos.map(\.id) == [1])
         #expect(secondRepos.map(\.id) == [1])
@@ -65,13 +65,13 @@ struct NetworkingManagerTests {
         configuration.protocolClasses = [OverlapURLProtocol.self]
         let session = URLSession(configuration: configuration)
         defer { session.invalidateAndCancel() }
-        let manager = NetworkingManager(session: session)
+        let networkingManager = NetworkingManager(session: session)
         let firstURL = try #require(URL(string: "https://example.test/first"))
         let secondURL = try #require(URL(string: "https://example.test/second"))
 
         // Neither response is released until both requests have reached the protocol.
-        async let first = manager.data(from: firstURL)
-        async let second = manager.data(from: secondURL)
+        async let first = networkingManager.data(from: firstURL)
+        async let second = networkingManager.data(from: secondURL)
         let (firstData, secondData) = try await (first, second)
         #expect(String(data: firstData, encoding: .utf8) == "/first")
         #expect(String(data: secondData, encoding: .utf8) == "/second")
@@ -82,11 +82,11 @@ struct NetworkingManagerTests {
         configuration.protocolClasses = [OverlapURLProtocol.self]
         let session = URLSession(configuration: configuration)
         defer { session.invalidateAndCancel() }
-        let manager = NetworkingManager(session: session)
+        let networkingManager = NetworkingManager(session: session)
         let goodURL = try #require(URL(string: "https://example.test/good"))
         let failureURL = try #require(URL(string: "https://example.test/failure"))
-        async let good = manager.data(from: goodURL)
-        async let failure = manager.data(from: failureURL)
+        async let good = networkingManager.data(from: goodURL)
+        async let failure = networkingManager.data(from: failureURL)
         #expect(try await String(data: good, encoding: .utf8) == "/good")
         do {
             _ = try await failure

@@ -8,36 +8,36 @@ struct AppModelTests {
         let name = "CFACompositionTests.\(UUID())"
         let defaults = try #require(UserDefaults(suiteName: name))
         defer { defaults.removePersistentDomain(forName: name) }
-        let repos = GitReposFeature(provider: TestGitReposProvider(), cache: TestRepoCache())
-        let settings = SettingsFeature(defaults: defaults)
-        let model = AppModel(gitReposFeature: repos, settingsFeature: settings)
-        #expect(model.gitReposFeature === repos)
-        #expect(model.settingsFeature === settings)
+        let gitReposFeature = GitReposFeature(provider: TestGitReposProvider(), cache: TestRepoCache())
+        let settingsFeature = SettingsFeature(defaults: defaults)
+        let appModel = AppModel(gitReposFeature: gitReposFeature, settingsFeature: settingsFeature)
+        #expect(appModel.gitReposFeature === gitReposFeature)
+        #expect(appModel.settingsFeature === settingsFeature)
     }
 
     @Test func repeatedLaunchStartsOneSharedRefresh() async throws {
         let name = "CFACompositionTests.\(UUID())"
         let defaults = try #require(UserDefaults(suiteName: name))
         defer { defaults.removePersistentDomain(forName: name) }
-        let provider = LaunchProvider()
-        let repos = GitReposFeature(provider: provider, cache: TestRepoCache())
-        let model = AppModel(gitReposFeature: repos,
-                             settingsFeature: SettingsFeature(defaults: defaults))
-        model.applicationDidFinishLaunching()
-        await provider.waitUntilStarted()
-        model.applicationDidFinishLaunching()
-        #expect(await provider.callCount == 1)
-        var joining = false
-        let waiter = Task { @MainActor in
-            joining = true
-            await repos.refresh()
+        let launchProvider = LaunchProvider()
+        let gitReposFeature = GitReposFeature(provider: launchProvider, cache: TestRepoCache())
+        let appModel = AppModel(gitReposFeature: gitReposFeature,
+                                settingsFeature: SettingsFeature(defaults: defaults))
+        appModel.applicationDidFinishLaunching()
+        await launchProvider.waitUntilStarted()
+        appModel.applicationDidFinishLaunching()
+        #expect(await launchProvider.callCount == 1)
+        var hasJoinedRefresh = false
+        let refreshWaiter = Task { @MainActor in
+            hasJoinedRefresh = true
+            await gitReposFeature.refresh()
         }
-        while !joining { await Task.yield() }
-        await provider.release()
-        await waiter.value
-        model.applicationDidFinishLaunching()
-        #expect(!repos.isRefreshing)
-        #expect(await provider.callCount == 1)
+        while !hasJoinedRefresh { await Task.yield() }
+        await launchProvider.release()
+        await refreshWaiter.value
+        appModel.applicationDidFinishLaunching()
+        #expect(!gitReposFeature.isRefreshing)
+        #expect(await launchProvider.callCount == 1)
     }
 
 }

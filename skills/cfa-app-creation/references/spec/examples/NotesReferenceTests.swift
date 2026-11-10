@@ -155,53 +155,53 @@ actor HeldNotesLoad: NotesRepository {
         let repository = ControlledNotes()
         let isolatedAppModel = AppModel(notesFeature: NotesFeature(repository: repository))
         let secondAppModel = AppModel(notesFeature: NotesFeature(repository: ControlledNotes()))
-        let feature = isolatedAppModel.notesFeature
-        let model = NotesEditorViewModel(notesFeature: feature)
-        model.text = "  "
-        let empty = await model.save().value
-        precondition(!empty && model.text == "  " && model.saveError == "Enter a note before saving.")
-        precondition(feature.notes.isEmpty)
-        model.text = "fail"
-        let failure = await model.save {
+        let notesFeature = isolatedAppModel.notesFeature
+        let viewModel = NotesEditorViewModel(notesFeature: notesFeature)
+        viewModel.text = "  "
+        let empty = await viewModel.save().value
+        precondition(!empty && viewModel.text == "  " && viewModel.saveError == "Enter a note before saving.")
+        precondition(notesFeature.notes.isEmpty)
+        viewModel.text = "fail"
+        let failure = await viewModel.save {
             preconditionFailure("A failed save must leave the editor open")
         }.value
-        precondition(!failure && model.text == "fail" && model.saveError != nil && feature.notes.isEmpty)
-        let cancelledSave = model.save {
+        precondition(!failure && viewModel.text == "fail" && viewModel.saveError != nil && notesFeature.notes.isEmpty)
+        let cancelledSave = viewModel.save {
             preconditionFailure("A cancelled save must leave the editor open")
         }
         cancelledSave.cancel()
         let savedAfterCancellation = await cancelledSave.value
-        precondition(!savedAfterCancellation && model.text == "fail")
-        precondition(model.saveError == nil && !model.isSaving && feature.notes.isEmpty)
+        precondition(!savedAfterCancellation && viewModel.text == "fail")
+        precondition(viewModel.saveError == nil && !viewModel.isSaving && notesFeature.notes.isEmpty)
 
-        model.text = "retry"
-        let success = await model.save().value
-        precondition(success && model.text.isEmpty && feature.notes.map(\.text) == ["retry"])
+        viewModel.text = "retry"
+        let success = await viewModel.save().value
+        precondition(success && viewModel.text.isEmpty && notesFeature.notes.map(\.text) == ["retry"])
         precondition(secondAppModel.notesFeature.notes.isEmpty, "An isolated AppModel owns a separate Feature graph")
-        let confirmedBeforeFailure = feature.notes
-        model.text = "fail"
-        let failedBeforeDiscard = await model.save().value
-        precondition(!failedBeforeDiscard && model.saveError != nil)
-        precondition(model.text == "fail", "The failed save keeps the draft available for retry")
-        precondition(feature.notes == confirmedBeforeFailure, "A failed save preserves confirmed notes")
-        model.discardDraft()
+        let confirmedBeforeFailure = notesFeature.notes
+        viewModel.text = "fail"
+        let failedBeforeDiscard = await viewModel.save().value
+        precondition(!failedBeforeDiscard && viewModel.saveError != nil)
+        precondition(viewModel.text == "fail", "The failed save keeps the draft available for retry")
+        precondition(notesFeature.notes == confirmedBeforeFailure, "A failed save preserves confirmed notes")
+        viewModel.discardDraft()
         let savedAfterDiscard = await repository.saved
-        precondition(model.text.isEmpty && model.saveError == nil)
-        precondition(savedAfterDiscard == ["retry"] && feature.notes.map(\.text) == savedAfterDiscard)
+        precondition(viewModel.text.isEmpty && viewModel.saveError == nil)
+        precondition(savedAfterDiscard == ["retry"] && notesFeature.notes.map(\.text) == savedAfterDiscard)
 
         // The task cannot enter save until this MainActor test suspends.
         let cancelledBeforeAdmission = Task { @MainActor in
-            try await feature.save("cancelled before admission")
+            try await notesFeature.save("cancelled before admission")
         }
         cancelledBeforeAdmission.cancel()
         do {
             try await cancelledBeforeAdmission.value
             preconditionFailure("A cancelled caller must not submit a new save")
         } catch is CancellationError {
-            precondition(feature.notes == confirmedBeforeFailure)
+            precondition(notesFeature.notes == confirmedBeforeFailure)
         }
 
-        let first = Task { try await feature.save("first") }
+        let first = Task { try await notesFeature.save("first") }
         await repository.waitForFirst()
         first.cancel() // A departing caller does not cancel the Feature-owned save.
         // Each MainActor task signals immediately before entering save. The
@@ -209,7 +209,7 @@ actor HeldNotesLoad: NotesRepository {
         let secondStarted = AsyncStream<Void>.makeStream()
         let second = Task { @MainActor in
             secondStarted.continuation.yield(())
-            try await feature.save("second")
+            try await notesFeature.save("second")
         }
         var secondSignal = secondStarted.stream.makeAsyncIterator()
         await secondSignal.next()
@@ -217,22 +217,22 @@ actor HeldNotesLoad: NotesRepository {
         let thirdStarted = AsyncStream<Void>.makeStream()
         let third = Task { @MainActor in
             thirdStarted.continuation.yield(())
-            try await feature.save("second")
+            try await notesFeature.save("second")
         }
         var thirdSignal = thirdStarted.stream.makeAsyncIterator()
         await thirdSignal.next()
         thirdStarted.continuation.finish()
         let before = await repository.saved
         precondition(before == ["retry"])
-        precondition(feature.notes.map(\.text) == before, "Publish only after the pending write succeeds")
-        let earlierSnapshot = feature.notes
+        precondition(notesFeature.notes.map(\.text) == before, "Publish only after the pending write succeeds")
+        let earlierSnapshot = notesFeature.notes
         await repository.release()
         try await first.value
         try await second.value
         try await third.value
         let saved = await repository.saved
         precondition(saved == ["retry", "first", "second", "second"])
-        precondition(feature.notes.map(\.text) == saved)
+        precondition(notesFeature.notes.map(\.text) == saved)
         precondition(earlierSnapshot == confirmedBeforeFailure, "A reader keeps its earlier snapshot after new saves")
 
         let repeatedTapRepository = ControlledNotes()
@@ -296,14 +296,14 @@ actor HeldNotesLoad: NotesRepository {
         precondition(failingFeature.notes.map(\.text) == savedAfterFailure)
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         defer { try? FileManager.default.removeItem(at: folder) }
-        let url = folder.appendingPathComponent("notes.json")
-        let disk = JSONNotesRepository(file: url)
-        let item = Note(id: UUID(), text: "Stored")
-        try await disk.save(item)
-        let restored = try JSONDecoder().decode([Note].self, from: Data(contentsOf: url))
-        precondition(restored == [item])
+        let notesFileURL = folder.appendingPathComponent("notes.json")
+        let diskRepository = JSONNotesRepository(file: notesFileURL)
+        let storedNote = Note(id: UUID(), text: "Stored")
+        try await diskRepository.save(storedNote)
+        let restored = try JSONDecoder().decode([Note].self, from: Data(contentsOf: notesFileURL))
+        precondition(restored == [storedNote])
 
-        let editingFeature = NotesFeature(repository: disk)
+        let editingFeature = NotesFeature(repository: diskRepository)
         do {
             // Model the sheet's Cancel path by ending the editor's lifetime.
             let editor = NotesEditorViewModel(notesFeature: editingFeature)
@@ -312,26 +312,26 @@ actor HeldNotesLoad: NotesRepository {
         }
         let replacementEditor = NotesEditorViewModel(notesFeature: editingFeature)
         precondition(replacementEditor.text.isEmpty)
-        precondition(editingFeature.notes == [item])
-        let storedAfterDiscard = try await disk.load()
-        precondition(storedAfterDiscard == [item])
+        precondition(editingFeature.notes == [storedNote])
+        let storedAfterDiscard = try await diskRepository.load()
+        precondition(storedAfterDiscard == [storedNote])
 
         let firstNote = Note(id: UUID(), text: "First concurrent save")
         let secondNote = Note(id: UUID(), text: "Second concurrent save")
-        async let saveFirst: Void = disk.save(firstNote)
-        async let saveSecond: Void = disk.save(secondNote)
+        async let saveFirst: Void = diskRepository.save(firstNote)
+        async let saveSecond: Void = diskRepository.save(secondNote)
         _ = try await (saveFirst, saveSecond)
-        let afterOverlap = try await JSONNotesRepository(file: url).load()
-        precondition(afterOverlap.first == item)
+        let afterOverlap = try await JSONNotesRepository(file: notesFileURL).load()
+        precondition(afterOverlap.first == storedNote)
         precondition(Set(afterOverlap.dropFirst().map(\.id)) == Set([firstNote.id, secondNote.id]))
         precondition(afterOverlap.count == 3)
         let corruptBytes = Data("Invalid JSON".utf8)
-        try corruptBytes.write(to: url, options: .atomic)
-        let corruptFeature = NotesFeature(repository: disk)
+        try corruptBytes.write(to: notesFileURL, options: .atomic)
+        let corruptFeature = NotesFeature(repository: diskRepository)
         let corruptEditor = NotesEditorViewModel(notesFeature: corruptFeature)
         corruptEditor.text = "Keep this draft"
         let corruptSave = await corruptEditor.save().value
-        let remainingBytes = try Data(contentsOf: url)
+        let remainingBytes = try Data(contentsOf: notesFileURL)
         precondition(!corruptSave && corruptEditor.saveError != nil)
         precondition(corruptEditor.text == "Keep this draft" && corruptFeature.notes.isEmpty)
         precondition(remainingBytes == corruptBytes, "A failed read must not overwrite saved bytes")
@@ -349,7 +349,7 @@ actor HeldNotesLoad: NotesRepository {
         precondition(savingEditor.text == "Save after restoration" && corruptFeature.notes.isEmpty)
 
         // Restore the known good file, then retry through the same screen and Feature.
-        try JSONEncoder().encode(afterOverlap).write(to: url, options: .atomic)
+        try JSONEncoder().encode(afterOverlap).write(to: notesFileURL, options: .atomic)
         await corruptEditor.retryLoad().value
         precondition(corruptEditor.loadError == nil && corruptFeature.notes == afterOverlap)
         precondition(corruptEditor.text == "Keep this draft")

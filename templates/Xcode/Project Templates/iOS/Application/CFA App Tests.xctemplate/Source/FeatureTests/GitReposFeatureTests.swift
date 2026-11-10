@@ -32,7 +32,7 @@ struct GitReposFeatureTests {
         let url = try #require(URL(string: "https://example.org/repo"))
         let response = GitHubRepoResponse(id: 42, fullName: "Example/Repo", repositoryURL: url,
                                           description: nil, stars: 3, updatedAt: .now)
-        let feature = GitReposFeature(provider: TestGitReposProvider(result: [response]), cache: TestRepoCache())
+        let feature = GitReposFeature(provider: TestGitReposProvider(gitHubResponses: [response]), cache: TestRepoCache())
         await feature.refresh()
         #expect(feature.repos.map(\.id) == [42])
         #expect(feature.repos.first?.summary == nil)
@@ -88,7 +88,7 @@ struct GitReposFeatureTests {
         let response = GitHubRepoResponse(id: 42, fullName: "Example/Repo", repositoryURL: url,
                                           description: nil, stars: 3, updatedAt: .now)
         let cache = FailingRepoCache()
-        let feature = GitReposFeature(provider: TestGitReposProvider(result: [response]), cache: cache)
+        let feature = GitReposFeature(provider: TestGitReposProvider(gitHubResponses: [response]), cache: cache)
         await feature.refresh()
         await cache.waitForAttempts()
         #expect(await cache.attempts == 2)

@@ -64,15 +64,15 @@ struct FixtureLaunchProvider: LaunchProviding {
 // MARK: - Behaviour check
 @MainActor
 func runExample() async {
-    let feature = LaunchFeature(provider: FixtureLaunchProvider())
-    precondition(feature.name == nil && !feature.isRefreshing && feature.refreshFailure == nil)
-    let loaded = await feature.refresh(available: true)
-    precondition(loaded && feature.name == "Artemis")
-    let failedRefreshSucceeded = await feature.refresh(available: false)
-    precondition(!failedRefreshSucceeded && !feature.isRefreshing)
-    precondition(feature.name == "Artemis" && feature.refreshFailure == .providerFailed)
-    let retried = await feature.refresh(available: true)
-    precondition(retried && feature.name == "Artemis" && feature.refreshFailure == nil)
+    let launchFeature = LaunchFeature(provider: FixtureLaunchProvider())
+    precondition(launchFeature.name == nil && !launchFeature.isRefreshing && launchFeature.refreshFailure == nil)
+    let loaded = await launchFeature.refresh(available: true)
+    precondition(loaded && launchFeature.name == "Artemis")
+    let failedRefreshSucceeded = await launchFeature.refresh(available: false)
+    precondition(!failedRefreshSucceeded && !launchFeature.isRefreshing)
+    precondition(launchFeature.name == "Artemis" && launchFeature.refreshFailure == .providerFailed)
+    let retried = await launchFeature.refresh(available: true)
+    precondition(retried && launchFeature.name == "Artemis" && launchFeature.refreshFailure == nil)
     print("Passed: MainActor publication, failure retention and retry.")
 }
 

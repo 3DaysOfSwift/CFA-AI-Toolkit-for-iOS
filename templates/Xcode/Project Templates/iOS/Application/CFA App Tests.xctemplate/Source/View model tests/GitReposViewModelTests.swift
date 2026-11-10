@@ -5,26 +5,26 @@ import Testing
 @Suite("Git repositories screen") @MainActor
 struct GitReposViewModelTests {
     @Test func missingDescriptionGetsPresentationFallback() throws {
-        let feature = GitReposFeature(provider: TestGitReposProvider(), cache: TestRepoCache())
-        let model = GitReposViewModel(gitReposFeature: feature)
-        let url = try #require(URL(string: "https://example.org/repo"))
-        let repo = Repo(id: 1, fullName: "Example/Repo", repositoryURL: url,
-                        summary: nil, stars: 0, updatedAt: .now)
-        #expect(model.summary(for: repo) == "No repository description.")
+        let gitReposFeature = GitReposFeature(provider: TestGitReposProvider(), cache: TestRepoCache())
+        let viewModel = GitReposViewModel(gitReposFeature: gitReposFeature)
+        let repositoryURL = try #require(URL(string: "https://example.org/repo"))
+        let repository = Repo(id: 1, fullName: "Example/Repo", repositoryURL: repositoryURL,
+                              summary: nil, stars: 0, updatedAt: .now)
+        #expect(viewModel.summary(for: repository) == "No repository description.")
     }
     @Test func refreshFinishesAndExposesFeatureState() async {
-        let feature = GitReposFeature(provider: TestGitReposProvider(), cache: TestRepoCache())
-        let model = GitReposViewModel(gitReposFeature: feature)
-        await model.refresh().value
-        #expect(model.repos.isEmpty)
-        #expect(!model.isRefreshing)
-        #expect(model.refreshFailureMessage == nil)
+        let gitReposFeature = GitReposFeature(provider: TestGitReposProvider(), cache: TestRepoCache())
+        let viewModel = GitReposViewModel(gitReposFeature: gitReposFeature)
+        await viewModel.refresh().value
+        #expect(viewModel.repos.isEmpty)
+        #expect(!viewModel.isRefreshing)
+        #expect(viewModel.refreshFailureMessage == nil)
     }
 
     @Test func refreshFailureHasReadableMessage() async {
-        let feature = GitReposFeature(provider: FailingGitReposProvider(), cache: TestRepoCache())
-        let model = GitReposViewModel(gitReposFeature: feature)
-        await model.refresh().value
-        #expect(model.refreshFailureMessage == "Could not refresh GitHub repositories. Please try again.")
+        let gitReposFeature = GitReposFeature(provider: FailingGitReposProvider(), cache: TestRepoCache())
+        let viewModel = GitReposViewModel(gitReposFeature: gitReposFeature)
+        await viewModel.refresh().value
+        #expect(viewModel.refreshFailureMessage == "Could not refresh GitHub repositories. Please try again.")
     }
 }

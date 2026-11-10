@@ -24,12 +24,12 @@ final class NotificationCount: @unchecked Sendable {
 // MARK: - Behaviour check
 @MainActor
 func runExample() {
-    let model = LegacyHabitModel()
-    let count = NotificationCount()
-    let subscription = model.objectWillChange.sink { count.record() }
-    model.recordCompletedDay()
-    model.recordCompletedDay()
-    precondition(model.completedDays == 2 && count.read() == 2)
+    let legacyHabitModel = LegacyHabitModel()
+    let notificationCount = NotificationCount()
+    let subscription = legacyHabitModel.objectWillChange.sink { notificationCount.record() }
+    legacyHabitModel.recordCompletedDay()
+    legacyHabitModel.recordCompletedDay()
+    precondition(legacyHabitModel.completedDays == 2 && notificationCount.read() == 2)
     withExtendedLifetime(subscription) {}
     print("Passed: Combine publishes both updates.")
 }
