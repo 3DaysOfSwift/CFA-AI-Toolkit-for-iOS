@@ -576,8 +576,11 @@ For each relevant operation, inspect:
   Work may intentionally outlive a screen; establish its owner and purpose.
 - Background work: trace registration, scheduling, system delivery and the
   owning operation separately. For BGTaskScheduler, verify that each identifier
-  is permitted and registered once before launch returns. In CFA, follow the
-  app-level callback through AppModel to the owning Feature. Verify that
+  is permitted and registered once before launch returns. Match the
+  identifiers in the affected target's built Info.plist to the registration
+  and submission call sites. Record a mismatch against the specific target
+  and configuration. In CFA, follow the app-level callback through AppModel
+  to the owning Feature. Verify that
   success, failure and expiration each complete the system callback exactly
   once, including when expiration races with completion. Trace cancellation
   from expiration to the work it owns. Check the system mechanism that permits
