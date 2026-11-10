@@ -66,6 +66,13 @@ direction. A stored Feature reference is a lead. Report an architecture
 violation only when the traced dependency conflicts with the rule, such as a
 cycle or duplicated ownership.
 
+When reviewing repeated constants, apply the
+[shared constants rule](references/spec/rules/cfa-const-01.md). Trace callers
+to confirm they share an app-wide concept before suggesting consolidation.
+Keep Feature-specific values with their owner and keep bundle identity and
+localized text in their authoritative resources. Flag embedded secrets
+without reproducing their values in the report.
+
 For shared microservices, apply the
 [service placement rule](references/spec/rules/cfa-svc-01.md). Trace the
 initializer injection and identify the common configuration or shared state
