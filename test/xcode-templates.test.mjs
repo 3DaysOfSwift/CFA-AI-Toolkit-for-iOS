@@ -436,7 +436,7 @@ test('CFA App includes a separate unit-test template component', {skip: process.
   const option = info.Options.find(item => item.Identifier === 'cfaUnitTests');
   assert.equal(option.Units.Include.Components[0].Identifier, testInfo.Identifier);
   assert.equal(info.Targets.length, 1);
-  assert.equal(testInfo.Targets[0].TargetIdentifierToBeTested, 'com.apple.dt.cocoaTouchApplicationTarget');
+  assert.equal(testInfo.Targets[0].TargetIdentifierToBeTested, 'com.apple.dt.applicationTarget');
   assert.ok(info.Nodes.every(node => !node.endsWith('Tests.swift')), 'Test files must not be included in the app component');
   for (const node of testInfo.Nodes) {
     assert.ok(!info.Nodes.includes(node), `Test component source must not be an app node: ${node}`);

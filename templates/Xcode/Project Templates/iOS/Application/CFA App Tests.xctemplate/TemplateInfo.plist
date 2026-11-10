@@ -73,7 +73,7 @@
 			<key>TargetIdentifier</key>
 			<string>com.apple.dt.applicationUnitTestBundleTarget</string>
 			<key>TargetIdentifierToBeTested</key>
-			<string>com.apple.dt.cocoaTouchApplicationTarget</string>
+			<string>com.apple.dt.applicationTarget</string>
 			<key>SharedSettings</key>
 			<dict>
 				<key>SWIFT_VERSION</key>
