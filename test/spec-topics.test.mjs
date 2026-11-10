@@ -185,6 +185,19 @@ test('navigation exposes the agreed account, refresh and multi-device boundaries
   assert.match(links, /successful navigation or explicit dismissal/);
 });
 
+test('complete review checklist names mandatory CFA invariants that broad labels could hide', () => {
+  const checklist = specTopics(root).get('topics/29-review-checklist.md');
+  for (const requirement of [
+    /`AppModel\.shared` a stored `static let` constructed by the single/,
+    /every request go through `NetworkingManager`/,
+    /every access go through `SwiftDataManager`/,
+    /without matching `FeatureAPI`\s+protocols/,
+    /confirmed domain data, operation state and retained errors represented\s+separately/,
+    /SwiftUI `App\.body` declare one stable root/,
+    /complete prohibited-pattern list reviewed/
+  ]) assert.match(checklist, requirement);
+});
+
 test('published app examples link to pinned source and relevant rule cards', () => {
   const topics = specTopics(root);
   const index = topics.get('examples/open-source-apps.md');
