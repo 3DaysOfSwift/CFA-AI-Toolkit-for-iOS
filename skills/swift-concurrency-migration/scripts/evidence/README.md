@@ -107,8 +107,11 @@ validator also rejects handoff evidence that names only unrelated targets.
 Use the case study's handoff table to compare each affected route at the
 baseline and final revisions. Check the receiving Feature's observable
 result and any applicable write-before-reload and failed-write behaviour.
-Record supported-device results separately from controlled tests. A passing
-build establishes compilation only. The linked final test run must name the targets it exercises. For test targets
+Compare handling of missing, unreadable, delayed and stale snapshots. If
+multiple targets can edit the same data, verify the product's conflict
+policy. Record actual delivery and the receiving Feature's update on
+supported devices separately from controlled tests. A passing build
+establishes compilation only. The linked final test run must name the targets it exercises. For test targets
 with separate names, record which affected app or extension targets they exercise.
 The validator cannot infer that relationship from test target names.
 

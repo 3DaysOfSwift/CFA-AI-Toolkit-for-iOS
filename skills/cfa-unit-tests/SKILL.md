@@ -136,9 +136,12 @@ For apps that exchange snapshots with a widget or another device target, apply
 the [multi-device rule](references/spec/rules/cfa-device-01.md). With controlled
 storage and a reload spy, verify that a successful widget snapshot write
 precedes the reload request and a failed write issues no reload request.
-For a receiving Feature, exercise missing, unreadable, delayed and stale
-snapshots according to the product's rules. Verify real WidgetKit or Watch
-Connectivity handoff separately on supported devices.
+Verify that an arriving snapshot updates the receiving Feature's observable
+state. Exercise missing, unreadable, delayed and stale snapshots according
+to the product's rules. When multiple targets can edit the same data, test
+their conflict policy. Verify the actual WidgetKit or Watch Connectivity
+handoff and the receiving Feature update on supported devices separately
+from controlled tests.
 
 For account changes, hold an old account's request open, switch accounts or
 sign out, then complete the old request. Verify that its data is never
