@@ -435,12 +435,17 @@ to the owning Feature when no relevant screen is visible. Record this lifecycle
 evidence separately from any startup timing measurement.
 
 Apply the [storage launch rule](spec/rules/cfa-launch-02.md) to CFA targets.
-Trace the first storage request and check that the root appears and unrelated
-navigation works while opening is pending and after it fails. Inspect root
-wrappers and blocking overlays as well as the delegate. Follow failure and
-retry through the affected Feature, ViewModel and screen, and verify that
-retry preserves existing data. Use controlled storage tests for these outcomes
-and record first-frame measurements separately.
+Trace the first Feature request to the storage owner. Check that composition
+leaves the store closed and that a file-backed store prepares its configured
+parent directory before opening. Hold the open pending and then fail it.
+Verify that the root remains visible and an unaffected destination remains
+accessible. Inspect root wrappers and blocking overlays as well as the delegate.
+Follow directory and open errors to the affected screen, then verify that
+retry issues the same domain request at the configured store location and
+preserves existing data. Separately, fail a fetch after a successful open.
+Verify that an initial fetch surfaces the failure, a failed refresh retains
+prior results, and retry reuses the working store. Record controlled tests,
+actual store and navigation checks, and first-frame measurements separately.
 
 Apply this review to CFA and non-CFA apps without requiring any particular
 architecture, AppModel name or launch delegate. First establish which work the
