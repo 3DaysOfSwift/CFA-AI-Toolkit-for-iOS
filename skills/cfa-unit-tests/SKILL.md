@@ -269,11 +269,13 @@ For system background work, apply the
 identifiers with the app’s permitted identifiers. Use a controlled scheduler
 to verify that repeated launch signals register each applicable handler once
 and that scheduling happens separately.
-Drive the handler through success, failure and expiration. Verify that the
-owning Feature cancels the work on expiration. Hold the work at completion
-and deliver expiration before releasing it. Verify that the race still
-completes the system callback exactly once. Confirm actual background
-execution on a supported device separately from the controlled tests.
+Drive success, failure and expiration in separate handler tests. In each
+case, assert that the system callback completes exactly once. Verify that
+expiration also cancels the work owned by the Feature. In a separate race
+test, hold normal completion pending, deliver expiration, then release the
+work and assert that the callback still completes exactly once. Confirm
+actual background execution on a supported device separately from these
+controlled tests.
 
 Give each production ViewModel a matching
 test file and test what its View can observe: loading/ready/error states,
