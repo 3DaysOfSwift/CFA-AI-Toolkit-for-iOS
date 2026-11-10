@@ -149,8 +149,12 @@ operation entry points and task sites, then use `node src/whole-app-health.mjs r
 <project-root> <review.json> <new-report.html> [app-icon.png]`. The report is
 generated after the current source and review evidence pass the coverage
 checks. If coverage is unresolved, the command lists the remaining checks in
-the terminal. To resume a batch, run
+the terminal. Prepare writes `review-draft.json` in the inventory directory.
+To resume a batch, pass that draft or its edited copy to
 `node src/whole-app-health.mjs next <project-root> <review.json>`.
+Prepare requires a new directory. If the existing directory has no draft,
+choose a new one. If the draft is malformed, correct it or restore a valid
+copy before resuming.
 Use `nextFiles`, `nextEntryPoints` and `nextTaskSites` to pick up the inventory.
 `nextFileReviews` and `nextTypes` include the recorded reasons and source
 locations for work already started. `nextOperations` identifies missing traces,
