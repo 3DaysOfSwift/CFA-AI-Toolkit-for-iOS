@@ -283,7 +283,7 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
           } else if (!item.targets.some(target => gate.affectedTargets.includes(target))) {
             errors.push(`completionGate.${field}: ${item.id} names only unrelated targets.`);
           }
-        } else if (['navigatorEvidenceId', 'manualArchitectureReviewEvidenceId'].includes(field)) {
+        } else if (['navigatorEvidenceId', 'finalCfaAuditEvidenceId', 'manualArchitectureReviewEvidenceId'].includes(field)) {
           const missing = gate.affectedTargets.filter(target => !item.targets?.includes(target));
           if (!item.targets?.length) {
             errors.push(`completionGate.${field}: ${item.id} must list the affected targets it reviews.`);

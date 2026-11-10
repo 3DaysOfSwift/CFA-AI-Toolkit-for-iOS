@@ -333,7 +333,7 @@ test('completion is not inferred from a build pass or tests at a different commi
     error.includes('evidence.after-widget-handoff: identify the producing and receiving targets')
   ));
 
-  for (const field of ['navigatorEvidenceId', 'manualArchitectureReviewEvidenceId']) {
+  for (const field of ['navigatorEvidenceId', 'finalCfaAuditEvidenceId', 'manualArchitectureReviewEvidenceId']) {
     const review = f.record.evidence.find(item => item.id === f.record.completionGate[field]);
     delete review.targets;
     f.write();

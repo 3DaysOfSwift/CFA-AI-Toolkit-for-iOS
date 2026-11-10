@@ -54,7 +54,8 @@ completion gate entry. Link the before/after
 navigator map from manual Xcode inspection, Feature and legacy primitive
 inventories, hybrid review, deployment compatibility, final CFA audit, build, tests, manual behaviour
 regression and human architecture review. List every affected target in the
-navigator inspection and human architecture review evidence. Record an executed test or manual observation at `repository.beforeCommit`
+navigator inspection, final CFA audit and human architecture review evidence.
+Record an executed test or manual observation at `repository.beforeCommit`
 for the behaviour baseline. If a manual baseline names targets, it must cover
 at least one affected target. Compare the same scenarios on each affected target that exposes them. The
 validator checks for baseline evidence. Verify scenario and target coverage
