@@ -173,7 +173,9 @@ generated. Automated source findings cover Swift. If the fingerprint differs, ru
 `prepare` into a new directory with the intended scope. Recheck changed
 source, target membership and task locations, then carry forward only
 judgments whose evidence still supports them. Keep the fresh draft's
-fingerprint and scan scope.
+fingerprint and scan scope. Keep the working inventory private because it
+contains source excerpts. The final Health Check HTML cites file and line
+ranges. Omit secret values from reviewer-authored text.
 
 The review's `presentation` requires `app`, `summary`, `verdict`, `conclusion`
 and a nonempty list of `criteria`. Use the verdict to describe the app’s

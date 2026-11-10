@@ -4,7 +4,7 @@ import path from 'node:path';
 import {createHash} from 'node:crypto';
 
 // Review judgments are authored; validation establishes provenance, not truth.
-export async function importReview(report,input,root) {
+export async function importReview(report,input,root,{includeExcerpts = true} = {}) {
   const text=v=>typeof v==='string' && v.trim().length>0;
   const fail=m=>{throw Error('Invalid architecture review: '+m)};
   if(input?.schemaVersion!==1 || input.sourceFingerprint!==report.sourceFingerprint) fail('schema or source fingerprint mismatch');
@@ -186,7 +186,8 @@ export async function importReview(report,input,root) {
     }
     const lines=cache.get(ref.file);
     if(!Number.isInteger(ref.line)||!Number.isInteger(ref.endLine)||ref.line<1||ref.endLine<ref.line||ref.endLine>lines.length) fail(`invalid evidence lines: ${ref.file}:${ref.line}–${ref.endLine}`);
-    ref.excerpt=lines.slice(ref.line-1,ref.endLine).join('\n');
+    if (includeExcerpts) ref.excerpt=lines.slice(ref.line-1,ref.endLine).join('\n');
+    else delete ref.excerpt;
   }
   return review;
 }

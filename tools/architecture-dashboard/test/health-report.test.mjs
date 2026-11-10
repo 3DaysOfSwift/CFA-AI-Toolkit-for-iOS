@@ -11,8 +11,10 @@ test('scores reviewed criteria and rejects unassessed or empty input', () => {
 });
 
 test('reports the verdict and escapes reviewer content', () => {
-  const html = renderHealthReport({app:'<App>', summary:'Summary', verdict:'Clear ownership', scope:'One path', conclusion:'Conclusion', criteria:[{title:'Ownership', detail:'Checked', status:'pass', verification:'Source inspection <only>'}]});
+  const html = renderHealthReport({app:'<App>', summary:'Summary', verdict:'Clear ownership', scope:'One path', conclusion:'Conclusion', criteria:[{title:'Ownership', detail:'Checked', status:'pass', verification:'Source inspection <only>', evidence:[{file:'Settings.swift',line:12,endLine:12,excerpt:'fixture-private-literal'}]}]});
   assert.match(html, /Verification: Source inspection &lt;only&gt;/);
+  assert.match(html, /Settings\.swift:12/);
+  assert.doesNotMatch(html, /fixture-private-literal/);
   assert.match(html, /100%/);
   assert.match(html, /Strong concurrency design/);
   assert.match(html, /Clear ownership/);

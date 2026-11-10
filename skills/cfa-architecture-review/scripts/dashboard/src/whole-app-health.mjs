@@ -404,7 +404,7 @@ async function loadCurrentReview(root, input, syntaxProvider) {
     }
   }
   const {report} = await currentInventory(root, syntaxProvider, {includeTests, expectedSourceFingerprint:raw.sourceFingerprint});
-  return {report, review:await importReview(report,raw,root)};
+  return {report, review:await importReview(report,raw,root,{includeExcerpts:false})};
 }
 
 function reportPresentationGap(review) {
