@@ -21,7 +21,7 @@ test('Day Streak native template matches the editable project', () => {
       `TimesThirty/1 - View/Views/${name}/${name}View.swift`,
       `TimesThirty/1 - View/Views/${name}/${name}ViewModel.swift`,
       `TimesThirtyTests/FeatureTests/${name}FeatureTests.swift`,
-      `TimesThirtyTests/ViewModelTests/${name}ViewModelTests.swift`
+      `TimesThirtyTests/View model tests/${name}ViewModelTests.swift`
     ]) assert.ok(fs.existsSync(path.join(project, relative)), relative);
   }
   assert.equal(info.Targets.length, 1);

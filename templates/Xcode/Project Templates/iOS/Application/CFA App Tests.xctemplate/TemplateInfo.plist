@@ -15,21 +15,21 @@
 	</array>
 	<key>Nodes</key>
 	<array>
-		<string>AppModelTests/AppModelTests.swift</string>
+		<string>AppModel tests/AppModelTests.swift</string>
 		<string>Support/TestDependencies.swift</string>
 		<string>FeatureTests/GitReposFeatureTests.swift</string>
 		<string>FeatureTests/SettingsFeatureTests.swift</string>
-		<string>ViewModelTests/GitReposViewModelTests.swift</string>
-		<string>ViewModelTests/SettingsViewModelTests.swift</string>
-		<string>ViewModelTests/RootTabViewModelTests.swift</string>
+		<string>View model tests/GitReposViewModelTests.swift</string>
+		<string>View model tests/SettingsViewModelTests.swift</string>
+		<string>View model tests/RootTabViewModelTests.swift</string>
 		<string>NetworkingTests/NetworkingManagerTests.swift</string>
 	</array>
 	<key>Definitions</key>
 	<dict>
-		<key>AppModelTests/AppModelTests.swift</key>
+		<key>AppModel tests/AppModelTests.swift</key>
 		<dict>
 			<key>Path</key>
-			<string>Source/AppModelTests/AppModelTests.swift</string>
+			<string>Source/AppModel tests/AppModelTests.swift</string>
 		</dict>
 		<key>Support/TestDependencies.swift</key>
 		<dict>
@@ -46,20 +46,20 @@
 			<key>Path</key>
 			<string>Source/FeatureTests/SettingsFeatureTests.swift</string>
 		</dict>
-		<key>ViewModelTests/GitReposViewModelTests.swift</key>
+		<key>View model tests/GitReposViewModelTests.swift</key>
 		<dict>
 			<key>Path</key>
-			<string>Source/ViewModelTests/GitReposViewModelTests.swift</string>
+			<string>Source/View model tests/GitReposViewModelTests.swift</string>
 		</dict>
-		<key>ViewModelTests/SettingsViewModelTests.swift</key>
+		<key>View model tests/SettingsViewModelTests.swift</key>
 		<dict>
 			<key>Path</key>
-			<string>Source/ViewModelTests/SettingsViewModelTests.swift</string>
+			<string>Source/View model tests/SettingsViewModelTests.swift</string>
 		</dict>
-		<key>ViewModelTests/RootTabViewModelTests.swift</key>
+		<key>View model tests/RootTabViewModelTests.swift</key>
 		<dict>
 			<key>Path</key>
-			<string>Source/ViewModelTests/RootTabViewModelTests.swift</string>
+			<string>Source/View model tests/RootTabViewModelTests.swift</string>
 		</dict>
 		<key>NetworkingTests/NetworkingManagerTests.swift</key>
 		<dict>

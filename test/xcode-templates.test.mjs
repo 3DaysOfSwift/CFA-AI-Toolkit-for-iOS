@@ -8,6 +8,26 @@ import { execFileSync, spawnSync } from 'node:child_process';
 const root = path.resolve(import.meta.dirname, '..');
 const names = ['CFA App', 'Habit Tracker', 'Day Streak'];
 
+test('starter projects and test templates use the canonical CFA test groups', () => {
+  const starterTestRoots = [
+    'starter-apps/Habit Tracker/HabitTrackerTemplateTests',
+    'starter-apps/Habit Tracker Pro/HabitTrackerProTests',
+    'starter-apps/Todays Twenty/TimesThirtyTests'
+  ];
+  const templateTestRoots = names.map(name =>
+    `templates/Xcode/Project Templates/iOS/Application/${name} Tests.xctemplate/Source`
+  );
+
+  for (const relative of [...starterTestRoots, ...templateTestRoots]) {
+    const testRoot = path.join(root, relative);
+    for (const group of ['View model tests', 'AppModel tests', 'FeatureTests']) {
+      assert.equal(fs.statSync(path.join(testRoot, group)).isDirectory(), true, `${relative}: ${group}`);
+    }
+    assert.equal(fs.existsSync(path.join(testRoot, 'ViewModelTests')), false, relative);
+    assert.equal(fs.existsSync(path.join(testRoot, 'AppModelTests')), false, relative);
+  }
+});
+
 test('template ViewModels receive typed app information instead of raw bundle metadata', () => {
   const application = path.join(root, 'templates/Xcode/Project Templates/iOS/Application');
   for (const name of names) {
@@ -699,7 +719,7 @@ test('CFA App includes a separate unit-test template component', {skip: process.
   for (const node of testInfo.Nodes) {
     assert.ok(!info.Nodes.includes(node), `Test component source must not be an app node: ${node}`);
   }
-  const testFiles = ['AppModelTests/AppModelTests.swift', 'FeatureTests/GitReposFeatureTests.swift', 'FeatureTests/SettingsFeatureTests.swift', 'NetworkingTests/NetworkingManagerTests.swift', 'ViewModelTests/GitReposViewModelTests.swift', 'ViewModelTests/SettingsViewModelTests.swift', 'ViewModelTests/RootTabViewModelTests.swift', 'Support/TestDependencies.swift'];
+  const testFiles = ['AppModel tests/AppModelTests.swift', 'FeatureTests/GitReposFeatureTests.swift', 'FeatureTests/SettingsFeatureTests.swift', 'NetworkingTests/NetworkingManagerTests.swift', 'View model tests/GitReposViewModelTests.swift', 'View model tests/SettingsViewModelTests.swift', 'View model tests/RootTabViewModelTests.swift', 'Support/TestDependencies.swift'];
   for (const file of testFiles) {
     assert.ok(testInfo.Nodes.includes(file), `Missing test source ${file}`);
     assert.ok(fs.existsSync(path.join(component, testInfo.Definitions[file].Path)));
