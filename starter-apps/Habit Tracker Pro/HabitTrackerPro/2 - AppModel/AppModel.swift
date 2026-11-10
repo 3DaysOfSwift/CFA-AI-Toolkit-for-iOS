@@ -11,6 +11,7 @@ final class AppModel {
     let purchasesFeature: PurchasesFeature
     let trendsFeature: TrendsFeature
     private var didFinishLaunching: Bool
+    private var transactionUpdatesTask: Task<Void, Never>?
 
     init(todayFeature: TodayFeature, habitsFeature: HabitsFeature, dayStreakFeature: DayStreakFeature,
          settingsFeature: SettingsFeature, purchasesFeature: PurchasesFeature, trendsFeature: TrendsFeature) {
@@ -21,6 +22,7 @@ final class AppModel {
         self.purchasesFeature = purchasesFeature
         self.trendsFeature = trendsFeature
         didFinishLaunching = false
+        transactionUpdatesTask = nil
     }
 
     static func live() -> AppModel {
@@ -37,9 +39,18 @@ final class AppModel {
         )
     }
 
+    deinit { transactionUpdatesTask?.cancel() }
+
     func applicationDidFinishLaunching() {
         guard !didFinishLaunching else { return }
         didFinishLaunching = true
+        let updates = purchasesFeature.transactionUpdates()
+        transactionUpdatesTask = Task { [purchasesFeature] in
+            for await _ in updates {
+                guard !Task.isCancelled else { break }
+                purchasesFeature.requestEntitlementRefresh()
+            }
+        }
         habitsFeature.startLoading()
         purchasesFeature.startLoading()
     }

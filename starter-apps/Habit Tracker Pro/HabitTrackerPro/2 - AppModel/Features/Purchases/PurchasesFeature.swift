@@ -25,14 +25,12 @@ final class PurchasesFeature {
 
     @ObservationIgnored private var startupTask: Task<Void, Never>?
     @ObservationIgnored private var offerTask: Task<Void, Never>?
-    @ObservationIgnored private var transactionUpdatesTask: Task<Void, Never>?
     @ObservationIgnored private var entitlementTask: Task<Void, Never>?
     @ObservationIgnored private var entitlementRefreshRequested = false
     private enum PurchaseAction { case purchase, restore }
     @ObservationIgnored private var lastAction: (id: UUID, kind: PurchaseAction, task: Task<Void, Never>)?
 
     func startLoading() {
-        startObservingTransactions()
         guard startupTask == nil else { return }
         startupTask = Task { [weak self] in
             await self?.prepare()
@@ -45,23 +43,13 @@ final class PurchasesFeature {
         await loadOffer()
     }
 
+    func transactionUpdates() -> AsyncStream<Void> { store.updates() }
+
     deinit {
         startupTask?.cancel()
         offerTask?.cancel()
-        transactionUpdatesTask?.cancel()
         entitlementTask?.cancel()
         lastAction?.task.cancel()
-    }
-
-    private func startObservingTransactions() {
-        guard transactionUpdatesTask == nil else { return }
-        let updates = store.updates()
-        transactionUpdatesTask = Task { [weak self] in
-            for await _ in updates {
-                guard !Task.isCancelled, let self else { break }
-                self.requestEntitlementRefresh()
-            }
-        }
     }
 
     func loadOffer() async {

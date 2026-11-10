@@ -157,7 +157,7 @@ test('Habit Tracker Pro keeps root and saved appearance state at CFA boundaries'
   assert.equal(fs.existsSync(path.join(source, '1 - View/Views/ContentView.swift')), false);
 });
 
-test('Habit Tracker Pro keeps StoreKit work and domain outcomes inside its purchase Feature', () => {
+test('Habit Tracker Pro keeps StoreKit outcomes in its Feature and the app-wide listener in AppModel', () => {
   const source = path.join(root, 'starter-apps/Habit Tracker Pro/HabitTrackerPro');
   const app = fs.readFileSync(path.join(source, '1 - View/App.swift'), 'utf8');
   const appModel = fs.readFileSync(path.join(source, '2 - AppModel/AppModel.swift'), 'utf8');
@@ -166,10 +166,13 @@ test('Habit Tracker Pro keeps StoreKit work and domain outcomes inside its purch
   const paywallViewModel = fs.readFileSync(path.join(source, '1 - View/Views/TrendsPaywall/TrendsPaywallViewModel.swift'), 'utf8');
 
   assert.doesNotMatch(app, /applicationDidBecomeActive[\s\S]*Task\s*\{/);
-  assert.doesNotMatch(appModel, /@Observable|transactionUpdatesTask|transactionUpdates\(\)/);
+  assert.doesNotMatch(appModel, /@Observable/);
+  assert.match(appModel, /private var transactionUpdatesTask: Task<Void, Never>\?/);
+  assert.match(appModel, /let updates = purchasesFeature\.transactionUpdates\(\)/);
+  assert.match(appModel, /transactionUpdatesTask = Task/);
   assert.match(appModel, /purchasesFeature\.requestEntitlementRefresh\(\)/);
-  assert.match(purchasesFeature, /private var transactionUpdatesTask: Task<Void, Never>\?/);
-  assert.match(purchasesFeature, /private func startObservingTransactions\(\)/);
+  assert.doesNotMatch(purchasesFeature, /transactionUpdatesTask/);
+  assert.match(purchasesFeature, /func transactionUpdates\(\) -> AsyncStream<Void>/);
   assert.match(purchasesFeature, /func requestEntitlementRefresh\(\)/);
   assert.match(purchasesFeature, /var error: \(any Error\)\?/);
   assert.doesNotMatch(purchasesFeature, /localizedDescription|errorMessage|"Your purchase|"No Trends/);
