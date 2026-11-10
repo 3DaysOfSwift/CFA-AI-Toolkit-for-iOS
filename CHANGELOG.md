@@ -16,6 +16,11 @@
   repository identity, changelog records and local documentation links.
 - Keep command modules safely importable, preserve portable macOS path handling
   and add release-package regressions for the corrected failure modes.
+- Include the source-only SwiftSyntax inventory in normal and release testing,
+  and preserve documented shell-script execution in generated source archives.
+- Keep the bundled dashboard package on the toolkit release version and validate
+  local Markdown links, HTML assets and heading anchors in source and plugin
+  documentation.
 
 ## 0.4.0 — 2026-11-01
 
