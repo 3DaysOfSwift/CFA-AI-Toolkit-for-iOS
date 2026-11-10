@@ -87,6 +87,15 @@ test('release validation keeps the public publisher and repository identity alig
  assert.throws(()=>validate(source,{source:false}),/Portable plugin manifest does not match Codex manifest/);
 });
 
+test('release validation keeps the dashboard package on the toolkit version', t => {
+ const {source}=release(t);
+ const manifest=path.join(source,'skills/cfa-architecture-review/scripts/dashboard/package.json');
+ const value=json(manifest);
+ value.version='0.3.3';
+ fs.writeFileSync(manifest,JSON.stringify(value));
+ assert.throws(()=>validate(source,{source:false}),/dashboard package identity does not match/);
+});
+
 test('release validation rejects stale skill and bundled-tool licences', t => {
  const {source}=release(t);
  const skillLicense=path.join(source,'skills/cfa-feature-work/LICENSE');

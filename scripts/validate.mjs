@@ -116,6 +116,7 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
   const portable=json(path.join(base,'plugin.json'));
   const packageFile=path.join(base,'package.json');
   const packageManifest=fs.existsSync(packageFile) ? json(packageFile) : undefined;
+  const dashboardManifest=json(path.join(base,'skills/cfa-architecture-review/scripts/dashboard/package.json'));
   if(portable.name!==manifest.name || portable.version!==manifest.version || portable.license!==manifest.license ||
       portable.author?.name!==publisherName || portable.author?.url!==publisherURL ||
       portable.homepage!==repositoryURL || portable.repository!==repositoryURL) {
@@ -125,6 +126,11 @@ export function validate(base=root,{source=true,checkXcodeProjects=true}={}) {
       (packageManifest && (packageManifest.name!==productIdentifier || packageManifest.version!==manifest.version ||
         packageManifest.license!==manifest.license || packageManifest.description!==productDescription))) {
     throw Error('Plugin and package identity must use the current CFA AI Toolkit for iOS metadata.');
+  }
+  if(dashboardManifest.name!=='cfa-architecture-dashboard' || dashboardManifest.version!==manifest.version ||
+      dashboardManifest.license!==manifest.license || dashboardManifest.engines?.node!=='>=20' ||
+      dashboardManifest.bin?.['swift-architecture']!=='./src/cli.mjs') {
+    throw Error('Bundled dashboard package identity does not match the toolkit release.');
   }
   if(source) {
     const sourceExamples = files(path.join(base,'examples/migration')).filter(isReleasePath).sort();
