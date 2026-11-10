@@ -13,7 +13,8 @@ test('generated template files import the frameworks used by their declarations'
   const expectations = new Map([
     ['Habit Tracker.xctemplate/Source/Application/1 - View/___PACKAGENAMEASIDENTIFIER___App.swift', ['SwiftUI', 'UIKit']],
     ['Day Streak.xctemplate/Source/Application/1 - View/___PACKAGENAMEASIDENTIFIER___App.swift', ['SwiftUI']],
-    ['Day Streak.xctemplate/Source/Application/1 - View/Theme/ThemeManager.swift', ['Observation', 'SwiftUI', 'UIKit']]
+    ['Day Streak.xctemplate/Source/Application/1 - View/Theme/ThemeManager.swift', ['Observation', 'SwiftUI', 'UIKit']],
+    ['Day Streak.xctemplate/Source/Application/1 - View/Views/Settings/SettingsViewModel.swift', ['Foundation', 'Observation']]
   ]);
   for (const [relative, modules] of expectations) {
     const source = fs.readFileSync(path.join(root, application, relative), 'utf8');

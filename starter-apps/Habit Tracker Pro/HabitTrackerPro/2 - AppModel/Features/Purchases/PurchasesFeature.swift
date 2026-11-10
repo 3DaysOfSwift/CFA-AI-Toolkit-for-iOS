@@ -80,7 +80,8 @@ final class PurchasesFeature {
         entitlementRefreshRequested = true
         guard entitlementTask == nil else { return }
         let task = Task { [weak self] in
-            await self?.drainEntitlementRefreshes()
+            guard let self else { return }
+            await self.drainEntitlementRefreshes()
         }
         entitlementTask = task
     }
