@@ -66,7 +66,7 @@ function memberSignatures(body) {
 
 function inspectSynchronousLaunchIO(name, file, source, opening, findings) {
   const body = memberSignatures(braceBody(source, opening));
-  for (const read of body.matchAll(/\b(?:(?:Data|String)\s*(?:\.\s*init\s*)?\(\s*contentsOf|FileHandle\s*(?:\.\s*init\s*)?\(\s*(?:forReadingFrom|forWritingTo|forUpdating|forReadingAtPath|forWritingAtPath|forUpdatingAtPath)|FileManager\s*\.\s*default\s*\.\s*contents\s*\(\s*atPath)\s*:/g)) {
+  for (const read of body.matchAll(/\b(?:(?:Data|String)\s*(?:\.\s*init\s*)?\(\s*contentsOf|FileHandle\s*(?:\.\s*init\s*)?\(\s*(?:forReadingFrom|forWritingTo|forUpdating|forReadingAtPath|forWritingAtPath|forUpdatingAtPath)|FileManager\s*\.\s*default\s*\.\s*(?:contents\s*\(\s*atPath|(?:createDirectory|removeItem|copyItem|moveItem|replaceItemAt|fileExists|attributesOfItem|contentsOfDirectory)\s*\(\s*(?:at|atPath)))\s*:/g)) {
     findings.push(finding('blocking-app-launch-io', 'review', `${name} appears to perform synchronous I/O. Verify the call and its input. CFA signals Features during launch and lets their asynchronous work complete independently.`, file, lineOf(source, opening + 1 + read.index)));
   }
 }

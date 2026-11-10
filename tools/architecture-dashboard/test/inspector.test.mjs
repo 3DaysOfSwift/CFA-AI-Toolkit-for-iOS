@@ -591,6 +591,22 @@ test('reviews synchronous launch reads without attributing Task work to the call
   assert.deepEqual(findings.map(item => [item.file, item.line, item.severity]), [[file, 3, 'review'], [file, 4, 'review']]);
 });
 
+test('reviews direct filesystem setup during startup, including qualified FileManager calls', async t => {
+  const file = 'Application/AppDelegate.swift';
+  const root = await fixture(t, {
+    [file]: `class AppDelegate {
+      func application(_ app: UIApplication, didFinishLaunchingWithOptions options: [String: Any]?) -> Bool {
+        try? Foundation.FileManager.default.createDirectory(at: cacheURL, withIntermediateDirectories: true)
+        _ = FileManager.default.fileExists(atPath: cachePath)
+        Task { try? FileManager.default.removeItem(at: cacheURL) }
+        return true
+      }
+    }`
+  });
+  const findings = (await inspect(root)).findings.filter(item => item.code === 'blocking-app-launch-io');
+  assert.deepEqual(findings.map(({file, line}) => [file, line]), [[file, 3], [file, 4]]);
+});
+
 test('reviews synchronous file opens before the launch callback returns', async t => {
   const file = 'Application/AppDelegate.swift';
   const root = await fixture(t, {
