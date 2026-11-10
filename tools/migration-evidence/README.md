@@ -102,11 +102,16 @@ build establishes compilation only. The linked final test run must name the targ
 with separate names, record which affected app or extension targets they exercise.
 The validator cannot infer that relationship from test target names.
 
-For each affected system background capability, link the owning Feature and
-evidence that permitted identifiers, launch registration and scheduling match
-the baseline. Record controlled success, failure, expiration and expiration
-racing completion. Verify cancellation and exactly-once system completion.
-Record actual delivery on supported hardware separately from handler tests.
+For each affected background capability, compare the permitted identifiers,
+synchronous launch registration and separate scheduling with the baseline.
+Verify that repeated startup does not duplicate registration. Trace the
+system callback through AppModel to the owning Feature and identify the
+system mechanism that permits background execution. Record controlled
+success, failure, expiration and expiration racing completion. Verify that
+expiration cancels owned work and each path completes the system callback
+exactly once. On supported hardware, record actual system delivery and the
+observed operation outcome separately from controlled handler tests. If
+device execution could not be verified, record that evidence gap.
 
 Read the warnings from both `validate` and `digest`. For a failed run during
 or after migration, keep the failure record and link a passing rerun at the
