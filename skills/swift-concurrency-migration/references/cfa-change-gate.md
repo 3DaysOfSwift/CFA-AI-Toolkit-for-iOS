@@ -351,8 +351,10 @@ operations enforce authorisation independently.
   Check that View and ViewModel initialization and View body construction
   avoid blocking I/O, slow work and asynchronous side effects. Keep screen
   and scene navigation selection in presentation. For a changed detail flow, open
-  distinct snapshots in two independently identified destinations. Refresh
-  the source list, including a response that omits a selected item, and
+  distinct snapshots in two independently identified destinations. Rebuild a
+  detail View with changed input and the same SwiftUI identity. Verify that
+  its existing ViewModel retains its selection. Refresh the source list,
+  including a response that omits a selected item, and
   verify both destinations stay open with their own selections. If a detail
   offers explicit refresh, verify it updates only that destination.
 - Allow reusable presentation components to receive action closures that

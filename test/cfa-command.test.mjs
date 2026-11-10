@@ -121,7 +121,8 @@ test('enable-project appends CFA guidance without overwriting existing instructi
   assert.match(content, /#Preview \{ NotesEditorView\(\) \}/);
   assert.match(content, /default Feature dependency comes\s+from AppModel\.shared/);
   assert.match(content, /Omission from a refreshed list does not establish deletion/);
-  assert.match(content, /leaves two independent detail destinations stable/);
+  assert.match(content, /same SwiftUI identity and verify that its existing\s+ViewModel retains its selection/);
+  assert.match(content, /including omission of an item, leaves two independent destinations open\s+with their selections intact/);
   assert.match(content, /A changed input does not\s+automatically replace its State-backed ViewModel/);
   assert.match(content, /genuinely shared across the app, define it once as a static\s+property on a purpose-named enum/);
   assert.match(content, /Start a new app without a constants enum until such a value is needed/);

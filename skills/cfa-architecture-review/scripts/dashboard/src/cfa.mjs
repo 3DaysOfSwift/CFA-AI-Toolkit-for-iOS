@@ -89,8 +89,12 @@ skill from that toolkit before changing the project.
   Omission from a refreshed list does not establish deletion. Prefer explicit
   refresh where it meets the product need. If several consumers need live
   updates for one item, prefer a focused Feature API by item identity and
-  define its lifetime and missing-item behaviour. Verify that refreshing the
-  source list leaves two independent detail destinations stable.
+  define its lifetime and missing-item behaviour. Rebuild a detail View with
+  changed input and the same SwiftUI identity and verify that its existing
+  ViewModel retains its selection. Verify that refreshing the source list,
+  including omission of an item, leaves two independent destinations open
+  with their selections intact. If the detail supports explicit refresh,
+  verify that it updates only that destination.
 - In a new app with deep links or notification actions, DeepLinkingFeature
   validates opening requests and owns the durable pending list shown in Settings.
   Save the safe data needed to identify and present each request before adding
