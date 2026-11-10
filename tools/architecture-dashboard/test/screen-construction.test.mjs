@@ -248,6 +248,42 @@ test('locates possible work started by the screen ViewModel initializer', async 
   assert.deepEqual(tasks.map(item => [item.file, item.line]), [[modelFile, 3]]);
 });
 
+test('reviews direct work started by screen and ViewModel initializers', async t => {
+  const modelFile = viewPath.replace('View.swift', 'ViewModel.swift');
+  const { report } = await inspectView(t, `struct HomeView: View {
+    @State private var viewModel = HomeViewModel()
+    init() {
+      refresh()
+    }
+    var body: some View { Text("Home") }
+  }`, {
+    [modelFile]: `final class HomeViewModel {
+      init() {
+        let cached = try? Data(contentsOf: cacheURL)
+      }
+    }`
+  });
+  const work = report.findings.filter(item => item.code === 'screen-initializer-work');
+  assert.deepEqual(work.map(item => [item.file, item.line, item.severity]), [
+    [viewPath, 4, 'review'],
+    [modelFile, 3, 'review']
+  ]);
+});
+
+test('does not treat an explicit work method declaration as initializer work', async t => {
+  const modelFile = viewPath.replace('View.swift', 'ViewModel.swift');
+  const { report } = await inspectView(t, `struct HomeView: View {
+    @State private var viewModel = HomeViewModel()
+    var body: some View { Text("Home") }
+  }`, {
+    [modelFile]: `final class HomeViewModel {
+      init() {}
+      func refresh() { startLoading() }
+    }`
+  });
+  assert.equal(report.findings.some(item => item.code === 'screen-initializer-work'), false);
+});
+
 test('maps a conventionally located screen with qualified View conformance', async t => {
   const {report} = await inspectView(t, `struct HomeView: SwiftUI.View {
     @State private var viewModel = HomeViewModel()

@@ -153,16 +153,21 @@ function* typeInitializers(body) {
   }
 }
 
-function inspectInitializerTask(name, initializer, source, start, file, findings) {
+function inspectInitializerWork(name, initializer, source, start, file, findings) {
   const task = initializer.initializerBody && /\bTask\s*(?:<[^{};]*>\s*)?(?:\.\s*(?:detached|init)\s*)?(?:\([^{}]*\)\s*)?\{/.exec(initializer.initializerBody);
   if (task) {
     findings.push(finding('screen-initializer-task', 'review', `${name}'s initializer contains a Task. Trace whether construction starts work or only defines a closure for later use.`, file, lineOf(source, start + initializer.bodyStart + task.index)));
+  }
+  if (!initializer.initializerBody) return;
+  const work = /\b(?:Data|String|NSString|NSData|NSDictionary)\s*\(\s*contentsOf\b|\bFileHandle\s*\(\s*for(?:Reading|Writing|Updating)From\b|\bFileManager\s*\.\s*default\s*\.\s*(?:contents|contentsOfDirectory|createFile|removeItem|copyItem|moveItem|replaceItem|attributesOfItem)\b|\bModel(?:Container|Context)\s*\(|(?<!\bfunc\s)(?<!\binit\s)(?:\b(?:self|super)\s*\.\s*|\b\w+\s*\.\s*)?\b(?:load|refresh|fetch|save|start|observe|listen|connect|open|request|synchronize|register)(?:[A-Z_]\w*)?\s*\(/.exec(initializer.initializerBody);
+  if (work) {
+    findings.push(finding('screen-initializer-work', 'review', `${name}'s initializer contains possible work-starting or blocking activity. CFA construction stays fast and starts work through an explicit method after initialization. Trace whether this expression executes during construction or only defines work for later use.`, file, lineOf(source, start + initializer.bodyStart + work.index)));
   }
 }
 
 function inspectScreenInputs(name, body, source, start, file, findings) {
   for (const initializer of typeInitializers(body)) {
-    inspectInitializerTask(name, initializer, source, start, file, findings);
+    inspectInitializerWork(name, initializer, source, start, file, findings);
     if (initializer.injectedViewModel) {
       findings.push(finding('screen-initializer-inputs', 'warning', `${name} appears to accept a ViewModel; CFA screens construct their own.`, file, lineOf(source, start + initializer.index)));
     }
@@ -975,7 +980,7 @@ export async function inspect(project) {
     ] : [];
     for (const location of dependencySources) {
       for (const initializer of typeInitializers(location.body)) {
-        inspectInitializerTask(viewModelName, initializer, location.source, location.offset, location.file, findings);
+        inspectInitializerWork(viewModelName, initializer, location.source, location.offset, location.file, findings);
         const services = [...new Set(initializer.types.filter(type => serviceTypeSuffix.test(type)))];
         if (services.length) {
           findings.push(finding('view-model-non-feature-dependency', 'review', `${viewModelName} accepts ${services.join(', ')} in its initializer. Verify that the ViewModel calls a Feature and that the Feature owns the service dependency.`, location.file, lineOf(location.source, location.offset + initializer.index)));
