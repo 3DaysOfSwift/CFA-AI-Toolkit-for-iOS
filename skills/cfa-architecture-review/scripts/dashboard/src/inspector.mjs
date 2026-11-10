@@ -64,8 +64,23 @@ function memberSignatures(body) {
   }).join('');
 }
 
+// Keep explicit error-handling blocks on the synchronous path. Leave local
+// functions and closures masked because their execution needs a call trace.
+function synchronousLaunchStatements(body) {
+  const topLevel = memberSignatures(body);
+  let result = topLevel;
+  for (const block of body.matchAll(/(?:^|[;{}\n])\s*(?<keyword>do|catch)\s*\{/g)) {
+    const opening = block.index + block[0].length - 1;
+    const keywordStart = block.index + block[0].indexOf(block.groups.keyword);
+    if (topLevel.slice(keywordStart, keywordStart + block.groups.keyword.length) !== block.groups.keyword) continue;
+    const nested = synchronousLaunchStatements(braceBody(body, opening));
+    result = result.slice(0, opening + 1) + nested + result.slice(opening + 1 + nested.length);
+  }
+  return result;
+}
+
 function inspectSynchronousLaunchIO(name, file, source, opening, findings) {
-  const body = memberSignatures(braceBody(source, opening));
+  const body = synchronousLaunchStatements(braceBody(source, opening));
   for (const read of body.matchAll(/\b(?:(?:Data|String)\s*(?:\.\s*init\s*)?\(\s*contentsOf|FileHandle\s*(?:\.\s*init\s*)?\(\s*(?:forReadingFrom|forWritingTo|forUpdating|forReadingAtPath|forWritingAtPath|forUpdatingAtPath)|FileManager\s*\.\s*default\s*\.\s*(?:contents\s*\(\s*atPath|(?:createDirectory|removeItem|copyItem|moveItem|replaceItemAt|fileExists|attributesOfItem|contentsOfDirectory)\s*\(\s*(?:at|atPath)))\s*:/g)) {
     findings.push(finding('blocking-app-launch-io', 'review', `${name} appears to perform synchronous I/O. Verify the call and its input. CFA signals Features during launch and lets their asynchronous work complete independently.`, file, lineOf(source, opening + 1 + read.index)));
   }
