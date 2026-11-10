@@ -68,14 +68,14 @@ create a separate coordinator or event infrastructure solely to relay this call.
 If the workflow grows into a distinct capability, reassess its boundary rather
 than assuming that a separate coordinating Feature is always required.
 When sign-out fails before the session ends, keep the user signed in and retain
-their account data; report the failure so they can retry. After successful
-sign-out, clear account-specific Feature state. If the authentication service
-can partially succeed before reporting an error, reconcile its actual session
-state rather than assuming either outcome.
+their account data and report the failure so they can retry. If authentication
+reports an error after a partial outcome, reconcile the actual session. Clear
+account-specific Feature state once the session has ended, including when the
+authentication operation also reports an error.
 
 When the app's sign-out contract promises a fresh-install experience, clear
-account-specific memory, caches and locally stored files as part of successful
-sign-out. Identify data that belongs to the account before deleting it; handle
+account-specific memory, caches and locally stored files once the session
+has ended. Identify data that belongs to the account before deleting it; handle
 unsynchronised user work transparently and do not treat independent purchases
 or user-owned documents as disposable account caches. Keep the signed-out
 experience and cleanup failures truthful.

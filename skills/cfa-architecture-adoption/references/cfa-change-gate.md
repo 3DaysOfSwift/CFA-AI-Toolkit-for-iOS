@@ -268,7 +268,7 @@ the architecture:
     persistent storage. Verify they cannot recreate cleared records or delete
     data saved by a newer session.
     If sign-out promises a fresh-install experience, clear account-specific
-    in-memory state, caches and local files after successful sign-out. Preserve
+    in-memory state, caches and local files once the session has ended. Preserve
     independent purchases and user-owned documents, and handle unsynchronised
     work according to the product contract.
 21. New-app visual starting points live in [new-app design defaults](new-app-design-defaults.md).
