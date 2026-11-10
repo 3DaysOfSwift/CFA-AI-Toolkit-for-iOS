@@ -126,8 +126,11 @@ skill from that toolkit before changing the project.
   bindings and action closures that forward intent to their owning screen and
   its ViewModel. For example, a RefreshButton can forward a tap to the
   owning screen's ViewModel. Verify that the component holds no ViewModel
-  and calls no Feature or service directly. Keep service closures and other
-  screens' ViewModel actions out of screen inputs.
+  and calls no Feature or service directly. A screen constructs its own
+  ViewModel and receives no AppModel, Feature, repository, service closure,
+  action from another ViewModel or navigation command owned by an ancestor
+  ViewModel. A detail screen
+  may receive the selected immutable value as described above.
 - Published domain snapshot structs use let properties and immutable contents.
   Check nested values and collection elements for references that can change
   in place. Publish a replacement snapshot after a confirmed change.
