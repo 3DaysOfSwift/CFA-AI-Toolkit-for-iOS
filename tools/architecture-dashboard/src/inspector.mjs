@@ -631,10 +631,10 @@ export async function inspect(project) {
       }
     }
     const requestCall = /\s*[?!]?\.\s*(?:data|bytes|download|upload|dataTask|dataTaskPublisher|downloadTask|uploadTask|webSocketTask|streamTask)\s*\(/;
-    const requestOnReceiver = new RegExp(String.raw`\b(?:(URLSession\s*\.\s*shared)|(\w+))${requestCall.source}`, 'g');
+    const requestOnReceiver = new RegExp(String.raw`\b(?:((?<!\.\s*)(?:Foundation(?:Networking)?\s*\.\s*)?URLSession\s*\.\s*shared)|(\w+))${requestCall.source}`, 'g');
     const directRequests = [...source.matchAll(requestOnReceiver)]
       .filter(match => (match[1] || sessionNames.has(match[2])) && outsideManager(match));
-    for (const constructor of source.matchAll(/\bURLSession\s*(?:\.\s*init\s*)?\(/g)) {
+    for (const constructor of source.matchAll(/\b(?<!\.\s*)(?:Foundation(?:Networking)?\s*\.\s*)?URLSession\s*(?:\.\s*init\s*)?\(/g)) {
       if (!outsideManager(constructor)) continue;
       const closing = closingParenthesis(source, constructor.index + constructor[0].length - 1);
       if (closing >= 0 && source.slice(closing + 1).search(requestCall) === 0) directRequests.push(constructor);

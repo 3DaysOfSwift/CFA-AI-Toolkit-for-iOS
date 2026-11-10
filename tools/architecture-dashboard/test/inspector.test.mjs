@@ -1036,10 +1036,14 @@ test('points to the URLSession request when the same file also configures a sess
       let session: URLSession = URLSession(configuration: .ephemeral)
       func load() async throws { _ = try await session.data(from: url) }
     }`,
+    'CustomProvider.swift': `struct CustomProvider {
+      func load() { _ = Fixtures . URLSession.shared.data(from: url) }
+      func retry() { _ = Fixtures.URLSession(configuration: config).data(from: url) }
+    }`,
     'ChainedProvider.swift': `struct ChainedProvider {
       let configured = URLSession(configuration: .ephemeral)
       func load() async throws {
-        _ = try await URLSession.init(configuration: makeConfiguration()).data(from: url)
+        _ = try await Foundation.URLSession.init(configuration: makeConfiguration()).data(from: url)
       }
     }`,
     'ConfiguredProvider.swift': `struct ConfiguredProvider {
@@ -1052,7 +1056,7 @@ test('points to the URLSession request when the same file also configures a sess
     }`,
     'SharedProvider.swift': `struct SharedProvider {
       let configured = URLSession(configuration: .ephemeral)
-      func load() async throws { _ = try await URLSession.shared.data(from: url) }
+      func load() async throws { _ = try await Foundation.URLSession.shared.data(from: url) }
       func retry() async throws { _ = try await configured.data(from: url) }
     }`
   });
@@ -1065,7 +1069,7 @@ test('flags SwiftData without a manager and direct URLSession calls', async t =>
   const root = await fixture(t, {
     'Application/2 - AppModel/AppModel.swift': 'final class AppModel { static func live() -> AppModel { AppModel() } }',
     'Application/2 - AppModel/Storage/HabitStore.swift': 'import SwiftData\nfinal class HabitStore {}',
-    'Application/2 - AppModel/Networking/GitHubAPI.swift': 'import Foundation\nfinal class GitHubAPI { func load() async throws { _ = try await URLSession.shared.data(from: url) } }'
+    'Application/2 - AppModel/Networking/GitHubAPI.swift': 'import Foundation\nfinal class GitHubAPI { func load() async throws { _ = try await Foundation.URLSession.shared.data(from: url) } }'
   });
   const findings = (await inspect(root)).findings;
   const codes = findings.map(item => item.code);
