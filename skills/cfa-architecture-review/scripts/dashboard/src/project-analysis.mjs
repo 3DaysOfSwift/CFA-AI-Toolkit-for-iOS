@@ -16,7 +16,14 @@ export async function collectProjectAnalysis(root, options = {}, providers = {})
   if (options.expectedSourceFingerprint !== undefined && before.sourceFingerprint !== options.expectedSourceFingerprint) {
     throw Error('Health Check source fingerprint mismatch. Prepare a fresh inventory and recheck changed evidence.');
   }
-  if (!before.files.length) throw Error('No Swift source files found.');
+  if (!before.files.length) {
+    const skipped = before.scope.skipped ?? [];
+    if (skipped.length) {
+      const details = skipped.map(({file, reason}) => `${file} (${reason})`);
+      throw Error(`No Swift source files could be scanned: ${details.join(', ')}.`);
+    }
+    throw Error('No Swift source files found.');
+  }
   const syntax = await (providers.syntax || collectSyntax)(root, {includeTests:options.includeTests});
   let compilerIndex = {status:'not-requested', calls:[], reason:'No compiler index and module were supplied.'};
   if (options.indexStore) {

@@ -10,6 +10,14 @@ import path from 'node:path';
 const inventory = () => ({sourceFingerprint:'abc',scope:{skipped:[]},files:[{path:'App.swift',hash:'hash'}],buildDefinitions:[{path:'App.entitlements',hash:'config-hash'}]});
 const syntax = async () => ({status:'available',files:['App.swift'],items:[{kind:'call.expression',name:'refresh',file:'App.swift',line:2}],warnings:[]});
 
+test('distinguishes an empty scan from one where every source was skipped', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cfa-empty-inventory-'));
+  t.after(() => fs.rm(root, {recursive:true, force:true}));
+  await assert.rejects(analyseProject(root), /No Swift source files found/);
+  await fs.writeFile(path.join(root, 'Invalid.swift'), Buffer.from([0xff]));
+  await assert.rejects(analyseProject(root), /No Swift source files could be scanned: Invalid\.swift \(Source is not valid UTF-8\)/);
+});
+
 test('compiled SwiftSyntax scanner inventories startup candidates', {
   skip: process.platform !== 'darwin', timeout: 150_000
 }, async t => {

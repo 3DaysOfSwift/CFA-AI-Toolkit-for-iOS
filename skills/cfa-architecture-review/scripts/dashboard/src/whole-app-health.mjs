@@ -299,7 +299,6 @@ async function currentInventory(root, syntaxProvider = collectSyntax, options = 
 }
 export async function prepare(root, output, syntaxProvider = collectSyntax, options = {}) {
   const {report,analysis} = await currentInventory(root, syntaxProvider, options);
-  if (!report.files.length) throw Error('No Swift source files found.');
   await fs.mkdir(output, {recursive:false});
   await fs.writeFile(path.join(output,'inventory.json'), JSON.stringify(report,null,2)+'\n', {flag:'wx'});
   await fs.writeFile(path.join(output,'project-analysis.json'), JSON.stringify(analysis,null,2)+'\n', {flag:'wx'});
