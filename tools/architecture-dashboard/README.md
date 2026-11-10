@@ -172,7 +172,8 @@ The scanner cannot establish target membership or discover every event by itself
 
 `next`, `progress` and `report` recheck the current project against the
 fingerprint from `prepare`. Changes to scanned Swift files, Objective-C or C-family sources and headers,
-module maps, or local build definitions can invalidate the draft. Native files
+module maps, or local project configuration such as Xcode test plans, StoreKit
+test configuration and privacy manifests can invalidate the draft. Native files
 appear in the checklist and require source review before the report can be
 generated. Automated source findings cover Swift. If the fingerprint differs, run
 `prepare` into a new directory with the intended scope. Recheck changed
