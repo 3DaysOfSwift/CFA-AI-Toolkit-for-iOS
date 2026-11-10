@@ -198,7 +198,8 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
     }
     const affectedTargets = new Set(record.completionGate?.affectedTargets ?? []);
     const hasBehaviourBaseline = record.repository.beforeCommit && record.evidence.some(item => {
-      if (item.phase !== 'before' || item.commit !== record.repository.beforeCommit || !item.targets?.length) return false;
+      if (item.phase !== 'before' || item.commit !== record.repository.beforeCommit || !item.targets?.length ||
+          item.id === record.completionGate?.baselineNavigatorEvidenceId) return false;
       // A test target can have a different name from the app it exercises.
       if (item.kind === 'test') return ['passed', 'failed'].includes(item.outcome);
       return item.kind === 'manual' && item.outcome !== 'not-run' &&
@@ -243,6 +244,17 @@ export function inspectRecord(recordFile, { publish = false, checkDigest = true 
       ).flatMap(item => item.targets ?? []));
       for (const target of gate.affectedTargets) {
         if (!builtTargets.has(target)) errors.push(`completionGate.affectedTargets: missing passed build at afterCommit for ${target}`);
+      }
+      const baselineNavigator = record.evidence.find(item => item.id === gate.baselineNavigatorEvidenceId);
+      if (!baselineNavigator || baselineNavigator.kind !== 'manual' || baselineNavigator.phase !== 'before' ||
+          !['observed', 'passed'].includes(baselineNavigator.outcome) ||
+          !record.repository.beforeCommit || baselineNavigator.commit !== record.repository.beforeCommit) {
+        errors.push('completionGate.baselineNavigatorEvidenceId: link an observed or passed manual navigator inspection at beforeCommit.');
+      } else {
+        const missing = gate.affectedTargets.filter(target => !baselineNavigator.targets?.includes(target));
+        if (missing.length) {
+          errors.push(`completionGate.baselineNavigatorEvidenceId: ${baselineNavigator.id} omits affected targets: ${missing.join(', ')}.`);
+        }
       }
       const requiredEvidence = [
         ['navigatorEvidenceId', ['manual']],

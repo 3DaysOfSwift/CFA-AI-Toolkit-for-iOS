@@ -95,6 +95,7 @@
       "properties": {
         "affectedTargets": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/targetName"}},
         "dataHandoffEvidenceIds": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/identifier"}},
+        "baselineNavigatorEvidenceId": {"$ref": "#/$defs/identifier"},
         "navigatorEvidenceId": {"$ref": "#/$defs/identifier"},
         "featureInventoryEvidenceId": {"$ref": "#/$defs/identifier"},
         "primitiveInventoryEvidenceId": {"$ref": "#/$defs/identifier"},

@@ -82,6 +82,9 @@ affected target in `completionGate.affectedTargets` and name the targets
 covered by each build and the linked final test run in their `targets` arrays.
 List every affected target in the navigator inspection, Feature and primitive inventories,
 hybrid review, final CFA audit and human architecture review evidence.
+Link the manual navigator inspections through `baselineNavigatorEvidenceId`
+at `beforeCommit` and `navigatorEvidenceId` at `afterCommit`. The baseline
+may be an observation and must cover every affected target.
 If test targets have separate names, explain which app or extension targets
 they exercise. Include affected extensions and
 device targets, and link each changed data handoff in

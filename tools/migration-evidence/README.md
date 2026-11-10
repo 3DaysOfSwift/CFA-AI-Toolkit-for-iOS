@@ -56,6 +56,9 @@ inventories, hybrid review, deployment compatibility, final CFA audit, build, te
 regression and human architecture review. List every affected target in the
 navigator inspection, Feature and primitive inventories, hybrid review, final
 CFA audit and human architecture review evidence.
+Link the manual navigator inspections through `baselineNavigatorEvidenceId`
+at `beforeCommit` and `navigatorEvidenceId` at `afterCommit`. The baseline
+may be an observation and must cover every affected target.
 Record an executed test or manual observation at `repository.beforeCommit`
 for the behaviour baseline and name the targets exercised. A manual baseline
 must cover at least one affected target. For separately named test targets,

@@ -233,6 +233,28 @@ test('completion is not inferred from a build pass or tests at a different commi
   testEvidence.targets.push('App');
   f.write();
   assert.ok(!inspectRecord(f.file).warnings.some(warning => warning.includes(testTargetWarning)));
+  const baselineNavigator = {
+    ...baseline, id: 'before-navigator', targets: ['App']
+  };
+  f.record.evidence.push(baselineNavigator);
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.includes('link an observed or passed manual navigator inspection')));
+  f.record.completionGate.baselineNavigatorEvidenceId = baselineNavigator.id;
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.includes('before-navigator omits affected targets: Widget')));
+  baselineNavigator.targets.push('Widget');
+  baselineNavigator.commit = f.record.repository.afterCommit;
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.includes('link an observed or passed manual navigator inspection')));
+  baselineNavigator.commit = f.record.repository.beforeCommit;
+  f.write();
+  assert.ok(!inspectRecord(f.file).errors.some(error => error.startsWith('completionGate.baselineNavigatorEvidenceId')));
+
+  baseline.outcome = 'not-run';
+  f.write();
+  assert.ok(inspectRecord(f.file).errors.some(error => error.includes('requires recorded before behaviour evidence')));
+  baseline.outcome = 'observed';
+
   const navigator = f.record.evidence.find(item => item.id === 'after-navigator');
   navigator.kind = 'diff';
   f.write();
