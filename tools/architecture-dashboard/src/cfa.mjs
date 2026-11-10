@@ -427,8 +427,13 @@ skill from that toolkit before changing the project.
   Audit the agreed migration scope against CFA, correct in-scope discrepancies
   and rerun affected builds and tests after corrections.
   Apply the installed CFA change gate before claiming migration completion.
-  Compare each affected target's behaviour with the baseline. Pin the builds,
-  tests and manual regression evidence to the final commit. Record the human
+  Compare each affected target's behaviour with the baseline. Record each
+  target's minimum OS and verify changed paths at that minimum. Check API
+  availability separately from Swift language mode. Preserve deployment
+  support unless the developer approves a change. Pin the builds, tests
+  and manual regression evidence to the final commit. Keep failed checks
+  in the evidence and link a passing final-commit rerun of the same scenario,
+  target, build configuration and OS. Record the human
   architecture review of the final Xcode navigator and ownership structure.
   Keep the migration open while required evidence is missing.
 - Inject a clock or date function when a business rule depends on current
