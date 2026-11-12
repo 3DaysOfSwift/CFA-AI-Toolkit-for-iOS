@@ -1298,6 +1298,12 @@ policy. Do not create a new wrapper
 task for every tap just to wait, or silently return from an async operation
 while its requested work is still unfinished.
 
+When keyed handles are needed, use a domain identifier, command enum or small
+`Hashable` command value. Do not key task maps with interpolated `String`
+labels: a spelling change silently changes the sharing policy. A View button
+for Feature work calls its ViewModel's synchronous intent method; it does not
+create an unretained `Task { }` merely to await that method.
+
 Install the handle before the first suspension. The following main-actor
 ViewModel example returns the same handle for repeated refresh requests:
 
@@ -1359,6 +1365,10 @@ its policy at the Feature boundary:
   suspension points, before starting the next admitted command. Each caller
   awaits its own outcome. Define cancellation, failure and cleanup so no waiter
   is lost and a failed command does not accidentally strand later commands.
+  Admit a mutation before it validates mutable Feature state. A duplicate
+  check and the resulting persistence therefore occur within the same admitted
+  operation; an `await` between an outside-the-queue check and save is a
+  time-of-check/time-of-use defect.
 
 These are the default policies. Reject-while-busy, latest-request-wins or
 independent execution needs a documented product reason. Never discard a new
@@ -1752,6 +1762,9 @@ Rules for tests:
   admission order with individual outcomes, even when their inputs match.
   Cover failure/cancellation cleanup and successful later retry;
 - clocks, repositories, and external clients use deterministic test doubles;
+- tests use controlled continuations or injected clocks with bounded waits;
+  they do not measure wall-clock duration, sleep arbitrarily, or spin on
+  `Task.yield()` waiting for scheduler luck;
 - tests describe observable behaviour, not private implementation details.
 - tests that need AppModel assemble an isolated graph and never alter the shared
   production instance;

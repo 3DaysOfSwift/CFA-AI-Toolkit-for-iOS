@@ -28,6 +28,9 @@ Rules for tests:
   admission order with individual outcomes, even when their inputs match.
   Cover failure/cancellation cleanup and successful later retry;
 - clocks, repositories, and external clients use deterministic test doubles;
+- tests use controlled continuations or injected clocks with bounded waits;
+  they do not measure wall-clock duration, sleep arbitrarily, or spin on
+  `Task.yield()` waiting for scheduler luck;
 - tests describe observable behaviour, not private implementation details.
 - tests that need AppModel assemble an isolated graph and never alter the shared
   production instance;
