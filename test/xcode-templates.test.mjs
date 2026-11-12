@@ -8,6 +8,13 @@ import { execFileSync, spawnSync } from 'node:child_process';
 const root = path.resolve(import.meta.dirname, '..');
 const names = ['CFA App', 'Habit Tracker', 'Day Streak'];
 
+test('Git Repos is an openable remote-list starter, not a project template', () => {
+  const starter = path.join(root, 'starter-apps', 'Git Repos');
+  assert.equal(fs.existsSync(path.join(starter, 'GitRepos.xcodeproj', 'project.pbxproj')), true);
+  assert.equal(fs.existsSync(path.join(starter, 'GitRepos', '2 - AppModel', 'Features', 'Git Repos', 'GitReposFeature.swift')), true);
+  assert.equal(fs.existsSync(path.join(starter, 'GitReposTests', 'FeatureTests', 'GitReposFeatureTests.swift')), true);
+});
+
 test('headless project creator retargets an Xcode project with strict concurrency', t => {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'cfa-created-project-'));
   const output = path.join(directory, 'ReadingList');
