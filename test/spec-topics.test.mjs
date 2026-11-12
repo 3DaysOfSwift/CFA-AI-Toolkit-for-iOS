@@ -8,6 +8,12 @@ import { specTopics } from '../scripts/spec-topics.mjs';
 import { root, cfaSkills } from '../scripts/sync.mjs';
 import { lookup } from '../tools/explanations/explanations.mjs';
 
+test('specification generation validates explanations from the canonical tool', () => {
+  const generator = fs.readFileSync(path.join(root, 'scripts/spec-topics.mjs'), 'utf8');
+  assert.match(generator, /from '\.\.\/tools\/explanations\/explanations\.mjs'/);
+  assert.doesNotMatch(generator, /from '\.\.\/skills\//);
+});
+
 test('topic reading edition retains every canonical section and is bundled consistently', () => {
   const expected = specTopics(root);
   const canonical = fs.readFileSync(path.join(root, 'architecture/cfa-specification.md'), 'utf8');
@@ -16,6 +22,29 @@ test('topic reading edition retains every canonical section and is bundled consi
   for (const folder of ['architecture/spec', ...cfaSkills.map(name => `skills/${name}/references/spec`)]) {
     for (const [name, value] of expected) assert.equal(fs.readFileSync(path.join(root, folder, name), 'utf8'), value, `${folder}/${name}`);
   }
+});
+
+test('AppInformation is an optional typed presentation boundary', () => {
+  const specification = fs.readFileSync(path.join(root, 'architecture/cfa-specification.md'), 'utf8');
+  const changeGate = fs.readFileSync(path.join(root, 'architecture/cfa-change-gate.md'), 'utf8');
+  const codingGuide = fs.readFileSync(path.join(root, 'architecture/swift-coding-guide.md'), 'utf8');
+
+  assert.match(specification, /AppInformation\.swift \(when app identity is presented\)/);
+  assert.match(specification, /`AppInformation\.swift` is optional/);
+  assert.match(specification, /Apps that do not present this metadata do not add the\s+type/);
+  assert.match(changeGate, /adjacent typed presentation value such as `AppInformation`/);
+  assert.doesNotMatch(changeGate, /Bundle\/system reads and presentation formatting\s+belong to the adjacent ViewModel/);
+  assert.match(codingGuide, /normalize it in\s+an adjacent typed presentation value such as `AppInformation`/);
+});
+
+test('public architecture map includes the mandatory Settings boundary', () => {
+  const readme = fs.readFileSync(path.join(root, 'README.md'), 'utf8');
+  const folderMap = /Here is an illustrative CFA folder map[\s\S]*?```text\n([\s\S]*?)```/.exec(readme)?.[1];
+
+  assert.ok(folderMap, 'README CFA folder map');
+  assert.match(folderMap, /SettingsView\.swift/);
+  assert.match(folderMap, /SettingsViewModel\.swift/);
+  assert.match(folderMap, /SettingsFeature\.swift/);
 });
 
 test('headings inside fenced examples remain part of their section', () => {
@@ -59,7 +88,7 @@ test('deep-link example persists a deferred request and completes after navigati
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'cfa-spec-example-'));
   try {
     const executable = path.join(directory, 'example');
-    const build = spawnSync('xcrun', ['swiftc', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(directory, 'cache'), path.join(root, 'architecture/spec-examples/DeepLinkingExample.swift'), '-o', executable], { encoding: 'utf8', timeout: 90000 });
+    const build = spawnSync('xcrun', ['swiftc', '-disable-sandbox', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(directory, 'cache'), path.join(root, 'architecture/spec-examples/DeepLinkingExample.swift'), '-o', executable], { encoding: 'utf8', timeout: 90000 });
     assert.equal(build.status, 0, build.stderr || build.error?.message);
     const run = spawnSync(executable, [], { encoding: 'utf8', timeout: 15000 });
     assert.equal(run.status, 0, run.stderr || run.error?.message);
@@ -80,7 +109,7 @@ test('Notes reference preserves failed drafts and serialises independent saves',
     const source = path.join(root, 'architecture/spec-examples/NotesReference.swift');
     const tests = path.join(root, 'architecture/spec-examples/NotesReferenceTests.swift');
     const executable = path.join(directory, 'notes');
-    const build = spawnSync('xcrun', ['swiftc', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(directory, 'cache'), source, tests, '-o', executable], { encoding: 'utf8', timeout: 90000 });
+    const build = spawnSync('xcrun', ['swiftc', '-disable-sandbox', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(directory, 'cache'), source, tests, '-o', executable], { encoding: 'utf8', timeout: 90000 });
     assert.equal(build.status, 0, build.stderr || build.error?.message);
     const run = spawnSync(executable, [], { encoding: 'utf8', timeout: 15000 });
     assert.equal(run.status, 0, run.stderr || run.error?.message);
@@ -158,7 +187,7 @@ extension NotesFeature { var auditSaveID: UUID? { lastSave?.id } }
     const input = path.join(directory, 'NotesQueue.swift');
     fs.writeFileSync(input, reference + harness);
     const executable = path.join(directory, 'notes-queue');
-    const build = spawnSync('xcrun', ['swiftc', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(directory, 'cache'), input, '-o', executable], { encoding: 'utf8', timeout: 90000 });
+    const build = spawnSync('xcrun', ['swiftc', '-disable-sandbox', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(directory, 'cache'), input, '-o', executable], { encoding: 'utf8', timeout: 90000 });
     assert.equal(build.status, 0, build.stderr || build.error?.message);
     const run = spawnSync(executable, [], { encoding: 'utf8', timeout: 15000 });
     assert.equal(run.status, 0, run.stderr || run.error?.message);
@@ -177,6 +206,19 @@ test('navigation exposes the agreed account, refresh and multi-device boundaries
   assert.match(devices, /Watch Connectivity/);
   assert.match(links, /scene owns navigation/);
   assert.match(links, /successful navigation or explicit dismissal/);
+});
+
+test('complete review checklist names mandatory CFA invariants that broad labels could hide', () => {
+  const checklist = specTopics(root).get('topics/29-review-checklist.md');
+  for (const requirement of [
+    /`AppModel\.shared` a stored `static let` constructed by the single/,
+    /every request go through `NetworkingManager`/,
+    /every access go through `SwiftDataManager`/,
+    /without matching `FeatureAPI`\s+protocols/,
+    /confirmed domain data, operation state and retained errors represented\s+separately/,
+    /SwiftUI `App\.body` declare one stable root/,
+    /complete prohibited-pattern list reviewed/
+  ]) assert.match(checklist, requirement);
 });
 
 test('published app examples link to pinned source and relevant rule cards', () => {

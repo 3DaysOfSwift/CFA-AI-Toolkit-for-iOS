@@ -57,6 +57,40 @@ test('catalogue validation rejects a canonical ID with no rule card', () => {
   assert.throws(() => validate(catalogue), /Unknown canonical explanation rule ID/);
 });
 
+test('catalogue separates canonical rules from legacy lookup aliases', () => {
+  const catalogue = validate(read());
+  assert.ok(catalogue.topics.every(topic => topic.ruleIds.every(id => id.startsWith('CFA-SPEC-'))));
+  assert.ok(catalogue.topics.every(topic => topic.aliases.every(id => !id.startsWith('CFA-SPEC-'))));
+  assert.equal(lookup(catalogue, 'CFA-TASK-01').id, 'unstructured-tasks');
+  const invalidRule = read();
+  invalidRule.topics[0].ruleIds.push('CFA-READ-99');
+  assert.throws(() => validate(invalidRule), /canonical rule ID/);
+  const invalidAlias = read();
+  invalidAlias.topics[0].aliases.push('CFA-SPEC-READ-99');
+  assert.throws(() => validate(invalidAlias), /legacy explanation alias/);
+});
+
+test('decision-note metadata cannot drift from canonical catalogue rules', t => {
+  const catalogue = read();
+  const topic = catalogue.topics[0];
+  const notePath = path.join(directory, topic.note);
+  const original = fs.readFileSync(notePath, 'utf8');
+  const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'cfa-explanations-'));
+  t.after(() => fs.rmSync(parent, { recursive: true, force: true }));
+  const temporary = path.join(parent, 'explanations');
+  fs.cpSync(directory, temporary, { recursive: true });
+  const copiedNote = path.join(temporary, topic.note);
+
+  fs.writeFileSync(copiedNote, original.replace(`Topic: \`${topic.id}\``, 'Topic: `different-topic`'));
+  assert.throws(() => validateCatalogue(catalogue, temporary), /topic does not match catalogue/);
+
+  fs.writeFileSync(copiedNote, original.replace(topic.ruleIds[0], 'CFA-TASK-01'));
+  assert.throws(() => validateCatalogue(catalogue, temporary), /legacy explanation alias/);
+
+  fs.writeFileSync(copiedNote, original.replace(topic.ruleIds[0], 'CFA-SPEC-UI-01'));
+  assert.throws(() => validateCatalogue(catalogue, temporary), /rules do not match catalogue/);
+});
+
 test('rule lookup returns relevant local rationale without inventing planned URLs', () => {
   const catalogue = read();
   catalogue.topics.find(topic => topic.id === 'unstructured-tasks').publication = {
@@ -135,7 +169,10 @@ test('rejects duplicate topic/rule IDs and traversal note paths', () => {
   assert.throws(() => validate(catalogue), /duplicate topic/);
   catalogue = read();
   catalogue.topics[1].ruleIds.push(catalogue.topics[0].ruleIds[0]);
-  assert.throws(() => validate(catalogue), /duplicate rule/);
+  assert.throws(() => validate(catalogue), /duplicate canonical rule/);
+  catalogue = read();
+  catalogue.topics[1].aliases.push(catalogue.topics[0].aliases[0]);
+  assert.throws(() => validate(catalogue), /duplicate legacy explanation alias/);
   catalogue = read();
   catalogue.topics[0].note = '../outside.md';
   assert.throws(() => validate(catalogue), /note path/);

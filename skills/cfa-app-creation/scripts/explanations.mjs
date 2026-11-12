@@ -60,7 +60,7 @@ export function validateCatalogue(catalogue, directory, { sourceRoot } = {}) {
   requireValue(Array.isArray(catalogue.auditSources) && catalogue.auditSources.length > 0 &&
     new Set(catalogue.auditSources).size === catalogue.auditSources.length &&
     catalogue.auditSources.every(file => sourceFiles.has(file)), 'Invalid audit sources');
-  const ids = new Set(), rules = new Set();
+  const ids = new Set(), rules = new Set(), aliases = new Set();
   const ruleDirectory = sourceRoot && path.join(sourceRoot, 'spec/rules');
   const canonicalRules = ruleDirectory && fs.existsSync(ruleDirectory)
     ? new Set(fs.readdirSync(ruleDirectory).filter(file => /^cfa-[a-z]+-\d{2}\.md$/.test(file))
@@ -81,19 +81,31 @@ export function validateCatalogue(catalogue, directory, { sourceRoot } = {}) {
     ids.add(topic.id);
     requireValue(nonempty(topic.title) && classifications.has(topic.classification), 'Invalid title/classification');
     requireValue(topic.rationaleStatus === 'documented-basis-editorial-analysis', 'Unrecognised rationale provenance');
-    requireValue(Array.isArray(topic.ruleIds) && topic.ruleIds.length > 0, 'Topic needs rule IDs');
+    requireValue(Array.isArray(topic.ruleIds) && Array.isArray(topic.aliases) &&
+      topic.ruleIds.length + topic.aliases.length > 0, 'Topic needs canonical rule IDs or legacy aliases');
     for (const id of topic.ruleIds) {
-      requireValue(/^CFA-(?:SPEC-)?[A-Z]+-\d{2}$/.test(id) && !rules.has(id), 'Invalid or duplicate rule ID');
-      if (canonicalRules && id.startsWith('CFA-SPEC-')) {
-        requireValue(canonicalRules.has(id), `Unknown canonical explanation rule ID: ${id}`);
-      }
+      requireValue(/^CFA-SPEC-[A-Z]+-\d{2}$/.test(id) && !rules.has(id), 'Invalid or duplicate canonical rule ID');
+      if (canonicalRules) requireValue(canonicalRules.has(id), `Unknown canonical explanation rule ID: ${id}`);
       rules.add(id);
+    }
+    for (const alias of topic.aliases) {
+      requireValue(/^CFA-(?!SPEC-)[A-Z]+-\d{2}$/.test(alias) && !aliases.has(alias),
+        'Invalid or duplicate legacy explanation alias');
+      aliases.add(alias);
     }
     requireValue(topic.note === `decisions/${topic.id}.md`, 'Invalid note path');
     const notePath = path.join(directory, topic.note);
     requireValue(!fs.lstatSync(path.join(directory, 'decisions')).isSymbolicLink() &&
       !fs.lstatSync(notePath).isSymbolicLink(), 'Linked notes are not distributable');
     const note = fs.readFileSync(notePath, 'utf8');
+    requireValue(note.match(/^Topic: `([^`]+)`/m)?.[1] === topic.id,
+      `Decision note topic does not match catalogue: ${topic.id}`);
+    requireValue(!/^.*CFA-(?!SPEC-)[A-Z]+-\d{2}.*$/m.test(note),
+      `Decision note contains a legacy explanation alias: ${topic.id}`);
+    const noteRules = note.match(/^Rules: (.+?)(?:\\)?$/m)?.[1]
+      .match(/CFA-SPEC-[A-Z]+-\d{2}/g) ?? [];
+    requireValue(JSON.stringify(noteRules) === JSON.stringify(topic.ruleIds),
+      `Decision note rules do not match catalogue: ${topic.id}`);
     for (const section of ['Rule', 'Problem', 'Documented rationale', 'Trade-offs and alternatives',
       'Scope and exceptions', 'Verification', 'Evidence and provenance', 'Publication']) {
       requireValue(headings(note).includes(section), `Incomplete decision note: ${topic.id}/${section}`);
@@ -124,6 +136,11 @@ export function validateCatalogue(catalogue, directory, { sourceRoot } = {}) {
       `Invalid related explanation topics for ${rule}`);
     }
   }
+  for (const topic of catalogue.topics.filter(item => item.ruleIds.length === 0)) {
+    const related = catalogue.topics.some(item => Object.values(item.ruleRelatedTopics ?? {})
+      .some(topicIds => topicIds.includes(topic.id)));
+    requireValue(related, `Explanation without a canonical rule relationship: ${topic.id}`);
+  }
   requireValue(Array.isArray(catalogue.exclusions), 'Missing audit exclusions');
   const excluded = new Set();
   for (const source of catalogue.exclusions) {
@@ -142,7 +159,7 @@ export function validateCatalogue(catalogue, directory, { sourceRoot } = {}) {
 }
 
 export function lookup(catalogue, key) {
-  const topic = catalogue.topics.find(t => t.id === key || t.ruleIds.includes(key));
+  const topic = catalogue.topics.find(t => t.id === key || t.ruleIds.includes(key) || t.aliases.includes(key));
   if (!topic) throw Error(`Unknown explanation key: ${key}`);
   const related = Object.hasOwn(topic.ruleRelatedTopics ?? {}, key)
     ? topic.ruleRelatedTopics[key]
@@ -211,7 +228,7 @@ export function main(args) {
   return { valid: true, topics: catalogue.topics.length };
 }
 
-if (process.argv[1] && fs.realpathSync(fileURLToPath(import.meta.url)) === fs.realpathSync(path.resolve(process.argv[1]))) {
+if (process.argv[1] && fs.existsSync(process.argv[1]) && fs.realpathSync(fileURLToPath(import.meta.url)) === fs.realpathSync(path.resolve(process.argv[1]))) {
   try { console.log(JSON.stringify(main(process.argv.slice(2)), null, 2)); }
   catch (error) { console.error(error.message); process.exitCode = 1; }
 }

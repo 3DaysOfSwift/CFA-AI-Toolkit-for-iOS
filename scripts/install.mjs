@@ -6,7 +6,7 @@ import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { inventory, verify, json, writeJSON, files } from './files.mjs';
-import { skills } from './sync.mjs';
+import { skills } from './skill-names.mjs';
 
 const NAME='ios-app-development-cfa';
 const RECEIPT='.cfa-receipt.json';
@@ -126,7 +126,7 @@ export function install({source=path.resolve(path.dirname(fileURLToPath(import.m
   if(commandTarget) writeCommand(commandTarget,dashboardCommand);
   return {status:mode==='plugin'&&stageOnly?'staged':'installed',mode,version:manifest.version,paths:destinations.map(([,to])=>to),command:commandTarget,marketplace:market?.name,backups:changes.flatMap(c=>c.backup?[c.backup]:[])};
 }
-if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href) {
+if(process.argv[1]&&fs.existsSync(process.argv[1])&&import.meta.url===pathToFileURL(fs.realpathSync(process.argv[1])).href) {
   try {
     const options={};const args=process.argv.slice(2);
     if(args.includes('--help')) {

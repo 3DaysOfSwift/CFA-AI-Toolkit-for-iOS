@@ -4,6 +4,65 @@ import Testing
 
 @MainActor
 struct PracticeFeatureTests {
+    @Test func admittedStartSurvivesCallerCancellation() async throws {
+        let env = TestEnvironment()
+        await env.repository.pauseNextSave()
+        let caller = Task { try await env.start() }
+        for _ in 0..<10_000 {
+            if await env.repository.isWaiting() { break }
+            await Task.yield()
+        }
+        #expect(await env.repository.isWaiting())
+
+        caller.cancel()
+        await env.repository.resumeSave()
+        try await caller.value
+
+        #expect(env.practice.currentSession != nil)
+        #expect(await env.repository.saveCount == 1)
+    }
+
+    @Test func admittedRefreshSurvivesCallerCancellation() async throws {
+        let env = TestEnvironment()
+        await env.repository.pauseNextFetch()
+        let caller = Task { try await env.practice.refresh() }
+        for _ in 0..<10_000 {
+            if await env.repository.isFetchWaiting() { break }
+            await Task.yield()
+        }
+        #expect(await env.repository.isFetchWaiting())
+
+        caller.cancel()
+        await env.repository.resumeFetch()
+        try await caller.value
+
+        #expect(env.practice.hasLoaded)
+        #expect(await env.repository.fetchCount == 1)
+    }
+
+    @Test func equivalentRefreshesShareOneFeatureOperation() async {
+        let env = TestEnvironment()
+        await env.repository.pauseNextFetch()
+        await env.repository.fail(true)
+        let first = Task { try await env.practice.refresh() }
+        for _ in 0..<10_000 {
+            if await env.repository.isFetchWaiting() { break }
+            await Task.yield()
+        }
+        #expect(await env.repository.isFetchWaiting())
+        let second = Task { try await env.practice.refresh() }
+        for _ in 0..<100 { await Task.yield() }
+
+        await env.repository.resumeFetch()
+        let firstResult = await first.result
+        let secondResult = await second.result
+
+        #expect(await env.repository.fetchCount == 1)
+        #expect(!env.practice.hasLoaded)
+        #expect(throws: TestFailure.self) { try firstResult.get() }
+        #expect(throws: TestFailure.self) { try secondResult.get() }
+    }
+
     @Test func correctAnswerIsScoredOnlyOnce() async throws {
         let env = TestEnvironment()
         try await env.start()
@@ -181,10 +240,18 @@ struct PracticeFeatureTests {
 
     @Test func concurrentStartsDoNotCreateDuplicateSessions() async throws {
         let env = TestEnvironment()
+        await env.repository.pauseNextSave()
         let first = Task { try await env.start() }
+        for _ in 0..<10_000 {
+            if await env.repository.isWaiting() { break }
+            await Task.yield()
+        }
+        #expect(await env.repository.isWaiting())
         let second = Task { try await env.start() }
-        _ = await first.result
-        _ = await second.result
+        for _ in 0..<100 { await Task.yield() }
+        await env.repository.resumeSave()
+        try await first.value
+        try await second.value
         #expect(env.practice.sessions.count == 1)
         #expect(await env.repository.saveCount == 1)
     }

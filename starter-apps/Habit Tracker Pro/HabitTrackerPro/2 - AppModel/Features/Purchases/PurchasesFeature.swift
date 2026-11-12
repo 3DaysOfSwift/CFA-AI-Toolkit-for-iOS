@@ -1,26 +1,32 @@
 import Foundation
 import Observation
 
+enum PurchaseNotice: Equatable {
+    case pendingApproval
+    case noPurchaseFound
+}
+
 @MainActor
 @Observable
 final class PurchasesFeature {
     private let store: any PurchaseStore
-    private var entitlementRevision = 0
     private(set) var hasTrendsAccess = false
     private(set) var offer: PurchaseOffer?
     private(set) var isLoadingOffer = false
     private(set) var isPurchasingOrRestoring = false
     private(set) var isPurchasePending = false
-    private var entitlementError: String?
-    private var offerError: String?
-    private var actionError: String?
-    var errorMessage: String? { entitlementError ?? actionError ?? offerError }
-    private(set) var notice: String?
+    private var entitlementError: (any Error)?
+    private var offerError: (any Error)?
+    private var actionError: (any Error)?
+    var error: (any Error)? { entitlementError ?? actionError ?? offerError }
+    private(set) var notice: PurchaseNotice?
 
     init(store: any PurchaseStore) { self.store = store }
 
     @ObservationIgnored private var startupTask: Task<Void, Never>?
     @ObservationIgnored private var offerTask: Task<Void, Never>?
+    @ObservationIgnored private var entitlementTask: Task<Void, Never>?
+    @ObservationIgnored private var entitlementRefreshRequested = false
     private enum PurchaseAction { case purchase, restore }
     @ObservationIgnored private var lastAction: (id: UUID, kind: PurchaseAction, task: Task<Void, Never>)?
 
@@ -39,6 +45,13 @@ final class PurchasesFeature {
 
     func transactionUpdates() -> AsyncStream<Void> { store.updates() }
 
+    deinit {
+        startupTask?.cancel()
+        offerTask?.cancel()
+        entitlementTask?.cancel()
+        lastAction?.task.cancel()
+    }
+
     func loadOffer() async {
         if let offerTask {
             await offerTask.value
@@ -51,7 +64,7 @@ final class PurchasesFeature {
                 offer = try await store.offer()
                 offerError = nil
             } catch {
-                offerError = error.localizedDescription
+                offerError = error
             }
         }
         offerTask = task
@@ -59,13 +72,31 @@ final class PurchasesFeature {
     }
 
     func refreshEntitlement() async {
-        // A newer StoreKit event may change access while an earlier read is suspended.
-        // Only the latest read may publish its result.
-        entitlementRevision += 1
-        let revision = entitlementRevision
+        requestEntitlementRefresh()
+        await entitlementTask?.value
+    }
+
+    func requestEntitlementRefresh() {
+        entitlementRefreshRequested = true
+        guard entitlementTask == nil else { return }
+        let task = Task { [weak self] in
+            guard let self else { return }
+            await self.drainEntitlementRefreshes()
+        }
+        entitlementTask = task
+    }
+
+    private func drainEntitlementRefreshes() async {
+        while entitlementRefreshRequested, !Task.isCancelled {
+            entitlementRefreshRequested = false
+            await performEntitlementRefresh()
+        }
+        entitlementTask = nil
+    }
+
+    private func performEntitlementRefresh() async {
         do {
             let hasAccess = try await store.hasTrendsAccess()
-            guard revision == entitlementRevision else { return }
             hasTrendsAccess = hasAccess
             entitlementError = nil
             if hasAccess {
@@ -76,9 +107,8 @@ final class PurchasesFeature {
             // Deliver/revoke access before acknowledging verified transactions.
             await store.finishTransactions()
         } catch {
-            guard revision == entitlementRevision else { return }
             hasTrendsAccess = false
-            entitlementError = error.localizedDescription
+            entitlementError = error
         }
     }
 
@@ -120,15 +150,15 @@ final class PurchasesFeature {
             switch try await store.purchase() {
             case .purchased:
                 await refreshEntitlement()
-                if !hasTrendsAccess && entitlementError == nil { actionError = PurchaseError.unverified.localizedDescription }
+                if !hasTrendsAccess && entitlementError == nil { actionError = PurchaseError.unverified }
             case .pending:
                 isPurchasePending = true
-                notice = "Your purchase is awaiting approval. Trends will unlock after it is approved."
+                notice = .pendingApproval
             case .cancelled:
                 break
             }
         } catch {
-            actionError = error.localizedDescription
+            actionError = error
         }
     }
 
@@ -138,11 +168,11 @@ final class PurchasesFeature {
         do {
             try await store.restore()
             await refreshEntitlement()
-            if !hasTrendsAccess && errorMessage == nil {
-                notice = "No Trends purchase was found for this Apple Account."
+            if !hasTrendsAccess && error == nil {
+                notice = .noPurchaseFound
             }
         } catch {
-            actionError = error.localizedDescription
+            actionError = error
         }
     }
 }

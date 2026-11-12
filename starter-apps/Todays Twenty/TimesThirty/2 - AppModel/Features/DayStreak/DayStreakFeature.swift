@@ -10,6 +10,7 @@ struct StreakDay: Identifiable {
 
 @MainActor @Observable
 final class DayStreakFeature {
+    private static let recentCompletedDayLimit = 30
     private let practiceFeature: PracticeFeature
     private let calendar: Calendar
 
@@ -18,9 +19,12 @@ final class DayStreakFeature {
         self.calendar = calendar
     }
 
-    var completedDays: Set<Date> { practiceFeature.completedActivityDays }
-    var today: Date { practiceFeature.today }
+    private var completedDays: Set<Date> { practiceFeature.completedActivityDays }
+    private var today: Date { practiceFeature.today }
     var completedDayCount: Int { completedDays.count }
+    var recentCompletedDays: [Date] {
+        Array(completedDays.sorted(by: >).prefix(Self.recentCompletedDayLimit))
+    }
     var correctAnswerCount: Int { practiceFeature.sessions.reduce(0) { $0 + $1.correctCount } }
     var currentStreak: Int { Self.streak(endingNear: today, days: completedDays, calendar: calendar) }
     var longestStreak: Int {
@@ -42,7 +46,7 @@ final class DayStreakFeature {
         }
     }
 
-    static func streak(endingNear today: Date, days: Set<Date>, calendar: Calendar) -> Int {
+    private static func streak(endingNear today: Date, days: Set<Date>, calendar: Calendar) -> Int {
         var date = calendar.startOfDay(for: today)
         // An unfinished today does not break yesterday's streak before midnight.
         if !days.contains(date), let yesterday = calendar.date(byAdding: .day, value: -1, to: date) {
@@ -57,5 +61,5 @@ final class DayStreakFeature {
         return count
     }
 
-    func refresh() async throws { try await practiceFeature.perform(.refresh) }
+    func refresh() async throws { try await practiceFeature.refresh() }
 }

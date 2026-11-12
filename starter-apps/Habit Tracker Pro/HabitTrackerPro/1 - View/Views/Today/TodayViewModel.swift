@@ -18,7 +18,9 @@ final class TodayViewModel {
 
     var habits: [Habit] { todayFeature.habits }
     var isLoading: Bool { todayFeature.isLoading }
-    var loadError: String? { todayFeature.loadError }
+    var loadError: String? {
+        todayFeature.loadError.map { _ in "Your saved habits could not be loaded. Please try again." }
+    }
     @ObservationIgnored private var retryTask: Task<Void, Never>?
     @discardableResult
     func retryLoading() -> Task<Void, Never> {
@@ -49,7 +51,7 @@ final class TodayViewModel {
 
     func editAmount(_ text: String, for habit: Habit) {
         amountDrafts[habit.id] = text
-        guard let value = Int(text), value >= 0 else {
+        guard let value = Int(text), todayFeature.isValidEntryValue(value) else {
             pendingValues[habit.id] = nil
             failedValues[habit.id] = nil
             if failedValues.isEmpty { errorMessage = nil }
@@ -59,13 +61,14 @@ final class TodayViewModel {
     }
 
     func increment(_ habit: Habit) {
-        guard let value = Int(amountText(for: habit)), value >= 0, value < Int.max else { return }
+        guard let value = Int(amountText(for: habit)),
+              todayFeature.isValidEntryValue(value), value < Int.max else { return }
         editAmount(String(value + 1), for: habit)
     }
 
     func canIncrement(_ habit: Habit) -> Bool {
         guard let value = Int(amountText(for: habit)) else { return false }
-        return value >= 0 && value < Int.max
+        return todayFeature.isValidEntryValue(value) && value < Int.max
     }
 
     func isSaving(_ habit: Habit) -> Bool {
@@ -73,7 +76,8 @@ final class TodayViewModel {
     }
 
     func statusText(for habit: Habit) -> String? {
-        if let draft = amountDrafts[habit.id], Int(draft).map({ $0 >= 0 }) != true {
+        if let draft = amountDrafts[habit.id],
+           Int(draft).map({ todayFeature.isValidEntryValue($0) }) != true {
             return "Enter a whole number of zero or more."
         }
         if failedValues[habit.id] != nil { return "Not saved. Tap Retry to try again." }
@@ -118,10 +122,21 @@ final class TodayViewModel {
                     let draftStillMatches = amountDrafts[habitID].map { Int($0) == value } ?? true
                     if pendingValues[habitID] == nil && draftStillMatches {
                         failedValues[habitID] = value
-                        errorMessage = error.localizedDescription
+                        errorMessage = message(for: error)
                     }
                 }
             }
+        }
+    }
+
+    private func message(for error: any Error) -> String {
+        guard let habitError = error as? HabitError else {
+            return "Your progress could not be saved. Please try again."
+        }
+        return switch habitError {
+        case .invalidEntry: "A recorded amount cannot be negative."
+        case .habitNotFound: "This habit is no longer available."
+        case .invalidName, .invalidTarget: "Your progress could not be saved. Please try again."
         }
     }
 }

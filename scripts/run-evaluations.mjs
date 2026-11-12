@@ -21,9 +21,21 @@ export function runEvaluations(base = root) {
     if (!expression.test(expected)) throw Error(`Flat-app expected outcome is missing: ${expression}`);
   }
   const manualFixtures = [
-    ['migration-handoff.md', /^## Synthetic checkpoint$/m, /^## Expected outcome$/m],
-    ['product-design-scope/expected.md', /^## 1\. New product, first request$/m, /^## Evaluation rubric$/m],
-    ['explanations.md', /^\| Prompt \/ context \| Expected behaviour \| Failure \|$/m]
+    ['migration-handoff.md', /^## Synthetic checkpoint$/m, /^## Expected outcome$/m,
+      /Report the migration as continuing/, /Complete the final CFA audit/,
+      /human architecture review/, /Fail the evaluation if the response declares completion/],
+    ['migration-continuation.md', /^## Synthetic checkpoint$/m, /^## Expected outcome$/m,
+      /Continue implementation through Account and Saved Items/,
+      /Do not ask the developer to prompt “continue”/,
+      /only after the migration completion gate/,
+      /asks whether it should continue/],
+    ['product-design-scope/expected.md', /^## 1\. New product, first request$/m,
+      /^## Evaluation rubric$/m, /preserves UI and saved preferences/,
+      /No artwork installation or project-instruction edits/],
+    ['explanations.md', /^\| Prompt \/ context \| Expected behaviour \| Failure \|$/m,
+      /Apply the current shared refresh rule/,
+      /Review this non-CFA app/,
+      /not these agent behaviours/]
   ];
   for (const [file, ...markers] of manualFixtures) {
     const fixture = requireText(path.join(base, 'evals', file), 'manual evaluation fixture');

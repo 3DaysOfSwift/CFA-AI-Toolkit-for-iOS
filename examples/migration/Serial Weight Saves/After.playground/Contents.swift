@@ -69,15 +69,15 @@ actor WeightStorage: WeightSaving {
 @MainActor
 func runExample() async {
     let storage = WeightStorage()
-    let feature = WeightLogFeature(storage: storage)
-    let firstSaved = await feature.save(70)
-    let invalidSaved = await feature.save(-1)
-    precondition(firstSaved && !invalidSaved && feature.weights == [70])
-    precondition(feature.saveFailure == .storageRejectedWrite)
-    let finalSaved = await feature.save(72)
+    let weightLogFeature = WeightLogFeature(storage: storage)
+    let firstSaved = await weightLogFeature.save(70)
+    let invalidSaved = await weightLogFeature.save(-1)
+    precondition(firstSaved && !invalidSaved && weightLogFeature.weights == [70])
+    precondition(weightLogFeature.saveFailure == .storageRejectedWrite)
+    let finalSaved = await weightLogFeature.save(72)
     let stored = await storage.read()
-    precondition(finalSaved && feature.weights == [70, 72] && stored == feature.weights)
-    precondition(feature.saveFailure == nil)
+    precondition(finalSaved && weightLogFeature.weights == [70, 72] && stored == weightLogFeature.weights)
+    precondition(weightLogFeature.saveFailure == nil)
 
     // Run three callers as child tasks. The Feature controls the save order
     // after admission, and this example waits for every outcome.

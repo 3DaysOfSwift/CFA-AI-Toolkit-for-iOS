@@ -31,19 +31,19 @@ final class LegacyWeightLog: @unchecked Sendable {
 // MARK: - Behaviour check
 @MainActor
 func runExample() async {
-    let model = LegacyWeightLog()
-    let results = AsyncStream<Bool>.makeStream()
-    model.save(70) { results.continuation.yield($0) }
-    model.save(-1) { results.continuation.yield($0) }
-    model.save(72) { results.continuation.yield($0) }
-    var iterator = results.stream.makeAsyncIterator()
+    let legacyWeightLog = LegacyWeightLog()
+    let saveResults = AsyncStream<Bool>.makeStream()
+    legacyWeightLog.save(70) { saveResults.continuation.yield($0) }
+    legacyWeightLog.save(-1) { saveResults.continuation.yield($0) }
+    legacyWeightLog.save(72) { saveResults.continuation.yield($0) }
+    var iterator = saveResults.stream.makeAsyncIterator()
     let first = await iterator.next()
     let invalid = await iterator.next()
     let last = await iterator.next()
-    results.continuation.finish()
+    saveResults.continuation.finish()
     precondition(first == true && invalid == false && last == true)
     let saved = await withCheckedContinuation { continuation in
-        model.read { continuation.resume(returning: $0) }
+        legacyWeightLog.read { continuation.resume(returning: $0) }
     }
     precondition(saved == [70, 72])
     print("Passed: valid saves stayed ordered; the invalid value was rejected.")

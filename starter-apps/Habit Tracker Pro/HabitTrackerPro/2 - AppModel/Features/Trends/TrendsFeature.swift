@@ -17,6 +17,7 @@ struct TrendWeek: Identifiable, Sendable {
 struct HabitTrend: Identifiable, Sendable {
     let id: UUID
     let name: String
+    let tracking: HabitTracking
     let unit: String
     let dailyTarget: Int?
     let days: [TrendDay]
@@ -39,24 +40,20 @@ final class TrendsFeature {
     }
 
     var isLoading: Bool { habitsFeature.isLoading }
-    var loadError: String? { habitsFeature.loadError }
+    var loadError: (any Error)? { habitsFeature.loadError }
     func reload() async { await habitsFeature.reload() }
 
     /// Calculate trends from the habits already owned by HabitsFeature.
     var trends: [HabitTrend] {
         let today = calendar.startOfDay(for: currentDate())
         return habitsFeature.habits.map { habit in
-            var amounts: [Date: Int] = [:]
-            for entry in habit.entries {
-                let day = calendar.startOfDay(for: entry.date)
-                guard day <= today else { continue }
-                amounts[day] = max(amounts[day] ?? 0, entry.value)
-            }
             let days = (-29...0).compactMap { offset -> TrendDay? in
                 guard let day = calendar.date(byAdding: .day, value: offset, to: today) else { return nil }
-                let value = amounts[day] ?? 0
-                let completed = value > 0 && value >= (habit.dailyTarget ?? 1)
-                return TrendDay(date: day, value: value, isComplete: completed)
+                return TrendDay(
+                    date: day,
+                    value: habit.value(on: day, calendar: calendar),
+                    isComplete: habit.isComplete(on: day, calendar: calendar)
+                )
             }
             // Four complete seven-day windows, ending today. These are not
             // calendar weeks; their meaning does not depend on locale settings.
@@ -66,7 +63,7 @@ final class TrendsFeature {
                                  completedDayCount: window.filter(\.isComplete).count)
             }
             return HabitTrend(id: habit.id, name: habit.name,
-                              unit: habit.tracking == .completion ? "Completion" : habit.unit,
+                              tracking: habit.tracking, unit: habit.unit,
                               dailyTarget: habit.dailyTarget, days: days, weeks: weeks,
                               completedDayCount: days.filter(\.isComplete).count)
         }

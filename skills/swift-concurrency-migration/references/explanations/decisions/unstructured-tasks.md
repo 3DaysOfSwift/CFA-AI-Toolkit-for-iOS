@@ -1,7 +1,8 @@
 # Unstructured tasks need a deliberate owner
 
 Topic: `unstructured-tasks`  
-Rules: `CFA-TASK-01`, `CFA-TASK-02`, `CFA-SPEC-TASK-03`\
+Rules: `CFA-SPEC-TASK-03`\
+Related canonical rules: `CFA-SPEC-TASK-01`\
 Classification: mixed  
 Status: documented basis with editorial analysis; not a founder-approved historical decision record.
 

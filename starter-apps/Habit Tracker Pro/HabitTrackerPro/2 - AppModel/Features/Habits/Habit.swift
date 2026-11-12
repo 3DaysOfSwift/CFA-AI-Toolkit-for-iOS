@@ -38,18 +38,10 @@ struct HabitEntry: Identifiable, Equatable, Sendable {
     let value: Int
 }
 
-enum HabitError: LocalizedError {
+enum HabitError: Error {
     case invalidName
     case invalidTarget
     case invalidEntry
     case habitNotFound
 
-    var errorDescription: String? {
-        switch self {
-        case .invalidName: "Enter a name for this habit."
-        case .invalidTarget: "The daily target must be greater than zero."
-        case .invalidEntry: "A recorded amount cannot be negative."
-        case .habitNotFound: "This habit is no longer available."
-        }
-    }
 }

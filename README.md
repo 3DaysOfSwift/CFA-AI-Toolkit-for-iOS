@@ -7,8 +7,8 @@
 # CFA AI Toolkit for iOS
 
 **Build, modernise, test and maintain iOS apps with AI, SwiftUI and Swift
-Concurrency.** This repository contains the CFA AI Toolkit for iOS: eight AI skills, a
-native Xcode project template, an architecture inspector and practical
+Concurrency.** This repository contains the CFA AI Toolkit for iOS: eight AI skills,
+three native Xcode project templates, an architecture inspector and practical
 guidance for working on new and existing apps. It is published by
 [3 Days of Swift Concurrency](https://www.3daysofswiftconcurrency.com/).
 
@@ -183,12 +183,14 @@ without you having to paste its rules into every prompt.
 
 ### Claude Code and other AI coding tools
 
-The portable CFA AI Toolkit for iOS skills are in the repository’s `skills` folder. Copy
-all eight folders inside it, without renaming them, into the folder where your
-AI coding tool reads skills.
+The portable CFA AI Toolkit for iOS skills are in both the extracted plugin
+release and the repository’s `skills` folder. The checksummed installer below
+must be run from the extracted plugin release. If you are working from a Git
+source checkout, copy all eight skill folders manually; the source checkout
+intentionally has no release checksum inventory.
 
-For Claude Code, that folder is commonly `~/.claude/skills`. This command copies
-the skills there for you:
+For Claude Code, the destination is commonly `~/.claude/skills`. From the
+extracted plugin release, this command copies the skills there for you:
 
 ```sh
 node scripts/install.mjs --mode skills --skills-directory ~/.claude/skills
@@ -303,9 +305,12 @@ Application
 │   │   ├── AppColourTheme.swift
 │   │   └── ThemeManager.swift
 │   └── Views
-│       └── Git Repos
-│           ├── GitReposView.swift
-│           └── GitReposViewModel.swift
+│       ├── Git Repos
+│       │   ├── GitReposView.swift
+│       │   └── GitReposViewModel.swift
+│       └── Settings
+│           ├── SettingsView.swift
+│           └── SettingsViewModel.swift
 ├── 2 - AppModel
 │   ├── AppModel.swift
 │   ├── Features
@@ -315,9 +320,11 @@ Application
 │   │   ├── WeightLog
 │   │   │   ├── WeightLogFeature.swift
 │   │   │   └── WeightEntry.swift
-│   │   └── Progress
-│   │       └── ProgressFeature.swift
-│   └── Networking & Data Storage
+│   │   ├── Progress
+│   │   │   └── ProgressFeature.swift
+│   │   └── Settings
+│   │       └── SettingsFeature.swift
+│   └── User Data Storage
 │       ├── Protocols
 │       │   └── WeightRepository.swift
 │       └── Local
@@ -328,7 +335,7 @@ Application
 │   └── Date+Day.swift
 ├── Assets.xcassets
 └── ApplicationTests
-    ├── ViewModelTests
+    ├── View model tests
     │   └── GitReposViewModelTests.swift
     └── FeatureTests
         └── WeightLogFeatureTests.swift
@@ -445,8 +452,9 @@ cfa enable-project --host claude
 ```
 
 This is optional. It reinforces CFA in that repository; it does not install
-skills or alter source code. Check the current installation and project guidance
-at any time with:
+skills or alter source code. Check that all eight installed skills are present,
+their bundled CFA references agree, and inspect project guidance at any time
+with:
 
 ```sh
 cfa doctor

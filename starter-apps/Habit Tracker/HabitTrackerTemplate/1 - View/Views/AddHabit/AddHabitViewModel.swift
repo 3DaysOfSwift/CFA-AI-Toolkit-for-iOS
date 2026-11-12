@@ -42,10 +42,22 @@ final class AddHabitViewModel {
                 errorMessage = nil
                 didSave = true
             } catch {
-                errorMessage = error.localizedDescription
+                errorMessage = message(for: error)
             }
         }
         saveTask = task
         return task
+    }
+
+    private func message(for error: any Error) -> String {
+        guard let habitError = error as? HabitError else {
+            return "Your habit could not be saved. Please try again."
+        }
+        return switch habitError {
+        case .invalidName: "Enter a name for this habit."
+        case .invalidTarget: "The daily target must be greater than zero."
+        case .invalidEntry: "A recorded amount cannot be negative."
+        case .habitNotFound: "This habit is no longer available."
+        }
     }
 }

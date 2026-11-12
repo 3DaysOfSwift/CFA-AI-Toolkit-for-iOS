@@ -26,5 +26,7 @@ struct TrendsFeatureTests {
         #expect(chart.weeks.count == 4)
         #expect(chart.weeks.last?.completedDayCount == 1)
         #expect(chart.dailyTarget == 10)
+        #expect(chart.tracking == .count)
+        #expect(chart.unit == "Reps")
     }
 }

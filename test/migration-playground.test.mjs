@@ -31,7 +31,7 @@ for (const name of examples) for (const [side, version] of [['Before','5'], ['Af
     try {
       const input = path.join(dir, 'Example.swift'); fs.writeFileSync(input, source + harness);
       const executable = path.join(dir, 'example');
-      const build = spawnSync('xcrun',['swiftc','-parse-as-library','-swift-version',version,'-module-cache-path',path.join(dir,'cache'),input,'-o',executable],{encoding:'utf8',timeout:90000});
+      const build = spawnSync('xcrun',['swiftc','-disable-sandbox','-parse-as-library','-swift-version',version,'-module-cache-path',path.join(dir,'cache'),input,'-o',executable],{encoding:'utf8',timeout:90000});
       assert.equal(build.status,0,build.stderr || build.error?.message);
       const run = spawnSync(executable,[],{encoding:'utf8',timeout:15000});
       assert.equal(run.status,0,run.stderr || run.error?.message);
@@ -113,7 +113,7 @@ extension LaunchFeature {
   try {
     const input = path.join(dir, 'Example.swift'); fs.writeFileSync(input, source);
     const executable = path.join(dir, 'example');
-    const build = spawnSync('xcrun', ['swiftc', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(dir, 'cache'), input, '-o', executable], {encoding:'utf8', timeout:90000});
+    const build = spawnSync('xcrun', ['swiftc', '-disable-sandbox', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(dir, 'cache'), input, '-o', executable], {encoding:'utf8', timeout:90000});
     assert.equal(build.status, 0, build.stderr || build.error?.message);
     const run = spawnSync(executable, [], {encoding:'utf8', timeout:15000});
     assert.equal(run.status, 0, run.stderr || run.error?.message);
@@ -188,7 +188,7 @@ extension WeightLogFeature { var testSaveID: UUID? { lastSaveID } }
   try {
     const input = path.join(dir, 'Example.swift'); fs.writeFileSync(input, source);
     const executable = path.join(dir, 'example');
-    const build = spawnSync('xcrun', ['swiftc', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(dir, 'cache'), input, '-o', executable], {encoding:'utf8', timeout:90000});
+    const build = spawnSync('xcrun', ['swiftc', '-disable-sandbox', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(dir, 'cache'), input, '-o', executable], {encoding:'utf8', timeout:90000});
     assert.equal(build.status, 0, build.stderr || build.error?.message);
     const run = spawnSync(executable, [], {encoding:'utf8', timeout:15000});
     assert.equal(run.status, 0, run.stderr || run.error?.message);
@@ -268,7 +268,7 @@ final class ControlledTransport: URLProtocol, @unchecked Sendable {
     const input = path.join(dir, 'Example.swift');
     fs.writeFileSync(input, source);
     const executable = path.join(dir, 'example');
-    const build = spawnSync('xcrun', ['swiftc', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(dir, 'cache'), input, '-o', executable], {encoding:'utf8', timeout:90000});
+    const build = spawnSync('xcrun', ['swiftc', '-disable-sandbox', '-parse-as-library', '-swift-version', '6', '-module-cache-path', path.join(dir, 'cache'), input, '-o', executable], {encoding:'utf8', timeout:90000});
     assert.equal(build.status, 0, build.stderr || build.error?.message);
     const run = spawnSync(executable, [], {encoding:'utf8', timeout:15000});
     assert.equal(run.status, 0, run.stderr || run.error?.message);

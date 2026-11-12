@@ -1,0 +1,4 @@
+interface:
+  display_name: "Swift Code Quality"
+  short_description: "Write and review clear, maintainable production Swift"
+  default_prompt: "Use $swift-code-quality to create, edit, or review this Swift code for clarity, safety, and maintainability."

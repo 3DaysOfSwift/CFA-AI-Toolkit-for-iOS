@@ -1,5 +1,9 @@
 # Publishing CFA AI Toolkit for iOS
 
+This is a source-checkout maintainer procedure. Download the source archive or
+use the Git repository before running its `npm`, sync, test or release commands;
+the installable plugin archive intentionally carries only customer runtime scripts.
+
 ## Identity
 
 - Public product name: **CFA AI Toolkit for iOS**
@@ -7,7 +11,7 @@
 - Plugin identifier: `ios-app-development-cfa`
 - Plugin display name: **CFA AI Toolkit for iOS**
 - Repository slug: `CFA-AI-Toolkit-for-iOS`
-- Subtitle: **AI skills and tools to build, modernise and maintain SwiftUI apps with Swift Concurrency.**
+- Subtitle: **AI skills and tools to build, modernise, test and maintain SwiftUI apps with Swift Concurrency.**
 - Suggested repository topics: `swift`, `swiftui`, `ios`, `swift-concurrency`, `architecture`, `ai-assisted-development`, `mvvm`, `gcd`, `migration`, `agent-skills`.
 
 Use the exact product name in public-facing toolkit/plugin titles, descriptions,

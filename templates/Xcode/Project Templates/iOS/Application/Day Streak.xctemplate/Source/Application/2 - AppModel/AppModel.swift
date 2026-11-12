@@ -2,17 +2,15 @@ import Foundation
 
 @MainActor
 final class AppModel {
-    static let shared = live()
+    static let shared = AppModel.live()
     let practiceFeature: PracticeFeature
     let dayStreakFeature: DayStreakFeature
     let settingsFeature: SettingsFeature
-    private var didFinishLaunching: Bool
 
     init(practiceFeature: PracticeFeature, dayStreakFeature: DayStreakFeature, settingsFeature: SettingsFeature) {
         self.practiceFeature = practiceFeature
         self.dayStreakFeature = dayStreakFeature
         self.settingsFeature = settingsFeature
-        didFinishLaunching = false
     }
 
     static func live() -> AppModel {
@@ -27,9 +25,4 @@ final class AppModel {
                         settingsFeature: settingsFeature)
     }
 
-    func applicationDidFinishLaunching() {
-        guard !didFinishLaunching else { return }
-        didFinishLaunching = true
-        // No database boot gate. Each requesting feature reports its own operation failures.
-    }
 }

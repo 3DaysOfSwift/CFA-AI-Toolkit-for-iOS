@@ -1,4 +1,4 @@
 interface:
   display_name: "Legacy GCD migration"
   short_description: "Migrate legacy iOS apps to CFA and Swift Concurrency"
-  default_prompt: "Migrate this legacy GCD iOS app to CFA and Swift Concurrency."
+  default_prompt: "Use $swift-concurrency-migration to migrate this legacy iOS app to CFA and Swift Concurrency."

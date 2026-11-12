@@ -1,10 +1,8 @@
 import Foundation
-import Observation
 
 @MainActor
-@Observable
 final class AppModel {
-    static let shared = live()
+    static let shared = AppModel.live()
 
     let todayFeature: TodayFeature
     let habitsFeature: HabitsFeature

@@ -51,11 +51,11 @@ actor PendingRequestStore: PendingRequestRepository {
     func remove(id: String) throws -> PendingSnapshot {
         try Task.checkCancellation()
         try loadIfNeeded()
-        let remaining = requests.filter { $0.id != id }
-        guard remaining.count != requests.count else { return try snapshot() }
-        let result = try commit(remaining)
+        let remainingRequests = requests.filter { $0.id != id }
+        guard remainingRequests.count != requests.count else { return try snapshot() }
+        let committedSnapshot = try commit(remainingRequests)
         resolvedIDs.insert(id) // Suppress repeated callbacks for this event in this store's lifetime.
-        return result
+        return committedSnapshot
     }
 
     private func loadIfNeeded() throws {

@@ -14,13 +14,13 @@ export function stageRelease(output,base=root) {
     fs.cpSync(path.join(base,relative),destination,{recursive:true,errorOnExist:true,force:false,
       filter: source => isReleasePath(path.relative(base, source))});
   };
-  for(const relative of ['.codex-plugin','plugin.json','readme-images','skills','LICENSE','Install.command','Install Xcode Template.command','docs','architecture','templates','starter-apps','scripts/install.mjs','scripts/install-xcode-template.mjs','scripts/files.mjs','scripts/release-exclusions.json','scripts/sync.mjs','scripts/spec-topics.mjs'])copy(relative);
+  for(const relative of ['.codex-plugin','plugin.json','readme-images','skills','LICENSE','CONTRIBUTING.md','Install.command','Install Xcode Template.command','docs','architecture','evals','templates','starter-apps','scripts/install.mjs','scripts/install-xcode-template.mjs','scripts/files.mjs','scripts/skill-names.mjs','scripts/release-exclusions.json'])copy(relative);
   fs.copyFileSync(path.join(base,'README.md'),path.join(output,'README.md'));
   writeJSON(path.join(output,'checksums.json'),inventory(output));
   validate(output,{source:false});
   return output;
 }
-if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href) {
+if(process.argv[1]&&fs.existsSync(process.argv[1])&&import.meta.url===pathToFileURL(fs.realpathSync(process.argv[1])).href) {
   try {
     if(process.argv.length!==3)throw Error('Usage: node scripts/build.mjs <new-output-folder>');
     console.log(stageRelease(process.argv[2]));

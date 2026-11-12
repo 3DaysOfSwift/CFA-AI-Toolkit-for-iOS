@@ -1,5 +1,35 @@
 # Changelog
 
+## Unreleased
+
+- Align all eight skill workflows, shared explanations and review tooling with
+  the current CFA rules for Feature ownership, MainActor isolation, service
+  placement, task lifetimes, screen construction and migration completion.
+- Strengthen the architecture inspector's recognition of Feature placement,
+  AppModel composition, services, launch work, SwiftData access and named tests
+  without presenting lexical review leads as proven defects.
+- Make extracted plugin installation self-contained and keep all packaged
+  documentation links and runtime module dependencies valid outside the source
+  checkout.
+- Validate the exact skill inventory, interface metadata, frontmatter,
+  licences, canonical reference generations, release manifests, publisher and
+  repository identity, changelog records and local documentation links.
+- Keep command modules safely importable, preserve portable macOS path handling
+  and add release-package regressions for the corrected failure modes.
+- Include the source-only SwiftSyntax inventory in normal and release testing,
+  and preserve documented shell-script execution in generated source archives.
+- Keep the bundled dashboard package on the toolkit release version and validate
+  local Markdown links, HTML assets and heading anchors in source and plugin
+  documentation.
+- Distinguish source-checkout installation from checksummed release installation,
+  and validate Codex-facing interface metadata plus the portable Agent Plugin
+  schema so host presentation cannot drift silently.
+- Preserve executable modes for release entry points and require the declared
+  dashboard command to remain executable.
+- Exclude Python caches, ignored reports and generated build output from release
+  archives, and refuse every untracked file that would otherwise enter a
+  checkout-built payload.
+
 ## 0.4.0 — 2026-11-01
 
 - Add a Swift Concurrency Health Check with source inventory, SwiftSyntax task-site evidence and an app-specific report.

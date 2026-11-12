@@ -1,7 +1,7 @@
 # One storage owner and honest writes
 
 Topic: `persistence-boundaries`  
-Rules: `CFA-STORE-01`, `CFA-STORE-02`, `CFA-STORE-03`, `CFA-SPEC-CACHE-01`, `CFA-SPEC-STORE-01`, `CFA-SPEC-SYNC-01`\
+Rules: `CFA-SPEC-CACHE-01`, `CFA-SPEC-STORE-01`, `CFA-SPEC-SYNC-01`\
 Classification: mixed  
 Status: documented basis with editorial analysis; not a founder-approved historical decision record.
 

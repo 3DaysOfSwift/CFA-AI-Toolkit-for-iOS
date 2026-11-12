@@ -1,7 +1,8 @@
 # Sharing requests and queueing commands
 
 Topic: `overlapping-requests`  
-Rules: `CFA-OVERLAP-01`, `CFA-OVERLAP-02`, `CFA-SPEC-TASK-01`, `CFA-SPEC-TASK-02`\
+Rules: `CFA-SPEC-TASK-01`, `CFA-SPEC-TASK-02`\
+Related canonical rules: `CFA-SPEC-TASK-03`\
 Classification: mixed  
 Status: documented basis with editorial analysis; not a founder-approved historical decision record.
 

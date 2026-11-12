@@ -56,7 +56,7 @@ def generated_files():
             nodes.append(node)
     definitions["Assets.xcassets"] = {"Path": "Source/Assets.xcassets", "TargetIdentifiers": ["com.apple.dt.applicationTarget"]}
     nodes.append("Assets.xcassets")
-    shared = {"SWIFT_VERSION": "6.0", "IPHONEOS_DEPLOYMENT_TARGET": "18.0", "GENERATE_INFOPLIST_FILE": "YES", "SWIFT_STRICT_CONCURRENCY": "complete", "SWIFT_DEFAULT_ACTOR_ISOLATION": "nonisolated"}
+    shared = {"SWIFT_VERSION": "6.0", "IPHONEOS_DEPLOYMENT_TARGET": "18.0", "GENERATE_INFOPLIST_FILE": "YES", "SWIFT_STRICT_CONCURRENCY": "complete", "SWIFT_DEFAULT_ACTOR_ISOLATION": "nonisolated", "MARKETING_VERSION": "1.0", "CURRENT_PROJECT_VERSION": "1"}
     info = {
         "Kind": "Xcode.Xcode3.ProjectTemplateUnitKind",
         "Identifier": "com.3daysofswift.cfa.habitTracker",

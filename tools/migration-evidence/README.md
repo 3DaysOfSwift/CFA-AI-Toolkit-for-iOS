@@ -139,10 +139,10 @@ Use a consistent description for the build configuration, OS and device or
 simulator. Differing build or test commands still trigger a review warning.
 Verify that the new command exercises the failed check and explain how the
 rerun resolves the failure. Check that minimum-OS evidence lists every
-affected target. Navigator and human architecture reviews can
-cover the whole project without a target list. When they name targets, the
-list must include every affected target. The reviewer verifies coverage when
-the evidence describes the project as a whole. If evidence is
+affected target. Navigator and human architecture review evidence must list
+every affected target, even when the review covers the whole project. The
+reviewer verifies that the declared target list matches the actual consumers
+of changed code. If evidence is
 shared with another checkpoint, record the human architecture review and
 its outcome separately within that evidence. For a completed record, the validator flags checks recorded as not run during
 or after migration. Link equivalent passing final-commit evidence or explain

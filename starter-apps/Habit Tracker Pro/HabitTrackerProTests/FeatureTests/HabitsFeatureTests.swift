@@ -18,6 +18,8 @@ private actor FailingHabitsRepository: HabitsRepository {
 private actor PausedRecordRepository: HabitsRepository {
     private var stored: [Habit]
     private var recordStarted = false
+    private var shouldPauseRecord = true
+    private(set) var recordCount = 0
     private var startedWaiter: CheckedContinuation<Void, Never>?
     private var releaseWaiter: CheckedContinuation<Void, Never>?
 
@@ -25,10 +27,14 @@ private actor PausedRecordRepository: HabitsRepository {
     func fetchHabits() async throws -> [Habit] { stored }
     func insertHabit(_ habit: Habit) async throws { stored.append(habit) }
     func record(habitID: UUID, entryID: UUID, date: Date, value: Int) async throws {
+        recordCount += 1
         recordStarted = true
         startedWaiter?.resume()
         startedWaiter = nil
-        await withCheckedContinuation { releaseWaiter = $0 }
+        if shouldPauseRecord {
+            shouldPauseRecord = false
+            await withCheckedContinuation { releaseWaiter = $0 }
+        }
         guard let index = stored.firstIndex(where: { $0.id == habitID }) else { return }
         stored[index] = stored[index].replacingEntries([HabitEntry(id: entryID, date: date, value: value)])
     }
@@ -50,11 +56,47 @@ private actor RejectingRecordRepository: HabitsRepository {
 @Suite("Habits feature")
 @MainActor
 struct HabitsFeatureTests {
+    @Test("Equivalent record commands share one persistence operation", .timeLimit(.minutes(1)))
+    func equivalentRecordsShareOneOperation() async throws {
+        let habit = Habit(id: UUID(), name: "Read", tracking: .count, unit: "pages", dailyTarget: nil, entries: [])
+        let repository = PausedRecordRepository(habit: habit)
+        let feature = HabitsFeature(repository: repository)
+        await feature.reload()
+        let first = Task { try await feature.recordToday(habitID: habit.id, value: 3) }
+        await repository.waitForRecord()
+        let second = Task { try await feature.recordToday(habitID: habit.id, value: 3) }
+        for _ in 0..<100 { await Task.yield() }
+
+        await repository.releaseRecord()
+        try await first.value
+        try await second.value
+
+        #expect(await repository.recordCount == 1)
+        #expect(feature.habits.first?.entries.first?.value == 3)
+    }
+
+    @Test("An admitted record survives caller cancellation", .timeLimit(.minutes(1)))
+    func admittedRecordSurvivesCancellation() async throws {
+        let habit = Habit(id: UUID(), name: "Read", tracking: .count, unit: "pages", dailyTarget: nil, entries: [])
+        let repository = PausedRecordRepository(habit: habit)
+        let feature = HabitsFeature(repository: repository)
+        await feature.reload()
+        let caller = Task { try await feature.recordToday(habitID: habit.id, value: 4) }
+        await repository.waitForRecord()
+
+        caller.cancel()
+        await repository.releaseRecord()
+        try await caller.value
+
+        #expect(await repository.recordCount == 1)
+        #expect(feature.habits.first?.entries.first?.value == 4)
+    }
+
     @Test("Loading failure stays in the feature for the screen to present")
     func reportsLoadingFailure() async {
         let feature = HabitsFeature(repository: FailingHabitsRepository())
         await feature.reload()
-        #expect(feature.loadError == "Database unavailable")
+        #expect(feature.loadError is FailingHabitsRepository.Failure)
         #expect(feature.habits.isEmpty)
         #expect(!feature.isLoading)
     }

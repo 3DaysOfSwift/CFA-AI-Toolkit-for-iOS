@@ -13,9 +13,184 @@ import { json, hash, inventory, isReleasePath } from '../scripts/files.mjs';
 function sandbox(t) { const dir=fs.mkdtempSync(path.join(os.tmpdir(),'cfa-test-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));return dir; }
 function release(t) {const dir=sandbox(t);return {dir,source:stageRelease(path.join(dir,'ios-app-development-cfa'))};}
 
+test('public architecture map uses the canonical CFA folder names', () => {
+ const readme=fs.readFileSync(path.join(root,'README.md'),'utf8');
+ assert.match(readme,/User Data Storage/);
+ assert.match(readme,/View model tests/);
+ assert.doesNotMatch(readme,/│   └── Networking & Data Storage|    ├── ViewModelTests\n/);
+});
+
+test('portable installation guidance distinguishes releases from source checkouts', () => {
+ const readme=fs.readFileSync(path.join(root,'README.md'),'utf8');
+ const installation=fs.readFileSync(path.join(root,'docs/INSTALLATION.md'),'utf8');
+ for(const text of [readme,installation]) {
+  assert.match(text,/extracted plugin release/);
+  assert.match(text,/source checkout[\s\S]{0,200}intentionally (?:has no|does not\s+contain)/);
+  assert.match(text,/copy [^\n]{0,80}eight [^\n]{0,30}folders\s+manually/);
+ }
+});
+
+test('command modules can be imported from Node standard input', () => {
+ const modules = [
+  'scripts/build.mjs',
+  'scripts/install.mjs',
+  'scripts/sync.mjs',
+  'scripts/validate.mjs',
+  'scripts/verify-ios-app-identity.mjs',
+  'scripts/verify-ios-orientations.mjs',
+  'tools/explanations/explanations.mjs',
+  'tools/architecture-dashboard/src/health-report.mjs'
+ ];
+ const input=modules.map(file=>`import ${JSON.stringify(new URL(`../${file}`,import.meta.url).href)};`).join('\n');
+ const result=spawnSync(process.execPath,['--input-type=module','-'],{input,encoding:'utf8'});
+ assert.equal(result.status,0,result.stderr);
+ assert.equal(result.stdout,'');
+});
+
+test('source archives preserve executable entry points regardless of extension', t => {
+ const directory=sandbox(t);
+ const script=path.join(directory,'run.sh');
+ const cli=path.join(directory,'cli.mjs');
+ const module=path.join(directory,'library.mjs');
+ const archive=path.join(directory,'source.zip');
+ fs.writeFileSync(script,'#!/bin/sh\n');
+ fs.writeFileSync(cli,'#!/usr/bin/env node\n');
+ fs.writeFileSync(module,'export const value = 1;\n');
+ fs.chmodSync(script,0o755);
+ fs.chmodSync(cli,0o755);
+ fs.chmodSync(module,0o644);
+ const python=`
+import importlib.util
+import pathlib
+import sys
+import zipfile
+spec = importlib.util.spec_from_file_location("cfa_release", sys.argv[1])
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+module.archive(pathlib.Path(sys.argv[2]), [
+    ("tools/run.sh", pathlib.Path(sys.argv[3])),
+    ("dashboard/cli.mjs", pathlib.Path(sys.argv[4])),
+    ("dashboard/library.mjs", pathlib.Path(sys.argv[5])),
+], "pkg")
+with zipfile.ZipFile(sys.argv[2]) as value:
+    for name in ["pkg/tools/run.sh", "pkg/dashboard/cli.mjs", "pkg/dashboard/library.mjs"]:
+        print(oct((value.getinfo(name).external_attr >> 16) & 0o777))
+`;
+ const result=spawnSync('python3',['-c',python,path.join(root,'scripts/release.py'),archive,script,cli,module],{encoding:'utf8'});
+ assert.equal(result.status,0,result.stderr);
+ assert.deepEqual(result.stdout.trim().split('\n'),['0o755','0o755','0o644']);
+});
+
+test('checkout releases detect untracked files that would enter the payload', t => {
+ const directory=sandbox(t);
+ assert.equal(spawnSync('git',['init','--quiet'],{cwd:directory,encoding:'utf8'}).status,0);
+ fs.mkdirSync(path.join(directory,'skills'),{recursive:true});
+ fs.mkdirSync(path.join(directory,'docs/__pycache__'),{recursive:true});
+ fs.writeFileSync(path.join(directory,'.gitignore'),'skills/private-notes.txt\n');
+ fs.writeFileSync(path.join(directory,'skills/private-notes.txt'),'not for release\n');
+ fs.writeFileSync(path.join(directory,'docs/__pycache__/cache.pyc'),'cache\n');
+ fs.writeFileSync(path.join(directory,'outside.txt'),'outside the release roots\n');
+ const python=`
+import importlib.util
+import json
+import pathlib
+import sys
+spec = importlib.util.spec_from_file_location("cfa_release", sys.argv[1])
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+print(json.dumps(module.untracked_release_files(pathlib.Path(sys.argv[2]), ["skills", "docs"])))
+`;
+ const result=spawnSync('python3',['-c',python,path.join(root,'scripts/release.py'),directory],{encoding:'utf8'});
+ assert.equal(result.status,0,result.stderr);
+ assert.deepEqual(JSON.parse(result.stdout),['skills/private-notes.txt']);
+});
+
+test('release validation keeps the public toolkit description aligned', t => {
+ const {source}=release(t);
+ const manifest=path.join(source,'.codex-plugin/plugin.json');
+ const value=json(manifest);
+ value.description='Older CFA subtitle';
+ fs.writeFileSync(manifest,JSON.stringify(value));
+ assert.throws(()=>validate(source,{source:false}),/Unexpected plugin description/);
+});
+
+test('release validation keeps portable and Codex manifest identity aligned', t => {
+ const {source}=release(t);
+ const manifest=path.join(source,'plugin.json');
+ const value=json(manifest);
+ value.version='9.9.9';
+ fs.writeFileSync(manifest,JSON.stringify(value));
+ assert.throws(()=>validate(source,{source:false}),/Portable plugin manifest does not match Codex manifest/);
+});
+
+test('release validation keeps the public publisher and repository identity aligned', t => {
+ const {source}=release(t);
+ const manifest=path.join(source,'plugin.json');
+ const value=json(manifest);
+ value.repository='https://example.com/not-cfa';
+ fs.writeFileSync(manifest,JSON.stringify(value));
+ assert.throws(()=>validate(source,{source:false}),/Portable plugin manifest does not match Codex manifest/);
+});
+
+test('release validation rejects malformed host interface metadata', t => {
+ const {source}=release(t);
+ const manifest=path.join(source,'.codex-plugin/plugin.json');
+ const value=json(manifest);
+ value.interface.capabilities=['Read'];
+ fs.writeFileSync(manifest,JSON.stringify(value));
+ assert.throws(()=>validate(source,{source:false}),/Invalid Codex plugin interface metadata/);
+});
+
+test('release validation keeps the portable Agent Plugin contract', t => {
+ const {source}=release(t);
+ const manifest=path.join(source,'plugin.json');
+ const value=json(manifest);
+ delete value.$schema;
+ fs.writeFileSync(manifest,JSON.stringify(value));
+ assert.throws(()=>validate(source,{source:false}),/Portable plugin manifest does not match Codex manifest/);
+});
+
+test('release validation keeps the dashboard package on the toolkit version', t => {
+ const {source}=release(t);
+ const manifest=path.join(source,'skills/cfa-architecture-review/scripts/dashboard/package.json');
+ const value=json(manifest);
+ value.version='0.3.3';
+ fs.writeFileSync(manifest,JSON.stringify(value));
+ assert.throws(()=>validate(source,{source:false}),/dashboard package identity does not match/);
+});
+
+test('release validation requires its declared dashboard command to be executable', t => {
+ const {source}=release(t);
+ const cli=path.join(source,'skills/cfa-architecture-review/scripts/dashboard/src/cli.mjs');
+ fs.chmodSync(cli,0o644);
+ assert.throws(()=>validate(source,{source:false}),/dashboard command must be an executable file/);
+});
+
+test('release validation rejects stale skill and bundled-tool licences', t => {
+ const {source}=release(t);
+ const skillLicense=path.join(source,'skills/cfa-feature-work/LICENSE');
+ fs.appendFileSync(skillLicense,'\nStale copy.\n');
+ assert.throws(()=>validate(source,{source:false}),/stale skill licence: cfa-feature-work/);
+ fs.copyFileSync(path.join(source,'LICENSE'),skillLicense);
+ const dashboardLicense=path.join(source,'skills/cfa-architecture-review/scripts/dashboard/LICENSE');
+ fs.appendFileSync(dashboardLicense,'\nStale copy.\n');
+ assert.throws(()=>validate(source,{source:false}),/stale bundled dashboard licence/);
+});
+
+test('release validation rejects unreviewed skill packages', t => {
+ const {source}=release(t);
+ const unexpected=path.join(source,'skills/unreviewed-skill');
+ fs.mkdirSync(unexpected);
+ fs.writeFileSync(path.join(unexpected,'SKILL.md'),'---\nname: unreviewed-skill\ndescription: Not reviewed.\n---\n');
+ assert.throws(()=>validate(source,{source:false}),/Unexpected or missing skill package/);
+});
+
 test('release omits local Xcode state and build outputs, but retains shared project configuration', t => {
  for (const file of ['A.xcodeproj/xcuserdata/person.xcuserdatad/state', 'View.xcuserstate',
-  '.DS_Store', 'App/.build/debug/out', 'App/DerivedData/out', 'App/.git/config']) assert.equal(isReleasePath(file),false,file);
+  '.DS_Store', 'App/.build/debug/out', 'App/DerivedData/out', 'App/.git/config',
+  'scripts/__pycache__/release.cpython-312.pyc', 'scripts/release.pyc', 'scripts/helper.pyd',
+  'scripts/.venv/bin/python', 'scripts/venv/bin/python', 'tools/reports/private.html',
+  'tools/dist/generated.js']) assert.equal(isReleasePath(file),false,file);
  for (const file of ['A.xcodeproj/xcshareddata/xcschemes/App.xcscheme',
   'Package.swift', '.swiftpm/configuration/registries.json', 'Package.resolved']) assert.equal(isReleasePath(file),true,file);
  const {source}=release(t);
@@ -128,6 +303,43 @@ test('portable installation accepts an explicit host skill directory',t=>{
  assert.equal(fs.existsSync(path.join(destination,'.agents','skills')),false);
 });
 
+test('staged release installer runs without maintainer-only source dependencies', t => {
+ const {dir,source}=release(t);
+ const installer=path.join(source,'scripts/install.mjs');
+ const help=spawnSync(process.execPath,[installer,'--help'],{encoding:'utf8'});
+ assert.equal(help.status,0,help.stderr);
+ assert.match(help.stdout,/CFA installer/);
+ const destination=path.join(dir,'extracted-release-customer');
+ const installed=spawnSync(process.execPath,[installer,'--mode','skills','--destination',destination,'--no-command'],{encoding:'utf8'});
+ assert.equal(installed.status,0,installed.stderr);
+ for(const name of skills) assert.ok(fs.existsSync(path.join(destination,'.agents/skills',name,'SKILL.md')),name);
+});
+
+test('release validation rejects a missing packaged module dependency', t => {
+ const {source}=release(t);
+ fs.unlinkSync(path.join(source,'scripts/skill-names.mjs'));
+ assert.throws(()=>validate(source,{source:false}),/Missing packaged module dependency: scripts\/install\.mjs/);
+});
+
+test('release validation rejects broken packaged documentation links', t => {
+ const {source}=release(t);
+ fs.unlinkSync(path.join(source,'CONTRIBUTING.md'));
+ assert.throws(()=>validate(source,{source:false}),/Broken local documentation reference: README\.md → CONTRIBUTING\.md/);
+});
+
+test('release validation rejects missing local HTML documentation assets', t => {
+ const {source}=release(t);
+ fs.unlinkSync(path.join(source,'readme-images/3DaysOfSwiftConcurrency-h512.png'));
+ assert.throws(()=>validate(source,{source:false}),/Broken local documentation reference: README\.md → readme-images\/3DaysOfSwiftConcurrency-h512\.png/);
+});
+
+test('release validation rejects broken local documentation anchors', t => {
+ const {source}=release(t);
+ const publishing=path.join(source,'docs/PUBLISHING.md');
+ fs.writeFileSync(publishing,fs.readFileSync(publishing,'utf8').replace('## Maintainer release procedure','## Release steps'));
+ assert.throws(()=>validate(source,{source:false}),/Broken local documentation anchor: docs\/VALIDATION\.md → PUBLISHING\.md#maintainer-release-procedure/);
+});
+
 test('every portable skill carries the shared workflow and separate design defaults', t => {
  const {dir,source}=release(t);
  const destination=path.join(dir,'customer');
@@ -141,6 +353,40 @@ test('every portable skill carries the shared workflow and separate design defau
     hash(path.join(root,'architecture',file)),name);
   }
  }
+});
+
+test('every skill ships complete interface metadata', t => {
+ const {source}=release(t);
+ for (const name of skills) {
+  const metadata=path.join(source,'skills',name,'agents/openai.yaml');
+  assert.ok(fs.existsSync(metadata),name);
+  const contents=fs.readFileSync(metadata,'utf8');
+  for (const field of ['display_name','short_description','default_prompt']) {
+   assert.match(contents,new RegExp(`^\\s{2}${field}:\\s+\\S`,'m'),`${name}: ${field}`);
+  }
+  assert.ok(contents.includes(`$${name}`), `${name}: default prompt invocation`);
+ }
+ fs.unlinkSync(path.join(source,'skills/swift-code-quality/agents/openai.yaml'));
+ assert.throws(()=>validate(source,{source:false}),/Missing skill interface metadata: swift-code-quality/);
+});
+
+test('release validation rejects a default prompt that does not invoke its skill', t => {
+ const {source}=release(t);
+ const metadata=path.join(source,'skills/cfa-feature-work/agents/openai.yaml');
+ fs.writeFileSync(metadata,fs.readFileSync(metadata,'utf8').replace('$cfa-feature-work','cfa-feature-work'));
+ assert.throws(()=>validate(source,{source:false}),/default prompt does not invoke \$cfa-feature-work/);
+});
+
+test('release validation rejects malformed skill interface metadata', t => {
+ const {source}=release(t);
+ const metadata=path.join(source,'skills/cfa-feature-work/agents/openai.yaml');
+ const original=fs.readFileSync(metadata,'utf8');
+ fs.writeFileSync(metadata,original.replace('"CFA Feature Work"','CFA Feature Work'));
+ assert.throws(()=>validate(source,{source:false}),/strings must be quoted and non-empty/);
+ fs.writeFileSync(metadata,original.replace('Add, change or remove a CFA iOS app feature','Too short'));
+ assert.throws(()=>validate(source,{source:false}),/25 to 64 characters/);
+ fs.writeFileSync(metadata,`${original}  display_name: "Duplicate"\n`);
+ assert.throws(()=>validate(source,{source:false}),/metadata structure/);
 });
 
 test('release validation rejects a missing workflow policy and an entry point that bypasses it', t => {
@@ -166,6 +412,18 @@ test('release validation rejects an unquoted colon in a skill description', t =>
  assert.doesNotThrow(()=>validate(source,{source:false}));
  fs.writeFileSync(entry,original);
  assert.doesNotThrow(()=>validate(source,{source:false}));
+});
+
+test('release validation rejects ambiguous skill frontmatter', t => {
+ const {source}=release(t);
+ const entry=path.join(source,'skills/cfa-feature-work/SKILL.md');
+ const original=fs.readFileSync(entry,'utf8');
+ fs.writeFileSync(entry,original.replace('name: cfa-feature-work','name: another-skill'));
+ assert.throws(()=>validate(source,{source:false}),/name must match its package/);
+ fs.writeFileSync(entry,original.replace('description: Add','name: cfa-feature-work\ndescription: Add'));
+ assert.throws(()=>validate(source,{source:false}),/frontmatter structure/);
+ fs.writeFileSync(entry,original.replace('\n---\n\n# CFA feature work','\nmetadata: extra\n---\n\n# CFA feature work'));
+ assert.throws(()=>validate(source,{source:false}),/frontmatter structure/);
 });
 
 test('release validation rejects a stale bundled reference Feature', t => {

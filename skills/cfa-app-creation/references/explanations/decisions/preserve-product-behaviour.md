@@ -1,7 +1,7 @@
 # Migration preserves product behaviour
 
 Topic: `preserve-product-behaviour`  
-Rules: `CFA-SCOPE-01`, `CFA-SCOPE-02`, `CFA-SPEC-DESIGN-01`\
+Rules: `CFA-SPEC-DESIGN-01`\
 Classification: cfa-choice  
 Status: documented basis with editorial analysis; not a founder-approved historical decision record.
 

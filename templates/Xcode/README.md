@@ -13,6 +13,19 @@ Native templates live in `Project Templates/iOS/Application/`. Habit Tracker and
 Day Streak are generated from their Starter Apps; edit those projects and use
 the generation commands in their READMEs. CFA App is maintained directly.
 
+## Terminal project creation
+
+An AI session or CI job can create an Xcode project without the Xcode chooser:
+
+```sh
+node scripts/create-cfa-project.mjs --name ReadingList --out /tmp/ReadingList
+xcodebuild -project /tmp/ReadingList/ReadingList.xcodeproj -scheme ReadingList -sdk iphonesimulator build
+```
+
+The command copies the maintained Day Streak starter and retargets the project,
+app, test target and bundle identifiers. `--name` is a bundle-identifier-safe
+Swift name; generated identifiers use `com.3DaysOfSwiftConcurrency.<AppName>`.
+
 Want an existing project you can open immediately? Browse
 [Starter Apps](../../starter-apps/README.md), including Habit Tracker Pro with
 charts and a StoreKit purchase example. Starter Apps are not installed into the

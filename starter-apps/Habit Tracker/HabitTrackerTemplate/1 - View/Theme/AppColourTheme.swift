@@ -3,7 +3,6 @@ import UIKit
 
 struct AppColourTheme: Equatable {
     let id: String
-    let name: String
     let colorScheme: ColorScheme?
     let background: Color
     let surface: Color
@@ -14,7 +13,7 @@ struct AppColourTheme: Equatable {
     let separator: Color
 
     static let light = AppColourTheme(
-        id: "light", name: "Light", colorScheme: .light,
+        id: "light", colorScheme: .light,
         background: Color(red: 0.96, green: 0.96, blue: 0.94),
         surface: .white, primaryText: Color(red: 0.12, green: 0.13, blue: 0.13),
         secondaryText: Color(red: 0.40, green: 0.42, blue: 0.42),
@@ -23,7 +22,7 @@ struct AppColourTheme: Equatable {
     )
 
     static let dark = AppColourTheme(
-        id: "dark", name: "Dark", colorScheme: .dark,
+        id: "dark", colorScheme: .dark,
         background: Color(red: 0.08, green: 0.09, blue: 0.09),
         surface: Color(red: 0.14, green: 0.15, blue: 0.15),
         primaryText: Color(red: 0.94, green: 0.95, blue: 0.93),
@@ -34,7 +33,7 @@ struct AppColourTheme: Equatable {
     )
 
     static let ocean = AppColourTheme(
-        id: "ocean", name: "Ocean", colorScheme: .dark,
+        id: "ocean", colorScheme: .dark,
         background: Color(red: 0.03, green: 0.10, blue: 0.16),
         surface: Color(red: 0.07, green: 0.18, blue: 0.25),
         primaryText: .white, secondaryText: Color(red: 0.68, green: 0.80, blue: 0.87),
@@ -44,7 +43,7 @@ struct AppColourTheme: Equatable {
     )
 
     static let plum = AppColourTheme(
-        id: "plum", name: "Plum", colorScheme: .dark,
+        id: "plum", colorScheme: .dark,
         background: Color(red: 0.12, green: 0.07, blue: 0.16),
         surface: Color(red: 0.21, green: 0.13, blue: 0.26),
         primaryText: Color(red: 0.98, green: 0.94, blue: 1),
@@ -55,7 +54,7 @@ struct AppColourTheme: Equatable {
     )
 
     static let forest = AppColourTheme(
-        id: "forest", name: "Forest", colorScheme: .light,
+        id: "forest", colorScheme: .light,
         background: Color(red: 0.91, green: 0.95, blue: 0.88),
         surface: Color(red: 0.97, green: 0.99, blue: 0.94),
         primaryText: Color(red: 0.12, green: 0.20, blue: 0.10),
@@ -65,7 +64,7 @@ struct AppColourTheme: Equatable {
     )
 
     static let terracotta = AppColourTheme(
-        id: "terracotta", name: "Terracotta", colorScheme: .light,
+        id: "terracotta", colorScheme: .light,
         background: Color(red: 0.98, green: 0.93, blue: 0.87),
         surface: Color(red: 1, green: 0.98, blue: 0.95),
         primaryText: Color(red: 0.24, green: 0.14, blue: 0.10),
@@ -75,7 +74,7 @@ struct AppColourTheme: Equatable {
     )
 
     static let indigo = AppColourTheme(
-        id: "indigo", name: "Indigo", colorScheme: .light,
+        id: "indigo", colorScheme: .light,
         background: Color(red: 0.93, green: 0.93, blue: 0.99),
         surface: Color(red: 0.98, green: 0.98, blue: 1),
         primaryText: Color(red: 0.14, green: 0.13, blue: 0.28),
@@ -92,7 +91,7 @@ struct AppColourTheme: Equatable {
     // Dynamic colours resolve against each presentation's traits without storing
     // a second, potentially stale copy of the system appearance in ThemeManager.
     static let automatic = AppColourTheme(
-        id: "automatic", name: "Automatic", colorScheme: nil,
+        id: "automatic", colorScheme: nil,
         background: adaptive(defaultLight.background, defaultDark.background),
         surface: adaptive(defaultLight.surface, defaultDark.surface),
         primaryText: adaptive(defaultLight.primaryText, defaultDark.primaryText),

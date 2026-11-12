@@ -21,7 +21,7 @@ struct DayStreakFeatureTests {
         #expect(env.streak.week.count == 7)
     }
 
-    @Test func calendarDaysWorkAcrossDSTAndLeapDay() throws {
+    @Test func calendarDaysWorkAcrossDSTAndLeapDay() async throws {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = try #require(TimeZone(identifier: "Europe/Paris"))
         for components in [DateComponents(year: 2024, month: 3, day: 1), DateComponents(year: 2026, month: 3, day: 30)] {
@@ -29,7 +29,46 @@ struct DayStreakFeatureTests {
             let dates = try (-3...0).map { offset in
                 try #require(calendar.date(byAdding: .day, value: offset, to: today))
             }
-            #expect(DayStreakFeature.streak(endingNear: today, days: Set(dates), calendar: calendar) == 4)
+            let question = MultiplicationQuestion(id: UUID(), left: 9, right: 9, choices: [81])
+            let sessions = dates.map { date in
+                PracticeSession(id: UUID(), day: date, isExtraPractice: false,
+                                difficulty: .everyday, question: question,
+                                correctCount: PracticeSession.target, completedAt: date)
+            }
+            let environment = TestEnvironment(repository: MemorySessions(sessions),
+                                              clock: TestClock(today), calendar: calendar)
+
+            try await environment.streak.refresh()
+
+            #expect(environment.streak.currentStreak == 4)
         }
+    }
+
+    @Test func recentCompletedDaysAreNewestFirstAndLimitedToThirty() async throws {
+        let calendar = Calendar(identifier: .gregorian)
+        let firstDay = Date(timeIntervalSince1970: 1_700_000_000)
+        let question = MultiplicationQuestion(id: UUID(), left: 9, right: 9, choices: [81])
+        let completedDays = try (0..<35).map { offset in
+            let day = try #require(calendar.date(byAdding: .day, value: offset, to: firstDay))
+            return PracticeSession(
+                id: UUID(),
+                day: day,
+                isExtraPractice: false,
+                difficulty: .everyday,
+                question: question,
+                correctCount: PracticeSession.target,
+                completedAt: day
+            )
+        }
+        let environment = TestEnvironment(
+            repository: MemorySessions(completedDays),
+            clock: TestClock(try #require(calendar.date(byAdding: .day, value: 35, to: firstDay))),
+            calendar: calendar
+        )
+
+        try await environment.streak.refresh()
+
+        #expect(environment.streak.recentCompletedDays.count == 30)
+        #expect(environment.streak.recentCompletedDays == completedDays.suffix(30).map(\.day).reversed())
     }
 }

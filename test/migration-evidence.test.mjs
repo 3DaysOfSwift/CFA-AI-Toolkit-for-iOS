@@ -608,6 +608,8 @@ test('portable installation carries the complete evidence tool and creates cases
   assert.equal(creation.status, 0, creation.stderr);
   const installedGuide = fs.readFileSync(path.join(path.dirname(cli), 'README.md'), 'utf8');
   assert.match(installedGuide, /Read the warnings from both `validate` and `digest`/);
+  assert.match(installedGuide, /Navigator and human architecture review evidence must list/);
+  assert.doesNotMatch(installedGuide, /cover the whole project without a target list/);
   const caseStudy = fs.readFileSync(path.join(target, 'case-study.md'), 'utf8');
   assert.match(caseStudy, /record the producing and receiving targets and the verification environment/);
   assert.match(caseStudy, /list the covered targets on the evidence/);

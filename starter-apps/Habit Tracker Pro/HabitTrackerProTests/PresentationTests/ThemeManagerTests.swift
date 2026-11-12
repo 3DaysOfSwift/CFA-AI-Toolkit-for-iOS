@@ -15,25 +15,27 @@ struct ThemeManagerTests {
         #expect(AppColourTheme.automatic.colorScheme == nil)
     }
 
-    @Test func selectionPersistsAndUnknownIdentifiersFollowSystem() throws {
+    @Test func featureSelectionDrivesThemeAndUnknownIdentifiersFollowSystem() throws {
         let suite = "ThemeManagerTests.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
-        let manager = ThemeManager(defaults: defaults)
-        #expect(manager.selectedTheme.id == "automatic")
+        let feature = SettingsFeature(defaults: defaults)
+        let themeManager = ThemeManager(settingsFeature: feature)
+        #expect(themeManager.selectedTheme.id == "automatic")
         for palette in AppColourTheme.availableThemes {
-            manager.select(palette)
-            #expect(manager.selectedTheme.id == palette.id)
-            #expect(ThemeManager(defaults: defaults).selectedTheme.id == palette.id)
+            let selection = try #require(ThemeSelection(rawValue: palette.id))
+            feature.selectTheme(selection)
+            #expect(themeManager.selectedTheme.id == palette.id)
+            #expect(SettingsFeature(defaults: defaults).selectedTheme == selection)
         }
-        manager.select(.automatic)
-        #expect(ThemeManager(defaults: defaults).selectedTheme.colorScheme == nil)
+        feature.selectTheme(.automatic)
+        #expect(themeManager.selectedTheme.colorScheme == nil)
         defaults.set("obsolete-theme", forKey: "selectedTheme")
-        #expect(ThemeManager(defaults: defaults).selectedTheme.id == "automatic")
+        #expect(SettingsFeature(defaults: defaults).selectedTheme == .automatic)
         // Existing installations keep their recognised choices.
         for legacyID in ["light", "dark"] {
             defaults.set(legacyID, forKey: "selectedTheme")
-            #expect(ThemeManager(defaults: defaults).selectedTheme.id == legacyID)
+            #expect(SettingsFeature(defaults: defaults).selectedTheme.rawValue == legacyID)
         }
     }
 

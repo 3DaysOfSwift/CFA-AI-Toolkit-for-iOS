@@ -87,9 +87,9 @@ actor JSONNotesRepository: NotesRepository {
     // Keep the read and replacement in one actor turn.
     func save(_ note: Note) throws {
         let notes = try load()
-        let data = try JSONEncoder().encode(notes + [note])
+        let encodedNotes = try JSONEncoder().encode(notes + [note])
         try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
-        try data.write(to: file, options: .atomic)
+        try encodedNotes.write(to: file, options: .atomic)
     }
 }
 

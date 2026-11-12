@@ -46,8 +46,9 @@ No app-owned Boolean in UserDefaults grants access.
 TrendsViewModel checks access before exposing trends or retrying a load;
 TrendsFeature owns the trend calculations.
 PurchasesFeature owns entitlement and purchase policy. Its StoreKitManager
-handles products, verified transactions, updates, finishing transactions and
-App Store synchronisation. PurchaseStore is a testable **external-service**
+handles products, verified transactions, the update stream, finishing transactions
+and App Store synchronisation. AppModel owns the single app-wide update-listener
+Task and forwards each event to PurchasesFeature. PurchaseStore is a testable **external-service**
 boundary, not a redundant protocol for a Feature.
 
 AppModel.live() constructs the graph. The delegate signals launch; independent

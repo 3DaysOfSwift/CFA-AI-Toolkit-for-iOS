@@ -86,6 +86,16 @@ struct TodayFeatureTests {
         #expect(todayFeature.completedHabitCount == 0)
     }
 
+    @Test("Entry validity is exposed by the Feature that owns the rule")
+    func entryValidity() {
+        let habitsFeature = HabitsFeature(repository: InMemoryHabitsRepository())
+        let todayFeature = TodayFeature(habitsFeature: habitsFeature)
+
+        #expect(todayFeature.isValidEntryValue(0))
+        #expect(todayFeature.isValidEntryValue(1))
+        #expect(!todayFeature.isValidEntryValue(-1))
+    }
+
     @Test("Today exposes a failed data request and recovers through the same shared owner")
     func loadingFailureAndRetry() async {
         let habit = Habit(id: UUID(), name: "Read", tracking: .completion, unit: "", dailyTarget: nil, entries: [])

@@ -31,7 +31,7 @@ struct PracticeView: View {
                 }
             }
             .background(themeManager.current.background)
-            .navigationTitle("Todays Twenty")
+            .navigationTitle(viewModel.appName)
             .navigationBarTitleDisplayMode(.inline)
             .task { await viewModel.refresh().value }
             .task(id: scenePhase == .active ? viewModel.questionAwaitingAdvanceID : nil) {
@@ -104,7 +104,7 @@ struct PracticeView: View {
 
             if session.canChangeDifficulty {
                 Picker("Difficulty", selection: Binding(get: { session.difficulty }, set: { viewModel.perform(.difficulty($0)) })) {
-                    ForEach(Difficulty.allCases) { Text($0.detail).tag($0) }
+                    ForEach(Difficulty.allCases) { Text(viewModel.difficultyDescription($0)).tag($0) }
                 }
                 .pickerStyle(.menu).frame(minHeight: 48)
                 Text("Choose now. Difficulty locks at question two.").font(.caption).foregroundStyle(.secondary)

@@ -1,7 +1,7 @@
 # Why CFA screens own their ViewModels
 
 Topic: `view-model-ownership`  
-Rules: `CFA-SCREEN-01`, `CFA-SCREEN-02`, `CFA-SPEC-APP-03`, `CFA-SPEC-UI-02`, `CFA-SPEC-UI-03`, `CFA-SPEC-UI-07`\
+Rules: `CFA-SPEC-APP-03`, `CFA-SPEC-UI-02`, `CFA-SPEC-UI-03`, `CFA-SPEC-UI-07`\
 Classification: cfa-choice  
 Status: documented basis with editorial analysis; not a founder-approved historical decision record.
 

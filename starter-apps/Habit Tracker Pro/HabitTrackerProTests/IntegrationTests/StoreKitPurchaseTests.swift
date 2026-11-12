@@ -26,7 +26,7 @@ struct StoreKitPurchaseTests {
         let feature = PurchasesFeature(store: store)
         await feature.purchaseTrends()
         #expect(feature.hasTrendsAccess)
-        #expect(feature.errorMessage == nil)
+        #expect(feature.error == nil)
 
         let trackingStore = TrackingPurchaseStore()
         let relaunched = PurchasesFeature(store: trackingStore)
@@ -34,14 +34,14 @@ struct StoreKitPurchaseTests {
         let defaults = try #require(UserDefaults(suiteName: suiteName))
         defer { defaults.removePersistentDomain(forName: suiteName) }
         let habits = HabitsFeature(repository: InMemoryHabitsRepository())
-        let model = AppModel(todayFeature: TodayFeature(habitsFeature: habits),
+        let appModel = AppModel(todayFeature: TodayFeature(habitsFeature: habits),
                              habitsFeature: habits,
                              dayStreakFeature: DayStreakFeature(habitsFeature: habits),
                              settingsFeature: SettingsFeature(defaults: defaults),
                              purchasesFeature: relaunched,
                              trendsFeature: TrendsFeature(habitsFeature: habits))
-        defer { withExtendedLifetime(model) {} }
-        model.applicationDidFinishLaunching()
+        defer { withExtendedLifetime(appModel) {} }
+        appModel.applicationDidFinishLaunching()
         await relaunched.prepare()
         #expect(relaunched.hasTrendsAccess)
         let transaction = try #require(session.allTransactions().first)

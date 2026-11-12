@@ -30,7 +30,11 @@ struct TrendsView: View {
                             }
                             .pickerStyle(.menu)
                             .frame(minHeight: 48)
-                            HabitTrendCharts(trend: trend, theme: themeManager.selectedTheme)
+                            HabitTrendCharts(
+                                trend: trend,
+                                activityUnit: viewModel.activityUnit(for: trend),
+                                theme: themeManager.selectedTheme
+                            )
                         } else if !viewModel.isLoading && viewModel.loadError == nil {
                             ContentUnavailableView("Your story starts with a habit",
                                 systemImage: "chart.bar", description: Text("Add a habit in Today. Your recorded activity will appear here."))
@@ -50,6 +54,7 @@ struct TrendsView: View {
 
 private struct HabitTrendCharts: View {
     let trend: HabitTrend
+    let activityUnit: String
     let theme: AppColourTheme
 
     var body: some View {
@@ -61,7 +66,7 @@ private struct HabitTrendCharts: View {
             }
             VStack(alignment: .leading, spacing: 16) {
                 Text("Daily activity").font(.headline)
-                Text(trend.unit.isEmpty ? "Recorded amount" : trend.unit)
+                Text(activityUnit)
                     .font(.subheadline).foregroundStyle(theme.secondaryText)
                 Chart {
                     ForEach(trend.days) { day in

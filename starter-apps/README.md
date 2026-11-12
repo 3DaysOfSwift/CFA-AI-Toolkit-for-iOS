@@ -8,6 +8,7 @@ features and tests, then make it your own. No template installation is required.
 | [Habit Tracker](Habit%20Tracker/README.md) | Habits, daily progress, streaks, SwiftData storage and Settings | [HabitTrackerTemplate.xcodeproj](Habit%20Tracker/HabitTrackerTemplate.xcodeproj) |
 | [Habit Tracker Pro](Habit%20Tracker%20Pro/README.md) | Habit Tracker plus charts and a one-time StoreKit unlock | [HabitTrackerPro.xcodeproj](Habit%20Tracker%20Pro/HabitTrackerPro.xcodeproj) |
 | [Todays Twenty](Todays%20Twenty/README.md) | Daily multiplication practice, saved sessions and reusable day-streak behaviour | [TimesThirty.xcodeproj](Todays%20Twenty/TimesThirty.xcodeproj) |
+| [Git Repos](Git%20Repos/README.md) | GitHub networking, JSON cache restoration, shared refresh and remote-list presentation | [GitRepos.xcodeproj](Git%20Repos/GitRepos.xcodeproj) |
 
 These are customisable starting points, not a guarantee of App Store readiness.
 Read each app's setup, verification and distribution notes. Configure your own
@@ -31,6 +32,7 @@ the editable sources of their native templates. Maintain one source, not two:
 | Habit Tracker | Habit Tracker | `python3 scripts/sync-habit-template.py` |
 | Todays Twenty | Day Streak | `python3 scripts/sync-day-streak-template.py` |
 | Habit Tracker Pro | None; standalone purchase example | No generation step |
+| Git Repos | None; optional remote-list and cache example | No generation step |
 
 Use each generation command with `--check` to detect stale template output.
 Do not hand-edit generated template sources. The Xcode template installer installs

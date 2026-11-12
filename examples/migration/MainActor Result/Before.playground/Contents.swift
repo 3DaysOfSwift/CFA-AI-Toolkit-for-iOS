@@ -10,9 +10,9 @@ final class LegacyLaunchModel {
     private(set) var name = "No launch loaded"
     func load(completion: @escaping @MainActor @Sendable () -> Void) {
         DispatchQueue.global().async {
-            let result = "Artemis"
+            let launchName = "Artemis"
             DispatchQueue.main.async {
-                self.name = result
+                self.name = launchName
                 completion()
             }
         }
@@ -23,10 +23,10 @@ final class LegacyLaunchModel {
 // MARK: - Behaviour check
 @MainActor
 func runExample() async {
-    let model = LegacyLaunchModel()
+    let legacyLaunchModel = LegacyLaunchModel()
     await withCheckedContinuation { continuation in
-        model.load {
-            precondition(model.name == "Artemis")
+        legacyLaunchModel.load {
+            precondition(legacyLaunchModel.name == "Artemis")
             continuation.resume()
         }
     }

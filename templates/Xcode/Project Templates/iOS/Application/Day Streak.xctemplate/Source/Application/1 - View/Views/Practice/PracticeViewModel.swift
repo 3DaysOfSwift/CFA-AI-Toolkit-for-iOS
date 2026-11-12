@@ -6,6 +6,7 @@ final class PracticeViewModel {
     private let practiceFeature: PracticeFeature
     private let dayStreakFeature: DayStreakFeature
     private let settingsFeature: SettingsFeature
+    private let appInformation: AppInformation
     private(set) var errorMessage: String?
     @ObservationIgnored private var queuedCommandTask: Task<Void, Never>?
     @ObservationIgnored private var lastQueuedCommand: PracticeFeature.Command?
@@ -18,10 +19,12 @@ final class PracticeViewModel {
 
     init(practiceFeature: PracticeFeature = AppModel.shared.practiceFeature,
          dayStreakFeature: DayStreakFeature = AppModel.shared.dayStreakFeature,
-         settingsFeature: SettingsFeature = AppModel.shared.settingsFeature) {
+         settingsFeature: SettingsFeature = AppModel.shared.settingsFeature,
+         appInformation: AppInformation = .current) {
         self.practiceFeature = practiceFeature
         self.dayStreakFeature = dayStreakFeature
         self.settingsFeature = settingsFeature
+        self.appInformation = appInformation
     }
 
     var session: PracticeSession? { practiceFeature.currentSession }
@@ -36,21 +39,30 @@ final class PracticeViewModel {
     var streak: Int { dayStreakFeature.currentStreak }
     var week: [StreakDay] { dayStreakFeature.week }
     var preferredDifficulty: Difficulty { settingsFeature.preferredDifficulty }
+    var appName: String { appInformation.appName }
+
+    func difficultyDescription(_ difficulty: Difficulty) -> String {
+        switch difficulty {
+        case .gentle: "2–5 times tables"
+        case .everyday: "2–12 times tables"
+        case .challenge: "6–19 times tables"
+        }
+    }
     func isCorrectAnswer(_ answer: Int, in question: MultiplicationQuestion) -> Bool {
-        question.isResolved && answer == question.answer
+        question.isCorrectChoice(answer)
     }
 
     func isIncorrectAnswer(_ answer: Int, in question: MultiplicationQuestion) -> Bool {
-        question.wrongAnswers.contains(answer)
+        question.isIncorrectChoice(answer)
     }
 
     var feedback: String {
         guard let question = session?.question else { return "" }
         if question.isRevealed { return "Answer revealed. This question earns no point." }
         if question.isAnswered {
-            return question.wrongAnswers.isEmpty ? "That's right. One point earned!" : "You've found it! No point this time—keep going."
+            return question.earnsPoint ? "That's right. One point earned!" : "You've found it! No point this time—keep going."
         }
-        if !question.wrongAnswers.isEmpty { return "Not quite. Try another answer. This question won't earn a point." }
+        if question.hasIncorrectAttempts { return "Not quite. Try another answer. This question won't earn a point." }
         return "Tap the question to reveal the answer."
     }
 
@@ -60,11 +72,11 @@ final class PracticeViewModel {
         let task = Task { @MainActor in
             defer { refreshTask = nil }
             do {
-                try await practiceFeature.perform(.refresh)
+                try await practiceFeature.refresh()
                 errorMessage = nil
             } catch {
                 retryCommand = .refresh
-                errorMessage = error.localizedDescription
+                errorMessage = "Your saved practice could not be loaded. Please try again."
             }
         }
         refreshTask = task
@@ -88,7 +100,7 @@ final class PracticeViewModel {
             errorMessage = nil
             retryCommand = command
             do { try await practiceFeature.perform(command) }
-            catch { errorMessage = error.localizedDescription }
+            catch { errorMessage = message(for: error, command: command) }
         }
         queuedCommandTask = task
         lastQueuedCommand = command
@@ -139,4 +151,19 @@ final class PracticeViewModel {
 
     @discardableResult
     func retry() -> Task<Void, Never> { perform(retryCommand) }
+
+    private func message(for error: any Error, command: PracticeFeature.Command) -> String {
+        if command == .refresh {
+            return "Your saved practice could not be loaded. Please try again."
+        }
+        guard let practiceError = error as? PracticeError else {
+            return "Your practice could not be saved. Please try again."
+        }
+        return switch practiceError {
+        case .unavailableSession: "This session is no longer available. Refresh to see today's practice."
+        case .staleQuestion: "The question has changed. Please answer the question now on screen."
+        case .difficultyLocked: "Difficulty is fixed after the first question."
+        case .unresolvedQuestion: "Find or reveal the correct answer before continuing."
+        }
+    }
 }

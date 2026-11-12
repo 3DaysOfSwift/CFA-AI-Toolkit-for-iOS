@@ -1,7 +1,7 @@
 # Keep edits visible and failures honest
 
 Topic: `honest-errors-and-editing`  
-Rules: `CFA-EDIT-01`, `CFA-ERROR-02`, `CFA-SPEC-ERROR-01`, `CFA-SPEC-OBS-02`, `CFA-SPEC-UI-04`\
+Rules: `CFA-SPEC-ERROR-01`, `CFA-SPEC-OBS-02`, `CFA-SPEC-UI-04`\
 Classification: cfa-choice  
 Status: documented basis with editorial analysis; not a founder-approved historical decision record.
 

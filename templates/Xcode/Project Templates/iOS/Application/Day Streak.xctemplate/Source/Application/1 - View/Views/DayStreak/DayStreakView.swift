@@ -34,10 +34,10 @@ struct DayStreakView: View {
                         .padding(24).background(themeManager.current.surface, in: RoundedRectangle(cornerRadius: 24))
                         Text("Finish your daily twenty to earn a day. Extra practice sharpens your skills, but never adds a second streak day. Missing a day resets your current streak—not your history.")
                             .font(.subheadline).foregroundStyle(.secondary)
-                        if !viewModel.completedDates.isEmpty {
+                        if !viewModel.recentCompletedDays.isEmpty {
                             VStack(alignment: .leading, spacing: 16) {
                                 Text("Your completed days").font(.headline)
-                                ForEach(viewModel.completedDates.prefix(30), id: \.self) { date in
+                                ForEach(viewModel.recentCompletedDays, id: \.self) { date in
                                     HStack {
                                         Text(date, format: .dateTime.day().month(.wide).year())
                                         Spacer()

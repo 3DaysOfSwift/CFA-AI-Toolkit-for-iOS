@@ -221,6 +221,7 @@ Use this top-level reading order:
 Application
 ├── 1 - View
 │   ├── App.swift
+│   ├── AppInformation.swift (when app identity is presented)
 │   ├── Theme
 │   │   ├── AppColourTheme.swift
 │   │   └── ThemeManager.swift
@@ -255,6 +256,15 @@ Application
         └── Feature Name
             └── FeatureNameFeatureTests.swift
 ```
+
+`AppInformation.swift` is optional. Include it when one or more screens present
+the app name, marketing version, build number, or similar system metadata. It is
+an immutable `Sendable` presentation value that converts the authoritative
+bundle metadata into typed display values. ViewModels may default this value to
+its live bundle-backed instance and tests inject explicit values. Do not place
+`Bundle`, `[String: Any]`, business behaviour, or mutable application state in a
+ViewModel initializer. Apps that do not present this metadata do not add the
+type merely to complete the folder diagram.
 
 The Xcode navigator must communicate the design without requiring a developer
 to inspect source files.
@@ -637,7 +647,7 @@ through every SwiftUI initializer.
 This is mandatory for CFA application screens. Before delivery, verify all three:
 
 1. Every screen owns a private dedicated ViewModel, constructed inline by default. A detail View may initialise its own State-backed ViewModel from a selected immutable snapshot in its initializer.
-2. Each ViewModel initializer defaults its narrow live feature dependencies from `AppModel.shared` while allowing tests to supply isolated replacements.
+2. Each ViewModel initializer defaults its narrow live feature dependencies from `AppModel.shared` while allowing tests to supply isolated replacements. It may receive a selected immutable domain snapshot for a detail screen or a typed immutable presentation value when system presentation data must be deterministic in tests. It does not accept `Bundle`, raw metadata dictionaries, services or unrelated convenience parameters.
 3. Never pass a ViewModel into a View. Selected value data is permitted for detail destinations; preserve independent destination identity.
 
 Do not remove a screen ViewModel, or pass feature dependencies through a screen initializer, merely because a generic architecture guideline would use fewer types. CFA makes the ViewModel boundary explicit so every screen has one clear, testable route into the shared application graph.
@@ -1288,6 +1298,12 @@ policy. Do not create a new wrapper
 task for every tap just to wait, or silently return from an async operation
 while its requested work is still unfinished.
 
+When keyed handles are needed, use a domain identifier, command enum or small
+`Hashable` command value. Do not key task maps with interpolated `String`
+labels: a spelling change silently changes the sharing policy. A View button
+for Feature work calls its ViewModel's synchronous intent method; it does not
+create an unretained `Task { }` merely to await that method.
+
 Install the handle before the first suspension. The following main-actor
 ViewModel example returns the same handle for repeated refresh requests:
 
@@ -1349,6 +1365,10 @@ its policy at the Feature boundary:
   suspension points, before starting the next admitted command. Each caller
   awaits its own outcome. Define cancellation, failure and cleanup so no waiter
   is lost and a failed command does not accidentally strand later commands.
+  Admit a mutation before it validates mutable Feature state. A duplicate
+  check and the resulting persistence therefore occur within the same admitted
+  operation; an `await` between an outside-the-queue check and save is a
+  time-of-check/time-of-use defect.
 
 These are the default policies. Reject-while-busy, latest-request-wins or
 independent execution needs a documented product reason. Never discard a new
@@ -1742,6 +1762,9 @@ Rules for tests:
   admission order with individual outcomes, even when their inputs match.
   Cover failure/cancellation cleanup and successful later retry;
 - clocks, repositories, and external clients use deterministic test doubles;
+- tests use controlled continuations or injected clocks with bounded waits;
+  they do not measure wall-clock duration, sleep arbitrarily, or spin on
+  `Task.yield()` waiting for scheduler luck;
 - tests describe observable behaviour, not private implementation details.
 - tests that need AppModel assemble an isolated graph and never alter the shared
   production instance;
@@ -1810,7 +1833,8 @@ Reject or refactor the following during review:
 
 Before accepting a change, answer every question:
 
-1. Can the folder location alone explain which layer owns every new type?
+1. Can the folder location alone explain which layer owns every new type, with
+   no vague dumping-ground folder hiding unrelated responsibilities?
 2. Does every screen-level SwiftUI View have its own adjacent ViewModel? For
    existing UIKit screens in a migration, have you mapped their actual
    presentation owners to their Features and tests?
@@ -1828,9 +1852,10 @@ Before accepting a change, answer every question:
    omission of a selected item, leaves both destinations open with their own
    selections. If detail refresh is available, verify that it updates only
    that destination.
-5. Is each business decision owned by its Feature? Can supporting Model
-   helpers perform calculations or infrastructure work without becoming a
-   competing authority for that decision or its state?
+5. Is each business decision owned by its Feature, with presentation formatting
+   and display text left to the ViewModel? Can supporting Model helpers perform
+   calculations or infrastructure work without becoming a competing authority
+   for that decision or its state?
 6. Can another target reuse the business decision without copying UI code?
    If the scope includes additional targets, build each affected target and
    verify shared Model membership, target-specific presentation, API
@@ -1842,8 +1867,15 @@ Before accepting a change, answer every question:
    data, exercise the product’s conflict policy.
 7. Does each ViewModel depend on the smallest coherent set of concrete
    Features needed by its screen?
-8. Does AppModel assemble and expose Features, own app-wide listener tasks,
-   and limit coordination to genuinely application-wide responsibilities?
+8. Is `AppModel.shared` a stored `static let` constructed by the single
+   `static live()` factory? Does its explicit initializer receive concrete
+   Features, set the private launch guard to false and initialize app-wide
+   listener handles to nil? Does AppModel store only that shared graph,
+   concrete Features, the launch guard and required listener handles—not
+   services, ViewModels, navigation, feature state or hidden live defaults?
+   Does the factory inject services into their owning Features without storing
+   those services on AppModel? Does AppModel own app-wide listener tasks and
+   limit coordination to genuinely application-wide responsibilities?
    Verify repeated startup signals start each listener once and that it forwards
    events to the owning Feature even when no relevant screen is visible.
    Where cancellation or replacement is supported, verify the old listener
@@ -1856,11 +1888,18 @@ Before accepting a change, answer every question:
    that expiration cancels the work. Record actual background execution on a
    supported device separately from controlled tests.
 9. Is persistence accessed through repository protocols, and are other
-   external-system details handled by appropriate microservices?
+   external-system details handled by appropriate microservices? When the app
+   uses SwiftData, does every access go through `SwiftDataManager`, with
+   non-trivial production work on a dedicated `@ModelActor`? When the app uses
+   `URLSession`, does every request go through `NetworkingManager`, while
+   feature-specific adapters own validation and decoding? Do Views and
+   ViewModels reach both boundaries only through their Features?
    For independent network requests, hold the first response open in a
    controlled transport and verify that a second request reaches the transport
    before the first finishes, unless a documented policy limits concurrency.
-10. Are async operations directly testable? Does each unstructured task have
+10. Are View and ViewModel initializers free of asynchronous side effects,
+    blocking I/O and expensive work? Are async operations directly testable?
+    Does each unstructured task have
     an explicit owner and a retained handle when needed? Do structured children
     and framework-owned lifecycle tasks stay with their existing owners, with
     no Task handles stored by a View?
@@ -1877,7 +1916,12 @@ Before accepting a change, answer every question:
     test target and are excluded from the production app target. Run the
     relevant tests to verify the behaviour they cover.
 14. Can a junior developer read the names as plain English without learning the
-    entire object graph first?
+    entire object graph first? Does every concrete Feature type use the
+    `Feature` suffix, with the same lower-camel-case name for its AppModel
+    property, ViewModel dependency, initializer label and local reference?
+    Do ViewModels depend on concrete Features without matching `FeatureAPI`
+    protocols, and do Feature commands express domain operations rather than
+    expose repositories or nested implementation state?
 15. Was every new abstraction earned by a concrete responsibility?
 16. Does each piece of shared state have one authoritative owner and mutate only
     through named feature commands? For shared state displayed on a screen,
@@ -1902,7 +1946,9 @@ Before accepting a change, answer every question:
     Confirm that observable results return to MainActor safely. An async
     declaration alone does not establish where the work executes. Record
     responsiveness evidence where timing matters.
-19. Are failures, partial loading, offline persistence, and retry behaviour
+19. Are confirmed domain data, operation state and retained errors represented
+    separately rather than collapsed into a result-like loading enum? Are
+    failures, partial loading, offline persistence, and retry behaviour
     represented honestly?
     - For durable edits, does the Feature publish the saved value only after
       required persistence succeeds? Verify that failure leaves the confirmed
@@ -1951,7 +1997,11 @@ Before accepting a change, answer every question:
 
 23. Does the application delegate call the AppModel launch method directly
     and synchronously? Verify that it initiates startup once and that the root
-    stays available while storage or networking is pending or fails.
+    stays available while storage or networking is pending or fails. Does the
+    SwiftUI `App.body` declare one stable root and app-wide presentation
+    modifiers without storing AppModel or gating startup? Is the root or
+    `RootTabView` structural only, with feature loading and errors presented by
+    the relevant feature screens?
 24. For deep linking in scope, do URL opens and notification actions reach
     the same routing capability while the receiving scene owns navigation?
     Where the app uses CFA's pending-request design, verify that a failed
@@ -1984,6 +2034,15 @@ Before accepting a change, answer every question:
     outcomes where applicable. Verify Apple-managed sync, including conflicting
     offline edits, on supported devices with the required capabilities, account
     and schema.
+26. When project structure or build settings changed, were the resolved bundle
+    identifiers of every affected existing app and test target compared across
+    affected configurations and preserved unless the developer explicitly
+    authorised a change? For a new app, were the built identity values,
+    orientation declarations, resources, test-target defaults and target
+    membership verified rather than inferred from project text?
+27. Was every item in the complete prohibited-pattern list reviewed against
+    actual source and target membership, with each applicable occurrence either
+    corrected or recorded as an explicit unresolved conformance failure?
 
 Every applicable answer must be yes. Marking a question not applicable requires
 a short explanation. Otherwise, the change is not architecturally complete.

@@ -57,8 +57,6 @@
       "title": "Names explain the work",
       "classification": "cfa-choice",
       "ruleIds": [
-        "CFA-READ-01",
-        "CFA-READ-02",
         "CFA-SPEC-API-01",
         "CFA-SPEC-MAINT-01",
         "CFA-SPEC-MAINT-02"
@@ -114,7 +112,7 @@
         "verificationEvidence": {
           "method": "rendered-content-review",
           "title": "Why use descriptive names in our code?",
-          "relevance": "Reviewed against CFA-READ-01, CFA-READ-02 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "relevance": "Reviewed against CFA-SPEC-API-01, CFA-SPEC-MAINT-01, CFA-SPEC-MAINT-02 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
           "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
           "anonymousAccess": true,
           "desktopViewport": "1280x900",
@@ -131,15 +129,17 @@
           "concrete-features"
         ]
       },
-      "relatedLessons": []
+      "relatedLessons": [],
+      "aliases": [
+        "CFA-READ-01",
+        "CFA-READ-02"
+      ]
     },
     {
       "id": "presentation-boundaries",
       "title": "Business meaning belongs below the screen",
       "classification": "cfa-choice",
       "ruleIds": [
-        "CFA-UI-01",
-        "CFA-STATE-01",
         "CFA-SPEC-FLOW-01",
         "CFA-SPEC-FLOW-02",
         "CFA-SPEC-UI-01",
@@ -193,7 +193,7 @@
         "verificationEvidence": {
           "method": "rendered-content-review",
           "title": "Why use a UI and model boundary in our code?",
-          "relevance": "Reviewed against CFA-UI-01, CFA-STATE-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "relevance": "Reviewed against CFA-SPEC-FLOW-01, CFA-SPEC-FLOW-02, CFA-SPEC-UI-01, CFA-SPEC-UI-05, CFA-SPEC-UI-06, CFA-SPEC-UI-03, CFA-SPEC-STATE-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
           "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
           "anonymousAccess": true,
           "desktopViewport": "1280x900",
@@ -204,15 +204,17 @@
           "websiteCommit": "d83657f"
         }
       },
-      "relatedLessons": []
+      "relatedLessons": [],
+      "aliases": [
+        "CFA-UI-01",
+        "CFA-STATE-01"
+      ]
     },
     {
       "id": "view-model-ownership",
       "title": "Why CFA screens own their ViewModels",
       "classification": "cfa-choice",
       "ruleIds": [
-        "CFA-SCREEN-01",
-        "CFA-SCREEN-02",
         "CFA-SPEC-APP-03",
         "CFA-SPEC-UI-02",
         "CFA-SPEC-UI-03",
@@ -257,7 +259,7 @@
         "verificationEvidence": {
           "method": "rendered-content-review",
           "title": "Why use screen-owned ViewModels in our code?",
-          "relevance": "Reviewed against CFA-SCREEN-01, CFA-SCREEN-02 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "relevance": "Reviewed against CFA-SPEC-APP-03, CFA-SPEC-UI-02, CFA-SPEC-UI-03, CFA-SPEC-UI-07 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
           "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
           "anonymousAccess": true,
           "desktopViewport": "1280x900",
@@ -276,15 +278,17 @@
           "presentation-boundaries"
         ]
       },
-      "relatedLessons": []
+      "relatedLessons": [],
+      "aliases": [
+        "CFA-SCREEN-01",
+        "CFA-SCREEN-02"
+      ]
     },
     {
       "id": "appmodel-composition",
       "title": "One production graph, isolated test graphs",
       "classification": "cfa-choice",
       "ruleIds": [
-        "CFA-GRAPH-01",
-        "CFA-GRAPH-02",
         "CFA-SPEC-LAUNCH-01",
         "CFA-SPEC-APP-01"
       ],
@@ -311,7 +315,7 @@
         "verificationEvidence": {
           "method": "rendered-content-review",
           "title": "Why use AppModel in our code?",
-          "relevance": "Reviewed against CFA-GRAPH-01, CFA-GRAPH-02 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "relevance": "Reviewed against CFA-SPEC-LAUNCH-01, CFA-SPEC-APP-01, CFA-SPEC-APP-03 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
           "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
           "anonymousAccess": true,
           "desktopViewport": "1280x900",
@@ -322,15 +326,17 @@
           "websiteCommit": "d83657f"
         }
       },
-      "relatedLessons": []
+      "relatedLessons": [],
+      "aliases": [
+        "CFA-GRAPH-01",
+        "CFA-GRAPH-02"
+      ]
     },
     {
       "id": "feature-ownership",
       "title": "Features follow responsibilities, not just tabs",
       "classification": "cfa-choice",
       "ruleIds": [
-        "CFA-FEATURE-01",
-        "CFA-FEATURE-02",
         "CFA-SPEC-FEATURE-01",
         "CFA-SPEC-FEATURE-02",
         "CFA-SPEC-STATE-01"
@@ -362,7 +368,7 @@
         "verificationEvidence": {
           "method": "rendered-content-review",
           "title": "Why use cohesive features in our code?",
-          "relevance": "Reviewed against CFA-FEATURE-01, CFA-FEATURE-02 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "relevance": "Reviewed against CFA-SPEC-FEATURE-01, CFA-SPEC-FEATURE-02, CFA-SPEC-STATE-01, CFA-SPEC-API-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
           "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
           "anonymousAccess": true,
           "desktopViewport": "1280x900",
@@ -381,15 +387,17 @@
           "presentation-boundaries"
         ]
       },
-      "relatedLessons": []
+      "relatedLessons": [],
+      "aliases": [
+        "CFA-FEATURE-01",
+        "CFA-FEATURE-02"
+      ]
     },
     {
       "id": "concrete-features",
       "title": "Why CFA does not mirror every Feature with a protocol",
       "classification": "cfa-choice",
-      "ruleIds": [
-        "CFA-API-01"
-      ],
+      "ruleIds": [],
       "note": "decisions/concrete-features.md",
       "rationaleStatus": "documented-basis-editorial-analysis",
       "sources": [
@@ -421,7 +429,7 @@
         "verificationEvidence": {
           "method": "rendered-content-review",
           "title": "Why use concrete features in our code?",
-          "relevance": "Reviewed against CFA-API-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "relevance": "Reviewed against CFA-SPEC-API-01, CFA-SPEC-FEATURE-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
           "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
           "anonymousAccess": true,
           "desktopViewport": "1280x900",
@@ -432,16 +440,16 @@
           "websiteCommit": "d83657f"
         }
       },
-      "relatedLessons": []
+      "relatedLessons": [],
+      "aliases": [
+        "CFA-API-01"
+      ]
     },
     {
       "id": "persistence-boundaries",
       "title": "One storage owner and honest writes",
       "classification": "mixed",
       "ruleIds": [
-        "CFA-STORE-01",
-        "CFA-STORE-02",
-        "CFA-STORE-03",
         "CFA-SPEC-CACHE-01",
         "CFA-SPEC-STORE-01",
         "CFA-SPEC-SYNC-01"
@@ -485,7 +493,7 @@
         "verificationEvidence": {
           "method": "rendered-content-review",
           "title": "Why use record-level persistence boundaries in our code?",
-          "relevance": "Reviewed against CFA-STORE-01, CFA-STORE-02, CFA-STORE-03 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "relevance": "Reviewed against CFA-SPEC-CACHE-01, CFA-SPEC-STORE-01, CFA-SPEC-SYNC-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
           "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
           "anonymousAccess": true,
           "desktopViewport": "1280x900",
@@ -496,15 +504,18 @@
           "websiteCommit": "d83657f"
         }
       },
-      "relatedLessons": []
+      "relatedLessons": [],
+      "aliases": [
+        "CFA-STORE-01",
+        "CFA-STORE-02",
+        "CFA-STORE-03"
+      ]
     },
     {
       "id": "storage-failures",
       "title": "A database failure must not replace the application",
       "classification": "cfa-choice",
       "ruleIds": [
-        "CFA-LAUNCH-01",
-        "CFA-ERROR-01",
         "CFA-SPEC-LAUNCH-02",
         "CFA-SPEC-PREF-01"
       ],
@@ -547,7 +558,7 @@
         "verificationEvidence": {
           "method": "rendered-content-review",
           "title": "Why use recoverable storage requests in our code?",
-          "relevance": "Reviewed against CFA-LAUNCH-01, CFA-ERROR-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "relevance": "Reviewed against CFA-SPEC-LAUNCH-02, CFA-SPEC-PREF-01, CFA-SPEC-ERROR-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
           "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
           "anonymousAccess": true,
           "desktopViewport": "1280x900",
@@ -558,15 +569,17 @@
           "websiteCommit": "d83657f"
         }
       },
-      "relatedLessons": []
+      "relatedLessons": [],
+      "aliases": [
+        "CFA-LAUNCH-01",
+        "CFA-ERROR-01"
+      ]
     },
     {
       "id": "unstructured-tasks",
       "title": "Unstructured tasks need a deliberate owner",
       "classification": "mixed",
       "ruleIds": [
-        "CFA-TASK-01",
-        "CFA-TASK-02",
         "CFA-SPEC-TASK-03"
       ],
       "note": "decisions/unstructured-tasks.md",
@@ -599,8 +612,8 @@
         "verifiedOn": "2026-10-29",
         "verificationEvidence": {
           "method": "rendered-content-review",
-          "title": "Unstructured tasks need an owner\u2014not a ban",
-          "relevance": "Reviewed against CFA-TASK-01, CFA-TASK-02 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "title": "Unstructured tasks need an owner—not a ban",
+          "relevance": "Reviewed against CFA-SPEC-TASK-03, CFA-SPEC-TASK-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
           "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
           "anonymousAccess": true,
           "desktopViewport": "1280x900",
@@ -616,14 +629,17 @@
           "overlapping-requests"
         ]
       },
-      "relatedLessons": []
+      "relatedLessons": [],
+      "aliases": [
+        "CFA-TASK-01",
+        "CFA-TASK-02"
+      ]
     },
     {
       "id": "task-cancellation",
       "title": "Cancellation is a policy, not a button",
       "classification": "mixed",
       "ruleIds": [
-        "CFA-CANCEL-01",
         "CFA-SPEC-CONC-03"
       ],
       "note": "decisions/task-cancellation.md",
@@ -649,7 +665,7 @@
         "verificationEvidence": {
           "method": "rendered-content-review",
           "title": "Cancellation is a policy, not a button",
-          "relevance": "Reviewed against CFA-CANCEL-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "relevance": "Reviewed against CFA-SPEC-CONC-03, CFA-SPEC-TASK-02 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
           "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
           "anonymousAccess": true,
           "desktopViewport": "1280x900",
@@ -660,15 +676,16 @@
           "websiteCommit": "d83657f"
         }
       },
-      "relatedLessons": []
+      "relatedLessons": [],
+      "aliases": [
+        "CFA-CANCEL-01"
+      ]
     },
     {
       "id": "overlapping-requests",
       "title": "Sharing requests and queueing commands",
       "classification": "mixed",
       "ruleIds": [
-        "CFA-OVERLAP-01",
-        "CFA-OVERLAP-02",
         "CFA-SPEC-TASK-01",
         "CFA-SPEC-TASK-02"
       ],
@@ -695,7 +712,7 @@
         "verificationEvidence": {
           "method": "rendered-content-review",
           "title": "Two callers. One refresh. No lost edits.",
-          "relevance": "Reviewed against CFA-OVERLAP-01, CFA-OVERLAP-02 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "relevance": "Reviewed against CFA-SPEC-TASK-01, CFA-SPEC-TASK-02, CFA-SPEC-TASK-03 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
           "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
           "anonymousAccess": true,
           "desktopViewport": "1280x900",
@@ -714,15 +731,17 @@
           "task-cancellation"
         ]
       },
-      "relatedLessons": []
+      "relatedLessons": [],
+      "aliases": [
+        "CFA-OVERLAP-01",
+        "CFA-OVERLAP-02"
+      ]
     },
     {
       "id": "isolation-and-sendable",
       "title": "Isolation does not replace an operation policy",
       "classification": "mixed",
       "ruleIds": [
-        "CFA-ISOLATION-01",
-        "CFA-SENDABLE-01",
         "CFA-SPEC-CONC-01",
         "CFA-SPEC-CONC-02",
         "CFA-SPEC-NET-01"
@@ -754,7 +773,7 @@
         "verificationEvidence": {
           "method": "rendered-content-review",
           "title": "Why use actors and Sendable values in our code?",
-          "relevance": "Reviewed against CFA-ISOLATION-01, CFA-SENDABLE-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "relevance": "Reviewed against CFA-SPEC-CONC-01, CFA-SPEC-CONC-02, CFA-SPEC-NET-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
           "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
           "anonymousAccess": true,
           "desktopViewport": "1280x900",
@@ -765,15 +784,17 @@
           "websiteCommit": "d83657f"
         }
       },
-      "relatedLessons": []
+      "relatedLessons": [],
+      "aliases": [
+        "CFA-ISOLATION-01",
+        "CFA-SENDABLE-01"
+      ]
     },
     {
       "id": "behavioural-testing",
       "title": "Test the promises, not the folder names",
       "classification": "mixed",
       "ruleIds": [
-        "CFA-TEST-01",
-        "CFA-TIME-01",
         "CFA-SPEC-TEST-01",
         "CFA-SPEC-TEST-02",
         "CFA-SPEC-TIME-01"
@@ -813,7 +834,7 @@
         "verificationEvidence": {
           "method": "rendered-content-review",
           "title": "Why use behavioural tests in our code?",
-          "relevance": "Reviewed against CFA-TEST-01, CFA-TIME-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "relevance": "Reviewed against CFA-SPEC-TEST-01, CFA-SPEC-TEST-02, CFA-SPEC-TIME-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
           "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
           "anonymousAccess": true,
           "desktopViewport": "1280x900",
@@ -824,15 +845,17 @@
           "websiteCommit": "d83657f"
         }
       },
-      "relatedLessons": []
+      "relatedLessons": [],
+      "aliases": [
+        "CFA-TEST-01",
+        "CFA-TIME-01"
+      ]
     },
     {
       "id": "preserve-product-behaviour",
       "title": "Migration preserves product behaviour",
       "classification": "cfa-choice",
       "ruleIds": [
-        "CFA-SCOPE-01",
-        "CFA-SCOPE-02",
         "CFA-SPEC-DESIGN-01"
       ],
       "note": "decisions/preserve-product-behaviour.md",
@@ -866,7 +889,7 @@
         "verificationEvidence": {
           "method": "rendered-content-review",
           "title": "Why use behaviour-preserving migration in our code?",
-          "relevance": "Reviewed against CFA-SCOPE-01, CFA-SCOPE-02 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "relevance": "Reviewed against CFA-SPEC-DESIGN-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
           "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
           "anonymousAccess": true,
           "desktopViewport": "1280x900",
@@ -877,15 +900,17 @@
           "websiteCommit": "d83657f"
         }
       },
-      "relatedLessons": []
+      "relatedLessons": [],
+      "aliases": [
+        "CFA-SCOPE-01",
+        "CFA-SCOPE-02"
+      ]
     },
     {
       "id": "project-structure",
       "title": "Make ownership visible in the project",
       "classification": "cfa-choice",
       "ruleIds": [
-        "CFA-PROJECT-01",
-        "CFA-PROJECT-02",
         "CFA-SPEC-STRUCT-01",
         "CFA-SPEC-STRUCT-02",
         "CFA-SPEC-STRUCT-03",
@@ -936,7 +961,7 @@
         "verificationEvidence": {
           "method": "rendered-content-review",
           "title": "Why use an ownership-based project structure in our code?",
-          "relevance": "Reviewed against CFA-PROJECT-01, CFA-PROJECT-02 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "relevance": "Reviewed against CFA-SPEC-STRUCT-01, CFA-SPEC-STRUCT-02, CFA-SPEC-STRUCT-03, CFA-SPEC-STRUCT-04, CFA-SPEC-STRUCT-06, CFA-SPEC-STRUCT-07 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
           "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
           "anonymousAccess": true,
           "desktopViewport": "1280x900",
@@ -947,14 +972,17 @@
           "websiteCommit": "d83657f"
         }
       },
-      "relatedLessons": []
+      "relatedLessons": [],
+      "aliases": [
+        "CFA-PROJECT-01",
+        "CFA-PROJECT-02"
+      ]
     },
     {
       "id": "new-app-design",
       "title": "Defaults help a new app; they do not own its design",
       "classification": "new-app-default",
       "ruleIds": [
-        "CFA-DESIGN-01",
         "CFA-SPEC-STRUCT-05"
       ],
       "note": "decisions/new-app-design.md",
@@ -1008,7 +1036,7 @@
         "verificationEvidence": {
           "method": "rendered-content-review",
           "title": "Why use opt-in design defaults in our code?",
-          "relevance": "Reviewed against CFA-DESIGN-01 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "relevance": "Reviewed against CFA-SPEC-STRUCT-05 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
           "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
           "anonymousAccess": true,
           "desktopViewport": "1280x900",
@@ -1019,15 +1047,16 @@
           "websiteCommit": "d83657f"
         }
       },
-      "relatedLessons": []
+      "relatedLessons": [],
+      "aliases": [
+        "CFA-DESIGN-01"
+      ]
     },
     {
       "id": "honest-errors-and-editing",
       "title": "Keep edits visible and failures honest",
       "classification": "cfa-choice",
       "ruleIds": [
-        "CFA-EDIT-01",
-        "CFA-ERROR-02",
         "CFA-SPEC-ERROR-01",
         "CFA-SPEC-OBS-02",
         "CFA-SPEC-UI-04"
@@ -1063,7 +1092,7 @@
         "verificationEvidence": {
           "method": "rendered-content-review",
           "title": "Why use recoverable editing workflows in our code?",
-          "relevance": "Reviewed against CFA-EDIT-01, CFA-ERROR-02 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
+          "relevance": "Reviewed against CFA-SPEC-ERROR-01, CFA-SPEC-OBS-02, CFA-SPEC-UI-04 and current authoritative-state/Feature-isolation policy. Historical app examples and editorial trade-offs are distinguished from CFA rules.",
           "reviewer": "Codex authoring and public rendered-page review; not independent technical review",
           "anonymousAccess": true,
           "desktopViewport": "1280x900",
@@ -1079,7 +1108,11 @@
           "storage-failures"
         ]
       },
-      "relatedLessons": []
+      "relatedLessons": [],
+      "aliases": [
+        "CFA-EDIT-01",
+        "CFA-ERROR-02"
+      ]
     }
   ]
 }

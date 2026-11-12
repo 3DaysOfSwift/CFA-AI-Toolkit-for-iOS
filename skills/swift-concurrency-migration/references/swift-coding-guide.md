@@ -79,17 +79,24 @@ button was tapped or a screen appeared. The ViewModel owns the screen workflow,
 so its API describes the meaningful intent that workflow performs.
 
 Each SwiftUI View describes the interface; it does not perform imperative work.
-Move view-related work—formatting externally supplied values, reading bundle or
-system metadata, constructing presentation strings, coordinating actions, and
-handling UI outcomes—to that View's ViewModel so it can be tested without
-rendering the View. Move business decisions, persistence, network work, and
-shared feature state to the owning Feature. Bindings, simple conditional
+Move view-related work—formatting externally supplied values, reading
+screen-specific system metadata, constructing presentation strings,
+coordinating actions, and handling UI outcomes—to that View's ViewModel so it
+can be tested without rendering the View. When several screens present the same
+immutable system metadata, or tests need deterministic values, normalize it in
+an adjacent typed presentation value such as `AppInformation` and inject that
+value into the ViewModels. Move business decisions, persistence, network work,
+and shared feature state to the owning Feature. Bindings, simple conditional
 rendering, and short layout-local values that directly describe the rendered
 interface remain declarative View code.
 
-A ViewModel may accept a selected immutable snapshot for its detail screen and defaults
-its narrow Feature dependencies from AppModel.shared. Tests may provide
-isolated Features. Screen selection remains presentation state.
+A ViewModel may accept a selected immutable domain snapshot for its detail screen and
+defaults its narrow Feature dependencies from AppModel.shared. Tests may provide
+isolated Features. It may also accept a typed immutable presentation value when system
+presentation data, such as app identity, must be deterministic in tests. Keep that value
+free of business behaviour and mutable state. Do not pass `Bundle`, a raw metadata dictionary,
+a service, or an unrelated convenience value through a ViewModel initializer. Screen
+selection remains presentation state.
 
 ```swift
 // Dedicated editor: describe the Save control and forward intent.

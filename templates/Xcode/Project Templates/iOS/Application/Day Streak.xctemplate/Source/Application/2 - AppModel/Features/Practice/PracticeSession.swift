@@ -4,14 +4,6 @@ enum Difficulty: String, CaseIterable, Codable, Identifiable, Sendable {
     case gentle, everyday, challenge
 
     var id: String { rawValue }
-    var title: String { rawValue.capitalized }
-    var detail: String {
-        switch self {
-        case .gentle: "2–5 times tables"
-        case .everyday: "2–12 times tables"
-        case .challenge: "6–19 times tables"
-        }
-    }
     var factors: ClosedRange<Int> {
         switch self {
         case .gentle: 2...5
@@ -31,6 +23,16 @@ struct MultiplicationQuestion: Codable, Equatable, Sendable, Identifiable {
     let isAnswered: Bool
     var answer: Int { left * right }
     var isResolved: Bool { isRevealed || isAnswered }
+    var earnsPoint: Bool { isAnswered && wrongAnswers.isEmpty }
+    var hasIncorrectAttempts: Bool { !wrongAnswers.isEmpty }
+
+    func isCorrectChoice(_ choice: Int) -> Bool {
+        isResolved && choice == answer
+    }
+
+    func isIncorrectChoice(_ choice: Int) -> Bool {
+        wrongAnswers.contains(choice)
+    }
 
     init(id: UUID, left: Int, right: Int, choices: [Int], wrongAnswers: Set<Int> = [],
          isRevealed: Bool = false, isAnswered: Bool = false) {
@@ -105,15 +107,6 @@ struct PracticeSession: Codable, Equatable, Identifiable, Sendable {
     }
 }
 
-enum PracticeError: LocalizedError {
+enum PracticeError: Error {
     case unavailableSession, staleQuestion, difficultyLocked, unresolvedQuestion
-
-    var errorDescription: String? {
-        switch self {
-        case .unavailableSession: "This session is no longer available. Refresh to see today's practice."
-        case .staleQuestion: "The question has changed. Please answer the question now on screen."
-        case .difficultyLocked: "Difficulty is fixed after the first question."
-        case .unresolvedQuestion: "Find or reveal the correct answer before continuing."
-        }
-    }
 }

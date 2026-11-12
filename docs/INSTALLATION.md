@@ -26,9 +26,10 @@ You can instead run it from Terminal:
 ./Install\ Xcode\ Template.command
 ```
 
-Wait for the installer to say **“CFA App is installed in Xcode”** and show
-the installed folder. If it does not, the template has not been installed;
-read the Terminal message before closing that window.
+Wait for the final **“Quit and reopen Xcode”** instruction before closing the
+Terminal window. An earlier success message for CFA App alone does not confirm
+that all three template components were installed. If an error appears, read it
+before closing the window.
 
 Then quit and reopen Xcode. Choose **File → New → Project → iOS → CFA App**
 or **Habit Tracker** or **Day Streak**. Habit Tracker includes habit tracking,
@@ -91,8 +92,9 @@ for machine-readable output. The inspector does not edit the app, run tests,
 or certify architectural correctness.
 
 Use `cfa doctor` to check that the skill entry files and core references are
-present and see whether the project has optional CFA guidance. Confirm skill
-discovery and execution separately in the AI host.
+present, that the installed skills carry matching generations of the bundled
+CFA references, and whether the project has optional CFA guidance. Confirm
+skill discovery and execution separately in the AI host.
 
 ```sh
 cfa doctor
@@ -156,6 +158,11 @@ Codex has loaded them. The plugin validator checks package structure but cannot 
 compatibility with every host version.
 
 ## Claude Code and other portable skill hosts
+
+Run the installer commands in this section from the extracted plugin release,
+which contains `checksums.json`. A Git source checkout intentionally does not
+contain that generated release inventory; copy its eight `skills` folders
+manually when installing directly from source.
 
 ```sh
 node scripts/install.mjs --mode skills --skills-directory ~/.claude/skills

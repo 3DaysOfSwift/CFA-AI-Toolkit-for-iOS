@@ -21,6 +21,11 @@ final class PracticeFeature {
     private let makeQuestion: (Difficulty) -> MultiplicationQuestion
     @ObservationIgnored private var operationTask: Task<Void, Error>?
     @ObservationIgnored private var operationID: UUID?
+    @ObservationIgnored private var refreshTask: Task<Void, Error>?
+    @ObservationIgnored private var refreshID: UUID?
+    @ObservationIgnored private var lastCommand: Command?
+    @ObservationIgnored private var lastCommandTask: Task<Void, Error>?
+    @ObservationIgnored private var lastCommandID: UUID?
 
     init(repository: any SessionRepository, calendar: Calendar = .autoupdatingCurrent,
          now: @escaping () -> Date = Date.init,
@@ -51,6 +56,46 @@ final class PracticeFeature {
     }
 
     func perform(_ command: Command) async throws {
+        if command == .refresh {
+            try await refresh()
+            return
+        }
+        if lastCommand == command, let lastCommandTask {
+            try await lastCommandTask.value
+            return
+        }
+        let (identifier, task) = admit(command)
+        lastCommand = command
+        lastCommandTask = task
+        lastCommandID = identifier
+        defer {
+            if lastCommandID == identifier {
+                lastCommand = nil
+                lastCommandTask = nil
+                lastCommandID = nil
+            }
+        }
+        try await finish(identifier: identifier, task: task)
+    }
+
+    func refresh() async throws {
+        if let refreshTask {
+            try await refreshTask.value
+            return
+        }
+        let (identifier, task) = admit(.refresh)
+        refreshTask = task
+        refreshID = identifier
+        defer {
+            if refreshID == identifier {
+                refreshTask = nil
+                refreshID = nil
+            }
+        }
+        try await finish(identifier: identifier, task: task)
+    }
+
+    private func admit(_ command: Command) -> (UUID, Task<Void, Error>) {
         let predecessor = operationTask
         let identifier = UUID()
         let task = Task { @MainActor in
@@ -61,6 +106,10 @@ final class PracticeFeature {
         }
         operationTask = task
         operationID = identifier
+        return (identifier, task)
+    }
+
+    private func finish(identifier: UUID, task: Task<Void, Error>) async throws {
         defer {
             if operationID == identifier {
                 operationTask = nil
@@ -105,8 +154,9 @@ final class PracticeFeature {
                 guard session.question.id == questionID else { throw PracticeError.staleQuestion }
                 guard !session.question.isResolved, session.question.choices.contains(value) else { return }
                 if value == session.question.answer {
-                    let correctCount = session.correctCount + (session.question.wrongAnswers.isEmpty ? 1 : 0)
-                    session = session.updating(question: session.question.updating(isAnswered: true),
+                    let answeredQuestion = session.question.updating(isAnswered: true)
+                    let correctCount = session.correctCount + (answeredQuestion.earnsPoint ? 1 : 0)
+                    session = session.updating(question: answeredQuestion,
                                                correctCount: correctCount,
                                                completedAt: correctCount >= PracticeSession.target ? now() : nil)
                 } else {

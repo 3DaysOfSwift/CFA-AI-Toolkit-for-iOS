@@ -10,10 +10,10 @@ struct SettingsView: View {
                 // Explicit setters avoid Swift 6.2.3's code-generation crash for bound actor-isolated methods.
                 Section {
                     Picker("Colour theme", selection: Binding(
-                        get: { themeManager.selectedTheme },
-                        set: { themeManager.select($0) }
+                        get: { viewModel.selectedTheme },
+                        set: { viewModel.selectTheme($0) }
                     )) {
-                        ForEach(ThemeChoice.allCases) { Text($0.title).tag($0) }
+                        ForEach(ThemeChoice.allCases) { Text(viewModel.themeTitle($0)).tag($0) }
                     }.pickerStyle(.menu).frame(minHeight: 48)
                 } header: {
                     Text("Make it yours")
@@ -26,7 +26,7 @@ struct SettingsView: View {
                         get: { viewModel.preferredDifficulty },
                         set: { viewModel.selectDifficulty($0) }
                     )) {
-                        ForEach(Difficulty.allCases) { Text($0.title).tag($0) }
+                        ForEach(Difficulty.allCases) { Text(viewModel.difficultyTitle($0)).tag($0) }
                     }.pickerStyle(.menu).frame(minHeight: 48)
                 } header: {
                     Text("Your practice")
@@ -51,12 +51,12 @@ struct SettingsView: View {
                                 Image(systemName: "multiply")
                             }
                             .font(.system(.caption2, design: .rounded, weight: .bold))
-                            Text("Todays Twenty")
+                            Text(viewModel.appName)
                                 .font(.system(.title3, design: .rounded, weight: .bold))
                         }
                         .foregroundStyle(themeManager.current.tint)
                         .accessibilityElement(children: .ignore)
-                        .accessibilityLabel("Todays Twenty")
+                        .accessibilityLabel(viewModel.appName)
                     }
                     LabeledContent("Storage", value: "SwiftData · on device")
                     LabeledContent("Architecture", value: "CFA iOS Architecture")
@@ -67,7 +67,7 @@ struct SettingsView: View {
                 Section {
                     VStack(spacing: 18) {
                         Text("Little questions. Lasting confidence.\nYour practice history stays on this device.")
-                        Text(viewModel.version)
+                        Text(viewModel.versionDescription)
                     }
                     .font(.footnote).foregroundStyle(.secondary)
                     .multilineTextAlignment(.center).frame(maxWidth: .infinity)

@@ -21,7 +21,7 @@ test('Day Streak native template matches the editable project', () => {
       `TimesThirty/1 - View/Views/${name}/${name}View.swift`,
       `TimesThirty/1 - View/Views/${name}/${name}ViewModel.swift`,
       `TimesThirtyTests/FeatureTests/${name}FeatureTests.swift`,
-      `TimesThirtyTests/ViewModelTests/${name}ViewModelTests.swift`
+      `TimesThirtyTests/View model tests/${name}ViewModelTests.swift`
     ]) assert.ok(fs.existsSync(path.join(project, relative)), relative);
   }
   assert.equal(info.Targets.length, 1);
@@ -38,4 +38,26 @@ test('Day Streak ships matching light/dark launch colours and a starter icon', (
   const values = launch.colors.map(item => ['red', 'green', 'blue'].map(component => Number(item.color.components[component])));
   assert.deepEqual(values, [[0.96078, 0.96863, 0.98824], [0.02353, 0.04314, 0.08627]]);
   assert.ok(fs.statSync(path.join(assets, 'AppIcon.appiconset/CFA-App-Icon.png')).size > 1000);
+});
+
+test('Day Streak keeps recent-history selection in its Feature', () => {
+  const source = path.join(native, 'Source/Application');
+  const feature = fs.readFileSync(
+    path.join(source, '2 - AppModel/Features/DayStreak/DayStreakFeature.swift'),
+    'utf8'
+  );
+  const viewModel = fs.readFileSync(
+    path.join(source, '1 - View/Views/DayStreak/DayStreakViewModel.swift'),
+    'utf8'
+  );
+  const view = fs.readFileSync(
+    path.join(source, '1 - View/Views/DayStreak/DayStreakView.swift'),
+    'utf8'
+  );
+
+  assert.match(feature, /private static let recentCompletedDayLimit = 30/);
+  assert.match(feature, /var recentCompletedDays: \[Date\]/);
+  assert.match(viewModel, /dayStreakFeature\.recentCompletedDays/);
+  assert.doesNotMatch(viewModel, /\.sorted|\.prefix/);
+  assert.doesNotMatch(view, /\.sorted|\.prefix/);
 });

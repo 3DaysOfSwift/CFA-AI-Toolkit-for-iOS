@@ -10,11 +10,26 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parent.parent
 EXCLUSIONS = json.loads((ROOT / 'scripts/release-exclusions.json').read_text())
+SOURCE_PARTS = ['.codex-plugin', '.github', 'readme-images', 'architecture', 'skills', 'tools', 'scripts', 'test', 'evals', 'examples', 'templates', 'starter-apps', 'docs',
+                'README.md', 'LICENSE', 'CHANGELOG.md', 'CONTRIBUTING.md', 'AGENTS.md', '.gitignore', 'Install.command', 'Install Xcode Template.command', 'package.json', 'plugin.json']
 
 def is_release_path(relative):
     return (not any(part in EXCLUSIONS['directoryNames'] for part in relative.parts)
             and relative.name not in EXCLUSIONS['fileNames']
             and not any(relative.name.endswith(suffix) for suffix in EXCLUSIONS['fileSuffixes']))
+
+def untracked_release_files(root, allowed=SOURCE_PARTS):
+    """Return every untracked file that a checkout release would package."""
+    if not (root / '.git').exists():
+        return []
+    result = subprocess.run(
+        ['git', 'ls-files', '--others', '-z'],
+        cwd=root, check=True, stdout=subprocess.PIPE)
+    allowed_roots = set(allowed)
+    paths = (Path(value.decode()) for value in result.stdout.split(b'\0') if value)
+    return sorted(relative.as_posix() for relative in paths
+                  if relative.parts and relative.parts[0] in allowed_roots
+                  and is_release_path(relative))
 
 def archive(output, pairs, prefix):
     with zipfile.ZipFile(output, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as z:
@@ -24,7 +39,11 @@ def archive(output, pairs, prefix):
             entry = zipfile.ZipInfo(prefix + '/' + relative, (1980, 1, 1, 0, 0, 0))
             entry.compress_type = zipfile.ZIP_DEFLATED
             entry.create_system = 3
-            mode = 0o755 if relative.endswith('.command') else 0o644
+            # Preserve intentional executable entry points regardless of their
+            # extension. In particular, the dashboard's package.json exposes
+            # src/cli.mjs as a bin, so reducing every .mjs file to 0644 breaks
+            # the declared command after extraction.
+            mode = 0o755 if source.stat().st_mode & 0o111 else 0o644
             entry.external_attr = (0o100000 | mode) << 16
             z.writestr(entry, source.read_bytes())
 
@@ -40,8 +59,16 @@ def main():
         parser.error('Output already exists; choose a new --out directory.')
     run = lambda *command: subprocess.run(command, cwd=ROOT, check=True)
     run(args.node, 'scripts/sync.mjs')
+    # Synchronisation can create a new generated file, so inspect the payload
+    # only after it has reached the state that will actually be packaged.
+    untracked = untracked_release_files(ROOT)
+    if untracked:
+        parser.error('Release-eligible untracked files must be reviewed, added or ignored first: '
+                     + ', '.join(untracked))
     run(args.node, 'scripts/validate.mjs')
-    tests = sorted(ROOT.glob('test/*.test.mjs')) + sorted(ROOT.glob('tools/architecture-dashboard/test/*.test.mjs'))
+    tests = (sorted(ROOT.glob('test/*.test.mjs'))
+             + sorted(ROOT.glob('tools/architecture-dashboard/test/*.test.mjs'))
+             + [ROOT / 'tools/swift-syntax-prototype/test.mjs'])
     run(args.node, '--test', *(str(test) for test in tests))
     manifest = json.loads((ROOT / '.codex-plugin/plugin.json').read_text())
     name, version = manifest['name'], manifest['version']
@@ -49,10 +76,8 @@ def main():
     run(args.node, 'scripts/build.mjs', str(package))
     plugin_zip = out / f'{name}-{version}-plugin.zip'
     archive(plugin_zip, [(p.relative_to(package).as_posix(), p) for p in package.rglob('*') if p.is_file()], name)
-    allowed = ['.codex-plugin', '.github', 'readme-images', 'architecture', 'skills', 'tools', 'scripts', 'test', 'evals', 'examples', 'templates', 'starter-apps', 'docs',
-               'README.md', 'LICENSE', 'CHANGELOG.md', 'CONTRIBUTING.md', 'AGENTS.md', '.gitignore', 'Install.command', 'Install Xcode Template.command', 'package.json', 'plugin.json']
     sources = []
-    for part in allowed:
+    for part in SOURCE_PARTS:
         path = ROOT / part
         if not path.exists():
             continue

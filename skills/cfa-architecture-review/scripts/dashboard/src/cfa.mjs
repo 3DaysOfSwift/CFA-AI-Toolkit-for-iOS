@@ -18,6 +18,7 @@ const cfaSkillNames = [
   'cfa-unit-tests',
   'swift-code-quality'
 ];
+const architectureSkillNames = cfaSkillNames.filter(name => name !== 'swift-code-quality');
 // Keep this legacy ownership marker stable so upgrades recognise existing guidance.
 const guidanceMarker = '<!-- CFA Toolkit project guidance -->';
 const outdatedStartupGuidance = 'or a scheduled Task. Features can start their own asynchronous work without';
@@ -40,6 +41,8 @@ const outdatedSnapshotGuidance = 'Published domain snapshots use immutable prope
 const snapshotGuidanceUpdate = 'Use let properties and check nested values for mutable references.';
 const outdatedSharedWaitGuidance = 'A departing screen may stop waiting while the Feature keeps refreshing.';
 const sharedWaitGuidanceUpdate = 'For a prompt exit, cancel the screen’s wait independently of the Feature’s shared refresh.';
+const outdatedIsolationGuidance = 'Keep Features explicitly on MainActor.';
+const isolationGuidanceUpdate = 'Keep ViewModels and Features explicitly on MainActor.';
 const projectGuidance = `${guidanceMarker}
 # CFA project guidance
 
@@ -234,7 +237,7 @@ skill from that toolkit before changing the project.
   devices, including how receiving Features refresh their state and handle
   missing, unreadable, delayed and stale snapshots. If multiple targets can
   edit the same data, verify the product's conflict policy.
-- Keep Features explicitly on MainActor. Networking, persistence and expensive
+- Keep ViewModels and Features explicitly on MainActor. Networking, persistence and expensive
   processing use an appropriate service isolation boundary off MainActor by
   default. Keep framework-required MainActor calls in a narrow adapter.
   A separate type or async declaration alone does not move work off MainActor.
@@ -548,6 +551,49 @@ function guidanceFiles(project) {
     .filter((file) => fs.existsSync(file) && fs.readFileSync(file, 'utf8').includes(guidanceMarker));
 }
 
+function regularFiles(folder, prefix = '') {
+  if (!fs.statSync(folder, { throwIfNoEntry: false })?.isDirectory()) return [];
+  return fs.readdirSync(folder, { withFileTypes: true }).flatMap(entry => {
+    const relative = path.join(prefix, entry.name);
+    const absolute = path.join(folder, entry.name);
+    if (entry.isDirectory()) return regularFiles(absolute, relative);
+    return entry.isFile() ? [relative] : [];
+  });
+}
+
+function inconsistentReferences(skillsRoot) {
+  const inconsistencies = new Set();
+  const compare = (skillNames, references) => {
+    for (const reference of references) {
+      const copies = skillNames.map(name => {
+        const file = path.join(skillsRoot, name, 'references', reference);
+        return fs.statSync(file, { throwIfNoEntry: false })?.isFile()
+          ? fs.readFileSync(file)
+          : undefined;
+      });
+      const baseline = copies.find(Boolean);
+      if (!baseline || copies.some(copy => !copy || !copy.equals(baseline))) {
+        inconsistencies.add(path.join('references', reference));
+      }
+    }
+  };
+  compare(cfaSkillNames, [
+    'swift-coding-guide.md',
+    'project-workflow.md',
+    'new-app-design-defaults.md',
+    'explanations/guide.md'
+  ]);
+  const specFiles = new Set(architectureSkillNames.flatMap(name => regularFiles(
+    path.join(skillsRoot, name, 'references', 'spec'), 'spec'
+  )));
+  compare(architectureSkillNames, [
+    'cfa-specification.md',
+    'cfa-change-gate.md',
+    ...specFiles
+  ]);
+  return [...inconsistencies].sort();
+}
+
 function doctor(projectArgument) {
   const project = projectDirectory(projectArgument);
   const skillsRoot = installedSkillsRoot();
@@ -557,17 +603,27 @@ function doctor(projectArgument) {
   const missingReferences = skillsRoot ? cfaSkillNames
     .filter(name => !missingSkills.includes(name))
     .flatMap(name => {
-      const references = ['swift-coding-guide.md'];
+      const references = [
+        'swift-coding-guide.md',
+        'project-workflow.md',
+        'new-app-design-defaults.md',
+        'explanations/guide.md'
+      ];
       if (name !== 'swift-code-quality') references.push('cfa-specification.md', 'cfa-change-gate.md', 'spec/README.md');
       return references.map(file => path.join(name, 'references', file))
         .filter(file => !fs.statSync(path.join(skillsRoot, file), { throwIfNoEntry: false })?.isFile());
     }) : [];
 
-  if (missingSkills.length === 0 && missingReferences.length === 0) {
+  const referenceDrift = skillsRoot && missingSkills.length === 0
+    ? inconsistentReferences(skillsRoot)
+    : [];
+
+  if (missingSkills.length === 0 && missingReferences.length === 0 && referenceDrift.length === 0) {
     console.log(`PASS CFA skills are installed: ${skillsRoot}`);
   } else if (skillsRoot) {
     if (missingSkills.length) console.log(`WARN missing CFA skills: ${missingSkills.join(', ')}`);
     for (const file of missingReferences) console.log(`WARN missing CFA reference: ${file}`);
+    for (const file of referenceDrift) console.log(`WARN inconsistent CFA reference copies: ${file}`);
   } else {
     console.log('WARN this CFA command is not running from an installed CFA skill.');
   }
@@ -612,13 +668,16 @@ function doctor(projectArgument) {
       if (content.includes(outdatedAppModelGuidance)) {
         console.log(`WARN outdated AppModel guidance in ${file}; update the CFA guidance block to allow private task handles for app-wide listeners.`);
       }
+      if (content.includes(outdatedIsolationGuidance)) {
+        console.log(`WARN outdated isolation guidance in ${file}. ${isolationGuidanceUpdate}`);
+      }
     }
   } else {
     console.log(`INFO no optional CFA project guidance in ${project}`);
     console.log(`Run: cfa enable-project ${JSON.stringify(project)}`);
   }
 
-  if (missingSkills.length || missingReferences.length) process.exitCode = 1;
+  if (missingSkills.length || missingReferences.length || referenceDrift.length) process.exitCode = 1;
 }
 
 function parseEnableProjectArguments(values) {
@@ -687,6 +746,9 @@ function enableProject(values) {
     }
     if (block.includes(outdatedAppModelGuidance)) {
       console.log('The existing AppModel guidance should allow private task handles for app-wide listeners. Edit only the CFA guidance block.');
+    }
+    if (block.includes(outdatedIsolationGuidance)) {
+      console.log(`Update the existing CFA isolation guidance block. ${isolationGuidanceUpdate}`);
     }
     return;
   }

@@ -15,7 +15,7 @@
 	</array>
 	<key>Nodes</key>
 	<array>
-		<string>AppModelTests/AppModelTests.swift</string>
+		<string>AppModel tests/AppModelTests.swift</string>
 		<string>FeatureTests/DayStreakFeatureTests.swift</string>
 		<string>FeatureTests/HabitsFeatureTests.swift</string>
 		<string>FeatureTests/SettingsFeatureTests.swift</string>
@@ -23,18 +23,19 @@
 		<string>PersistenceTests/SwiftDataManagerTests.swift</string>
 		<string>PresentationTests/ThemeManagerTests.swift</string>
 		<string>Support/InMemoryHabitsRepository.swift</string>
-		<string>ViewModelTests/AddHabitViewModelTests.swift</string>
-		<string>ViewModelTests/DayStreakViewModelTests.swift</string>
-		<string>ViewModelTests/HabitsViewModelTests.swift</string>
-		<string>ViewModelTests/SettingsViewModelTests.swift</string>
-		<string>ViewModelTests/TodayViewModelTests.swift</string>
+		<string>View model tests/AddHabitViewModelTests.swift</string>
+		<string>View model tests/ContentViewModelTests.swift</string>
+		<string>View model tests/DayStreakViewModelTests.swift</string>
+		<string>View model tests/HabitsViewModelTests.swift</string>
+		<string>View model tests/SettingsViewModelTests.swift</string>
+		<string>View model tests/TodayViewModelTests.swift</string>
 	</array>
 	<key>Definitions</key>
 	<dict>
-		<key>AppModelTests/AppModelTests.swift</key>
+		<key>AppModel tests/AppModelTests.swift</key>
 		<dict>
 			<key>Path</key>
-			<string>Source/AppModelTests/AppModelTests.swift</string>
+			<string>Source/AppModel tests/AppModelTests.swift</string>
 		</dict>
 		<key>FeatureTests/DayStreakFeatureTests.swift</key>
 		<dict>
@@ -71,30 +72,35 @@
 			<key>Path</key>
 			<string>Source/Support/InMemoryHabitsRepository.swift</string>
 		</dict>
-		<key>ViewModelTests/AddHabitViewModelTests.swift</key>
+		<key>View model tests/AddHabitViewModelTests.swift</key>
 		<dict>
 			<key>Path</key>
-			<string>Source/ViewModelTests/AddHabitViewModelTests.swift</string>
+			<string>Source/View model tests/AddHabitViewModelTests.swift</string>
 		</dict>
-		<key>ViewModelTests/DayStreakViewModelTests.swift</key>
+		<key>View model tests/ContentViewModelTests.swift</key>
 		<dict>
 			<key>Path</key>
-			<string>Source/ViewModelTests/DayStreakViewModelTests.swift</string>
+			<string>Source/View model tests/ContentViewModelTests.swift</string>
 		</dict>
-		<key>ViewModelTests/HabitsViewModelTests.swift</key>
+		<key>View model tests/DayStreakViewModelTests.swift</key>
 		<dict>
 			<key>Path</key>
-			<string>Source/ViewModelTests/HabitsViewModelTests.swift</string>
+			<string>Source/View model tests/DayStreakViewModelTests.swift</string>
 		</dict>
-		<key>ViewModelTests/SettingsViewModelTests.swift</key>
+		<key>View model tests/HabitsViewModelTests.swift</key>
 		<dict>
 			<key>Path</key>
-			<string>Source/ViewModelTests/SettingsViewModelTests.swift</string>
+			<string>Source/View model tests/HabitsViewModelTests.swift</string>
 		</dict>
-		<key>ViewModelTests/TodayViewModelTests.swift</key>
+		<key>View model tests/SettingsViewModelTests.swift</key>
 		<dict>
 			<key>Path</key>
-			<string>Source/ViewModelTests/TodayViewModelTests.swift</string>
+			<string>Source/View model tests/SettingsViewModelTests.swift</string>
+		</dict>
+		<key>View model tests/TodayViewModelTests.swift</key>
+		<dict>
+			<key>Path</key>
+			<string>Source/View model tests/TodayViewModelTests.swift</string>
 		</dict>
 	</dict>
 	<key>Targets</key>

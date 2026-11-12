@@ -1,27 +1,32 @@
 import Foundation
 import Observation
 
+enum ThemeChoice: String, CaseIterable, Identifiable {
+    case automatic, daylight, midnight, quiet, ocean, plum, ember, indigo
+    var id: String { rawValue }
+}
+
 @MainActor @Observable
 final class SettingsFeature {
+    private static let preferredDifficultyStorageKey = "preferredDifficulty"
+    private static let selectedThemeStorageKey = "selectedTheme"
+    private(set) var selectedTheme: ThemeChoice
     private(set) var preferredDifficulty: Difficulty
     private let defaults: UserDefaults
-    let version: String
 
-    init(defaults: UserDefaults, appInformation: [String: Any] = Bundle.main.infoDictionary ?? [:]) {
+    init(defaults: UserDefaults) {
         self.defaults = defaults
-        preferredDifficulty = Difficulty(rawValue: defaults.string(forKey: "preferredDifficulty") ?? "") ?? .everyday
-        func information(_ key: String) -> String {
-            guard let value = appInformation[key] as? String,
-                  !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return "—" }
-            return value
-        }
-        let number = information("CFBundleShortVersionString")
-        let build = information("CFBundleVersion")
-        version = "Version \(number) (\(build))"
+        selectedTheme = ThemeChoice(rawValue: defaults.string(forKey: Self.selectedThemeStorageKey) ?? "") ?? .automatic
+        preferredDifficulty = Difficulty(rawValue: defaults.string(forKey: Self.preferredDifficultyStorageKey) ?? "") ?? .everyday
     }
 
     func selectDifficulty(_ difficulty: Difficulty) {
-        defaults.set(difficulty.rawValue, forKey: "preferredDifficulty")
+        defaults.set(difficulty.rawValue, forKey: Self.preferredDifficultyStorageKey)
         preferredDifficulty = difficulty
+    }
+
+    func selectTheme(_ theme: ThemeChoice) {
+        defaults.set(theme.rawValue, forKey: Self.selectedThemeStorageKey)
+        selectedTheme = theme
     }
 }

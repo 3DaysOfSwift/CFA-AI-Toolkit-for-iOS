@@ -11,7 +11,9 @@ final class HabitsViewModel {
 
     var habits: [Habit] { habitsFeature.habits }
     var isLoading: Bool { habitsFeature.isLoading }
-    var loadError: String? { habitsFeature.loadError }
+    var loadError: String? {
+        habitsFeature.loadError.map { _ in "Your saved habits could not be loaded. Please try again." }
+    }
     @ObservationIgnored private var retryTask: Task<Void, Never>?
     @discardableResult
     func retryLoading() -> Task<Void, Never> {

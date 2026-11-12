@@ -56,7 +56,10 @@ cancellation and overlapping-operation scenarios. Assert observable results,
 state transitions and side effects rather than private implementation details.
 Await async Feature commands directly. Use injected repositories, clocks,
 clients and controllable continuations to exercise stale results, actor
-reentrancy and partial failure wherever they affect correctness. Avoid live
+reentrancy and partial failure wherever they affect correctness. Give every
+test wait a timeout. Do not measure wall-clock durations, use `Task.sleep`,
+`ContinuousClock`, or spin on `Task.yield()` to make a test pass; release a
+controlled continuation or advance an injected clock instead. Avoid live
 services, arbitrary sleeps and assumptions about task scheduling.
 
 For retained ViewModel tasks, prove that repeated actions share one execution

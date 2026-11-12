@@ -6,10 +6,10 @@ import { analyse, maskSwift, scanSource } from './analyse.mjs';
 const screenPath = /(?:^|\/)1 - View\/Views\/.*View\.swift$/;
 const productionSourceTree = /(?:^|\/)(?:1 - View|2 - AppModel|3 - App Resources|4 - Swift Extensions)\//;
 const featureTypeSuffix = /Feature(?:API)?$/;
-const serviceTypeSuffix = /(?:Repository|NetworkingManager|SwiftDataManager)$/;
+const serviceTypeSuffix = /(?:Repository|Provider|Responding|Client|Store|Service|NetworkingManager|SwiftDataManager)$/;
 
 function isKnownNonFeatureType(type) {
-  return type.endsWith('ViewModel') || type === 'NetworkingManager' || type === 'SwiftDataManager';
+  return type.endsWith('ViewModel') || serviceTypeSuffix.test(type);
 }
 
 function isFeatureCandidate(type, file = '') {
@@ -153,16 +153,21 @@ function* typeInitializers(body) {
   }
 }
 
-function inspectInitializerTask(name, initializer, source, start, file, findings) {
-  const task = initializer.initializerBody && /\bTask\s*(?:<[^{};]*>\s*)?(?:\.\s*(?:detached|init)\s*)?(?:\([^{}]*\)\s*)?\{/.exec(initializer.initializerBody);
+function inspectInitializerWork(name, initializer, source, start, file, findings) {
+  const task = initializer.initializerBody && /\b(?:(?:Swift|_Concurrency)\s*\.\s*)?Task\s*(?:<[^{};]*>\s*)?(?:\.\s*(?:detached|init)\s*)?(?:\((?:[^{}()]|\([^{}()]*\))*\)\s*|\((?:[^{}()]|\([^{}()]*\))*?\boperation\s*:\s*)?\{/.exec(initializer.initializerBody);
   if (task) {
     findings.push(finding('screen-initializer-task', 'review', `${name}'s initializer contains a Task. Trace whether construction starts work or only defines a closure for later use.`, file, lineOf(source, start + initializer.bodyStart + task.index)));
+  }
+  if (!initializer.initializerBody) return;
+  const work = /\b(?:Data|String|NSString|NSData|NSDictionary)\s*\(\s*contentsOf\b|\bFileHandle\s*\(\s*for(?:Reading|Writing|Updating)From\b|\bFileManager\s*\.\s*default\s*\.\s*(?:contents|contentsOfDirectory|createFile|removeItem|copyItem|moveItem|replaceItem|attributesOfItem)\b|\bModel(?:Container|Context)\s*\(|(?<!\bfunc\s)(?<!\binit\s)(?:\b(?:self|super)\s*\.\s*|\b\w+\s*\.\s*)?\b(?:load|refresh|fetch|save|start|observe|listen|connect|open|request|synchronize|register)(?:[A-Z_]\w*)?\s*\(/.exec(initializer.initializerBody);
+  if (work) {
+    findings.push(finding('screen-initializer-work', 'review', `${name}'s initializer contains possible work-starting or blocking activity. CFA construction stays fast and starts work through an explicit method after initialization. Trace whether this expression executes during construction or only defines work for later use.`, file, lineOf(source, start + initializer.bodyStart + work.index)));
   }
 }
 
 function inspectScreenInputs(name, body, source, start, file, findings) {
   for (const initializer of typeInitializers(body)) {
-    inspectInitializerTask(name, initializer, source, start, file, findings);
+    inspectInitializerWork(name, initializer, source, start, file, findings);
     if (initializer.injectedViewModel) {
       findings.push(finding('screen-initializer-inputs', 'warning', `${name} appears to accept a ViewModel; CFA screens construct their own.`, file, lineOf(source, start + initializer.index)));
     }
@@ -969,13 +974,28 @@ export async function inspect(project) {
     const viewModel = viewModelDeclaration ? candidateViewModel : undefined;
     const viewModelBodyStart = viewModelDeclaration ? viewModelDeclaration.index + viewModelDeclaration[0].length : 0;
     const viewModelBody = viewModelDeclaration ? braceBody(viewModel, viewModelBodyStart - 1) : '';
+    if (viewModel) {
+      const explicitlyNonisolated = new RegExp(`\\bnonisolated\\s+(?:(?:final|public|internal|private|fileprivate|package|open)\\s+)*class\\s+${viewModelName}\\b`).exec(viewModel);
+      if (explicitlyNonisolated) {
+        findings.push(finding('view-model-isolation', 'review', `${viewModelName} declares nonisolated. Verify its effective isolation; CFA screen ViewModels use MainActor.`, viewModelFile, lineOf(viewModel, explicitlyNonisolated.index)));
+      }
+    }
     const dependencySources = viewModel ? [
       {file: viewModelFile, source: viewModel, offset: viewModelBodyStart, body: viewModelBody},
       ...(extensionsByName.get(viewModelName) ?? [])
     ] : [];
     for (const location of dependencySources) {
+      for (const access of location.body.matchAll(/\bBundle\s*\.\s*main\b/g)) {
+        findings.push(finding(
+          'view-model-bundle-access',
+          'review',
+          `${viewModelName} reads Bundle.main directly. When a screen presents app identity or other immutable system metadata, normalize it in an adjacent typed presentation value such as AppInformation and inject that value for tests.`,
+          location.file,
+          lineOf(location.source, location.offset + access.index)
+        ));
+      }
       for (const initializer of typeInitializers(location.body)) {
-        inspectInitializerTask(viewModelName, initializer, location.source, location.offset, location.file, findings);
+        inspectInitializerWork(viewModelName, initializer, location.source, location.offset, location.file, findings);
         const services = [...new Set(initializer.types.filter(type => serviceTypeSuffix.test(type)))];
         if (services.length) {
           findings.push(finding('view-model-non-feature-dependency', 'review', `${viewModelName} accepts ${services.join(', ')} in its initializer. Verify that the ViewModel calls a Feature and that the Feature owns the service dependency.`, location.file, lineOf(location.source, location.offset + initializer.index)));
@@ -988,6 +1008,9 @@ export async function inspect(project) {
     const retainedAppModels = [];
     for (const member of storedTypedMembers(viewModelMembers, viewModel ?? '')) {
       if (member.type === 'AppModel') retainedAppModels.push(member);
+      if (member.type === 'Bundle') {
+        findings.push(finding('view-model-bundle-access', 'review', `${viewModelName} appears to store Bundle directly. Prefer an adjacent typed presentation value such as AppInformation so tests inject explicit immutable metadata.`, viewModelFile, lineOf(viewModel, member.index)));
+      }
       if (!serviceTypeSuffix.test(member.type)) continue;
       findings.push(finding('view-model-non-feature-dependency', 'review', `${viewModelName} appears to store ${member.type} directly. Verify that the ViewModel calls a Feature and that the Feature owns the service dependency.`, viewModelFile, lineOf(viewModel, member.index)));
     }

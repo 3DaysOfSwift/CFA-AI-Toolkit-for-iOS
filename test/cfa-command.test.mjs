@@ -44,6 +44,31 @@ test('doctor reports an installed skill missing its specification', (t) => {
   assert.doesNotMatch(result.stdout, /PASS CFA skills are installed/);
 });
 
+test('doctor reports a mandatory shared reference missing from any installed skill', (t) => {
+  const { directory, command } = installedCommand(t);
+  const reference = 'swift-code-quality/references/project-workflow.md';
+  fs.unlinkSync(path.join(directory, 'customer/.agents/skills', reference));
+
+  const result = spawnSync(command, ['doctor', directory], { encoding: 'utf8' });
+
+  assert.equal(result.status, 1, result.stderr);
+  assert.ok(result.stdout.includes(`WARN missing CFA reference: ${reference}`));
+  assert.doesNotMatch(result.stdout, /PASS CFA skills are installed/);
+});
+
+test('doctor rejects mixed generations of bundled CFA references', (t) => {
+  const { directory, command } = installedCommand(t);
+  const reference = 'references/spec/rules/cfa-flow-01.md';
+  const stale = path.join(directory, 'customer/.agents/skills/cfa-feature-work', reference);
+  fs.appendFileSync(stale, '\nStale local rule copy.\n');
+
+  const result = spawnSync(command, ['doctor', directory], { encoding: 'utf8' });
+
+  assert.equal(result.status, 1, result.stderr);
+  assert.ok(result.stdout.includes(`WARN inconsistent CFA reference copies: ${reference}`));
+  assert.doesNotMatch(result.stdout, /PASS CFA skills are installed/);
+});
+
 test('doctor identifies a missing review skill entry and a directory masquerading as one', (t) => {
   const { directory, command } = installedCommand(t);
   const skills = path.join(directory, 'customer/.agents/skills');
@@ -280,7 +305,7 @@ test('installed guidance predating the isolation rule is identified and preserve
   const enabled = spawnSync(command, ['enable-project', directory], { encoding: 'utf8' });
   assert.equal(enabled.status, 0, enabled.stderr);
   const current = fs.readFileSync(agents, 'utf8');
-  const previous = current.replace(/- Keep Features explicitly on MainActor\.[\s\S]*?(?=- SwiftDataManager)/, '');
+  const previous = current.replace(/- Keep ViewModels and Features explicitly on MainActor\.[\s\S]*?(?=- SwiftDataManager)/, '');
   assert.notEqual(previous, current);
   fs.writeFileSync(agents, previous);
 
@@ -288,6 +313,23 @@ test('installed guidance predating the isolation rule is identified and preserve
     const result = spawnSync(command, [action, directory], { encoding: 'utf8' });
     assert.equal(result.status, 0, result.stderr);
     assert.match(result.stdout, /differs from the installed toolkit/);
+  }
+  assert.equal(fs.readFileSync(agents, 'utf8'), previous);
+});
+
+test('both guidance commands identify Feature-only MainActor guidance', t => {
+  const { directory, command } = installedCommand(t);
+  const agents = path.join(directory, 'AGENTS.md');
+  assert.equal(spawnSync(command, ['enable-project', directory]).status, 0);
+  const current = fs.readFileSync(agents, 'utf8');
+  const previous = current.replace('Keep ViewModels and Features explicitly on MainActor.', 'Keep Features explicitly on MainActor.');
+  assert.notEqual(previous, current);
+  fs.writeFileSync(agents, previous);
+
+  for (const action of ['doctor', 'enable-project']) {
+    const result = spawnSync(command, [action, directory], { encoding: 'utf8' });
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /isolation guidance.*Keep ViewModels and Features explicitly on MainActor/);
   }
   assert.equal(fs.readFileSync(agents, 'utf8'), previous);
 });

@@ -1,0 +1,66 @@
+import Foundation
+import Testing
+
+@testable import HabitTrackerPro
+
+@Suite("AppModel composition")
+@MainActor
+struct AppModelTests {
+    @Test("Releasing an isolated AppModel cancels its transaction listener", .timeLimit(.minutes(1)))
+    func releasingModelCancelsListener() async throws {
+        let suiteName = "HabitTrackerPro.ListenerTests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let store = TestPurchaseStore()
+        let termination = AsyncStream<Bool>.makeStream()
+        store.onUpdateTermination = { reason in
+            termination.continuation.yield(reason == .cancelled)
+            termination.continuation.finish()
+        }
+        let habits = HabitsFeature(repository: InMemoryHabitsRepository())
+        var appModel: AppModel? = AppModel(
+            todayFeature: TodayFeature(habitsFeature: habits), habitsFeature: habits,
+            dayStreakFeature: DayStreakFeature(habitsFeature: habits),
+            settingsFeature: SettingsFeature(defaults: defaults),
+            purchasesFeature: PurchasesFeature(store: store),
+            trendsFeature: TrendsFeature(habitsFeature: habits)
+        )
+        appModel?.applicationDidFinishLaunching()
+        #expect(store.updateSubscriptionCount == 1)
+        appModel = nil
+        var iterator = termination.stream.makeAsyncIterator()
+        #expect(await iterator.next() == true)
+    }
+
+    @Test("Five tab Features use one authoritative habit collection")
+    func tabFeaturesShareHabits() async throws {
+        let suiteName = "HabitTrackerPro.AppModelTests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let date = Date(timeIntervalSince1970: 1_700_000_000)
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+        let habitsFeature = HabitsFeature(repository: InMemoryHabitsRepository(), calendar: calendar, currentDate: { date })
+        let todayFeature = TodayFeature(habitsFeature: habitsFeature)
+        let dayStreakFeature = DayStreakFeature(habitsFeature: habitsFeature, calendar: calendar, currentDate: { date })
+        let settingsFeature = SettingsFeature(defaults: defaults)
+        let purchasesFeature = PurchasesFeature(store: TestPurchaseStore())
+        let trendsFeature = TrendsFeature(habitsFeature: habitsFeature, calendar: calendar, currentDate: { date })
+        let appModel = AppModel(todayFeature: todayFeature, habitsFeature: habitsFeature,
+                                dayStreakFeature: dayStreakFeature, settingsFeature: settingsFeature,
+                                purchasesFeature: purchasesFeature, trendsFeature: trendsFeature)
+
+        #expect(appModel.todayFeature === todayFeature)
+        #expect(appModel.habitsFeature === habitsFeature)
+        #expect(appModel.dayStreakFeature === dayStreakFeature)
+        #expect(appModel.settingsFeature === settingsFeature)
+        #expect(appModel.trendsFeature === trendsFeature)
+        #expect(appModel.purchasesFeature === purchasesFeature)
+        try await appModel.habitsFeature.addHabit(name: "Read", tracking: .completion, unit: "", dailyTarget: nil)
+        let habit = try #require(appModel.todayFeature.habits.first)
+        try await appModel.todayFeature.recordToday(habitID: habit.id, value: 1)
+        #expect(appModel.habitsFeature.habits.first?.value(on: date, calendar: calendar) == 1)
+        #expect(appModel.todayFeature.completedHabitCount == 1)
+        #expect(appModel.dayStreakFeature.summaries.first?.currentStreak == 1)
+    }
+}

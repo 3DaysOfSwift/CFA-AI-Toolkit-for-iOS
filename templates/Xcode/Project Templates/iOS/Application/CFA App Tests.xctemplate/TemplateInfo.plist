@@ -1,91 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-	<key>Kind</key>
-	<string>Xcode.Xcode3.ProjectTemplateUnitKind</string>
-	<key>Identifier</key>
-	<string>com.3daysofswift.cfa.unit-tests</string>
-	<key>Concrete</key>
-	<false/>
-	<key>Ancestors</key>
-	<array>
-		<string>com.apple.dt.unit.unitTestBundleBase.app.SwiftUI</string>
-		<string>com.apple.dt.unit.multiPlatform.base</string>
-	</array>
-	<key>Nodes</key>
-	<array>
-		<string>AppModelTests/AppModelTests.swift</string>
-		<string>Support/TestDependencies.swift</string>
-		<string>FeatureTests/GitReposFeatureTests.swift</string>
-		<string>FeatureTests/SettingsFeatureTests.swift</string>
-		<string>ViewModelTests/GitReposViewModelTests.swift</string>
-		<string>ViewModelTests/SettingsViewModelTests.swift</string>
-		<string>ViewModelTests/RootTabViewModelTests.swift</string>
-		<string>NetworkingTests/NetworkingManagerTests.swift</string>
-	</array>
-	<key>Definitions</key>
-	<dict>
-		<key>AppModelTests/AppModelTests.swift</key>
-		<dict>
-			<key>Path</key>
-			<string>Source/AppModelTests/AppModelTests.swift</string>
-		</dict>
-		<key>Support/TestDependencies.swift</key>
-		<dict>
-			<key>Path</key>
-			<string>Source/Support/TestDependencies.swift</string>
-		</dict>
-		<key>FeatureTests/GitReposFeatureTests.swift</key>
-		<dict>
-			<key>Path</key>
-			<string>Source/FeatureTests/GitReposFeatureTests.swift</string>
-		</dict>
-		<key>FeatureTests/SettingsFeatureTests.swift</key>
-		<dict>
-			<key>Path</key>
-			<string>Source/FeatureTests/SettingsFeatureTests.swift</string>
-		</dict>
-		<key>ViewModelTests/GitReposViewModelTests.swift</key>
-		<dict>
-			<key>Path</key>
-			<string>Source/ViewModelTests/GitReposViewModelTests.swift</string>
-		</dict>
-		<key>ViewModelTests/SettingsViewModelTests.swift</key>
-		<dict>
-			<key>Path</key>
-			<string>Source/ViewModelTests/SettingsViewModelTests.swift</string>
-		</dict>
-		<key>ViewModelTests/RootTabViewModelTests.swift</key>
-		<dict>
-			<key>Path</key>
-			<string>Source/ViewModelTests/RootTabViewModelTests.swift</string>
-		</dict>
-		<key>NetworkingTests/NetworkingManagerTests.swift</key>
-		<dict>
-			<key>Path</key>
-			<string>Source/NetworkingTests/NetworkingManagerTests.swift</string>
-		</dict>
-	</dict>
-	<key>Targets</key>
-	<array>
-		<dict>
-			<key>TargetIdentifier</key>
-			<string>com.apple.dt.applicationUnitTestBundleTarget</string>
-			<key>TargetIdentifierToBeTested</key>
-			<string>com.apple.dt.cocoaTouchApplicationTarget</string>
-			<key>SharedSettings</key>
-			<dict>
-				<key>SWIFT_VERSION</key>
-				<string>6.0</string>
-				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
-				<string>17.0</string>
-				<key>SWIFT_STRICT_CONCURRENCY</key>
-				<string>complete</string>
-				<key>PRODUCT_BUNDLE_IDENTIFIER</key>
-				<string>___VARIABLE_bundleIdentifierPrefix___.___PROJECTNAME:identifier___.___PACKAGENAME:identifier___</string>
-			</dict>
-		</dict>
-	</array>
-</dict>
-</plist>
+<plist version="1.0"><dict>
+<key>Ancestors</key><array><string>com.apple.dt.unit.cocoaTouchUnitTestBundle</string></array>
+<key>Concrete</key><true/><key>Identifier</key><string>com.3daysofswift.cfa.iosAppTests</string><key>Kind</key><string>Xcode.Xcode3.ProjectTemplateUnitKind</string>
+<key>Definitions</key><dict>
+<key>View model tests/ContentViewModelTests.swift</key><dict><key>Path</key><string>Source/View model tests/ContentViewModelTests.swift</string><key>TargetIdentifiers</key><array><string>com.apple.dt.unitTestTarget</string></array></dict>
+<key>AppModel tests/AppModelTests.swift</key><dict><key>Path</key><string>Source/AppModel tests/AppModelTests.swift</string><key>TargetIdentifiers</key><array><string>com.apple.dt.unitTestTarget</string></array></dict>
+</dict></dict></plist>
