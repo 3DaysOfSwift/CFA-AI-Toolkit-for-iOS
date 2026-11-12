@@ -8,6 +8,22 @@ import { execFileSync, spawnSync } from 'node:child_process';
 const root = path.resolve(import.meta.dirname, '..');
 const names = ['CFA App', 'Habit Tracker', 'Day Streak'];
 
+test('headless project creator retargets an Xcode project with strict concurrency', t => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'cfa-created-project-'));
+  const output = path.join(directory, 'ReadingList');
+  t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const result = spawnSync('node', ['scripts/create-cfa-project.mjs', '--name', 'ReadingList', '--out', output], {
+    cwd: root,
+    encoding: 'utf8'
+  });
+  assert.equal(result.status, 0, result.stderr);
+  const project = fs.readFileSync(path.join(output, 'ReadingList.xcodeproj', 'project.pbxproj'), 'utf8');
+  assert.match(project, /PRODUCT_BUNDLE_IDENTIFIER = com\.3DaysOfSwiftConcurrency\.ReadingList;/);
+  assert.match(project, /PRODUCT_BUNDLE_IDENTIFIER = com\.3DaysOfSwiftConcurrency\.ReadingList\.ReadingListTests;/);
+  assert.match(project, /SWIFT_STRICT_CONCURRENCY = complete;/);
+  assert.doesNotMatch(project, /TimesThirty/);
+});
+
 test('starter projects and test templates use the canonical CFA test groups', () => {
   const starterTestRoots = [
     'starter-apps/Habit Tracker/HabitTrackerTemplateTests',
