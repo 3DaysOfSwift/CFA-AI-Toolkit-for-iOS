@@ -43,6 +43,7 @@ export function createGitReposStarter() {
   copy(path.join(template, 'CFA App.xctemplate', 'Source', 'Assets.xcassets'), path.join(output, projectName, 'Assets.xcassets'));
   copy(path.join(template, 'CFA App Tests.xctemplate', 'Source'), path.join(output, `${projectName}Tests`));
   renamePaths(output, 'TimesThirty', projectName);
+  renamePaths(output, '___PACKAGENAME:identifier___', projectName);
   replaceProjectNames(output);
   fs.writeFileSync(path.join(output, 'README.md'), `# Git Repos Starter\n\nAn optional CFA example for remote collections, cache restoration, shared refresh and list/detail presentation. It is not the general CFA App foundation.\n`);
   return output;
